@@ -2416,7 +2416,8 @@ namespace Gekko
         {
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
-                foreach (string ext in Globals.datopgek_otherTypes2)
+                List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
+                foreach (string ext in datopgek_otherTypes2)
                 {
                     if (G.Equal(file.Extension, "." + ext))
                     {

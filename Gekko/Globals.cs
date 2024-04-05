@@ -63,25 +63,8 @@ namespace Gekko
         public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;
         public static bool collapseFlexOverride = false; //must always be false
 
-        // -------------------------------------------------
-        // pink stuff start
-        // -------------------------------------------------        
-        //public static bool pink = false; //overall pink or not: pink2 and pink3 controls details.                        
-        public static List<string> datopgek_errors = null;
-        public static List<string> datopgek_banks = null;
-        public static List<string> datopgek_otherBanks = null;
-        public static List<string> datopgek_listfiles = null;
-        public static List<string> datopgek_sysCalls = null;
-        public static List<string> datopgek_otherTypes = new List<string>() { "tsd", "prn", "csv" };
-        public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
-        // ----- trace
-        //public static EDataTrace dataTrace = EDataTrace.None;
         public static DependencyTracking dependencyTracking = null;
-        // -------------------------------------------------
-        // pink stuff end. Use this to track down the pink stuff when it should be deleted.
-        // -------------------------------------------------     
-        // -------------------------------------------------     
-
+        
         public const string eqs1 = "------------- scalar -------------";
         public const string eqs2 = "<no raw eqs>";
         public const string eqs3 = "-------------- GAMS --------------";

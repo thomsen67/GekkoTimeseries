@@ -1710,21 +1710,8 @@ namespace Gekko
 
             Program.AbortingReset();
 
-            Globals.errorMemory = null;  //so that it is not recording all the time.   
-
-            if (Program.IsDependencyTracking())
-            {
-                Globals.dependencyTracking = new DependencyTracking();
-            }
-
-            if (Program.options.global_pink)
-            {
-                Globals.datopgek_errors = new List<string>();
-                Globals.datopgek_banks = new List<string>();            
-                Globals.datopgek_otherBanks = new List<string>();
-                Globals.datopgek_listfiles = new List<string>();            
-                Globals.datopgek_sysCalls = new List<string>();
-            }
+            Globals.errorMemory = null;  //so that it is not recording all the time.            
+            Globals.dependencyTracking = new DependencyTracking();            
 
             if (newUserInput)
             {
@@ -2165,7 +2152,7 @@ namespace Gekko
                 //}
 
                 List<string> traceList = null;
-                if (Program.IsDependencyTracking() && Globals.dependencyTracking != null)  //last condition should not be necessary
+                if (Globals.dependencyTracking.Count() > 0)
                 {
                     traceList = Globals.dependencyTracking.Get();
                     if (traceList.Count > 0)
@@ -2177,6 +2164,7 @@ namespace Gekko
                         tab.CurRow.Next();
                         int count = -1;
                         int sysCalls = 0;
+                        bool hasNonSys = false;
                         foreach (string s in traceList)
                         {
                             count++;
@@ -2188,21 +2176,25 @@ namespace Gekko
                                 count--;
                                 continue;
                             }
+                            hasNonSys = true;
                             tab.CurRow.SetText(1, ss[1]);
                             tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
                             tab.CurRow.SetText(3, ss[2]);
-                        }                        
+                        }
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.SetLeftBorder(1);
                         tab.CurRow.SetRightBorder(3);
-                        
+
                         int widthRemember = Program.options.print_width;
                         Program.options.print_width = int.MaxValue;
                         try
                         {
                             G.Writeln();
-                            List<string> ss = tab.Print();
-                            foreach (string s in ss) G.Writeln(s, Color.Gray);
+                            if (hasNonSys)
+                            {
+                                List<string> ss = tab.Print();
+                                foreach (string s in ss) G.Writeln(s, Color.Gray);
+                            }
                             if (sysCalls > 0) G.Writeln("SYS calls: total = " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
                             G.Writeln("Cf. menu 'Options' --> 'Program dependency tracking'", Color.Gray);
                         }

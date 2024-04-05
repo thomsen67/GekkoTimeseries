@@ -312,14 +312,158 @@ namespace Gekko
     public class DependencyTracking
     {        
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public void Add(int priority, string type, string fileName2)
+        public void Add(int priority, string type, string fileName3)
         {
-            string fileName = fileName2;
-            if (fileName != null) fileName = fileName.Trim();  //just in case
-            if (priority < 1 || priority > 9) new Error("Priority!");
-            string s = priority + "¤" + type + "¤" + fileName;
-            if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
+            string fileNameTrim = fileName3.Trim();
+
+            if (!G.NullOrBlanks(Program.options.global_fence_black_folders) || !G.NullOrBlanks(Program.options.global_fence_white_folders))
+            {
+                List<string> black = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
+                List<string> white = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+                bool ok = true;
+                if (black.Count > 0 && white.Count > 0)
+                {
+                    if (!Match(black, fileNameTrim) && Match(white, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else if (black.Count > 0 && white.Count == 0)
+                {
+                    if (!Match(black, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else if (black.Count == 0 && white.Count > 0)
+                {
+                    if (Match(white, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else
+                {
+                    //do nothing, no filters.
+                }
+                if (!ok)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("The file path '" + fileNameTrim + "' is illegal due to the 'option global fence ...' settings.");
+                        txt.MainNewLineTight();
+                        if (black.Count() > 0)
+                        {
+                            txt.MainAdd("--- Blacklist: ---");
+                            txt.MainNewLineTight();
+                            foreach (string line in black)
+                            {
+                                txt.MainAdd(s);
+                                txt.MainNewLineTight();
+                            }
+                        }
+                        if (white.Count() > 0)
+                        {
+                            txt.MainAdd("--- Whitelist: ---");
+                            txt.MainNewLineTight();
+                            foreach (string line in white)
+                            {
+                                txt.MainAdd(s);
+                                txt.MainNewLineTight();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (G.Equal(Program.options.global_dependency_tracking, "simple"))
+            {
+                string fileName = fileNameTrim;
+                if (fileName != null) fileName = fileName.Trim();  //just in case
+
+                if (G.Contains(fileName, "testing"))
+                {
+                    new Error("The file '" + fileName + "' contains the string 'testing'!!");
+                }
+
+                if (priority < 1 || priority > 9) new Error("Priority!");
+                string s = priority + "¤" + type + "¤" + fileName;
+                if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
+            }
         }
+
+        /// <summary>
+        /// Looks for the string input inside the elements. Special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1a\bank2".
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static bool Match(List<string> elements, string input)
+        {
+            bool match = false;
+            foreach (string s in elements)
+            {
+                int i = input.IndexOf(s);
+                if (i >= 0)
+                {
+                    match = true;
+                    int i1 = i;
+                    int i2 = i + s.Length;
+                    if (i1 > 0 && G.IsLetterOrDigitOrUnderscore(input[i1 - 1])) match = false;
+                    if (i2 < input.Length - 1 && G.IsLetterOrDigitOrUnderscore(input[i2 + 1])) match = false;
+                    if (match) break;
+                }
+            }
+            return match;
+        }
+
+        /// <summary>
+        /// Splits "c:\a\b; c:\f\g" into ["c:\a\b", "c:\f\g"]. And tests for blanks etc. Also frontslashes are converted into backslashes.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static List<string> SplitIntoFoldersBySemicolon(string input)
+        {
+            List<string> m = new List<string>();            
+            if (!G.NullOrBlanks(input))
+            {
+                foreach (string s in input.Split(';'))
+                {
+                    string s2 = s.Replace("/", "\\").Trim();
+                    if (s2.StartsWith("\\")) s2 = s2.Substring(1);
+                    if (s2.EndsWith("\\")) s2 = s2.Substring(0, s2.Length - 1);
+                    if (!G.NullOrBlanks(s2))
+                    {
+                        //Something like c:\my path\my file.xlsx is legal.
+                        if (s2.Contains(": ") || s2.Contains(" :") || s2.Contains("\\ ") || s2.Contains(" \\") || s2.Contains(". ") || s2.Contains(" ."))
+                        {
+                            new Error("The string '" + s2 + "' in 'option global fence ...' seems to contain invalid blanks.");
+                        }
+                        //it may look like "abc\def\ghi" now.
+                        m.Add(s2);
+                    }
+                }
+            }
+            return m;
+        }
+
+        public int Count()
+        {
+            return this.storage.Count;
+        }
+
         public List<string> Get()
         {
             List<string> x = this.storage.Keys.ToList();
@@ -4762,12 +4906,6 @@ namespace Gekko
 
                 string originalFileName = file;
 
-                if (Program.options.global_pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
-                {
-                    Globals.datopgek_errors.Add("OPEN/READ/IMPORT of this file: " + originalFileName);
-                    DatopgekError();
-                }
-
                 bool isGbk = true;
                 //bool isProtobuf = false;
                 string extension = "" + Globals.extensionDatabank + "";
@@ -4869,7 +5007,7 @@ namespace Gekko
                 FindFileHelper ffh = ReadHelper(file, ref cancel, extension, p);
                 file = ffh.realPathAndFileName;
 
-                if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
+                Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
 
                 if (cancel)
                 {
@@ -5915,13 +6053,7 @@ namespace Gekko
             FindFileHelper ffh = Program.FindFile(fileName, null, true, true, true, true, o.p);            
             fileName = ffh.realPathAndFileName;            
 
-            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
-            {
-                Globals.datopgek_errors.Add("SHEET<import> used this file: " + o.fileName);
-                DatopgekError();
-            }
-
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
+            Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
             
             TableLight inputTable = null;
             if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
@@ -16213,12 +16345,6 @@ namespace Gekko
             }
             if (cancel) return;
 
-            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
-            {
-                Globals.datopgek_errors.Add("Running this program file: " + fileName);
-                DatopgekError();
-            }            
-
             RunHelper(o, fileName);
         }
 
@@ -16408,7 +16534,7 @@ namespace Gekko
                 new Error("Could not find file: " + ffh.prettyPathAndFileName);
             }
 
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(3, "Run", ffh.prettyPathAndFileName);
+            Globals.dependencyTracking.Add(3, "Run", ffh.prettyPathAndFileName);
 
             Program.RunGekkoCommands("", fileName2, (int)o.opt_skip, o.p);
 
@@ -20345,7 +20471,7 @@ namespace Gekko
         /// <param name="mute"></param>
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Pipe", fileName);
+            Globals.dependencyTracking.Add(2, "Pipe", fileName);
             if (!mute && !Globals.pipe) G.Writeln2("Directing output to file: '" + fileName + "'");
             Globals.pipe = true;
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
@@ -20731,15 +20857,6 @@ namespace Gekko
                 }
             }
             return rv;
-        }
-
-        /// <summary>
-        /// If dependency tracking is activated.
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsDependencyTracking()
-        {
-            return G.Equal(Program.options.global_dependency_tracking, "simple");
         }
 
         /// <summary>
@@ -21849,7 +21966,7 @@ namespace Gekko
 
             file = G.AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             if (File.Exists(pathAndFilename))
             {
@@ -22355,28 +22472,6 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = G.StripQuotes(fileName);
 
-            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
-            {
-                Globals.datopgek_errors.Add("WRITE/EXPORT of this file: " + fileName);
-                DatopgekError();
-            }
-
-            if (Program.options.global_pink)
-            {
-                if (writeType == EDatabankWriteType.Csv || writeType == EDatabankWriteType.Prn || writeType == EDatabankWriteType.Tsd)
-                {
-                    if (fileName != null && (fileName.ToLower().Contains("g:\\datopgek3\\") || fileName.ToLower().Contains("g:/datopgek3/")))
-                    {
-                        string fileName7 = fileName;
-                        if (writeType == EDatabankWriteType.Csv && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".csv";
-                        else if (writeType == EDatabankWriteType.Prn && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".prn";
-                        else if (writeType == EDatabankWriteType.Tsd && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".tsd";
-                        string fileName77 = CreateFullPathAndFileName(fileName7);
-                        Globals.datopgek_otherBanks.Add(fileName77);
-                    }
-                }
-            }
-
             bool isCaps = true; if (G.Equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
@@ -22528,7 +22623,7 @@ namespace Gekko
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = G.AddExtension(fileName, "." + "gdx");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+                    Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
                     if (Program.options.gams_fast)
                     {
                         GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);
@@ -22551,7 +22646,7 @@ namespace Gekko
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = G.AddExtension(fileName, "." + "arrow");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+                    Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
                     try
                     {
                         Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);
@@ -22608,11 +22703,6 @@ namespace Gekko
             }
         }
 
-        public static void DatopgekError()
-        {
-            new Error("Illegal access to g:\\datopgek\\ folder. " + Stringlist.GetListWithCommas(Globals.datopgek_errors));
-        }
-
         /// <summary>
         /// Helper for WRITE/EXPORT
         /// </summary>
@@ -22667,7 +22757,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", fullFileName);
+            Globals.dependencyTracking.Add(2, "Write", fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -22716,7 +22806,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", fullFileName);
+            Globals.dependencyTracking.Add(2, "Write", fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -22907,15 +22997,7 @@ namespace Gekko
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
-            if (Program.options.global_pink)
-            {
-                if (pathAndFileNameResultingFile != null && (pathAndFileNameResultingFile.ToLower().Contains("g:\\datopgek3\\") || pathAndFileNameResultingFile.ToLower().Contains("g:/datopgek3/")))
-                {
-                    Globals.datopgek_banks.Add(pathAndFileNameResultingFile);
-                }
-            }
-
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFileNameResultingFile);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFileNameResultingFile);
 
             int count = 0;
 
@@ -23144,7 +23226,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -23190,7 +23272,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -23951,7 +24033,7 @@ namespace Gekko
             }
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             int counter = 0;
             if (true)
@@ -24295,7 +24377,7 @@ namespace Gekko
             filename = G.AddExtension(filename, ".dat");
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -24397,7 +24479,7 @@ namespace Gekko
             filename = filename;
             filename = G.AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -24646,15 +24728,23 @@ namespace Gekko
             Globals.modelFileName = "";
             GuiSetModelName();
 
+            // ------------------------------------------------------
             //Remember some options, see #er89ljkhaf87
-            string folder_working = Program.options.folder_working;
-            bool global_pink = Program.options.global_pink;
-            string global_dependency_tracking = Program.options.global_dependency_tracking;
+            string folder_working_REMEMBER = Program.options.folder_working;
+            bool global_pink_REMEMBER = Program.options.global_pink;
+            string global_dependency_tracking_REMEMBER = Program.options.global_dependency_tracking;
+            string global_fence_black_folders_REMEMBER = Program.options.global_fence_black_folders;
+            string global_fence_white_folders_REMEMBER = Program.options.global_fence_white_folders;
+            // ------------------------------------------------------
             Program.options = new Options();  //resetting these
+            // ------------------------------------------------------
             //Restoring some options
-            if (!G.NullOrBlanks(folder_working)) Program.options.folder_working = folder_working;
-            Program.options.global_pink = global_pink;
-            Program.options.global_dependency_tracking = global_dependency_tracking;
+            if (!G.NullOrBlanks(folder_working_REMEMBER)) Program.options.folder_working = folder_working_REMEMBER;
+            Program.options.global_pink = global_pink_REMEMBER;
+            Program.options.global_dependency_tracking = global_dependency_tracking_REMEMBER;
+            Program.options.global_fence_black_folders = global_fence_black_folders_REMEMBER;
+            Program.options.global_fence_white_folders = global_fence_white_folders_REMEMBER;
+            // ------------------------------------------------------
 
             CrossThreadStuff.Mode();  //to show default color
 
@@ -24904,7 +24994,7 @@ namespace Gekko
             int n = 0;
             if (!skipWrite)
             {
-                if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", removed.FileNameWithPath);
+                Globals.dependencyTracking.Add(2, "Write", removed.FileNameWithPath);
                 n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
             }
         }
@@ -31225,7 +31315,7 @@ namespace Gekko
                 }
                 fileNameWithPathOriginal = fileNameWithPath;
 
-                if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", fileNameWithPathOriginal);
+                Globals.dependencyTracking.Add(2, "Write", fileNameWithPathOriginal);
 
                 EAppend append = EAppend.No;
                 if (oPrt != null && oPrt.opt_append != null)
@@ -31868,7 +31958,7 @@ namespace Gekko
                 }
 
                 fileNameTempLocalFile = fileNameOriginalFile;  //3a is original file, 4 may become a local copy below
-                if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", fileNameOriginalFile);
+                Globals.dependencyTracking.Add(2, "Write", fileNameOriginalFile);
 
                 if (copyLocal)
                 {

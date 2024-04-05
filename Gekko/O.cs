@@ -931,7 +931,7 @@ namespace Gekko
                     string file3 = Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
                     if (!G.Equal(file, file3))
                     {
-                        new Error("Options that are 'global' (that is, options with the pattern 'option global ... = ... ;') are only intended to be put inside a " + Globals.autoExecCmdFileName + " file in the same folder as the executing gekko.exe file. The gekko.exe file is placed in this folder: " + G.GetProgramDir() + ".");
+                        new Error("Options of the type 'option global ...' are only intended to be put inside a " + Globals.autoExecCmdFileName + " file in the same folder as the executing gekko.exe file. The gekko.exe file is placed in this folder: " + G.GetProgramDir() + ".");
                     }
                 }
             }
@@ -2615,19 +2615,14 @@ namespace Gekko
         private static List ReadListFile(string varname, P p)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            fileName = G.AddExtension(fileName, "." + "lst");
-            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
-            {
-                Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
-                Program.DatopgekError();
-            }            
+            fileName = G.AddExtension(fileName, "." + "lst");            
             List<string> folders = new List<string>();
             FindFileHelper ffh = Program.FindFile(fileName, folders, true, true, false, true, p);
             if (ffh.realPathAndFileName == null)
             {
                 new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
             }
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(1, "Read list", ffh.prettyPathAndFileName);
+            Globals.dependencyTracking.Add(1, "Read list", ffh.prettyPathAndFileName);
             List ml = GetRawListElements(ffh.realPathAndFileName);            
             return ml;
         }
@@ -3519,18 +3514,8 @@ namespace Gekko
             //List<string> temp = Stringlist.GetListOfStringsFromList(rhs);
 
             file = G.AddExtension(file, "." + "lst");
-            string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
-
-            if (Program.options.global_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
-            {
-                Globals.datopgek_errors.Add("Writing this listfile: " + pathAndFilename);
-                Program.DatopgekError();
-            }
-            if (Program.options.global_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek3\\") || pathAndFilename.ToLower().Contains("g:/datopgek3/")))
-            {
-                Globals.datopgek_listfiles.Add(pathAndFilename);
-            }
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write list", pathAndFilename);
+            string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);            
+            Globals.dependencyTracking.Add(2, "Write list", pathAndFilename);
 
             List rhs_list = rhs as List;
             if (rhs_list == null)
@@ -10821,12 +10806,7 @@ namespace Gekko
                 {
                     string ss = O.ConvertToString(s);
 
-                    if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Sys", ss); //0 means do not print, but can be used for fencing...!
-
-                    if (Program.options.global_pink)
-                    {
-                        Globals.datopgek_sysCalls.Add(ss);
-                    }
+                    Globals.dependencyTracking.Add(2, "Sys", ss); //0 means do not print, but can be used for fencing...!
 
                     Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"), fileName);                    
                 }

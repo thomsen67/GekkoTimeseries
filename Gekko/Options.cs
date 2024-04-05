@@ -99,8 +99,10 @@ namespace Gekko
         // --- the following can only be called from gekko.ini next to gekko.exe
         // ----    REMEMBER
         // ----    REMEMBER
-        // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
+        // --- !!! REMEMBER --> to implement these 'global' options here (3 places in all): #er89ljkhaf87
         public string global_dependency_tracking = "none";  // none | simple
+        public string global_fence_white_folders = "";  //delimit with semicolon
+        public string global_fence_black_folders = "";  //delimit with semicolon
         public bool global_pink = false;
         // ----    REMEMBER
         // ----    REMEMBER
@@ -381,6 +383,8 @@ namespace Gekko
             //These options must start with 'global'
             // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
             Add("GLOBAL DEPENDENCY TRACKING", Globals.xnameOrString, "none", "simple");
+            Add("GLOBAL FENCE BLACK FOLDERS", Globals.xnameOrString);
+            Add("GLOBAL FENCE WHITE FOLDERS", Globals.xnameOrString);
             Add("GLOBAL PINK", Globals.xbool);
 
             //========================================================================================================
