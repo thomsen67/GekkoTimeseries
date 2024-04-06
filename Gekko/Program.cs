@@ -312,10 +312,15 @@ namespace Gekko
     public class DependencyTracking
     {        
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private List<string> blacklist = null;
-        private List<string> whitelist = null;
+        private List<string> blacklist = new List<string>();
+        private List<string> whitelist = new List<string>();
+        
+        private bool IsActive()
+        {
+            return this.blacklist.Count + this.whitelist.Count > 0;
+        }
 
-        public DependencyTracking()
+        public void Init()
         {
             this.blacklist = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
             this.whitelist = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
@@ -323,86 +328,95 @@ namespace Gekko
 
         public void Add(int priority, string type, string fileName3)
         {
-            string fileNameTrim = fileName3.Trim();
+            if (this.IsActive())  //priority 9 is not fenced-tested (SYS calls)
+            {
+                //First test fencing black/whitelists if active
 
-            if (!G.NullOrBlanks(Program.options.global_fence_black_folders) || !G.NullOrBlanks(Program.options.global_fence_white_folders))
-            {                
                 bool ok = true;
-                if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
+                string fileNameTrim = fileName3.Trim();
+
+                if (priority == Globals.dependencyTrackingSysNumber)
                 {
-                    if (!Match(this.blacklist, fileNameTrim) && Match(this.whitelist, fileNameTrim))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
-                    }
-                }
-                else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
-                {
-                    if (!Match(this.blacklist, fileNameTrim))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
-                    }
-                }
-                else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
-                {
-                    if (Match(this.whitelist, fileNameTrim))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
-                    }
+                    //SYS calls. These are checked for blacklist only
+                    //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
+                    if (Match(this.blacklist, fileNameTrim)) ok = false;
                 }
                 else
-                {
-                    //do nothing, no filters.
+                {                    
+                    if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
+                    {
+                        if (!Match(this.blacklist, fileNameTrim) && Match(this.whitelist, fileNameTrim))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
+                    {
+                        if (!Match(this.blacklist, fileNameTrim))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
+                    {
+                        if (Match(this.whitelist, fileNameTrim))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else
+                    {
+                        //do nothing, no filters.
+                    }                    
                 }
                 if (!ok)
                 {
                     using (Error txt = new Error())
                     {
-                        txt.MainAdd("The file path '" + fileNameTrim + "' is illegal due to the 'option global fence ...' settings.");
+                        if (priority == Globals.dependencyTrackingSysNumber) txt.MainAdd("Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
+                        else txt.MainAdd("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
                         txt.MainNewLineTight();
                         if (this.blacklist.Count() > 0)
                         {
-                            txt.MainAdd("--- Blacklist: ---"); txt.MainNewLineTight();
-                            foreach (string line in this.blacklist)
+                            txt.MainAdd("+++ Blacklist:");
+                            foreach (string s in this.blacklist)
                             {
-                                txt.MainAdd(line); txt.MainNewLineTight();
+                                txt.MainAdd(s + ";");
                             }
                         }
-                        if (this.whitelist.Count() > 0)
+                        if (this.whitelist.Count() > 0 && priority != Globals.dependencyTrackingSysNumber)
                         {
-                            txt.MainAdd("--- Whitelist: ---"); txt.MainNewLineTight();
-                            foreach (string line in this.whitelist)
+                            if (this.blacklist.Count > 0 && this.whitelist.Count > 0) txt.MainNewLineTight();
+                            txt.MainAdd("+++ Whitelist:");
+                            foreach (string s in this.whitelist)
                             {
-                                txt.MainAdd(line); txt.MainNewLineTight();
+                                txt.MainAdd(s + ";");
                             }
                         }
+                        txt.MainNewLineTight();
+                        txt.MainAdd("You may change the fencing in the 'global' " + Globals.autoExecCmdFileName + " file in the folder: " + G.GetProgramDir() + ". After that, you need to close and restart the Gekko program.");
                     }
                 }
             }
 
+            //Put into tracking if active
             if (G.Equal(Program.options.global_dependency_tracking, "simple"))
             {
-                string fileName = fileNameTrim;
-                if (fileName != null) fileName = fileName.Trim();  //just in case
-
-                if (G.Contains(fileName, "testing"))
-                {
-                    new Error("The file '" + fileName + "' contains the string 'testing'!!");
-                }
-
+                string fileNameTrim = fileName3.Trim();
                 if (priority < 1 || priority > 9) new Error("Priority!");
-                string s = priority + "¤" + type + "¤" + fileName;
+                string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
             }
         }
@@ -414,22 +428,21 @@ namespace Gekko
         /// <param name="input"></param>
         /// <returns></returns>
         private static bool Match(List<string> elements, string input)
-        {
-            bool match = false;
+        {            
             foreach (string s in elements)
-            {
-                int i = input.IndexOf(s);
-                if (i >= 0)
+            {                
+                List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
+                foreach (int i in allIndexOf)
                 {
-                    match = true;
+                    bool match = true; //seems to be a match, but it may be falsified
                     int i1 = i;
                     int i2 = i + s.Length;
                     if (i1 > 0 && G.IsLetterOrDigitOrUnderscore(input[i1 - 1])) match = false;
-                    if (i2 < input.Length - 1 && G.IsLetterOrDigitOrUnderscore(input[i2 + 1])) match = false;
-                    if (match) break;
+                    if (i2 < input.Length && G.IsLetterOrDigitOrUnderscore(input[i2])) match = false;
+                    if (match) return true;
                 }
             }
-            return match;
+            return false;
         }
 
         /// <summary>
@@ -437,25 +450,35 @@ namespace Gekko
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public List<string> SplitIntoFoldersBySemicolon(string input)
+        private List<string> SplitIntoFoldersBySemicolon(string input)
         {
             List<string> m = new List<string>();            
             if (!G.NullOrBlanks(input))
             {
                 foreach (string s in input.Split(';'))
                 {
-                    string s2 = s.Replace("/", "\\").Trim();
-                    if (s2.StartsWith("\\")) s2 = s2.Substring(1);
-                    if (s2.EndsWith("\\")) s2 = s2.Substring(0, s2.Length - 1);
-                    if (!G.NullOrBlanks(s2))
+                    string s2Trim = s.Replace("/", "\\").Trim();
+                    string s_orig = s2Trim;
+                    
+                    if (!s2Trim.StartsWith("\\\\localhost\\", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //Beware that "\\localhost\g$\data\sub1\sub2" would be legal
+                        if (s2Trim.StartsWith("\\")) s2Trim = s2Trim.Substring(1);
+                    }
+                    if (s2Trim.EndsWith("\\")) s2Trim = s2Trim.Substring(0, s2Trim.Length - 1);
+                    if (!G.NullOrBlanks(s2Trim))
                     {
                         //Something like c:\my path\my file.xlsx is legal.
-                        if (s2.Contains(": ") || s2.Contains(" :") || s2.Contains("\\ ") || s2.Contains(" \\") || s2.Contains(". ") || s2.Contains(" ."))
+                        if (s2Trim.Contains(": ") || s2Trim.Contains(" :") || s2Trim.Contains("\\ ") || s2Trim.Contains(" \\") || s2Trim.Contains(". ") || s2Trim.Contains(" ."))
                         {
-                            new Error("The string '" + s2 + "' in 'option global fence ...' seems to contain invalid blanks.");
+                            new Error("The string '" + s_orig + "' in 'option global fence ...' seems to contain invalid blanks.");
                         }
-                        //it may look like "abc\def\ghi" now.
-                        m.Add(s2);
+                        if (s2Trim.StartsWith("\\") || s2Trim.EndsWith("\\") || s2Trim.Contains("\\\\"))
+                        {
+                            new Error("The string '" + s_orig + "' in 'option global fence ...' seems to contain double backslashes.");
+                        }
+                        //it may look like "abc\def\ghi" now, or "c:\abc\def\ghi"
+                        m.Add(s2Trim);
                     }
                 }
             }

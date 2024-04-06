@@ -63,8 +63,10 @@ namespace Gekko
         public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;
         public static bool collapseFlexOverride = false; //must always be false
 
-        public static DependencyTracking dependencyTracking = null;
-        
+        public static DependencyTracking dependencyTracking = new DependencyTracking();
+        public const int dependencyTrackingSysNumber = 9;
+
+
         public const string eqs1 = "------------- scalar -------------";
         public const string eqs2 = "<no raw eqs>";
         public const string eqs3 = "-------------- GAMS --------------";

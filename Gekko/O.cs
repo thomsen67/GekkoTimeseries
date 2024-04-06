@@ -1920,6 +1920,12 @@ namespace Gekko
                 Program.RunGekkoCommands("", fileName2, 0, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
+                try { Globals.dependencyTracking.Init(); }
+                catch
+                {
+                    new Error("Problematic ini file: '" + fileName2 + "'", false);
+                    throw;
+                }
             }
 
             List<string> folders = new List<string>();
@@ -10805,9 +10811,7 @@ namespace Gekko
                 else
                 {
                     string ss = O.ConvertToString(s);
-
-                    Globals.dependencyTracking.Add(2, "Sys", ss); //0 means do not print, but can be used for fencing...!
-
+                    Globals.dependencyTracking.Add(Globals.dependencyTrackingSysNumber, "Sys", ss); //9 means do not print, but can be used for fencing...!
                     Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"), fileName);                    
                 }
             }

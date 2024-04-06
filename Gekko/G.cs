@@ -2684,6 +2684,25 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Get all IndexOf() from a string, cf. https://stackoverflow.com/questions/15993357/how-to-get-all-indexof-instances-of-string-in-another-string-c-sharp. Can be empty, but will never contain an element = -1.
+        /// </summary>        
+        /// <param name="input"></param>
+        /// <param name="substring"></param>
+        /// <param name="comparisonType"></param>
+        /// <returns></returns>
+        public static List<int> AllIndexOf(string input, string substring, StringComparison comparisonType)
+        {
+            List<int> allIndexOf = new List<int>();
+            int index = input.IndexOf(substring, comparisonType);
+            while (index != -1)
+            {
+                allIndexOf.Add(index);
+                index = input.IndexOf(substring, index + 1, comparisonType);
+            }
+            return allIndexOf;
+        }
+
+        /// <summary>
         /// Normal letters + digigs + _
         /// </summary>
         /// <param name="c"></param>

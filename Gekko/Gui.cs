@@ -391,6 +391,8 @@ namespace Gekko
                     Globals.screenDpiZoomY = 150;
                 }
             }
+
+            //Globals.dependencyTracking = new DependencyTracking();
         }
 
         private void StartupExeAndIniStuff()
@@ -1711,8 +1713,8 @@ namespace Gekko
             Program.AbortingReset();
 
             Globals.errorMemory = null;  //so that it is not recording all the time.            
-            Globals.dependencyTracking = new DependencyTracking();
-
+            //Globals.dependencyTracking = new DependencyTracking();
+            
             if (newUserInput)
             {
                 Globals.tasks.Enqueue(gekkoCommands);
@@ -2170,7 +2172,7 @@ namespace Gekko
                             count++;
                             if (count > 0) tab.CurRow.Next();
                             string[] ss = s.Split('¤');
-                            if (G.Equal(ss[1], "Sys"))
+                            if (G.Equal(ss[0], Globals.dependencyTrackingSysNumber.ToString()))
                             {
                                 sysCalls++;
                                 count--;
@@ -2195,7 +2197,7 @@ namespace Gekko
                                 List<string> ss = tab.Print();
                                 foreach (string s in ss) G.Writeln(s, Color.Gray);
                             }
-                            if (sysCalls > 0) G.Writeln("SYS calls: total = " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
+                            if (sysCalls > 0) G.Writeln("Total number of SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
                             G.Writeln("Cf. menu 'Options' --> 'Program dependency tracking'", Color.Gray);
                         }
                         finally
