@@ -459,7 +459,7 @@ namespace Gekko
                 }
             }
             txt.MainNewLineTight();
-            txt.MainAdd("You may change fencing in the 'Gekko-level' " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After changing ', you need to close and relaunch Gekko.");
+            txt.MainAdd("You may change fencing in the " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After adjusting this "+ Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
         }
 
         /// <summary>

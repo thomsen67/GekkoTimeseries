@@ -182,6 +182,7 @@ namespace UnitTests
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
             Program.InitUfunctionsAndArithmeticsAndMore();
             Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
+            Globals.dependencyTracking = new DependencyTracking(); //empty always here
         }
 
         // Use ClassCleanup to run code after all tests in a class have run
@@ -10172,10 +10173,82 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("27/33/29.4 iterations"));
         }
 
+        [TestMethod]
+        public void _Test_Fence()
+        {
+            //We are cheating and changing the options directly!
+
+            Program.options.global_fence_black_folders = null;
+            Program.options.global_fence_white_folders = null;
+
+            try
+            {
+
+                // -----------------------------------------------------------------
+                //           Whitelist
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = Globals.ttPath2 + @"\regres\Databanks\temp";
+                Globals.dependencyTracking.InitFence();
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                string s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                // -----------------------------------------------------------------
+                //           Blacklist
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = Globals.ttPath2 + @"\regres\Databanks\temp";
+                Program.options.global_fence_white_folders = null;
+                Globals.dependencyTracking.InitFence();
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+            }
+            finally
+            {
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = null;
+            }
+        }
 
         [TestMethod]
         public void _Test_GekkoVersion()
         {                        
+            //Just a sanity check
             I("gekko version >= '" + Globals.gekkoVersion + "';");
             I("gekko version == '" + Globals.gekkoVersion + "';");
             I("gekko version <= '" + Globals.gekkoVersion + "';");

@@ -9308,7 +9308,7 @@ namespace Gekko
                 }
                 else new Error("Number of conditions.");
 
-                string details = "You are using an inadequate Gekko version " + Globals.gekkoVersion + ", and another (possibly newer) version is required in order to run the program. You may remove the 'gekko version' check to avoid this error, but beware that the version check may be there for a reason, and that your program may fail or produce wrong results if the check is ignored.";
+                string details = "You are using an inadequate Gekko version (cf. the Gekko menu 'Help' --> 'About...'), and another (possibly newer) version is required in order to run the program. You may remove the 'gekko version' check to avoid this error, but beware that the version check may be there for a reason, and that your program may fail or produce wrong results if the check is ignored.";
 
                 if (n == 1)
                 {
