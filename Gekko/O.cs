@@ -859,6 +859,23 @@ namespace Gekko
         public static void HandleOptions(string s, int isBlock, P p)
         {
             string s2 = s.Replace("Program.options.", "");
+                        
+            if (s2.ToLower().StartsWith("global_"))
+            {
+                if (p != null)
+                {
+                    string file = p.GetExecutingGcmFile(false);
+                    string file3 = Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
+                    if (!G.Equal(file, file3))
+                    {
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("Options of the type 'option global ...' are only intended to be put inside a " + Globals.autoExecCmdFileName + " file in the same folder as the executing gekko.exe file. The gekko.exe file is placed in this folder: " + G.GetProgramDir() + ".");
+                            if (G.Equal(s2, "global_dependency_tracking")) txt.MainAdd("However, regarding 'option dependency tracking' you may set this option manually in the Gekko main window menu: Options --> Program dependency tracking.");
+                        }
+                    }
+                }
+            }
 
             if (G.Equal(s2, "freq"))
             {
@@ -897,9 +914,9 @@ namespace Gekko
             {
                 new Note("Reorder: you must issue a MODEL statement afterwards, for this option to take effect. (In command files, place this option before any MODEL statements).");
             }
-            else if (G.Equal(s2, "global_pink"))
+            else if (G.Equal(s2, "global_color"))
             {
-                CrossThreadStuff.SetPink(); //er89ljkhaf87
+                CrossThreadStuff.SetColor(); //er89ljkhaf87
             }
             else if (G.Equal(s2, "global_dependency_tracking"))
             {
@@ -919,22 +936,7 @@ namespace Gekko
             else if (isBlock == 0 && G.Equal(s2, "timefilter_type"))  //TODO: only issue if really avg
             {
                 new Note("Timefilter type = 'avg' only works for PRT and MULPRT.");
-            }
-
-            // ----------------------------------------------
-            //Check this separately
-            if (s2.ToLower().StartsWith("global_"))
-            {
-                if (p != null)
-                {
-                    string file = p.GetExecutingGcmFile(false);
-                    string file3 = Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
-                    if (!G.Equal(file, file3))
-                    {
-                        new Error("Options of the type 'option global ...' are only intended to be put inside a " + Globals.autoExecCmdFileName + " file in the same folder as the executing gekko.exe file. The gekko.exe file is placed in this folder: " + G.GetProgramDir() + ".");
-                    }
-                }
-            }
+            }            
         }
 
         /// <summary>

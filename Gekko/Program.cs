@@ -24768,7 +24768,7 @@ namespace Gekko
             // ------------------------------------------------------
             //Remember some options, see #er89ljkhaf87
             string folder_working_REMEMBER = Program.options.folder_working;
-            bool global_pink_REMEMBER = Program.options.global_pink;
+            string global_color_REMEMBER = Program.options.global_color;
             string global_dependency_tracking_REMEMBER = Program.options.global_dependency_tracking;
             string global_fence_black_folders_REMEMBER = Program.options.global_fence_black_folders;
             string global_fence_white_folders_REMEMBER = Program.options.global_fence_white_folders;
@@ -24777,7 +24777,7 @@ namespace Gekko
             // ------------------------------------------------------
             //Restoring some options
             if (!G.NullOrBlanks(folder_working_REMEMBER)) Program.options.folder_working = folder_working_REMEMBER;
-            Program.options.global_pink = global_pink_REMEMBER;
+            Program.options.global_color = global_color_REMEMBER;
             Program.options.global_dependency_tracking = global_dependency_tracking_REMEMBER;
             Program.options.global_fence_black_folders = global_fence_black_folders_REMEMBER;
             Program.options.global_fence_white_folders = global_fence_white_folders_REMEMBER;
@@ -24890,6 +24890,14 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Whether "option global color" has a value (that is not white).
+        /// </summary>
+        /// <returns></returns>
+        public static bool GuiHasColor()
+        {
+            return !(G.NullOrBlanks(Program.options.global_color) || G.Equal(Program.options.global_color, "White"));
+        }
         public static void RemoteInit()
         {
             try

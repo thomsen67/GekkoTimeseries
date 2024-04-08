@@ -100,10 +100,10 @@ namespace Gekko
         // ----    REMEMBER
         // ----    REMEMBER
         // --- !!! REMEMBER --> to implement these 'global' options here (3 places in all): #er89ljkhaf87
-        public string global_dependency_tracking = "none";  // none | simple
+        public string global_dependency_tracking = "none";  // none | simple. If this is set in C# code, you must use SetDatatrace() afterwards to get it into drop-down.
         public string global_fence_black_folders = "";  //delimit with semicolon
         public string global_fence_white_folders = "";  //delimit with semicolon
-        public bool global_pink = false;
+        public string global_color = "";  //default: "White"
         // ----    REMEMBER
         // ----    REMEMBER
         // ----    REMEMBER
@@ -385,7 +385,7 @@ namespace Gekko
             Add("GLOBAL DEPENDENCY TRACKING", Globals.xnameOrString, "none", "simple");
             Add("GLOBAL FENCE BLACK FOLDERS", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS", Globals.xnameOrString);
-            Add("GLOBAL PINK", Globals.xbool);
+            Add("GLOBAL COLOR", Globals.xnameOrString);
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies

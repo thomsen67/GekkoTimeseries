@@ -193,13 +193,21 @@ namespace Gekko
             else
             {
                 Gui.gui.textBoxMainTabLower.ReadOnly = b;
-                if (!Program.options.global_pink)
+                if (Program.GuiHasColor())
                 {
-                    if (b) Gui.gui.textBoxMainTabLower.BackColor = Color.LightGray;
-                    else Gui.gui.textBoxMainTabLower.BackColor = Color.White;
+                    if (b)
+                    {
+                        Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.LightGray;
+                        Gui.gui.textBoxMainTabLower.BackColor = Color.LightGray;                        
+                    }
+                    else
+                    {
+                        //Gui.gui.textBoxMainTabLower.BackColor = Color.White;
+                        CrossThreadStuff.SetColor();
+                    }
                 }
             }
-        }
+        }        
 
         //weird delegate pattern, but it works!
         delegate void SetTabCallback(string text, bool refreshArrows);
@@ -261,7 +269,8 @@ namespace Gekko
                 }
                 else
                 {
-                    if (!Program.options.global_pink) Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+                    //Can we ever end here?
+                    if (!Program.GuiHasColor()) Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
                 }
 
             }
@@ -678,29 +687,42 @@ namespace Gekko
             }
         }
 
-        delegate void SetPinkCallback();
-        public static void SetPink()
+        delegate void SetColorCallback();
+        public static void SetColor()
         {
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new SetPinkCallback(SetPink));
+                Gui.gui.Invoke(new SetColorCallback(SetColor));
             }
             else
-            {
-                if (Program.options.global_pink)
+            {                
+                if (Program.GuiHasColor())
                 {
-                    Gui.gui.textBoxMainTabLower.BackColor = Color.MistyRose;
-                    Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.MistyRose;
-                    Program.options.global_dependency_tracking = "simple";
-                    SetDatatrace();
-                    new Writeln("Activated special DST databank version (pink version). This version is intended for work in the g:\\datopgek3\\ folder and will -- among other things -- make sure that files on g:\\datopgek\\ are not tampered with.");                    
+                    string colorTrim = Program.options.global_color.Trim();
+                    try
+                    {
+                        if (colorTrim.StartsWith("#"))
+                        {                            
+                            Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.ColorTranslator.FromHtml(colorTrim);
+                            Gui.gui.textBoxMainTabLower.Parent.BackColor = System.Drawing.ColorTranslator.FromHtml(colorTrim);
+                        }
+                        else
+                        {
+                            string colorTrim2 = G.FirstCharToUpper(colorTrim.ToLower());
+                            Gui.gui.textBoxMainTabLower.BackColor = Color.FromName(colorTrim2);
+                            Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.FromName(colorTrim2);
+                        }
+                    }
+                    catch
+                    {
+                        new Error("The color '" + Program.options.global_color + "' from 'option global color = ...' is unknown to .NET. Possible colors can be seen in the link: https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors");
+                    }                    
                 }
                 else
                 {
                     Gui.gui.textBoxMainTabLower.BackColor = Color.White;
                     Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.White;
-                    new Writeln("Deactivated special DST databank version.");
                 }
             }
         }

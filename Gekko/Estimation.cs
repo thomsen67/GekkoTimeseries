@@ -163,7 +163,6 @@ namespace Gekko
                 string s = null;
                 if (constant == 1) s = "(including constant) ";
                 new Error("There are " + m + " params " + s + "and " + k + " restrictions with only " + n + " observations");
-                //throw new GekkoException();
             }
 
             OLSRekurInfo rekurInfo = new OLSRekurInfo();
