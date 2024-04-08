@@ -102,7 +102,7 @@ namespace Gekko
         // --- !!! REMEMBER --> to implement these 'global' options here (3 places in all): #er89ljkhaf87
         public string global_dependency_tracking = "none";  // none | simple
         public string global_fence_black_folders = "";  //delimit with semicolon
-        public string global_fence_white_folders = "";  //delimit with semicolon        
+        public string global_fence_white_folders = "";  //delimit with semicolon
         public bool global_pink = false;
         // ----    REMEMBER
         // ----    REMEMBER

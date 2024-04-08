@@ -1103,6 +1103,19 @@ namespace Gekko
 
             if (!G.IsUnitTesting()) Globals.userSettings.WorkingFolder = folder;
 
+            if (false)
+            {
+                //This is probably too strict/annoying, for instance at Gekko startup
+                if (!Globals.dependencyTracking.CheckBlackAndWhitelist(false, folder.Trim()))
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("Due to fencing blacklist/whitelist, it is not legal to use '" + folder.Trim() + "' as working folder.");
+                        Globals.dependencyTracking.FencingError(txt, false);
+                    }
+                }
+            }
+
             Program.options.folder_working = folder;
             if (G.SetWorkingFolder(false))
             {
@@ -1112,7 +1125,6 @@ namespace Gekko
             {
                 G.Writeln();
                 G.WriteDirs("small", false);
-
                 if (!G.IsUnitTesting())
                 {
                     Globals.guiRecentFoldersCache[Program.options.folder_working] = Program.options.folder_working;
@@ -1121,7 +1133,6 @@ namespace Gekko
                 ChangeWorkingFolderNoteMessage();
                 Globals.remoteIsInvestigating = false;  //probably superfluous
                 Globals.remoteFileStamp = new DateTime(0l);  //just because we change working folder, an existing remote.gcm file in that folder should not be considered 'new' just because of that change.
-
                 Program.RemoteInit();
             }
         }

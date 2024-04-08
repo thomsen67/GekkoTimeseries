@@ -331,56 +331,9 @@ namespace Gekko
             if (this.IsActive())  //priority 9 is not fenced-tested (SYS calls)
             {
                 //First test fencing black/whitelists if active
-
-                bool ok = true;
+                
                 string fileNameTrim = fileName3.Trim();
-
-                if (priority == Globals.dependencyTrackingSysNumber)
-                {
-                    //SYS calls. These are checked for blacklist only
-                    //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
-                    if (Match(this.blacklist, fileNameTrim)) ok = false;
-                }
-                else
-                {                    
-                    if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
-                    {
-                        if (!Match(this.blacklist, fileNameTrim) && Match(this.whitelist, fileNameTrim))
-                        {
-                            //do nothing
-                        }
-                        else
-                        {
-                            ok = false;
-                        }
-                    }
-                    else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
-                    {
-                        if (!Match(this.blacklist, fileNameTrim))
-                        {
-                            //do nothing
-                        }
-                        else
-                        {
-                            ok = false;
-                        }
-                    }
-                    else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
-                    {
-                        if (Match(this.whitelist, fileNameTrim))
-                        {
-                            //do nothing
-                        }
-                        else
-                        {
-                            ok = false;
-                        }
-                    }
-                    else
-                    {
-                        //do nothing, no filters.
-                    }                    
-                }
+                bool ok = this.CheckBlackAndWhitelist(priority == Globals.dependencyTrackingSysNumber, fileNameTrim);
                 if (!ok)
                 {
                     using (Error txt = new Error())
@@ -388,25 +341,7 @@ namespace Gekko
                         if (priority == Globals.dependencyTrackingSysNumber) txt.MainAdd("Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
                         else txt.MainAdd("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
                         txt.MainNewLineTight();
-                        if (this.blacklist.Count() > 0)
-                        {
-                            txt.MainAdd("+++ Blacklist:");
-                            foreach (string s in this.blacklist)
-                            {
-                                txt.MainAdd(s + ";");
-                            }
-                        }
-                        if (this.whitelist.Count() > 0 && priority != Globals.dependencyTrackingSysNumber)
-                        {
-                            if (this.blacklist.Count > 0 && this.whitelist.Count > 0) txt.MainNewLineTight();
-                            txt.MainAdd("+++ Whitelist:");
-                            foreach (string s in this.whitelist)
-                            {
-                                txt.MainAdd(s + ";");
-                            }
-                        }
-                        txt.MainNewLineTight();
-                        txt.MainAdd("You may change the fencing in the 'global' " + Globals.autoExecCmdFileName + " file in the folder: " + G.GetProgramDir() + ". After that, you need to close and restart the Gekko program.");
+                        FencingError(txt, priority == Globals.dependencyTrackingSysNumber);
                     }
                 }
             }
@@ -421,16 +356,92 @@ namespace Gekko
             }
         }
 
+        public bool CheckBlackAndWhitelist(bool isSysCall, string fileNameTrim)
+        {
+            bool ok = true;
+            if (isSysCall)
+            {
+                //SYS calls. These are checked for blacklist only
+                //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
+                if (this.Match(this.blacklist, fileNameTrim)) ok = false;
+            }
+            else
+            {
+                if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
+                {
+                    if (!this.Match(this.blacklist, fileNameTrim) && this.Match(this.whitelist, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
+                {
+                    if (!this.Match(this.blacklist, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
+                {
+                    if (this.Match(this.whitelist, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else
+                {
+                    //do nothing, no filters.
+                }
+            }
+
+            return ok;
+        }
+
+        public void FencingError(Error txt, bool isSysCall)
+        {
+            if (this.blacklist.Count() > 0)
+            {
+                txt.MainAdd("+++ Blacklist:");
+                foreach (string s in this.blacklist)
+                {
+                    txt.MainAdd(s + ";");
+                }
+            }
+            if (this.whitelist.Count() > 0 && !isSysCall)
+            {
+                if (this.blacklist.Count > 0 && this.whitelist.Count > 0) txt.MainNewLineTight();
+                txt.MainAdd("+++ Whitelist:");
+                foreach (string s in this.whitelist)
+                {
+                    txt.MainAdd(s + ";");
+                }
+            }
+            txt.MainNewLineTight();
+            txt.MainAdd("You may change the fencing in the " + Globals.autoExecCmdFileName + " file in the folder: " + G.GetProgramDir() + ". After that, you need to close and relaunch Gekko.");
+        }
+
         /// <summary>
         /// Looks for the string input inside the elements. Special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1a\bank2".
         /// </summary>
         /// <param name="elements"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        private static bool Match(List<string> elements, string input)
-        {            
+        private bool Match(List<string> elements, string input)
+        {
             foreach (string s in elements)
-            {                
+            {
                 List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
                 foreach (int i in allIndexOf)
                 {
