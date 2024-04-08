@@ -10211,6 +10211,12 @@ namespace UnitTests
                 s = Globals.unitTestScreenOutput.ToString();
                 Assert.IsFalse(s.Contains("+++ WARNING: "));
 
+                I("x = 2;");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+
+
                 // -----------------------------------------------------------------
                 //           Blacklist
                 // -----------------------------------------------------------------
@@ -10237,6 +10243,30 @@ namespace UnitTests
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
                 s = Globals.unitTestScreenOutput.ToString();
                 Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+
+                I("x = 2;");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+
+                // -----------------------------------------------------------------
+                //           Whitelist with blacklist
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = Globals.ttPath2 + @"\regres\Databanks\temp\temp2";
+                Program.options.global_fence_white_folders = Globals.ttPath2 + @"\regres\Databanks\temp";
+                Globals.dependencyTracking.InitFence();
+                
+                I("x = 2;");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+
+
             }
             finally
             {
