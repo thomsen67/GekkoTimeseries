@@ -1922,7 +1922,7 @@ namespace Gekko
                 Program.RunGekkoCommands("", fileName2, 0, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
-                try { Globals.dependencyTracking.Init(); }
+                try { Globals.dependencyTracking.InitFence(); }
                 catch
                 {
                     new Error("Problematic ini file: '" + fileName2 + "'", false);

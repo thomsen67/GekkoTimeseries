@@ -4932,7 +4932,7 @@ namespace Gekko
         }
 
         public static void writefile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable file1, IVariable x1)
-        {
+        {            
             Program.WriteFileWithWait(file1, O.ReplaceSlash(x1));
         }
 

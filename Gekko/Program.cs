@@ -315,36 +315,25 @@ namespace Gekko
         private List<string> blacklist = new List<string>();
         private List<string> whitelist = new List<string>();
         
-        private bool IsActive()
+        private bool FenceIsActive()
         {
             return this.blacklist.Count + this.whitelist.Count > 0;
         }
 
-        public void Init()
+        public void InitFence()
         {
             this.blacklist = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
             this.whitelist = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
         }
 
+        public void InitDependencyTracking()
+        {
+            this.storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
         public void Add(int priority, string type, string fileName3)
         {
-            if (this.IsActive())  //priority 9 is not fenced-tested (SYS calls)
-            {
-                //First test fencing black/whitelists if active
-                
-                string fileNameTrim = fileName3.Trim();
-                bool ok = this.CheckBlackAndWhitelist(priority == Globals.dependencyTrackingSysNumber, fileNameTrim);
-                if (!ok)
-                {
-                    using (Error txt = new Error())
-                    {
-                        if (priority == Globals.dependencyTrackingSysNumber) txt.MainAdd("Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
-                        else txt.MainAdd("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
-                        txt.MainNewLineTight();
-                        FencingError(txt, priority == Globals.dependencyTrackingSysNumber);
-                    }
-                }
-            }
+            this.CheckFence(fileName3, priority == Globals.dependencyTrackingSysNumber);
 
             //Put into tracking if active
             if (G.Equal(Program.options.global_dependency_tracking, "simple"))
@@ -353,6 +342,27 @@ namespace Gekko
                 if (priority < 1 || priority > 9) new Error("Priority!");
                 string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
+            }
+        }
+
+        public void CheckFence(string fileName3, bool isSys)
+        {
+            if (this.FenceIsActive())  //priority 9 is not fenced-tested (SYS calls)
+            {
+                //First test fencing black/whitelists if active
+
+                string fileNameTrim = fileName3.Trim();
+                bool ok = this.CheckBlackAndWhitelist(isSys, fileNameTrim);
+                if (!ok)
+                {
+                    using (Error txt = new Error())
+                    {
+                        if (isSys) txt.MainAdd("Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
+                        else txt.MainAdd("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
+                        txt.MainNewLineTight();
+                        FencingError(txt, isSys);
+                    }
+                }
             }
         }
 
@@ -19769,6 +19779,7 @@ namespace Gekko
 
             Globals.modelPathAndFileName = ffh.prettyPathAndFileName;  //always contains a path            
             Globals.modelFileName = Path.GetFileName(ffh.prettyPathAndFileName);
+            Globals.dependencyTracking.Add(1, "Model", ffh.prettyPathAndFileName);
 
             if (!File.Exists(ffh.realPathAndFileName))
             {
@@ -21005,7 +21016,7 @@ namespace Gekko
         /// <param name="entry"></param>
         /// <returns></returns>
         public static string WaitForZipExtractFileEntryToTempFile(ZipArchiveEntry entry, string zipFileWithPath)
-        {
+        {            
             DateTime dt0 = DateTime.Now;
             string tempFileName = null;
 
@@ -23356,7 +23367,7 @@ namespace Gekko
             }
         }
 
-        //See also overload.
+        //See also overload. Used from Gekko.
         public static void WriteFileWithWait(IVariable file2, IVariable x1)
         {
             string file = O.ConvertToString(file2);
@@ -23662,7 +23673,7 @@ namespace Gekko
         /// <param name="originalFileName"></param>
         /// <returns></returns>
         public static string WaitForZipReadGbk(string folder, string zipFileName, string inside, string originalFileName)
-        {
+        {            
             //is not actually waiting...
             DateTime dt0 = DateTime.Now;
             int gap = Globals.waitFileGap;  //2 seconds
@@ -23796,7 +23807,7 @@ namespace Gekko
         /// <param name="bufferSize"></param>
         /// <returns></returns>
         public static FileStream WaitForFileStream(string realPathAndFilename, string prettyPathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen, int bufferSize)
-        {
+        {            
             if (type != GekkoFileReadOrWrite.Read)
             {
                 PossibleLibraryOrZipWriteError(realPathAndFilename, "write");
@@ -23829,7 +23840,6 @@ namespace Gekko
 
                 if (type == GekkoFileReadOrWrite.Read)
                 {
-
                     //checking if the file is there at all for reading
                     if (!File.Exists(realPathAndFilename))
                     {
@@ -23847,7 +23857,7 @@ namespace Gekko
                                 //from inside zipped file
                                 e.MainAdd("Could not find file '" + prettyPathAndFilename + "' for reading.");
                                 e.MainAdd("The file has been unzipped, but cannot be read from the following temporary file: '" + realPathAndFilename + "'");
-                            }                            
+                            }
                         }
                     }
                 }
@@ -23916,6 +23926,16 @@ namespace Gekko
                 new Error("Gave up on file '" + realPathAndFilename + "'. Is it blocked by another program?");
             }
             return fs;
+        }
+
+        /// <summary>
+        /// This is an extra check just in case "real" checks fail. We only check if it is an absolute path here.
+        /// Not used at the moment.
+        /// </summary>
+        /// <param name="realPathAndFilename"></param>
+        private static void FenceCheckExtra(string realPathAndFilename)
+        {
+            if (G.IsAbsolutePath(realPathAndFilename)) Globals.dependencyTracking.CheckFence(realPathAndFilename, false);
         }
 
         private static void PossibleLibraryOrZipWriteError(string pathAndFilename, string s)

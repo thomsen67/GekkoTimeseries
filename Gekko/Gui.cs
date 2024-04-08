@@ -1724,7 +1724,7 @@ namespace Gekko
             Program.AbortingReset();
 
             Globals.errorMemory = null;  //so that it is not recording all the time.            
-            //Globals.dependencyTracking = new DependencyTracking();
+            Globals.dependencyTracking.InitDependencyTracking();
             
             if (newUserInput)
             {
