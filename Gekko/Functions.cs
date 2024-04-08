@@ -2183,7 +2183,6 @@ namespace Gekko
                     if (!G.Equal(option_string, "all"))
                     {
                         new Error("Expected 'all' option");
-                        //throw new GekkoException();
                     }
                     helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
                 }

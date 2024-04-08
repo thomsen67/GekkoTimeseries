@@ -367,7 +367,7 @@ namespace Gekko
 
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
             StartupExeAndIniStuff();
-            CrossThreadStuff.Mode();
+            CrossThreadStuff.Mode();            
 
             Gui.gui.gekkoToolStripMenuItem.Checked = true;
 
@@ -1101,20 +1101,7 @@ namespace Gekko
             if (folder.StartsWith("20. ")) folder = folder.Substring(4);
             if (folder == "") return;
 
-            if (!G.IsUnitTesting()) Globals.userSettings.WorkingFolder = folder;
-
-            if (false)
-            {
-                //This is probably too strict/annoying, for instance at Gekko startup
-                if (!Globals.dependencyTracking.CheckBlackAndWhitelist(false, folder.Trim()))
-                {
-                    using (Error txt = new Error())
-                    {
-                        txt.MainAdd("Due to fencing blacklist/whitelist, it is not legal to use '" + folder.Trim() + "' as working folder.");
-                        Globals.dependencyTracking.FencingError(txt, false);
-                    }
-                }
-            }
+            if (!G.IsUnitTesting()) Globals.userSettings.WorkingFolder = folder;            
 
             Program.options.folder_working = folder;
             if (G.SetWorkingFolder(false))
@@ -1135,6 +1122,8 @@ namespace Gekko
                 Globals.remoteFileStamp = new DateTime(0l);  //just because we change working folder, an existing remote.gcm file in that folder should not be considered 'new' just because of that change.
                 Program.RemoteInit();
             }
+
+            Globals.dependencyTracking.FencingWarning();
         }
 
         private static void ChangeWorkingFolderNoteMessage()

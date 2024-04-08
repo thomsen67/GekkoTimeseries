@@ -1909,6 +1909,10 @@ namespace Gekko
         /// <param name="p"></param>
         public static void Ini(P p)
         {
+            // =======================================================
+            //         gekko.ini next to gekko.exe
+            // =======================================================
+
             string s = Globals.autoExecCmdFileName;
             string fileName2 = Program.FindFile(s, new List<string> { G.GetProgramDir() }, false, false, false, true, null).realPathAndFileName;
             if (fileName2 == null)
@@ -1930,29 +1934,44 @@ namespace Gekko
                 }
             }
 
+            // =======================================================
+            //         gekko.ini in working folder
+            // =======================================================
+
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
             FindFileHelper ffh2 = Program.FindFile(s, folders, true, false, false, true, null); //also calls CreateFullPathAndFileName(), library files not allowed
-            fileName2 = ffh2.realPathAndFileName;
+            string fileName3 = ffh2.realPathAndFileName;
 
-            if (fileName2 == null)
+            if (fileName3 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
                 return;  //used for gekko.ini file
             }
             else
             {
-                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-                Program.RunGekkoCommands("", fileName2, 0, p);
-                G.Writeln();
-                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+
+                if (!G.Equal(fileName2, fileName3))  //equal if Gekko starts op in gekko.exe folder.
+                {
+                    Globals.cmdPathAndFileName = fileName3;  //always contains a path, is used if there is a lexer error
+                    Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                    Program.RunGekkoCommands("", fileName3, 0, p);
+                    G.Writeln();
+                    G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+                }
             }
+
+            // =========================================================================
+            // Fencing
+            // =========================================================================
+
+            Globals.dependencyTracking.FencingWarning();
         }
 
+        
         /// <summary>
         /// CLS command.
         /// </summary>

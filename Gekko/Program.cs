@@ -352,7 +352,7 @@ namespace Gekko
                 //First test fencing black/whitelists if active
 
                 string fileNameTrim = fileName3.Trim();
-                bool ok = this.CheckBlackAndWhitelist(isSys, fileNameTrim);
+                bool ok = this.CheckBlackAndWhitelist(fileNameTrim, isSys);
                 if (!ok)
                 {
                     using (Error txt = new Error())
@@ -366,7 +366,13 @@ namespace Gekko
             }
         }
 
-        public bool CheckBlackAndWhitelist(bool isSysCall, string fileNameTrim)
+        /// <summary>
+        /// Checks that these checks are ok.
+        /// </summary>
+        /// <param name="fileNameTrim"></param>
+        /// <param name="isSysCall"></param>
+        /// <returns></returns>
+        public bool CheckBlackAndWhitelist(string fileNameTrim, bool isSysCall)
         {
             bool ok = true;
             if (isSysCall)
@@ -419,11 +425,25 @@ namespace Gekko
             return ok;
         }
 
-        public void FencingError(Error txt, bool isSysCall)
+        public void FencingWarning()
+        {
+            if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
+            {
+                using (Warning txt = new Warning())
+                {
+                    txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
+                    txt.MainNewLineTight();
+                    this.FencingError(txt, false);
+                }
+            }
+        }
+
+
+        public void FencingError(Wrap txt, bool isSysCall)
         {
             if (this.blacklist.Count() > 0)
             {
-                txt.MainAdd("+++ Blacklist:");
+                txt.MainAdd("+++ Blacklist = ");
                 foreach (string s in this.blacklist)
                 {
                     txt.MainAdd(s + ";");
@@ -439,7 +459,7 @@ namespace Gekko
                 }
             }
             txt.MainNewLineTight();
-            txt.MainAdd("You may change the fencing in the " + Globals.autoExecCmdFileName + " file in the folder: " + G.GetProgramDir() + ". After that, you need to close and relaunch Gekko.");
+            txt.MainAdd("You may change fencing in the 'Gekko-level' " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After changing ', you need to close and relaunch Gekko.");
         }
 
         /// <summary>
