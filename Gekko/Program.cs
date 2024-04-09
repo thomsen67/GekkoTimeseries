@@ -16409,7 +16409,12 @@ write datatest;
                 }
             }
             return type;
-        }        
+        }
+
+        public static bool GuiHasColor()
+        {
+            return !(G.NullOrBlanks(Program.options.global_color) || G.equal(Program.options.global_color, "White"));
+        }
 
         public static void Tell(string text, bool nocr)
         {            

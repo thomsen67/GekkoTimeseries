@@ -2993,7 +2993,7 @@ namespace Gekko.Parser.Gek
                                     if (p != null)
                                     {
 
-                                        string file = p.GetExecutingGcmFile(false);
+                                        string file = p.lastFileSentToANTLR;
                                         string file3 = System.IO.Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
                                         if (!G.equal(file, file3))
                                         {
@@ -3001,6 +3001,16 @@ namespace Gekko.Parser.Gek
                                             throw new GekkoException();
                                         }
                                     }
+                                }
+
+                                if (G.equal(o, "global_color"))
+                                {
+                                    node.Code.A("CrossThreadStuff.SetColor();"); //er89ljkhaf87
+                                }
+                                
+                                if (G.equal(o, "global_dependency_tracking"))
+                                {
+                                    //CrossThreadStuff.SetDatatrace(); //er89ljkhaf87  -->NO, no menu
                                 }
 
                                 if (o == "freq")

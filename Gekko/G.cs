@@ -1666,6 +1666,17 @@ namespace Gekko
             WriteAbstract(s, null, false, Color.Empty, false, ETabs.Main);            
         }
 
+        public static string FirstCharToUpper(string input)
+        {
+            switch (input)
+            {
+                case null: G.Writeln2("*** ERROR: Null string for FirstCharToUpper()"); throw new GekkoException(); break;
+                case "": G.Writeln2("*** ERROR: Empty string for FirstCharToUpper()"); throw new GekkoException(); break;
+                default: return input[0].ToString().ToUpper() + input.Substring(1);
+            }
+            return null;
+        }
+
         public static void Write(string s, ETabs tab)
         {
             WriteAbstract(s, null, false, Color.Empty, false, tab);

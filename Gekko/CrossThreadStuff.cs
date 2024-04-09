@@ -98,6 +98,47 @@ namespace Gekko
             }
         }
 
+        delegate void SetColorCallback();
+        public static void SetColor()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new SetColorCallback(SetColor));
+            }
+            else
+            {
+                if (Program.GuiHasColor())
+                {
+                    string colorTrim = Program.options.global_color.Trim();
+                    try
+                    {
+                        if (colorTrim.StartsWith("#"))
+                        {
+                            Gui.gui.textBox2.BackColor = System.Drawing.ColorTranslator.FromHtml(colorTrim);
+                            Gui.gui.textBox2.Parent.BackColor = System.Drawing.ColorTranslator.FromHtml(colorTrim);
+                        }
+                        else
+                        {
+                            string colorTrim2 = G.FirstCharToUpper(colorTrim.ToLower());
+                            Gui.gui.textBox2.BackColor = Color.FromName(colorTrim2);
+                            Gui.gui.textBox2.Parent.BackColor = Color.FromName(colorTrim2);
+                        }
+                    }
+                    catch
+                    {
+                        G.Writeln2("*** ERROR: The color '" + Program.options.global_color + "' from 'option global color = ...' is unknown to .NET. Possible colors can be seen in the link: https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    Gui.gui.textBox2.BackColor = Color.White;
+                    Gui.gui.textBox2.Parent.BackColor = Color.White;
+                }
+            }
+        }
+
         //weird delegate pattern, but it works!
         delegate void ZoomCallback();
         public static void Zoom()
@@ -132,8 +173,19 @@ namespace Gekko
             else
             {
                 Gui.gui.textBox2.ReadOnly = b;
-                if (b) Gui.gui.textBox2.BackColor = Color.LightGray;
-                else Gui.gui.textBox2.BackColor = Color.White;                
+                if (Program.GuiHasColor())
+                {
+                    if (b)
+                    {
+                        Gui.gui.textBox2.Parent.BackColor = Color.LightGray;
+                        Gui.gui.textBox2.BackColor = Color.LightGray;
+                    }
+                    else
+                    {
+                        //Gui.gui.textBoxMainTabLower.BackColor = Color.White;
+                        CrossThreadStuff.SetColor();
+                    }
+                }
             }
         }
 
