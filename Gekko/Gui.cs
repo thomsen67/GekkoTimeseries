@@ -572,6 +572,7 @@ namespace Gekko
                 Program.options.folder_working = folder;
             }
             else Program.options.folder_working = G.GetWorkingFolder();  //if called from cmd prompt, it will be that folder -> may be overwritten later on
+            Globals.dependencyTracking.FencingWarning();
 
             if (track) MessageBox.Show("13");
             string s1 = G.GetWorkingFolder();
@@ -594,6 +595,7 @@ namespace Gekko
                                 if (Directory.Exists(Globals.userSettings.WorkingFolder))
                                 {
                                     Program.options.folder_working = Globals.userSettings.WorkingFolder;
+                                    Globals.dependencyTracking.FencingWarning();
                                 }
                             }
                         }
@@ -619,6 +621,7 @@ namespace Gekko
                 {
                     MessageBox.Show("Gekko: The working folder '" + Program.options.folder_working + "' does not seem to exist \n -- changed to desktop folder: " + desktop);
                     Program.options.folder_working = desktop;
+                    Globals.dependencyTracking.FencingWarning();
                 }
 
                 //Testing write access of working folder (writing a file, and deleting it again)
@@ -872,6 +875,7 @@ namespace Gekko
             }
 
             Program.options.folder_working = us.WorkingFolder;
+            Globals.dependencyTracking.FencingWarning();
 
             Point pGraph = HandleMonitor(us.GraphWindowTopDistance, us.GraphWindowLeftDistance);
             Globals.guiGraphWindowTopDistance = pGraph.X;
@@ -1069,6 +1073,7 @@ namespace Gekko
             if (folder != "")
             {
                 Program.options.folder_working = folder;
+                Globals.dependencyTracking.FencingWarning();
                 System.IO.Directory.SetCurrentDirectory(Program.options.folder_working);
             }
 
@@ -1104,6 +1109,7 @@ namespace Gekko
             if (!G.IsUnitTesting()) Globals.userSettings.WorkingFolder = folder;            
 
             Program.options.folder_working = folder;
+            Globals.dependencyTracking.FencingWarning();
             if (G.SetWorkingFolder(false))
             {
                 //folder does not exist.

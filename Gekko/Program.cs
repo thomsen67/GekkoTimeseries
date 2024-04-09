@@ -332,7 +332,9 @@ namespace Gekko
         }
 
         public void Add(int priority, string type, string fileName3)
-        {
+        {            
+            if (!G.IsAbsolutePath(fileName3)) return; //should not be possible... (also checks for null)
+            
             this.CheckFence(fileName3, priority == Globals.dependencyTrackingSysNumber);
 
             //Put into tracking if active
@@ -5072,15 +5074,16 @@ namespace Gekko
 
                 bool cancel = false;
                 FindFileHelper ffh = ReadHelper(file, ref cancel, extension, p);
-                file = ffh.realPathAndFileName;
-
-                Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
+                file = ffh.realPathAndFileName;                
 
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
                     return;  //from READ * cancelling
                 }
+
+                Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
+
                 bool category2_fileExists = false;
                 if (file == null)
                 {
@@ -19798,8 +19801,7 @@ namespace Gekko
             FindFileHelper ffh = FindFile(fileName, folders, true, true, false, true, o.p);  //calls CreateFullPathAndFileName()
 
             Globals.modelPathAndFileName = ffh.prettyPathAndFileName;  //always contains a path            
-            Globals.modelFileName = Path.GetFileName(ffh.prettyPathAndFileName);
-            Globals.dependencyTracking.Add(1, "Model", ffh.prettyPathAndFileName);
+            Globals.modelFileName = Path.GetFileName(ffh.prettyPathAndFileName);            
 
             if (!File.Exists(ffh.realPathAndFileName))
             {
@@ -19811,6 +19813,8 @@ namespace Gekko
                     e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
                 }
             }
+
+            Globals.dependencyTracking.Add(1, "Model", ffh.prettyPathAndFileName);
 
             //salted with subpers, so will end with "1" for annual, "4" for quarterly.
             string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName, G.Subperiods(model.modelCommon.GetFreq()).ToString());
