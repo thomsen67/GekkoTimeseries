@@ -105,6 +105,7 @@ ASTOPT_STRING_ALL;
 	ASTNOT;
 	ASTABS;
     ASTACCEPT;
+    ASTVERSION;
     ASTADD;
     ASTANALYZE;
     ASTAPPEND;
@@ -126,6 +127,7 @@ ASTOPT_STRING_ALL;
     ASTCLEAR;
     ASTCLEARALL;
     ASTCLONE;
+    ASTPLACEHOLDER;
     ASTCLOSE;
 	ASTPROCEDUREDEFCODE;
     ASTCLOSEALL;
@@ -211,6 +213,7 @@ ASTOPT_STRING_ALL;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
     ASTFINDMISSINGDATA;
+    ASTGEKKO;
     ASTFLAT;
     ASTFOR;
     ASTFORDATE;
@@ -867,6 +870,16 @@ Y2                    = 'Y2'                       ;
     CREATE           = 'CREATE'          ;
     CREATEVARS       = 'CREATEVARS'      ;
     CSV              = 'CSV'             ;
+
+    GLOBAL              = 'GLOBAL'             ;
+    FENCE='FENCE';
+    BLACK='BLACK';
+    FOLDERS='FOLDERS';
+    WHITE='WHITE';
+    DEPENDENCY='DEPENDENCY';
+    TRACKING='TRACKING';
+    COLOR='COLOR';
+
     CURROW           = 'CURROW';
     D             = 'D'            ;
     DAMP             = 'DAMP'            ;
@@ -924,6 +937,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+    GEKKO      = 'GEKKO'     ;
 	IMPORTEXPORT = 'IMPORTEXPORT';
     FIRST            = 'FIRST';
     FIRSTCOLWIDTH = 'FIRSTCOLWIDTH';
@@ -1433,6 +1447,16 @@ d.Add("Y" ,Y);
                                         d.Add("create"  , CREATE    );
                                         d.Add("createvars"              , CREATEVARS);
                                         d.Add("csv"     , CSV       );
+
+                                        d.Add("GLOBAL", GLOBAL)             ;
+    d.Add("FENCE", FENCE);
+    d.Add("BLACK", BLACK);
+    d.Add("FOLDERS", FOLDERS);
+    d.Add("WHITE", WHITE);
+    d.Add("DEPENDENCY", DEPENDENCY);
+    d.Add("TRACKING", TRACKING);
+    d.Add("COLOR", COLOR);
+
                                         d.Add("currow"  , CURROW       );
                                         d.Add("d"    , D      );
                                         d.Add("damp"    , DAMP      );
@@ -1488,6 +1512,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
                                         d.Add("findmissingdata"         , FINDMISSINGDATA);
+                                        d.Add("gekko"         , GEKKO);
 										d.Add("IMPORTEXPORT", IMPORTEXPORT);
                                         d.Add("first"    , FIRST  );
                                         d.Add("FIRSTCOLWIDTH" ,FIRSTCOLWIDTH);
@@ -1839,6 +1864,7 @@ expr2                     :
 						  | proceduredef   SEMICOLON!						
 						  | functiondef    SEMICOLON!						
                           | genr           SEMICOLON   ->    ^({token("ASTMETA¤"+($genr.text), ASTMETA, 0)} genr)
+                          | gekko          SEMICOLON!
 						  | goto2          SEMICOLON!
 						  | hdg            SEMICOLON!
 						  | help           SEMICOLON!
@@ -1888,7 +1914,6 @@ expr2                     :
 						  | label2         SEMICOLON!
                           | test           SEMICOLON!
 						  | tell           SEMICOLON!
-                          | gekko          SEMICOLON!
                           | time           SEMICOLON!
 						  | timefilter     SEMICOLON!						
 						  | truncate       SEMICOLON!
@@ -2526,7 +2551,10 @@ label2                    : TARGET ident -> ^(ASTTARGET ident);
 
 tell					  : TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} expression NOCR?);
 
-gekko   				  : GEKKO VERSION expression -> ^({token("ASTGEKKO", ASTGEKKO, $ASTGEKKO.Line)} expression);
+gekko:						GEKKO VERSION ifOperator versionAndDate (andOr VERSION ifOperator versionAndDate)? -> ^({token("ASTGEKKO", ASTGEKKO, input.LT(1).Line)} ASTVERSION ^(ASTPLACEHOLDER ifOperator versionAndDate) ^(ASTPLACEHOLDER ifOperator? versionAndDate?) ^(ASTPLACEHOLDER andOr?));
+andOr:                      AND | OR ;
+versionAndDate:             expression  -> ^(ASTPLACEHOLDER expression);
+//versionAndDate:             expression expression? -> ^(ASTPLACEHOLDER expression expression?);
 
 test                      : TEST ident ->  ^(ASTTEST ident);
 
@@ -3261,6 +3289,11 @@ optionType :
              | FOLDER TABLE2   '='? fileName ->  FOLDER TABLE2 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
 
+             | GLOBAL FENCE BLACK FOLDERS '='? expression -> GLOBAL FENCE BLACK FOLDERS ^(ASTSTRINGSIMPLE expression)
+             | GLOBAL FENCE WHITE FOLDERS '='? expression -> GLOBAL FENCE WHITE FOLDERS ^(ASTSTRINGSIMPLE expression)
+             | GLOBAL DEPENDENCY TRACKING '='? expression -> GLOBAL DEPENDENCY TRACKING ^(ASTSTRINGSIMPLE expression)
+             | GLOBAL COLOR '='? expression -> GLOBAL COLOR ^(ASTSTRINGSIMPLE expression)
+
 			 | FREQ question -> FREQ question
              //| FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
 			 | FREQ '='? name -> FREQ ^(ASTNAME3 name)
@@ -3618,6 +3651,15 @@ identWithoutCommand       : Ident |
                             
                             CPLOT|
                             CREATEVARS|
+
+                            GLOBAL|
+    FENCE|
+    BLACK|
+    FOLDERS|
+    WHITE|
+    DEPENDENCY|
+    TRACKING|
+    COLOR|
                             
                             CSV|
                             CURROW|
@@ -4014,6 +4056,7 @@ END|
 EXIT|
 EXO|
 FINDMISSINGDATA|
+GEKKO|
 IMPORTEXPORT|
 FOR|
 FUNCTION|
@@ -4237,6 +4280,15 @@ XEDIT|
                             
                             CPLOT|
                             CREATEVARS|
+
+                                                    GLOBAL|
+    FENCE|
+    BLACK|
+    FOLDERS|
+    WHITE|
+    DEPENDENCY|
+    TRACKING|
+    COLOR|
                             
                             CSV|
                             CURROW|

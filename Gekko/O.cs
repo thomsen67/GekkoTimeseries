@@ -5086,7 +5086,260 @@ namespace Gekko
                 }
             }
         }
-        
+
+        public class Gekko2  //cannot be called "Gekko"
+        {
+            public string operator1 = null;
+            public IVariable x1a = null;
+            public IVariable x1b = null;  //always null
+            public string operator2 = null;
+            public IVariable x2a = null;
+            public IVariable x2b = null;  //always null
+            public string logical12 = null;
+            public void Exe()
+            {
+                List<string> v = new List<string>();
+                List<bool> ok = new List<bool>();
+                v.Add(null); v.Add(null);
+                ok.Add(false); ok.Add(false);
+
+                string op = null;
+                string s = null;
+
+                //Either type:
+                // 1: string, null
+                // 2: date, null    --> not valid
+                // 3: string, date  --> not valid
+
+                int n = 1;
+                if (this.logical12 != null) n = 2;
+
+                for (int i = 0; i < n; i++)
+                {
+                    if (i == 0)
+                    {
+                        op = this.operator1;
+                        if (x1b == null)
+                        {
+                            if (x1a.Type() == EVariableType.String)
+                            {
+                                s = (x1a as ScalarString)._string2;
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Expected string argument");
+                                throw new GekkoException();
+                            }
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Bad 'gekko version' syntax");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (i == 1)
+                    {
+                        op = this.operator2;
+                        if (x2b == null)
+                        {
+                            if (x2a.Type() == EVariableType.String)
+                            {
+                                s = (x2a as ScalarString)._string2;
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Expected string argument");
+                                throw new GekkoException();
+                            }
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Bad 'gekko version' syntax");
+                            throw new GekkoException();
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Operator problem");
+                        throw new GekkoException();
+                    }
+
+                    int req_i1 = 0;
+                    int req_i2 = 0;
+                    int req_i3 = 0;
+                    if (true)
+                    {
+                        SplitVersionNumber(s, ref req_i1, ref req_i2, ref req_i3);
+                    }
+
+                    int req_d1 = 0;
+                    int req_d2 = 0;
+                    int req_d3 = 0;
+                    long req = GetLongNumber(req_i1, req_i2, req_i3, req_d1, req_d2, req_d3);
+
+                    // ------------------------- Get system info ----------------------------
+
+                    int ths_i1 = 0;
+                    int ths_i2 = 0;
+                    int ths_i3 = 0;
+                    if (true)
+                    {
+                        SplitVersionNumber(Globals.gekkoVersion, ref ths_i1, ref ths_i2, ref ths_i3);
+                    }
+
+                    int ths_d1 = 0;
+                    int ths_d2 = 0;
+                    int ths_d3 = 0;
+                    long ths = GetLongNumber(ths_i1, ths_i2, ths_i3, ths_d1, ths_d2, ths_d3);
+
+                    // ---------------------- compare ------------------
+
+                    if (op == "<")
+                    {
+                        if (ths < req) ok[i] = true;
+                    }
+                    else if (op == "<=")
+                    {
+                        if (ths <= req) ok[i] = true;
+                    }
+                    else if (op == "==")
+                    {
+                        if (ths == req) ok[i] = true;
+                    }
+                    else if (op == ">=")
+                    {
+                        if (ths >= req) ok[i] = true;
+                    }
+                    else if (op == ">")
+                    {
+                        if (ths > req) ok[i] = true;
+                    }
+                    else if (op == "<>")
+                    {
+                        if (ths != req) ok[i] = true;
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Invalid operator '" + op + "'");
+                        throw new GekkoException();
+                    }
+
+                    string sreq_i = req_i1 + "." + req_i2 + "." + req_i3;
+                    string sths_i = ths_i1 + "." + ths_i2 + "." + ths_i3;
+                    v[i] = sths_i + " " + op + " " + sreq_i;
+
+                }
+
+                bool okCombined = false;
+                if (n == 1) okCombined = ok[0];
+                else if (n == 2)
+                {
+                    if (G.equal(this.logical12, "and")) okCombined = ok[0] && ok[1];
+                    else if (G.equal(this.logical12, "or")) okCombined = ok[0] || ok[1];
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Number of conditions.");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Number of conditions.");
+                    throw new GekkoException();
+                }
+
+                if (n == 1)
+                {
+                    if (okCombined) G.Writeln2("Gekko version check: " + v[0] + " --> OK");
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Gekko version problem. The version requirement " + v[0] + " is false. You are using an inadequate Gekko version " + Globals.gekkoVersion + ", and another (possibly newer) version is required in order to run the program. You may remove the 'gekko version' check to avoid this error, but beware that the version check may be there for a reason, and that your program may fail or produce wrong results if the check is ignored.");
+                        throw new GekkoException();
+                    }
+                }
+                else if (n == 2)
+                {
+                    if (okCombined) G.Writeln2("Gekko version check: " + v[0] + " " + this.logical12 + " " + v[1] + " --> OK");
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Gekko version problem. The version requirement " + v[0] + " " + this.logical12 + " " + v[1] + " is false. You are using an inadequate Gekko version " + Globals.gekkoVersion + ", and another (possibly newer) version is required in order to run the program. You may remove the 'gekko version' check to avoid this error, but beware that the version check may be there for a reason, and that your program may fail or produce wrong results if the check is ignored.");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Number of conditions.");
+                    throw new GekkoException();
+                }
+            }
+
+            private static void SplitVersionNumber(string s, ref int i1, ref int i2, ref int i3)
+            {
+                if (s == null)
+                {
+                    G.Writeln2("*** ERROR: Problem with 'GEKKO version' statement.");
+                    throw new GekkoException();
+                }
+                string[] ss = s.Split('.');
+                if (ss.Length == 1)
+                {
+                    i1 = G.ConvertToInt(ss[0]);
+                    if (i1 == int.MaxValue || i1 < 0)
+                    {
+                        G.Writeln2("*** ERROR: Version part '" + ss[0] + "' is not a legal non-negative integer");
+                        throw new GekkoException();
+                    }
+                }
+                else if (ss.Length == 2)
+                {
+                    i1 = G.ConvertToInt(ss[0]);
+                    if (i1 == int.MaxValue || i1 < 0)
+                    {
+                        G.Writeln2("*** ERROR: Version part '" + ss[0] + "' is not a legal non-negative integer");
+                        throw new GekkoException();
+                    }
+                    i2 = G.ConvertToInt(ss[1]);
+                    if (i2 == int.MaxValue || i2 < 0)
+                    {
+                        G.Writeln2("*** ERROR: Version part '" + ss[1] + "' is not a legal non-negative integer");
+                        throw new GekkoException();
+                    }
+                }
+                else if (ss.Length == 3)
+                {
+                    i1 = G.ConvertToInt(ss[0]);
+                    if (i1 == int.MaxValue || i1 < 0)
+                    {
+                        G.Writeln2("*** ERROR: Version part '" + ss[0] + "' is not a legal non-negative integer");
+                        throw new GekkoException();
+                    }
+                    i2 = G.ConvertToInt(ss[1]);
+                    if (i2 == int.MaxValue || i2 < 0)
+                    {
+                        G.Writeln2("*** ERROR: Version part '" + ss[1] + "' is not a legal non-negative integer");
+                        throw new GekkoException();
+                    }
+                    i3 = G.ConvertToInt(ss[2]);
+                    if (i3 == int.MaxValue || i3 < 0)
+                    {
+                        G.Writeln2("*** ERROR: Version part '" + ss[2] + "' is not a legal non-negative integer");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Problems with number of dots in version number '" + s + "'");
+                    throw new GekkoException();
+                }
+            }
+
+            private static long GetLongNumber(long i1, long i2, long i3, long d1, long d2, long d3)
+            {
+                // 1122333yyyymmdd (15 digits, long has 18-19).                
+                return (long)1e13 * i1 + (long)1e11 * i2 + (long)1e8 * i3 + (long)1e4 * d1 + (long)1e2 * d2 + d3;
+            }
+        }
+
 
         public class X12a
         {

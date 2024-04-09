@@ -816,6 +816,33 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
+                    case "ASTGEKKO":
+                        {
+                            node.Code.A("O.Gekko2 o" + Num(node) + " = new O.Gekko2();" + G.NL);
+                            if (node[0].Text == "ASTVERSION")
+                            {
+                                if (true)
+                                {
+                                    node.Code.A("o" + Num(node) + ".operator1 = " + "@`" + GetOperator(node[1][0][0].Text) + "`" + ";");
+                                    node.Code.A("o" + Num(node) + ".x1a = " + node[1][1][0].Code + ";");
+                                    if (node[1][1].ChildrenCount() > 1) node.Code.A("o" + Num(node) + ".x1b = " + node[1][1][1].Code + ";");
+                                }
+                                if (node[2].ChildrenCount() > 0)
+                                {
+                                    node.Code.A("o" + Num(node) + ".operator2 = " + "@`" + GetOperator(node[2][0][0].Text) + "`" + ";");
+                                    if (node[2][1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".x2a = " + node[2][1][0].Code + ";");
+                                    if (node[2][1].ChildrenCount() > 1) node.Code.A("o" + Num(node) + ".x2b = " + node[2][1][1].Code + ";");
+                                    node.Code.A("o" + Num(node) + ".logical12 = " + "@`" + node[3][0].Text + "`" + ";");
+                                }
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Syntax error in 'gekko' statement.");
+                                throw new GekkoException();
+                            }
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
                     case "ASTHDG":
                         node.Code.A("Program.Hdg(O.GetString(" + node[0].Code + "));");
                         break;
@@ -2960,6 +2987,22 @@ namespace Gekko.Parser.Gek
                                 StringBuilder s = new StringBuilder();
                                 CreateOptionVariable(node, s, ref o);
                                 node.Code.A(s.ToString());
+
+                                if (o.ToLower().StartsWith("global_"))
+                                {
+                                    if (p != null)
+                                    {
+
+                                        string file = p.GetExecutingGcmFile(false);
+                                        string file3 = System.IO.Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
+                                        if (!G.equal(file, file3))
+                                        {
+                                            G.Writeln2("*** ERROR: Options of the type 'option global ...' are only intended to be put inside a " + Globals.autoExecCmdFileName + " file in the same folder as the executing gekko.exe file. The gekko.exe file is placed in this folder: " + G.GetProgramDir() + ".");
+                                            throw new GekkoException();
+                                        }
+                                    }
+                                }
+
                                 if (o == "freq")
                                 {
                                     //node.Code.A(Globals.clearTsCsCode + G.NL);
@@ -4342,6 +4385,42 @@ namespace Gekko.Parser.Gek
                 }
                 tmp = tmp.Parent;
             }
+        }
+
+        private static string GetOperator(string op)
+        {
+            string op2 = null;
+
+            if (op == "ASTIFOPERATOR4")  //"<"
+            {
+                op2 = "<";
+            }
+            else if (op == "ASTIFOPERATOR6")  //"<="
+            {
+                op2 = "<=";
+            }
+            else if (op == "ASTIFOPERATOR1") //"=="
+            {
+                op2 = "==";
+            }
+            else if (op == "ASTIFOPERATOR5")  //">="
+            {
+                op2 = ">=";
+            }
+            else if (op == "ASTIFOPERATOR3") //">"
+            {
+                op2 = ">";
+            }
+            else if (op == "ASTIFOPERATOR2") //"<>"
+            {
+                op2 = "<>";
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: In GEKKO statement, unknown comparison operator");
+                throw new GekkoException();
+            }
+            return op2;
         }
 
         private static void ResetUFunctionHelpers(W w)

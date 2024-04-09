@@ -1651,7 +1651,12 @@ namespace Gekko
             }
             return sb.ToString();
         }
-        
+
+        public static bool NullOrBlanks(string x)
+        {
+            return !(x != null && x.Trim() != "");
+        }
+
         /// <summary>
         /// For writing output to screen
         /// </summary>
@@ -1991,7 +1996,37 @@ namespace Gekko
                     //textBox.SelectionFont = new Font(textBox.SelectionFont, FontStyle.Regular);  //clear
                 }
             }
+        }
 
+        /// <summary>
+        /// Get all IndexOf() from a string, cf. https://stackoverflow.com/questions/15993357/how-to-get-all-indexof-instances-of-string-in-another-string-c-sharp. Can be empty, but will never contain an element = -1.
+        /// </summary>        
+        /// <param name="input"></param>
+        /// <param name="substring"></param>
+        /// <param name="comparisonType"></param>
+        /// <returns></returns>
+        public static List<int> AllIndexOf(string input, string substring, StringComparison comparisonType)
+        {
+            List<int> allIndexOf = new List<int>();
+            int index = input.IndexOf(substring, comparisonType);
+            while (index != -1)
+            {
+                allIndexOf.Add(index);
+                index = input.IndexOf(substring, index + 1, comparisonType);
+            }
+            return allIndexOf;
+        }
+
+        public static int ConvertToInt(string input)
+        {
+            int output = int.MaxValue;
+            if (input == null) return output;
+            try
+            {
+                output = int.Parse(input);
+            }
+            catch (Exception e) { };
+            return output;
         }
 
         private static void WriteAbstractClipHelper(string s, RichTextBoxEx textBox, bool newline)

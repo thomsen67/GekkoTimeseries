@@ -103,6 +103,234 @@ namespace Gekko
         }
     }
 
+    public class DependencyTracking
+    {
+        private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private List<string> blacklist = new List<string>();
+        private List<string> whitelist = new List<string>();
+
+        private bool FenceIsActive()
+        {
+            return this.blacklist.Count + this.whitelist.Count > 0;
+        }
+
+        public void InitFence()
+        {
+            this.blacklist = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
+            this.whitelist = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+        }
+
+        public void InitDependencyTracking()
+        {
+            this.storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public void Add(int priority, string type, string fileName3)
+        {
+            this.CheckFence(fileName3, priority == Globals.dependencyTrackingSysNumber);
+
+            //Put into tracking if active
+            if (G.equal(Program.options.global_dependency_tracking, "simple"))
+            {
+                string fileNameTrim = fileName3.Trim();
+                if (priority < 1 || priority > 9)
+                {
+                    G.Writeln("*** ERROR: Priority!");
+                    throw new GekkoException();
+                }
+                string s = priority + "¤" + type + "¤" + fileNameTrim;
+                if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
+            }
+        }
+
+        public void CheckFence(string fileName3, bool isSys)
+        {
+            if (this.FenceIsActive())  //priority 9 is not fenced-tested (SYS calls)
+            {
+                //First test fencing black/whitelists if active
+
+                string fileNameTrim = fileName3.Trim();
+                bool ok = this.CheckBlackAndWhitelist(fileNameTrim, isSys);
+                if (!ok)
+                {
+
+                    if (isSys) G.Writeln2("*** Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
+                    else G.Writeln2("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
+                    FencingError(isSys);
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks that these checks are ok.
+        /// </summary>
+        /// <param name="fileNameTrim"></param>
+        /// <param name="isSysCall"></param>
+        /// <returns></returns>
+        public bool CheckBlackAndWhitelist(string fileNameTrim, bool isSysCall)
+        {
+            bool ok = true;
+            if (isSysCall)
+            {
+                //SYS calls. These are checked for blacklist only
+                //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
+                if (this.Match(this.blacklist, fileNameTrim)) ok = false;
+            }
+            else
+            {
+                if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
+                {
+                    if (!this.Match(this.blacklist, fileNameTrim) && this.Match(this.whitelist, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
+                {
+                    if (!this.Match(this.blacklist, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
+                {
+                    if (this.Match(this.whitelist, fileNameTrim))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                else
+                {
+                    //do nothing, no filters.
+                }
+            }
+
+            return ok;
+        }
+
+        public void FencingWarning()
+        {
+            if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
+            {
+                G.Writeln("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
+                this.FencingError(false);
+            }
+        }
+
+
+        public void FencingError(bool isSysCall)
+        {
+            if (this.blacklist.Count() > 0)
+            {
+                G.Write("+++ Blacklist = ");
+                foreach (string s in this.blacklist)
+                {
+                    G.Write(s + ";");
+                }
+            }
+            if (this.whitelist.Count() > 0 && !isSysCall)
+            {
+                if (this.blacklist.Count > 0 && this.whitelist.Count > 0) G.Writeln();
+                G.Write("+++ Whitelist:");
+                foreach (string s in this.whitelist)
+                {
+                    G.Write(s + ";");
+                }
+            }
+            G.Writeln();
+            G.Writeln("You may change fencing in the " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After adjusting this " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
+        }
+
+        /// <summary>
+        /// Looks for the string input inside the elements. Special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1a\bank2".
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private bool Match(List<string> elements, string input)
+        {
+            foreach (string s in elements)
+            {
+                List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
+                foreach (int i in allIndexOf)
+                {
+                    bool match = true; //seems to be a match, but it may be falsified
+                    int i1 = i;
+                    int i2 = i + s.Length;
+                    if (i1 > 0 && G.IsLetterOrDigitOrUnderscore(input[i1 - 1])) match = false;
+                    if (i2 < input.Length && G.IsLetterOrDigitOrUnderscore(input[i2])) match = false;
+                    if (match) return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Splits "c:\a\b; c:\f\g" into ["c:\a\b", "c:\f\g"]. And tests for blanks etc. Also frontslashes are converted into backslashes.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private List<string> SplitIntoFoldersBySemicolon(string input)
+        {
+            List<string> m = new List<string>();
+            if (!G.NullOrBlanks(input))
+            {
+                foreach (string s in input.Split(';'))
+                {
+                    string s2Trim = s.Replace("/", "\\").Trim();
+                    string s_orig = s2Trim;
+
+                    if (!s2Trim.StartsWith("\\\\localhost\\", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //Beware that "\\localhost\g$\data\sub1\sub2" would be legal
+                        if (s2Trim.StartsWith("\\")) s2Trim = s2Trim.Substring(1);
+                    }
+                    if (s2Trim.EndsWith("\\")) s2Trim = s2Trim.Substring(0, s2Trim.Length - 1);
+                    if (!G.NullOrBlanks(s2Trim))
+                    {
+                        //Something like c:\my path\my file.xlsx is legal.
+                        if (s2Trim.Contains(": ") || s2Trim.Contains(" :") || s2Trim.Contains("\\ ") || s2Trim.Contains(" \\") || s2Trim.Contains(". ") || s2Trim.Contains(" ."))
+                        {
+                            G.Writeln2("*** ERROR: The string '" + s_orig + "' in 'option global fence ...' seems to contain invalid blanks.");
+                        }
+                        if (s2Trim.StartsWith("\\") || s2Trim.EndsWith("\\") || s2Trim.Contains("\\\\"))
+                        {
+                            G.Writeln2("*** ERROR: The string '" + s_orig + "' in 'option global fence ...' seems to contain double backslashes.");
+                        }
+                        //it may look like "abc\def\ghi" now, or "c:\abc\def\ghi"
+                        m.Add(s2Trim);
+                    }
+                }
+            }
+            return m;
+        }
+
+        public int Count()
+        {
+            return this.storage.Count;
+        }
+
+        public List<string> Get()
+        {
+            List<string> x = this.storage.Keys.ToList();
+            x.Sort();
+            return x;
+        }
+    }
+
 
     public class GekkoList<T>
     {
@@ -16181,10 +16409,11 @@ write datatest;
                 }
             }
             return type;
-        }
+        }        
 
         public static void Tell(string text, bool nocr)
-        {
+        {            
+            G.Writeln();
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
@@ -36139,6 +36368,35 @@ write datatest;
         public string GetStack(int i)
         {
             return stack[i];
+        }
+
+        public string GetExecutingGcmFile(bool simple)
+        {
+            string command = null;
+            if (simple)
+            {
+                try
+                {
+                    command = this.GetStack(this.GetDepth());
+                }
+                catch { } //do not choke on this
+                return command;
+            }
+            else
+            {
+                try
+                {
+                    int max = this.GetDepth();
+                    for (int i = max; i >= 1; i--)
+                    {
+                        command = this.GetStack(i);
+                        string[] ss = command.Split('¤');
+                        if (ss.Length == 2 && File.Exists(ss[0])) return ss[0];
+                    }
+                }
+                catch { } //do not choke on this
+                return null;
+            }
         }
 
         public bool IsSimple() {

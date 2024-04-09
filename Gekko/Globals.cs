@@ -93,7 +93,10 @@ namespace Gekko
         public static string splitCommandBlockEnd = "//[[commandEnd]]";
 
         public const string brandNewFile = "brand new file";
-        
+
+        public static DependencyTracking dependencyTracking = new DependencyTracking();
+        public const int dependencyTrackingSysNumber = 9;
+
         public static bool showTimings = false;  //use comand TIMINGS
         
         //public static int stackedTimePeriods = 5;

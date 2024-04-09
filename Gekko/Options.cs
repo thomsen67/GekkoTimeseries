@@ -83,6 +83,11 @@ Additionally, there are model, solve, equation options.
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
         public bool gams_fast = true; //use low-level api
 
+        public string global_fence_black_folders = "";  
+        public string global_fence_white_folders = "";
+        public string global_dependency_tracking = "none";
+        public string global_color = "";                     //kan bruge --> option color = '%s'; Samme for de andre.
+
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
