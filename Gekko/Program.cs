@@ -15701,25 +15701,30 @@ write datatest;
                     G.Writeln2("*** ERROR: Problematic ini file: '" + fileName2 + "'");
                     throw;
                 }
-            }            
+            }           
+            
+            // ========================================================================================
 
             folders = new List<string>();
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
-            fileName2 = SearchForFile(s, folders, true);  //also calls CreateFullPathAndFileName()
-            if (fileName2 == null)
+            string fileName3 = SearchForFile(s, folders, true);  //also calls CreateFullPathAndFileName()
+            if (fileName3 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
                 return;  //used for gekko.ini file
             }
             else
             {
-                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-                Program.EmitCodeFromANTLR("", fileName2, false, p);
-                G.Writeln();
-                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+                if (!G.equal(fileName2, fileName3))  //equal if Gekko starts op in gekko.exe folder.
+                {
+                    Globals.cmdPathAndFileName = fileName3;  //always contains a path, is used if there is a lexer error
+                    Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                    Program.EmitCodeFromANTLR("", fileName3, false, p);
+                    G.Writeln();
+                    G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+                }
             }
 
             Globals.dependencyTracking.FencingWarning();
