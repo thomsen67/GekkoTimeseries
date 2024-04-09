@@ -1677,6 +1677,19 @@ namespace Gekko
             return null;
         }
 
+        /// <summary>
+        /// Is it a full path like 'c:\xx\yy.zz'? With drive letter and colon (localhost ok too).
+        /// This method is probably not completely watertight.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static bool IsAbsolutePath(string input)
+        {
+            if (G.NullOrBlanks(input)) return false;
+            return input.Trim().Contains(":") || input.Trim().StartsWith("\\\\localhost\\", StringComparison.OrdinalIgnoreCase);
+            //for .NET Core use: return Path.IsPathRooted(input) && Path.IsPathFullyQualified(input);
+        }
+
         public static void Write(string s, ETabs tab)
         {
             WriteAbstract(s, null, false, Color.Empty, false, tab);

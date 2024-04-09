@@ -126,7 +126,9 @@ namespace Gekko
         }
 
         public void Add(int priority, string type, string fileName3)
-        {
+        {            
+            if (!G.IsAbsolutePath(fileName3)) return; //should not be possible... (also checks for null)
+
             this.CheckFence(fileName3, priority == Globals.dependencyTrackingSysNumber);
 
             //Put into tracking if active
@@ -5349,6 +5351,8 @@ write datatest;
 
             string file = AddExtension(file2, "." + "gdx");
             string pathAndFilename = CreateFullPathAndFileName(file);
+
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             DateTime dt1 = DateTime.Now;
 
@@ -20740,6 +20744,9 @@ write datatest;
 
             file = AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
+
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+
             if (File.Exists(pathAndFilename))
             {
                 //Try to taste the file to see if it is ok to remove it
@@ -21362,7 +21369,7 @@ write datatest;
             }
 
             string writeOption = "" + Globals.extensionDatabank + "";  //default
-            if (G.equal(o.opt_tsd, "yes")) writeOption = "tsd";
+            if (G.equal(o.opt_tsd, "yes")) writeOption = "tsd";            
 
             if (G.equal(o.opt_csv, "yes") || G.equal(o.opt_prn, "yes"))
             {
@@ -21447,6 +21454,8 @@ write datatest;
             }
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
+
+            Globals.dependencyTracking.Add(2, "Write", fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -21703,6 +21712,8 @@ write datatest;
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
+
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -22347,6 +22358,9 @@ write datatest;
             }            
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
+
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+
             int counter = 0;
             if(true)
             { 
@@ -22592,6 +22606,9 @@ write datatest;
             filename = AddExtension(filename, ".dat");
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
+
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -22670,6 +22687,7 @@ write datatest;
             filename = filename;
             filename = AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
+            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -22877,8 +22895,26 @@ write datatest;
             Globals.modelFileName = "";
             GuiSetModelName();
 
-            string workingFolder = Program.options.folder_working;
-            Program.options = new Options();  //resetting these, but letting working folder live on.
+
+
+            // ------------------------------------------------------
+            //Remember some options, see #er89ljkhaf87
+            string folder_working_REMEMBER = Program.options.folder_working;
+            string global_color_REMEMBER = Program.options.global_color;
+            string global_dependency_tracking_REMEMBER = Program.options.global_dependency_tracking;
+            string global_fence_black_folders_REMEMBER = Program.options.global_fence_black_folders;
+            string global_fence_white_folders_REMEMBER = Program.options.global_fence_white_folders;
+            // ------------------------------------------------------
+            Program.options = new Options();  //resetting these
+            // ------------------------------------------------------
+            //Restoring some options
+            if (!G.NullOrBlanks(folder_working_REMEMBER)) Program.options.folder_working = folder_working_REMEMBER;
+            Program.options.global_color = global_color_REMEMBER;
+            Program.options.global_dependency_tracking = global_dependency_tracking_REMEMBER;
+            Program.options.global_fence_black_folders = global_fence_black_folders_REMEMBER;
+            Program.options.global_fence_white_folders = global_fence_white_folders_REMEMBER;
+            // ------------------------------------------------------
+                        
             CrossThreadStuff.Mode();  //to show default color
 
             Program.GetStartingPeriod();
@@ -22890,10 +22926,6 @@ write datatest;
             Globals.detectedRPath = null;  //we reset this, too
             Globals.r_fileContent = null;
 
-            if (workingFolder != null && workingFolder != "")
-            {
-                Program.options.folder_working = workingFolder;
-            }
             Globals.lastPrtOrMulprtTable = null;
             CrossThreadStuff.CopyButtonEnabled(false);
             //Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = false;  //this logic can be removed in a couple of years (maybe in 2015)
@@ -32872,6 +32904,9 @@ write datatest;
             if (fileName != null)
             {
                 fileNameWithPath = CreateFullPathAndFileName(fileName);
+
+                Globals.dependencyTracking.Add(2, "Write", fileNameWithPath);
+
                 fileName3 = fileNameWithPath;
                 if (fileName3.ToLower().EndsWith(".xls")) fileName3 = fileName3.Substring(0, fileName3.Length - 4);
                 if (fileName3.ToLower().EndsWith(".xlsx")) fileName3 = fileName3.Substring(0, fileName3.Length - 5);
@@ -33330,6 +33365,9 @@ write datatest;
                 {
                     fileNameWithPath = AddExtension(CreateFullPathAndFileName(fileNameWithPath), ".xlsx");
                 }
+
+                Globals.dependencyTracking.Add(2, "Write", fileNameWithPath);
+
                 fileNameWithPathOriginal = fileNameWithPath;
 
                 bool isAppend = false; if (oPrt != null && G.equal(oPrt.opt_append, "yes")) isAppend = true;
