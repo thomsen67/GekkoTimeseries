@@ -559,6 +559,9 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
                 throw new GekkoException();
             }
+
+            Globals.dependencyTracking.Add(1, "Read list", fileNameTemp);
+
             string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
             List<string> input = G.ExtractLinesFromText(listFile);
             
@@ -5082,6 +5085,7 @@ namespace Gekko
                 else
                 {
                     string ss = O.GetString(s);
+                    Globals.dependencyTracking.Add(Globals.dependencyTrackingSysNumber, "Sys", ss); //9 means do not print, but can be used for fencing...!
                     Program.ExecuteShellCommand(ss, G.equal(this.opt_mute, "yes"));
                 }
             }

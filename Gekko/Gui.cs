@@ -1227,6 +1227,8 @@ namespace Gekko
                 Globals.remoteFileStamp = new DateTime(0l);  //just because we change working folder, an existing remote.gcm file in that folder should not be considered 'new' just because of that change.
 
                 Program.RemoteInit();
+
+                Globals.dependencyTracking.FencingWarning();
             }
         }
 
@@ -1703,7 +1705,8 @@ namespace Gekko
             Globals.numberOfSkippedLines = 0;
             Globals.threadIsInProcessOfAborting = false;  //clearing this
             Globals.applicationIsInProcessOfAborting = false;  //clearing this
-            Globals.errorMemory = null;  //so that it is not recording all the time.            
+            Globals.errorMemory = null;  //so that it is not recording all the time.
+            Globals.dependencyTracking.InitDependencyTracking();
 
             if (newUserInput)
             {
@@ -1914,6 +1917,60 @@ namespace Gekko
                 }
                 p.ReportToRunStatus(true);
                 Gui.PrintTotalErrors(p);
+
+                List<string> traceList = null;
+                if (Globals.dependencyTracking.Count() > 0)
+                {
+                    traceList = Globals.dependencyTracking.Get();
+                    if (traceList.Count > 0)
+                    {
+                        Table tab = new Table();
+                        tab.CurRow.SetTopBorder(1, 3);
+                        tab.CurRow.SetText(1, "DEPENDENCY TRACKING:");
+                        tab.CurRow.SetBottomBorder(1, 3);
+                        tab.CurRow.Next();
+                        int count = -1;
+                        int sysCalls = 0;
+                        bool hasNonSys = false;
+                        foreach (string s in traceList)
+                        {
+                            count++;
+                            if (count > 0) tab.CurRow.Next();
+                            string[] ss = s.Split('¤');
+                            if (G.equal(ss[0], Globals.dependencyTrackingSysNumber.ToString()))
+                            {
+                                sysCalls++;
+                                count--;
+                                continue;
+                            }
+                            hasNonSys = true;
+                            tab.CurRow.SetText(1, ss[1]);
+                            tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
+                            tab.CurRow.SetText(3, ss[2]);
+                        }
+                        tab.CurRow.SetBottomBorder(1, 3);
+                        tab.CurRow.SetLeftBorder(1);
+                        tab.CurRow.SetRightBorder(3);
+
+                        int widthRemember = Program.options.print_width;
+                        Program.options.print_width = int.MaxValue;
+                        try
+                        {
+                            G.Writeln();
+                            if (hasNonSys)
+                            {
+                                List<string> ss = tab.Print();
+                                foreach (string s in ss) G.Writeln(s, Color.Gray);
+                            }
+                            if (sysCalls > 0) G.Writeln("Total number of SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
+                            G.Writeln("Cf. 'option global dependency tracking' in gekko.ini next to gekko.exe.", Color.Gray);
+                        }
+                        finally
+                        {
+                            Program.options.print_width = widthRemember;
+                        }
+                    }
+                }
             }
         }
 

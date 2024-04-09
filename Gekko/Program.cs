@@ -154,10 +154,10 @@ namespace Gekko
                 if (!ok)
                 {
 
-                    if (isSys) G.Writeln2("*** Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
-                    else G.Writeln2("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
+                    if (isSys) G.Writeln2("*** ERROR: Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
+                    else G.Writeln2("*** ERROR: Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
                     FencingError(isSys);
-
+                    throw new GekkoException();
                 }
             }
         }
@@ -225,7 +225,7 @@ namespace Gekko
         {
             if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
             {
-                G.Writeln("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
+                G.Writeln2("+++ WARNING: The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
                 this.FencingError(false);
             }
         }
@@ -2320,6 +2320,8 @@ namespace Gekko
                     readInfo.abortedStar = true;
                     return;  //from READ * cancelling
                 }
+
+                Globals.dependencyTracking.Add(1, "Read", file);
 
                 if (open && createNewOpenFile && oRead.protect)
                 {
@@ -13658,6 +13660,9 @@ write datatest;
 
             file = Program.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
+
+            Globals.dependencyTracking.Add(1, "Write list", pathAndFilename);
+
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
@@ -15683,7 +15688,13 @@ write datatest;
                 Program.EmitCodeFromANTLR("", fileName2, false, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
-            }
+                try { Globals.dependencyTracking.InitFence(); }
+                catch
+                {
+                    G.Writeln2("*** ERROR: Problematic ini file: '" + fileName2 + "'");
+                    throw;
+                }
+            }            
 
             folders = new List<string>();
             folders.Add(Program.options.folder_command);
@@ -15703,6 +15714,8 @@ write datatest;
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
             }
+
+            Globals.dependencyTracking.FencingWarning();
         }
 
         public static void AddAbstract(string s, bool run, bool isLibrary, P p)
