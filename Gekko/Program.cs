@@ -2727,6 +2727,9 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+
+            Globals.dependencyTracking.Add(1, "Read", fileName);
+
             TableLight matrix = ReadExcelWorkbook(fileName, o.opt_sheet);
 
             bool transpose = false;  //corresponding to row-wise reading
@@ -15751,6 +15754,8 @@ write datatest;
                 Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
             }
 
+            Globals.dependencyTracking.Add(3, "Run", fileName2);
+
             Program.EmitCodeFromANTLR("", fileName2, isLibrary, p);
 
             if (G.equal(s, Globals.autoExecCmdFileName))
@@ -16953,6 +16958,9 @@ write datatest;
                     throw new GekkoException();
                 }
                 h.fileName = fileName;  //put it back, with path and all
+
+                Globals.dependencyTracking.Add(1, "Model", fileName);
+
                 string textInputRaw = Program.GetTextFromFileWithWait(fileName);
                 if (!oldFashion)
                 {
@@ -17311,6 +17319,7 @@ write datatest;
 
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
+            Globals.dependencyTracking.Add(2, "Pipe", fileName);
             if (!mute && !Globals.pipe) G.Writeln("Directing output to file: '" + fileName + "'");
             Globals.pipe = true;
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
