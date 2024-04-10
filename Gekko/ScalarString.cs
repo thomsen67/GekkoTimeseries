@@ -145,9 +145,11 @@ namespace Gekko
 
                         if (G.equal(variable, "root()") || G.equal(variable, "root( )") || G.equal(variable, "root(  )"))
                         {
-                            //Something like '{root()}\bank1\xx';
+                            //Something like '{root()}\bank1\xx';                            
+                            string s3 = (Functions.root(new GekkoTime(EFreq.Annual, 1, 1)) as ScalarString)._string2;
+                            string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1);
+                            s2 += s4 + s3;
                             hit = true;
-                            s2 = (Functions.root(new GekkoTime(EFreq.Annual, 1, 1)) as ScalarString)._string2;
                             lastEnd = end;
                             j = lastEnd;
                         }
