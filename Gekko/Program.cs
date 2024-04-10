@@ -381,13 +381,13 @@ namespace Gekko
             {
                 //SYS calls. These are checked for blacklist only
                 //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
-                if (this.Match(this.blacklist, fileNameTrim)) ok = false;
+                if (G.Match(fileNameTrim, this.blacklist)) ok = false;
             }
             else
             {
                 if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
                 {
-                    if (!this.Match(this.blacklist, fileNameTrim) && this.Match(this.whitelist, fileNameTrim))
+                    if (!G.Match(fileNameTrim, this.blacklist) && G.Match(fileNameTrim, this.whitelist))
                     {
                         //do nothing
                     }
@@ -398,7 +398,7 @@ namespace Gekko
                 }
                 else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
                 {
-                    if (!this.Match(this.blacklist, fileNameTrim))
+                    if (!G.Match(fileNameTrim, this.blacklist))
                     {
                         //do nothing
                     }
@@ -409,7 +409,7 @@ namespace Gekko
                 }
                 else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
                 {
-                    if (this.Match(this.whitelist, fileNameTrim))
+                    if (G.Match(fileNameTrim, this.whitelist))
                     {
                         //do nothing
                     }
@@ -464,30 +464,8 @@ namespace Gekko
             txt.MainAdd("You may change fencing in the " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After adjusting this "+ Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
         }
 
-        /// <summary>
-        /// Looks for the string input inside the elements. Special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1a\bank2".
-        /// </summary>
-        /// <param name="elements"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        private bool Match(List<string> elements, string input)
-        {
-            foreach (string s in elements)
-            {
-                List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
-                foreach (int i in allIndexOf)
-                {
-                    bool match = true; //seems to be a match, but it may be falsified
-                    int i1 = i;
-                    int i2 = i + s.Length;
-                    if (i1 > 0 && G.IsLetterOrDigitOrUnderscore(input[i1 - 1])) match = false;
-                    if (i2 < input.Length && G.IsLetterOrDigitOrUnderscore(input[i2])) match = false;
-                    if (match) return true;
-                }
-            }
-            return false;
-        }
 
+        
         /// <summary>
         /// Splits "c:\a\b; c:\f\g" into ["c:\a\b", "c:\f\g"]. And tests for blanks etc. Also frontslashes are converted into backslashes.
         /// </summary>

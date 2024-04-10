@@ -2685,6 +2685,7 @@ namespace Gekko
 
         /// <summary>
         /// Get all IndexOf() from a string, cf. https://stackoverflow.com/questions/15993357/how-to-get-all-indexof-instances-of-string-in-another-string-c-sharp. Can be empty, but will never contain an element = -1.
+        /// See also G.Match() and G.IsWord().
         /// </summary>        
         /// <param name="input"></param>
         /// <param name="substring"></param>
@@ -4202,18 +4203,44 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Can be used after .IndexOf() or G.AllIndexOf() to test boundaries of match.
+        /// Checks if a substring inside input starting at i and with given length is word-like. That is, there are no alphanumeric (or '_'
+        /// just before or after the substring. 
+        /// For instance: good for for making sure "c:\bank1" does not match input "c:\bank1a", but matches input "c:\bank1a\bank2".
+        /// See _Test_WordMatch.        
+        /// See also G.Match() and G.AllIndexOf().
         /// </summary>
         /// <param name="input"></param>
         /// <param name="s"></param>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static bool MatchWord(string input, int sLength, int i)
+        public static bool IsWord(string input, int i, int length)
         {            
             if (i > 0 && G.IsLetterOrDigitOrUnderscore(input[i - 1])) return false;
-            if (i + sLength < input.Length && G.IsLetterOrDigitOrUnderscore(input[i + sLength])) return false;
+            if (i + length < input.Length && G.IsLetterOrDigitOrUnderscore(input[i + length])) return false;
             return true;
         }
+
+        /// <summary>
+        /// Looks for the string input inside the elements. BEWARE: special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1\bank2".
+        /// See also G.AllIndexOf() and G.IsWord().
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="elements"></param>
+        /// <returns></returns>
+        public static bool Match(string input, List<string> elements)
+        {
+            foreach (string s in elements)
+            {
+                List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
+                foreach (int i in allIndexOf)
+                {
+                    bool match = G.IsWord(input, i, s.Length);
+                    if (match) return true;
+                }
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Cf. IsIdent()

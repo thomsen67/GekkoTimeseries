@@ -2534,7 +2534,7 @@ namespace Gekko
                         
                     }
                     
-                    log.Add(file.FullName + " --- copied to .gbk_gek2. " + exist);
+                    log.Add(file.FullName + " --- copied to .gbk_gek2. ");
                 }
             }
 
