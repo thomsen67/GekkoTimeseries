@@ -16445,7 +16445,6 @@ write datatest;
 
         public static void Tell(string text, bool nocr)
         {            
-            G.Writeln();
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
