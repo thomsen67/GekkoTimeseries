@@ -4202,6 +4202,20 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Can be used after .IndexOf() or G.AllIndexOf() to test boundaries of match.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static bool MatchWord(string input, int sLength, int i)
+        {            
+            if (i > 0 && G.IsLetterOrDigitOrUnderscore(input[i - 1])) return false;
+            if (i + sLength < input.Length && G.IsLetterOrDigitOrUnderscore(input[i + sLength])) return false;
+            return true;
+        }
+
+        /// <summary>
         /// Cf. IsIdent()
         /// </summary>
         /// <param name="s"></param>

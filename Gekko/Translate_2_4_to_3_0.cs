@@ -2241,6 +2241,44 @@ namespace Gekko
 
         }
 
+        public static void Rootify(string rootify)
+        {
+            //kaldes med rootify('g:\datopgek')
+
+            string g3 = @"g:\datopgek3";
+            string ext = ".gbk_gek2";
+
+            string logfile = Program.options.folder_working + "\\clone_log.txt";
+
+            //if (Globals.runningOnTTComputer) g3 = @"c:\Tools\slet";
+
+            System.Windows.Forms.MessageBox.Show("About to clone .gbk files into .gbk_gek2 in the folder: " + g3);
+
+            List<string> log = new List<string>();
+
+            if (!Directory.Exists(g3))
+            {
+                new Error("Directory '" + g3 + "' does not exist");
+            }
+
+            new Writeln("Clone started... ");
+
+            Insert2_WalkFolderHelper2(new DirectoryInfo(g3), log);
+
+            new Writeln("... cloning ended");
+            new Writeln(log.Count + " files were cloned, cf. clone_log.txt");
+
+            using (FileStream fs = Program.WaitForFileStream(logfile, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter file2 = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in log)
+                {
+                    file2.WriteLine(s);
+                }
+            }
+            new Writeln("You may inspect the log-file here: " + logfile);
+        }
+
         public static void Insert()
         {
             //kaldes med tell'datopgek3_agh7xvslke3jfhqp';
@@ -2436,6 +2474,73 @@ namespace Gekko
             foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
             {
                 Insert3_WalkFolderHelper(subfolder, log);
+            }
+        }
+
+        public static void Insert4(string rootify)
+        {
+            //kaldes med rootify()
+
+            string g3 = @"g:\datopgek3";
+            string ext = ".gbk_gek2";
+
+            string logfile = Program.options.folder_working + "\\rootify_log.txt";
+            
+            System.Windows.Forms.MessageBox.Show("About to rootify .gcm files in the folder: " + g3);
+
+            List<string> log = new List<string>();
+
+            if (!Directory.Exists(g3))
+            {
+                new Error("Directory '" + g3 + "' does not exist");
+            }
+
+            new Writeln("Rootify started... ");
+
+            Insert4_WalkFolderHelper4(new DirectoryInfo(g3), log, rootify);
+
+            new Writeln("... rootify ended");
+            new Writeln(log.Count + " files were rootified, cf. rootify_log.txt");
+
+            using (FileStream fs = Program.WaitForFileStream(logfile, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter file2 = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in log)
+                {
+                    file2.WriteLine(s);
+                }
+            }
+            new Writeln("You may inspect the log-file here: " + logfile);
+        }
+
+        public static void Insert4_WalkFolderHelper4(DirectoryInfo directoryInfo, List<string> log, string rootify)
+        {
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                if (G.Equal(file.Extension, ".gcm"))
+                {
+                    
+                    string s = File.ReadAllText(file.FullName);
+                    string s2 = "";
+                    List<int> ii = G.AllIndexOf(s, rootify, StringComparison.OrdinalIgnoreCase);
+                    int counter = 0;
+                    foreach (int i in ii)
+                    {                        
+                        if (i > 0 && G.IsLetterOrDigitOrUnderscore(s[i - 1])) continue;
+                        if (i < s.Length - 1 && G.IsLetterOrDigitOrUnderscore(s[i + 1])) continue;
+                        //Will nok match "g:\datopgek" in "g:\datopgek2", but will in "g:\datopgek\abase".
+                        counter++;
+
+                        
+                    }
+                    
+                    log.Add(file.FullName + " --- copied to .gbk_gek2. " + exist);
+                }
+            }
+
+            foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
+            {
+                Insert4_WalkFolderHelper4(subfolder, log, rootify);
             }
         }
 
