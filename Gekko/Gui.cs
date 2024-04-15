@@ -1131,7 +1131,7 @@ namespace Gekko
                 Program.RemoteInit();
             }
 
-            Globals.dependencyTracking.FencingWarning();
+            Globals.dependencyTracking.FencingWarning(); //if the user (or program) changes working folder.
         }
 
         private static void ChangeWorkingFolderNoteMessage()

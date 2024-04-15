@@ -362,7 +362,7 @@ namespace Gekko
                         if (isSys) txt.MainAdd("Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
                         else txt.MainAdd("Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
                         txt.MainNewLineTight();
-                        FencingError(txt, isSys);
+                        FencingMessage(txt, isSys);
                     }
                 }
             }
@@ -431,17 +431,18 @@ namespace Gekko
         {            
             if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
             {
-                using (Warning txt = new Warning())
+                using (Warning txt = new Warning()) //Remove #kjlasfa87iads if this is no longer a warning
                 {
                     txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
                     txt.MainNewLineTight();
-                    this.FencingError(txt, false);
+                    this.FencingMessage(txt, false);
                 }
+                Globals.numberOfWarnings--; //See #kjlasfa87iads, to avoid a "number of warnings" message.
             }
         }
 
 
-        public void FencingError(Wrap txt, bool isSysCall)
+        public void FencingMessage(Wrap txt, bool isSysCall)
         {
             if (this.blacklist.Count() > 0)
             {
@@ -461,10 +462,9 @@ namespace Gekko
                 }
             }
             txt.MainNewLineTight();
-            txt.MainAdd("You may change fencing in the " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After adjusting this "+ Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
+            txt.MainAdd("You may change these settings in the system gekko.ini file.");
+            txt.MoreAdd("You may change fencing in the file " + Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName) + ". If you are using your own local version of Gekko, this is all fine. If Gekko is opened from a network folder, beware that changing the gekko.ini changes Gekko settings for all the users using that particular Gekko version (if gekko.ini resides in a write-protected folder, you need write access). After adjusting the " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
         }
-
-
         
         /// <summary>
         /// Splits "c:\a\b; c:\f\g" into ["c:\a\b", "c:\f\g"]. And tests for blanks etc. Also frontslashes are converted into backslashes.

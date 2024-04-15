@@ -2555,11 +2555,12 @@ namespace Gekko
                     try
                     {
                         DateTime date = File.GetLastWriteTime(file.FullName);
-                        string s = File.ReadAllText(file.FullName);
+                        string s = File.ReadAllText(file.FullName, Encoding.Default);
                         string s2 = "";
                         List<int> ii1 = G.AllIndexOf(s, rootify, StringComparison.OrdinalIgnoreCase);
                         List<int> ii2 = G.AllIndexOf(s, rootify.Replace("\\", "/"), StringComparison.OrdinalIgnoreCase);                                                
                         List<int> ii = ii1.Union(ii2).ToList();
+                        ii.Sort();
 
                         int counter = 0;
                         int begin = 0;
@@ -2599,7 +2600,7 @@ namespace Gekko
                                 s3 = top + s2;
 
                             }
-                            File.WriteAllText(file.FullName, s3);
+                            File.WriteAllText(file.FullName, s3, Encoding.Default);
                             File.SetLastWriteTime(file.FullName, date);
                             if (counter > 0)
                             {

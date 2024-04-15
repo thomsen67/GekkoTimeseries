@@ -1951,11 +1951,9 @@ namespace Gekko
             if (fileName3 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
-                return;  //used for gekko.ini file
             }
             else
             {
-
                 if (!G.Equal(fileName2, fileName3))  //equal if Gekko starts op in gekko.exe folder.
                 {
                     Globals.cmdPathAndFileName = fileName3;  //always contains a path, is used if there is a lexer error
@@ -1970,7 +1968,7 @@ namespace Gekko
             // Fencing
             // =========================================================================
 
-            Globals.dependencyTracking.FencingWarning();
+            Globals.dependencyTracking.FencingWarning();  //fencing can only be set via a gekko.ini next to Gekko.exe. So we check it here.
         }
 
         
