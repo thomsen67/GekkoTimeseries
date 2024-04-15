@@ -220,7 +220,7 @@ namespace Gekko
 
                 if (commandName == "" && supreme != null)
                 {
-                    //some of the last nodes may be without .parent (comments etc.). This is a hack to handle it.
+                    //some of the begin nodes may be without .parent (comments etc.). This is a hack to handle it.
                     commandName = supreme.meta.commandName;
                 }
 
@@ -1497,7 +1497,7 @@ namespace Gekko
                 int itemp = StringTokenizer.FindS(line, op_i + 1, "=");
                 if (itemp == -12345)
                 {
-                    //there is not an '=' following, so it is the last equals sign (or other operator)
+                    //there is not an '=' following, so it is the begin equals sign (or other operator)
                     //x%y = will not have % replaced with %=
                     //problem: x%y % 3 will be wrong
                     if (line[op_i].s == "^") line[op_i].s = "^=";
@@ -1738,9 +1738,9 @@ namespace Gekko
                         }
                     }
                 }
-                items.Add(s.Trim());  //last item
+                items.Add(s.Trim());  //begin item
                 itemsExtra.Add(sExtra);
-                //The following is a BIG HACK to handle blanks for the last element.
+                //The following is a BIG HACK to handle blanks for the begin element.
                 if (itemsExtra.Count > 1 && itemsExtra[itemsExtra.Count - 1] == "" && itemsExtra[itemsExtra.Count - 2].Length > 0) itemsExtra[itemsExtra.Count - 1] = " ";
                                 
                 //items are elements from l2
@@ -2250,7 +2250,7 @@ namespace Gekko
 
             string logfile = Program.options.folder_working + "\\clone_log.txt";
 
-            //if (Globals.runningOnTTComputer) g3 = @"c:\Tools\slet";
+            //if (Globals.runningOnTTComputer) directoryPath = @"c:\Tools\slet";
 
             System.Windows.Forms.MessageBox.Show("About to clone .gbk files into .gbk_gek2 in the folder: " + g3);
 
@@ -2360,7 +2360,7 @@ namespace Gekko
 
             string logfile = Program.options.folder_working + "\\clone_log.txt";
 
-            //if (Globals.runningOnTTComputer) g3 = @"c:\Tools\slet";
+            //if (Globals.runningOnTTComputer) directoryPath = @"c:\Tools\slet";
 
             System.Windows.Forms.MessageBox.Show("About to clone .gbk files into .gbk_gek2 in the folder: " + g3);
 
@@ -2477,30 +2477,59 @@ namespace Gekko
             }
         }
 
-        public static void Insert4(string rootify)
+        public static void Insert4(string directoryPath, string rootify, string option)
         {
             //kaldes med rootify()
 
-            string g3 = @"g:\datopgek3";
-            string ext = ".gbk_gek2";
+            bool decorate = false;
+            if (option != null)
+            {
+                if (G.Equal(option, "decorate")) decorate = true;
+                else new Error("Illegal option '" + option + "'");
+            }
+
+            if (rootify.StartsWith("\\") || rootify.StartsWith("/") || rootify.EndsWith("\\") || rootify.EndsWith("/")) new Error("The rootify string (argument #2) should not start or end with a back- or frontslash");
 
             string logfile = Program.options.folder_working + "\\rootify_log.txt";
-            
-            System.Windows.Forms.MessageBox.Show("About to rootify .gcm files in the folder: " + g3);
+
+            System.Windows.Forms.MessageBox.Show("About to rootify .gcm files in the folder: " + directoryPath + ". \nBeware that .gcm files will (probably) be altered. \nUse the red 'Stop current job' button to abort now. \nNote: will replace for both '" + rootify + "' and '" + rootify.Replace("\\", "/") + "'. \nLogfile: " + logfile);
 
             List<string> log = new List<string>();
 
-            if (!Directory.Exists(g3))
+            if (!Directory.Exists(directoryPath))
             {
-                new Error("Directory '" + g3 + "' does not exist");
+                new Error("Directory '" + directoryPath + "' does not exist");
             }
 
+            DateTime dt = DateTime.Now;
             new Writeln("Rootify started... ");
 
-            Insert4_WalkFolderHelper4(new DirectoryInfo(g3), log, rootify);
+            GekkoDictionary<string, int> dict = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-            new Writeln("... rootify ended");
-            new Writeln(log.Count + " files were rootified, cf. rootify_log.txt");
+            int hits = 0; int failed = 0;
+            Insert4_WalkFolderHelper4(new DirectoryInfo(directoryPath), log, rootify, decorate, dict, ref hits, ref failed);
+
+            new Writeln("... rootify ended, " + G.Seconds(dt));
+            string d = null; if (decorate) d = "/decorated";
+            new Writeln("Investigated" + d + " " + log.Count + " .gcm files, of which " + hits + " were rootified. Cf. rootify_log.txt in your working folder");
+
+            if (failed > 0) new Warning(failed + " .gcm files failed investigation, cf. log");
+
+            if (dict.Count > 0)
+            {
+                G.Writeln2("The following textfile types contained '" + rootify + "'");
+                List<string> xx = new List<string>();
+                foreach (KeyValuePair<string, int> kvp in dict)
+                {
+                    xx.Add(kvp.Key + ": " + kvp.Value + " file" + G.S(kvp.Value));
+                }
+                xx.Sort();
+                foreach (string s in xx)
+                {
+                    G.Writeln(s);
+                }
+                G.Writeln("These file types may or may not need investigation");
+            }
 
             using (FileStream fs = Program.WaitForFileStream(logfile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter file2 = G.GekkoStreamWriter(fs))
@@ -2513,34 +2542,120 @@ namespace Gekko
             new Writeln("You may inspect the log-file here: " + logfile);
         }
 
-        public static void Insert4_WalkFolderHelper4(DirectoryInfo directoryInfo, List<string> log, string rootify)
+        public static void Insert4_WalkFolderHelper4(DirectoryInfo directoryInfo, List<string> log, string rootify, bool decorate, GekkoDictionary<string, int> dict, ref int hits, ref int failed)
         {
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
                 if (G.Equal(file.Extension, ".gcm"))
                 {
-                    
-                    string s = File.ReadAllText(file.FullName);
-                    string s2 = "";
-                    List<int> ii = G.AllIndexOf(s, rootify, StringComparison.OrdinalIgnoreCase);
-                    int counter = 0;
-                    foreach (int i in ii)
-                    {                        
-                        if (i > 0 && G.IsLetterOrDigitOrUnderscore(s[i - 1])) continue;
-                        if (i < s.Length - 1 && G.IsLetterOrDigitOrUnderscore(s[i + 1])) continue;
-                        //Will nok match "g:\datopgek" in "g:\datopgek2", but will in "g:\datopgek\abase".
-                        counter++;
+                    //  ---xyz----xyz--   
+                    //  ---{root()}----{root()}--
+                    //  0123456789012345678901234
 
-                        
+                    try
+                    {
+                        DateTime date = File.GetLastWriteTime(file.FullName);
+                        string s = File.ReadAllText(file.FullName);
+                        string s2 = "";
+                        List<int> ii1 = G.AllIndexOf(s, rootify, StringComparison.OrdinalIgnoreCase);
+                        List<int> ii2 = G.AllIndexOf(s, rootify.Replace("\\", "/"), StringComparison.OrdinalIgnoreCase);                                                
+                        List<int> ii = ii1.Union(ii2).ToList();
+
+                        int counter = 0;
+                        int begin = 0;
+                        foreach (int i in ii)
+                        {
+                            if (G.IsDelimited(s, i, rootify.Length))
+                            {
+                                //Will not match "g:\datopgek" in "g:\datopgek2", but will in "g:\datopgek\abase".
+                                counter++;
+                                if (i > 0) s2 += G.Substring(s, begin, i - 1);
+                                s2 += "{root()}";
+                                begin = i + rootify.Length;
+                            }
+                        }
+                        s2 += s.Substring(begin);
+
+                        if (s2.Length != s.Length - counter * (rootify.Length - "{root()}".Length)) new Error("Rootify() failed: needs investigation -- contact Gekko editor.");
+
+                        string d = null;  if (decorate) d = " Decorated.";
+                        string x = "    ";
+                        if (counter > 0 || decorate)
+                        {
+                            string s3 = s2;
+                            if (decorate)
+                            {
+                                string top = null;
+                                if (counter > 0)
+                                {
+                                    top = "//+++ Indeholder " + counter + " {root()}-referencer";
+                                    top += G.NL;
+                                }
+                                //top += "//+++ Original fildato: " + date.ToString(new System.Globalization.CultureInfo("da-DK"));
+                                //top += G.NL;
+                                top += "gekko version >= '2.5.3' and version < '3';";
+                                top += G.NL;
+                                top += G.NL;
+                                s3 = top + s2;
+
+                            }
+                            File.WriteAllText(file.FullName, s3);
+                            File.SetLastWriteTime(file.FullName, date);
+                            if (counter > 0)
+                            {
+                                hits++;
+                                x = "+++ ";
+                                //if (!dict.ContainsKey("gcm")) dict.Add("gcm", 0);
+                                //dict["gcm"]++;
+                            }
+                        }
+                        log.Add(x + file.FullName + " --> rootified " + counter + " paths." + d);
                     }
-                    
-                    log.Add(file.FullName + " --- copied to .gbk_gek2. ");
+                    catch
+                    {
+                        log.Add("*** " + file.FullName + " *** ERROR: FAILED.");
+                        failed++;
+                    }                    
+                }
+                else
+                {
+                    try
+                    {
+                        if (!G.IsBinary(file.FullName))
+                        {
+                            string s = File.ReadAllText(file.FullName);
+                            List<int> ii1 = G.AllIndexOf(s, rootify, StringComparison.OrdinalIgnoreCase);
+                            List<int> ii2 = G.AllIndexOf(s, rootify.Replace("\\", "/"), StringComparison.OrdinalIgnoreCase);
+                            List<int> ii = ii1.Union(ii2).ToList();
+
+                            bool hit = false;
+                            foreach (int i in ii)
+                            {
+                                if (G.IsDelimited(s, i, rootify.Length))
+                                {
+                                    hit = true;
+                                    break;
+                                }
+                            }
+
+
+                            if (hit)
+                            {
+                                if (!dict.ContainsKey(file.Extension.ToLower())) dict.Add(file.Extension.ToLower(), 0);
+                                dict[file.Extension.ToLower()]++;
+                            }
+                        }
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
             foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
             {
-                Insert4_WalkFolderHelper4(subfolder, log, rootify);
+                Insert4_WalkFolderHelper4(subfolder, log, rootify, decorate, dict, ref hits, ref failed);
             }
         }
 

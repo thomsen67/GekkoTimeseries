@@ -2685,7 +2685,7 @@ namespace Gekko
 
         /// <summary>
         /// Get all IndexOf() from a string, cf. https://stackoverflow.com/questions/15993357/how-to-get-all-indexof-instances-of-string-in-another-string-c-sharp. Can be empty, but will never contain an element = -1.
-        /// See also G.Match() and G.IsWord().
+        /// See also G.Match() and G.IsDelimited().
         /// </summary>        
         /// <param name="input"></param>
         /// <param name="substring"></param>
@@ -4213,7 +4213,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static bool IsWord(string input, int i, int length)
+        public static bool IsDelimited(string input, int i, int length)
         {            
             if (i > 0 && G.IsLetterOrDigitOrUnderscore(input[i - 1])) return false;
             if (i + length < input.Length && G.IsLetterOrDigitOrUnderscore(input[i + length])) return false;
@@ -4222,7 +4222,7 @@ namespace Gekko
 
         /// <summary>
         /// Looks for the string input inside the elements. BEWARE: special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1\bank2".
-        /// See also G.AllIndexOf() and G.IsWord().
+        /// See also G.AllIndexOf() and G.IsDelimited().
         /// </summary>
         /// <param name="input"></param>
         /// <param name="elements"></param>
@@ -4234,7 +4234,7 @@ namespace Gekko
                 List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
                 foreach (int i in allIndexOf)
                 {
-                    bool match = G.IsWord(input, i, s.Length);
+                    bool match = G.IsDelimited(input, i, s.Length);
                     if (match) return true;
                 }
             }

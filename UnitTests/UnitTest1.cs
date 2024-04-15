@@ -11921,8 +11921,30 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_IsWord()
+        {                       
+            Assert.IsTrue(G.Match("abcde", new List<string>() { "abcde" }));
+            Assert.IsTrue(G.Match("abcde", new List<string>() { "xyz", "cd", "abcde" }));
+            Assert.IsTrue(G.Match(",abcde,", new List<string>() { "abcde" }));
+            Assert.IsTrue(G.Match("\\abcde\\", new List<string>() { "abcde" }));
+            Assert.IsTrue(!G.Match("_abcde_", new List<string>() { "abcde" }));
+            Assert.IsTrue(G.Match("abcde", new List<string>() { "AbCdE" }));
+            Assert.IsTrue(G.Match("aBcDe", new List<string>() { "abcde" }));
+            Assert.IsTrue(!G.Match("abcde", new List<string>() { "abcd" }));
+            Assert.IsTrue(!G.Match("abcde", new List<string>() { "bcde" }));
+            Assert.IsTrue(!G.Match("abcd_", new List<string>() { "abcd" }));
+            Assert.IsTrue(!G.Match("_bcde", new List<string>() { "bcde" }));
+            Assert.IsTrue(!G.Match("abcd1", new List<string>() { "abcd" }));
+            Assert.IsTrue(!G.Match("1bcde", new List<string>() { "bcde" }));
+            Assert.IsTrue(G.Match("abcd\\", new List<string>() { "abcd" }));
+            Assert.IsTrue(G.Match("\\bcde", new List<string>() { "bcde" }));
+            Assert.IsTrue(G.Match("abcd,", new List<string>() { "abcd" }));
+            Assert.IsTrue(G.Match(",bcde", new List<string>() { "bcde" }));            
+        }
+
+        [TestMethod]
         public void _Test_Sim_MONA()
-        {
+        {            
             for (int i = 0; i < 2; i++)
             {
                 if (i == 0) I("flush();");
@@ -17978,7 +18000,6 @@ namespace UnitTests
                     sw.WriteLine(@"  ""is_manual"" : true,"); 
                     sw.WriteLine(@"  ""cmd_file"" : ""scalar.cmd"",");
                     sw.WriteLine(@"  ""gms_file"" : ""scalar.gms"",");
-                    //sw.WriteLine(@"  ""lst_file"" : ""scalar.lst"",");
                     sw.WriteLine(@"  ""model_name"" : """ + modelName + @""",");
                     sw.WriteLine(@"  ""solve_call"" : ""solve "",");
                     sw.WriteLine(@"  ""raw_file"" : ""scalar.gms"",");

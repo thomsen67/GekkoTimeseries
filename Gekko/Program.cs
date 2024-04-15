@@ -331,16 +331,16 @@ namespace Gekko
             this.storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public void Add(int priority, string type, string fileName3)
+        public void Add(int priority, string type, string input)
         {            
-            if (!G.IsAbsolutePath(fileName3)) return; //should not be possible... (also checks for null)
+            if (priority != Globals.dependencyTrackingSysNumber && !G.IsAbsolutePath(input)) return; //should not be possible... (also checks for null)
             
-            this.CheckFence(fileName3, priority == Globals.dependencyTrackingSysNumber);
+            this.CheckFence(input, priority == Globals.dependencyTrackingSysNumber);
 
             //Put into tracking if active
             if (G.Equal(Program.options.global_dependency_tracking, "simple"))
             {
-                string fileNameTrim = fileName3.Trim();
+                string fileNameTrim = input.Trim();
                 if (priority < 1 || priority > 9) new Error("Priority!");
                 string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
@@ -428,7 +428,7 @@ namespace Gekko
         }
 
         public void FencingWarning()
-        {
+        {            
             if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
             {
                 using (Warning txt = new Warning())
@@ -448,16 +448,16 @@ namespace Gekko
                 txt.MainAdd("+++ Blacklist = ");
                 foreach (string s in this.blacklist)
                 {
-                    txt.MainAdd(s + ";");
+                    txt.MainAdd(s + "; ");
                 }
             }
             if (this.whitelist.Count() > 0 && !isSysCall)
             {
                 if (this.blacklist.Count > 0 && this.whitelist.Count > 0) txt.MainNewLineTight();
-                txt.MainAdd("+++ Whitelist:");
+                txt.MainAdd("+++ Whitelist = ");
                 foreach (string s in this.whitelist)
                 {
-                    txt.MainAdd(s + ";");
+                    txt.MainAdd(s + "; ");
                 }
             }
             txt.MainNewLineTight();
@@ -32006,7 +32006,7 @@ namespace Gekko
                     fileName3 = fileNameWithPath;
                     if (fileName3.ToLower().EndsWith(".xls")) fileName3 = fileName3.Substring(0, fileName3.Length - 4);
                     if (fileName3.ToLower().EndsWith(".xlsx")) fileName3 = fileName3.Substring(0, fileName3.Length - 5);
-                    //fileName3 is stripped of .xls or .xlsx
+                    //input is stripped of .xls or .xlsx
                     fileNameOriginalFile = "";
 
                     //A bit hacky...........

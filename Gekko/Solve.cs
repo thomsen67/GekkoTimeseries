@@ -809,16 +809,32 @@ namespace Gekko
                             functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
                                                                        //double x = r[i];                            
                         }
-                        //This could be speedup using a faster string matching, and more importantly storing the data in a double[] array and put it in in 1 go.                                                    
+                        //This could be speedup using a faster string matching, and more importantly storing the data in a double[] array and put it in in 1 go.
+
+                        int timelessEquations = 0;
+                        int indexlessEquations = 0;
+                        int allEquations = 0;                        
+                        
                         string previousName = ""; string[] previousIndexes = null; Series previousSeries = null;
                         for (int i = 0; i < modelGamsScalar.eqCounts - modelGamsScalar.fakeEqCounts; i++)
                         {
                             string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
                             G.Chop_Chop(modelGamsScalar.GetEqName(i), out bank, out name2, out freq2, out indexes); //freq2 will be == null
                             string name = o.opt_prefix + name2;
-                            //if (name2.ToLower().StartsWith("e" + Globals.scalarModelExtraVariable)) continue;
-                            if (indexes == null) new Error("Equation " + name2 + " does not seem to have indexes -- this is unexpected.");
-                            GekkoTime t = GekkoTime.FromStringToGekkoTime(indexes[indexes.Length - 1]);
+                            if (indexes == null)
+                            {
+                                indexlessEquations++;
+                                continue;
+                            }
+
+                            GekkoTime t = GekkoTime.FromStringToGekkoTime(indexes[indexes.Length - 1], false, false);  //may return .tNull
+                            if (t.IsNull())
+                            {
+                                timelessEquations++;
+                                continue;
+                            }
+
+                            allEquations++;
 
                             bool good = true;
                             if (name != previousName)  //no need to check case-insensitive
@@ -891,7 +907,22 @@ namespace Gekko
                                 counterSeries++;
                             }
                         }
-                        new Writeln("Residuals calculated for " + t1.ToString() + "-" + t2.ToString() + ", resulting in " + counterSeries + " (array-)series with a total of " + modelGamsScalar.eqCounts + " residual values (of which " + counterMissings + " were missings)");
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.MainAdd("Residuals series produced for " + t1.ToString() + "-" + t2.ToString() + ", resulting in " + counterSeries + " (array-)series with a total of " + allEquations + " residual values/observations (of which " + counterMissings + " were missings)");
+                            if (indexlessEquations > 0)
+                            {
+                                txt.MainNewLineTight();
+                                txt.MainAdd("NOTE: Gekko did not produce residuals for " + indexlessEquations + " indexless equation" + G.S(indexlessEquations));
+                                txt.MoreAdd("An indexless equation like e1 does not have any indexes, in contrast to for instance e1['a'] or e1['a', '2020'].");
+                            }
+                            if (timelessEquations > 0)
+                            {
+                                txt.MainNewLineTight();
+                                txt.MainAdd("NOTE: Gekko did not produce residuals for " + timelessEquations + " timeless equation" + G.S(timelessEquations));
+                                txt.MoreAdd("A timeless equation like e1['a'] does not have any time index, in contrast to for instance e1['a', '2020'].");
+                            }
+                        }
                     }
                 }
                 return;

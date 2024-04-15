@@ -366,7 +366,8 @@ namespace Gekko
             Program.InitUfunctionsAndArithmeticsAndMore();
 
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
-            StartupExeAndIniStuff();
+            StartupExeAndIniStuff();            
+
             CrossThreadStuff.Mode();            
 
             Gui.gui.gekkoToolStripMenuItem.Checked = true;
@@ -572,7 +573,7 @@ namespace Gekko
                 Program.options.folder_working = folder;
             }
             else Program.options.folder_working = G.GetWorkingFolder();  //if called from cmd prompt, it will be that folder -> may be overwritten later on
-            Globals.dependencyTracking.FencingWarning();
+            //Globals.dependencyTracking.FencingWarning();
 
             if (track) MessageBox.Show("13");
             string s1 = G.GetWorkingFolder();
@@ -595,7 +596,7 @@ namespace Gekko
                                 if (Directory.Exists(Globals.userSettings.WorkingFolder))
                                 {
                                     Program.options.folder_working = Globals.userSettings.WorkingFolder;
-                                    Globals.dependencyTracking.FencingWarning();
+                                    //Globals.dependencyTracking.FencingWarning();
                                 }
                             }
                         }
@@ -621,7 +622,7 @@ namespace Gekko
                 {
                     MessageBox.Show("Gekko: The working folder '" + Program.options.folder_working + "' does not seem to exist \n -- changed to desktop folder: " + desktop);
                     Program.options.folder_working = desktop;
-                    Globals.dependencyTracking.FencingWarning();
+                    //Globals.dependencyTracking.FencingWarning();
                 }
 
                 //Testing write access of working folder (writing a file, and deleting it again)
@@ -761,6 +762,7 @@ namespace Gekko
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
+            //Globals.dependencyTracking.FencingWarning();
         }        
 
         /// <summary>
@@ -875,7 +877,7 @@ namespace Gekko
             }
 
             Program.options.folder_working = us.WorkingFolder;
-            Globals.dependencyTracking.FencingWarning();
+            //Globals.dependencyTracking.FencingWarning();
 
             Point pGraph = HandleMonitor(us.GraphWindowTopDistance, us.GraphWindowLeftDistance);
             Globals.guiGraphWindowTopDistance = pGraph.X;
@@ -1073,7 +1075,7 @@ namespace Gekko
             if (folder != "")
             {
                 Program.options.folder_working = folder;
-                Globals.dependencyTracking.FencingWarning();
+                //Globals.dependencyTracking.FencingWarning();
                 System.IO.Directory.SetCurrentDirectory(Program.options.folder_working);
             }
 
@@ -1109,7 +1111,7 @@ namespace Gekko
             if (!G.IsUnitTesting()) Globals.userSettings.WorkingFolder = folder;            
 
             Program.options.folder_working = folder;
-            Globals.dependencyTracking.FencingWarning();
+            //Globals.dependencyTracking.FencingWarning();
             if (G.SetWorkingFolder(false))
             {
                 //folder does not exist.
@@ -1937,26 +1939,25 @@ namespace Gekko
                         Table tab = new Table();
                         tab.CurRow.SetTopBorder(1, 3);
                         tab.CurRow.SetText(1, "DEPENDENCY TRACKING:");
-                        tab.CurRow.SetBottomBorder(1, 3);
-                        tab.CurRow.Next();
-                        int count = -1;
+                        tab.CurRow.SetBottomBorder(1, 3);         
                         int sysCalls = 0;
-                        bool hasNonSys = false;
+                        int nonSysCalls = 0;
                         foreach (string s in traceList)
-                        {
-                            count++;
-                            if (count > 0) tab.CurRow.Next();
+                        {                            
                             string[] ss = s.Split('¤');
                             if (G.Equal(ss[0], Globals.dependencyTrackingSysNumber.ToString()))
                             {
                                 sysCalls++;
-                                count--;
                                 continue;
                             }
-                            hasNonSys = true;
-                            tab.CurRow.SetText(1, ss[1]);
-                            tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
-                            tab.CurRow.SetText(3, ss[2]);
+                            else
+                            {
+                                nonSysCalls++;
+                                tab.CurRow.Next();
+                                tab.CurRow.SetText(1, ss[1]);
+                                tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
+                                tab.CurRow.SetText(3, ss[2]);
+                            }
                         }
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.SetLeftBorder(1);
@@ -1967,12 +1968,12 @@ namespace Gekko
                         try
                         {
                             G.Writeln();
-                            if (hasNonSys)
+                            if (nonSysCalls > 0)
                             {
                                 List<string> ss = tab.Print();
                                 foreach (string s in ss) G.Writeln(s, Color.Gray);
                             }
-                            if (sysCalls > 0) G.Writeln("Total number of SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
+                            if (sysCalls > 0) G.Writeln("Total number of different SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
                             G.Writeln("Cf. menu 'Options' --> 'Program dependency tracking'", Color.Gray);
                         }
                         finally

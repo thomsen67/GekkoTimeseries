@@ -1923,7 +1923,9 @@ namespace Gekko
             {
                 Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
                 Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                
                 Program.RunGekkoCommands("", fileName2, 0, p);
+                
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
                 try { Globals.dependencyTracking.InitFence(); }

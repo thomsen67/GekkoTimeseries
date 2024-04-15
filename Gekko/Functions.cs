@@ -6604,7 +6604,20 @@ namespace Gekko
         // LIST functions end
         // -----------------------------------
 
+        public static void rootify(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            Functions.rootify(smpl, _t1, _t2, x1, x2, null);
+        }
 
+        public static void rootify(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            //NOTE: Use BACKslash for arg #2
+            string dir = O.ConvertToString(x1);
+            string rootify = O.ConvertToString(x2);
+            string option = null;
+            if (x3 != null) option = O.ConvertToString(x3);
+            Translate_2_4_to_3_0.Insert4(dir, rootify, option);
+        }
 
         /// <summary>
         /// Inbuilt function to search for the file root.ini upwards in the directory structure.
@@ -6616,7 +6629,7 @@ namespace Gekko
         public static IVariable root(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
             if (vars.Length > 1) new Error("Funtion root() only accepts 0 or 1 arguments");
-                        
+
             string rootFileName = "root.ini";
             if (vars.Length == 1)
             {
@@ -6625,7 +6638,7 @@ namespace Gekko
                 else if (G.Equal(s, "root")) rootFileName = "root.ini";
                 else new Error("Expected argument to be 'root' or 'gekko'");
             }
-            
+
             string folder1 = Program.options.folder_working;
 
             //From working folder
@@ -6694,7 +6707,7 @@ namespace Gekko
                 }
             }
             return null;  //because of errors we never get here
-        }        
+        }    
 
         private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
         {
