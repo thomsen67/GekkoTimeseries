@@ -324,6 +324,11 @@ namespace Gekko
 
         public void InitFence()
         {
+            this.blacklist_read = new List<string>();
+            this.blacklist_write = new List<string>();
+            this.whitelist_read = new List<string>();
+            this.whitelist_write = new List<string>();
+
             List<string> black_both = new List<string>();
             List<string> white_both = new List<string>();
             black_both = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
