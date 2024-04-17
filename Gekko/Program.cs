@@ -314,7 +314,12 @@ namespace Gekko
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private List<string> blacklist = new List<string>();
         private List<string> whitelist = new List<string>();
-        
+
+        private List<string> blacklist_read = new List<string>();
+        private List<string> whitelist_read = new List<string>();
+        private List<string> blacklist_write = new List<string>();
+        private List<string> whitelist_write = new List<string>();
+
         private bool FenceIsActive()
         {
             return this.blacklist.Count + this.whitelist.Count > 0;
@@ -379,9 +384,13 @@ namespace Gekko
             bool ok = true;
             if (isSysCall)
             {
-                //SYS calls. These are checked for blacklist only
-                //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
-                if (G.Match(fileNameTrim, this.blacklist)) ok = false;
+                if (Program.options.global_fence_sys)
+                {
+                    //SYS calls. These are checked for blacklist only (and only if option global fence sys = yes).
+                    //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
+                    //Hard to do for whitelist here, then we would need to parse the string and find things that look like paths.
+                    if (G.Match(fileNameTrim, this.blacklist)) ok = false;
+                }
             }
             else
             {
@@ -24794,6 +24803,12 @@ namespace Gekko
             string global_dependency_tracking_REMEMBER = Program.options.global_dependency_tracking;
             string global_fence_black_folders_REMEMBER = Program.options.global_fence_black_folders;
             string global_fence_white_folders_REMEMBER = Program.options.global_fence_white_folders;
+            string global_fence_black_folders_read_REMEMBER = Program.options.global_fence_black_folders_read;
+            string global_fence_white_folders_read_REMEMBER = Program.options.global_fence_white_folders_read;
+            string global_fence_black_folders_write_REMEMBER = Program.options.global_fence_black_folders_write;
+            string global_fence_white_folders_write_REMEMBER = Program.options.global_fence_white_folders_write;
+            bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
+
             // ------------------------------------------------------
             Program.options = new Options();  //resetting these
             // ------------------------------------------------------
@@ -24803,6 +24818,11 @@ namespace Gekko
             Program.options.global_dependency_tracking = global_dependency_tracking_REMEMBER;
             Program.options.global_fence_black_folders = global_fence_black_folders_REMEMBER;
             Program.options.global_fence_white_folders = global_fence_white_folders_REMEMBER;
+            Program.options.global_fence_black_folders_read = global_fence_black_folders_read_REMEMBER;
+            Program.options.global_fence_white_folders_read = global_fence_white_folders_read_REMEMBER;
+            Program.options.global_fence_black_folders_write = global_fence_black_folders_write_REMEMBER;
+            Program.options.global_fence_white_folders_write = global_fence_white_folders_write_REMEMBER;
+            Program.options.global_fence_sys = global_fence_sys_REMEMBER;
             // ------------------------------------------------------
 
             CrossThreadStuff.Mode();  //to show default color

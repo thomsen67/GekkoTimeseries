@@ -103,6 +103,11 @@ namespace Gekko
         public string global_dependency_tracking = "none";  // none | simple. If this is set in C# code, you must use SetDatatrace() afterwards to get it into drop-down.
         public string global_fence_black_folders = "";  //delimit with semicolon
         public string global_fence_white_folders = "";  //delimit with semicolon
+        public string global_fence_black_folders_read = "";  //delimit with semicolon
+        public string global_fence_white_folders_read = "";  //delimit with semicolon
+        public string global_fence_black_folders_write = "";  //delimit with semicolon
+        public string global_fence_white_folders_write = "";  //delimit with semicolon
+        public bool global_fence_sys = true;  //can switch SYS fencing off
         public string global_color = "";  //default: "White"
         // ----    REMEMBER
         // ----    REMEMBER
@@ -385,6 +390,11 @@ namespace Gekko
             Add("GLOBAL DEPENDENCY TRACKING", Globals.xnameOrString, "none", "simple");
             Add("GLOBAL FENCE BLACK FOLDERS", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS", Globals.xnameOrString);
+            Add("GLOBAL FENCE BLACK FOLDERS READ", Globals.xnameOrString);
+            Add("GLOBAL FENCE WHITE FOLDERS READ", Globals.xnameOrString);
+            Add("GLOBAL FENCE BLACK FOLDERS WRITE", Globals.xnameOrString);
+            Add("GLOBAL FENCE WHITE FOLDERS WRITE", Globals.xnameOrString);
+            Add("GLOBAL FENCE SYS", Globals.xbool);
             Add("GLOBAL COLOR", Globals.xnameOrString);
 
             //========================================================================================================

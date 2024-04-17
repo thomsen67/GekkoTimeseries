@@ -10357,6 +10357,184 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Fence_Read_Write()
+        {
+            //We are cheating and changing the options directly!
+
+            try
+            {
+
+                // -----------------------------------------------------------------
+                //           Whitelist
+                // -----------------------------------------------------------------
+
+
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = null;
+
+                string absolutePath = "";
+                absolutePath = Globals.ttPath2;  //i==0: abs path, for i==1 path is relative.
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = absolutePath + @"\regres\Databanks\temp";
+                Globals.dependencyTracking.InitFence();
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                string s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                I("x = 2;");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+
+                // -----------------------------------------------------------------
+                //           Blacklist
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = absolutePath + @"\regres\Databanks\temp";
+                Program.options.global_fence_white_folders = null;
+                Globals.dependencyTracking.InitFence();
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+
+                I("x = 2;");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+
+                // -----------------------------------------------------------------
+                //           Whitelist with blacklist
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = absolutePath + @"\regres\Databanks\temp\temp2";
+                Program.options.global_fence_white_folders = absolutePath + @"\regres\Databanks\temp";
+                Globals.dependencyTracking.InitFence();
+
+                I("x = 2;");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+
+                // -----------------------------------------------------------------
+                //           Test SYS
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = Globals.ttPath2 + @"\regres";
+                Globals.dependencyTracking.InitFence();
+                Globals.unitTestScreenOutput.Clear();
+                I("sys 'dir " + Globals.ttPath2 + @"\regres2';");  //should be ok even if outside whitelist
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("Fencing problem"));
+
+                I("reset;");
+                Program.options.global_fence_black_folders = Globals.ttPath2 + @"\regres2";
+                Program.options.global_fence_white_folders = null;
+                Globals.dependencyTracking.InitFence();
+                Globals.unitTestScreenOutput.Clear();
+                FAIL("sys 'dir " + Globals.ttPath2 + @"\regres2';");  //not ok because inside blacklist
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("Fencing problem"));
+
+                // -----------------------------------------------------------------
+                //           Test that c:\abc does not match c:\abcd (it matches c:\abc\de though).
+                // -----------------------------------------------------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = Globals.ttPath2 + @"\regres\Databanks\tem";  //note: temp --> tem
+                Globals.dependencyTracking.InitFence();
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+
+                // ------------------
+
+                I("reset;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\temp2");
+                Program.options.global_fence_black_folders = Globals.ttPath2 + @"\regres\Databanks\tem";  //note: temp --> tem
+                Program.options.global_fence_white_folders = null;
+                Globals.dependencyTracking.InitFence();
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+                Globals.unitTestScreenOutput.Clear();
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
+                s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsFalse(s.Contains("+++ WARNING: "));
+
+            }
+            finally
+            {
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = null;
+            }
+        }
+
+        [TestMethod]
         public void _Test_GekkoVersion()
         {                        
             //Just a sanity check
