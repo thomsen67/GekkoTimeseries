@@ -312,9 +312,6 @@ namespace Gekko
     public class DependencyTracking
     {        
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private List<string> blacklist = new List<string>();
-        private List<string> whitelist = new List<string>();
-
         private List<string> blacklist_read = new List<string>();
         private List<string> whitelist_read = new List<string>();
         private List<string> blacklist_write = new List<string>();
@@ -322,13 +319,34 @@ namespace Gekko
 
         private bool FenceIsActive()
         {
-            return this.blacklist.Count + this.whitelist.Count > 0;
+            return this.blacklist_read.Count + this.blacklist_write.Count + this.whitelist_read.Count + this.whitelist_write.Count > 0;
         }
 
         public void InitFence()
         {
-            this.blacklist = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
-            this.whitelist = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+            List<string> black_both = new List<string>();
+            List<string> white_both = new List<string>();
+            black_both = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
+            white_both = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+            this.blacklist_read.AddRange(black_both);
+            this.blacklist_write.AddRange(black_both);
+            this.whitelist_read.AddRange(white_both);
+            this.whitelist_write.AddRange(white_both);
+
+            List<string> black_read = new List<string>();
+            List<string> white_read = new List<string>();
+            black_read = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders_read);
+            white_read = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders_read);
+            this.blacklist_read.AddRange(black_read);            
+            this.whitelist_read.AddRange(white_read);
+
+            List<string> black_write = new List<string>();
+            List<string> white_write = new List<string>();
+            black_write = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders_write);
+            white_write = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders_write);
+            this.blacklist_write.AddRange(black_write);
+            this.whitelist_write.AddRange(white_write);
+
         }
 
         public void InitDependencyTracking()
@@ -336,11 +354,11 @@ namespace Gekko
             this.storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public void Add(int priority, string type, bool reading, string input)
+        public void Add(int priority, string type, bool isReading, string input)
         {            
             if (priority != Globals.dependencyTrackingSysNumber && !G.IsAbsolutePath(input)) return; //should not be possible... (also checks for null)
             
-            this.CheckFence(input, priority == Globals.dependencyTrackingSysNumber);
+            this.CheckFence(input, priority == Globals.dependencyTrackingSysNumber, isReading);
 
             //Put into tracking if active
             if (G.Equal(Program.options.global_dependency_tracking, "simple"))
@@ -352,14 +370,14 @@ namespace Gekko
             }
         }
 
-        public void CheckFence(string fileName3, bool isSys)
+        public void CheckFence(string fileName3, bool isSys, bool isReading)
         {
             if (this.FenceIsActive())  //priority 9 is not fenced-tested (SYS calls)
             {
                 //First test fencing black/whitelists if active
 
                 string fileNameTrim = fileName3.Trim();
-                bool ok = this.CheckBlackAndWhitelist(fileNameTrim, isSys);
+                bool ok = this.CheckBlackAndWhitelist(fileNameTrim, isSys, isReading);
                 if (!ok)
                 {
                     using (Error txt = new Error())
@@ -379,7 +397,7 @@ namespace Gekko
         /// <param name="fileNameTrim"></param>
         /// <param name="isSysCall"></param>
         /// <returns></returns>
-        public bool CheckBlackAndWhitelist(string fileNameTrim, bool isSysCall)
+        public bool CheckBlackAndWhitelist(string fileNameTrim, bool isSysCall, bool isReading)
         {
             bool ok = true;
             if (isSysCall)
@@ -387,49 +405,104 @@ namespace Gekko
                 if (Program.options.global_fence_sys)
                 {
                     //SYS calls. These are checked for blacklist only (and only if option global fence sys = yes).
+                    //SYS calls are added with isReading == false, as if SYS is writing.
                     //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
                     //Hard to do for whitelist here, then we would need to parse the string and find things that look like paths.
-                    if (G.Match(fileNameTrim, this.blacklist)) ok = false;
+                    if (isReading == false)  //will always be so!
+                    {
+                        if (G.Match(fileNameTrim, this.blacklist_write)) ok = false;
+                    }
                 }
             }
             else
             {
-                if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
+                if (isReading)
                 {
-                    if (!G.Match(fileNameTrim, this.blacklist) && G.Match(fileNameTrim, this.whitelist))
+                    //
+                    //  READING
+                    //
+
+                    if (this.blacklist_read.Count > 0 && this.whitelist_read.Count > 0)
                     {
-                        //do nothing
+                        if (!G.Match(fileNameTrim, this.blacklist_read) && G.Match(fileNameTrim, this.whitelist_read))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_read.Count > 0 && this.whitelist_read.Count == 0)
+                    {
+                        if (!G.Match(fileNameTrim, this.blacklist_read))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_read.Count == 0 && this.whitelist_read.Count > 0)
+                    {
+                        if (G.Match(fileNameTrim, this.whitelist_read))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
                     }
                     else
                     {
-                        ok = false;
-                    }
-                }
-                else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
-                {
-                    if (!G.Match(fileNameTrim, this.blacklist))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
-                    }
-                }
-                else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
-                {
-                    if (G.Match(fileNameTrim, this.whitelist))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
+                        //do nothing, no filters.
                     }
                 }
                 else
                 {
-                    //do nothing, no filters.
+                    //
+                    //  WRITING
+                    //
+
+                    if (this.blacklist_write.Count > 0 && this.whitelist_write.Count > 0)
+                    {
+                        if (!G.Match(fileNameTrim, this.blacklist_write) && G.Match(fileNameTrim, this.whitelist_write))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_write.Count > 0 && this.whitelist_write.Count == 0)
+                    {
+                        if (!G.Match(fileNameTrim, this.blacklist_write))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_write.Count == 0 && this.whitelist_write.Count > 0)
+                    {
+                        if (G.Match(fileNameTrim, this.whitelist_write))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else
+                    {
+                        //do nothing, no filters.
+                    }
                 }
             }
 
@@ -437,8 +510,9 @@ namespace Gekko
         }
 
         public void FencingWarning()
-        {            
-            if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
+        {
+            //We check first as if working folder is reading, then as if it is writing.
+            if (!(this.CheckBlackAndWhitelist(Program.options.folder_working, false, true)) || !(this.CheckBlackAndWhitelist(Program.options.folder_working, false, false)))
             {
                 using (Warning txt = new Warning()) //Remove #kjlasfa87iads if this is no longer a warning
                 {
@@ -453,21 +527,43 @@ namespace Gekko
 
         public void FencingMessage(Wrap txt, bool isSysCall)
         {
-            if (this.blacklist.Count() > 0)
+            if (this.blacklist_read.Count() > 0)
             {
-                txt.MainAdd("+++ Blacklist = ");
-                foreach (string s in this.blacklist)
+                txt.MainAdd("+++ Blacklist (read) = ");
+                foreach (string s in this.blacklist_read)
                 {
                     txt.MainAdd(s + "; ");
                 }
+                txt.MainNewLineTight();
             }
-            if (this.whitelist.Count() > 0 && !isSysCall)
+            if (this.blacklist_write.Count() > 0)
             {
-                if (this.blacklist.Count > 0 && this.whitelist.Count > 0) txt.MainNewLineTight();
-                txt.MainAdd("+++ Whitelist = ");
-                foreach (string s in this.whitelist)
+                txt.MainAdd("+++ Blacklist (write) = ");
+                foreach (string s in this.blacklist_write)
                 {
                     txt.MainAdd(s + "; ");
+                }
+                txt.MainNewLineTight();
+            }
+            if (!isSysCall)
+            {
+                if (this.whitelist_read.Count() > 0)
+                {
+                    txt.MainAdd("+++ Whitelist (read) = ");
+                    foreach (string s in this.whitelist_read)
+                    {
+                        txt.MainAdd(s + "; ");
+                    }
+                    txt.MainNewLineTight();
+                }
+                if (this.whitelist_write.Count() > 0)
+                {
+                    txt.MainAdd("+++ Whitelist (write) = ");
+                    foreach (string s in this.whitelist_write)
+                    {
+                        txt.MainAdd(s + "; ");
+                    }
+                    txt.MainNewLineTight();
                 }
             }
             txt.MainNewLineTight();
@@ -23937,16 +24033,6 @@ namespace Gekko
                 new Error("Gave up on file '" + realPathAndFilename + "'. Is it blocked by another program?");
             }
             return fs;
-        }
-
-        /// <summary>
-        /// This is an extra check just in case "real" checks fail. We only check if it is an absolute path here.
-        /// Not used at the moment.
-        /// </summary>
-        /// <param name="realPathAndFilename"></param>
-        private static void FenceCheckExtra(string realPathAndFilename)
-        {
-            if (G.IsAbsolutePath(realPathAndFilename)) Globals.dependencyTracking.CheckFence(realPathAndFilename, false);
         }
 
         private static void PossibleLibraryOrZipWriteError(string pathAndFilename, string s)
