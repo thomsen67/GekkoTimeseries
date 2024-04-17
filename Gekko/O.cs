@@ -2649,7 +2649,7 @@ namespace Gekko
             {
                 new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
             }
-            Globals.dependencyTracking.Add(1, "Read list", ffh.prettyPathAndFileName);
+            Globals.dependencyTracking.Add(1, "Read list", true, ffh.prettyPathAndFileName);
             List ml = GetRawListElements(ffh.realPathAndFileName);            
             return ml;
         }
@@ -3542,7 +3542,7 @@ namespace Gekko
 
             file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);            
-            Globals.dependencyTracking.Add(2, "Write list", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write list", false, pathAndFilename);
 
             List rhs_list = rhs as List;
             if (rhs_list == null)
@@ -10832,7 +10832,7 @@ namespace Gekko
                 else
                 {
                     string ss = O.ConvertToString(s);
-                    Globals.dependencyTracking.Add(Globals.dependencyTrackingSysNumber, "Sys", ss); //9 means do not print, but can be used for fencing...!
+                    Globals.dependencyTracking.Add(Globals.dependencyTrackingSysNumber, "Sys", false, ss); //9 means do not print, but can be used for fencing...!
                     Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"), fileName);                    
                 }
             }

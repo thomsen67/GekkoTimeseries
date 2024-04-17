@@ -2628,6 +2628,7 @@ namespace Gekko
                             List<int> ii1 = G.AllIndexOf(s, rootify, StringComparison.OrdinalIgnoreCase);
                             List<int> ii2 = G.AllIndexOf(s, rootify.Replace("\\", "/"), StringComparison.OrdinalIgnoreCase);
                             List<int> ii = ii1.Union(ii2).ToList();
+                            ii.Sort();  //not actually necessary...
 
                             bool hit = false;
                             foreach (int i in ii)
