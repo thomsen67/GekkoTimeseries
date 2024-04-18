@@ -86,6 +86,11 @@ Additionally, there are model, solve, equation options.
         public string global_fence_black_folders = "";  
         public string global_fence_white_folders = "";
         public string global_dependency_tracking = "none";
+        public string global_fence_black_folders_read = "";  //delimit with semicolon
+        public string global_fence_white_folders_read = "";  //delimit with semicolon
+        public string global_fence_black_folders_write = "";  //delimit with semicolon
+        public string global_fence_white_folders_write = "";  //delimit with semicolon
+        public bool global_fence_sys = true;  //can switch SYS fencing off
         public string global_color = "";                     //kan bruge --> option color = '%s'; Samme for de andre.
 
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).

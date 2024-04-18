@@ -106,18 +106,45 @@ namespace Gekko
     public class DependencyTracking
     {
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private List<string> blacklist = new List<string>();
-        private List<string> whitelist = new List<string>();
+        private List<string> blacklist_read = new List<string>();
+        private List<string> whitelist_read = new List<string>();
+        private List<string> blacklist_write = new List<string>();
+        private List<string> whitelist_write = new List<string>();
 
         private bool FenceIsActive()
         {
-            return this.blacklist.Count + this.whitelist.Count > 0;
+            return this.blacklist_read.Count + this.blacklist_write.Count + this.whitelist_read.Count + this.whitelist_write.Count > 0;
         }
 
         public void InitFence()
         {
-            this.blacklist = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
-            this.whitelist = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+            this.blacklist_read = new List<string>();
+            this.blacklist_write = new List<string>();
+            this.whitelist_read = new List<string>();
+            this.whitelist_write = new List<string>();
+
+            List<string> black_both = new List<string>();
+            List<string> white_both = new List<string>();
+            black_both = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
+            white_both = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+            this.blacklist_read.AddRange(black_both);
+            this.blacklist_write.AddRange(black_both);
+            this.whitelist_read.AddRange(white_both);
+            this.whitelist_write.AddRange(white_both);
+
+            List<string> black_read = new List<string>();
+            List<string> white_read = new List<string>();
+            black_read = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders_read);
+            white_read = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders_read);
+            this.blacklist_read.AddRange(black_read);
+            this.whitelist_read.AddRange(white_read);
+
+            List<string> black_write = new List<string>();
+            List<string> white_write = new List<string>();
+            black_write = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders_write);
+            white_write = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders_write);
+            this.blacklist_write.AddRange(black_write);
+            this.whitelist_write.AddRange(white_write);
         }
 
         public void InitDependencyTracking()
@@ -125,34 +152,30 @@ namespace Gekko
             this.storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public void Add(int priority, string type, string fileName3)
-        {            
-            if (!G.IsAbsolutePath(fileName3)) return; //should not be possible... (also checks for null)
+        public void Add(int priority, string type, bool isReading, string input)
+        {
+            if (priority != Globals.dependencyTrackingSysNumber && !G.IsAbsolutePath(input)) return; //should not be possible... (also checks for null)
 
-            this.CheckFence(fileName3, priority == Globals.dependencyTrackingSysNumber);
+            this.CheckFence(input, priority == Globals.dependencyTrackingSysNumber, isReading);
 
             //Put into tracking if active
             if (G.equal(Program.options.global_dependency_tracking, "simple"))
             {
-                string fileNameTrim = fileName3.Trim();
-                if (priority < 1 || priority > 9)
-                {
-                    G.Writeln("*** ERROR: Priority!");
-                    throw new GekkoException();
-                }
+                string fileNameTrim = input.Trim();
+                if (priority < 0 || priority > 9) new Error("Priority!");
                 string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
             }
         }
 
-        public void CheckFence(string fileName3, bool isSys)
+        public void CheckFence(string fileName3, bool isSys, bool isReading)
         {
             if (this.FenceIsActive())  //priority 9 is not fenced-tested (SYS calls)
             {
                 //First test fencing black/whitelists if active
 
                 string fileNameTrim = fileName3.Trim();
-                bool ok = this.CheckBlackAndWhitelist(fileNameTrim, isSys);
+                bool ok = this.CheckBlackAndWhitelist(fileNameTrim, isSys, isReading);
                 if (!ok)
                 {
 
@@ -170,53 +193,112 @@ namespace Gekko
         /// <param name="fileNameTrim"></param>
         /// <param name="isSysCall"></param>
         /// <returns></returns>
-        public bool CheckBlackAndWhitelist(string fileNameTrim, bool isSysCall)
+        public bool CheckBlackAndWhitelist(string fileNameTrim, bool isSysCall, bool isReading)
         {
             bool ok = true;
             if (isSysCall)
             {
-                //SYS calls. These are checked for blacklist only
-                //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
-                if (this.Match(this.blacklist, fileNameTrim)) ok = false;
+                if (Program.options.global_fence_sys)
+                {
+                    //SYS calls. These are checked for blacklist only (and only if option global fence sys = yes).
+                    //SYS calls are added with isReading == false, as if SYS is WRITING.
+                    //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
+                    //Hard to do for whitelist here, then we would need to parse the string and find things that look like paths.
+                    if (isReading == false)  //will always be so!
+                    {
+                        if (G.Match(fileNameTrim, this.blacklist_write)) ok = false;
+                    }
+                }
             }
             else
             {
-                if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
+                if (isReading)
                 {
-                    if (!this.Match(this.blacklist, fileNameTrim) && this.Match(this.whitelist, fileNameTrim))
+                    //
+                    //  READING
+                    //
+
+                    if (this.blacklist_read.Count > 0 && this.whitelist_read.Count > 0)
                     {
-                        //do nothing
+                        if (!G.Match(fileNameTrim, this.blacklist_read) && G.Match(fileNameTrim, this.whitelist_read))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_read.Count > 0 && this.whitelist_read.Count == 0)
+                    {
+                        if (!G.Match(fileNameTrim, this.blacklist_read))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_read.Count == 0 && this.whitelist_read.Count > 0)
+                    {
+                        if (G.Match(fileNameTrim, this.whitelist_read))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
                     }
                     else
                     {
-                        ok = false;
-                    }
-                }
-                else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
-                {
-                    if (!this.Match(this.blacklist, fileNameTrim))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
-                    }
-                }
-                else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
-                {
-                    if (this.Match(this.whitelist, fileNameTrim))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        ok = false;
+                        //do nothing, no filters.
                     }
                 }
                 else
                 {
-                    //do nothing, no filters.
+                    //
+                    //  WRITING
+                    //
+
+                    if (this.blacklist_write.Count > 0 && this.whitelist_write.Count > 0)
+                    {
+                        if (!G.Match(fileNameTrim, this.blacklist_write) && G.Match(fileNameTrim, this.whitelist_write))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_write.Count > 0 && this.whitelist_write.Count == 0)
+                    {
+                        if (!G.Match(fileNameTrim, this.blacklist_write))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else if (this.blacklist_write.Count == 0 && this.whitelist_write.Count > 0)
+                    {
+                        if (G.Match(fileNameTrim, this.whitelist_write))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            ok = false;
+                        }
+                    }
+                    else
+                    {
+                        //do nothing, no filters.
+                    }
                 }
             }
 
@@ -225,60 +307,89 @@ namespace Gekko
 
         public void FencingWarning()
         {
-            if (!this.CheckBlackAndWhitelist(Program.options.folder_working, false))
+            //We check first as if working folder is reading, then as if it is writing.
+            if (!(this.CheckBlackAndWhitelist(Program.options.folder_working, false, true)) || !(this.CheckBlackAndWhitelist(Program.options.folder_working, false, false)))
             {
-                G.Writeln2("+++ WARNING: The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
-                this.FencingError(false);
+                using (Warning txt = new Warning()) //Remove #kjlasfa87iads if this is no longer a warning
+                {
+                    txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
+                    txt.MainNewLineTight();
+                    this.FencingMessage(txt, false);
+                }
+                Globals.numberOfWarnings--; //See #kjlasfa87iads, to avoid a "number of warnings" message.
             }
         }
 
 
         public void FencingError(bool isSysCall)
         {
-            if (this.blacklist.Count() > 0)
+            if (this.blacklist_read.Count() > 0)
             {
-                G.Write("+++ Blacklist = ");
-                foreach (string s in this.blacklist)
+                txt.MainAdd("+++ Blacklist read = ");
+                foreach (string s in this.blacklist_read)
                 {
-                    G.Write(s + ";");
+                    txt.MainAdd(s + "; ");
+                }
+                txt.MainNewLineTight();
+            }
+            if (this.blacklist_write.Count() > 0)
+            {
+                txt.MainAdd("+++ Blacklist write = ");
+                foreach (string s in this.blacklist_write)
+                {
+                    txt.MainAdd(s + "; ");
+                }
+                txt.MainNewLineTight();
+            }
+            if (!isSysCall)
+            {
+                if (this.whitelist_read.Count() > 0)
+                {
+                    txt.MainAdd("+++ Whitelist read = ");
+                    foreach (string s in this.whitelist_read)
+                    {
+                        txt.MainAdd(s + "; ");
+                    }
+                    txt.MainNewLineTight();
+                }
+                if (this.whitelist_write.Count() > 0)
+                {
+                    txt.MainAdd("+++ Whitelist write = ");
+                    foreach (string s in this.whitelist_write)
+                    {
+                        txt.MainAdd(s + "; ");
+                    }
+                    txt.MainNewLineTight();
                 }
             }
-            if (this.whitelist.Count() > 0 && !isSysCall)
-            {
-                if (this.blacklist.Count > 0 && this.whitelist.Count > 0) G.Writeln();
-                G.Write("+++ Whitelist:");
-                foreach (string s in this.whitelist)
-                {
-                    G.Write(s + ";");
-                }
-            }
-            G.Writeln();
-            G.Writeln("You may change fencing in the " + Globals.autoExecCmdFileName + " in the program folder: " + G.GetProgramDir() + ". After adjusting this " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
+            txt.MainNewLineTight();
+            txt.MainAdd("You may change these settings in the system gekko.ini file.");
+            txt.MoreAdd("You may change fencing in the file " + Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName) + ". If you are using your own local version of Gekko, this is all fine. If Gekko is opened from a network folder, beware that changing the gekko.ini changes Gekko settings for all the users using that particular Gekko version (if gekko.ini resides in a write-protected folder, you need write access). After adjusting the " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
         }
 
-        /// <summary>
-        /// Looks for the string input inside the elements. Special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1a\bank2".
-        /// </summary>
-        /// <param name="elements"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        private bool Match(List<string> elements, string input)
-        {
-            foreach (string s in elements)
-            {
-                List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
-                foreach (int i in allIndexOf)
-                {
-                    bool match = true; //seems to be a match, but it may be falsified
-                    int i1 = i;
-                    int i2 = i + s.Length;
-                    if (i1 > 0 && G.IsLetterOrDigitOrUnderscore(input[i1 - 1])) match = false;
-                    if (i2 < input.Length && G.IsLetterOrDigitOrUnderscore(input[i2])) match = false;
-                    if (match) return true;
-                }
-            }
-            return false;
-        }
+        ///// <summary>
+        ///// Looks for the string input inside the elements. Special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1a\bank2".
+        ///// </summary>
+        ///// <param name="elements"></param>
+        ///// <param name="input"></param>
+        ///// <returns></returns>
+        //private bool Match(List<string> elements, string input)
+        //{
+        //    foreach (string s in elements)
+        //    {
+        //        List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
+        //        foreach (int i in allIndexOf)
+        //        {
+        //            bool match = true; //seems to be a match, but it may be falsified
+        //            int i1 = i;
+        //            int i2 = i + s.Length;
+        //            if (i1 > 0 && G.IsLetterOrDigitOrUnderscore(input[i1 - 1])) match = false;
+        //            if (i2 < input.Length && G.IsLetterOrDigitOrUnderscore(input[i2])) match = false;
+        //            if (match) return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// Splits "c:\a\b; c:\f\g" into ["c:\a\b", "c:\f\g"]. And tests for blanks etc. Also frontslashes are converted into backslashes.
@@ -2323,7 +2434,7 @@ namespace Gekko
                     return;  //from READ * cancelling
                 }
 
-                Globals.dependencyTracking.Add(1, "Read", file);
+                Globals.dependencyTracking.Add(1, "Read", true, file);
 
                 if (open && createNewOpenFile && oRead.protect)
                 {
@@ -2730,7 +2841,7 @@ namespace Gekko
             fileName = AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
 
-            Globals.dependencyTracking.Add(1, "Read", fileName);
+            Globals.dependencyTracking.Add(1, "Read", true, fileName);
 
             TableLight matrix = ReadExcelWorkbook(fileName, o.opt_sheet);
 
@@ -5352,7 +5463,7 @@ write datatest;
             string file = AddExtension(file2, "." + "gdx");
             string pathAndFilename = CreateFullPathAndFileName(file);
 
-            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             DateTime dt1 = DateTime.Now;
 
@@ -13668,7 +13779,7 @@ write datatest;
             file = Program.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
 
-            Globals.dependencyTracking.Add(1, "Write list", pathAndFilename);
+            Globals.dependencyTracking.Add(1, "Write list", false, pathAndFilename);
 
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
@@ -15763,7 +15874,7 @@ write datatest;
                 Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
             }
 
-            Globals.dependencyTracking.Add(3, "Run", fileName2);
+            Globals.dependencyTracking.Add(0, "Run", true, fileName2);
 
             Program.EmitCodeFromANTLR("", fileName2, isLibrary, p);
 
@@ -16967,7 +17078,7 @@ write datatest;
                 }
                 h.fileName = fileName;  //put it back, with path and all
 
-                Globals.dependencyTracking.Add(1, "Model", fileName);
+                Globals.dependencyTracking.Add(1, "Model", true, fileName);
 
                 string textInputRaw = Program.GetTextFromFileWithWait(fileName);
                 if (!oldFashion)
@@ -17327,7 +17438,7 @@ write datatest;
 
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
-            Globals.dependencyTracking.Add(2, "Pipe", fileName);
+            Globals.dependencyTracking.Add(2, "Pipe", false, fileName);
             if (!mute && !Globals.pipe) G.Writeln("Directing output to file: '" + fileName + "'");
             Globals.pipe = true;
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
@@ -20749,7 +20860,7 @@ write datatest;
             file = AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
 
-            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             if (File.Exists(pathAndFilename))
             {
@@ -21459,7 +21570,7 @@ write datatest;
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            Globals.dependencyTracking.Add(2, "Write", fullFileName);
+            Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -21717,7 +21828,7 @@ write datatest;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
 
-            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -22363,7 +22474,7 @@ write datatest;
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
 
-            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             if(true)
@@ -22611,7 +22722,7 @@ write datatest;
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
 
-            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
@@ -22691,7 +22802,7 @@ write datatest;
             filename = filename;
             filename = AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -22908,6 +23019,12 @@ write datatest;
             string global_dependency_tracking_REMEMBER = Program.options.global_dependency_tracking;
             string global_fence_black_folders_REMEMBER = Program.options.global_fence_black_folders;
             string global_fence_white_folders_REMEMBER = Program.options.global_fence_white_folders;
+            string global_fence_black_folders_read_REMEMBER = Program.options.global_fence_black_folders_read;
+            string global_fence_white_folders_read_REMEMBER = Program.options.global_fence_white_folders_read;
+            string global_fence_black_folders_write_REMEMBER = Program.options.global_fence_black_folders_write;
+            string global_fence_white_folders_write_REMEMBER = Program.options.global_fence_white_folders_write;
+            bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
+
             // ------------------------------------------------------
             Program.options = new Options();  //resetting these
             // ------------------------------------------------------
@@ -22917,8 +23034,13 @@ write datatest;
             Program.options.global_dependency_tracking = global_dependency_tracking_REMEMBER;
             Program.options.global_fence_black_folders = global_fence_black_folders_REMEMBER;
             Program.options.global_fence_white_folders = global_fence_white_folders_REMEMBER;
+            Program.options.global_fence_black_folders_read = global_fence_black_folders_read_REMEMBER;
+            Program.options.global_fence_white_folders_read = global_fence_white_folders_read_REMEMBER;
+            Program.options.global_fence_black_folders_write = global_fence_black_folders_write_REMEMBER;
+            Program.options.global_fence_white_folders_write = global_fence_white_folders_write_REMEMBER;
+            Program.options.global_fence_sys = global_fence_sys_REMEMBER;            
             // ------------------------------------------------------
-                        
+
             CrossThreadStuff.Mode();  //to show default color
 
             Program.GetStartingPeriod();
@@ -32909,7 +33031,7 @@ write datatest;
             {
                 fileNameWithPath = CreateFullPathAndFileName(fileName);
 
-                Globals.dependencyTracking.Add(2, "Write", fileNameWithPath);
+                Globals.dependencyTracking.Add(2, "Write", false, fileNameWithPath);
 
                 fileName3 = fileNameWithPath;
                 if (fileName3.ToLower().EndsWith(".xls")) fileName3 = fileName3.Substring(0, fileName3.Length - 4);
@@ -33370,7 +33492,7 @@ write datatest;
                     fileNameWithPath = AddExtension(CreateFullPathAndFileName(fileNameWithPath), ".xlsx");
                 }
 
-                Globals.dependencyTracking.Add(2, "Write", fileNameWithPath);
+                Globals.dependencyTracking.Add(2, "Write", false, fileNameWithPath);
 
                 fileNameWithPathOriginal = fileNameWithPath;
 

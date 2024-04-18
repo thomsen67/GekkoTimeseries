@@ -560,7 +560,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Globals.dependencyTracking.Add(1, "Read list", fileNameTemp);
+            Globals.dependencyTracking.Add(1, "Read list", true, fileNameTemp);
 
             string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
             List<string> input = G.ExtractLinesFromText(listFile);
@@ -5085,7 +5085,7 @@ namespace Gekko
                 else
                 {
                     string ss = O.GetString(s);
-                    Globals.dependencyTracking.Add(Globals.dependencyTrackingSysNumber, "Sys", ss); //9 means do not print, but can be used for fencing...!
+                    Globals.dependencyTracking.Add(Globals.dependencyTrackingSysNumber, "Sys", false, ss); //9 means do not print, but can be used for fencing...!
                     Program.ExecuteShellCommand(ss, G.equal(this.opt_mute, "yes"));
                 }
             }

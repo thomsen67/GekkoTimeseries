@@ -1678,6 +1678,45 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Checks if a substring inside input starting at i and with given length is word-like. That is, there are no alphanumeric (or '_'
+        /// just before or after the substring. 
+        /// For instance: good for for making sure "c:\bank1" does not match input "c:\bank1a", but matches input "c:\bank1a\bank2".
+        /// See _Test_WordMatch.        
+        /// See also G.Match() and G.AllIndexOf().
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static bool IsDelimited(string input, int i, int length)
+        {
+            if (i > 0 && G.IsLetterOrDigitOrUnderscore(input[i - 1])) return false;
+            if (i + length < input.Length && G.IsLetterOrDigitOrUnderscore(input[i + length])) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Looks for the string input inside the elements. BEWARE: special logic so "c:\bank1" does not match "c:\bank1a", but matches "c:\bank1\bank2".
+        /// See also G.AllIndexOf() and G.IsDelimited().
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="elements"></param>
+        /// <returns></returns>
+        public static bool Match(string input, List<string> elements)
+        {
+            foreach (string s in elements)
+            {
+                List<int> allIndexOf = G.AllIndexOf(input, s, StringComparison.OrdinalIgnoreCase);
+                foreach (int i in allIndexOf)
+                {
+                    bool match = G.IsDelimited(input, i, s.Length);
+                    if (match) return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Is it a full path like 'c:\xx\yy.zz'? With drive letter and colon (localhost ok too).
         /// This method is probably not completely watertight.
         /// </summary>

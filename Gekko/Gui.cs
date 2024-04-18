@@ -1933,25 +1933,24 @@ namespace Gekko
                         tab.CurRow.SetTopBorder(1, 3);
                         tab.CurRow.SetText(1, "DEPENDENCY TRACKING:");
                         tab.CurRow.SetBottomBorder(1, 3);
-                        tab.CurRow.Next();
-                        int count = -1;
                         int sysCalls = 0;
-                        bool hasNonSys = false;
+                        int nonSysCalls = 0;
                         foreach (string s in traceList)
                         {
-                            count++;
-                            if (count > 0) tab.CurRow.Next();
                             string[] ss = s.Split('¤');
                             if (G.equal(ss[0], Globals.dependencyTrackingSysNumber.ToString()))
                             {
                                 sysCalls++;
-                                count--;
                                 continue;
                             }
-                            hasNonSys = true;
-                            tab.CurRow.SetText(1, ss[1]);
-                            tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
-                            tab.CurRow.SetText(3, ss[2]);
+                            else
+                            {
+                                nonSysCalls++;
+                                tab.CurRow.Next();
+                                tab.CurRow.SetText(1, ss[1]);
+                                tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
+                                tab.CurRow.SetText(3, ss[2]);
+                            }
                         }
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.SetLeftBorder(1);
@@ -1962,12 +1961,12 @@ namespace Gekko
                         try
                         {
                             G.Writeln();
-                            if (hasNonSys)
+                            if (nonSysCalls > 0)
                             {
                                 List<string> ss = tab.Print();
                                 foreach (string s in ss) G.Writeln(s, Color.Gray);
                             }
-                            if (sysCalls > 0) G.Writeln("Total number of SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
+                            if (sysCalls > 0) G.Writeln("Total number of different SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
                             G.Writeln("Cf. 'option global dependency tracking' in gekko.ini next to gekko.exe.", Color.Gray);
                         }
                         finally
