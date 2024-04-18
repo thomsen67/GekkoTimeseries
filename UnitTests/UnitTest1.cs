@@ -10374,7 +10374,45 @@ namespace UnitTests
                 I("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig777';");
                 I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig777';");
                 I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig777';");
-                
+
+                // ==== BLACK BOTH
+
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = null;
+                Program.options.global_fence_black_folders_read = null;
+                Program.options.global_fence_white_folders_read = null;
+                Program.options.global_fence_black_folders_write = null;
+                Program.options.global_fence_white_folders_write = null;
+                // ---
+                Program.options.global_fence_black_folders = absolutePath + @"\regres\Databanks\temp";  //!!!
+                Globals.dependencyTracking.InitFence();
+                I("x = 2;");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+                I("read '" + Globals.ttPath2 + @"\regres\Databanks\sletmig777';");
+                FAIL("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig777';");
+                FAIL("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig777';");
+
+                // ==== WHITE BOTH
+
+                Program.options.global_fence_black_folders = null;
+                Program.options.global_fence_white_folders = null;
+                Program.options.global_fence_black_folders_read = null;
+                Program.options.global_fence_white_folders_read = null;
+                Program.options.global_fence_black_folders_write = null;
+                Program.options.global_fence_white_folders_write = null;
+                // ---
+                Program.options.global_fence_white_folders = absolutePath + @"\regres\Databanks\temp";  //!!!
+                Globals.dependencyTracking.InitFence();
+                I("x = 2;");
+                FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
+                I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
+                FAIL("read '" + Globals.ttPath2 + @"\regres\Databanks\sletmig777';");
+                I("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig777';");
+                I("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig777';");
+
                 // ==== BLACK READ
 
                 Program.options.global_fence_black_folders = null;

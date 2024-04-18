@@ -369,7 +369,7 @@ namespace Gekko
             if (G.Equal(Program.options.global_dependency_tracking, "simple"))
             {
                 string fileNameTrim = input.Trim();
-                if (priority < 1 || priority > 9) new Error("Priority!");
+                if (priority < 0 || priority > 9) new Error("Priority!");
                 string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
             }
@@ -410,7 +410,7 @@ namespace Gekko
                 if (Program.options.global_fence_sys)
                 {
                     //SYS calls. These are checked for blacklist only (and only if option global fence sys = yes).
-                    //SYS calls are added with isReading == false, as if SYS is writing.
+                    //SYS calls are added with isReading == false, as if SYS is WRITING.
                     //What is tested is not really a filename, but an argument. But that may contain DOS copy statements.
                     //Hard to do for whitelist here, then we would need to parse the string and find things that look like paths.
                     if (isReading == false)  //will always be so!
@@ -534,7 +534,7 @@ namespace Gekko
         {
             if (this.blacklist_read.Count() > 0)
             {
-                txt.MainAdd("+++ Blacklist (read) = ");
+                txt.MainAdd("+++ Blacklist read = ");
                 foreach (string s in this.blacklist_read)
                 {
                     txt.MainAdd(s + "; ");
@@ -543,7 +543,7 @@ namespace Gekko
             }
             if (this.blacklist_write.Count() > 0)
             {
-                txt.MainAdd("+++ Blacklist (write) = ");
+                txt.MainAdd("+++ Blacklist write = ");
                 foreach (string s in this.blacklist_write)
                 {
                     txt.MainAdd(s + "; ");
@@ -554,7 +554,7 @@ namespace Gekko
             {
                 if (this.whitelist_read.Count() > 0)
                 {
-                    txt.MainAdd("+++ Whitelist (read) = ");
+                    txt.MainAdd("+++ Whitelist read = ");
                     foreach (string s in this.whitelist_read)
                     {
                         txt.MainAdd(s + "; ");
@@ -563,7 +563,7 @@ namespace Gekko
                 }
                 if (this.whitelist_write.Count() > 0)
                 {
-                    txt.MainAdd("+++ Whitelist (write) = ");
+                    txt.MainAdd("+++ Whitelist write = ");
                     foreach (string s in this.whitelist_write)
                     {
                         txt.MainAdd(s + "; ");
@@ -16692,7 +16692,7 @@ namespace Gekko
                 new Error("Could not find file: " + ffh.prettyPathAndFileName);
             }
 
-            Globals.dependencyTracking.Add(3, "Run", true, ffh.prettyPathAndFileName);
+            Globals.dependencyTracking.Add(0, "Run", true, ffh.prettyPathAndFileName);
 
             Program.RunGekkoCommands("", fileName2, (int)o.opt_skip, o.p);
 
