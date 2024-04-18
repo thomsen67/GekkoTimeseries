@@ -162,7 +162,11 @@ namespace Gekko
             if (G.equal(Program.options.global_dependency_tracking, "simple"))
             {
                 string fileNameTrim = input.Trim();
-                if (priority < 0 || priority > 9) new Error("Priority!");
+                if (priority < 0 || priority > 9)
+                {
+                    G.Writeln2("*** ERROR: Fencing");
+                    throw new GekkoException();
+                }
                 string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
             }
@@ -181,7 +185,7 @@ namespace Gekko
 
                     if (isSys) G.Writeln2("*** ERROR: Fencing problem: the SYS argument '" + fileNameTrim + "' is illegal due to 'option global fence black folder' settings.");
                     else G.Writeln2("*** ERROR: Fencing problem: the file path '" + fileNameTrim + "' is illegal due to 'option global fence' settings.");
-                    FencingError(isSys);
+                    FencingMessage(isSys);
                     throw new GekkoException();
                 }
             }
@@ -310,61 +314,57 @@ namespace Gekko
             //We check first as if working folder is reading, then as if it is writing.
             if (!(this.CheckBlackAndWhitelist(Program.options.folder_working, false, true)) || !(this.CheckBlackAndWhitelist(Program.options.folder_working, false, false)))
             {
-                using (Warning txt = new Warning()) //Remove #kjlasfa87iads if this is no longer a warning
-                {
-                    txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
-                    txt.MainNewLineTight();
-                    this.FencingMessage(txt, false);
-                }
+                G.Writeln("+++ WARNING: The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");                    
+                this.FencingMessage(false);                
                 Globals.numberOfWarnings--; //See #kjlasfa87iads, to avoid a "number of warnings" message.
             }
         }
 
 
-        public void FencingError(bool isSysCall)
+        public void FencingMessage(bool isSysCall)
         {
             if (this.blacklist_read.Count() > 0)
             {
-                txt.MainAdd("+++ Blacklist read = ");
+                G.Writeln("+++ Blacklist read = ");
                 foreach (string s in this.blacklist_read)
                 {
-                    txt.MainAdd(s + "; ");
+                    G.Write(s + "; ");
                 }
-                txt.MainNewLineTight();
+                G.Writeln();
             }
             if (this.blacklist_write.Count() > 0)
             {
-                txt.MainAdd("+++ Blacklist write = ");
+                G.Writeln("+++ Blacklist write = ");
                 foreach (string s in this.blacklist_write)
                 {
-                    txt.MainAdd(s + "; ");
+                    G.Write(s + "; ");
                 }
-                txt.MainNewLineTight();
+                G.Writeln();
             }
             if (!isSysCall)
             {
                 if (this.whitelist_read.Count() > 0)
                 {
-                    txt.MainAdd("+++ Whitelist read = ");
+                    G.Writeln("+++ Whitelist read = ");
                     foreach (string s in this.whitelist_read)
                     {
-                        txt.MainAdd(s + "; ");
+                        G.Write(s + "; ");
                     }
-                    txt.MainNewLineTight();
+                    G.Writeln();
                 }
                 if (this.whitelist_write.Count() > 0)
                 {
-                    txt.MainAdd("+++ Whitelist write = ");
+                    G.Writeln("+++ Whitelist write = ");
                     foreach (string s in this.whitelist_write)
                     {
-                        txt.MainAdd(s + "; ");
+                        G.Write(s + "; ");
                     }
-                    txt.MainNewLineTight();
+                    G.Writeln();
                 }
             }
-            txt.MainNewLineTight();
-            txt.MainAdd("You may change these settings in the system gekko.ini file.");
-            txt.MoreAdd("You may change fencing in the file " + Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName) + ". If you are using your own local version of Gekko, this is all fine. If Gekko is opened from a network folder, beware that changing the gekko.ini changes Gekko settings for all the users using that particular Gekko version (if gekko.ini resides in a write-protected folder, you need write access). After adjusting the " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
+            G.Writeln();
+            G.Writeln("You may change these settings in the system gekko.ini file.");
+            G.Writeln("You may change fencing in the file " + Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName) + ". If you are using your own local version of Gekko, this is all fine. If Gekko is opened from a network folder, beware that changing the gekko.ini changes Gekko settings for all the users using that particular Gekko version (if gekko.ini resides in a write-protected folder, you need write access). After adjusting the " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
         }
 
         ///// <summary>
