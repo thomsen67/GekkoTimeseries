@@ -21,6 +21,13 @@ namespace Gekko.Parser.Gek
         public string textWithExtraLines;
         public CommonTree t;
     }
+
+    public class Extra
+    {
+        public int record = 0;  //1: lhs, 2: rhs
+        public List<string> lhs = new List<string>();
+        public List<string> rhs = new List<string>();
+    }
     
     /// <summary>
     /// This class is used to parse statements and create an ASTtree, and walk it.There is a similar class for model files.
@@ -273,6 +280,156 @@ namespace Gekko.Parser.Gek
             return lexerAndParserErrors;
         }
 
+        public static void Xx_2x(Cmd2Parser.expr_return r, Extra e)
+        {
+            ASTNode root = new ASTNode(null);
+            CommonTree t = null;
+            t = (CommonTree)r.Tree;
+            CreateASTNodesForCmd(t, root, 0);
+            W wh2 = new W();            
+            WalkASTAndEmit_2x(root, 0, 0, null, wh2, null, e);
+
+        }
+
+        public static void WalkASTAndEmit_2x(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, Extra e)
+        {
+            //See also #890752345
+            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
+            {
+                relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
+            }
+
+            if (relativeDepth == 1)
+            {
+                w.wh = new WalkHelper();
+                w.wh.currentCommand = node.Text;  //if for instance a GENR statement, this field will be 'ASTGENR'                
+            }
+
+            if (node.Text == "ASTNAMEWITHBANK")
+            {
+                string bank = null;
+                try
+                {
+                    if (node?[0]?[0]?[0].Text == "ASTIDENT")
+                    {
+                        bank = node?[0]?[0]?[0]?[0].Text;
+                    }
+                } catch { }
+
+                string variable = null;
+                try
+                {
+                    if (node?[1]?[0]?[0].Text == "ASTIDENT")
+                    {
+                        variable = node?[1]?[0]?[0]?[0].Text;
+                    }
+                }
+                catch { }
+                if (variable != null)
+                {
+                    if (!G.NullOrBlanks(variable))
+                    {
+                        variable = variable.Trim();
+                        if (!G.NullOrBlanks(bank))
+                        {
+                            variable = bank.Trim() + ":" + variable;
+                        }
+                    }
+                }
+                if (e.record == 1) e.lhs.Add(variable);
+                else if (e.record == 2) e.rhs.Add(variable);
+            }
+
+            //Before sub-nodes
+
+            int n = -1;
+            foreach (ASTNode child in node.ChildrenIterator())
+            {                
+                n++;
+                switch (node.Text)
+                {
+                    case "ASTGENR": //2
+                        {
+                            if (n >= 2) e.record = 2;
+                            else e.record = 1;
+                        }
+                        break;
+                    case "ASTGENRLHSFUNCTION": //2
+                        {
+                            if (n >= 2) e.record = 2;
+                            else e.record = 1;
+                        }
+                        break;
+                    case "ASTGENRINDEXER":  //2
+                        {
+                            if (n >= 2) e.record = 2;
+                            else e.record = 1;
+                        }
+                        break;
+                    case "ASTUPD":  //3
+                        {
+                            if (n >= 3) e.record = 2;
+                            else e.record = 1;
+                        }
+                        break;
+
+                    case "ASTGENRLISTINDEXER": //3
+                        {
+                            if (n >= 3) e.record = 2;
+                            else e.record = 1;
+                        }
+                        break;
+                    case "ASTSERIES": //1
+                        {
+                            if (n >= 1) e.record = 2;
+                            else e.record = 1;
+                        }
+                        break;                   
+
+                }
+
+                WalkASTAndEmit_2x(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, e);
+                //return; Globals.testing = true;
+            }
+
+            //After sub-nodes
+            switch (node.Text)
+            {
+
+                case "ASTGENR": //2
+                    {
+                        e.record = 0;
+                    }
+                    break;
+                case "ASTGENRLHSFUNCTION": //2
+                    {
+                        e.record = 0;
+                    }
+                    break;
+                case "ASTGENRINDEXER":  //2
+                    {
+                        e.record = 0;
+                    }
+                    break;
+                case "ASTUPD":  //3
+                    {
+                        e.record = 0;
+                    }
+                    break;
+
+                case "ASTGENRLISTINDEXER": //3
+                    {
+                        e.record = 0;
+                    }
+                    break;
+                case "ASTSERIES": //1
+                    {
+                        e.record = 0;
+                    }
+                    break;
+            }
+        }
+
         /// <summary>
         /// Method to quick test if a string of Gekko 3.0 command(s) is legal syntax (parses ok in ANTLR). Nothing is executed.
         /// </summary>
@@ -317,11 +474,15 @@ namespace Gekko.Parser.Gek
         /// <returns></returns>
         public static bool IsValid2_4Syntax(string commands)
         {
-
             //CompileAndRunAST
+            bool ok; Cmd2Parser.expr_return r;
+            ParseGekko2x(commands, out ok, out r);                       
+            return ok;
+        }
 
-            bool ok = true;
-
+        public static void ParseGekko2x(string commands, out bool ok, out Cmd2Parser.expr_return r)
+        {
+            ok = true;
             string s2a = Stringlist.ExtractTextFromLines(HandleGekkoCommandsFromGekko2_4(Stringlist.ExtractLinesFromText(commands))).ToString();
             string textInput = s2a + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
             ANTLRStringStream input = new ANTLRStringStream(textInput);
@@ -329,11 +490,11 @@ namespace Gekko.Parser.Gek
             CommonTree t = null;
             // Create a lexer attached to that input
             Cmd2Parser parser2 = null;
-            Cmd2Lexer lexer2 = new Cmd2Lexer(input);                     
+            Cmd2Lexer lexer2 = new Cmd2Lexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer2);
             // Create a parser attached to the token stream
             parser2 = new Cmd2Parser(tokens);
-            Cmd2Parser.expr_return r = null;
+            r = null;
 
             try
             {
@@ -351,8 +512,6 @@ namespace Gekko.Parser.Gek
                     ok = false;
                 }
             }
-
-            return ok;
         }
 
         private static List<string> HandleGekkoCommandsFromGekko2_4(List<string> inputFileLines)

@@ -2436,7 +2436,47 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                if (text.Contains("inout"))
+                {
+                    FindFileHelper ffh = Program.FindFile("inout.gcm", null, true, true, false, true, null);
+                    if (ffh.realPathAndFileName == null) new Error("File '" + ffh.prettyPathAndFileName + "' does not seem to exist");
+                    string input = GetTextFromFileWithWait(ffh.realPathAndFileName);
+                    bool ok; Cmd2Parser.expr_return r;
+                    Parser.Gek.ParserGekCreateAST.ParseGekko2x(input, out ok, out r);
+                    if (!ok) new Error("The file '" + ffh.prettyPathAndFileName + "' does not parse in Gekko 2.x");
+                    Gekko.Parser.Gek.Extra e = new Gekko.Parser.Gek.Extra();
+                    Gekko.Parser.Gek.ParserGekCreateAST.Xx_2x(r, e);
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd(e.lhs.Count + " left-hand side variable" + G.S(e.lhs.Count));
+                        if (e.lhs.Count > 0)
+                        {
+                            txt.MainAdd(":");
+                            txt.MainNewLineTight();
+                            txt.MainAdd(Stringlist.GetListWithCommas(e.lhs));
+                        }
+                    }
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd(e.rhs.Count + " right-hand side variable" + G.S(e.rhs.Count));
+                        if (e.rhs.Count > 0)
+                        {
+                            txt.MainAdd(":");
+                            txt.MainNewLineTight();
+                            txt.MainAdd(Stringlist.GetListWithCommas(e.rhs));
+                        }
+                    }
 
+                    List lhs_ = new List(e.lhs);
+                    List rhs_ = new List(e.rhs);
+
+                    if (e.lhs.Count + e.rhs.Count > 0)
+                    {
+                        O.AddIVariableWithOverwriteFromString("#lhs", lhs_);
+                        O.AddIVariableWithOverwriteFromString("#rhs", rhs_);
+                        new Writeln("See the lists #lhs and #rhs.");
+                    }
+                }
             }
 
             if (false && Globals.runningOnTTComputer)
