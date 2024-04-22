@@ -280,23 +280,47 @@ namespace Gekko.Parser.Gek
             return lexerAndParserErrors;
         }
 
-        public static void Xx_2x(Cmd2Parser.expr_return r, Extra e)
+        public static void LhsRhs(string input, Extra e, int version)
         {
+            
             ASTNode root = new ASTNode(null);
             CommonTree t = null;
-            t = (CommonTree)r.Tree;
+
+            if (version == 2)
+            {                
+                bool ok; Cmd2Parser.expr_return r;
+                Parser.Gek.ParserGekCreateAST.ParseGekko2x(input, out ok, out r);
+                if (!ok) new Error("The file does not parse in Gekko 2.x. You may try to RUN it to locate the error.");
+                t = (CommonTree)r.Tree;
+            }
+            else
+            {                
+                bool ok; Cmd3Parser.start_return r;
+                Parser.Gek.ParserGekCreateAST.ParseGekko3x(input, out ok, out r);
+                if (!ok) new Error("The file does not parse in Gekko 3.x. You may try to RUN it to locate the error.");
+                t = (CommonTree)r.Tree;
+            }
             CreateASTNodesForCmd(t, root, 0);
             W wh2 = new W();            
-            WalkASTAndEmit_2x(root, 0, 0, null, wh2, null, e);
-
+            WalkASTAndEmit_LhsRhs(root, 0, 0, null, wh2, null, e, version);
         }
 
-        public static void WalkASTAndEmit_2x(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, Extra e)
+        public static void WalkASTAndEmit_LhsRhs(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, Extra e, int version)
         {
-            //See also #890752345
-            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
+
+            if (version == 2)
             {
-                relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
+                if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
+                {
+                    relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
+                }
+            }
+            else
+            {
+                if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
+                {
+                    relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
+                }
             }
 
             if (relativeDepth == 1)
@@ -305,128 +329,215 @@ namespace Gekko.Parser.Gek
                 w.wh.currentCommand = node.Text;  //if for instance a GENR statement, this field will be 'ASTGENR'                
             }
 
-            if (node.Text == "ASTNAMEWITHBANK")
+            if (version == 2)
             {
-                string bank = null;
-                try
+                if (node.Text == "ASTNAMEWITHBANK")
                 {
-                    if (node?[0]?[0]?[0].Text == "ASTIDENT")
+                    string bank = null;
+                    try
                     {
-                        bank = node?[0]?[0]?[0]?[0].Text;
-                    }
-                } catch { }
-
-                string variable = null;
-                try
-                {
-                    if (node?[1]?[0]?[0].Text == "ASTIDENT")
-                    {
-                        variable = node?[1]?[0]?[0]?[0].Text;
-                    }
-                }
-                catch { }
-                if (variable != null)
-                {
-                    if (!G.NullOrBlanks(variable))
-                    {
-                        variable = variable.Trim();
-                        if (!G.NullOrBlanks(bank))
+                        if (node?[0]?[0]?[0]?.Text == "ASTIDENT")
                         {
-                            variable = bank.Trim() + ":" + variable;
+                            bank = node?[0]?[0]?[0]?[0]?.Text;
                         }
                     }
+                    catch { }
+
+                    string variable = null;
+                    try
+                    {
+                        if (node?[1]?[0]?[0]?.Text == "ASTIDENT")
+                        {
+                            variable = node?[1]?[0]?[0]?[0]?.Text;
+                        }
+                    }
+                    catch { }
+
+                    if (variable != null)
+                    {
+                        if (!G.NullOrBlanks(variable))
+                        {
+                            variable = variable.Trim();
+                            if (!G.NullOrBlanks(bank))
+                            {
+                                variable = bank.Trim() + ":" + variable;
+                            }
+                            if (e.record == 1) e.lhs.Add(variable);
+                            else if (e.record == 2) e.rhs.Add(variable);
+                        }                        
+                    }                    
                 }
-                if (e.record == 1) e.lhs.Add(variable);
-                else if (e.record == 2) e.rhs.Add(variable);
+            }
+            else
+            {
+                if (node.Text == "ASTBANKVARNAME")
+                {
+                    string bank = null;
+                    try
+                    {
+                        if (node?[0]?[0]?[0]?.Text == "ASTIDENT")
+                        {
+                            bank = node?[0]?[0]?[0]?[0]?.Text;
+                        }
+                    }
+                    catch { }
+
+                    string variable = null;
+                    try
+                    {
+                        if ((node?[1]?[0]?[0]?.Text != "ASTPERCENT" && node?[1]?[0]?[0]?.Text != "ASTHASH") && node?[1]?[1]?[0]?[0]?.Text == "ASTIDENT")
+                        {
+                            variable = node?[1]?[1]?[0]?[0]?[0].Text;
+                        }
+                    }
+                    catch { }
+
+                    string freq = null;
+                    try
+                    {
+                        if (node?[1]?[2]?[0]?[0]?.Text == "ASTIDENT")
+                        {
+                            freq = node?[1]?[2]?[0]?[0]?[0].Text;
+                        }
+                    }
+                    catch { }
+
+                    if (variable != null)
+                    {
+                        if (!G.NullOrBlanks(variable))
+                        {
+                            variable = variable.Trim();
+                            if (!G.NullOrBlanks(freq))
+                            {
+                                variable += "!" + freq.Trim();
+                            }
+                            if (!G.NullOrBlanks(bank))
+                            {
+                                variable = bank.Trim() + ":" + variable;
+                            }                            
+                            if (e.record == 1) e.lhs.Add(variable);
+                            else if (e.record == 2) e.rhs.Add(variable);
+                        }
+                    }                    
+                }
             }
 
             //Before sub-nodes
 
             int n = -1;
             foreach (ASTNode child in node.ChildrenIterator())
-            {                
+            {
                 n++;
-                switch (node.Text)
+                if (version == 2)
                 {
-                    case "ASTGENR": //2
-                        {
-                            if (n >= 2) e.record = 2;
-                            else e.record = 1;
-                        }
-                        break;
-                    case "ASTGENRLHSFUNCTION": //2
-                        {
-                            if (n >= 2) e.record = 2;
-                            else e.record = 1;
-                        }
-                        break;
-                    case "ASTGENRINDEXER":  //2
-                        {
-                            if (n >= 2) e.record = 2;
-                            else e.record = 1;
-                        }
-                        break;
-                    case "ASTUPD":  //3
-                        {
-                            if (n >= 3) e.record = 2;
-                            else e.record = 1;
-                        }
-                        break;
+                    switch (node.Text)
+                    {
+                        case "ASTGENR": //2
+                            {
+                                if (n >= 2) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
+                        case "ASTGENRLHSFUNCTION": //2
+                            {
+                                if (n >= 2) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
+                        case "ASTGENRINDEXER":  //2
+                            {
+                                if (n >= 2) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
+                        case "ASTUPD":  //3
+                            {
+                                if (n >= 3) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
 
-                    case "ASTGENRLISTINDEXER": //3
-                        {
-                            if (n >= 3) e.record = 2;
-                            else e.record = 1;
-                        }
-                        break;
-                    case "ASTSERIES": //1
-                        {
-                            if (n >= 1) e.record = 2;
-                            else e.record = 1;
-                        }
-                        break;                   
+                        case "ASTGENRLISTINDEXER": //3
+                            {
+                                if (n >= 3) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
+                        case "ASTSERIES": //1
+                            {
+                                if (n >= 1) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
 
+                    }
+                }
+                else
+                {
+                    switch (node.Text)
+                    {
+                        case "ASTASSIGNMENT": //1
+                            {
+                                if (n >= 1) e.record = 2;
+                                else e.record = 1;
+                            }
+                            break;
+                    }
                 }
 
-                WalkASTAndEmit_2x(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, e);
-                //return; Globals.testing = true;
-            }
+                WalkASTAndEmit_LhsRhs(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, e, version);                
 
-            //After sub-nodes
-            switch (node.Text)
-            {
+                //After sub-nodes
+                if (version == 2)
+                {
+                    switch (node.Text)
+                    {
 
-                case "ASTGENR": //2
-                    {
-                        e.record = 0;
-                    }
-                    break;
-                case "ASTGENRLHSFUNCTION": //2
-                    {
-                        e.record = 0;
-                    }
-                    break;
-                case "ASTGENRINDEXER":  //2
-                    {
-                        e.record = 0;
-                    }
-                    break;
-                case "ASTUPD":  //3
-                    {
-                        e.record = 0;
-                    }
-                    break;
+                        case "ASTGENR": //2
+                            {
+                                e.record = 0;
+                            }
+                            break;
+                        case "ASTGENRLHSFUNCTION": //2
+                            {
+                                e.record = 0;
+                            }
+                            break;
+                        case "ASTGENRINDEXER":  //2
+                            {
+                                e.record = 0;
+                            }
+                            break;
+                        case "ASTUPD":  //3
+                            {
+                                e.record = 0;
+                            }
+                            break;
 
-                case "ASTGENRLISTINDEXER": //3
-                    {
-                        e.record = 0;
+                        case "ASTGENRLISTINDEXER": //3
+                            {
+                                e.record = 0;
+                            }
+                            break;
+                        case "ASTSERIES": //1
+                            {
+                                e.record = 0;
+                            }
+                            break;
                     }
-                    break;
-                case "ASTSERIES": //1
+                }
+                else
+                {
+                    switch (node.Text)
                     {
-                        e.record = 0;
+                        case "ASTASSIGNMENT": //1
+                            {
+                                e.record = 0;
+                            }
+                            break;
                     }
-                    break;
+
+                }
             }
         }
 
@@ -436,8 +547,15 @@ namespace Gekko.Parser.Gek
         /// <param name="commands"></param>
         /// <returns></returns>
         public static bool IsValid3_0Syntax(string commands)
+        {            
+            bool ok; Cmd3Parser.start_return r3;
+            ParseGekko3x(commands, out ok, out r3);
+            return ok;
+        }
+
+        private static void ParseGekko3x(string commands, out bool ok, out Cmd3Parser.start_return r3)
         {
-            bool ok = true;
+            ok = true;
             string s2a = Program.HandleGekkoCommands(commands);
             string textInput = s2a + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
             ANTLRStringStream input = new ANTLRStringStream(textInput);
@@ -445,7 +563,7 @@ namespace Gekko.Parser.Gek
             Cmd3Lexer lexer3 = new Cmd3Lexer(input);
             CommonTokenStream tokens3 = new CommonTokenStream(lexer3);
             parser3 = new Cmd3Parser(tokens3);
-            Cmd3Parser.start_return r3 = null;
+            r3 = null;
 
             try
             {
@@ -463,8 +581,6 @@ namespace Gekko.Parser.Gek
                     ok = false;
                 }
             }
-
-            return ok;
         }
 
         /// <summary>

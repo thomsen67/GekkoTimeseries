@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2024-03-20 15:32:27
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2024-04-22 21:48:04
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -3311,7 +3311,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          additiveExpression, lblb
+            			    		// elements:          lblb, additiveExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3361,7 +3361,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          lblb, additiveExpression
+            			    		// elements:          additiveExpression, lblb
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3530,7 +3530,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          lbla, multiplicativeExpression
+            			    		// elements:          multiplicativeExpression, lbla
             			    		// token labels:      
             			    		// rule labels:       retval, lbla
             			    		// token list labels: 
@@ -3580,7 +3580,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          multiplicativeExpression, lblb
+            			    		// elements:          lblb, multiplicativeExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -4960,7 +4960,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          stringInQuotesWithCurliesC, stringInQuotesWithCurliesA, stringInQuotesWithCurliesB
+            	// elements:          stringInQuotesWithCurliesC, stringInQuotesWithCurliesB, stringInQuotesWithCurliesA
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -5805,7 +5805,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          lbla, bankvarnameIndexer
+            			    	// elements:          bankvarnameIndexer, lbla
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -7717,7 +7717,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          mapItem, mapHelper
+                    	// elements:          mapHelper, mapItem
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8612,7 +8612,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, fargs, libraryWithColon
+                    	// elements:          fargs, libraryWithColon, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8722,7 +8722,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, fargs, libraryWithColon
+                    	// elements:          libraryWithColon, fargs, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8981,7 +8981,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, libraryWithColon, fargs
+                    	// elements:          ident, fargs, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -9091,7 +9091,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, ident, libraryWithColon
+                    	// elements:          fargs, libraryWithColon, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -9793,7 +9793,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, expression
+                    	// elements:          expression, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11267,7 +11267,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          repN, seqItem7Naked
+                    	// elements:          seqItem7Naked, repN
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11705,7 +11705,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          indexer7Naked, freq7Naked, bank7Naked, name7
+            	// elements:          indexer7Naked, name7, freq7Naked, bank7Naked
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -12426,7 +12426,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          minus, double2
+                    	// elements:          double2, minus
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -12889,7 +12889,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          wildcard7, indexer7, bank7
+                    	// elements:          indexer7, bank7, wildcard7
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -18321,7 +18321,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          cnameHelper, name
+            	// elements:          name, cnameHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -19694,7 +19694,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seriesname, bankColon
+            	// elements:          bankColon, seriesname
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -19829,7 +19829,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          nameOrCname, freq
+            	// elements:          freq, nameOrCname
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -20917,7 +20917,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          logicalOr, lbla
+            			    	// elements:          lbla, logicalOr
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -21336,7 +21336,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, ifOperator, expression
+                    	// elements:          expression, expression, ifOperator
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -24975,7 +24975,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, seriesOpt1, leftSide, assignmentType
+                    	// elements:          nakedList, leftSide, seriesOpt1, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25099,7 +25099,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, assignmentType, leftSide, seriesOpt1
+                    	// elements:          expression, assignmentType, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25199,7 +25199,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, seriesOpt1, leftSide, assignmentType, leftSide
+                    	// elements:          seriesOpt1, leftSide, assignmentType, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25332,7 +25332,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, expression, seriesOpt1, assignmentType
+                    	// elements:          seriesOpt1, leftSide, expression, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25441,7 +25441,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, leftSide, seriesOpt1, nakedList
+                    	// elements:          assignmentType, leftSide, seriesOpt1, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25574,7 +25574,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, assignmentType, seriesOpt1, expression
+                    	// elements:          assignmentType, expression, leftSide, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25683,7 +25683,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, nakedList, leftSide, leftSide
+                    	// elements:          seriesOpt1, leftSide, assignmentType, nakedList, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25816,7 +25816,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, leftSide, assignmentType, expression, leftSide
+                    	// elements:          seriesOpt1, leftSide, leftSide, assignmentType, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25925,7 +25925,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, leftSide, nakedList, assignmentType
+                    	// elements:          leftSide, nakedList, seriesOpt1, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26058,7 +26058,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, seriesOpt1, assignmentType, expression
+                    	// elements:          leftSide, seriesOpt1, assignmentType, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26169,7 +26169,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, assignmentType, leftSide, nakedList
+                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26295,7 +26295,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, seriesOpt1, assignmentType
+                    	// elements:          assignmentType, expression, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26395,7 +26395,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
+                    	// elements:          seriesOpt1, nakedList, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26519,7 +26519,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, seriesOpt1, assignmentType
+                    	// elements:          seriesOpt1, leftSide, assignmentType, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26621,7 +26621,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, leftSide, assignmentType, nakedList
+                    	// elements:          nakedList, seriesOpt1, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26747,7 +26747,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, leftSide, expression, seriesOpt1
+                    	// elements:          assignmentType, expression, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26828,7 +26828,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
+                    	// elements:          leftSide, assignmentType, nakedList, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26927,7 +26927,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, expression, leftSide, assignmentType
+                    	// elements:          leftSide, seriesOpt1, assignmentType, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27002,7 +27002,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, seriesOpt1, leftSide, nakedList
+                    	// elements:          leftSide, seriesOpt1, nakedList, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27194,7 +27194,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, leftSide, nakedList
+                    	// elements:          leftSide, assignmentType, seriesOpt1, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27302,7 +27302,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, leftSide, expression, leftSide, assignmentType
+                    	// elements:          assignmentType, leftSide, seriesOpt1, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27386,7 +27386,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, nakedList, assignmentType, seriesOpt1, leftSide
+                    	// elements:          leftSide, assignmentType, seriesOpt1, nakedList, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27494,7 +27494,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, expression, leftSide, leftSide, seriesOpt1
+                    	// elements:          seriesOpt1, leftSide, leftSide, assignmentType, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27578,7 +27578,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, nakedList, seriesOpt1, leftSide
+                    	// elements:          seriesOpt1, assignmentType, leftSide, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27686,7 +27686,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, leftSide, leftSide, seriesOpt1, expression
+                    	// elements:          expression, leftSide, leftSide, seriesOpt1, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27772,7 +27772,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, nakedList, seriesOpt1, leftSide
+                    	// elements:          seriesOpt1, leftSide, nakedList, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27873,7 +27873,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, expression, seriesOpt1, leftSide
+                    	// elements:          assignmentType, leftSide, expression, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27948,7 +27948,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, nakedList, assignmentType, seriesOpt1
+                    	// elements:          nakedList, seriesOpt1, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28047,7 +28047,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, expression, leftSide, seriesOpt1
+                    	// elements:          seriesOpt1, expression, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28124,7 +28124,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, leftSide, assignmentType, seriesOpt1
+                    	// elements:          seriesOpt1, nakedList, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28225,7 +28225,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, expression, leftSide
+                    	// elements:          expression, leftSide, assignmentType, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28300,7 +28300,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1a, assignmentType, nakedList, leftSide
+                    	// elements:          assignmentType, nakedList, leftSide, seriesOpt1a
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28399,7 +28399,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1a, expression, assignmentType
+                    	// elements:          seriesOpt1a, expression, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28511,7 +28511,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1a, ident, expression, leftSide
+                    	// elements:          assignmentType, seriesOpt1a, leftSide, ident, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28643,7 +28643,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, leftSide, assignmentType, expression, seriesOpt1
+                    	// elements:          leftSide, expression, seriesOpt1, ident, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28762,7 +28762,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, expression, ident, leftSide, seriesOpt1
+                    	// elements:          expression, seriesOpt1, leftSide, assignmentType, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28952,7 +28952,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          leftSide, expression, assignmentType, seriesOpt1
+            	// elements:          leftSide, assignmentType, expression, seriesOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -30358,7 +30358,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1h, dates, localOptions
+                    	// elements:          dates, localOptions, seriesOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -32653,7 +32653,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, analyzeOpt1h
+                    	// elements:          dates, analyzeOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -34079,7 +34079,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, closeOpt1
+                    	// elements:          closeOpt1, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -34444,7 +34444,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, closeOpt1h
+                    	// elements:          closeOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -34939,7 +34939,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames2, collapseOpt1, collapseMethod, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames2, seqOfBankvarnames, collapseMethod, collapseOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -35313,7 +35313,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          collapseOpt1h, localOptions
+                    	// elements:          localOptions, collapseOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -35626,7 +35626,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          compareOpt1, fileName, seqOfBankvarnames
+            	// elements:          fileName, seqOfBankvarnames, compareOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -35967,7 +35967,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, compareOpt1h
+                    	// elements:          compareOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -36102,7 +36102,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, compareOpt1h, localOptions
+                    	// elements:          compareOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -36977,7 +36977,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          copyOpt1, seqOfBankvarnames, assignmentType, seqOfBankvarnames2
+            	// elements:          seqOfBankvarnames2, assignmentType, copyOpt1, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -37305,7 +37305,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          copyOpt1h, localOptions
+                    	// elements:          localOptions, copyOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -37440,7 +37440,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, copyOpt1h
+                    	// elements:          copyOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -38403,7 +38403,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, countOpt1h
+                    	// elements:          countOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -38977,7 +38977,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          decompExpression, decompOpt1
+                    	// elements:          decompOpt1, decompExpression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -39360,7 +39360,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          decompFrom, decompEndo, decompWhere, decompOpt1, decompCols, decompRows, decompGroup, decompVar1Simple
+                    	// elements:          decompRows, decompGroup, decompFrom, decompEndo, decompVar1Simple, decompOpt1, decompWhere, decompCols
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -39527,7 +39527,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          decompOpt1, decompVar1Simple
+                    	// elements:          decompVar1Simple, decompOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -39834,7 +39834,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnamesAlias, seqOfBankvarnamesOnly1, decompOpt2
+            	// elements:          seqOfBankvarnamesOnly1, seqOfBankvarnamesAlias, decompOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -40020,7 +40020,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompExpression2, seqOfBankvarnamesOnly1Alias, decompOpt2
+            	// elements:          seqOfBankvarnamesOnly1Alias, decompOpt2, decompExpression2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41157,7 +41157,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompWhere1, seqOfBankvarnamesOnly1
+            	// elements:          seqOfBankvarnamesOnly1, decompWhere1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41419,7 +41419,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression2, expression, seqOfBankvarnamesOnly1, seqOfBankvarnamesOnly1
+            	// elements:          seqOfBankvarnamesOnly1, expression2, expression, seqOfBankvarnamesOnly1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41889,7 +41889,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, decompOpt1h
+                    	// elements:          decompOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -42024,7 +42024,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, decompOpt1h
+                    	// elements:          decompOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -43611,7 +43611,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          findOpt1h, localOptions
+                    	// elements:          localOptions, findOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -43746,7 +43746,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, findOpt1h
+                    	// elements:          localOptions, findOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -44688,7 +44688,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, dispOpt1, assignmentType
+                    	// elements:          assignmentType, dispOpt1, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45011,7 +45011,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dispOpt1h, localOptions
+                    	// elements:          localOptions, dispOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45169,7 +45169,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, dispOpt1h, dates
+                    	// elements:          dispOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45557,7 +45557,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          docOpt1, fileName, seqOfBankvarnames, docOpt2
+            	// elements:          seqOfBankvarnames, fileName, docOpt1, docOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -45900,7 +45900,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, docOpt1h
+                    	// elements:          docOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -46833,7 +46833,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, url, downloadOpt1, fileName2
+            	// elements:          fileName2, fileName, url, downloadOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -47668,7 +47668,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          eeOpt1, eeHelper
+            	// elements:          eeHelper, eeOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -47809,7 +47809,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          eeHelper, eeOpt1
+            	// elements:          eeOpt1, eeHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -48818,7 +48818,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          findmissingdataOpt1h, localOptions
+                    	// elements:          localOptions, findmissingdataOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -48967,7 +48967,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, findmissingdataOpt1h, localOptions
+                    	// elements:          findmissingdataOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -49882,7 +49882,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, forLhs, expression3, expression2
+                    	// elements:          expression, forLhs, expression2, expression3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -49959,7 +49959,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          forLhs, nakedList
+                    	// elements:          nakedList, forLhs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50026,7 +50026,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          forLhs, expression
+                    	// elements:          expression, forLhs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50158,7 +50158,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          svarname, type
+            	// elements:          type, svarname
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -50316,7 +50316,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          functionStatements, ident, typeRv, functionArg
+            	// elements:          functionStatements, functionArg, typeRv, ident
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -50562,7 +50562,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          tripleDot, functionArgElement, functionArgElement1
+            	// elements:          functionArgElement1, tripleDot, functionArgElement
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -50970,7 +50970,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          typeArg, expression1, expression2, svarname
+            	// elements:          svarname, expression1, typeArg, expression2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -51730,7 +51730,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          bankvarname, fargs, libraryWithColon, ident
+                    	// elements:          fargs, bankvarname, libraryWithColon, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -51868,7 +51868,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          bankvarname, fargs, libraryWithColon, ident
+                    	// elements:          fargs, bankvarname, ident, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -52070,7 +52070,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          andOr, versionAndDate, versionAndDate, ifOperator, ifOperator
+            	// elements:          versionAndDate, ifOperator, ifOperator, versionAndDate, andOr
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -52905,7 +52905,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionStatements2, functionStatements, logical
+                    	// elements:          functionStatements, logical, functionStatements2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -53077,7 +53077,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionStatements, logical, logical, functionStatements2, functionStatements
+                    	// elements:          logical, logical, functionStatements2, functionStatements, functionStatements
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -54962,7 +54962,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, interpolateMethod, seqOfBankvarnames2, seqOfBankvarnames3
+            	// elements:          seqOfBankvarnames3, seqOfBankvarnames, interpolateMethod, seqOfBankvarnames2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -55211,7 +55211,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, dates
+            	// elements:          dates, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -55371,7 +55371,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          localOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, localOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -55684,7 +55684,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOpt1h, localOptions
+                    	// elements:          localOptions, localOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -55974,7 +55974,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, globalOpt1
+            	// elements:          globalOpt1, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -57094,7 +57094,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileNameStar, name
+            	// elements:          name, fileNameStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -58475,7 +58475,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          modelOpt1h, localOptions
+                    	// elements:          localOptions, modelOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -59145,7 +59145,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          olsOpt1, olsExpression, olsImpose
+                    	// elements:          olsExpression, olsImpose, olsOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -59370,7 +59370,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          olsOpt1, olsExpression, olsImpose, name
+                    	// elements:          olsImpose, olsExpression, olsOpt1, name
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -59911,7 +59911,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, olsOpt1h
+                    	// elements:          olsOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -60501,7 +60501,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          openHelper, openOpt1
+            	// elements:          openOpt1, openHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -60949,7 +60949,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, openOpt1h
+                    	// elements:          openOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -63471,7 +63471,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          pipeOpt1, fileName
+            	// elements:          fileName, pipeOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -64945,7 +64945,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs_proc, libraryWithColon, identWithoutCommand
+                    	// elements:          libraryWithColon, fargs_proc, identWithoutCommand
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -65051,7 +65051,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs_proc, identWithoutCommand, libraryWithColon
+                    	// elements:          fargs_proc, libraryWithColon, identWithoutCommand
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -65310,7 +65310,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, fargs, libraryWithColon
+                    	// elements:          fargs, libraryWithColon, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -65420,7 +65420,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, ident, libraryWithColon
+                    	// elements:          ident, fargs, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -65573,7 +65573,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          identWithoutCommand, procedureStatements, procedureArg
+            	// elements:          procedureArg, procedureStatements, identWithoutCommand
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -65819,7 +65819,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          procedureArgElement1, tripleDot, procedureArgElement
+            	// elements:          procedureArgElement, tripleDot, procedureArgElement1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -66227,7 +66227,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression2, svarname, expression1, typeArg
+            	// elements:          expression1, typeArg, expression2, svarname
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -66541,7 +66541,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          prtElements, prtOpt1, prtOpt2, prtHelper
+            	// elements:          prtOpt1, prtElements, prtOpt2, prtHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -66964,7 +66964,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          prtElementOptionField, gekkoLabel, expression
+            	// elements:          expression, prtElementOptionField, gekkoLabel
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -67425,7 +67425,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          prtOpt1Helper, localOptions
+                    	// elements:          localOptions, prtOpt1Helper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -67560,7 +67560,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, dates, prtOpt1Helper
+                    	// elements:          localOptions, prtOpt1Helper, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -78796,7 +78796,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          r_exportOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, r_exportOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -79421,7 +79421,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, fileName, r_runOpt1
+                    	// elements:          seqOfBankvarnames, r_runOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -79544,7 +79544,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          r_runOpt1, fileName
+                    	// elements:          fileName, r_runOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -81201,7 +81201,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          rebaseDate2, rebaseDate1, rebaseOpt1, seqOfBankvarnames
+            	// elements:          rebaseOpt1, seqOfBankvarnames, rebaseDate2, rebaseDate1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -81640,7 +81640,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, rebaseOpt1h
+                    	// elements:          rebaseOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -82253,7 +82253,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          renameOpt1, assignmentType, seqOfBankvarnames, seqOfBankvarnames2
+            	// elements:          seqOfBankvarnames2, renameOpt1, seqOfBankvarnames, assignmentType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -83285,7 +83285,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          nameOrStar, readOpt1, readHelper, fileNameStar
+            	// elements:          fileNameStar, nameOrStar, readOpt1, readHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -83681,7 +83681,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, readOpt1h
+                    	// elements:          readOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -83808,7 +83808,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, readOpt1h
+                    	// elements:          readOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -86971,7 +86971,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          runOpt1h, localOptions
+                    	// elements:          localOptions, runOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -87210,7 +87210,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          sheetImportOpt1, seqOfBankvarnames, fileName
+            	// elements:          seqOfBankvarnames, fileName, sheetImportOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -87578,7 +87578,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sheetImportOpt1h, localOptions, dates
+                    	// elements:          dates, localOptions, sheetImportOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -89116,7 +89116,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, simOpt1h
+                    	// elements:          simOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -89251,7 +89251,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, simOpt1h, dates
+                    	// elements:          dates, localOptions, simOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -90044,7 +90044,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, smoothOpt2, seqOfBankvarnames3, seqOfBankvarnames2
+            	// elements:          seqOfBankvarnames3, seqOfBankvarnames, seqOfBankvarnames2, smoothOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -90873,7 +90873,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, seqOfBankvarnames, spliceOpt1
+            	// elements:          spliceOpt1, expression, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -91781,7 +91781,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sysOpt1, fileName, expression
+                    	// elements:          fileName, sysOpt1, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -92097,7 +92097,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, sysOpt1h
+                    	// elements:          sysOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -92985,7 +92985,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93043,7 +93043,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression
+                    	// elements:          expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93108,7 +93108,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression
+                    	// elements:          expression, tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93223,7 +93223,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93389,7 +93389,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow, expression
+                    	// elements:          tableCurrow, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93447,7 +93447,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93561,7 +93561,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93626,7 +93626,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93700,7 +93700,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, expression, tableCurrow
+                    	// elements:          expression, tableCurrow, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93807,7 +93807,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, expression, expression, expression, expression, expression, tableCurrow
+                    	// elements:          expression, expression, expression, expression, tableCurrow, expression, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93890,7 +93890,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, tableOpt1
+                    	// elements:          tableOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -94420,7 +94420,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableOpt1h, dates, localOptions
+                    	// elements:          tableOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -95364,7 +95364,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, tellOpt1h
+                    	// elements:          tellOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96879,7 +96879,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          translateOpt1, fileName
+            	// elements:          fileName, translateOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -97184,7 +97184,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          translateOpt1h, localOptions
+                    	// elements:          localOptions, translateOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97976,7 +97976,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          writeOpt1, seqOfBankvarnames, seqOfBankvarnames2, writeHelper, fileName
+                    	// elements:          seqOfBankvarnames2, fileName, writeHelper, writeOpt1, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -98092,7 +98092,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          writeOpt1, fileName, writeHelper
+                    	// elements:          fileName, writeHelper, writeOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -98632,7 +98632,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, writeOpt1h
+                    	// elements:          localOptions, dates, writeOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -101002,7 +101002,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, truncateOpt1
+            	// elements:          truncateOpt1, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -101624,7 +101624,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          x12aOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, x12aOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -101944,7 +101944,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, x12aOpt1h
+                    	// elements:          x12aOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102094,7 +102094,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, x12aOpt1h, localOptions
+                    	// elements:          localOptions, dates, x12aOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102637,7 +102637,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FILE, INTERNAL, DATABANK, fileName, GBK
+                    	// elements:          DATABANK, fileName, INTERNAL, GBK, FILE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102732,7 +102732,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, BANK, fileName
+                    	// elements:          fileName, BANK, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102809,7 +102809,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, BANK1
+                    	// elements:          BANK1, fileName, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102886,7 +102886,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          BANK2, FOLDER, fileName
+                    	// elements:          fileName, FOLDER, BANK2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103040,7 +103040,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, COMMAND1
+                    	// elements:          FOLDER, COMMAND1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103117,7 +103117,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          COMMAND2, FOLDER, fileName
+                    	// elements:          fileName, COMMAND2, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103194,7 +103194,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          HELP, FOLDER, fileName
+                    	// elements:          FOLDER, HELP, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103271,7 +103271,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          MENU, fileName, FOLDER
+                    	// elements:          fileName, MENU, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103348,7 +103348,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, MODEL, FOLDER
+                    	// elements:          MODEL, fileName, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103425,7 +103425,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, PIPE
+                    	// elements:          FOLDER, fileName, PIPE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103502,7 +103502,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          TABLE, fileName, FOLDER
+                    	// elements:          FOLDER, TABLE, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103579,7 +103579,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          TABLE1, FOLDER, fileName
+                    	// elements:          fileName, TABLE1, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103656,7 +103656,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          TABLE2, FOLDER, fileName
+                    	// elements:          FOLDER, fileName, TABLE2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103733,7 +103733,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, WORKING
+                    	// elements:          WORKING, FOLDER, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103813,7 +103813,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, EXE, GAMS
+                    	// elements:          fileName, EXE, FOLDER, GAMS
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103902,7 +103902,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, INTERFACE, REMOTE, FILE
+                    	// elements:          FILE, REMOTE, fileName, INTERFACE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -103988,7 +103988,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          MENU, fileName, STARTFILE
+                    	// elements:          fileName, STARTFILE, MENU
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -104145,7 +104145,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          EXE, PYTHON, FOLDER, fileName
+                    	// elements:          PYTHON, FOLDER, fileName, EXE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -104234,7 +104234,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          EXE, fileName, FOLDER, R
+                    	// elements:          R, EXE, FOLDER, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106463,7 +106463,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileNameFirstPart, fileNamePart
+                    	// elements:          fileNamePart, fileNameFirstPart
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 

@@ -5394,7 +5394,6 @@ namespace Gekko
                     //ignore
                 }
             }
-
             return m;
         }
 
@@ -6619,49 +6618,47 @@ namespace Gekko
             Translate_2_4_to_3_0.Insert4(dir, rootify, option);
         }
 
-        public static void causalanalysis(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        public static void lhsrhs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
-            causalanalysis(smpl, _t1, _t2, x1, new ScalarVal(3d));
+            lhsrhs(smpl, _t1, _t2, x1, new ScalarVal(3d));
         }
 
-        public static void causalanalysis(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        public static void lhsrhs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             string dir = O.ConvertToString(x1);
-            double d = O.ConvertToInt(x2);
+            int i = O.ConvertToInt(x2);
+            if (i < 2 || i > 3) new Error("Expected argument 2 or 3.");
             FindFileHelper ffh = Program.FindFile(dir, null, true, true, false, true, null);
             if (ffh.realPathAndFileName == null) new Error("File '" + ffh.prettyPathAndFileName + "' does not seem to exist");
-            string input = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-            bool ok; Cmd2Parser.expr_return r;
-            Parser.Gek.ParserGekCreateAST.ParseGekko2x(input, out ok, out r);
-            if (!ok) new Error("The file '" + ffh.prettyPathAndFileName + "' does not parse in Gekko 2.x");
+            string input = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);            
             Gekko.Parser.Gek.Extra e = new Gekko.Parser.Gek.Extra();
-            Gekko.Parser.Gek.ParserGekCreateAST.Xx_2x(r, e);
+            Gekko.Parser.Gek.ParserGekCreateAST.LhsRhs(input, e, i);
+            List lhs = new List(e.lhs);
+            List rhs = new List(e.rhs);
+            lhs = Functions.unique(smpl, _t1, _t2, lhs) as List;
+            rhs = Functions.unique(smpl, _t1, _t2, rhs) as List;
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd(e.lhs.Count + " left-hand side variable" + G.S(e.lhs.Count));
-                if (e.lhs.Count > 0)
+                txt.MainAdd(lhs.list.Count + " left-hand side variable" + G.S(lhs.list.Count));
+                if (lhs.list.Count > 0)
                 {                    
                     txt.MainNewLineTight();
-                    txt.MainAdd(Stringlist.GetListWithCommas(e.lhs));
+                    txt.MainAdd(Stringlist.GetListWithCommas(Stringlist.GetListOfStringsFromIVariable(lhs)));
                 }
             }
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd(e.rhs.Count + " right-hand side variable" + G.S(e.rhs.Count));
-                if (e.rhs.Count > 0)
-                {                    
+                txt.MainAdd(rhs.list.Count + " right-hand side variable" + G.S(rhs.list.Count));
+                if (rhs.list.Count > 0)
+                {
                     txt.MainNewLineTight();
-                    txt.MainAdd(Stringlist.GetListWithCommas(e.rhs));
+                    txt.MainAdd(Stringlist.GetListWithCommas(Stringlist.GetListOfStringsFromIVariable(rhs)));
                 }
             }
-
-            List lhs_ = new List(e.lhs);
-            List rhs_ = new List(e.rhs);
-
-            if (e.lhs.Count + e.rhs.Count > 0)
+            if (lhs.list.Count + rhs.list.Count > 0)
             {
-                O.AddIVariableWithOverwriteFromString("#lhs", lhs_);
-                O.AddIVariableWithOverwriteFromString("#rhs", rhs_);
+                O.AddIVariableWithOverwriteFromString("#lhs", lhs);
+                O.AddIVariableWithOverwriteFromString("#rhs", rhs);
                 new Writeln("See the lists #lhs and #rhs.");
             }
         }
