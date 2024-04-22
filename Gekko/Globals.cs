@@ -139,7 +139,7 @@ namespace Gekko
                 
         public List<Databank> bankOpen = new List<Databank>();
         
-        public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
+        public static string ttPath3 = "GekkoCS_2.5.3";  //or "GekkoCS"
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
 
         public static bool smart1 = true;

@@ -3288,9 +3288,14 @@ optionType :
              | FOLDER TABLE1   '='? fileName ->  FOLDER TABLE1 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER TABLE2   '='? fileName ->  FOLDER TABLE2 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
-
+             
+             | GLOBAL FENCE BLACK FOLDERS READ '='? expression -> GLOBAL FENCE BLACK FOLDERS READ ^(ASTSTRINGSIMPLE expression)
+             | GLOBAL FENCE BLACK FOLDERS WRITE '='? expression -> GLOBAL FENCE BLACK FOLDERS WRITE ^(ASTSTRINGSIMPLE expression)
+             | GLOBAL FENCE WHITE FOLDERS READ '='? expression -> GLOBAL FENCE WHITE FOLDERS READ ^(ASTSTRINGSIMPLE expression)
+             | GLOBAL FENCE WHITE FOLDERS WRITE '='? expression -> GLOBAL FENCE WHITE FOLDERS WRITE ^(ASTSTRINGSIMPLE expression)
              | GLOBAL FENCE BLACK FOLDERS '='? expression -> GLOBAL FENCE BLACK FOLDERS ^(ASTSTRINGSIMPLE expression)
              | GLOBAL FENCE WHITE FOLDERS '='? expression -> GLOBAL FENCE WHITE FOLDERS ^(ASTSTRINGSIMPLE expression)
+
              | GLOBAL DEPENDENCY TRACKING '='? expression -> GLOBAL DEPENDENCY TRACKING ^(ASTSTRINGSIMPLE expression)
              | GLOBAL COLOR '='? expression -> GLOBAL COLOR ^(ASTSTRINGSIMPLE expression)
 
