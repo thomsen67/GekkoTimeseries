@@ -2459,24 +2459,52 @@ namespace Gekko
 
         public static void comparefolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
+            comparefolders(smpl, _t1, _t2, x1, x2, null, null);
+        }
+
+        public static void comparefolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            comparefolders(smpl, _t1, _t2, x1, x2, x3, null);
+        }
+
+
+        public static void comparefolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3, IVariable x4)
+        {
             //
             // TODO: when doing text compare, allow differing number of blank lines. Will need line read syncing.
+            // .git subfolder is ignored (everything that starts with .git...).
             //
             string f1 = O.ConvertToString(x1);  //new
             string f2 = O.ConvertToString(x2);  //old
+            string f3 = null; if (x3 != null) f3 = O.ConvertToString(x3);  //filter
+            string f4 = null; if (x4 != null) f4 = O.ConvertToString(x4);  //options
+
             if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
             if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
             if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
             if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");
-            var d1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
-            var d2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+
+            List<string> black = new List<string>();
+            black.Add("m*.*");
+            List<string> white = new List<string>();
+            white.Add("*.txt");
+
+            List<Wildcard> wblack = new List<Wildcard>();
+            foreach (string s in black) wblack.Add(new Wildcard(s, System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+            List<Wildcard> wwhite = new List<Wildcard>();
+            foreach (string s in white) wwhite.Add(new Wildcard(s, System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+            List<string> d1 = MatchInBlackWhiteWildcards(xd1, wblack, wwhite);
+            List<string> d2 = MatchInBlackWhiteWildcards(xd2, wblack, wwhite);
+
             var e12 = d1.Except(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
             var e21 = d2.Except(d1, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
             var intersect = d1.Intersect(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
 
             List<string> differentBinary = new List<string>();
             List<string> differentText = new List<string>();
-            List<string> differentAll = new List<string>();            
+            List<string> differentAll = new List<string>();
 
             new Writeln("Comparing files...");
             foreach (string s in intersect)
@@ -2555,7 +2583,7 @@ namespace Gekko
                 }
                 File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder1.gcm", sb.ToString());
             }
-            
+
             if (true)
             {
                 StringBuilder sb = new StringBuilder();
@@ -2629,28 +2657,28 @@ namespace Gekko
             foreach (string s in intersect)
             {
                 sb2.AppendLine(s);
-            }            
+            }
 
             sb2.AppendLine();
             sb2.AppendLine("========== " + e12.Count() + " files in folder1, but not in folder2:" + " ==========");
             foreach (string s in e12)
             {
                 sb2.AppendLine(s);
-            }            
+            }
 
             sb2.AppendLine();
             sb2.AppendLine("========== " + e21.Count() + " files in folder2, but not in folder1:" + " ==========");
             foreach (string s in e21)
             {
                 sb2.AppendLine(s);
-            }            
+            }
 
             sb2.AppendLine();
             sb2.AppendLine("========== " + differentBinary.Count + " different common files (binary):" + " ==========");
             foreach (string s in differentBinary)
             {
                 sb2.AppendLine(s);
-            }            
+            }
 
             sb2.AppendLine();
             sb2.AppendLine("========== " + differentText.Count + " different common files (text):" + " ==========");
@@ -2659,7 +2687,7 @@ namespace Gekko
                 sb2.AppendLine(s);
             }
 
-            File.WriteAllText("comparefolders.txt", sb2.ToString());            
+            File.WriteAllText("comparefolders.txt", sb2.ToString());
 
             using (var txt = new Writeln())
             {
@@ -2669,6 +2697,53 @@ namespace Gekko
                 txt.MainNewLineTight();
                 txt.MainAdd("File comparefolders2.zip contains Gekko code to update folder1 or folder2");
             }
+        }
+
+        /// <summary>
+        /// Input is a list of fileNameWithPaths. Will only look at filenames.
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="wblack"></param>
+        /// <param name="wwhite"></param>
+        /// <returns></returns>
+        private static List<string> MatchInBlackWhiteWildcards(IOrderedEnumerable<string> names, List<Wildcard> wblack, List<Wildcard> wwhite)
+        {            
+            List<string> result = new List<string>();
+            foreach (string s2 in names)
+            {
+                bool ok = false;
+                string s = Path.GetFileName(s2);
+
+                if (wwhite.Count == 0)
+                {
+                    ok = true;
+                }
+                else
+                {
+                    foreach (Wildcard wp in wwhite)
+                    {
+                        if (wp.IsMatch(s))
+                        {
+                            ok = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (ok)
+                {
+                    foreach (Wildcard wn in wblack)
+                    {
+                        if (wn.IsMatch(s))
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+                }
+                if (ok) result.Add(s2);
+            }    
+            return result;
         }
 
         public static IVariable chol(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

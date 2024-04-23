@@ -290,14 +290,14 @@ namespace Gekko.Parser.Gek
             {                
                 bool ok; Cmd2Parser.expr_return r;
                 Parser.Gek.ParserGekCreateAST.ParseGekko2x(input, out ok, out r);
-                if (!ok) new Error("The file does not parse in Gekko 2.x. You may try to RUN it to locate the error.");
+                if (!ok) new Error("The file does not parse in Gekko 2.x. You may try to RUN it to locate the error. Use argument lhsrhs(..., 3) to use Gekko 3 parser.");
                 t = (CommonTree)r.Tree;
             }
             else
             {                
                 bool ok; Cmd3Parser.start_return r;
                 Parser.Gek.ParserGekCreateAST.ParseGekko3x(input, out ok, out r);
-                if (!ok) new Error("The file does not parse in Gekko 3.x. You may try to RUN it to locate the error.");
+                if (!ok) new Error("The file does not parse in Gekko 3.x. You may try to RUN it to locate the error. Use argument lhsrhs(..., 2) to use Gekko 2 parser.");
                 t = (CommonTree)r.Tree;
             }
             CreateASTNodesForCmd(t, root, 0);
