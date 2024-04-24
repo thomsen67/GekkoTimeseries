@@ -8170,36 +8170,22 @@ namespace Gekko
             double[] data = null;
             int ii = 0;
             int jj = 0;
-
-            List<int> fractions = new List<int>();
-            List<double> fractions2 = new List<double>();
-            for (double dd = 0.1; dd <= 1.0; dd = dd + 0.1)
-            {
-                fractions.Add((int)(dd * (double)lines2.Count));
-                fractions2.Add(dd);
-            }
-
-            int lineCounter = 0;
-
+            
             G.Writeln2("Starting to read " + lines2.Count + " data lines from data file");
 
             GekkoTime gt0 = GekkoTime.tNull;
             GekkoTime gt1 = GekkoTime.tNull;
 
+            List<int> fractions; List<double> fractions2;
+            G.GetFractions(lines2.Count, out fractions, out fractions2);
+
+            int lineCounter = 0;
+
             int state = 0;  //DATA=1, CODES("tid")=2, CODES(...)=3, VALUES(...)=4, VARIABLECODE(...)=5
             foreach (string line2 in lines2)
             {
                 lineCounter++;
-                if (lines2.Count >= 10000)
-                {
-                    for (int i = 0; i < fractions.Count; i++)
-                    {
-                        if (fractions[i] == lineCounter)
-                        {
-                            G.Writeln("    Progress: " + (int)(Math.Round(100 * fractions2[i])) + "% of " + lines2.Count + " data lines");
-                        }
-                    }
-                }
+                G.CheckFractions(lineCounter, lines2.Count, 10000, fractions, fractions2);
 
                 string line = line2.Trim();
                 bool semi = false;
@@ -8753,13 +8739,13 @@ namespace Gekko
                     for (int i = 0; i < split2.Length; i++)
                     {
                         split2[i] = split[2 * i + 2];
-                    }                    
+                    }
 
                     tsArray.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(split2, tsArray), ts);
                     tsArray.SetDirty(true);
 
                     if (Program.options.databank_trace)
-                    {                        
+                    {
                         try
                         {
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
@@ -8814,14 +8800,14 @@ namespace Gekko
                         if (gt1.IsNull()) gt1 = gt_end;
                         if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
                         if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
-                    }                    
+                    }
 
                     //put in the timeseries                    
                     databank.AddIVariableWithOverwrite(ts.name, ts);
                     ts.SetDirty(true);
 
                     if (Program.options.databank_trace)
-                    {                        
+                    {
                         try
                         {
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
@@ -8920,7 +8906,7 @@ namespace Gekko
                 }
             }
             if (variablecodeNote != null) new Note(variablecodeNote);
-        }
+        }        
 
         /// <summary>
         /// Helper method for ReadPx() method.

@@ -2486,10 +2486,33 @@ namespace Gekko
             var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
             var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
 
-            List<string> black = new List<string>();
-            black.Add("m*.*");
+            bool onlyAllowText = false;
+            if (!G.NullOrBlanks(f4))
+            {
+                if (G.ContainsWord(f4, "text")) onlyAllowText = true;
+            }
+
+            List<string> black = new List<string>();            
             List<string> white = new List<string>();
-            white.Add("*.txt");
+            if (!G.NullOrBlanks(f3))
+            {
+                string[] ss = f3.Split(',');
+                foreach (string s2 in ss)
+                {
+                    string s = s2.Trim();
+                    if (!G.NullOrBlanks(s))
+                    {
+                        if (s.StartsWith("!"))
+                        {
+                            black.Add(s.Substring(1));
+                        }
+                        else
+                        {
+                            white.Add(s);
+                        }
+                    }
+                }
+            }            
 
             List<Wildcard> wblack = new List<Wildcard>();
             foreach (string s in black) wblack.Add(new Wildcard(s, System.Text.RegularExpressions.RegexOptions.IgnoreCase));
@@ -2500,15 +2523,45 @@ namespace Gekko
 
             var e12 = d1.Except(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
             var e21 = d2.Except(d1, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
-            var intersect = d1.Intersect(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+            var intersect_temp = d1.Intersect(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
 
             List<string> differentBinary = new List<string>();
             List<string> differentText = new List<string>();
             List<string> differentAll = new List<string>();
 
-            new Writeln("Comparing files...");
+            //Some double work, but should still be fast
+            List<string> intersect = new List<string>();
+            foreach (string s in intersect_temp)
+            {                
+                if (onlyAllowText)
+                {
+                    string p1 = f1 + "\\" + s;
+                    string p2 = f2 + "\\" + s;
+                    bool isText = !G.IsBinary(p1) && !G.IsBinary(p2);
+                    if (!isText) continue;  //skip it
+                }
+                intersect.Add(s);
+            }
+
+            string extra = null;
+            string extra2 = null;
+            if (intersect_temp.Length - intersect.Count > 0)
+            {
+                extra = " (" + (intersect_temp.Length - intersect.Count) + " skipped binary files)";
+                extra2 = " text";
+            }
+
+            new Writeln("Comparing " + intersect.Count + extra2 + " files" + extra);
+
+            List<int> fractions; List<double> fractions2;
+            G.GetFractions(intersect.Count, out fractions, out fractions2);            
+
+            int lineCounter = 0;
             foreach (string s in intersect)
             {
+                lineCounter++;
+                G.CheckFractions(lineCounter, intersect.Count, 1000, fractions, fractions2);
+
                 string p1 = f1 + "\\" + s;
                 string p2 = f2 + "\\" + s;
                 bool identical = false;

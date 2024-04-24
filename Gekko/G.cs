@@ -4947,7 +4947,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used in DECOMP.
+        /// Used in DECOMP. Not case sensitive.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="word"></param>
@@ -4990,6 +4990,45 @@ namespace Gekko
             if (!Globals.printGrayLinesForDebugging) return;
             WriteAbstract(EWrapType.Writeln, s, null, true, Color.Gray, false, ETabs.Main);
         }
+
+        /// <summary>
+        /// Helper class to show GUI progress. See CheckFractions().
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="fractions"></param>
+        /// <param name="fractions2"></param>
+        public static void GetFractions(int count, out List<int> fractions, out List<double> fractions2)
+        {
+            fractions = new List<int>();
+            fractions2 = new List<double>();
+            for (double dd = 0.1; dd <= 1.0; dd = dd + 0.1)
+            {
+                fractions.Add((int)(dd * (double)count));
+                fractions2.Add(dd);
+            }
+        }
+
+        /// <summary>
+        /// See GetFractions(). Set threshold so it does not activate for small jobs.
+        /// </summary>
+        /// <param name="lines2"></param>
+        /// <param name="fractions"></param>
+        /// <param name="fractions2"></param>
+        /// <param name="lineCounter"></param>
+        public static void CheckFractions(int lineCounter, int numberOfLines, int threshold, List<int> fractions, List<double> fractions2)
+        {
+            if (numberOfLines >= threshold)
+            {
+                for (int i = 0; i < fractions.Count; i++)
+                {
+                    if (fractions[i] == lineCounter)
+                    {
+                        G.Writeln("    Progress: " + (int)(Math.Round(100 * fractions2[i])) + "% of " + numberOfLines + " elements", Color.Gray);
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// For developer use/debugging. Will also be true if ExcelDna or hiding GUI is active.
