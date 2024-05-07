@@ -2434,58 +2434,20 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (Globals.runningOnTTComputer)
-            {
-        
-            }
-
             if (false && Globals.runningOnTTComputer)
             {                
-                StringIntern si = new StringIntern(); 
+                string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
 
-                InternTest it1 = new InternTest();
-                it1.i1 = si.GetIntFromString(@"1");
-                it1.i2 = si.GetIntFromString(@"1");
-                it1.i3 = si.GetIntFromString(@"2");
+                //Around 700 ms
+                DateTime t0 = DateTime.Now;
+                string md5a = G.GetMd5FromFile(file);
+                string md5b = G.GetMd5FromFile(file);
+                new Writeln("MD5 ms = " + (DateTime.Now - t0).TotalMilliseconds);
 
-                InternTest it2 = new InternTest();
-                it2.i1 = si.GetIntFromString(@"2");
-                it2.i2 = si.GetIntFromString(@"3");
-                it2.i3 = si.GetIntFromString(@"1");
-
-                si.Pack();
-                si.Unpack();
-
-                G.Writeln(si.GetStringFromInt(it1.i1) + ", " + si.GetStringFromInt(it1.i2) + ", "+ si.GetStringFromInt(it1.i3));
-                G.Writeln(si.GetStringFromInt(it2.i1) + ", " + si.GetStringFromInt(it2.i2) + ", " + si.GetStringFromInt(it2.i3));
-                G.Writeln("Count "+si.Count());
-
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                new Writeln("M123AB7∆ÿ≈.TABEL_13224153" + " --> " + DstCodes("M123AB7∆ÿ≈.TABEL_13224153", true));
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                //string ss = "100\t2\t3.3\t4\t3\t123456.78\t1234567.89\t12345678.91\t123456789.12\t1234567891.23\tabc\t4\r\n2\t3234234.2342343243\t123456.7811\t1234567.8911\t12345678.9111\t123456789.1211\t1234567891.2311\tdef\t3\t2.345\t3\t4";
-                string ss = "100\t2\t3.3\t4\t3\t1234567.89\t12345678.91\t123456789.12\t1234567891.23\tabc\t4\r\n2\t3234234.2342343243\tNB\t777777.7777e-13\t1234567.891\t12345678.911\t123456789.121\t1234567891.231\tdef\t3\t2.345\t3\t4";
-                Clipboard.SetText(ss, TextDataFormat.Text);
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                DateTime dt0 = DateTime.Now;
-                long j = 1;
-                for (int i = 0; i < 1e6; i++)
-                {
-                    //DateTime dt = DateTime.Now;  //0.3
-                    //DateTime dt = DateTime.UtcNow;  //0.08
-                    //ScalarVal v = new ScalarVal(123d); //0.01...
-                    j++;  //0.002
-                }
-                new Writeln(G.Seconds(dt0));
+                //Around 1400 ms
+                t0 = DateTime.Now;
+                bool identical = File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(file));
+                new Writeln("SeqEqual ms = " + (DateTime.Now - t0).TotalMilliseconds);                
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -2496,66 +2458,6 @@ namespace Gekko
             if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                DateTime t0 = DateTime.Now;
-                new Writeln("Start");
-                double x = 0;
-                for (double i = 1; i <= 1e10; i++)
-                {
-                    x += i;
-                }
-                new Writeln("" + x + "   " + G.Seconds(t0));
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                G.Writeln("");
-                G.Writeln("==========================================================================================");
-                G.Writeln("SERIES Work: e");
-                G.Writeln("Annual data from 2021 to 2023 (updated: 06-06-2022)");
-                G.Writeln("Source: Statistics Denmark");
-                G.Write("Calc: read bank1; "); G.WriteLink("(trace)", ""); G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln("Period           value         %");
-                G.Writeln("2021           28.0000    ******");
-                G.Writeln("2022           32.0000     14.29");
-                G.Writeln("2023           36.0000     12.50");
-                G.Writeln("==========================================================================================");
-                G.Writeln("");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln(@"Work:e!a");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Write(@"read bank1; --- "); G.Write(@"bank: c:\Gekko\bank1.gbk 06-06-2022 9:45:24 --- trace: "); G.WriteLink("Work:e!a", ""); G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln(@"Work:e!a --> Work:e!a");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Write(@"copy d to e; --- copied Work:e!a from Work:d!a --- trace: "); G.WriteLink("Work:d!a", ""); G.Writeln();
-                G.Writeln(@"2024-2025: e <2024 2025> = 22, 23;");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln(@"Work:d!a --> Work:e!a --> Work:e!a");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Write(@"2021-2023: d = a + b + c; --- trace: "); G.WriteLink("Work:a!a", ""); G.Write(", "); G.WriteLink("Work:b!a", ""); G.Write(", "); G.WriteLink("Work:c!a", ""); G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln(@"Work:c!a --> Work:d!a --> Work:e!a --> Work:e!a");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Write(@"2021-2023: c = a + b; --- trace: "); G.WriteLink("Work:a!a", ""); G.Write(", "); G.WriteLink("Work:b!a", ""); G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln();
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln(@"Work:a!a --> Work:c!a --> Work:d!a --> Work:e!a --> Work:e!a");
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln(@"2021-2023:  a = 2, 3, 4;");
-                G.Writeln("------------------------------------------------------------------------------------------");
-
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -10925,7 +10827,6 @@ namespace Gekko
                                 eqList += ", " + s8;
                                 output.Add("equation " + s8 + "; " + s8 + " .. sum(t, " + Globals.scalarModelGamsVariable + ") =E= 0;");
                             }
-
                         }                        
 
                         output.Add("model " + Globals.scalarModelModelName + " / " + settings.model_name + eqList + " / ;");
@@ -16430,50 +16331,17 @@ namespace Gekko
 
             if (inputText != null)
             {
-                // step 1, calculate MD5 hash from input
-                MD5 md5 = MD5.Create();
-                byte[] inputBytes = Encoding.UTF8.GetBytes(inputText);  //UTF8 seems best choice
-                byte[] hash2 = md5.ComputeHash(inputBytes);
-                // step 2, convert byte array to hex string
-                StringBuilder sb = new StringBuilder();
-                hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
-                //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
-                //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
-                //This is a little better than hex (32 symbols).
+                hash = G.GetMd5FromText(inputText);
             }
             else if (fileNameWithPath != null)
             {
-                //tried physically splitting file in n chunks --> 
-                //has about same speed as MD5 itself... (0.6 s for a 176 MB file)                
-                //also, copying the file with File.Copy is not that much slower than MD5 itself.
-                //So we need to use something that operates on the file itself, also cannot put it in
-                //byte[] array and operate on this.
-                //Maybe just accept it, or wait until a suitable parallel implementation of SHA3.
-                //Cannot use xxHash and similar directly, they produce a ulong suitable for Dictionary
-                //hashing.
-                //In general, allowing READ <type> xx.zip, where file.type is inside the zip would be nice,
-                //because then the hashing would be faster. User would have to zip gdx files though.
-                //
-                //!! actually if xxHash returns 128 bits (uint128), that is actually the same as
-                //   MD5. Then the question is about collisions... Maybe when this:
-                //   https://github.com/uranium62/xxHash adds stream support for 128 bit hashes.
-                //
-                using (var md5Instance = MD5.Create())
-                {
-                    using (var stream = File.OpenRead(fileNameWithPath))
-                    {
-                        byte[] hash2 = md5Instance.ComputeHash(stream);
-                        //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
-                        //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
-                        hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
-                    }
-                }
+                hash = G.GetMd5FromFile(fileNameWithPath);
             }
             else new Error("Wrong call");
             if (Globals.runningOnTTComputer) new Writeln("TTH: MD5 took " + G.Seconds(t0));
             hash += salt;
             return hash;
-        }
+        }        
 
         /// <summary>
         /// RUN statement.
@@ -21585,6 +21453,365 @@ namespace Gekko
                 //throw new GekkoException();
             }
             return rv;
+        }
+
+        /// <summary>
+        /// Used for compareFolders() function.
+        /// </summary>
+        /// <param name="f1"></param>
+        /// <param name="f2"></param>
+        /// <param name="f3"></param>
+        /// <param name="f4"></param>
+        public static void CompareFolders(string f1, string f2, string f3, string f4)
+        {
+            //TODO: warn or skip if some folder is a .git folder.
+            
+            string omit = ".git";  //takes care of .gitignore etc.
+
+            DateTime t0 = DateTime.Now;                       
+
+            if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
+            if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
+            if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
+            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");
+            var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            
+            bool option_text = false;
+            bool option_strict = false;
+            if (!G.NullOrBlanks(f4))
+            {
+                if (G.ContainsWord(f4, "text")) option_text = true;
+                if (G.ContainsWord(f4, "strict")) option_strict = true;
+            }
+
+            List<string> black = new List<string>();
+            List<string> white = new List<string>();
+            if (!G.NullOrBlanks(f3))
+            {
+                string[] ss = f3.Split(',');
+                foreach (string s2 in ss)
+                {
+                    string s = s2.Trim();
+                    if (!G.NullOrBlanks(s))
+                    {
+                        if (s.StartsWith("!"))
+                        {
+                            black.Add(s.Substring(1));
+                        }
+                        else
+                        {
+                            white.Add(s);
+                        }
+                    }
+                }
+            }
+
+            List<Wildcard> wblack = new List<Wildcard>();
+            foreach (string s in black) wblack.Add(new Wildcard(s, System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+            List<Wildcard> wwhite = new List<Wildcard>();
+            foreach (string s in white) wwhite.Add(new Wildcard(s, System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+            List<string> d1 = MatchInBlackWhiteWildcards(xd1, wblack, wwhite);
+            List<string> d2 = MatchInBlackWhiteWildcards(xd2, wblack, wwhite);
+
+            var e12 = d1.Except(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+            var e21 = d2.Except(d1, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+            var intersect_temp = d1.Intersect(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+
+            List<string> differentBinary = new List<string>();
+            List<string> differentText = new List<string>();
+            List<string> differentAll = new List<string>();
+            
+            //Some double work, but should still be fast
+            List<string> intersect = new List<string>();
+            foreach (string s in intersect_temp)
+            {
+                if (option_text)
+                {
+                    string p1 = f1 + "\\" + s;
+                    string p2 = f2 + "\\" + s;
+                    bool isText = !G.IsBinary(p1) && !G.IsBinary(p2);
+                    if (!isText) continue;  //skip it
+                }
+                intersect.Add(s);
+            }            
+
+            string extra = null;
+            string extra2 = null;
+            if (intersect_temp.Length - intersect.Count > 0)
+            {
+                extra = " (" + (intersect_temp.Length - intersect.Count) + " skipped binary files)";
+                extra2 = " text";
+            }
+
+            new Writeln("Comparing " + intersect.Count + extra2 + " files" + extra);
+
+            List<int> fractions; List<double> fractions2;
+            G.GetFractions(intersect.Count, out fractions, out fractions2);            
+
+            int lineCounter = 0;
+            foreach (string s in intersect)
+            {
+                lineCounter++;
+                G.CheckFractions(lineCounter, intersect.Count, 1000, fractions, fractions2);
+
+                string p1 = f1 + "\\" + s;
+                string p2 = f2 + "\\" + s;
+
+                bool identical = G.CompareFiles(p1, p2, option_strict);  //could speed up more by parallelizing the whole intersect list.
+
+                if (!identical)
+                {
+                    bool isText = !G.IsBinary(p1) && !G.IsBinary(p2);
+                    if (isText)
+                    {
+                        //Two text files may have same contents when ignoring blanks etc.
+                        List<string> ss1 = Stringlist.ExtractLinesFromText(File.ReadAllText(p1));
+                        List<string> ss2 = Stringlist.ExtractLinesFromText(File.ReadAllText(p2));
+
+                        //TODO: Maybe allow blank lines to differ??
+                        if (ss1.Count == ss2.Count)
+                        {
+                            bool same = true;
+                            for (int i = 0; i < ss1.Count; i++)
+                            {
+                                if (ss1[i].Trim() != ss2[i].Trim())
+                                {
+                                    //Beware that this removes tabs in Python files (in practice hard to see that this should possibly be a problem regarding equality)
+                                    //On the positive side, it removes quite a lot of noise like file endings etc.
+                                    //Differing blank lines will render the files different
+                                    same = false;
+                                    break;
+                                }
+                            }
+                            if (same) identical = true;  //the two text files are the same line by line, if stuff like tabs + blanks (whitespace) are trimmed off at start/end of line
+                        }
+                    }
+                    if (isText) differentText.Add(s);
+                    else differentBinary.Add(s);
+                    differentAll.Add(s);
+                }
+            }
+
+            //
+            // ------- comparefolders2.zip
+            //
+
+            Zipper zipper2 = new Zipper("comparefolders2.zip");
+            if (true)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("// ========== From folder2 to folder1: copy files that are missing in folder1 ==========");
+                foreach (string s in e21)
+                {
+                    sb.AppendLine("sys 'copy " + f2 + s + " " + f1 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder2 to folder1: overwrite common files that are different (binary) ==========");
+                foreach (string s in differentBinary)
+                {
+                    sb.AppendLine("sys 'copy /y " + f2 + s + " " + f1 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder2 to folder1: overwrite common files that are different (text) ==========");
+                foreach (string s in differentText)
+                {
+                    sb.AppendLine("sys 'copy /y " + f2 + s + " " + f1 + s + "';");
+                }
+                File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder1.gcm", sb.ToString());
+            }
+
+            if (true)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("// ========== From folder1 to folder2: copy files that are missing in folder2 ==========");
+                foreach (string s in e12)
+                {
+                    sb.AppendLine("sys 'copy " + f1 + s + " " + f2 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder1 to folder2: overwrite common files that are different (binary) ==========");
+                foreach (string s in differentBinary)
+                {
+                    sb.AppendLine("sys 'copy /y " + f1 + s + " " + f2 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder1 to folder2: overwrite common files that are different (text) ==========");
+                foreach (string s in differentText)
+                {
+                    sb.AppendLine("sys 'copy /y " + f1 + s + " " + f2 + s + "';");
+                }
+                File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder2.gcm", sb.ToString());
+            }
+            zipper2.ZipAndCleanup();
+
+            StringBuilder sb2 = new StringBuilder();
+
+            using (var txt = new Writeln())
+            {
+                txt.MainAdd("Finished compareFolders() in " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));                
+                sb2.AppendLine("Finished compareFolders() in " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                txt.MainNewLineTight();
+
+                txt.MainAdd("Folder1 = " + f1);
+                sb2.AppendLine("Folder1 = " + f1);
+                txt.MainNewLineTight();
+
+                txt.MainAdd("Folder2 = " + f2);
+                sb2.AppendLine("Folder2 = " + f2);
+                txt.MainNewLineTight();                
+
+                if (!G.NullOrBlanks(f3))
+                {
+                    txt.MainAdd("Filters = " + f3);
+                    sb2.AppendLine("Filters = " + f3);
+                    txt.MainNewLineTight();
+                }
+
+                if (option_text)
+                {
+                    txt.MainAdd("Option 'text': only text files are compared");
+                    sb2.AppendLine("Option 'text': only text files are compared");
+                    txt.MainNewLineTight();
+                }
+
+                if (option_strict)
+                {
+                    txt.MainAdd("Option 'strict': files dates not used in file comparison");
+                    sb2.AppendLine("Option 'strict': files dates not used in file comparison");
+                    txt.MainNewLineTight();
+                }
+
+                txt.MainAdd(intersect.Count() + " common files, of which " + differentAll.Count + " are different");
+                sb2.AppendLine(intersect.Count() + " common files, of which " + differentAll.Count + " are different");
+                txt.MainNewLineTight();
+
+                txt.MainAdd(e12.Count() + " files from folder1 do not exist in folder2");
+                sb2.AppendLine(e12.Count() + " files from folder1 do not exist in folder2");
+                txt.MainNewLineTight();
+
+                txt.MainAdd(e21.Count() + " files from folder2 do not exist in folder1");
+                sb2.AppendLine(e21.Count() + " files from folder2 do not exist in folder1");
+                txt.MainNewLineTight();
+            }
+
+            //
+            // ------- comparefolders1.zip
+            //
+
+            if (true)
+            {
+                Zipper zipper1 = new Zipper("comparefolders1.zip");
+                foreach (string s in differentText)
+                {
+                    string a1 = f1 + s;
+                    string b1 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s).Replace(".", ",") + "," + Path.GetExtension(s).Replace(".", "") + " (1)";
+                    File.Copy(a1, b1);
+                    string a2 = f2 + s;
+                    string b2 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s).Replace(".", ",") + "," + Path.GetExtension(s).Replace(".", "") + " (2)";
+                    File.Copy(a2, b2);
+                }
+                zipper1.ZipAndCleanup();
+            }
+
+            //
+            // ------- comparefolders.txt
+            //
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + intersect.Count() + " common files" + " ==========");
+            foreach (string s in intersect)
+            {
+                sb2.AppendLine(s);
+            }
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + e12.Count() + " files in folder1, but not in folder2:" + " ==========");
+            foreach (string s in e12)
+            {
+                sb2.AppendLine(s);
+            }
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + e21.Count() + " files in folder2, but not in folder1:" + " ==========");
+            foreach (string s in e21)
+            {
+                sb2.AppendLine(s);
+            }
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + differentBinary.Count + " different common files (binary):" + " ==========");
+            foreach (string s in differentBinary)
+            {
+                sb2.AppendLine(s);
+            }
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + differentText.Count + " different common files (text):" + " ==========");
+            foreach (string s in differentText)
+            {
+                sb2.AppendLine(s);
+            }
+
+            File.WriteAllText("comparefolders.txt", sb2.ToString());
+
+            using (var txt = new Writeln())
+            {
+                txt.MainAdd("File comparefolders.txt contains lists of file differences");
+                txt.MainNewLineTight();
+                txt.MainAdd("File comparefolders1.zip contains differing text files for easy comparison");
+                txt.MainNewLineTight();
+                txt.MainAdd("File comparefolders2.zip contains Gekko code to update folder1 or folder2");
+            }            
+        }
+
+        
+
+        /// <summary>
+        /// Input is a list of fileNameWithPaths. Will only look at filenames.
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="wblack"></param>
+        /// <param name="wwhite"></param>
+        /// <returns></returns>
+        private static List<string> MatchInBlackWhiteWildcards(IOrderedEnumerable<string> names, List<Wildcard> wblack, List<Wildcard> wwhite)
+        {
+            List<string> result = new List<string>();
+            foreach (string s2 in names)
+            {
+                bool ok = false;
+                string s = Path.GetFileName(s2);
+
+                if (wwhite.Count == 0)
+                {
+                    ok = true;
+                }
+                else
+                {
+                    foreach (Wildcard wp in wwhite)
+                    {
+                        if (wp.IsMatch(s))
+                        {
+                            ok = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (ok)
+                {
+                    foreach (Wildcard wn in wblack)
+                    {
+                        if (wn.IsMatch(s))
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+                }
+                if (ok) result.Add(s2);
+            }
+            return result;
         }
 
         /// <summary>

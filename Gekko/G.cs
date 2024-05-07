@@ -35,6 +35,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Security.Policy;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 
 namespace Gekko
 {
@@ -3221,6 +3222,7 @@ namespace Gekko
 
         /// <summary>
         /// Tastes a file to see if it is (likely) binary, cf. https://stackoverflow.com/questions/4744890/c-sharp-check-if-file-is-text-based
+        /// Practically uses no time.
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="requiredConsecutiveNul"></param>
@@ -4947,6 +4949,116 @@ namespace Gekko
         }
 
         /// <summary>
+        /// The precision of the last modification time being stored in a file system varies between different file systems (VFAT, FAT, NTFS). 
+        /// So, its best to use an epsillon environment for this and either let the user choose a sensible value or choose a value based 
+        /// on the involved file systems. https://superuser.com/questions/937380/get-creation-time-of-file-in-milliseconds
+        /// </summary>
+        /// <returns></returns>
+        public static bool FilesHaveSameWriteTime(string f1, string f2)
+        {
+            double epsilon = 2.0;  //can be around 2 sec for FAT/VFAT
+            DateTime lastUpdateA = File.GetLastWriteTime(f1);
+            DateTime lastUpdateB = File.GetLastWriteTime(f2);
+            if (Math.Abs(Math.Round((lastUpdateA - lastUpdateB).TotalSeconds)) > epsilon) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Compares two files, returns true if they are identical.
+        /// If unequal size --> false. 
+        /// Else if option_strict == false and the dates are within 2 seconds --> true.
+        /// Else two md5 hashes are computed and are used to return true or false.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="option_strict"></param>
+        /// <returns></returns>
+        public static bool CompareFiles(string p1, string p2, bool option_strict)
+        {
+            if ((new FileInfo(p1)).Length != (new FileInfo(p2)).Length) return false;
+            if (!option_strict && G.FilesHaveSameWriteTime(p1, p2)) return true;
+            //This is about 4x slower than the other way below
+            //File.ReadAllBytes(p1).SequenceEqual(File.ReadAllBytes(p2)) is 2x slower than (GetMd5FromFile()+GetMd5FromFile())
+            //So here we get a 4x speedup all in all. And we could report dublets in each folder.
+            //identical = File.ReadAllBytes(p1).SequenceEqual(File.ReadAllBytes(p2));           
+            //Now the hard way
+            List<int> numbers = new List<int>() { 0, 1 };
+            string md5_1 = null;
+            string md5_2 = null;
+            System.Threading.Tasks.Parallel.ForEach(numbers, number =>   //TODO: could test chunks...?
+            {
+                if (number == 0) md5_1 = G.GetMd5FromFile(p1);
+                else md5_2 = G.GetMd5FromFile(p2);                
+            });
+            if (md5_1 == md5_2) return true;  //almost certainly identical            
+            return false;
+        }
+
+        /// <summary>
+        /// Gets a MD5 hash from a file. Seems to be the fastest reasonable hash available (faster than SHA). Not parallel though. See GetMd5FromText().
+        /// </summary>
+        /// <param name="fileNameWithPath"></param>
+        /// <returns></returns>
+        public static string GetMd5FromFile(string fileNameWithPath)
+        {
+            string hash;
+            //tried physically splitting file in n chunks --> 
+            //has about same speed as MD5 itself... (0.6 s for a 176 MB file)                
+            //also, copying the file with File.Copy is not that much slower than MD5 itself.
+            //So we need to use something that operates on the file itself, also cannot put it in
+            //byte[] array and operate on this.
+            //Maybe just accept it, or wait until a suitable parallel implementation of SHA3.
+            //Cannot use xxHash and similar directly, they produce a ulong suitable for Dictionary
+            //hashing.
+            //In general, allowing READ <type> xx.zip, where file.type is inside the zip would be nice,
+            //because then the hashing would be faster. User would have to zip gdx files though.
+            //
+            //!! actually if xxHash returns 128 bits (uint128), that is actually the same as
+            //   MD5. Then the question is about collisions... Maybe when this:
+            //   https://github.com/uranium62/xxHash adds stream support for 128 bit hashes.
+            //
+            //Conclusion: using md5 to compare files is 2x faster than SequenceEqual().
+            //But with a lot of different files this may not be true.
+            //Typically for compareFolders() most files are unchanged, and if not they would typically differ in size anyway.
+            //Two files with same exact size are often identical.
+            //As a benefit we get to tell number of dublets.
+
+            using (MD5 md5Instance = MD5.Create())
+            {
+                using (FileStream stream = File.OpenRead(fileNameWithPath))
+                {
+                    byte[] hash2 = md5Instance.ComputeHash(stream);
+                    //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
+                    //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
+                    hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                }
+            }
+
+            return hash;
+        }
+
+        /// <summary>
+        /// /// Gets a MD5 hash from text. Seems to be the fastest reasonable hash available (faster than SHA). Not parallel though. See G.GetMd5FromFile().
+        /// </summary>
+        /// <param name="inputText"></param>
+        /// <returns></returns>
+        public static string GetMd5FromText(string inputText)
+        {
+            string hash;
+            // step 1, calculate MD5 hash from input            
+            MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.UTF8.GetBytes(inputText);  //UTF8 seems best choice
+            byte[] hash2 = md5.ComputeHash(inputBytes);
+            // step 2, convert byte array to hex string
+            StringBuilder sb = new StringBuilder();
+            hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+            //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
+            //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
+            //This is a little better than hex (32 symbols).
+            return hash;
+        }
+
+        /// <summary>
         /// Used in DECOMP. Not case sensitive.
         /// </summary>
         /// <param name="s"></param>
@@ -5001,7 +5113,7 @@ namespace Gekko
         {
             fractions = new List<int>();
             fractions2 = new List<double>();
-            for (double dd = 0.1; dd <= 1.0; dd = dd + 0.1)
+            for (double dd = 0.05; dd <= 1.0; dd = dd + 0.05)
             {
                 fractions.Add((int)(dd * (double)count));
                 fractions2.Add(dd);
