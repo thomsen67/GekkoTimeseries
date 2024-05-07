@@ -3538,7 +3538,6 @@ namespace Gekko
             //see also #98037532985
 
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            //List<string> temp = Stringlist.GetListOfStringsFromList(rhs);
 
             file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);            
@@ -3609,7 +3608,6 @@ namespace Gekko
                             else
                             {
                                 new Error("Expected sub-list elements to be string, date, or val");
-                                //throw new GekkoException();
                             }
                         }
                     }
@@ -6259,7 +6257,6 @@ namespace Gekko
             catch
             {
                 new Error("Matrix concatenation source is not rectangular");
-                //throw new GekkoException();
             }
 
             if (FirstDim == 1 && SecondDim == 1)

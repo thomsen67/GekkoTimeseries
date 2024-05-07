@@ -535,6 +535,7 @@ namespace Gekko
                 }
                 else
                 {
+                    //SHEET x1, x2 with timeseries
                     tab2 = printTable.Transpose();
                     ExcelOptions eo = Program.PrepareDataForExcel(tab2);
                     Program.WriteExcel(eo, o, IsMulprt(o), false, dateFormat, dateType);

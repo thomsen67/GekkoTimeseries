@@ -10357,6 +10357,49 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Sheet_Matrix()
+        {            
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
+            I("#m = [1, 2; 3, 4];");
+            I("sheet #m file = matrix.xlx;");
+            I("reset;");
+            I("sheet <import matrix> #m file = matrix.xlx;");
+            _AssertMatrix(First(), "#m", "rows", 2);
+            _AssertMatrix(First(), "#m", "cols", 2);
+            _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
+        }
+
+        [TestMethod]
+        public void _Test_Sheet_List()
+        {
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
+            I("#m = ((1, 2), (3, 4));");
+            I("sheet #m file = list.xlx;");
+            I("reset;");
+            I("sheet <import list> #m file = list.xlx;");            
+            List m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
+            Assert.AreEqual(m.list.Count, 2);
+            List m1 = m.list[0] as List;
+            List m2 = m.list[1] as List;
+            Assert.AreEqual(m1.list.Count, 2);
+            Assert.AreEqual(m2.list.Count, 2);
+            double d11 = m1.list[0].ConvertToVal();
+            double d12 = m1.list[1].ConvertToVal();
+            double d21 = m2.list[0].ConvertToVal();
+            double d22 = m2.list[1].ConvertToVal();
+            Assert.AreEqual(d11, 1d);
+            Assert.AreEqual(d12, 2d);
+            Assert.AreEqual(d21, 3d);
+            Assert.AreEqual(d22, 4d);
+        }
+
+
+        [TestMethod]
         public void _Test_Fence_Read_Write()
         {
             //We are cheating and changing the options directly!

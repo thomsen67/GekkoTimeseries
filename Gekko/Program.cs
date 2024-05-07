@@ -23332,14 +23332,25 @@ namespace Gekko
             else
             {
                 int iHere = 0;
-                IVariable iv = O.GetIVariableFromString(list[iHere].s1, O.ECreatePossibilities.NoneReportError, true);
+                IVariable iv = O.GetIVariableFromString(list[iHere].s1, O.ECreatePossibilities.NoneReportError, true);                              
+
                 Matrix m = iv as Matrix;
-                if (m == null)
+                List l = iv as List;
+
+                if (m != null)
                 {
-                    G.Writeln2("The variable '" + list[iHere].s1 + "' is not a matrix");
+                    PrepareDataForExcel(m, eo);
+                }
+                else if (l != null)
+                {
+                    //See #lksfowm65assh
+                    new Error("The list '" + list[iHere].s1 + "' cannot be exported. Exporting of lists to Excel is not yet supported.");
+                }
+                else
+                {
+                    new Error("The variable '" + list[iHere].s1 + "' cannot be exported. It is not a series, a list or a matrix");
                     throw new GekkoException();
                 }
-                PutMatrixIntoExcelObject(m, eo);
             }
 
             eo.fileName = fileName;
@@ -23347,42 +23358,7 @@ namespace Gekko
             Program.WriteExcel(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat, datetype);
         }
 
-        /// <summary>
-        /// Prepare for being sent to EPplus (Excel).
-        /// </summary>
-        /// <param name="m"></param>
-        /// <param name="eo"></param>
-        private static void PutMatrixIntoExcelObject(Matrix m, ExcelOptions eo)
-        {
-            double[,] data = m.data;
-            int ni = data.GetLength(0);
-            int nj = data.GetLength(1);
-
-            eo.excelData = new double[ni, nj];
-            eo.colors = "no";
-
-            if (m.rownames != null)
-            {
-                eo.excelRowLabels = new string[m.rownames.Count, 1];
-                for (int i = 0; i < m.rownames.Count; i++) eo.excelRowLabels[i, 0] = m.rownames[i];
-            }
-
-            if (m.colnames != null)
-            {
-                eo.excelColumnLabels = new string[1, m.colnames.Count];
-                for (int i = 0; i < m.colnames.Count; i++) eo.excelColumnLabels[0, i] = m.colnames[i];
-            }
-
-            for (int i = 0; i < ni; i++)
-            {
-                for (int j = 0; j < nj; j++)
-                {
-                    double var1 = data[i, j];
-                    if (G.isNumericalError(var1)) var1 = 9.99999e+99;
-                    eo.excelData[i, j] = var1;
-                }
-            }
-        }
+        
 
         public static string ArrayTimeseriesTip(string name)
         {
@@ -27422,6 +27398,43 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Prepare for being sent to EPplus (Excel).
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="eo"></param>
+        public static void PrepareDataForExcel(Matrix m, ExcelOptions eo)
+        {
+            double[,] data = m.data;
+            int ni = data.GetLength(0);
+            int nj = data.GetLength(1);
+
+            eo.excelData = new double[ni, nj];
+            eo.colors = "no";
+
+            if (m.rownames != null)
+            {
+                eo.excelRowLabels = new string[m.rownames.Count, 1];
+                for (int i = 0; i < m.rownames.Count; i++) eo.excelRowLabels[i, 0] = m.rownames[i];
+            }
+
+            if (m.colnames != null)
+            {
+                eo.excelColumnLabels = new string[1, m.colnames.Count];
+                for (int i = 0; i < m.colnames.Count; i++) eo.excelColumnLabels[0, i] = m.colnames[i];
+            }
+
+            for (int i = 0; i < ni; i++)
+            {
+                for (int j = 0; j < nj; j++)
+                {
+                    double var1 = data[i, j];
+                    if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                    eo.excelData[i, j] = var1;
+                }
+            }
+        }
+
+        /// <summary>
         /// Plotting in Gekko (PLOT statement). Can plot mixed frequencies.
         /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
@@ -27511,14 +27524,15 @@ namespace Gekko
             List list = ListSheet();
             if (matrix != null)
             {
+                //SHEET #m, with matrix
                 ExcelOptions eo = new ExcelOptions();
-                PutMatrixIntoExcelObject(matrix, eo);
+                PrepareDataForExcel(matrix, eo);
                 eo.fileName = oPrt.opt_filename;
-                Program.WriteExcel(eo, null, false, true, null, null);
+                Program.WriteExcel(eo, oPrt, false, true, null, null);                
             }
             else if (ListSheet() != null)
             {
-                //Activate this!!!
+                //Activate this!!! See #lksfowm65assh
             }
             else
             {
