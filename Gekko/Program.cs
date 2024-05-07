@@ -185,6 +185,45 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// Contains warning messsages that may be many in number, and similar.
+    /// </summary>
+    public class WarningContainer
+    {
+        //See #lafh7h3bbkahfd
+        public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// The info string may be null. Else info is small warning information bit, like left-hand side variable etc. Should be rather small in size.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="info"></param>
+        public void Add(string s, string info)
+        {
+            WarningInfo wi = null;
+            this.storage.TryGetValue(s, out wi);
+            if (wi == null)
+            {
+                wi = new WarningInfo();
+                wi.storage.Add(info, false);
+                this.storage.Add(s, wi);
+            }
+            else
+            {
+                if (!wi.storage.ContainsKey(info)) wi.storage.Add(info, false);                
+            }
+        }
+    }
+
+    /// <summary>
+    /// Small warning information bits, like left-hand side variable etc. Should be rather small in size.
+    /// </summary>
+    public class WarningInfo
+    {
+        //value is not used
+        public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+    }
+
 
     /// <summary>
     /// Helper for protobuffing databank cache. It can basically be either a name+iv or a trace.
@@ -2434,6 +2473,14 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (true && Globals.runningOnTTComputer)
+            {                
+                Globals.warningContainer.Add("Did not find '=e=' in equation", "qBNP");
+                Globals.warningContainer.Add("Did not find '=e=' in equation", "vtKilde");
+                Globals.warningContainer.Add("Did not find '=e=' in equation", "vtkilde");
+                Globals.warningContainer.Add("No LHS variable found", "qBNP");
+            }
+            
             if (false && Globals.runningOnTTComputer)
             {                
                 string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
@@ -23221,10 +23268,21 @@ namespace Gekko
             if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
             {
                 new Error("No variables to write");
-                //throw new GekkoException();
             }
         }
 
+        /// <summary>
+        /// Used for export&lt;xlsx>, not for SHEET.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="list"></param>
+        /// <param name="isCols"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
+        /// <param name="variablesType"></param>
+        /// <exception cref="GekkoException"></exception>
         private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
         {
             ExcelOptions eo = new ExcelOptions();
@@ -23281,41 +23339,49 @@ namespace Gekko
                     G.Writeln2("The variable '" + list[iHere].s1 + "' is not a matrix");
                     throw new GekkoException();
                 }
-                double[,] data = m.data;
-                int ni = data.GetLength(0);
-                int nj = data.GetLength(1);
-
-                G.Writeln2("Writing Excel file containing matrix");
-
-                eo.excelData = new double[ni, nj];
-                eo.colors = "no";
-
-                if (m.rownames != null)
-                {
-                    eo.excelRowLabels = new string[m.rownames.Count, 1];
-                    for (int i = 0; i < m.rownames.Count; i++) eo.excelRowLabels[i, 0] = m.rownames[i];
-                }
-
-                if (m.colnames != null)
-                {
-                    eo.excelColumnLabels = new string[1, m.colnames.Count];
-                    for (int i = 0; i < m.colnames.Count; i++) eo.excelColumnLabels[0, i] = m.colnames[i];
-                }
-
-                for (int i = 0; i < ni; i++)
-                {
-                    for (int j = 0; j < nj; j++)
-                    {
-                        double var1 = data[i, j];
-                        if (G.isNumericalError(var1)) var1 = 9.99999e+99;
-                        eo.excelData[i, j] = var1;
-                    }
-                }
+                PutMatrixIntoExcelObject(m, eo);
             }
 
             eo.fileName = fileName;
 
             Program.WriteExcel(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat, datetype);
+        }
+
+        /// <summary>
+        /// Prepare for being sent to EPplus (Excel).
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="eo"></param>
+        private static void PutMatrixIntoExcelObject(Matrix m, ExcelOptions eo)
+        {
+            double[,] data = m.data;
+            int ni = data.GetLength(0);
+            int nj = data.GetLength(1);
+
+            eo.excelData = new double[ni, nj];
+            eo.colors = "no";
+
+            if (m.rownames != null)
+            {
+                eo.excelRowLabels = new string[m.rownames.Count, 1];
+                for (int i = 0; i < m.rownames.Count; i++) eo.excelRowLabels[i, 0] = m.rownames[i];
+            }
+
+            if (m.colnames != null)
+            {
+                eo.excelColumnLabels = new string[1, m.colnames.Count];
+                for (int i = 0; i < m.colnames.Count; i++) eo.excelColumnLabels[0, i] = m.colnames[i];
+            }
+
+            for (int i = 0; i < ni; i++)
+            {
+                for (int j = 0; j < nj; j++)
+                {
+                    double var1 = data[i, j];
+                    if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                    eo.excelData[i, j] = var1;
+                }
+            }
         }
 
         public static string ArrayTimeseriesTip(string name)
@@ -27441,16 +27507,58 @@ namespace Gekko
 
         public static void NonSeriesHandling(O.Prt oPrt)
         {
-            string pling = null;
-            pling = "'";
-            foreach (O.Prt.Element element in oPrt.prtElements)
+            Matrix matrix = MatrixSheet();
+            List list = ListSheet();
+            if (matrix != null)
             {
-                string[] w = Print.RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
-                string labelGiven = G.ReplaceGlueSymbols(w[0]);
-                NonSeriesHelper helper = new NonSeriesHelper();
-                PrintNonSeries(element.variable[0], labelGiven, 0, helper);
-                helper.Message();
+                ExcelOptions eo = new ExcelOptions();
+                PutMatrixIntoExcelObject(matrix, eo);
+                eo.fileName = oPrt.opt_filename;
+                Program.WriteExcel(eo, null, false, true, null, null);
             }
+            else if (ListSheet() != null)
+            {
+                //Activate this!!!
+            }
+            else
+            {
+                foreach (O.Prt.Element element in oPrt.prtElements)
+                {
+                    string[] w = Print.RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
+                    string labelGiven = G.ReplaceGlueSymbols(w[0]);
+                    NonSeriesHelper helper = new NonSeriesHelper();
+                    PrintNonSeries(element.variable[0], labelGiven, 0, helper);
+                    helper.Message();
+                }
+            }
+
+            Matrix MatrixSheet()
+            {
+                IVariable iv = null;
+                try
+                {
+                    if (!G.Equal(oPrt.prtType, "sheet")) return null;
+                    iv = oPrt?.prtElements?[0]?.variable?[0];
+                    if (iv == null) return null;
+                    if (iv.Type() != EVariableType.Matrix) return null;
+                    if (oPrt.operators.Count > 0)
+                    {
+                        if (oPrt.operators.Count > 1) return null;
+                        if (!G.Equal(oPrt.operators[0].s1, "n")) return null;
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+                return iv as Matrix;
+            }
+
+            List ListSheet()
+            {
+                return null; // <--------------- !!!
+            }
+
         }
 
         public static string PrintNonSeries(IVariable x, string labelGiven, int depth, NonSeriesHelper helper)

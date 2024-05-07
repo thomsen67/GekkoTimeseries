@@ -1713,6 +1713,7 @@ namespace Gekko
             //TODO: Really this stuff should be stored in the P object, instead of here
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
+            Globals.warningContainer = new WarningContainer();  //This is for warnings that may be large in numbers and are assembled here.
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
             Globals.numberOfTimeWindowErrors = 0;
@@ -2005,7 +2006,35 @@ namespace Gekko
                     if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the statement");
                     else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the statement");
                 }
-            }            
+            }
+
+            if (Globals.warningContainer.storage.Count > 0)
+            {
+                //#lafh7h3bbkahfd
+                using (Writeln txt = new Writeln())
+                {                    
+                    foreach (KeyValuePair<string, WarningInfo> kvp in Globals.warningContainer.storage)
+                    {
+                        Action<GAO> a = (gao) =>
+                        {
+                            List<string> infos = new List<string>();
+                            foreach (string s in kvp.Value.storage.Keys)
+                            {
+                                infos.Add(s);
+                            }
+                            infos.Sort();
+                            using (Writeln txt2 = new Writeln())
+                            {
+                                txt2.tab = ETabs.Output;
+                                txt2.MainAdd("Hejsa fra GAO ... " + Stringlist.GetListWithCommas(infos));
+                            }                            
+                        };
+                        txt.MainAdd(kvp.Key + " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                        txt.MainNewLineTight();
+                    }
+
+                }
+            }
 
             if (Globals.bugfixMissing1.Count > 0)
             {
