@@ -2015,6 +2015,36 @@ namespace Gekko
                 {                    
                     foreach (KeyValuePair<string, WarningInfo> kvp in Globals.warningPool.storage)
                     {
+                        string[] ss = kvp.Key.Split('.');
+                        string s1 = ss[0].Trim();
+                        string s2 = null; 
+                        string x1 = null;
+                        string x2 = null;
+                        if (ss.Length == 1) 
+                        {
+                            x1 = ss[0].Trim();
+                        }
+                        else
+                        {
+                            x1 = ss[0].Trim();
+                            x2 = ss[1].Trim() + "." + ss[1].Trim();
+                        }
+                        string w1 = null; Globals.warningPool.warningStrings.TryGetValue(x1, out w1);
+                        string w2 = null; Globals.warningPool.warningStrings.TryGetValue(x2, out w2);
+                        if (w1 != null)
+                        {
+                            w1 = w1.Trim();
+                            if (!w1.EndsWith(".")) w1 += ".";
+                        }
+                        if (w2 != null)
+                        {
+                            w2 = w2.Trim();
+                            if (!w2.EndsWith(".")) w2 += ".";
+                        }
+
+                        new Warning(w1 + " " + w2 + " ");
+
+
                         Action<GAO> a = (gao) =>
                         {
                             List<string> infos = new List<string>();

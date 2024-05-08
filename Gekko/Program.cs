@@ -191,13 +191,14 @@ namespace Gekko
         //See #lafh7h3bbkahfd
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
 
-        public static Dictionary<string, string> warningStrings = new Dictionary<string, string>()
+        public Dictionary<string, string> warningStrings = new Dictionary<string, string>()
         {
             //Numbers can be deleted if they are not used anymore, but in that case remove them here and
             // remove in enum. Never replace a number with some other contents (changing the text is ok).
             //In code, we will use Globals.warningStrings[2] etc., and 2 can be used in options
             //to turn on/off that message.
             //Take care that these numbers are ok, also when calling Add() on warningContainer. Beware of blanks also.
+            {"", "Unknown type" },  //This should never happen...
             {"1", "GAMS raw model reading problem" },
             {"1.1", "Could not find '=e=' in eq definition" },
             {"1.2", "Could not find ending ';' in eq definition" },
@@ -225,11 +226,6 @@ namespace Gekko
             }
             else
             {
-                if (wi.lineAndFileForFirstOccurrence == null)
-                {
-
-                }
-
                 if (!wi.storage.ContainsKey(info))
                 {
                     wi.storage.Add(info, false);
@@ -244,8 +240,7 @@ namespace Gekko
     public class WarningInfo
     {
         //value is not used
-        public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        public string lineAndFileForFirstOccurrence = null;
+        public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);        
     }
 
 
@@ -25170,9 +25165,12 @@ namespace Gekko
             string global_fence_black_folders_write_REMEMBER = Program.options.global_fence_black_folders_write;
             string global_fence_white_folders_write_REMEMBER = Program.options.global_fence_white_folders_write;
             bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
+            string global_warnings_ignore_REMEMBER = Program.options.global_warnings_ignore;
+            string global_warnings_show_REMEMBER = Program.options.global_warnings_show;
+            bool global_warnings_stop_REMEMBER = Program.options.global_warnings_stop;
 
-            // ------------------------------------------------------
-            Program.options = new Options();  //resetting these
+        // ------------------------------------------------------
+        Program.options = new Options();  //resetting these
             // ------------------------------------------------------
             //Restoring some options
             if (!G.NullOrBlanks(folder_working_REMEMBER)) Program.options.folder_working = folder_working_REMEMBER;
@@ -25185,6 +25183,10 @@ namespace Gekko
             Program.options.global_fence_black_folders_write = global_fence_black_folders_write_REMEMBER;
             Program.options.global_fence_white_folders_write = global_fence_white_folders_write_REMEMBER;
             Program.options.global_fence_sys = global_fence_sys_REMEMBER;
+            Program.options.global_warnings_ignore = global_warnings_ignore_REMEMBER;
+            Program.options.global_warnings_show = global_warnings_show_REMEMBER;
+            Program.options.global_warnings_stop = global_warnings_stop_REMEMBER;
+
             // ------------------------------------------------------
 
             CrossThreadStuff.Mode();  //to show default color

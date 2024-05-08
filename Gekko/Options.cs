@@ -94,12 +94,13 @@ namespace Gekko
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public string gams_time_set = "t";  //name of the time set in GAMS
         public int gams_trim = 0;  //trim vars/params from gdx with few elements  
-        
+
         // --- ----------------------------------------------------------------------------
         // --- the following can only be called from gekko.ini next to gekko.exe
         // ----    REMEMBER
         // ----    REMEMBER
         // --- !!! REMEMBER --> to implement these 'global' options here (3 places in all): #er89ljkhaf87
+        public string global_color = "";  //default: "White"
         public string global_dependency_tracking = "none";  // none | simple. If this is set in C# code, you must use SetDatatrace() afterwards to get it into drop-down.
         public string global_fence_black_folders = "";  //delimit with semicolon
         public string global_fence_white_folders = "";  //delimit with semicolon
@@ -108,7 +109,9 @@ namespace Gekko
         public string global_fence_black_folders_write = "";  //delimit with semicolon
         public string global_fence_white_folders_write = "";  //delimit with semicolon
         public bool global_fence_sys = true;  //can switch SYS fencing off
-        public string global_color = "";  //default: "White"
+        public string global_warnings_ignore = null;
+        public string global_warnings_show = "five";
+        public bool global_warnings_stop = false;
         // ----    REMEMBER
         // ----    REMEMBER
         // ----    REMEMBER
@@ -387,6 +390,7 @@ namespace Gekko
             //Options here can only be in gekko.ini next to gekko.exe
             //These options must start with 'global'
             // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
+            Add("GLOBAL COLOR", Globals.xnameOrString);
             Add("GLOBAL DEPENDENCY TRACKING", Globals.xnameOrString, "none", "simple");
             Add("GLOBAL FENCE BLACK FOLDERS", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS", Globals.xnameOrString);
@@ -395,7 +399,9 @@ namespace Gekko
             Add("GLOBAL FENCE BLACK FOLDERS WRITE", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS WRITE", Globals.xnameOrString);
             Add("GLOBAL FENCE SYS", Globals.xbool);
-            Add("GLOBAL COLOR", Globals.xnameOrString);
+            Add("GLOBAL WARNINGS IGNORE", Globals.xstring);  //for instance: '1.1, 2'
+            Add("GLOBAL WARNINGS SHOW", Globals.xnameOrString, "none", "one", "five", "all");
+            Add("GLOBAL WARNINGS STOP", Globals.xbool);            
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
