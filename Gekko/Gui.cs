@@ -1713,7 +1713,7 @@ namespace Gekko
             //TODO: Really this stuff should be stored in the P object, instead of here
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
-            Globals.warningContainer = new WarningContainer();  //This is for warnings that may be large in numbers and are assembled here.
+            Globals.warningPool = new WarningPool();  //This is for warnings that may be large in numbers and are assembled here.
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
             Globals.numberOfTimeWindowErrors = 0;
@@ -2008,12 +2008,12 @@ namespace Gekko
                 }
             }
 
-            if (Globals.warningContainer.storage.Count > 0)
+            if (Globals.warningPool.storage.Count > 0)
             {
                 //#lafh7h3bbkahfd
                 using (Writeln txt = new Writeln())
                 {                    
-                    foreach (KeyValuePair<string, WarningInfo> kvp in Globals.warningContainer.storage)
+                    foreach (KeyValuePair<string, WarningInfo> kvp in Globals.warningPool.storage)
                     {
                         Action<GAO> a = (gao) =>
                         {

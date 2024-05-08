@@ -52,8 +52,6 @@ using System.Threading.Tasks;
 
 namespace Gekko
 {
-
-
     public enum EDataTrace
     {
         None,
@@ -188,17 +186,34 @@ namespace Gekko
     /// <summary>
     /// Contains warning messsages that may be many in number, and similar.
     /// </summary>
-    public class WarningContainer
+    public class WarningPool
     {
         //See #lafh7h3bbkahfd
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
+
+        public static Dictionary<string, string> warningStrings = new Dictionary<string, string>()
+        {
+            //Numbers can be deleted if they are not used anymore, but in that case remove them here and
+            // remove in enum. Never replace a number with some other contents (changing the text is ok).
+            //In code, we will use Globals.warningStrings[2] etc., and 2 can be used in options
+            //to turn on/off that message.
+            //Take care that these numbers are ok, also when calling Add() on warningContainer. Beware of blanks also.
+            {"1", "GAMS raw model reading problem" },
+            {"1.1", "Could not find '=e=' in eq definition" },
+            {"1.2", "Could not find ending ';' in eq definition" },
+            {"1.3", "Eq name with '__'" },
+            {"1.4", "Eq name without '_'" },
+            {"1.5", "Eq name with no 'e_'" },
+            {"1.6", "Eq name invalid" },
+            {"1.7", "Parsing error" },
+        };  
 
         /// <summary>
         /// The info string may be null. Else info is small warning information bit, like left-hand side variable etc. Should be rather small in size.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="info"></param>
-        public void Add(string s, string info)
+        public void WAdd(string s, string info)  //WAdd() so it is easier to find by search like .Wadd("1.1"
         {
             WarningInfo wi = null;
             this.storage.TryGetValue(s, out wi);
@@ -210,7 +225,15 @@ namespace Gekko
             }
             else
             {
-                if (!wi.storage.ContainsKey(info)) wi.storage.Add(info, false);                
+                if (wi.lineAndFileForFirstOccurrence == null)
+                {
+
+                }
+
+                if (!wi.storage.ContainsKey(info))
+                {
+                    wi.storage.Add(info, false);
+                }
             }
         }
     }
@@ -222,6 +245,7 @@ namespace Gekko
     {
         //value is not used
         public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        public string lineAndFileForFirstOccurrence = null;
     }
 
 
@@ -2472,15 +2496,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
-            if (true && Globals.runningOnTTComputer)
-            {                
-                Globals.warningContainer.Add("Did not find '=e=' in equation", "qBNP");
-                Globals.warningContainer.Add("Did not find '=e=' in equation", "vtKilde");
-                Globals.warningContainer.Add("Did not find '=e=' in equation", "vtkilde");
-                Globals.warningContainer.Add("No LHS variable found", "qBNP");
-            }
-            
+        {            
             if (false && Globals.runningOnTTComputer)
             {                
                 string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
