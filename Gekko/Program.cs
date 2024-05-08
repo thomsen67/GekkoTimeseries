@@ -31893,22 +31893,15 @@ namespace Gekko
                     bool isStamp = false; if (oPrt != null && G.Equal(oPrt.opt_stamp, "yes")) isStamp = true;
                     bool isDates = true; if (oPrt != null && G.Equal(oPrt.opt_dates, "no")) isDates = false;
                     bool isNames = true; if (oPrt != null && G.Equal(oPrt.opt_names, "no")) isNames = false;
-                    bool isColors = true; if (oPrt != null && G.Equal(oPrt.opt_colors, "no")) isColors = false;
+                    bool isColors = true; if (oPrt != null && G.Equal(oPrt.opt_colors, "no")) isColors = false; //colors=yes is default for series
 
                     if (isMatrix)
                     {
-                        isStamp = false;
-                        isColors = false;
+                        isColors = false; if (oPrt != null && G.Equal(oPrt.opt_colors, "yes")) isColors = true; //colors=no is default for matrix
                         isNames = false;
                         isDates = false;
-                        if (eo.excelRowLabels != null)
-                        {
-                            isNames = true;
-                        }
-                        if (eo.excelColumnLabels != null)
-                        {
-                            isDates = true;  //not really dates for matrices... but oh well                            
-                        }
+                        if (eo.excelRowLabels != null) isNames = true;
+                        if (eo.excelColumnLabels != null) isDates = true;  //not really dates for matrices... but oh well                                                   
                     }
 
                     string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
