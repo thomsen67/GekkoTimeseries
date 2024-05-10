@@ -3876,6 +3876,16 @@ namespace Gekko
         }
 
         /// <summary>
+        /// First argument always "x.y"! Used for the warning pool.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="s"></param>
+        public static void Warning(string type, string s)
+        {
+            Globals.warningPool.WAdd(type, s);
+        }
+
+        /// <summary>
         /// Check if the week number is legal (some years have 52 weeks, some have 53 weeks). If reportError = false, 
         /// the method returns true if there is a problem/error.
         /// </summary>

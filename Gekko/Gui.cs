@@ -2008,64 +2008,8 @@ namespace Gekko
                 }
             }
 
-            if (Globals.warningPool.storage.Count > 0)
-            {
-                //#lafh7h3bbkahfd
-                using (Writeln txt = new Writeln())
-                {                    
-                    foreach (KeyValuePair<string, WarningInfo> kvp in Globals.warningPool.storage)
-                    {
-                        string[] ss = kvp.Key.Split('.');
-                        string s1 = ss[0].Trim();
-                        string s2 = null; 
-                        string x1 = null;
-                        string x2 = null;
-                        if (ss.Length == 1) 
-                        {
-                            x1 = ss[0].Trim();
-                        }
-                        else
-                        {
-                            x1 = ss[0].Trim();
-                            x2 = ss[1].Trim() + "." + ss[1].Trim();
-                        }
-                        string w1 = null; Globals.warningPool.warningStrings.TryGetValue(x1, out w1);
-                        string w2 = null; Globals.warningPool.warningStrings.TryGetValue(x2, out w2);
-                        if (w1 != null)
-                        {
-                            w1 = w1.Trim();
-                            if (!w1.EndsWith(".")) w1 += ".";
-                        }
-                        if (w2 != null)
-                        {
-                            w2 = w2.Trim();
-                            if (!w2.EndsWith(".")) w2 += ".";
-                        }
-
-                        new Warning(w1 + " " + w2 + " ");
-
-
-                        Action<GAO> a = (gao) =>
-                        {
-                            List<string> infos = new List<string>();
-                            foreach (string s in kvp.Value.storage.Keys)
-                            {
-                                infos.Add(s);
-                            }
-                            infos.Sort();
-                            using (Writeln txt2 = new Writeln())
-                            {
-                                txt2.tab = ETabs.Output;
-                                txt2.MainAdd("Hejsa fra GAO ... " + Stringlist.GetListWithCommas(infos));
-                            }                            
-                        };
-                        txt.MainAdd(kvp.Key + " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
-                        txt.MainNewLineTight();
-                    }
-
-                }
-            }
-
+            Globals.warningPool.Report();  //show any warnings
+            
             if (Globals.bugfixMissing1.Count > 0)
             {
                 G.Writeln2("+++ WARNING (compatibility): The following statements compare whole timeseries that contain ", Globals.warningColor);

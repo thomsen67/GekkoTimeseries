@@ -2201,7 +2201,7 @@ namespace Gekko
 
                 if (iEqual == -12345)
                 {
-                    Globals.warningPool.WAdd("1.1", "GAMS file: " + tok.Offset(i).LineAndPosText());
+                    G.Warning("1.1", "GAMS file: " + tok.Offset(i).LineAndPosText());
                     return eqCounter;
                 }
 
@@ -2211,7 +2211,7 @@ namespace Gekko
 
                 if (iSemi == -12345)
                 {
-                    Globals.warningPool.WAdd("1.2", "GAMS file: " + tok.Offset(i).LineAndPosText());
+                    G.Warning("1.2", "GAMS file: " + tok.Offset(i).LineAndPosText());
                     return eqCounter;
                 }
 
@@ -2296,7 +2296,7 @@ namespace Gekko
             catch
             {
                 //Hopefully will not happen, but more so a bad line does not crash the whole thing
-                Globals.warningPool.WAdd("1.7", "Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());
+                G.Warning("1.7", "Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());
                 return eqCounter;
             }
 
@@ -2331,23 +2331,23 @@ namespace Gekko
                 if (eqnameGams.Contains("__"))
                 {
                     //new Error("Eqname '" + eqnameGams + "': did not expect '__' substring in name");
-                    Globals.warningPool.WAdd("1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");
+                    G.Warning("1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");
                 }
                 string[] ss = eqnameGams.Split('_');
                 if (ss.Length <= 1)
                 {
                     //new Error("Eqname '" + eqnameGams + "': did not find any '_' separators");
-                    Globals.warningPool.WAdd("1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");
+                    G.Warning("1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");
                 }
                 if (!G.Equal(ss[0], "e"))
                 {
                     //new Error("Eqname '" + eqnameGams + "': expected it to start with 'e_'");
-                    Globals.warningPool.WAdd("1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");
+                    G.Warning("1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");
                 }
                 if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
                 {
                     //new Error("Eqname '" + eqnameGams + "': could not resolve variable name");
-                    Globals.warningPool.WAdd("1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
+                    G.Warning("1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
                 }
                 lhs = ss[1];
             }

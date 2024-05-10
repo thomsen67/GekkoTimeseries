@@ -190,6 +190,7 @@ namespace Gekko
     {
         //See #lafh7h3bbkahfd
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
+        public int totalWarnings = 0;
 
         public Dictionary<string, string> warningStrings = new Dictionary<string, string>()
         {
@@ -198,8 +199,11 @@ namespace Gekko
             //In code, we will use Globals.warningStrings[2] etc., and 2 can be used in options
             //to turn on/off that message.
             //Take care that these numbers are ok, also when calling Add() on warningContainer. Beware of blanks also.
+            //Will be stated with colon: "GAMS raw model file reading problem: could not find '=e=' in eq definition. [more details]".
+            // -----
             {"", "Unknown type" },  //This should never happen...
-            {"1", "GAMS raw model reading problem" },
+            // -----
+            {"1", "GAMS raw model file reading problem" },
             {"1.1", "Could not find '=e=' in eq definition" },
             {"1.2", "Could not find ending ';' in eq definition" },
             {"1.3", "Eq name with '__'" },
@@ -207,6 +211,10 @@ namespace Gekko
             {"1.5", "Eq name with no 'e_'" },
             {"1.6", "Eq name invalid" },
             {"1.7", "Parsing error" },
+            // -----
+            {"2", "Tsd file reading problem" },
+            {"2.1", "Empty string" },
+            {"2.2", "Small number" },
         };  
 
         /// <summary>
@@ -216,20 +224,142 @@ namespace Gekko
         /// <param name="info"></param>
         public void WAdd(string s, string info)  //WAdd() so it is easier to find by search like .Wadd("1.1"
         {
+            totalWarnings++;
             WarningInfo wi = null;
             this.storage.TryGetValue(s, out wi);
             if (wi == null)
             {
                 wi = new WarningInfo();
+                wi.counter = this.storage.Count + 1;  //so they can be shown/sorted by insertion order at the end
                 wi.storage.Add(info, false);
-                this.storage.Add(s, wi);
+                this.storage.Add(s, wi);                
             }
             else
             {
-                if (!wi.storage.ContainsKey(info))
+                if (!wi.storage.ContainsKey(info)) wi.storage.Add(info, false);                
+            }
+        }
+
+        public void Report() 
+        {
+            if (this.storage.Count > 0)
+            {
+                //#lafh7h3bbkahfd
+
+                //1. GAMS raw file reading.                  level1
+                //  1.1 Could not find '=e=',                level2          this.storage.Count
+                //    File problem in line 117 pos 10.       level3          this.storage["..."].storage.Count
+                //
+                //It gets stored with "1.1" as key, and value as a dict containing details like "File problem in line 117 pos 10".
+                //
+                //There were {level3} warnings, of {level2} subtypes and {level1} types.
+
+                using (Writeln txt = new Writeln())
                 {
-                    wi.storage.Add(info, false);
+                    Dictionary<string, bool> level1Numbers = new Dictionary<string, bool>();
+                    Dictionary<string, bool> level2Numbers = new Dictionary<string, bool>();                    
+
+                    foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
+                    {
+                        string w1, w2;
+                        this.GetText(kvp.Key, level1Numbers, level2Numbers, out w1, out w2);
+                    }
+
+                    Action<GAO> a1 = (gao) =>
+                    {
+                        using (Writeln txt = new Writeln())
+                        {
+                            foreach (string s in level1Numbers.Keys)
+                            {
+                                string w1, w2;
+                                this.GetText(s, null, null, out w1, out w2);
+                                txt.MainAdd(w1 + " [" + s + "]");
+                                txt.MainNewLineTight();
+                            }
+                        }
+                    };
+
+                    Action<GAO> a2 = (gao) =>
+                    {
+                        using (Writeln txt = new Writeln())
+                        {
+                            foreach (string s in level2Numbers.Keys)
+                            {
+                                string w1, w2;
+                                this.GetText(s, null, null, out w1, out w2);
+                                txt.MainAdd(w1 + " " + w2 + " [" + s + "]");
+                                txt.MainNewLineTight();
+                            }
+                        }
+                    };
+
+                    txt.MainAdd("There were " + this.totalWarnings + " total warnings: " + level1Numbers.Count + " "+ G.GetLinkAction("main types", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + " and " + level2Numbers.Count + " "+ G.GetLinkAction("sub types", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ".");                                       
+
                 }
+            }
+
+        }
+
+        /// <summary>
+        /// For a string s like "2.3" it will spit out w1 as text for "2" and w2 as text for "3". 
+        /// If level1 and level2 are non-null, it will also "2" and "2.3" into level1 and level2 respectively.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="level1"></param>
+        /// <param name="level2"></param>
+        /// <param name="w1"></param>
+        /// <param name="w2"></param>
+        private void GetText(string s, Dictionary<string, bool> level1, Dictionary<string, bool> level2, out string w1, out string w2)
+        {
+            //kvp.Key is alway something like "1.1", "5.3" and so on. Each of these have 1 or more elements.  
+            string s1, s1s2;
+            this.GetNumbers(s, out s1, out s1s2);
+            if (level1 != null && !level1.ContainsKey(s1)) level1.Add(s1, false);  //"1", "3", etc.
+            if (level2 != null && !level2.ContainsKey(s1s2)) level2.Add(s1s2, false); //"1.1", "3.2", etc.
+            this.GetTextHelper(s1, s1s2, out w1, out w2);
+        }
+
+        /// <summary>
+        /// For a string s like "2.3", it returns "2" and "2.3". For "2" it will return "2" and "2.0". 
+        /// Will handle blanks etc. If illegal, it will return "0" and "0.0".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="s1"></param>
+        /// <param name="s1s2"></param>
+        private void GetNumbers(string s, out string s1, out string s1s2)
+        {
+            string[] ss = s.Split('.');
+            if (ss.Length == 1) ss = new string[2] { s.Trim(), "0" };
+            if (ss.Length != 2) ss = new string[2] { "0", "0" };  //so it does not crash
+            s1 = ss[0].Trim();
+            string s2 = ss[1].Trim();
+            s1s2 = s1 + "." + s2;
+        }
+
+        /// <summary>
+        /// For input numbers like "2" and "2.3" it returns the two corresponding labels for type and sub-type. Returned labels end with ".".
+        /// May return null for returned labels if not found.
+        /// </summary>
+        /// <param name="number1"></param>
+        /// <param name="number2"></param>
+        /// <param name="w1"></param>
+        /// <param name="w2"></param>
+        private void GetTextHelper(string number1, string number2, out string w1, out string w2)
+        {
+            w1 = null;
+            this.warningStrings.TryGetValue(number1, out w1);
+            w2 = null;
+            this.warningStrings.TryGetValue(number2, out w2);
+
+            if (w1 != null)
+            {
+                w1 = w1.Trim();
+                if (!w1.EndsWith(".")) w1 += ".";
+            }
+            if (w2 != null)
+            {
+                w2 = w2.Trim();
+                if (!w2.EndsWith(".")) w2 += ".";
             }
         }
     }
@@ -240,7 +370,8 @@ namespace Gekko
     public class WarningInfo
     {
         //value is not used
-        public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);        
+        public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        public int counter = 0;
     }
 
 
@@ -2491,7 +2622,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {            
+        {                       
             if (false && Globals.runningOnTTComputer)
             {                
                 string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
@@ -2881,6 +3012,22 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
+
+            if (G.IsUnitTesting() || Globals.runningOnTTComputer)
+            {
+                //Do not delete: used in unit tests
+                if (text == "warningpool")
+                {
+                    Globals.warningPool = new WarningPool();
+                    G.Warning("2.1", "Extra 2.1");
+                    G.Warning("2.2", "Extra 2.2");
+                    G.Warning("1.1", "Extra 1.1");
+                    G.Warning("1.2", "Extra 1.2");
+                    G.Warning("1.3", "Extra 1.3");
+                    G.Warning("1.2", "Extra 1.2"); //does not get added
+                    G.Warning("1.3", "Extra 1.3 variant"); //gets added
+                }
+            }
         }        
 
         /// <summary>
@@ -3784,8 +3931,7 @@ namespace Gekko
                     o = Serializer.Deserialize<T>(fs);
                 }
                 catch (Exception e)
-                {
-                    //Hmmm: this will not abort if Error()
+                {                    
                     new Warning("Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
                     throw;
                 }
@@ -7366,9 +7512,8 @@ namespace Gekko
                 readInfo.startPerInFile = d1min;
                 readInfo.endPerInFile = d2max;
                 readInfo.variables = counter;
-                if (emptyWarnings > 0) new Warning(emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
-                if (smallWarnings > 0) new Warning(smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
-
+                if (emptyWarnings > 0) G.Warning("2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
+                if (smallWarnings > 0) G.Warning("2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
             }
         }
 
