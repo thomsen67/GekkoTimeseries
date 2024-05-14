@@ -286,7 +286,7 @@ namespace Gekko
                     };
 
                     Action<GAO> a2 = (gao) =>
-                    {                        
+                    {
                         using (Writeln txt2 = new Writeln())
                         {
                             txt2.tab = ETabs.Output;
