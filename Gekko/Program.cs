@@ -2646,7 +2646,13 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {                       
+        {
+            if (true && Globals.runningOnTTComputer)
+            {
+                var xx = new WpfApplicationSample();
+                xx.Run();
+            }
+            
             if (false && Globals.runningOnTTComputer)
             {                
                 string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";

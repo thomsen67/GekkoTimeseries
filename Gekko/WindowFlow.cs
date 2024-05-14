@@ -15,12 +15,12 @@ using Microsoft.Msagl.Layout.Layered;
 using Microsoft.Msagl.WpfGraphControl;
 using Microsoft.Win32;
 using Color = Microsoft.Msagl.Drawing.Color;
-using LabelPlacement = Microsoft.Msagl.Core.Layout.LabelPlacement;
+//using LabelPlacement = Microsoft.Msagl.Core.Layout.LabelPlacement;
 
 using ModifierKeys = System.Windows.Input.ModifierKeys;
 using Size = System.Windows.Size;
 
-namespace WpfApplicationSample
+namespace Gekko
 {
     class WpfApplicationSample : Application
     {
@@ -297,7 +297,7 @@ namespace WpfApplicationSample
                 //             //   graph.LayoutAlgorithmSettings.EdgeRoutingSettings.RouteMultiEdgesAsBundles = true;
                 //                //graph.LayoutAlgorithmSettings.EdgeRoutingSettings.EdgeRoutingMode = EdgeRoutingMode.SplineBundling;
                 //                //layout the graph and draw it
-                Graph graph = new Graph();
+                Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph();
                 graph.AddEdge("47", "58");
                 graph.AddEdge("70", "71");
                 var tn = graph.AddNode("test");
@@ -314,7 +314,7 @@ namespace WpfApplicationSample
                 subgraph2.Label.Text = "Inner";
                 subgraph2.Attr.Color = Color.Black;
                 subgraph2.Attr.FillColor = Color.Yellow;
-                subgraph2.Attr.ClusterLabelMargin = LabelPlacement.Bottom;
+                //subgraph2.Attr.ClusterLabelMargin = LabelPlacement.Bottom;
                 subgraph2.AddNode(graph.FindNode("70"));
                 subgraph2.AddNode(graph.FindNode("71"));
                 subgraph.AddSubgraph(subgraph2);
@@ -327,7 +327,7 @@ namespace WpfApplicationSample
                 var local = (SugiyamaLayoutSettings)global.Clone();
                 local.Transformation = PlaneTransformation.Rotation(-Math.PI / 2);
                 subgraph2.LayoutSettings = local;   // for Collapsing\Expanding
-                global.ClusterSettings.Add(subgraph2, local);
+                //global.ClusterSettings.Add(subgraph2, local);
 
                 graphViewer.Graph = graph;
             }
