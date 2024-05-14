@@ -257,43 +257,67 @@ namespace Gekko
                 using (Writeln txt = new Writeln())
                 {
                     Dictionary<string, bool> level1Numbers = new Dictionary<string, bool>();
-                    Dictionary<string, bool> level2Numbers = new Dictionary<string, bool>();                    
+                    Dictionary<string, bool> level2Numbers = new Dictionary<string, bool>();
+                    int level3Numbers = 0;
 
                     foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
                     {
                         string w1, w2;
                         this.GetText(kvp.Key, level1Numbers, level2Numbers, out w1, out w2);
-                    }
+                        level3Numbers+=kvp.Value.storage.Count;
+                    }                    
 
-                    Action<GAO> a1 = (gao) =>
-                    {
-                        using (Writeln txt = new Writeln())
+                    Action<GAO> a3 = (gao) =>
+                    {                        
+                        using (Writeln txt3 = new Writeln())
                         {
-                            foreach (string s in level1Numbers.Keys)
+                            txt3.tab = ETabs.Output;
+                            foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
                             {
                                 string w1, w2;
-                                this.GetText(s, null, null, out w1, out w2);
-                                txt.MainAdd(w1 + " [" + s + "]");
-                                txt.MainNewLineTight();
+                                this.GetText(kvp.Key, null, null, out w1, out w2);
+                                foreach (KeyValuePair<string, bool> kvp2 in kvp.Value.storage)
+                                {
+                                    txt3.MainAdd(w1 + " "+ w2 + " " + kvp2.Key + " [" + kvp.Key + "]");
+                                    txt3.MainNewLineTight();
+                                }
                             }
                         }
                     };
 
                     Action<GAO> a2 = (gao) =>
-                    {
-                        using (Writeln txt = new Writeln())
+                    {                        
+                        using (Writeln txt2 = new Writeln())
                         {
+                            txt2.tab = ETabs.Output;
                             foreach (string s in level2Numbers.Keys)
                             {
                                 string w1, w2;
                                 this.GetText(s, null, null, out w1, out w2);
-                                txt.MainAdd(w1 + " " + w2 + " [" + s + "]");
-                                txt.MainNewLineTight();
+                                txt2.MainAdd(w1 + " " + w2 + " [" + s + "]");
+                                txt2.MainNewLineTight();
                             }
+                            txt2.MainAdd("See more details " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
                         }
                     };
 
-                    txt.MainAdd("There were " + this.totalWarnings + " total warnings: " + level1Numbers.Count + " "+ G.GetLinkAction("main types", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + " and " + level2Numbers.Count + " "+ G.GetLinkAction("sub types", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ".");                                       
+                    Action<GAO> a1 = (gao) =>
+                    {
+                        using (Writeln txt1 = new Writeln())
+                        {
+                            txt1.tab = ETabs.Output;
+                            foreach (string s in level1Numbers.Keys)
+                            {
+                                string w1, w2;
+                                this.GetText(s, null, null, out w1, out w2);
+                                txt1.MainAdd(w1 + " [" + s + "]");
+                                txt1.MainNewLineTight();
+                            }
+                            txt1.MainAdd("See more details " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)));
+                        }
+                    };
+
+                    txt.MainAdd("Warnings: " + level1Numbers.Count + " " + G.GetLinkAction("main types", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + ", " + level2Numbers.Count + " " + G.GetLinkAction("subtypes", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ", " + level3Numbers +" "+ G.GetLinkAction("mesage types", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ", and " + this.totalWarnings + " total warnings");
 
                 }
             }
