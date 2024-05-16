@@ -10396,12 +10396,22 @@ namespace UnitTests
         public void _Test_Invalid_Period()
         {
             I("reset;");
-            //FAIL("time 2003 2001;");
+            FAIL("time 2003 2001;");
             I("time 2001 2003;");
             I("x1 = 1, 2, 3;");
             I("x2 = 11, 12, 13;");
-            //FAIL("x1 <2003 2001; option databank trace = no> = x2;");
-            I("x1 <2003 2001; option databank trace = no> = 100;");
+            // ---------- without data tracing --------------------
+            FAIL("x1 <2003 2001; option databank trace = no> = x2;");
+            FAIL("x1 <2003 2001; option databank trace = no> = 100;");
+            I("option bugfix dates = no;");
+            FAIL("x1 <2003 2001; option databank trace = no> = x2;");  //Probably internal error
+            I("x1 <2003 2001; option databank trace = no> = 100;");  //This emulates a bad error from Gekko < 3.1.19
+            // ---------- with data tracing --------------------
+            FAIL("x1 <2003 2001> = x2;");
+            FAIL("x1 <2003 2001> = 100;");
+            I("option bugfix dates = no;");
+            FAIL("x1 <2003 2001> = x2;");  //Probably internal error
+            FAIL("x1 <2003 2001> = 100;");  //Probably fails because of a trace error
         }
 
         [TestMethod]

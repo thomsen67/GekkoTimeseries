@@ -1278,7 +1278,22 @@ namespace Gekko
 
                     if (Program.options.bugfix_dates)
                     {
-                        if (smpl != null && !(smpl.t1.IsNull() || smpl.t2.IsNull()) && smpl.t1.StrictlyLargerThan(smpl.t2))
+                        bool b = false;
+                        string d1 = null;
+                        string d2 = null;
+
+                        try
+                        {
+                            b = smpl.t1.StrictlyLargerThan(smpl.t2);
+                        }
+                        catch
+                        {
+                            //Do nothing, so this check can never crash due to somthing missing or being null regarding periods.
+                            //Should never be thrown, so should have no cost.
+                            if (Globals.runningOnTTComputer) new Writeln("TTH: Dates check problem!");
+                        }
+
+                        if (b)
                         {
                             using (Error txt = new Error())
                             {
@@ -1289,7 +1304,7 @@ namespace Gekko
                                 txt.MoreAdd("emulate Gekko < 3.1.19 behavior and skip this consistency check.");
                                 txt.MoreNewLine();
                                 txt.MoreAdd("In Gekko < 3.1.19, an invalid statement like for instance 'x <2020 2010> = 100;' entails that only the first period x[2020] gets updated, and no error is issued.");
-                                txt.MoreAdd("Note: When data tracing is activated (which is default in Gekko >= 3.1.16), an invalid period will generally crash the data tracing part anyway and result in an error.");
+                                txt.MoreAdd("Note: When data tracing is activated (which is per default in Gekko >= 3.1.16), an invalid series statement period will generally crash the data tracing part in any case and result in an error.");
                             }
                         }
                     }

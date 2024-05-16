@@ -4046,7 +4046,6 @@ namespace Gekko
             if (n < 1)
             {
                 new Error("Start date (" + t1.ToString() + ") should be same as or before end date (" + t2.ToString() + ")");
-                //throw new GekkoException();
             }
         }
 

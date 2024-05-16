@@ -22193,9 +22193,7 @@ namespace Gekko
         public static void Time(GekkoTime t1, GekkoTime t2)
         {
             GekkoSmplSimple freqs = ConvertFreqs(t1, t2, Program.options.freq);
-
             G.CheckLegalPeriod(freqs.t1, freqs.t2);
-
             Globals.globalPeriodStart = freqs.t1;
             Globals.globalPeriodEnd = freqs.t2;
             G.Writeln2(G.FreqAndPeriodPretty(false, true));
