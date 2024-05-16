@@ -202,8 +202,11 @@ namespace Gekko
             //Will be stated with colon: "GAMS raw model file reading problem: could not find '=e=' in eq definition. [more details]".
             // -----
             {"", "Unknown type" },  //This should never happen...
-            // -----
+
+            // =========================================================
+            // =========================================================
             {"1", "GAMS raw model file reading problem" },
+            // ---------------------------------------------------------
             {"1.1", "Could not find '=e=' in eq definition" },
             {"1.2", "Could not find ending ';' in eq definition" },
             {"1.3", "Eq name with '__'" },
@@ -211,8 +214,11 @@ namespace Gekko
             {"1.5", "Eq name with no 'e_'" },
             {"1.6", "Eq name invalid" },
             {"1.7", "Parsing error" },
-            // -----
+            
+            // =========================================================
+            // =========================================================
             {"2", "Tsd file reading problem" },
+            // ---------------------------------------------------------
             {"2.1", "Empty string" },
             {"2.2", "Small number" },
         };  
@@ -2647,7 +2653,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
+            if (true && text == "flow" && Globals.runningOnTTComputer)
             {
                 var xx = new WpfApplicationSample();
                 xx.Run();
