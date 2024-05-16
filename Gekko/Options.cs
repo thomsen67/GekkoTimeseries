@@ -43,6 +43,7 @@ namespace Gekko
         public bool bugfix_lhs_dollar = true;      //not mentioned in help, if lhs condition is a series, just skips the 0 (false) values instead of setting them to 0. On the rhs, they are always set to 0. Does not affect non-series conditions like set membership.
         public bool bugfix_lhs_dollar_warning = true;  //see above...
         public bool bugfix_csv_missing = true;     ////not mentioned in help, uses #N/A or #I/T, and determines start/end dates better (also works for prn)
+        public bool bugfix_dates = true;           //not mentioned in help, disallows stuff like x<2003 2001> = 100;
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -108,10 +109,7 @@ namespace Gekko
         public string global_fence_white_folders_read = "";  //delimit with semicolon
         public string global_fence_black_folders_write = "";  //delimit with semicolon
         public string global_fence_white_folders_write = "";  //delimit with semicolon
-        public bool global_fence_sys = true;  //can switch SYS fencing off
-        public string global_warnings_ignore = null;
-        public string global_warnings_show = "five";
-        public bool global_warnings_stop = false;
+        public bool global_fence_sys = true;  //can switch SYS fencing off        
         // ----    REMEMBER
         // ----    REMEMBER
         // ----    REMEMBER
@@ -143,6 +141,7 @@ namespace Gekko
         public int interface_sound_wait = 60; //seconds command files run to get a sound        
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_operators = true;
+        public int interface_warnings_limit = 5;
         public int interface_zoom = 100;
         // ---
         public string interpolate_method = "repeat"; //repeat|prorate
@@ -352,6 +351,7 @@ namespace Gekko
             Add("BUGFIX LHS DOLLAR", Globals.xbool);
             Add("BUGFIX LHS DOLLAR WARNING", Globals.xbool);
             Add("BUGFIX CSV MISSING", Globals.xbool);
+            Add("BUGFIX DATES", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
@@ -398,10 +398,7 @@ namespace Gekko
             Add("GLOBAL FENCE WHITE FOLDERS READ", Globals.xnameOrString);
             Add("GLOBAL FENCE BLACK FOLDERS WRITE", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS WRITE", Globals.xnameOrString);
-            Add("GLOBAL FENCE SYS", Globals.xbool);
-            Add("GLOBAL WARNINGS IGNORE", Globals.xstring);  //for instance: '1.1, 2'
-            Add("GLOBAL WARNINGS SHOW", Globals.xnameOrString, "none", "one", "five", "all");
-            Add("GLOBAL WARNINGS STOP", Globals.xbool);            
+            Add("GLOBAL FENCE SYS", Globals.xbool);           
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -441,6 +438,7 @@ namespace Gekko
             Add("INTERFACE SOUND WAIT", Globals.xint);
             Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
             Add("INTERFACE TABLE OPERATORS", Globals.xbool);
+            Add("INTERFACE WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
             Add("INTERFACE ZOOM", Globals.xint);
             Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
             Add("LIBRARY CACHE", Globals.xbool);

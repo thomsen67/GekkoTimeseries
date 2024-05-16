@@ -1274,7 +1274,25 @@ namespace Gekko
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                    LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);                           
+                    LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);
+
+                    if (Program.options.bugfix_dates)
+                    {
+                        if (smpl != null && !(smpl.t1.IsNull() || smpl.t2.IsNull()) && smpl.t1.StrictlyLargerThan(smpl.t2))
+                        {
+                            using (Error txt = new Error())
+                            {
+                                txt.MainAdd("Invalid date interval " + smpl.t1.ToString() + "-" + smpl.t2.ToString() + " detected in series statement. Start period must be <= end period.");
+                                txt.MoreAdd("If you are upgrading from a Gekko version < 3.1.19 to a");
+                                txt.MoreAdd("Gekko version >= 3.1.19, this error may come out of the blue. It would be best to fix the error, but");
+                                txt.MoreAdd("if this turns problematic or cumbersome, as a workaround you may set 'OPTION bugfix dates = no;' in order to");
+                                txt.MoreAdd("emulate Gekko < 3.1.19 behavior and skip this consistency check.");
+                                txt.MoreNewLine();
+                                txt.MoreAdd("In Gekko < 3.1.19, an invalid statement like for instance 'x <2020 2010> = 100;' entails that only the first period x[2020] gets updated, and no error is issued.");
+                                txt.MoreAdd("Note: When data tracing is activated (which is default in Gekko >= 3.1.16), an invalid period will generally crash the data tracing part anyway and result in an error.");
+                            }
+                        }
+                    }
 
                     switch (rhs.Type())
                     {

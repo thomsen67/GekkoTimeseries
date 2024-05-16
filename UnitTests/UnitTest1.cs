@@ -10391,6 +10391,19 @@ namespace UnitTests
             Globals.warningPool.Report();
         }
 
+
+        [TestMethod]
+        public void _Test_Invalid_Period()
+        {
+            I("reset;");
+            //FAIL("time 2003 2001;");
+            I("time 2001 2003;");
+            I("x1 = 1, 2, 3;");
+            I("x2 = 11, 12, 13;");
+            //FAIL("x1 <2003 2001; option databank trace = no> = x2;");
+            I("x1 <2003 2001; option databank trace = no> = 100;");
+        }
+
         [TestMethod]
         public void _Test_Sheet_List()
         {

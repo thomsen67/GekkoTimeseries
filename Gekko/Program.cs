@@ -25346,9 +25346,6 @@ namespace Gekko
             string global_fence_black_folders_write_REMEMBER = Program.options.global_fence_black_folders_write;
             string global_fence_white_folders_write_REMEMBER = Program.options.global_fence_white_folders_write;
             bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
-            string global_warnings_ignore_REMEMBER = Program.options.global_warnings_ignore;
-            string global_warnings_show_REMEMBER = Program.options.global_warnings_show;
-            bool global_warnings_stop_REMEMBER = Program.options.global_warnings_stop;
 
         // ------------------------------------------------------
         Program.options = new Options();  //resetting these
@@ -25364,9 +25361,6 @@ namespace Gekko
             Program.options.global_fence_black_folders_write = global_fence_black_folders_write_REMEMBER;
             Program.options.global_fence_white_folders_write = global_fence_white_folders_write_REMEMBER;
             Program.options.global_fence_sys = global_fence_sys_REMEMBER;
-            Program.options.global_warnings_ignore = global_warnings_ignore_REMEMBER;
-            Program.options.global_warnings_show = global_warnings_show_REMEMBER;
-            Program.options.global_warnings_stop = global_warnings_stop_REMEMBER;
 
             // ------------------------------------------------------
 
