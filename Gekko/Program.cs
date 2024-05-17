@@ -204,6 +204,7 @@ namespace Gekko
     public class WarningPool
     {
         //See #lafh7h3bbkahfd
+                
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
         public int counter = 0;
 
@@ -215,24 +216,32 @@ namespace Gekko
             //to turn on/off that message.
             //Take care that these numbers are ok, also when calling Add() on warningContainer. Beware of blanks also.
             //Will be stated with colon: "GAMS raw model file reading problem: could not find '=e=' in eq definition. [more details]".
-            // -----
+            //
+            //    +-------------------------------------------------------------------------------+
+            //    | NEW WARNING: Always augment and use a new number!                             |
+            //    |              For a new type when "{x}.{y}" is last, add "{x+1}.1" etc.        |
+            //    |              For a new {x} subtype when "{x}.{y}" is last, add "{x}.{y+1}".   |
+            //    | Do not mess with existing numbers. Changning the text is ok. No dots (".").   |
+            //    | Keep messages as short as reasonably possible.                                |
+            //    +-------------------------------------------------------------------------------+
+            //
+            // =========================================================
+            // =========================================================
             {"", "Unknown type" },  //This should never happen...
-
             // =========================================================
             // =========================================================
-            {"1", "GAMS raw model file reading problem" },
+            {"1", "GAMS raw model file reading" },
             // ---------------------------------------------------------
-            {"1.1", "Could not find '=e=' in eq definition" },
-            {"1.2", "Could not find ending ';' in eq definition" },
+            {"1.1", "Could not find '=e=' in eq def" },
+            {"1.2", "Could not find ending ';' in eq def" },
             {"1.3", "Eq name with '__'" },
             {"1.4", "Eq name without '_'" },
             {"1.5", "Eq name with no 'e_'" },
             {"1.6", "Eq name invalid" },
-            {"1.7", "Parsing error" },
-            
+            {"1.7", "Parsing error" },            
             // =========================================================
             // =========================================================
-            {"2", "Tsd file reading problem" },
+            {"2", "Tsd file reading" },
             // ---------------------------------------------------------
             {"2.1", "Empty string" },
             {"2.2", "Small number" },
@@ -308,16 +317,14 @@ namespace Gekko
                 //"File problem in line 117 pos 10".
 
                 using (Writeln txt = new Writeln())
-                {                    
+                {                                        
                     Dictionary<string, bool> level2Numbers = new Dictionary<string, bool>();
-                    int level3Numbers = 0;
 
                     foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
                     {
                         string w1, w2;
                         this.GetText(kvp.Key, level2Numbers, out w1, out w2);
-                        level3Numbers+=kvp.Value.storage.Count;
-                    }                    
+                    }
 
                     Action<GAO> a3 = (gao) =>
                     {
@@ -328,27 +335,34 @@ namespace Gekko
                             this.GetText(kvp.Key, null, out w1, out w2);
                             foreach (KeyValuePair<string, int> kvp2 in kvp.Value.storage)
                             {
-                                m.Add(new WarningPoolHelper() { s = w1 + " " + w2 + " " + kvp2.Key + " [" + kvp.Key + "]    counter = " + kvp2.Value, i = kvp2.Value });                                
+                                string w3 = kvp2.Key.Trim();
+                                if (!w3.EndsWith(".")) w3 += ".";
+                                m.Add(new WarningPoolHelper() { s = w1 + " " + w2 + " " + w3, i = kvp2.Value });
                             }
                         }
 
                         using (Writeln txt3 = new Writeln())
                         {
                             txt3.tab = ETabs.Output;
-                            List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList();
+                            List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList(); //sort chronologically
                             foreach (WarningPoolHelper wph in m2)
                             {
                                 txt3.MainAdd(wph.s);
                                 txt3.MainNewLineTight();
                             }
                         }
-                    };                    
-                    
-                    txt.MainAdd("Warnings: " + level3Numbers +" "+ G.GetLinkAction("message types", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ", and " + this.counter + " total warnings");
+                    };
 
+                    int n = 0;
+                    List<WarningPoolHelper> m = new List<WarningPoolHelper>();
+                    foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
+                    {
+                        n += kvp.Value.storage.Count;
+                    }
+
+                    txt.MainAdd("There were " + n + " WARNING messages while running the job (" + G.GetLinkAction("show messages", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
                 }
             }
-
         }
 
         /// <summary>

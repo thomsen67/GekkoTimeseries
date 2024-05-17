@@ -162,7 +162,17 @@ namespace Gekko
             this.textBoxOutputTab.Location = new System.Drawing.Point(0, 0);
             this.textBoxOutputTab.Name = "textBoxTab2";
             this.textBoxOutputTab.ReadOnly = true;
-            this.textBoxOutputTab.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            if (true)
+            {
+                this.textBoxOutputTab.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            }
+            else
+            {
+                //Gekko 3.4: maybe make it scroll like main tab. For now maybe too dangerous to set,
+                //           if existing code prints out large comma separated list?
+                this.textBoxOutputTab.WordWrap = false;
+                this.textBoxOutputTab.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Both;
+            }            
             this.textBoxOutputTab.Size = new System.Drawing.Size(641, 358);
             this.textBoxOutputTab.TabIndex = 0;
             this.textBoxOutputTab.TabStop = false;
@@ -1993,18 +2003,18 @@ namespace Gekko
                 G.Writeln();
                 if (Globals.numberOfErrors > 0)
                 {
-                    if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the statement");
-                    else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the statement");
+                    if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the job");
+                    else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the job");
                 }
                 if (Globals.numberOfWarnings > 0)
                 {
-                    if (Globals.numberOfWarnings == 1) G.Writeln("There was " + Globals.numberOfWarnings + " WARNING message while running the statement");
-                    else G.Writeln("There were " + Globals.numberOfWarnings + " WARNING messages while running the statement");
+                    if (Globals.numberOfWarnings == 1) G.Writeln("There was " + Globals.numberOfWarnings + " WARNING message while running the job");
+                    else G.Writeln("There were " + Globals.numberOfWarnings + " WARNING messages while running the job");
                 }
                 if (Globals.numberOfSkippedLines > 0)
                 {
-                    if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the statement");
-                    else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the statement");
+                    if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the job");
+                    else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the job");
                 }
             }
 
