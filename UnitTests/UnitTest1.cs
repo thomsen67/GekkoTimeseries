@@ -10378,15 +10378,15 @@ namespace UnitTests
         {
             I("tell 'warningpool';");
             Assert.AreEqual(5, Globals.warningPool.storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["2.1"].counter);
+            Assert.AreEqual(1, Globals.warningPool.storage["2.1"].sortOrder);
             Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-            Assert.AreEqual(2, Globals.warningPool.storage["2.2"].counter);
+            Assert.AreEqual(2, Globals.warningPool.storage["2.2"].sortOrder);
             Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
-            Assert.AreEqual(3, Globals.warningPool.storage["1.1"].counter);
+            Assert.AreEqual(3, Globals.warningPool.storage["1.1"].sortOrder);
             Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-            Assert.AreEqual(4, Globals.warningPool.storage["1.2"].counter);
+            Assert.AreEqual(4, Globals.warningPool.storage["1.2"].sortOrder);
             Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count);
-            Assert.AreEqual(5, Globals.warningPool.storage["1.3"].counter);
+            Assert.AreEqual(5, Globals.warningPool.storage["1.3"].sortOrder);
             Assert.AreEqual(2, Globals.warningPool.storage["1.3"].storage.Count);
             Globals.warningPool.Report();
         }

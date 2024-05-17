@@ -5229,7 +5229,7 @@ namespace Gekko
                 txt += s2 + G.NL + G.NL;
             }            
 
-            WindowMessageBox w = new WindowMessageBox();
+            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
             w.Height = 500;
             w.Width = 800;
             w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;

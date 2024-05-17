@@ -1278,9 +1278,7 @@ namespace Gekko
 
                     if (Program.options.bugfix_dates)
                     {
-                        bool b = false;
-                        string d1 = null;
-                        string d2 = null;
+                        bool b = false;                        
 
                         try
                         {

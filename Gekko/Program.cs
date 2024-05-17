@@ -52,6 +52,12 @@ using System.Threading.Tasks;
 
 namespace Gekko
 {
+    public enum EMessageBox
+    {
+        Normal,
+        Pause
+    }
+    
     public enum EDataTrace
     {
         None,
@@ -184,13 +190,22 @@ namespace Gekko
     }
 
     /// <summary>
+    /// Small helper class.
+    /// </summary>
+    public class WarningPoolHelper
+    {
+        public string s;
+        public int i;
+    }
+
+    /// <summary>
     /// Contains warning messsages that may be many in number, and similar.
     /// </summary>
     public class WarningPool
     {
         //See #lafh7h3bbkahfd
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
-        public int totalWarnings = 0;
+        public int counter = 0;
 
         public Dictionary<string, string> warningStrings = new Dictionary<string, string>()
         {
@@ -221,7 +236,7 @@ namespace Gekko
             // ---------------------------------------------------------
             {"2.1", "Empty string" },
             {"2.2", "Small number" },
-        };  
+        };
 
         /// <summary>
         /// The info string may be null. Else info is small warning information bit, like left-hand side variable etc. Should be rather small in size.
@@ -230,19 +245,52 @@ namespace Gekko
         /// <param name="info"></param>
         public void WAdd(string s, string info)  //WAdd() so it is easier to find by search like .Wadd("1.1"
         {
-            totalWarnings++;
+            this.counter++;
             WarningInfo wi = null;
             this.storage.TryGetValue(s, out wi);
             if (wi == null)
             {
                 wi = new WarningInfo();
-                wi.counter = this.storage.Count + 1;  //so they can be shown/sorted by insertion order at the end
-                wi.storage.Add(info, false);
-                this.storage.Add(s, wi);                
+                wi.storage.Add(info, counter);
+                this.storage.Add(s, wi);
             }
             else
             {
-                if (!wi.storage.ContainsKey(info)) wi.storage.Add(info, false);                
+                if (!wi.storage.ContainsKey(info))
+                {
+                    wi.storage.Add(info, counter);
+                }
+                else
+                {
+                    //already seen
+                }
+            }
+
+            bool print = false;
+
+            if (Program.options.interface_warnings_limit == -2)
+            {
+                WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
+                w.textBox1.Text = s + "'." + G.NL + G.NL + "Press [Enter] to continue";
+                w.ShowDialog();
+            }
+            else if (Program.options.interface_warnings_limit == -1)
+            {
+                print = true;
+            }            
+            else if (wi.storage.Count <= Program.options.interface_warnings_limit)
+            {
+                print = true;
+            }
+
+            if (!G.NullOrBlanks(Program.options.interface_warnings_pause))
+            {
+                if (G.Contains(s, Program.options.interface_warnings_pause))
+                {
+                    WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
+                    w.textBox1.Text = "Warning text '" + Program.options.interface_warnings_pause + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
+                    w.ShowDialog();
+                }
             }
         }
 
@@ -252,78 +300,51 @@ namespace Gekko
             {
                 //#lafh7h3bbkahfd
 
-                //1. GAMS raw file reading.                  level1
-                //  1.1 Could not find '=e=',                level2          this.storage.Count
-                //    File problem in line 117 pos 10.       level3          this.storage["..."].storage.Count
+                //1. GAMS raw file reading.                  precooked
+                //  1.1 Could not find '=e=',                precooked          this.storage.Count
+                //    File problem in line 117 pos 10.       random             this.storage["..."].storage.Count
                 //
-                //It gets stored with "1.1" as key, and value as a dict containing details like "File problem in line 117 pos 10".
-                //
-                //There were {level3} warnings, of {level2} subtypes and {level1} types.
+                //It gets stored with "1.1" as key, and value as a dict containing details like
+                //"File problem in line 117 pos 10".
 
                 using (Writeln txt = new Writeln())
-                {
-                    Dictionary<string, bool> level1Numbers = new Dictionary<string, bool>();
+                {                    
                     Dictionary<string, bool> level2Numbers = new Dictionary<string, bool>();
                     int level3Numbers = 0;
 
                     foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
                     {
                         string w1, w2;
-                        this.GetText(kvp.Key, level1Numbers, level2Numbers, out w1, out w2);
+                        this.GetText(kvp.Key, level2Numbers, out w1, out w2);
                         level3Numbers+=kvp.Value.storage.Count;
                     }                    
 
                     Action<GAO> a3 = (gao) =>
-                    {                        
+                    {
+                        List<WarningPoolHelper> m = new List<WarningPoolHelper>();
+                        foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
+                        {
+                            string w1, w2;
+                            this.GetText(kvp.Key, null, out w1, out w2);
+                            foreach (KeyValuePair<string, int> kvp2 in kvp.Value.storage)
+                            {
+                                m.Add(new WarningPoolHelper() { s = w1 + " " + w2 + " " + kvp2.Key + " [" + kvp.Key + "]    counter = " + kvp2.Value, i = kvp2.Value });                                
+                            }
+                        }
+
                         using (Writeln txt3 = new Writeln())
                         {
                             txt3.tab = ETabs.Output;
-                            foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
+                            List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList();
+                            foreach (WarningPoolHelper wph in m2)
                             {
-                                string w1, w2;
-                                this.GetText(kvp.Key, null, null, out w1, out w2);
-                                foreach (KeyValuePair<string, bool> kvp2 in kvp.Value.storage)
-                                {
-                                    txt3.MainAdd(w1 + " "+ w2 + " " + kvp2.Key + " [" + kvp.Key + "]");
-                                    txt3.MainNewLineTight();
-                                }
+                                txt3.MainAdd(wph.s);
+                                txt3.MainNewLineTight();
                             }
                         }
-                    };
-
-                    Action<GAO> a2 = (gao) =>
-                    {
-                        using (Writeln txt2 = new Writeln())
-                        {
-                            txt2.tab = ETabs.Output;
-                            foreach (string s in level2Numbers.Keys)
-                            {
-                                string w1, w2;
-                                this.GetText(s, null, null, out w1, out w2);
-                                txt2.MainAdd(w1 + " " + w2 + " [" + s + "]");
-                                txt2.MainNewLineTight();
-                            }
-                            txt2.MainAdd("See more details " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
-                        }
-                    };
-
-                    Action<GAO> a1 = (gao) =>
-                    {
-                        using (Writeln txt1 = new Writeln())
-                        {
-                            txt1.tab = ETabs.Output;
-                            foreach (string s in level1Numbers.Keys)
-                            {
-                                string w1, w2;
-                                this.GetText(s, null, null, out w1, out w2);
-                                txt1.MainAdd(w1 + " [" + s + "]");
-                                txt1.MainNewLineTight();
-                            }
-                            txt1.MainAdd("See more details " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)));
-                        }
-                    };
-
-                    txt.MainAdd("Warnings: " + level1Numbers.Count + " " + G.GetLinkAction("main types", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + ", " + level2Numbers.Count + " " + G.GetLinkAction("subtypes", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ", " + level3Numbers +" "+ G.GetLinkAction("mesage types", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ", and " + this.totalWarnings + " total warnings");
+                    };                    
+                    
+                    txt.MainAdd("Warnings: " + level3Numbers +" "+ G.GetLinkAction("message types", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ", and " + this.counter + " total warnings");
 
                 }
             }
@@ -339,12 +360,11 @@ namespace Gekko
         /// <param name="level2"></param>
         /// <param name="w1"></param>
         /// <param name="w2"></param>
-        private void GetText(string s, Dictionary<string, bool> level1, Dictionary<string, bool> level2, out string w1, out string w2)
+        private void GetText(string s, Dictionary<string, bool> level2, out string w1, out string w2)
         {
             //kvp.Key is alway something like "1.1", "5.3" and so on. Each of these have 1 or more elements.  
             string s1, s1s2;
             this.GetNumbers(s, out s1, out s1s2);
-            if (level1 != null && !level1.ContainsKey(s1)) level1.Add(s1, false);  //"1", "3", etc.
             if (level2 != null && !level2.ContainsKey(s1s2)) level2.Add(s1s2, false); //"1.1", "3.2", etc.
             this.GetTextHelper(s1, s1s2, out w1, out w2);
         }
@@ -400,8 +420,7 @@ namespace Gekko
     public class WarningInfo
     {
         //value is not used
-        public GekkoDictionary<string, bool> storage = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        public int counter = 0;
+        public GekkoDictionary<string, int> storage = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
     }
 
 
@@ -2652,13 +2671,14 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
+        {           
+
             if (true && text == "flow" && Globals.runningOnTTComputer)
             {
                 var xx = new WpfApplicationSample();
                 xx.Run();
             }
-            
+
             if (false && Globals.runningOnTTComputer)
             {                
                 string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";

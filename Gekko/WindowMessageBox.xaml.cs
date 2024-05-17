@@ -18,15 +18,19 @@ namespace Gekko
     /// </summary>
     public partial class WindowMessageBox : Window
     {
-        //public WindowMessageBox(bool copyButton)
-        //{
-        //    this.button2.IsEnabled = copyButton;
-        //    InitializeComponent();
-        //}
+        public EMessageBox type = EMessageBox.Normal;
         
-        public WindowMessageBox()
+        public WindowMessageBox(EMessageBox type)
         {
             InitializeComponent();
+            this.type = type;
+            if (this.type == EMessageBox.Pause)
+            {                
+                this.Title = "Pause";
+                this.textBox1.Text = "Pausing current Gekko job";
+                this.button1.Content = "Continue";
+                this.button2.Content = "Stop";
+            }
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -36,7 +40,14 @@ namespace Gekko
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.Clipboard.SetText(this.textBox1.Text, System.Windows.Forms.TextDataFormat.Text);
+            if (this.type == EMessageBox.Pause)
+            {
+                new Error("Execution stopped by user");
+            }
+            else
+            {
+                System.Windows.Forms.Clipboard.SetText(this.textBox1.Text, System.Windows.Forms.TextDataFormat.Text);
+            }
         }
     }
 }

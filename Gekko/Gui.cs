@@ -311,7 +311,7 @@ namespace Gekko
             s += "           " + e2.ToString() + "\n";  //ToString() contains stacktrace etc.
             s += "============ System output end =======================\n";
             s += "\n";
-            WindowMessageBox w = new WindowMessageBox();
+            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
             w.textBox1.Text = s;
             w.ShowDialog();
         }
@@ -1402,7 +1402,7 @@ namespace Gekko
                     s += G.NL;
                     s += G.WriteDirs("large", true);
                     //MessageBox.Show(s);
-                    WindowMessageBox w = new WindowMessageBox();
+                    WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
                     //w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New"); ugly...
                     w.textBox1.Text = s;
                     w.ShowDialog();
@@ -3058,7 +3058,7 @@ namespace Gekko
         private void commandHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             List<string> ss2 = GetCleanedCommandMemory(Globals.commandMemory.storage.ToString(), true);
-            WindowMessageBox w = new WindowMessageBox();
+            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
             w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
             w.textBox1.FontSize = 11;
             w.Title = "Statement history since last clearing of workspace";

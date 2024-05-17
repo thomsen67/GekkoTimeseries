@@ -122,7 +122,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Search for string inside string (case-insensitive)
+        /// Search for string inside string (case-insensitive). For instance Contains('Peartree', 'TREE') == true.
         /// </summary>
         /// <param name="s1">String to search (e.g. 'peartree')</param>
         /// <param name="s2">Sub-string to search for (e.g. 'tree')</param>

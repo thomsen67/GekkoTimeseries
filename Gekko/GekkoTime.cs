@@ -1454,7 +1454,7 @@ namespace Gekko
         // (double.NaN > double.NaN)
         // (double.NaN > 100d)
         // (100d > double.NaN)
-        // (double.NaN <double.NaN)
+        // (double.NaN < double.NaN)
         // (double.NaN < 100d)
         // (100d < double.NaN)
         // (double.NaN == double.NaN)

@@ -141,7 +141,8 @@ namespace Gekko
         public int interface_sound_wait = 60; //seconds command files run to get a sound        
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_operators = true;
-        public int interface_warnings_limit = 5;
+        public int interface_warnings_limit = 5;        
+        public string interface_warnings_pause = "";
         public int interface_zoom = 100;
         // ---
         public string interpolate_method = "repeat"; //repeat|prorate
@@ -439,6 +440,7 @@ namespace Gekko
             Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
             Add("INTERFACE TABLE OPERATORS", Globals.xbool);
             Add("INTERFACE WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
+            Add("INTERFACE WARNINGS PAUSE", Globals.xstring);  //where to pause
             Add("INTERFACE ZOOM", Globals.xint);
             Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
             Add("LIBRARY CACHE", Globals.xbool);

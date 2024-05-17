@@ -3,10 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     
     Title="Gekko message" Height="214" Width="570" Name="startup" WindowStartupLocation="CenterScreen">
-
-    <!--<StackPanel>
-        <DataGrid ItemsSource="{Binding}"/>
-    </StackPanel>-->
+    
     <DockPanel>
         <Grid  DockPanel.Dock="Bottom" Height="35" Background="WhiteSmoke">
         <Button Name="button1" Width="75" IsDefault="True" Click="button1_Click" HorizontalAlignment="Right" Margin="0,6,9,7" IsCancel="True">OK</Button>

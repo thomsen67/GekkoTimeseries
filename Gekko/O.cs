@@ -1898,9 +1898,14 @@ namespace Gekko
                 G.Writeln();
                 G.Writeln(arg);
             }
-            if (arg.Length > 0) arg += "\n" + "\n";
+            if (arg.Length > 0) arg += G.NL + G.NL;
             arg += "Press [Enter] to continue";
-            if (Globals.pausePopup) MessageBox.Show(arg);
+            if (Globals.pausePopup)
+            {
+                WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
+                w.textBox1.Text = arg;
+                w.ShowDialog();                
+            }
         }
 
         /// <summary>
@@ -6716,8 +6721,7 @@ namespace Gekko
         /// <param name="smpl"></param>
         /// <param name="p"></param>
         public static void StopHelper(GekkoSmpl smpl, P p)
-        {
-            //if (!Globals.stopFix) p.hasSeenStopCommand = 1;
+        {            
             p.stopCommandEncountered = true;
             O.FunctionLookupNew2(p, null, Globals.stopHelper)(smpl, p, false, null, null);
         }
