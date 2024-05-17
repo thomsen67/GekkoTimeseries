@@ -109,7 +109,11 @@ namespace Gekko
         public string global_fence_white_folders_read = "";  //delimit with semicolon
         public string global_fence_black_folders_write = "";  //delimit with semicolon
         public string global_fence_white_folders_write = "";  //delimit with semicolon
-        public bool global_fence_sys = true;  //can switch SYS fencing off        
+        public bool global_fence_sys = true;  //can switch SYS fencing off
+        public string global_warnings_ignore = "";  //for instance "2.3, 4, 7.1".
+        public int global_warnings_limit = 5;
+        public string global_warnings_pause = "";
+
         // ----    REMEMBER
         // ----    REMEMBER
         // ----    REMEMBER
@@ -140,9 +144,7 @@ namespace Gekko
         public string interface_sound_type = "bowl";  //bowl, ding, notify, ring
         public int interface_sound_wait = 60; //seconds command files run to get a sound        
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
-        public bool interface_table_operators = true;
-        public int interface_warnings_limit = 5;        
-        public string interface_warnings_pause = "";
+        public bool interface_table_operators = true;        
         public int interface_zoom = 100;
         // ---
         public string interpolate_method = "repeat"; //repeat|prorate
@@ -439,8 +441,9 @@ namespace Gekko
             Add("INTERFACE SOUND WAIT", Globals.xint);
             Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
             Add("INTERFACE TABLE OPERATORS", Globals.xbool);
-            Add("INTERFACE WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
-            Add("INTERFACE WARNINGS PAUSE", Globals.xstring);  //where to pause
+            Add("GLOBAL WARNINGS IGNORE", Globals.xstring);  //warnings to ignore
+            Add("GLOBAL WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
+            Add("GLOBAL WARNINGS PAUSE", Globals.xstring);  //where to pause
             Add("INTERFACE ZOOM", Globals.xint);
             Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
             Add("LIBRARY CACHE", Globals.xbool);

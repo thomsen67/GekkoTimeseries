@@ -902,6 +902,10 @@ namespace Gekko
             {
                 CrossThreadStuff.Zoom();
             }
+            else if (G.Equal(s2, "global_warnings_ignore"))
+            {
+                CrossThreadStuff.WarningsIgnore();
+            }
             else if (G.Equal(s2, "folder_working"))
             {
                 CrossThreadStuff.WorkingFolder("");

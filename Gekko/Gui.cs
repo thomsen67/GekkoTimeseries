@@ -1723,7 +1723,11 @@ namespace Gekko
             //TODO: Really this stuff should be stored in the P object, instead of here
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
-            Globals.warningPool = new WarningPool();  //This is for warnings that may be large in numbers and are assembled here.
+            
+            Dictionary<string, bool> ignore = Globals.warningPool.ignore;
+            Globals.warningPool = new WarningPool();  //This is for warnings that may be large in numbers and are assembled here. We do not make a new pool after RESET/RESTART!
+            Globals.warningPool.ignore = ignore;  //ressurect it!
+
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
             Globals.numberOfTimeWindowErrors = 0;

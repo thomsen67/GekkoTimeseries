@@ -204,9 +204,10 @@ namespace Gekko
     public class WarningPool
     {
         //See #lafh7h3bbkahfd
-                
+        
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
         public int counter = 0;
+        public Dictionary<string, bool> ignore = new Dictionary<string, bool>();
 
         public Dictionary<string, string> warningStrings = new Dictionary<string, string>()
         {
@@ -277,27 +278,27 @@ namespace Gekko
 
             bool print = false;
 
-            if (Program.options.interface_warnings_limit == -2)
+            if (Program.options.global_warnings_limit == -2)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
                 w.textBox1.Text = s + "'." + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }
-            else if (Program.options.interface_warnings_limit == -1)
+            else if (Program.options.global_warnings_limit == -1)
             {
                 print = true;
             }            
-            else if (wi.storage.Count <= Program.options.interface_warnings_limit)
+            else if (wi.storage.Count <= Program.options.global_warnings_limit)
             {
                 print = true;
             }
 
-            if (!G.NullOrBlanks(Program.options.interface_warnings_pause))
+            if (!G.NullOrBlanks(Program.options.global_warnings_pause))
             {
-                if (G.Contains(s, Program.options.interface_warnings_pause))
+                if (G.Contains(s, Program.options.global_warnings_pause))
                 {
                     WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                    w.textBox1.Text = "Warning text '" + Program.options.interface_warnings_pause + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
+                    w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pause + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
                     w.ShowDialog();
                 }
             }
@@ -337,20 +338,11 @@ namespace Gekko
                             {
                                 string w3 = kvp2.Key.Trim();
                                 if (!w3.EndsWith(".")) w3 += ".";
-                                m.Add(new WarningPoolHelper() { s = w1 + " " + w2 + " " + w3, i = kvp2.Value });
+                                m.Add(new WarningPoolHelper() { s = w1 + " " + w2 + " " + w3 + "¤" + kvp.Key, i = kvp2.Value });
                             }
                         }
 
-                        using (Writeln txt3 = new Writeln())
-                        {
-                            txt3.tab = ETabs.Output;
-                            List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList(); //sort chronologically
-                            foreach (WarningPoolHelper wph in m2)
-                            {
-                                txt3.MainAdd(wph.s);
-                                txt3.MainNewLineTight();
-                            }
-                        }
+                        this.PrintWarnings(m, false);
                     };
 
                     int n = 0;
@@ -361,6 +353,39 @@ namespace Gekko
                     }
 
                     txt.MainAdd("There were " + n + " WARNING messages while running the job (" + G.GetLinkAction("show messages", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
+                }
+            }
+        }
+
+        public void PrintWarnings(List<WarningPoolHelper> m, bool showId)
+        {
+            Action<GAO> a = (gao) =>
+            {
+                PrintWarnings(m, true);
+            };
+
+            using (Writeln txt3 = new Writeln())
+            {
+                txt3.tab = ETabs.Output;
+                txt3.lineWidth *= 2;
+                List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList(); //sort chronologically                            
+                if (showId)
+                {
+                    txt3.MainAdd("For instance: option global warnings ignore = '3.5, 3.6, 5, 7.1';. See under {a{option¤option.htm}a}.");
+                    txt3.MainNewLineTight();
+                    txt3.MainAdd("(These id numbers have no significance and are quite arbitrary).");
+                }
+                else
+                {
+                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers. Use id's to ignore warnings: option global warnings ignore = ... ;.");
+                }
+                txt3.MainNewLine();
+                foreach (WarningPoolHelper wph in m2)
+                {
+                    string[] ss = wph.s.Split('¤');
+                    if (showId) txt3.MainAdd(ss[0] + " [id = " + ss[1] + "]");
+                    else txt3.MainAdd(ss[0]);
+                    txt3.MainNewLineTight();
                 }
             }
         }
@@ -3089,13 +3114,13 @@ namespace Gekko
                 if (text == "warningpool")
                 {
                     Globals.warningPool = new WarningPool();
-                    G.Warning("2.1", "Extra 2.1");
-                    G.Warning("2.2", "Extra 2.2");
-                    G.Warning("1.1", "Extra 1.1");
-                    G.Warning("1.2", "Extra 1.2");
-                    G.Warning("1.3", "Extra 1.3");
-                    G.Warning("1.2", "Extra 1.2"); //does not get added
-                    G.Warning("1.3", "Extra 1.3 variant"); //gets added
+                    G.Warning("2.1", "More more more");
+                    G.Warning("2.2", "Extra extra extra");
+                    G.Warning("1.1", "Add add");
+                    G.Warning("1.2", "Put put");
+                    G.Warning("1.3", "Put put");
+                    G.Warning("1.2", "put put"); //does not get added
+                    G.Warning("1.3", "Put put variation"); //gets added
                 }
             }
         }        
@@ -25320,7 +25345,7 @@ namespace Gekko
             Program.databanks.localGlobal = new LocalGlobal();
             w2.FileNameWithPath = null; w2.FileNameWithPathPretty = null;
             b2.FileNameWithPath = null; b2.FileNameWithPathPretty = null;
-            Globals.createdVariables.Clear();  //these should maybe live inside work databank
+            Globals.createdVariables.Clear();  //these should maybe live inside work databank            
 
             string resetRestartFirstLine = null;
             string lastCommand = null;
@@ -25378,9 +25403,12 @@ namespace Gekko
             string global_fence_black_folders_write_REMEMBER = Program.options.global_fence_black_folders_write;
             string global_fence_white_folders_write_REMEMBER = Program.options.global_fence_white_folders_write;
             bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
+            string global_warnings_ignore_REMEMBER = Program.options.global_warnings_ignore;
+            int global_warnings_limit_REMEMBER = Program.options.global_warnings_limit;
+            string global_warnings_pause_REMEMBER = Program.options.global_warnings_pause;
 
-        // ------------------------------------------------------
-        Program.options = new Options();  //resetting these
+            // ------------------------------------------------------
+            Program.options = new Options();  //resetting these
             // ------------------------------------------------------
             //Restoring some options
             if (!G.NullOrBlanks(folder_working_REMEMBER)) Program.options.folder_working = folder_working_REMEMBER;
@@ -25393,6 +25421,10 @@ namespace Gekko
             Program.options.global_fence_black_folders_write = global_fence_black_folders_write_REMEMBER;
             Program.options.global_fence_white_folders_write = global_fence_white_folders_write_REMEMBER;
             Program.options.global_fence_sys = global_fence_sys_REMEMBER;
+
+            Program.options.global_warnings_ignore = global_warnings_ignore_REMEMBER;
+            Program.options.global_warnings_limit = global_warnings_limit_REMEMBER;
+            Program.options.global_warnings_pause = global_warnings_pause_REMEMBER;
 
             // ------------------------------------------------------
 
@@ -25442,7 +25474,6 @@ namespace Gekko
             Globals.expression = null;
             Globals.expressions = null;
             Globals.asbRecode_dict1 = null;
-            //Globals.dataTraceContainer = null; //not really necessary 
 
             RemoteInit();
 
