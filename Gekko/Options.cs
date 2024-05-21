@@ -112,7 +112,7 @@ namespace Gekko
         public bool global_fence_sys = true;  //can switch SYS fencing off
         public string global_warnings_ignore = "";  //for instance "2.3, 4, 7.1".
         public int global_warnings_limit = 5;
-        public string global_warnings_pause = "";
+        public string global_warnings_find = "";
 
         // ----    REMEMBER
         // ----    REMEMBER
@@ -401,7 +401,10 @@ namespace Gekko
             Add("GLOBAL FENCE WHITE FOLDERS READ", Globals.xnameOrString);
             Add("GLOBAL FENCE BLACK FOLDERS WRITE", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS WRITE", Globals.xnameOrString);
-            Add("GLOBAL FENCE SYS", Globals.xbool);           
+            Add("GLOBAL FENCE SYS", Globals.xbool);
+            Add("GLOBAL WARNINGS IGNORE", Globals.xstring);  //warnings to ignore
+            Add("GLOBAL WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
+            Add("GLOBAL WARNINGS FIND", Globals.xstring);  //find particular message
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -440,10 +443,7 @@ namespace Gekko
             Add("INTERFACE SOUND TYPE", Globals.xnameOrString, "bowl", "ding", "notify", "ring");
             Add("INTERFACE SOUND WAIT", Globals.xint);
             Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
-            Add("INTERFACE TABLE OPERATORS", Globals.xbool);
-            Add("GLOBAL WARNINGS IGNORE", Globals.xstring);  //warnings to ignore
-            Add("GLOBAL WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
-            Add("GLOBAL WARNINGS PAUSE", Globals.xstring);  //where to pause
+            Add("INTERFACE TABLE OPERATORS", Globals.xbool);            
             Add("INTERFACE ZOOM", Globals.xint);
             Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
             Add("LIBRARY CACHE", Globals.xbool);

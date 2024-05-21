@@ -276,32 +276,58 @@ namespace Gekko
                 }
             }
 
-            bool print = false;
+            // ============= Limits ====================================
 
-            if (Program.options.global_warnings_limit == -2)
+            bool print = false;
+            int popup = 0;  //1:normal popup, 2:find-popup.
+
+            if (Program.options.global_warnings_limit >= 0)
+            {
+                if (wi.storage.Count <= Program.options.global_warnings_limit)  //limit like e.g. 5
+                {
+                    print = true;
+                }
+            }
+            else if (Program.options.global_warnings_limit == -1)  //show all, same as int.MaxValue
+            {
+                print = true;
+            }
+            else if (Program.options.global_warnings_limit == -2)  //pause each
+            {
+                popup = 1;
+            }
+            else
+            {
+                new Error("Expected option global warnings limit to be >= -2.");
+            }
+
+            if (!G.NullOrBlanks(Program.options.global_warnings_find) && G.Contains(s, Program.options.global_warnings_find))
+            {
+                print = true;
+                popup = 2;  //overrides any popup = 1
+            }
+
+
+
+            if (popup == 1)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
                 w.textBox1.Text = s + "'." + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }
-            else if (Program.options.global_warnings_limit == -1)
+            else if (popup == 2)
             {
-                print = true;
-            }            
-            else if (wi.storage.Count <= Program.options.global_warnings_limit)
-            {
-                print = true;
+                WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
+                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_find + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
+                w.ShowDialog();
             }
 
-            if (!G.NullOrBlanks(Program.options.global_warnings_pause))
-            {
-                if (G.Contains(s, Program.options.global_warnings_pause))
-                {
-                    WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                    w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pause + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
-                    w.ShowDialog();
-                }
-            }
+
+            
+            //ignore
+            //limit (maybe print all, maybe pause all)
+            //find
+            
         }
 
         public void Report() 
@@ -377,7 +403,7 @@ namespace Gekko
                 }
                 else
                 {
-                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers. Use id's to ignore warnings: option global warnings ignore = ... ;.");
+                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers (you may use id's to ignore warnings: option global warnings ignore = ... ).");
                 }
                 txt3.MainNewLine();
                 foreach (WarningPoolHelper wph in m2)
@@ -3121,6 +3147,22 @@ namespace Gekko
                     G.Warning("1.3", "Put put");
                     G.Warning("1.2", "put put"); //does not get added
                     G.Warning("1.3", "Put put variation"); //gets added
+                }
+                else if (text == "warningpool1")
+                {
+                    Globals.warningPool = new WarningPool();
+                    G.Warning("2.1", "More more more");
+                    G.Warning("2.2", "Extra extra extra");
+                    G.Warning("1.1", "Add add");
+                    G.Warning("1.2", "Put put");
+                    G.Warning("1.3", "Put put");
+                    G.Warning("1.2", "put put"); //does not get added
+                    G.Warning("1.3", "Put put variation1"); //gets added
+                    G.Warning("1.3", "Put put variation2"); //gets added
+                    G.Warning("1.3", "Put put variation3"); //gets added
+                    G.Warning("1.3", "Put put variation4"); //gets added
+                    G.Warning("1.3", "Put put variation5"); //gets added
+                    G.Warning("1.3", "Put put variation6"); //does not get added, > 5.
                 }
             }
         }        
@@ -25405,7 +25447,7 @@ namespace Gekko
             bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
             string global_warnings_ignore_REMEMBER = Program.options.global_warnings_ignore;
             int global_warnings_limit_REMEMBER = Program.options.global_warnings_limit;
-            string global_warnings_pause_REMEMBER = Program.options.global_warnings_pause;
+            string global_warnings_pause_REMEMBER = Program.options.global_warnings_find;
 
             // ------------------------------------------------------
             Program.options = new Options();  //resetting these
@@ -25424,7 +25466,7 @@ namespace Gekko
 
             Program.options.global_warnings_ignore = global_warnings_ignore_REMEMBER;
             Program.options.global_warnings_limit = global_warnings_limit_REMEMBER;
-            Program.options.global_warnings_pause = global_warnings_pause_REMEMBER;
+            Program.options.global_warnings_find = global_warnings_pause_REMEMBER;
 
             // ------------------------------------------------------
 
