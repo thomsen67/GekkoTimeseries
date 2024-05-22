@@ -14364,6 +14364,29 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_TraceAddRangeFromSeries()
+        {
+            //See code fix here: #p0fjad8fjd
+            I("reset;");
+            I("time 2001 2003;");
+            I("p1!a = 100;");
+            I("interpolate p2!q = p1!a repeat;");
+            I("p1!a = 200;");
+            I("disp p2!q;");
+            Series p2 = O.GetIVariableFromString("p2!q", ECreatePossibilities.NoneReportError) as Series;
+            Assert.AreEqual(1, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+            Assert.AreEqual(1, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
+            Assert.AreEqual(2001, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+            Assert.AreEqual(2003, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+            Assert.AreEqual("interpolate p2!q = p1!a repeat;", p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text);
+            Assert.AreEqual(1, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
+            Assert.AreEqual(1, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
+            Assert.AreEqual(2001, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+            Assert.AreEqual(2003, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+            Assert.AreEqual("p1!a = 100;", p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text);
+        }
+
+        [TestMethod]
         public void _Test_TraceResurrection()
         {
             Assert.Fail();

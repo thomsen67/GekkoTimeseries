@@ -452,7 +452,62 @@ namespace Gekko
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
             if (this.GetContents().precedentsNames == null) this.GetContents().precedentsNames = new List<string>();
             this.GetContents().precedentsNames.Add(TraceGetNameDecorated(rhs, hasTrace));
-            if (hasTrace) this.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse()); //may come from an old Gekko databank where .trace2 == null.           
+            if (hasTrace)
+            {
+                if (true)
+                {
+                    //Doing some cloning: else this fails: (see unit test: #p0fjad8fjd)
+                    //
+                    //reset;
+                    //time 2001 2003;
+                    //p1!a = 100;
+                    //interpolate p2!q = p1!a repeat;
+                    //p1!a = 200;
+                    //disp p2!q;
+                    //
+                    // ---> Now the trace of p2!q shows it depends upon the trace p1!a = 200. Which is obviously BAD.
+                    //      Probably because without cloning there is a pointing p1!a --> TraceAndPeriod which points to 
+                    //      the same object as p2!q --> p1!a --> TraceAndPeriod.
+
+                    if (rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+                    {
+                        Precedents2 pp = rhs.meta.trace2.precedents;
+                        List<TraceAndPeriods2> taps2 = new List<TraceAndPeriods2>();
+                        foreach (TraceAndPeriods2 tap in pp.GetStorage())
+                        {
+                            TraceAndPeriods2 tap2 = new TraceAndPeriods2();
+                            tap2.trace = tap.trace;
+                            if (true)
+                            {
+                                //This timeperiod cloning may not be necessary, but unsure precisely WHY it is not necessary --> anyway: not costly.
+                                //Clone the list of timespans (not the timespans themselves)
+                                tap2.periods = new GekkoTimeSpansSimple();
+                                foreach (GekkoTimeSpanSimple gtss in tap.periods.GetStorage())
+                                {
+                                    tap2.periods.Add(gtss);
+                                }
+                            }
+                            else
+                            {
+                                tap2.periods = tap.periods;
+                            }
+                            taps2.Add(tap2);
+                        }
+                        if (this.precedents == null)
+                        {
+                            this.precedents = new Precedents2();
+                            this.precedents.SetStorage(new List<TraceAndPeriods2>());
+                        }
+                        Precedents2 pp2 = new Precedents2();
+                        pp2.SetStorage(taps2);
+                        this.GetPrecedents_BewareOnlyInternalUse().AddRange(pp2);
+                    }
+                }
+                else
+                {
+                    this.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse()); //may come from an old Gekko databank where .trace2 == null.           
+                }
+            }
         }
 
         /// <summary>
