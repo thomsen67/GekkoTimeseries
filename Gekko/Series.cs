@@ -1353,7 +1353,7 @@ namespace Gekko
                         //on? To avoid such confusion, if the .anchorPeriodPositionInArray is altered in such an "empty shell" object,
                         //we clone the dataarray for it. This will happen rarely anyway.   
 
-                        this.data = this.data.DeepClone();                        
+                        this.data = this.data.DeepClone(0);                        
 
                     }
 
@@ -2808,7 +2808,7 @@ namespace Gekko
         /// to the periods.
         /// </summary>
         /// <returns>The cloned Series object.</returns>
-        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
+        public IVariable DeepClone(int depth, GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             //Always make sure new fields are remembered in the DeepClone() method
 
@@ -2844,7 +2844,7 @@ namespace Gekko
                 {
                     MultidimItem item = kvp.Key.Clone();
                     item.parent = tsCopy;  //must be re-pointed
-                    Series subseries = kvp.Value.DeepClone(truncate, cloneHelper) as Series;
+                    Series subseries = kvp.Value.DeepClone(depth + 1, truncate, cloneHelper) as Series;
                     subseries.mmi = item; //the sub-ser
                     tsCopy.dimensionsStorage.storage.Add(item, subseries);
                 }                
@@ -2882,7 +2882,7 @@ namespace Gekko
                         //{
 
                         //}
-                        tsCopy.meta.trace2 = this.meta.trace2.DeepClone(cloneHelper);
+                        tsCopy.meta.trace2 = this.meta.trace2.DeepClone(depth + 1, cloneHelper);
                     }
 
                 }
@@ -3075,7 +3075,7 @@ namespace Gekko
             this.dataArray = x;
         }
 
-        public SeriesDataInformation DeepClone()
+        public SeriesDataInformation DeepClone(int depth)
         {
             SeriesDataInformation rv = new SeriesDataInformation();
             rv.dataArray = this.dataArray.Clone() as double[];

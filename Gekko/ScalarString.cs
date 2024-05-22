@@ -365,7 +365,7 @@ namespace Gekko
             //throw new GekkoException();
         }
 
-        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
+        public IVariable DeepClone(int depth, GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             ScalarString ss = new ScalarString(this.string2);
             ss.isFromNakedList = this.isFromNakedList;

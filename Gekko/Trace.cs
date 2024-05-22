@@ -856,12 +856,12 @@ namespace Gekko
             this.precedents.Add(tap5);
         }     
 
-        public Trace2 DeepClone(CloneHelper cloneHelper)
+        public Trace2 DeepClone(int depth, CloneHelper cloneHelper)
         {            
             object known = null;
             Trace2 trace2 = null;
 
-            if (Program.options.bugfix_tracedepth != -1 && cloneHelper.traceDepth > Program.options.bugfix_tracedepth)
+            if (Program.options.bugfix_tracedepth != -1 && depth > Program.options.bugfix_tracedepth)
             {
                 //do nothing: stop the possible infinite regress here
                 cloneHelper.traceDepthTriggered = true;
@@ -874,10 +874,8 @@ namespace Gekko
                 }
                 if (known == null)
                 {
-                    trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!
-                    cloneHelper.traceDepth++;  //only used for some bugfixes                
-                    trace2.precedents = this.precedents?.DeepClone(cloneHelper);
-                    cloneHelper.traceDepth--;
+                    trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!                                
+                    trace2.precedents = this.precedents?.DeepClone(depth + 1, cloneHelper);
                     if (cloneHelper != null)
                     {
                         if (cloneHelper.dict.ContainsKey(this))
@@ -1965,7 +1963,7 @@ namespace Gekko
             set { this.storage[i] = value; }
         }
 
-        public Precedents2 DeepClone(CloneHelper cloneHelper)
+        public Precedents2 DeepClone(int depth, CloneHelper cloneHelper)
         {
             Precedents2 precedents = new Precedents2();            
             if (this.storage != null)
@@ -1973,7 +1971,7 @@ namespace Gekko
                 precedents.storage = new List<TraceAndPeriods2>();
                 foreach (TraceAndPeriods2 traceAndPeriods in this.storage)
                 {
-                    precedents.storage.Add(traceAndPeriods.DeepClone(cloneHelper));
+                    precedents.storage.Add(traceAndPeriods.DeepClone(depth + 1, cloneHelper));
                 }
             }
             return precedents;
@@ -2078,7 +2076,7 @@ namespace Gekko
             return this.periods.GetStorage()[this.periods.Count() - 1].t2;
         }
 
-        public TraceAndPeriods2 DeepClone(CloneHelper cloneHelper)
+        public TraceAndPeriods2 DeepClone(int depth, CloneHelper cloneHelper)
         {
             GekkoTimeSpansSimple gtss = null;
             if (this.periods != null)
@@ -2086,7 +2084,7 @@ namespace Gekko
                 gtss = new GekkoTimeSpansSimple();
                 gtss.AddRange(this.periods);  //the timespans themselves are immutable
             }
-            return new TraceAndPeriods2(this.trace.DeepClone(cloneHelper), gtss);
+            return new TraceAndPeriods2(this.trace.DeepClone(depth + 1, cloneHelper), gtss);
         }
     }
 

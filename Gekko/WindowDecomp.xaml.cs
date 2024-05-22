@@ -3234,8 +3234,8 @@ namespace Gekko
             if (this.dataPattern != null)
             {
                 d.dataPattern = new Data();
-                d.dataPattern.dataCellsGradQuo = (Series)this.dataPattern.dataCellsGradQuo.DeepClone(null, null);
-                d.dataPattern.dataCellsGradRef = (Series)this.dataPattern.dataCellsGradRef.DeepClone(null, null);
+                d.dataPattern.dataCellsGradQuo = (Series)this.dataPattern.dataCellsGradQuo.DeepClone(0, null, null);
+                d.dataPattern.dataCellsGradRef = (Series)this.dataPattern.dataCellsGradRef.DeepClone(0, null, null);
             }
 
             return d;

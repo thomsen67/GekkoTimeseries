@@ -1164,7 +1164,6 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ArraySeries1()
         {
-
             // ------------------------------------
 
             I("RESET; TIME 2001 2003;");
@@ -10426,9 +10425,9 @@ namespace UnitTests
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
             I("#m = ((1, 2), (3, 4));");
-            I("sheet #m file = list.xlx;");
+            I("sheet #m file = list.xlsx;");
             I("reset;");
-            I("sheet <import list> #m file = list.xlx;");            
+            I("sheet <import list> #m file = list.xlsx;");            
             List m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
             Assert.AreEqual(m.list.Count, 2);
             List m1 = m.list[0] as List;

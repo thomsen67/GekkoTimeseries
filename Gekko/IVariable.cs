@@ -98,7 +98,7 @@ namespace Gekko
 
         EVariableType Type();
         
-        IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper);
+        IVariable DeepClone(int depth, GekkoSmplSimple truncate, CloneHelper cloneHelper);
 
         void DeepTrace(TraceHelper th);
 

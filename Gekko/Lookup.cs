@@ -1146,7 +1146,7 @@ namespace Gekko
                                 //---------------------------------------------------------         
                                 if (lhsType == EVariableType.List || lhsType == EVariableType.Var)
                                 {
-                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null, null));
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(0, null, null));
                                     G.ServiceMessage("list " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
@@ -1163,7 +1163,7 @@ namespace Gekko
 
                                 if (lhsType == EVariableType.Map || lhsType == EVariableType.Var)
                                 {
-                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null, null));
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(0, null, null));
                                     G.ServiceMessage("map " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
@@ -1179,7 +1179,7 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                 {
-                                    Matrix m = rhs.DeepClone(null, null) as Matrix;
+                                    Matrix m = rhs.DeepClone(0, null, null) as Matrix;
                                     if (o.opt_colnames != null) m.colnames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
                                     if (o.opt_rownames != null) m.rownames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
@@ -1269,7 +1269,7 @@ namespace Gekko
                     Series original = null;
                     if (keep || false)
                     {
-                        original = (Series)lhs_series.DeepClone(null, null);
+                        original = (Series)lhs_series.DeepClone(0, null, null);
                     }
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
@@ -1302,7 +1302,7 @@ namespace Gekko
                                 txt.MoreAdd("emulate Gekko < 3.1.19 behavior and skip this consistency check.");
                                 txt.MoreNewLine();
                                 txt.MoreAdd("In Gekko < 3.1.19, an invalid statement like for instance 'x <2020 2010> = 100;' entails that only the first period x[2020] gets updated, and no error is issued.");
-                                txt.MoreAdd("Note: When data tracing is activated (which is per default in Gekko >= 3.1.16), an invalid series statement period will generally crash the data tracing part in any case and result in an error.");
+                                txt.MoreAdd("Note: When data tracing is activated (which it is per default in Gekko >= 3.1.16), an invalid series statement period will generally crash the data tracing part in any case and result in an error.");
                             }
                         }
                     }
@@ -1423,7 +1423,7 @@ namespace Gekko
 
                                                 if (create)
                                                 {
-                                                    lhs_series = rhs_series_beware.DeepClone(null, null) as Series;  //so that it becomes timeless, too                                                
+                                                    lhs_series = rhs_series_beware.DeepClone(0, null, null) as Series;  //so that it becomes timeless, too                                                
                                                     lhs_series.name = varnameWithFreq; ;
                                                     double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
                                                     if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
@@ -1486,7 +1486,7 @@ namespace Gekko
                                                 new Error("Operators cannot be used for array-series (yet)");
                                             }
 
-                                            lhs_series = rhs.DeepClone(null, null) as Series;
+                                            lhs_series = rhs.DeepClone(0, null, null) as Series;
                                             lhs_series.name = varnameWithFreq;
                                             //!we need to make all the subseries point to the superseries, this pointer is used in DECOMP and other places
                                             foreach (KeyValuePair<MultidimItem, IVariable> kvp in lhs_series.dimensionsStorage.storage)
