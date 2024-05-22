@@ -14384,6 +14384,12 @@ namespace UnitTests
             Assert.AreEqual(2001, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
             Assert.AreEqual(2003, p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
             Assert.AreEqual("p1!a = 100;", p2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text);
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("option bugfix tracedepth = 100;");
+            I("read 8_alle;");  //a MONA databank
+            I("disp fcip!q;");  //a series that has infinite cycles because of bug, cf. #p0fjad8fjd
         }
 
         [TestMethod]
