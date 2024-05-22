@@ -6,6 +6,26 @@ using System.Linq;
 using System.Windows;
 using System.Threading;
 
+// Simplificed overview
+//
+//+ Timeseries meta object
+//  + Trace2                                         <---- just a phoney object ("GluedToSeries")
+//    + TraceContents2             
+//    + List<TraceAndPeriods2>                       <---- precedents
+//      + List<GekkoTimeSpanSimple>
+//      + Trace2
+//        + TraceContents2
+//        + Lis <TraceAndPeriods2>                   <---- precedents
+
+//So each trace has contents (like command line) and n precedents. Each precedent is a (trace, timespans), so a precedent
+//is not "just" another trace, but a (trace, timespans) combination.Because the same previous trace may be time-shadowed
+//in different ways in different places.
+
+//When protobuffed, the precedents (List<TraceAndPeriods2>) are cut off and replaced with ID's. So if there are n precedents,
+//.storageIDTemporary and .storagePeriodsTemporary will each get n elements, where the former is a traceID consisting of a
+//combination (DateTime, long) and the latter is raw periods.
+
+
 namespace Gekko
 {
     /// 
@@ -1663,7 +1683,7 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Is basically a List&lt;Trace>.
+    /// Is basically a List&lt;TraceAndPeriods2>.
     /// </summary>
     [ProtoContract]
     public class Precedents2
@@ -1808,7 +1828,7 @@ namespace Gekko
                     this.storagePeriodsTemporary.Add(temp2);
                 }
             }
-            this.SetStorage(null);
+            this.SetStorage(null);  //breaks the references
         }
 
         public void FromID(Dictionary<TraceID2, Trace2> dict2)

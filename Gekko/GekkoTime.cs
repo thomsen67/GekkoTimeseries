@@ -2104,6 +2104,9 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// Basically a List of GekkoTimeSpanSimple's, where the latter is GekkoTime t1, t2.
+    /// </summary>
     [ProtoContract]
     public class GekkoTimeSpansSimple
     {
