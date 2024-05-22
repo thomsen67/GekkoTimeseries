@@ -857,26 +857,52 @@ namespace Gekko
         }     
 
         public Trace2 DeepClone(CloneHelper cloneHelper)
-        {
+        {            
             object known = null;
             Trace2 trace2 = null;
-            if (cloneHelper != null)
+
+            if (Program.options.bugfix_tracedepth != -1 && cloneHelper.traceDepth > Program.options.bugfix_tracedepth)
             {
-                cloneHelper.dict.TryGetValue(this, out known);
-            }
-            if (known == null)
-            {
-                trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!
-                trace2.precedents = this.precedents?.DeepClone(cloneHelper);
-                if (cloneHelper != null)
-                {
-                    cloneHelper.dict.Add(this, trace2);
-                }
+                //do nothing: stop the possible infinite regress here
+                cloneHelper.traceDepthTriggered = true;
             }
             else
             {
-                trace2 = known as Trace2;
-            }            
+                if (cloneHelper != null)
+                {
+                    cloneHelper.dict.TryGetValue(this, out known);
+                }
+                if (known == null)
+                {
+                    trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!
+                    cloneHelper.traceDepth++;  //only used for some bugfixes                
+                    trace2.precedents = this.precedents?.DeepClone(cloneHelper);
+                    cloneHelper.traceDepth--;
+                    if (cloneHelper != null)
+                    {
+                        if (cloneHelper.dict.ContainsKey(this))
+                        {
+                            //Should not normally happen unless cycles in graph
+                            if (cloneHelper.traceDepthTriggered)
+                            {
+                                //ok, we ignore it
+                            }
+                            else
+                            {
+                                if (Globals.runningOnTTComputer) new Writeln("TTH: Clone dict dublet problem");
+                            }
+                        }
+                        else
+                        {
+                            cloneHelper.dict.Add(this, trace2);
+                        }
+                    }
+                }
+                else
+                {
+                    trace2 = known as Trace2;
+                }
+            }
             return trace2;
         }
 

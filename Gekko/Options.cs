@@ -44,6 +44,7 @@ namespace Gekko
         public bool bugfix_lhs_dollar_warning = true;  //see above...
         public bool bugfix_csv_missing = true;     ////not mentioned in help, uses #N/A or #I/T, and determines start/end dates better (also works for prn)
         public bool bugfix_dates = true;           //not mentioned in help, disallows stuff like x<2003 2001> = 100;
+        public int bugfix_tracedepth = -1;         //not mentioned in help, -1 = inactive: if we get DeepClone() problem with traces and stacktrace errors, try to set this to something large like 100 or 1000. Removed in the longer run.
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -355,6 +356,7 @@ namespace Gekko
             Add("BUGFIX LHS DOLLAR WARNING", Globals.xbool);
             Add("BUGFIX CSV MISSING", Globals.xbool);
             Add("BUGFIX DATES", Globals.xbool);
+            Add("BUGFIX TRACEDEPTH", Globals.xsint);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

@@ -2877,7 +2877,11 @@ namespace Gekko
                     }
 
                     if (this.meta.trace2 != null)
-                    {                           
+                    {
+                        //if (this.name == "fcip!q")
+                        //{
+
+                        //}
                         tsCopy.meta.trace2 = this.meta.trace2.DeepClone(cloneHelper);
                     }
 
