@@ -66,6 +66,7 @@ namespace Gekko
         public static DependencyTracking dependencyTracking = new DependencyTracking();
         public const int dependencyTrackingSysNumber = 9;
 
+        public static bool useNewWarningPool = false;
         public static WarningPool warningPool = new WarningPool();        
 
         public const string eqs1 = "------------- scalar -------------";

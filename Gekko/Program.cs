@@ -7650,8 +7650,16 @@ namespace Gekko
                 readInfo.startPerInFile = d1min;
                 readInfo.endPerInFile = d2max;
                 readInfo.variables = counter;
-                if (emptyWarnings > 0) G.Warning("2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
-                if (smallWarnings > 0) G.Warning("2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                if (emptyWarnings > 0)
+                {
+                    if (Globals.useNewWarningPool) G.Warning("2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
+                    else new Warning("Tsd file reading. Empty string. " + emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
+                }
+                if (smallWarnings > 0)
+                {
+                    if (Globals.useNewWarningPool) G.Warning("2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                    else new Warning("Tsd file reading. Small number. " + smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                }
             }
         }
 

@@ -4325,8 +4325,10 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Print()
         {
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
             //bank/ref
-            I("reset;");
+            I("reset;");            
             I("time 2001 2001;");
             I("open <edit> b1;");
             I("x = 2.2;");
@@ -5793,7 +5795,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Rename()
-        {            
+        {
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
             //Here, objects are actually renamed
 
@@ -5807,6 +5809,9 @@ namespace UnitTests
             //  x2
 
             // Work:x1 = 11 from 2001-2003
+
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             TestCopyHelper(0);
 
@@ -5927,7 +5932,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Copy1()
-        {            
+        {
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
             //Here, objects are actually copied
 
@@ -5939,6 +5944,9 @@ namespace UnitTests
             //  x2
 
             // Work:x1 = 11 from 2001-2003
+
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             TestCopyHelper(0);
 
@@ -6093,6 +6101,9 @@ namespace UnitTests
         {
             //This also implicitly tests a lot of RENAME functionality,
             //since COPY and RENAME share a lot of code.
+
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             TestCopyHelper(0);
 
@@ -10350,8 +10361,15 @@ namespace UnitTests
             }
             finally
             {
-                Program.options.global_fence_black_folders = null;
-                Program.options.global_fence_white_folders = null;
+                //defaults
+                Program.options.global_fence_black_folders = "";
+                Program.options.global_fence_white_folders = "";
+                Program.options.global_fence_black_folders_read = "";
+                Program.options.global_fence_white_folders_read = "";
+                Program.options.global_fence_black_folders_write = "";
+                Program.options.global_fence_white_folders_write = "";
+                Program.options.global_fence_sys = true;
+                Globals.dependencyTracking.InitFence();
             }
         }
 
@@ -10422,10 +10440,11 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Sheet_List()
         {
-            I("reset;");
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
+            I("reset;");            
             I("#m = ((1, 2), (3, 4));");
-            I("sheet #m file = list.xlsx;");
+            I("sheet #m file = list.xlsx;");  //TTH 23/5 2024: har nok aldrig virket, og måske har der ligget en list.xlsx-fil. Pt. giver kommandoen bare et skærmprint. Bør fikses.
             I("reset;");
             I("sheet <import list> #m file = list.xlsx;");            
             List m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
@@ -10582,12 +10601,15 @@ namespace UnitTests
             }
             finally
             {
-                Program.options.global_fence_black_folders = null;
-                Program.options.global_fence_white_folders = null;
-                Program.options.global_fence_black_folders_read = null;
-                Program.options.global_fence_white_folders_read = null;
-                Program.options.global_fence_black_folders_write = null;
-                Program.options.global_fence_white_folders_write = null;
+                //defaults
+                Program.options.global_fence_black_folders = "";
+                Program.options.global_fence_white_folders = "";
+                Program.options.global_fence_black_folders_read = "";
+                Program.options.global_fence_white_folders_read = "";
+                Program.options.global_fence_black_folders_write = "";
+                Program.options.global_fence_white_folders_write = "";
+                Program.options.global_fence_sys = true;
+                Globals.dependencyTracking.InitFence();
             }
         }
 
@@ -19829,6 +19851,13 @@ namespace UnitTests
 
             //I("SERIES ");
         }
+                
+        [TestMethod]
+        public void _Test_WriteDirs()
+        {
+            //Just to get the Gekko.exe location if this is needed
+            G.WriteDirs("large", false);
+        }
 
         [TestMethod]
         public void _Test_Filenames()
@@ -24144,6 +24173,9 @@ print(df2)
             //  #x1      #x1      #x3
             //  x2       x1!q     x3!q
             //  x1!q
+
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             TestCopyHelper(1);
 
