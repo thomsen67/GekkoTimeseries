@@ -456,6 +456,8 @@ namespace Gekko
             {
                 if (true)
                 {
+                    //RIGHT WAY!
+
                     //Doing some cloning: else this fails: (see unit test: #p0fjad8fjd)
                     //
                     //reset;
@@ -468,43 +470,50 @@ namespace Gekko
                     // ---> Now the trace of p2!q shows it depends upon the trace p1!a = 200. Which is obviously BAD.
                     //      Probably because without cloning there is a pointing p1!a --> TraceAndPeriod which points to 
                     //      the same object as p2!q --> p1!a --> TraceAndPeriod.
+                    //
+                    //Somewhat ugly, but we just need to make it work. Perhaps do it more clean for 
+                    //a rewrite of traces. Wonder what .DeepClone() can do regarding this?
 
-                    if (rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
-                    {
-                        Precedents2 pp = rhs.meta.trace2.precedents;
-                        List<TraceAndPeriods2> taps2 = new List<TraceAndPeriods2>();
-                        foreach (TraceAndPeriods2 tap in pp.GetStorage())
+                    if (rhs.meta.trace2.precedents.Count() > 0)
+                    {                        
+                        List<TraceAndPeriods2> taps_clone = new List<TraceAndPeriods2>();
+                        foreach (TraceAndPeriods2 tap in rhs.meta.trace2.precedents.GetStorage())  //.GetStorage() cannot be null (because .Count() > 0)
                         {
-                            TraceAndPeriods2 tap2 = new TraceAndPeriods2();
-                            tap2.trace = tap.trace;
+                            TraceAndPeriods2 tap_clone = new TraceAndPeriods2();
+                            tap_clone.trace = tap.trace;
                             if (true)
                             {
                                 //This timeperiod cloning may not be necessary, but unsure precisely WHY it is not necessary --> anyway: not costly.
                                 //Clone the list of timespans (not the timespans themselves)
-                                tap2.periods = new GekkoTimeSpansSimple();
-                                foreach (GekkoTimeSpanSimple gtss in tap.periods.GetStorage())
+                                tap_clone.periods = new GekkoTimeSpansSimple();
+                                foreach (GekkoTimeSpanSimple gtss in tap.periods.GetStorage())  //.GetStorage() cannot be null
                                 {
-                                    tap2.periods.Add(gtss);
+                                    tap_clone.periods.Add(gtss);
                                 }
                             }
                             else
                             {
-                                tap2.periods = tap.periods;
+                                tap_clone.periods = tap.periods;
                             }
-                            taps2.Add(tap2);
+                            taps_clone.Add(tap_clone);
                         }
                         if (this.precedents == null)
                         {
                             this.precedents = new Precedents2();
                             this.precedents.SetStorage(new List<TraceAndPeriods2>());
                         }
-                        Precedents2 pp2 = new Precedents2();
-                        pp2.SetStorage(taps2);
-                        this.GetPrecedents_BewareOnlyInternalUse().AddRange(pp2);
+                        Precedents2 precedents_clone = new Precedents2();
+                        precedents_clone.SetStorage(taps_clone);
+                        this.precedents.AddRange(precedents_clone);
                     }
                 }
                 else
                 {
+                    //WRONG WAY!
+                    //This is too naive: Problem is that rhs.meta.trace2.precedents can change, since trace2 her is 
+                    //of type GluedToSeries, and hence .precedents (which is really a List<TraceAndPeriods2> is
+                    //dynamic and may change afterwards). Therefore, we need to create a new .precendents where
+                    //each TraceAndPeriods2 gets added.
                     this.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse()); //may come from an old Gekko databank where .trace2 == null.           
                 }
             }
@@ -672,6 +681,9 @@ namespace Gekko
         /// </summary>
         private void PrecedentsShadowing(Trace2 traceThatIsGoingToBeAdded)
         {
+            // This pushes traceThatIsGoingToBeAdded onto existing traces, potentially cutting 
+            // the existing traces into halves etc.
+            //
             // When we already have shadowing, we have stuff like this
             //
             //            ==========                                   always 1 piece
@@ -945,14 +957,14 @@ namespace Gekko
         /// Param usesRealDataPeriod is not used for now, just a pointer for future fixes.
         /// </summary>
         /// <param name="ts"></param>
-        public static void PushIntoSeries(Series ts, Trace2 trace, ETracePushType type, bool usesRealDataPeriod)
+        public static void PushIntoSeries(Series ts, Trace2 traceThatIsGoingToBeAdded, ETracePushType type, bool usesRealDataPeriod)
         {
             //
             // !!!
             // !!! In the longer run, these IF's can be removed
             // !!!            
-            if (trace == null) new Error("Trace problem: trace == null");
-            if (trace.GetContents().text == null) new Error("Trace problem: trace.GetContents().text == null");
+            if (traceThatIsGoingToBeAdded == null) new Error("Trace problem: trace == null");
+            if (traceThatIsGoingToBeAdded.GetContents().text == null) new Error("Trace problem: trace.GetContents().text == null");
             if (ts.meta == null) new Error("Trace problem: ts.meta == null");
             
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
@@ -960,9 +972,9 @@ namespace Gekko
             if (type == ETracePushType.Sibling)
             {
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
-                ts.meta.trace2.PrecedentsShadowing(trace);
+                ts.meta.trace2.PrecedentsShadowing(traceThatIsGoingToBeAdded);
                 //In unit tests, trace period (t1/t2) is always present here, so no null periods.
-                if ((Globals.runningOnTTComputer || G.IsUnitTesting()) && trace.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1: " + trace.traceContents.text);
+                if ((Globals.runningOnTTComputer || G.IsUnitTesting()) && traceThatIsGoingToBeAdded.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1: " + traceThatIsGoingToBeAdded.traceContents.text);
             }
             else if (type == ETracePushType.NewParent)
             {
@@ -985,12 +997,7 @@ namespace Gekko
 
                 //LOOK AT COPY, maybe in the cases where we copy PART of data (with <t1 t2> or <respect>) FROM a series into a NEW series or EXISTING series.
                 //COPY<respect> accumulates worst, possibly because time is not detected --> should be, fix this first!
-
-                //if (trace.GetContents().period.t1.IsNull())
-                //{
-
-                //}
-
+                
                 //COPY x1 to x2; (period)
                 //RENAME x1 as x2; (null)
                 //COLLAPSE y!a = x1; (period)
@@ -1003,10 +1010,10 @@ namespace Gekko
                 //READ <t1 t2> xx; (period)
                 //READ xx; (period)
 
-                trace.AddRangeFromSeries2(null, ts);
+                traceThatIsGoingToBeAdded.AddRangeFromSeries2(null, ts);
                 ts.meta.trace2.precedents = new Precedents2();
                 TraceAndPeriods2 tap6 = new TraceAndPeriods2();
-                tap6.trace = trace;
+                tap6.trace = traceThatIsGoingToBeAdded;
                 GekkoTimeSpansSimple gtss = new GekkoTimeSpansSimple();
                 gtss.SetStorage(new List<GekkoTimeSpanSimple>() { tap6.trace.GetContents().period });  //should be ok to just add it here, because .GetContents().period never changes (is immutable anyway)
                 tap6.periods = gtss;

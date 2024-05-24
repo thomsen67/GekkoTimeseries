@@ -1907,6 +1907,7 @@ namespace Gekko
             if (Globals.pausePopup)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
+                w.Width = 400; w.Height = 150;  //Else it feels too large. But nice being able to hit [Stop].
                 w.textBox1.Text = arg;
                 w.ShowDialog();                
             }

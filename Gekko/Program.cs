@@ -371,8 +371,7 @@ namespace Gekko
                         this.PrintWarnings(m, false);
                     };
 
-                    int n = 0;
-                    List<WarningPoolHelper> m = new List<WarningPoolHelper>();
+                    int n = 0;                    
                     foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
                     {
                         n += kvp.Value.storage.Count;
@@ -2737,12 +2736,14 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {           
+        {
 
-            if (true && text == "flow" && Globals.runningOnTTComputer)
+            if (text == "flowgraph1" || text == "flowgraph2")
             {
-                var xx = new WpfApplicationSample();
+                WpfApplicationSample xx = new WpfApplicationSample();
+                if (text == "flowgraph1") xx.rotate = true;
                 xx.Run();
+                return;
             }
 
             if (false && Globals.runningOnTTComputer)

@@ -24,7 +24,7 @@ namespace Gekko
 {
     class WpfApplicationSample : Application
     {
-
+        public bool rotate = false;
 
         public static readonly RoutedUICommand LoadSampleGraphCommand = new RoutedUICommand("Open File...", "OpenFileCommand",
                                                                                      typeof(WpfApplicationSample));
@@ -57,7 +57,10 @@ namespace Gekko
                     
 
                     e = graph.AddEdge("vtAktie", "vtKilde");                    
-                    e.Attr.Color = Color(0.10);                    
+                    e.Attr.Color = Color(0.10);
+
+                    //e = graph.AddEdge("vtKilde", "vtAktie");
+                    //e.Attr.Color = Color(0.10);
 
                     e = graph.AddEdge("vtKommune", "vtKilde");
                     e.Attr.Color = Color(0.73);
@@ -65,13 +68,13 @@ namespace Gekko
                     e = graph.AddEdge("vtBund", "vtKilde");          
                     e.Attr.Color = Color(0.35);
 
-                    e = graph.AddEdge("vSkatteplIndk", "vtKommune");
+                    e = graph.AddEdge("vSkatteplInd", "vtKommune");
                     e.Attr.Color = Color(1.08);
 
                     e = graph.AddEdge("vPersFradrag", "vtKommune");
                     e.Attr.Color = Color(-0.09);
 
-                    e = graph.AddEdge("vPersIndk", "vtBund");
+                    e = graph.AddEdge("vPersInd", "vtBund");
                     e.Attr.Color = Color(1.08);
 
                     e = graph.AddEdge("vPersFradrag", "vtBund");
@@ -83,17 +86,37 @@ namespace Gekko
                     e = graph.AddEdge("vHh[-1]", "vtAktie");
                     e.Attr.Color = Color(0.60);
 
-                    n = graph.FindNode("vtKilde");
-                    n.Attr.LabelMargin = 3;
-                    n = graph.FindNode("vtAktie");
-                    n.Attr.LabelMargin = 3;
-                    n = graph.FindNode("vtKommune");
-                    n.Attr.LabelMargin = 3;
-                    n = graph.FindNode("vtBund");
-                    n.Attr.LabelMargin = 3;
+                    e = graph.AddEdge("vWHh", "vPersInd");
+                    e.Attr.Color = Color(1.21);
 
-                    graph.Attr.LayerDirection = LayerDirection.RL;
-                                        
+                    e = graph.AddEdge("vPensIndb", "vPersInd");
+                    e.Attr.Color = Color(-0.11);
+
+                    e = graph.AddEdge("vtHhAM", "vPersInd");
+                    e.Attr.Color = Color(-0.10);
+
+                    e = graph.AddEdge("vSatsIndeks", "vPersFradrag");
+                    e.Attr.Color = Color(1.00);
+
+                    e = graph.AddEdge("vPersInd", "vSkatteplInd");
+                    e.Attr.Color = Color(1.10);
+
+                    e = graph.AddEdge("vBeskFradrag", "vSkatteplInd");
+                    e.Attr.Color = Color(-0.07);
+
+                    e = graph.AddEdge("vWHh", "vBeskFradrag");
+                    e.Attr.Color = Color(1.00);
+
+                    foreach (string s in new string[] { "vtKilde", "vtAktie", "vtKommune", "vtBund", "vSkatteplInd", "vPersFradrag", "vRealiseretAktieOmv", "vHh[-1]", "vPersInd", "vWHh", "vPensIndb", "vtHhAM", "vSatsIndeks", "vBeskFradrag" })
+                    {
+                        n = graph.FindNode(s);
+                        n.Attr.LabelMargin = 4;
+                        n.Attr.Color = Color(0.3);
+                        if (s == "vtKilde") n.Attr.FillColor = Color(0.3);
+                    }
+
+                    if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
+                    else graph.Attr.LayerDirection = LayerDirection.RL;                                        
 
                 }
                 else if (true)
@@ -278,12 +301,14 @@ namespace Gekko
             }
         }
 
-        private static Color Color(double d)
-        {            
+        private static Color Color(double d2)
+        {
+            double d = Math.Abs(d2);
             if (d > 1) d = 1;
-            else if (d < 0.1) d = 0.1;
+            else if (d < 0.20) d = 0.20;
             byte b = (byte)((1 - d) * 255);
-            return new Color(255, b, b, b);
+            if (d2 > 0) return new Color(255, b, b, b);
+            else return new Color(255, 255, b, b);
         }
 
         private static double Width(double d, double factor)
@@ -326,11 +351,11 @@ namespace Gekko
         void SetStatusBar()
         {
             var statusBar = new StatusBar();            
-            statusTextBox = new TextBox { Text = "No object" };            
+            statusTextBox = new TextBox { Text = "" };  //{ Text = "No object" };            
             statusBar.Items.Add(statusTextBox);
             mainGrid.Children.Add(statusBar);
             statusBar.VerticalAlignment = VerticalAlignment.Bottom;
-            statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.yellow);
+            statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.GekkoModeYellow);
         }
 
         void graphViewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
@@ -340,7 +365,20 @@ namespace Gekko
             {
                 var drawingNode = (Node)node.DrawingObject;
                 statusTextBox.Text = drawingNode.Label.Text;
-                if (statusTextBox.Text == "vtKilde") statusTextBox.Text = "Kildeskatter, mio. kr\nKilde: ADAM";
+                if (statusTextBox.Text == "vtKilde") statusTextBox.Text = "Kildeskatter";
+                else if (statusTextBox.Text == "vtAktie") statusTextBox.Text = "Aktieskatter";
+                else if (statusTextBox.Text == "vtBund") statusTextBox.Text = "Bundskatter";
+                else if (statusTextBox.Text == "vtKommune") statusTextBox.Text = "Kommunale indkomstskatter";
+                else if (statusTextBox.Text == "vPersFradrag") statusTextBox.Text = "Imputeret personfradrag";
+                else if (statusTextBox.Text == "vSkatteplInd") statusTextBox.Text = "Skattepligtig indkomst";
+                else if (statusTextBox.Text == "vPersInd") statusTextBox.Text = "Personlig indkomst";
+                else if (statusTextBox.Text == "vPensIndb") statusTextBox.Text = "Pensionsindbetalinger";
+                else if (statusTextBox.Text == "vWHh") statusTextBox.Text = "Årsløn per beskæftiget";
+                else if (statusTextBox.Text == "vtHhAM") statusTextBox.Text = "Arbejdsmarkedsbidrag betalt af husholdningerne";
+                else if (statusTextBox.Text == "vRealiseretAktieOmv") statusTextBox.Text = "Skøn over realiseret gevinst ved salg af aktier";                
+                else if (statusTextBox.Text == "vHh[-1]") statusTextBox.Text = "Husholdningernes finansielle portefølje";
+                else if (statusTextBox.Text == "vSatsIndeks") statusTextBox.Text = "Satsregulering";
+                else if (statusTextBox.Text == "vBeskFradrag") statusTextBox.Text = "Imputeret beskæftigelsesfradrag";
             }
             else
             {
@@ -349,7 +387,7 @@ namespace Gekko
                     statusTextBox.Text = ((Edge)edge.DrawingObject).SourceNode.Label.Text + " --> " +
                                          ((Edge)edge.DrawingObject).TargetNode.Label.Text;
                 else
-                    statusTextBox.Text = "No object";
+                    statusTextBox.Text = "";  // "No object";
             }
         }
 
