@@ -764,11 +764,11 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Is it used=
+        /// Used in GUI dropdown and for crash report.
         /// </summary>
         public void Write()
         {
-            Write(null, true);
+            Write("Program.options.", true);
         }
 
         /// <summary>
