@@ -2746,6 +2746,40 @@ namespace Gekko
                 return;
             }
 
+            if (text == "bash" && Globals.runningOnTTComputer)
+            {
+                ProcessStartInfo gitInfo = new ProcessStartInfo();
+                Process gitProcess = new Process();
+
+                string command = @"cd c:/Thomas/Gekko/GekkoCS/.git; ./gitstamps.sh";
+                gitInfo.Arguments = "-c \" " + command + " \"";
+
+                /*
+                 * 
+                 * rm gitstamps.txt
+for file in $(git ls-files); do
+    # Get the last commit date for each file
+    last_commit_date=$(git log -1 --format="%ci" -- "$file")
+    echo "$file: $last_commit_date" >> gitstamps.txt
+done
+                 * 
+                 * */
+
+                gitInfo.WorkingDirectory = "c:/Thomas/Gekko/GekkoCS/.git";
+                gitInfo.FileName = "c:\\Program Files\\Git\\git-bash.exe";
+                gitInfo.UseShellExecute = false;
+
+                gitInfo.RedirectStandardOutput = true;
+                gitInfo.RedirectStandardError = true;
+
+                gitProcess.StartInfo = gitInfo;
+                gitProcess.Start();
+                string stderr_str = gitProcess.StandardError.ReadToEnd();  // pick up STDERR
+                string stdout_str = gitProcess.StandardOutput.ReadToEnd(); // pick up STDOUT
+                gitProcess.WaitForExit();
+                gitProcess.Close();
+            }
+
             if (false && Globals.runningOnTTComputer)
             {                
                 string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
