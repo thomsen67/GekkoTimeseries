@@ -2748,36 +2748,47 @@ namespace Gekko
 
             if (text == "bash" && Globals.runningOnTTComputer)
             {
-                ProcessStartInfo gitInfo = new ProcessStartInfo();
-                Process gitProcess = new Process();
+                string name = "gitstampstemporary";
+                string wd = "c:/Thomas/Gekko/GekkoCS/.git";
+                string wdf = wd + "/" + name + ".sh";
 
-                string command = @"cd c:/Thomas/Gekko/GekkoCS/.git; ./gitstamps.sh";
-                gitInfo.Arguments = "-c \" " + command + " \"";
+                try
+                {
+                    ProcessStartInfo gitInfo = new ProcessStartInfo();
+                    Process gitProcess = new Process();
 
-                /*
-                 * 
-                 * rm gitstamps.txt
-for file in $(git ls-files); do
-    # Get the last commit date for each file
-    last_commit_date=$(git log -1 --format="%ci" -- "$file")
-    echo "$file: $last_commit_date" >> gitstamps.txt
-done
-                 * 
-                 * */
+                    string command = @"cd c:/Thomas/Gekko/GekkoCS/.git; ./" + name + ".sh";
+                    gitInfo.Arguments = "-c \" " + command + " \"";                                        
 
-                gitInfo.WorkingDirectory = "c:/Thomas/Gekko/GekkoCS/.git";
-                gitInfo.FileName = "c:\\Program Files\\Git\\git-bash.exe";
-                gitInfo.UseShellExecute = false;
+                    string s = null;
 
-                gitInfo.RedirectStandardOutput = true;
-                gitInfo.RedirectStandardError = true;
+                    if (File.Exists(wdf)) File.Delete(wdf);
+                    s += @"rm " + name + ".txt" + G.NL;
+                    s += @"for file in $(git ls-files -z); do" + G.NL;
+                    s += @"last_commit_date=$(git log -1 --format=""%ci"" -- ""$file"")" + G.NL;
+                    s += @"echo ""$file"" >> " + name + ".txt" + G.NL;
+                    s += @"echo ""$last_commit_date"" >> " + name + ".txt" + G.NL;
+                    s += @"done" + G.NL;
+                    File.WriteAllText(wdf, s);
 
-                gitProcess.StartInfo = gitInfo;
-                gitProcess.Start();
-                string stderr_str = gitProcess.StandardError.ReadToEnd();  // pick up STDERR
-                string stdout_str = gitProcess.StandardOutput.ReadToEnd(); // pick up STDOUT
-                gitProcess.WaitForExit();
-                gitProcess.Close();
+                    gitInfo.WorkingDirectory = wd;
+                    gitInfo.FileName = "c:\\Program Files\\Git\\git-bash.exe";
+                    gitInfo.UseShellExecute = false;
+
+                    gitInfo.RedirectStandardOutput = true;
+                    gitInfo.RedirectStandardError = true;
+
+                    gitProcess.StartInfo = gitInfo;
+                    gitProcess.Start();
+                    string stderr_str = gitProcess.StandardError.ReadToEnd();  // pick up STDERR
+                    string stdout_str = gitProcess.StandardOutput.ReadToEnd(); // pick up STDOUT
+                    gitProcess.WaitForExit();
+                    gitProcess.Close();
+                }
+                finally
+                {
+                    if (File.Exists(wdf)) File.Delete(wdf);
+                }
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -6755,9 +6766,7 @@ done
         {
 
             //Note: file is altered below in several places, including is_a_protobuffer_file stuff
-
             //NOTE: time-truncation is only done at the uppermost level: series or array-series. Stuff inside LIST or MAP is not time-truncated.
-
             //bool mergeOrTimeLimit = oRead.Merge || dates != null;
 
             readInfo.databankVersion = "";
@@ -6781,7 +6790,6 @@ done
             //both protobuffers and tsd files
 
             tsdxFile = file;
-            //file = tempTsdxPath + "\\" + unzippedFile;
             file = tempTsdxPath + "\\" + foundTsdFile;
             string databankVersion = null;
             string traceVersion = null;
