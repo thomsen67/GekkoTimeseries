@@ -28,10 +28,11 @@ namespace Gekko
     public class Databank : IBank
     {
         //Databanks: version 1.0 is tsd inside zip, version 1.1 is using protobuffers,
-        //version 1.2 is for Gekko 3.0.        
+        //           version 1.2 is for Gekko 3.0.        
 
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
-        //Remember new fields in Clear() method and also in G.CloneDatabank()        
+        //Remember new fields in Clear() method and also in G.CloneDatabank()
+        //
         [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage;
 
@@ -39,7 +40,7 @@ namespace Gekko
         public DatabankCacheParams cacheParameters = null;
 
         [ProtoMember(3)]
-        public List<Trace2> traces = null; //when writing, this is where all the Trace's go.
+        public List<Trace2> traces = null; //when writing, this is where all the Trace's go.       
 
         public string name = null;
 
@@ -126,7 +127,6 @@ namespace Gekko
         public string date = null; //must be taken from DatabankInfo.xml, don't use protobuffer
         public bool isDirty = false;  //used to see if en OPEN databank must be re-written. Don't use protobuffer on this field.
         public bool editable = true;  //used to set an OPEN databank as editable. Don't use protobuffer on this field.        
-        public Program.ReadInfo readInfo = null; //contains info from reading the file, among other things info from the XML file. NOTE: do not store it in protobuf!
         public string fileHash = null; //do not store this in protobuf
         public string databankVersion = null; //do not store this in protobuf
 
@@ -424,6 +424,36 @@ namespace Gekko
 
         [ProtoMember(15)]
         public bool trace;
+
+        //The following are not used in IsSame(). They are values from XML file inside .gbk and are stored here. When loading from cache, they are copied from here to the ReadInfo object.
+        //See also ReadInfo class.
+
+        [ProtoMember(16)]
+        public string databankVersion = "";
+        [ProtoMember(17)]
+        public string info1 = null;
+        [ProtoMember(18)]
+        public string date;  
+        [ProtoMember(19)]
+        public string modelName;
+        [ProtoMember(20)]
+        public string modelInfo;
+        [ProtoMember(21)]
+        public string modelDate;
+        [ProtoMember(22)]
+        public string modelSignature;
+        [ProtoMember(23)]
+        public string modelHash;
+        [ProtoMember(24)]
+        public string modelLastSimPeriod;
+        [ProtoMember(25)]
+        public string modelLastSimStamp; 
+        [ProtoMember(26)]
+        public string modelLargestLag; 
+        [ProtoMember(27)]
+        public string modelLargestLead;
+
+        // ================= COMPARE =======================================================
 
         /// <summary>
         /// Tests if one object is equal (equal fields) to another.

@@ -3931,10 +3931,7 @@ namespace Gekko
                 {
                     sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
                 }
-
                 if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
-                //if (print) new Writeln("TTH: Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);            
-
                 double milliseconds = (DateTime.Now - t).TotalMilliseconds;
                 milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
                 string s = G.SecondsFormat(milliseconds);
@@ -6080,13 +6077,6 @@ namespace Gekko
             //file is the "real" system filepath and filename.
             //When we get here, the file is typically already copied (copylocal option)
 
-            //
-            //
-            // !!!!!!!!!!! what about the xml file inside a gbk??
-            // !!!!!!!!!!! maybe store it separately in cache as a normal file
-            //
-            //
-
             Databank databankTemp = new Databank("temporary"); //doing it like this, merging is much easier
 
             //first we (may) look in the protobuffer cache, to see if there is a hit.
@@ -6113,6 +6103,21 @@ namespace Gekko
                     readInfo.startPerInFile = year1;
                     readInfo.endPerInFile = year2;
                     readInfo.variables = databankTemp2.storage.Count;
+                    if (databankTemp2.cacheParameters != null)  //will this ever be false?
+                    {
+                        readInfo.databankVersion = databankTemp2.cacheParameters.databankVersion;
+                        readInfo.info1 = databankTemp2.cacheParameters.info1;
+                        readInfo.date = databankTemp2.cacheParameters.date;
+                        readInfo.modelName = databankTemp2.cacheParameters.modelName;
+                        readInfo.modelInfo = databankTemp2.cacheParameters.modelInfo;
+                        readInfo.modelDate = databankTemp2.cacheParameters.modelDate;
+                        readInfo.modelSignature = databankTemp2.cacheParameters.modelSignature;
+                        readInfo.modelHash = databankTemp2.cacheParameters.modelHash;
+                        readInfo.modelLastSimPeriod = databankTemp2.cacheParameters.modelLastSimPeriod;
+                        readInfo.modelLastSimStamp = databankTemp2.cacheParameters.modelLastSimStamp;
+                        readInfo.modelLargestLag = databankTemp2.cacheParameters.modelLargestLag;
+                        readInfo.modelLargestLead = databankTemp2.cacheParameters.modelLargestLead;
+                    }
                 }
             }
 
@@ -6173,7 +6178,7 @@ namespace Gekko
                     }
                     else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
                     {
-                        ReadGbk(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath);
+                        ReadGbk(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath, cacheParameters);
                     }
                     else if (oRead.Type == EDataFormat.Tsp)
                     {
@@ -6762,7 +6767,7 @@ namespace Gekko
         /// <param name="originalFilePath"></param>
         /// <param name="tsdxFile"></param>
         /// <param name="tempTsdxPath"></param>
-        public static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, string originalFilePathPretty, ref string tsdxFile, ref string tempTsdxPath)
+        public static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, string originalFilePathPretty, ref string tsdxFile, ref string tempTsdxPath, DatabankCacheParams cacheParameters)
         {
 
             //Note: file is altered below in several places, including is_a_protobuffer_file stuff
@@ -6994,6 +6999,25 @@ namespace Gekko
 
             readInfo.startPerResultingBank = readInfo.startPerInFile;
             readInfo.endPerResultingBank = readInfo.endPerInFile;
+
+            //Storing XML info in cache object, so it can be shown if the same gbk is loaded from cache
+
+            if (cacheParameters != null)  //will this ever be false?)
+            {
+                cacheParameters.databankVersion = readInfo.databankVersion;
+                cacheParameters.info1 = readInfo.info1;
+                cacheParameters.date = readInfo.date;
+                cacheParameters.modelName = readInfo.modelName;
+                cacheParameters.modelInfo = readInfo.modelInfo;
+                cacheParameters.modelDate = readInfo.modelDate;
+                cacheParameters.modelSignature = readInfo.modelSignature;
+                cacheParameters.modelHash = readInfo.modelHash;
+                cacheParameters.modelLastSimPeriod = readInfo.modelLastSimPeriod;
+                cacheParameters.modelLastSimStamp = readInfo.modelLastSimStamp;
+                cacheParameters.modelLargestLag = readInfo.modelLargestLag;
+                cacheParameters.modelLargestLead = readInfo.modelLargestLead;
+                //Later on, databank.cacheParameters will be set = cacheParameters
+            }
         }        
 
         /// <summary>
@@ -20167,20 +20191,17 @@ namespace Gekko
                     double hashMs = 0d;
                     DateTime t0 = DateTime.Now;
                     Model modelTemp = Program.ReadParallelModelMaybe(modelHash);
-                                                            
-                    if (true)
+
+                    cacheParameters = new ModelCacheParams();
+                    cacheParameters.option_solve_gauss_reorder = Program.options.solve_gauss_reorder;
+                    if (o.opt_dep != null)
                     {
-                        cacheParameters = new ModelCacheParams();
-                        cacheParameters.option_solve_gauss_reorder = Program.options.solve_gauss_reorder;
-                        if (o.opt_dep != null)
-                        {
-                            //Slack that we do this 2 times... :-(
-                            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(o.opt_dep);
-                            cacheParameters.dep = tup.Item2.ToString();
-                        }
-                        cacheParameters.option_model_gams_dep_current = Program.options.model_gams_dep_current;
-                        cacheParameters.option_model_gams_dep_method = Program.options.model_gams_dep_method;
+                        //Slack that we do this 2 times... :-(
+                        Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(o.opt_dep);
+                        cacheParameters.dep = tup.Item2.ToString();
                     }
+                    cacheParameters.option_model_gams_dep_current = Program.options.model_gams_dep_current;
+                    cacheParameters.option_model_gams_dep_method = Program.options.model_gams_dep_method;
 
                     if (modelTemp != null && modelTemp.modelCommon.cacheParameters.IsSame(cacheParameters))
                     {
@@ -35311,7 +35332,7 @@ namespace Gekko
             catch { };
         }
 
-        [ProtoContract]
+        [ProtoContract]  //Why?: it does not seem ReadInfo is ever protobuffed...
         public class ReadInfo
         {
             public static GekkoTime tStart = GekkoTime.tNull;
@@ -35326,7 +35347,6 @@ namespace Gekko
             public int endPerResultingBank = -12345;
             public int createdVars;
             public int nanCounter;
-
             public double time = 0d;
             public Databank databank = null;
             public bool conversionMessage = false;
@@ -35337,19 +35357,19 @@ namespace Gekko
             public string note = null;
             public string gamsNote = null;
 
-            // ------- from XML
+            // ------- from XML, see also same fields in DatabankCacheParams           
             public string databankVersion = "";
-            public string info1 = null;  //from XML
-            public string date;  //from XML
-            public string modelName;  //from XML
-            public string modelInfo;  //from XML
-            public string modelDate;  //from XML
-            public string modelSignature;  //from XML
-            public string modelHash;  //from XML
-            public string modelLastSimPeriod;  //from XML
-            public string modelLastSimStamp;  //from XML
-            public string modelLargestLag;  //from XML
-            public string modelLargestLead;  //from XML
+            public string info1 = null; 
+            public string date;  
+            public string modelName;
+            public string modelInfo;
+            public string modelDate;
+            public string modelSignature;
+            public string modelHash;  
+            public string modelLastSimPeriod;
+            public string modelLastSimStamp;
+            public string modelLargestLag;
+            public string modelLargestLead;
 
             public void Print()
             {
