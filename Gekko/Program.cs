@@ -51,7 +51,8 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 
 namespace Gekko
-{
+{    
+    
     public enum EMessageBox
     {
         Normal,
@@ -159,6 +160,12 @@ namespace Gekko
         Find,
         Unknown
     }
+
+    public class EquationTextHelper
+    {
+        public bool showTime = false;
+    }
+
 
     /// <summary>
     /// Adds elements if those have not been seen before.
@@ -17379,9 +17386,9 @@ namespace Gekko
 
                 if (ts == null)
                 {
-                    NonSeriesHelper helper = new NonSeriesHelper();
-                    PrintNonSeries(x, null, 0, helper);
-                    helper.Message();
+                    NonSeriesHelper helper2 = new NonSeriesHelper();
+                    PrintNonSeries(x, null, 0, helper2);
+                    helper2.Message();
                     nonSeries++;
                     continue;
                 }
@@ -17417,6 +17424,8 @@ namespace Gekko
             // ========= move this! ================================================
             // ========= move this! ================================================
 
+            EquationTextHelper helper = new EquationTextHelper();
+
             //Print any equations now
             if (originalList != null)
             {
@@ -17428,7 +17437,7 @@ namespace Gekko
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), false);
-                        string eq = Program.model.GetEquationText(new List<string>() { s2 }, false, tUsedHere);
+                        string eq = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
                         if (!eq.EndsWith("."))
                         {
                             using (var txt = new Writeln("", int.MaxValue, Color.Empty, false, ETabs.Main))

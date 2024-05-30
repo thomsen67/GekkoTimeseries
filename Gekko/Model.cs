@@ -182,7 +182,7 @@ namespace Gekko
         /// Helper, for the DECOMP window not the FIND window.
         /// </summary>
         /// <returns></returns>
-        public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0, Model model)
+        public static string GetEquationTextHelper(List<Link>links, EquationTextHelper helper, GekkoTime t0, Model model)
         {
             GekkoTime tUsedHere = t0;
             if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(t0);
@@ -192,7 +192,7 @@ namespace Gekko
             {
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), false));
             }
-            s = model.GetEquationText(eqNames, showTime, t0);
+            s = model.GetEquationText(eqNames, helper, t0);
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
@@ -204,7 +204,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0)
+        public string GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
         {
             bool hit = false;  //if anything is found
             List<string> eqs2 = new List<string>();
@@ -224,7 +224,7 @@ namespace Gekko
                 if (i > 0) sUnfolded += G.NL;
                 if (this.modelGamsScalar != null)
                 {
-                    sUnfolded += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;
+                    sUnfolded += this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0) + G.NL;
                     if (!sUnfolded.Contains(Globals.eqs6)) hit = true;
                 }
                 else
@@ -1000,7 +1000,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public List<string> GetPrecedentsNames(int eqNumber, bool showTime, GekkoTime t0)
+        public List<string> GetPrecedentsNames(int eqNumber, EquationTextHelper helper, GekkoTime t0)
         {
             List<string> precedents = new List<string>();
             foreach (PeriodAndVariable dp in this.precedents[eqNumber].vars)
@@ -1008,7 +1008,7 @@ namespace Gekko
                 //see also #as7f3læaf9                
                 Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod(this);
                 string name2 = null;
-                if (showTime)
+                if (helper.showTime)
                 {
                     name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
                 }
@@ -1678,17 +1678,19 @@ namespace Gekko
             return ts;
         }
 
-        
         /// <summary>
         /// Gets human-readable equation text corresponding to (unfolded) equation name.
         /// Uses equationChunks list, which is only about 1% of full scalar model size.
         /// The result uses the C# code (modified a bit), where stuff like a[b[0]][b[1]] and
-        /// c[d[0]] is replaced with "real" variable[period]. By avoiding storing the full scalar model in human-readable form (up to 1 mio eqs),
+        /// c[d[0]] is replaced with "real" variable[period]. By avoiding storing the full 
+        /// scalar model in human-readable form (up to 1 mio eqs),
         /// a lot of RAM is saved.
         /// </summary>
-        /// <param name="eq"></param>
+        /// <param name="name"></param>
+        /// <param name="showTime"></param>
+        /// <param name="t0"></param>
         /// <returns></returns>
-        public string GetEquationTextUnfolded(string name, bool showTime, GekkoTime t0)
+        public string GetEquationTextUnfolded(string name, EquationTextHelper helper, GekkoTime t0)
         {
             //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
@@ -1799,7 +1801,7 @@ namespace Gekko
                     if (Globals.decompFixTimelessProblem && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
                     string varname = this.GetVarNameA(i2);
                     string varname2 = null;
-                    if (showTime)
+                    if (helper.showTime)
                     {
                         varname2 = G.Chop_DimensionAddLast(varname, gt.ToString());
                     }

@@ -4972,18 +4972,18 @@ namespace Gekko
                 eqsNew.AddRange(eqsNew1a);
                 eqsNew.AddRange(eqsNew2a);
 
-                foreach (EqHelper helper in eqsNew)
+                foreach (EqHelper eqHelper in eqsNew)
                 {
                     lineCounter++;
-                    string eqName = helper.eqName;
-                    string eqName3 = helper.eqNameWithLag;
-
-                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.tSelected);
-
+                    string eqName = eqHelper.eqName;
+                    string eqName3 = eqHelper.eqNameWithLag;
+                    EquationTextHelper helper = new EquationTextHelper();
+                    helper.showTime = o.decompFind.decompOptions2.showTime;
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper, o.tSelected);
                     string bool1 = "";
                     string bool2 = "";
 
-                    if (helper.best) bool1 = Globals.protectSymbol;
+                    if (eqHelper.best) bool1 = Globals.protectSymbol;
                     //bool2 = Globals.protectSymbol;
 
                     string tt = "tx0";
@@ -5017,7 +5017,9 @@ namespace Gekko
                     windowFind.FindSetLabel(variableName);
                     windowFind._activeEquation = firstEqName2;
                     windowFind._activeVariable = null;
-                    windowFind.FindSetEquation(firstEqName2, o.decompFind.decompOptions2.showTime, o.tSelected, model);
+                    EquationTextHelper helper = new EquationTextHelper();
+                    helper.showTime = o.decompFind.decompOptions2.showTime;
+                    windowFind.FindSetEquation(firstEqName2, helper, o.tSelected, model);
                     windowFind.decompFind.SetWindow(windowFind);
                     windowFind.ShowDialog();
                 }

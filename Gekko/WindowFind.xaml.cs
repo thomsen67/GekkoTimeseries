@@ -88,7 +88,9 @@ namespace Gekko
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
         {
             this._activeVariable = null;
-            this.FindSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            EquationTextHelper helper = new EquationTextHelper();
+            helper.showTime = this.decompFind.decompOptions2.showTime;
+            this.FindSetEquation(_activeEquation, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -121,7 +123,9 @@ namespace Gekko
             }
             else
             {
-                this.FindSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.tSelected, decompFind.model);
+                EquationTextHelper helper = new EquationTextHelper();
+                helper.showTime = this.decompFind.decompOptions2.showTime;
+                this.FindSetEquation(_activeEquation, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
             }
         }
 
@@ -188,7 +192,9 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
-            this.FindSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            EquationTextHelper helper = new EquationTextHelper();
+            helper.showTime = this.decompFind.decompOptions2.showTime;
+            this.FindSetButtons(item.fullName, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
             this._activeEquation = item.fullName;
         }
 
@@ -197,7 +203,9 @@ namespace Gekko
             this.windowFindStatusBar.Text = Globals.windowFindStatusBarText;
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;
-            this.FindSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            EquationTextHelper helper = new EquationTextHelper();
+            helper.showTime = this.decompFind.decompOptions2.showTime;
+            this.FindSetButtons(item.fullName, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -205,21 +213,23 @@ namespace Gekko
             this.windowFindStatusBar.Text = "";
             bool showTime = false;
             GekkoTime t0 = this.decompFind.decompOptions2.t1;
-            this.FindSetButtons(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            EquationTextHelper helper = new EquationTextHelper();
+            helper.showTime = this.decompFind.decompOptions2.showTime;
+            this.FindSetButtons(_activeEquation, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
-        private void FindSetButtons(string eqName, bool showTime, GekkoTime t0, Model model)
+        private void FindSetButtons(string eqName, EquationTextHelper helper, GekkoTime t0, Model model)
         {
-            this.FindSetEquation(eqName, showTime, t0, model);
+            this.FindSetEquation(eqName, helper, t0, model);
             int eqNumber = model.modelGamsScalar.GetEqNumber(eqName);
-            List<string> precedents = model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
+            List<string> precedents = model.modelGamsScalar.GetPrecedentsNames(eqNumber, helper, t0);
             this.FindSetButtons(eqName, precedents, model);
         }
 
-        public void FindSetEquation(string eq, bool showTime, GekkoTime t0, Model model)
+        public void FindSetEquation(string eq, EquationTextHelper helper, GekkoTime t0, Model model)
         {
-            string s = model.GetEquationText(new List<string>() { eq }, showTime, t0);
+            string s = model.GetEquationText(new List<string>() { eq }, helper, t0);
             WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s));
         }
 

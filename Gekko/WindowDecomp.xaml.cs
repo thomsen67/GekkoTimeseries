@@ -1531,9 +1531,11 @@ namespace Gekko
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
                 string s = null;
+                EquationTextHelper helper = new EquationTextHelper();
+                helper.showTime = this.decompFind.decompOptions2.showTime;
                 if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
                 {
-                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, this.decompFind.model);
+                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, helper, this.decompFind.decompOptions2.t1, this.decompFind.model);
                 }
                 else
                 {
@@ -1832,7 +1834,9 @@ namespace Gekko
                     string s = null;
                     if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
                     {
-                        s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, this.decompFind.model);
+                        EquationTextHelper helper = new EquationTextHelper();
+                        helper.showTime = this.decompFind.decompOptions2.showTime;
+                        s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, helper, this.decompFind.decompOptions2.t1, this.decompFind.model);
                     }
                     else
                     {
@@ -1961,8 +1965,10 @@ namespace Gekko
 
             string s = null;            
             if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
-            {                
-                s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, model);                
+            {
+                EquationTextHelper helper = new EquationTextHelper();
+                helper.showTime = this.decompFind.decompOptions2.showTime;
+                s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, helper, this.decompFind.decompOptions2.t1, model);                
             }
             else
             {
