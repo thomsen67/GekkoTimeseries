@@ -10435,6 +10435,55 @@ namespace UnitTests
             I("option bugfix dates = no;");
             FAIL("x1 <2003 2001> = x2;");  //Probably internal error
             FAIL("x1 <2003 2001> = 100;");  //Probably fails because of a trace error
+
+            // =========== another similar bugfix ===================
+
+
+            I("reset;");
+            I("option databank trace = yes;");
+            I("option freq q;");
+            I("time 2001q1 2003q4;");
+            I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
+            I("%qslut = 2004q1;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
+            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
+            I("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
+            _AssertSeries(First(), "iy!q", EFreq.Q, 2003, 4, 24d, sharedDelta);
+            _AssertSeries(First(), "iy!q", EFreq.Q, 2004, 1, 24d, sharedDelta);
+
+            I("reset;");
+            I("option databank trace = yes;");
+            I("option freq q;");
+            I("time 2001q1 2003q4;");
+            I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
+            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
+            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
+            //Below will be 2004q1 to 2003q4 which is invalid
+            FAIL("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
+
+            I("reset;");
+            I("option databank trace = no;");
+            I("option freq q;");
+            I("time 2001q1 2003q4;");
+            I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
+            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
+            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
+            //Below will be 2004q1 to 2003q4 which is invalid
+            //Before bugfix this would set iy!q[2004q1] = 2004, even though end period is 2003q4. BAD!
+            I("option bugfix dates = no;");
+            I("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
+
+            I("reset;");
+            I("option databank trace = no;");
+            I("option freq q;");
+            I("time 2001q1 2003q4;");
+            I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
+            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
+            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
+            //Below will be 2004q1 to 2003q4 which is invalid
+            //Before bugfix this would set iy!q[2004q1] = 2004, even though end period is 2003q4. BAD!
+            I("option bugfix dates = yes;");
+            FAIL("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
+
         }
 
         [TestMethod]
