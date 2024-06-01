@@ -164,6 +164,7 @@ namespace Gekko
     public class EquationTextHelper
     {
         public bool showTime = false;
+        public bool showEq = true;
     }
 
 

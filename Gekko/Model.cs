@@ -1834,7 +1834,13 @@ namespace Gekko
                     sb.Append(tokens[i].ToString());
                 }                
             }
-            return sb.ToString().Trim();
+            string sEq = null;
+            if (helper.showEq)
+            {
+                sEq = "/* " + name + " */ ";
+                sEq = name + " .. ";
+            }
+            return sEq + sb.ToString().Trim();
         }
 
         public string GamsModelDefinedString()
