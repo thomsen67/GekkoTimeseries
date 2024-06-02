@@ -10417,7 +10417,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Invalid_Period()
-        {
+        {            
             I("reset;");
             FAIL("time 2003 2001;");
             I("time 2001 2003;");
@@ -10438,10 +10438,9 @@ namespace UnitTests
 
             // =========== another similar bugfix ===================
 
-
             I("reset;");
-            I("option databank trace = yes;");
             I("option freq q;");
+            I("option databank trace = yes;");            
             I("time 2001q1 2003q4;");
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
             I("%qslut = 2004q1;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
@@ -10451,39 +10450,34 @@ namespace UnitTests
             _AssertSeries(First(), "iy!q", EFreq.Q, 2004, 1, 24d, sharedDelta);
 
             I("reset;");
-            I("option databank trace = yes;");
             I("option freq q;");
+            I("option databank trace = yes;");            
             I("time 2001q1 2003q4;");
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
             I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
-            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
             //Below will be 2004q1 to 2003q4 which is invalid
+            FAIL("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
+            
+            I("reset;");
+            I("option freq q;");
+            I("option databank trace = no;");            
+            I("time 2001q1 2003q4;");
+            I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
+            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
+            //Below will be 2004q1 to 2003q4 which is invalid. Before, for Gekko <= 3.1.19, this would set iy!q[2004q1] = 2004, even though end period is 2003q4. That was BAD!
             FAIL("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
 
             I("reset;");
-            I("option databank trace = no;");
             I("option freq q;");
-            I("time 2001q1 2003q4;");
-            I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
-            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
-            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
-            //Below will be 2004q1 to 2003q4 which is invalid
-            //Before bugfix this would set iy!q[2004q1] = 2004, even though end period is 2003q4. BAD!
             I("option bugfix dates = no;");
-            I("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
-
-            I("reset;");
             I("option databank trace = no;");
-            I("option freq q;");
             I("time 2001q1 2003q4;");
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
-            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
-            I("prt work:iy!q.fromSeries('dataEnd')+1, %qslut;");
-            //Below will be 2004q1 to 2003q4 which is invalid
-            //Before bugfix this would set iy!q[2004q1] = 2004, even though end period is 2003q4. BAD!
-            I("option bugfix dates = yes;");
-            FAIL("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
-
+            I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no            
+            //Below will be 2004q1 to 2003q4 which is invalid, but option bugfix dates = no makes it work like it did in Gekko <= 3.1.19.
+            I("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");  //erroneous but accepted
+            _AssertSeries(First(), "iy!q", EFreq.Q, 2003, 4, 24d, sharedDelta);
+            _AssertSeries(First(), "iy!q", EFreq.Q, 2004, 1, 24d, sharedDelta);
         }
 
         [TestMethod]

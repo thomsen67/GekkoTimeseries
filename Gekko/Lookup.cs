@@ -1278,11 +1278,13 @@ namespace Gekko
 
                     if (Program.options.bugfix_dates)
                     {
-                        bool b = false;                        
+                        bool b = false;
 
+                        GekkoTime tEnd = GekkoTime.tNull;
                         try
                         {
-                            b = smpl.t1.StrictlyLargerThan(smpl.t2);
+                            tEnd = GetTEnd(smpl.t2, smpl.t3, G.Equal(o.opt_dyn, "yes"));
+                            b = smpl.t1.StrictlyLargerThan(tEnd);
                         }
                         catch
                         {
@@ -1295,7 +1297,7 @@ namespace Gekko
                         {
                             using (Error txt = new Error())
                             {
-                                txt.MainAdd("Invalid date interval " + smpl.t1.ToString() + "-" + smpl.t2.ToString() + " detected in series statement. Start period must be <= end period.");
+                                txt.MainAdd("Invalid date interval " + smpl.t1.ToString() + "-" + tEnd + " detected in series statement. Start period must be <= end period.");
                                 txt.MoreAdd("If you are upgrading from a Gekko version < 3.1.19 to a");
                                 txt.MoreAdd("Gekko version >= 3.1.19, this error may come out of the blue. It would be best to fix the error, but");
                                 txt.MoreAdd("if this turns problematic or cumbersome, as a workaround you may set 'OPTION bugfix dates = no;' in order to");
@@ -1754,11 +1756,7 @@ namespace Gekko
                     {
                         if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
                         // ---------
-                        GekkoTime tEnd = t2;
-                        if (G.Equal(o.opt_dyn, "yes"))
-                        {
-                            tEnd = t3;
-                        }
+                        GekkoTime tEnd = GetTEnd(t2, t3, G.Equal(o.opt_dyn, "yes"));
                         Trace2 trace = new Trace2(ETraceType.Normal, t1, tEnd);  //if <dyn>, only the first of the iterations will have a trace, and this trace has to be modified regarding end period.
                         string b = null;
                         if (databank != null) b = databank.GetName() + Globals.symbolBankColon;
@@ -1767,7 +1765,7 @@ namespace Gekko
                         trace.GetContents().text = traceString + ";";
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                         if (Globals.traceContainer != null && Globals.traceContainer.Count() > 0)
-                        {                            
+                        {
                             int counter1 = -1;
                             foreach (IVariable iv in Globals.traceContainer.GetList())
                             {
@@ -1789,7 +1787,18 @@ namespace Gekko
                 }                
             }            
         }
-        
+
+        private static GekkoTime GetTEnd(GekkoTime t2, GekkoTime t3, bool dyn)
+        {
+            GekkoTime tEnd = t2;
+            if (dyn)
+            {
+                tEnd = t3;
+            }
+
+            return tEnd;
+        }
+
         private static void LookupHandleMetaStuff(Series lhs_series, bool isArraySubSeries, Assignment o)
         {
             if (!isArraySubSeries)
