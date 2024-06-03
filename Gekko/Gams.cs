@@ -1302,12 +1302,12 @@ namespace Gekko
                 new Writeln("END ASTNODES -- " + G.Seconds(tt0));
                 if (errors.Count > 0)
                 {
-                    new Warning("GAMS parse error");
+                    G.Warning("6.1", "");
                 }
             }
             catch (Exception e)
             {
-                new Warning("GAMS other error");
+                G.Warning("6.2", "");
             }
         }
 
@@ -2432,11 +2432,10 @@ namespace Gekko
                 if (eqs == null || eqs.Count == 0)
                 {
                     new Error("Variable '" + varname + "' was not found");
-                    //throw new GekkoException();
                 }
                 if (eqs.Count > 1)
                 {
-                    new Warning("Variable '" + varname + "' appears in several equations, first one is picked");
+                    G.Warning("7.1", "Variable '" + varname + "' appears in several equations, first one is picked");
                 }
                 found = eqs[0];  //#820948324: pick the first one, a variable name may point to several equations, for instance if y is present on the lhs in several equations.
             }

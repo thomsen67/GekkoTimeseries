@@ -1608,12 +1608,7 @@ namespace Gekko.Parser.Frm
         }
 
         private static void PrintEquationCodeWarning(EquationHelper eh)
-        {
-            if (false)
-            {
-                //Probably no need to report these
-                new Warning("Equation type set to _I for this equation:" + G.NL + eh.equationText);
-            }
+        {            
             return;
         }
 

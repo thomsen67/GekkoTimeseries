@@ -986,7 +986,7 @@ namespace Gekko
                                 if (G.Equal(s5, name))
                                 {
                                     //Can happen in libraries
-                                    new Warning("Beware that user " + G.FromLibraryToFunctionProcedureName(Globals.procedure + name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
+                                    G.Warning("9.1", "Beware that user " + G.FromLibraryToFunctionProcedureName(Globals.procedure + name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
                                 }
                             }
                         }

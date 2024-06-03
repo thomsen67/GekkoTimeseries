@@ -43,7 +43,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                new Warning("The .json file does not seem correctly formatted. " + e.Message);
+                G.Warning("4.1", "The .json file does not seem correctly formatted. " + e.Message);
             }
 
             // -------------------------------------------------------------

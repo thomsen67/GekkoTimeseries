@@ -954,7 +954,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Warning("PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
+                    G.Warning("14.1", "PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
                 }
             }
 
