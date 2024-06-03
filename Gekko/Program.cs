@@ -274,7 +274,7 @@ namespace Gekko
             int n = 0; if (wi != null) n = wi.storage.Count;
 
             bool add = false;
-            bool print = Program.options.global_warnings_print;
+            bool print = Program.options.global_warnings_print;  //normally true
             int popup = 0;  //1:normal popup, 2:find-popup.
 
             if (Program.options.global_warnings_limit >= 0)
@@ -283,15 +283,21 @@ namespace Gekko
                 {
                     add = true;
                 }
+                else
+                {
+                    print = false;
+                }
             }
-            else if (Program.options.global_warnings_limit == -1)  //show all, same as int.MaxValue
+            else if (Program.options.global_warnings_limit == -1)  //add/print all, same as int.MaxValue
             {
                 add = true;
+                print = true;
             }
             else if (Program.options.global_warnings_limit == -2)  //pause each
             {
                 popup = 1;
                 add = true;
+                print = true;
             }
             else
             {

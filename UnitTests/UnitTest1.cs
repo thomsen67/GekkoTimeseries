@@ -10393,116 +10393,42 @@ namespace UnitTests
         [TestMethod]
         public void _Test_WarningPool()
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
-                if (true)
-                {
-                    I("reset;"); Program.options = new Options();  //no resurrection!
-                    if (i == 1) Program.options.global_warnings_print = false;
-                    else if (i == 2) Program.options.global_warnings_limit = 4;
-                    Globals.warningPool = new WarningPool();
-                    Globals.unitTestScreenOutput.Clear();
-                    Globals.warningPool = new WarningPool();
-                    I("warning(1);");  //special function for unit tests
-                    Assert.AreEqual(5, Globals.warningPool.storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count); //2 identical are added, 1 stored
-                    Assert.AreEqual(2, Globals.warningPool.storage["1.3"].storage.Count);
-                    Globals.warningPool.Report();
-                    Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 6 distinct WARNING messages"));
-                    if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                    else Assert.AreEqual(7, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                }
 
-                if (true)
+                int limit = 4;
+                I("reset;"); Program.options = new Options();  //no resurrection!
+                Globals.warningPool = new WarningPool();
+                if (i == 1) Program.options.global_warnings_print = false;
+                else if (i == 2) Program.options.global_warnings_limit = limit;
+                else if (i == 3)
                 {
-                    I("reset;"); Program.options = new Options();  //no resurrection!
-                    if (i == 1) Program.options.global_warnings_print = false;
-                    else if (i == 2) Program.options.global_warnings_limit = 4;
-                    Globals.warningPool = new WarningPool();
-                    Globals.unitTestScreenOutput.Clear();
-                    Globals.warningPool = new WarningPool();
-                    I("warning(2);");
-                    Assert.AreEqual(5, Globals.warningPool.storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count); //2 identical are added, 1 stored
-                    if (i == 2) Assert.AreEqual(4, Globals.warningPool.storage["1.3"].storage.Count);
-                    else Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.
-                    Globals.warningPool.Report();
-                    if (i == 2) Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 8 distinct WARNING messages"));
-                    else Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 9 distinct WARNING messages"));
-                    if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                    else Assert.AreEqual(12, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+                    Program.options.global_warnings_ignore = "2, 1.2";
+                    Globals.warningPool.GetIgnores();
                 }
-
-                if (true)
-                {
-                    I("reset;"); Program.options = new Options();  //no resurrection!
-                    if (i == 1) Program.options.global_warnings_print = false;
-                    else if (i == 2) Program.options.global_warnings_limit = 4;
-                    Globals.warningPool = new WarningPool();
-                    Globals.unitTestScreenOutput.Clear();
-                    Globals.warningPool = new WarningPool();
-                    Program.options.global_warnings_ignore = "2.2, 1.2"; Globals.warningPool.GetIgnores();
-                    I("warning(2);");
-                    Assert.AreEqual(3, Globals.warningPool.storage.Count);
-                    Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-                    Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.2"));
-                    Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-                    Assert.IsFalse(Globals.warningPool.storage.ContainsKey("1.2"));
-                    if (i == 2) Assert.AreEqual(4, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.
-                    else Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.
-                    Globals.warningPool.Report();
-                    if (i == 2)
-                    {
-                        Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 6 distinct WARNING messages"));
-                        if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                        if (i == 2) Assert.AreEqual(9, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                        else Assert.AreEqual(8, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                    }
-                    else
-                    {
-                        Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 7 distinct WARNING messages"));
-                        if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                        else Assert.AreEqual(9, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                    }
-                }
-
-                if (true)
-                {
-                    I("reset;"); Program.options = new Options();  //no resurrection!
-                    if (i == 1) Program.options.global_warnings_print = false;
-                    else if (i == 2) Program.options.global_warnings_limit = 4;
-                    Globals.warningPool = new WarningPool();
-                    Globals.unitTestScreenOutput.Clear();
-                    Globals.warningPool = new WarningPool();
-                    Program.options.global_warnings_ignore = "2, 1.2"; Globals.warningPool.GetIgnores();
-                    I("warning(2);");
-                    Assert.AreEqual(2, Globals.warningPool.storage.Count);                    
-                    Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.1"));
-                    Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.2"));
-                    Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-                    Assert.IsFalse(Globals.warningPool.storage.ContainsKey("1.2"));
-                    if (i == 2) Assert.AreEqual(4, Globals.warningPool.storage["1.3"].storage.Count);//is pruned off at 5, even though 6 are added.
-                    else Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count);//is pruned off at 5, even though 6 are added.
-                    Globals.warningPool.Report();
-                    if (i == 2)
-                    {
-                        Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 5 distinct WARNING messages"));
-                        if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                        else Assert.AreEqual(8, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                    }
-                    else
-                    {
-                        Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 6 distinct WARNING messages"));
-                        if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                        else Assert.AreEqual(8, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
-                    }
-                }
+                Globals.unitTestScreenOutput.Clear();
+                I("warning(2);");
+                if (i == 3) Assert.AreEqual(2, Globals.warningPool.storage.Count);
+                else Assert.AreEqual(5, Globals.warningPool.storage.Count);
+                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.1"));
+                else Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
+                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.2"));
+                else Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
+                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("1.2"));
+                else Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count); //2 identical are added, 1 stored                    
+                if (i == 2) Assert.AreEqual(limit, Globals.warningPool.storage["1.3"].storage.Count);
+                else Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.                    
+                Globals.warningPool.Report();
+                //There are 9 and 8 and 6 here: one completely identical message does not get into dict
+                if (i == 2) Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 8 distinct WARNING messages"));
+                else if (i == 3) Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 6 distinct WARNING messages"));
+                else Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 9 distinct WARNING messages"));
+                //There are 9+1 and 8+1 and 6 here: one completely identical message is printed even though it has been printed before. Here: 6 and not 6+1 because of dublet not stored in pool.
+                if (i == 0) Assert.AreEqual(10, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+                else if (i == 1) Assert.AreEqual(0, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+                else if (i == 3) Assert.AreEqual(6, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+                else Assert.AreEqual(9, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
             }
         }
 
