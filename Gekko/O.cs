@@ -904,7 +904,7 @@ namespace Gekko
             }
             else if (G.Equal(s2, "global_warnings_ignore"))
             {
-                CrossThreadStuff.WarningsIgnore();
+                //CrossThreadStuff.WarningsIgnore();
             }
             else if (G.Equal(s2, "folder_working"))
             {

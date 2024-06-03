@@ -258,64 +258,88 @@ namespace Gekko
 
         /// <summary>
         /// The info string may be null. Else info is small warning information bit, like left-hand side variable etc. Should be rather small in size.
+        /// First argument always "x.y"! 
         /// </summary>
         /// <param name="s"></param>
         /// <param name="info"></param>
         public void WAdd(string s, string info)  //WAdd() so it is easier to find by search like .Wadd("1.1"
         {
-            this.counter++;
-            WarningInfo wi = null;
-            this.storage.TryGetValue(s, out wi);
-            if (wi == null)
-            {
-                wi = new WarningInfo();
-                wi.storage.Add(info, counter);
-                this.storage.Add(s, wi);
-            }
-            else
-            {
-                if (!wi.storage.ContainsKey(info))
-                {
-                    wi.storage.Add(info, counter);
-                }
-                else
-                {
-                    //already seen
-                }
-            }
 
             // ============= Limits ====================================
 
-            bool print = false;
+            this.counter++;
+            WarningInfo wi = null;
+            this.storage.TryGetValue(s, out wi);
+            int n = 0; if (wi != null) n = wi.storage.Count;
+
+            bool add = false;
+            bool print = Program.options.global_warnings_print;
             int popup = 0;  //1:normal popup, 2:find-popup.
 
             if (Program.options.global_warnings_limit >= 0)
             {
-                if (wi.storage.Count <= Program.options.global_warnings_limit)  //limit like e.g. 5
+                if (n < Program.options.global_warnings_limit)  //limit like e.g. 5
                 {
-                    print = true;
+                    add = true;
                 }
             }
             else if (Program.options.global_warnings_limit == -1)  //show all, same as int.MaxValue
             {
-                print = true;
+                add = true;
             }
             else if (Program.options.global_warnings_limit == -2)  //pause each
             {
                 popup = 1;
+                add = true;
             }
             else
             {
                 new Error("Expected option global warnings limit to be >= -2.");
+            }            
+
+            if (!G.NullOrBlanks(Program.options.global_warnings_pauseat) && G.Contains(s, Program.options.global_warnings_pauseat))
+            {                
+                popup = 2;  //overrides any popup == 1
             }
 
-            if (!G.NullOrBlanks(Program.options.global_warnings_find) && G.Contains(s, Program.options.global_warnings_find))
+            if (this.ignore.ContainsKey(s))
             {
-                print = true;
-                popup = 2;  //overrides any popup = 1
+                add = false;
+                print = false;
             }
 
+            // ------------------------------------------------
+            // ------------------------------------------------
+            // ------------------------------------------------
 
+            if (add)
+            {
+                if (wi == null)
+                {
+                    wi = new WarningInfo();
+                    wi.storage.Add(info, counter);
+                    this.storage.Add(s, wi);
+                }
+                else
+                {
+                    if (!wi.storage.ContainsKey(info))
+                    {
+                        wi.storage.Add(info, counter);
+                    }
+                    else
+                    {
+                        //already seen
+                    }
+                }
+            }
+
+            if (print)
+            {
+                string w1, w2;
+                this.GetText(s, null, out w1, out w2);
+                string warningText = w1 + " " + w2 + " " + info;
+                new Warning(warningText);
+            }
 
             if (popup == 1)
             {
@@ -326,16 +350,33 @@ namespace Gekko
             else if (popup == 2)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_find + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
+                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pauseat + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }
-
-
             
             //ignore
             //limit (maybe print all, maybe pause all)
-            //find
-            
+            //find            
+        }
+
+        public void GetIgnores()
+        {
+            if (!G.NullOrBlanks(Program.options.global_warnings_ignore))
+            {
+                string[] ss = Program.options.global_warnings_ignore.Split(',');
+                Dictionary<string, bool> ignore = new Dictionary<string, bool>();
+                foreach (string s2 in ss)
+                {
+                    string s = s2.Trim();
+                    //Element must be something like "2" or "2.3".
+                    if (G.NullOrBlanks(s)) new Error("Empty element: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    if (s.Split('.').Length - 1 > 1) new Error("Element '" + s + "' with > 1 dots ('.'): option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    if (!G.IsInteger(s.Replace(".", ""))) new Error("Invalid element '" + s + "': option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    if (ignore.ContainsKey(s)) new Error("Dublets encountered: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    ignore.Add(s, false);
+                }
+                this.ignore = ignore;  //at the moment, option global warning ignore = ... can only be set in a gekko.ini next to Gekko.exe. So when this method is run, Globals.warningPool i brand new. And Globals.warningPool.ignore will not be changed until Gekko is closed and reopened.
+            }
         }
 
         public void Report() 
@@ -352,7 +393,8 @@ namespace Gekko
                 //"File problem in line 117 pos 10".
 
                 using (Writeln txt = new Writeln())
-                {                                        
+                {
+                    txt.color = Globals.warningColor;
                     Dictionary<string, bool> level2Numbers = new Dictionary<string, bool>();
 
                     foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
@@ -385,7 +427,7 @@ namespace Gekko
                         n += kvp.Value.storage.Count;
                     }
 
-                    txt.MainAdd("There were " + n + " WARNING messages while running the job (" + G.GetLinkAction("show messages", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
+                    txt.MainAdd("There were " + n + " distinct WARNING messages while running the job (" + G.GetLinkAction("show messages", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
                 }
             }
         }
@@ -404,19 +446,17 @@ namespace Gekko
                 List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList(); //sort chronologically                            
                 if (showId)
                 {
-                    txt3.MainAdd("For instance: option global warnings ignore = '3.5, 3.6, 5, 7.1';. See under {a{option¤option.htm}a}.");
-                    txt3.MainNewLineTight();
-                    txt3.MainAdd("(These id numbers have no significance and are quite arbitrary).");
+                    txt3.MainAdd("Turn off particular warning id's with syntax like this: option global warnings ignore = '3.5, 3.6, 5, 7.1';. See {a{option¤option.htm}a}.");
                 }
                 else
                 {
-                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers (you may use id's to ignore warnings: option global warnings ignore = ... ).");
+                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers (you may use id's to turn off particular warnings).");
                 }
                 txt3.MainNewLine();
                 foreach (WarningPoolHelper wph in m2)
                 {
                     string[] ss = wph.s.Split('¤');
-                    if (showId) txt3.MainAdd(ss[0] + " [id = " + ss[1] + "]");
+                    if (showId) txt3.MainAdd(ss[1] + ": " + ss[0]);
                     else txt3.MainAdd(ss[0]);
                     txt3.MainNewLineTight();
                 }
@@ -487,7 +527,8 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Small warning information bits, like left-hand side variable etc. Should be rather small in size.
+    /// Small warning information bits, like left-hand side variable etc. The added strings should be rather small in size. 
+    /// When adding, at counter is added as value (always increment by 1). This is for easier sorting when reporting.
     /// </summary>
     public class WarningInfo
     {
@@ -3187,39 +3228,7 @@ namespace Gekko
                 return;
             }
             if (nocr) G.Write(text);
-            else G.Writeln(text);
-
-            if (G.IsUnitTesting() || Globals.runningOnTTComputer)
-            {
-                //Do not delete: used in unit tests
-                if (text == "warningpool")
-                {
-                    Globals.warningPool = new WarningPool();
-                    G.Warning("2.1", "More more more");
-                    G.Warning("2.2", "Extra extra extra");
-                    G.Warning("1.1", "Add add");
-                    G.Warning("1.2", "Put put");
-                    G.Warning("1.3", "Put put");
-                    G.Warning("1.2", "put put"); //does not get added
-                    G.Warning("1.3", "Put put variation"); //gets added
-                }
-                else if (text == "warningpool1")
-                {
-                    Globals.warningPool = new WarningPool();
-                    G.Warning("2.1", "More more more");
-                    G.Warning("2.2", "Extra extra extra");
-                    G.Warning("1.1", "Add add");
-                    G.Warning("1.2", "Put put");
-                    G.Warning("1.3", "Put put");
-                    G.Warning("1.2", "put put"); //does not get added
-                    G.Warning("1.3", "Put put variation1"); //gets added
-                    G.Warning("1.3", "Put put variation2"); //gets added
-                    G.Warning("1.3", "Put put variation3"); //gets added
-                    G.Warning("1.3", "Put put variation4"); //gets added
-                    G.Warning("1.3", "Put put variation5"); //gets added
-                    G.Warning("1.3", "Put put variation6"); //does not get added, > 5.
-                }
-            }
+            else G.Writeln(text);            
         }        
 
         /// <summary>
@@ -7727,13 +7736,11 @@ namespace Gekko
                 readInfo.variables = counter;
                 if (emptyWarnings > 0)
                 {
-                    if (Globals.useNewWarningPool) G.Warning("2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
-                    else new Warning("Tsd file reading. Empty string. " + emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
+                    G.Warning("2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");                    
                 }
                 if (smallWarnings > 0)
                 {
-                    if (Globals.useNewWarningPool) G.Warning("2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
-                    else new Warning("Tsd file reading. Small number. " + smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                    G.Warning("2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
                 }
             }
         }
@@ -25530,7 +25537,7 @@ namespace Gekko
             bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
             string global_warnings_ignore_REMEMBER = Program.options.global_warnings_ignore;
             int global_warnings_limit_REMEMBER = Program.options.global_warnings_limit;
-            string global_warnings_pause_REMEMBER = Program.options.global_warnings_find;
+            string global_warnings_stopat_REMEMBER = Program.options.global_warnings_pauseat;
 
             // ------------------------------------------------------
             Program.options = new Options();  //resetting these
@@ -25549,7 +25556,7 @@ namespace Gekko
 
             Program.options.global_warnings_ignore = global_warnings_ignore_REMEMBER;
             Program.options.global_warnings_limit = global_warnings_limit_REMEMBER;
-            Program.options.global_warnings_find = global_warnings_pause_REMEMBER;
+            Program.options.global_warnings_pauseat = global_warnings_stopat_REMEMBER;
 
             // ------------------------------------------------------
 

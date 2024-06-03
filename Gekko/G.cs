@@ -2228,6 +2228,20 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Counts occurrences of string 'inside' inside 's'. Case-insensitive.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="inside"></param>
+        /// <returns></returns>
+        public static int Count(string s, string inside)
+        {
+            if (G.NullOrBlanks(s) == null) return 0;
+            if (G.NullOrBlanks(inside) == null) return 0;
+            int n = s.ToLower().Split(new string[] { inside.ToLower() }, StringSplitOptions.None).Length - 1;
+            return n;
+        }
+
+        /// <summary>
         /// Helper method for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
         /// </summary>
         /// <param name="strA"></param>

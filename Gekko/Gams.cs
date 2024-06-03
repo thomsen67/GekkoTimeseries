@@ -2201,8 +2201,7 @@ namespace Gekko
 
                 if (iEqual == -12345)
                 {
-                    if (Globals.useNewWarningPool) G.Warning("1.1", "GAMS file: " + tok.Offset(i).LineAndPosText());
-                    else new Warning("GAMS raw model file reading. Could not find '=e=' in eq def. GAMS file: " + tok.Offset(i).LineAndPosText());
+                    G.Warning("1.1", "GAMS file: " + tok.Offset(i).LineAndPosText());                    
                     return eqCounter;
                 }
 
@@ -2212,8 +2211,7 @@ namespace Gekko
 
                 if (iSemi == -12345)
                 {
-                    if (Globals.useNewWarningPool) G.Warning("1.2", "GAMS file: " + tok.Offset(i).LineAndPosText());
-                    else new Warning("GAMS raw model file reading. Could not find ending ';' in eq def. GAMS file: " + tok.Offset(i).LineAndPosText());
+                    G.Warning("1.2", "GAMS file: " + tok.Offset(i).LineAndPosText());                    
                     return eqCounter;
                 }
 
@@ -2298,8 +2296,7 @@ namespace Gekko
             catch
             {
                 //Hopefully will not happen, but more so a bad line does not crash the whole thing
-                if (Globals.useNewWarningPool) G.Warning("1.7", "Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());
-                else new Warning("GAMS raw model file reading. Parsing error. Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());
+                G.Warning("1.7", "Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());                
                 return eqCounter;
             }
 
@@ -2334,27 +2331,23 @@ namespace Gekko
                 if (eqnameGams.Contains("__"))
                 {
                     //new Error("Eqname '" + eqnameGams + "': did not expect '__' substring in name");
-                    if (Globals.useNewWarningPool) G.Warning("1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");
-                    else new Warning("GAMS raw model file reading. Eq name with '__'. Eqname '" + eqnameGams + "': did not expect '__' substring in name");
+                    G.Warning("1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");                    
                 }
                 string[] ss = eqnameGams.Split('_');
                 if (ss.Length <= 1)
                 {
                     //new Error("Eqname '" + eqnameGams + "': did not find any '_' separators");
-                    if (Globals.useNewWarningPool) G.Warning("1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");
-                    else new Warning("GAMS raw model file reading. Eq name without '_'. Eqname '" + eqnameGams + "': did not find any '_' separators");
+                    G.Warning("1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");                    
                 }
                 if (!G.Equal(ss[0], "e"))
                 {
                     //new Error("Eqname '" + eqnameGams + "': expected it to start with 'e_'");
-                    if (Globals.useNewWarningPool) G.Warning("1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");
-                    else new Warning("GAMS raw model file reading. Eq name with no 'e_'. Eqname '" + eqnameGams + "': expected it to start with 'e_'");
+                    G.Warning("1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");                    
                 }
                 if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
                 {
                     //new Error("Eqname '" + eqnameGams + "': could not resolve variable name");
-                    if (Globals.useNewWarningPool) G.Warning("1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
-                    else new Warning("GAMS raw model file reading. Eq name invalid. Eqname '" + eqnameGams + "': could not resolve variable name");
+                    G.Warning("1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");                    
                 }
                 lhs = ss[1];
             }

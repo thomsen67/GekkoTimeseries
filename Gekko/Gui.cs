@@ -1723,10 +1723,9 @@ namespace Gekko
             //TODO: Really this stuff should be stored in the P object, instead of here
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
-            
-            Dictionary<string, bool> ignore = Globals.warningPool.ignore;
+                        
             Globals.warningPool = new WarningPool();  //This is for warnings that may be large in numbers and are assembled here. We do not make a new pool after RESET/RESTART!
-            Globals.warningPool.ignore = ignore;  //ressurect it!
+            Globals.warningPool.GetIgnores();
 
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
@@ -2005,16 +2004,11 @@ namespace Gekko
             if (Globals.numberOfWarnings + Globals.numberOfErrors > 0)
             {
                 G.Writeln();
-                if (Globals.numberOfErrors > 0)
+                if (Globals.numberOfErrors > 0 || Globals.numberOfSkippedLines > 0)
                 {
                     if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the job");
                     else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the job");
-                }
-                if (Globals.numberOfWarnings > 0)
-                {
-                    if (Globals.numberOfWarnings == 1) G.Writeln("There was " + Globals.numberOfWarnings + " WARNING message while running the job");
-                    else G.Writeln("There were " + Globals.numberOfWarnings + " WARNING messages while running the job");
-                }
+                }                
                 if (Globals.numberOfSkippedLines > 0)
                 {
                     if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the job");

@@ -10391,27 +10391,62 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Warning()
+        public void _Test_WarningPool()
         {
-            Globals.warningPool = new WarningPool();
-            I("tell 'warningpool';");
-            Assert.AreEqual(5, Globals.warningPool.storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count);
-            Assert.AreEqual(2, Globals.warningPool.storage["1.3"].storage.Count);
-            Globals.warningPool.Report();
+            if (true)
+            {
+                I("reset;");
+                Globals.warningPool = new WarningPool();
+                Globals.unitTestScreenOutput.Clear();
+                Globals.warningPool = new WarningPool();
+                I("warning(1);");  //special function for unit tests
+                Assert.AreEqual(5, Globals.warningPool.storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count); //2 identical are added, 1 stored
+                Assert.AreEqual(2, Globals.warningPool.storage["1.3"].storage.Count);
+                Globals.warningPool.Report();
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 6 distinct WARNING messages"));
+                Assert.AreEqual(7, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+            }
 
-            Globals.warningPool = new WarningPool();
-            I("tell 'warningpool1';");
-            Assert.AreEqual(5, Globals.warningPool.storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-            Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count);
-            Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count);
-            Globals.warningPool.Report();
+            if (true)
+            {
+                I("reset;");
+                Globals.warningPool = new WarningPool();
+                Globals.unitTestScreenOutput.Clear();
+                Globals.warningPool = new WarningPool();
+                I("warning(2);");
+                Assert.AreEqual(5, Globals.warningPool.storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count); //2 identical are added, 1 stored
+                Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.
+                Globals.warningPool.Report();
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 9 distinct WARNING messages"));
+                Assert.AreEqual(12, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+            }
+
+            if (true)
+            {
+                I("reset;");
+                Globals.warningPool = new WarningPool();
+                Globals.unitTestScreenOutput.Clear();                
+                Globals.warningPool = new WarningPool();
+                Program.options.global_warnings_ignore = "2.2, 1.2"; Globals.warningPool.GetIgnores();
+                I("warning(2);");
+                Assert.AreEqual(3, Globals.warningPool.storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
+                Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.2"));
+                Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
+                Assert.IsFalse(Globals.warningPool.storage.ContainsKey("1.2"));
+                Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.
+                Globals.warningPool.Report();
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 7 distinct WARNING messages"));
+                Assert.AreEqual(9, G.Count(Globals.unitTestScreenOutput.ToString(), "+++ WARNING"));
+            }
         }
 
 
@@ -10475,7 +10510,7 @@ namespace UnitTests
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
             I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no            
             //Below will be 2004q1 to 2003q4 which is invalid, but option bugfix dates = no makes it work like it did in Gekko <= 3.1.19.
-            I("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");  //erroneous but accepted
+            I("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");  //erroneous but accepted because of the bugfix option.
             _AssertSeries(First(), "iy!q", EFreq.Q, 2003, 4, 24d, sharedDelta);
             _AssertSeries(First(), "iy!q", EFreq.Q, 2004, 1, 24d, sharedDelta);
         }

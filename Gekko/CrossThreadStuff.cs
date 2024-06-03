@@ -181,39 +181,24 @@ namespace Gekko
             }
         }
 
-        //weird delegate pattern, but it works!
-        delegate void WarningsIgnoreCallback();
-        public static void WarningsIgnore()
-        {
-            if (G.IsUnitTesting())
-            {
-                return;
-            }
-            if (Gui.gui.textBoxMainTabUpper.InvokeRequired)
-            {
-                // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new WarningsIgnoreCallback(WarningsIgnore), new object[] { });
-            }
-            else
-            {
-                if (!G.NullOrBlanks(Program.options.global_warnings_ignore))
-                {
-                    string[] ss = Program.options.global_warnings_ignore.Split(',');
-                    Dictionary<string, bool> ignore = new Dictionary<string, bool>();
-                    foreach (string s2 in ss)
-                    {
-                        string s = s2.Trim();
-                        //Element must be something like "2" or "2.3".
-                        if (G.NullOrBlanks(s)) new Error("Empty element: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                        if (s.Split('.').Length - 1 > 1) new Error("Element '" + s + "' with > 1 dots ('.'): option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                        if (!G.IsInteger(s.Replace(".", ""))) new Error("Invalid element '" + s + "': option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                        if (ignore.ContainsKey(s)) new Error("Dublets encountered: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                        ignore.Add(s, false);
-                    }
-                    Globals.warningPool.ignore = ignore;  //at the moment, option global warning ignore = ... can only be set in a gekko.ini next to Gekko.exe. So when this method is run, Globals.warningPool i brand new. And Globals.warningPool.ignore will not be changed until Gekko is closed and reopened.
-                }
-            }
-        }
+        ////weird delegate pattern, but it works!
+        //delegate void WarningsIgnoreCallback();
+        //public static void WarningsIgnore()
+        //{
+        //    if (G.IsUnitTesting())
+        //    {
+        //        return;
+        //    }
+        //    if (Gui.gui.textBoxMainTabUpper.InvokeRequired)
+        //    {
+        //        // It's on a different thread, so use Invoke.
+        //        Gui.gui.Invoke(new WarningsIgnoreCallback(WarningsIgnore), new object[] { });
+        //    }
+        //    else
+        //    {
+        //        Globals.warningPool.GetIgnores();
+        //    }
+        //}        
 
         //weird delegate pattern, but it works!
         delegate void SetReadOnlyCallback(bool b);

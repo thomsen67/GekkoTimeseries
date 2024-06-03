@@ -6000,6 +6000,45 @@ namespace Gekko
 
         // --------------------------------
 
+        public static void warning(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            if (!(G.IsUnitTesting() || Globals.runningOnTTComputer)) new Error("Function warning() is unknown.");
+            double d = O.ConvertToVal(x);
+            if (G.IsUnitTesting() || Globals.runningOnTTComputer)
+            {
+                //Do not delete: used in unit tests
+                if (d == 1)
+                {                    
+                    G.Warning("2.1", "MORE MORE MORE");
+                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("1.1", "ADD ADD");
+                    G.Warning("1.2", "PUT PUT");
+                    G.Warning("1.3", "PUT PUT");
+                    G.Warning("1.2", "PUT PUT"); //does not get added, already there
+                    G.Warning("1.3", "PUT PUT VARIATION"); //gets added
+                    new Writeln("Extra text1");
+                    new Writeln("Extra text2");
+                }
+                else if (d == 2)
+                {                    
+                    G.Warning("2.1", "MORE MORE MORE");
+                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("1.1", "ADD ADD");
+                    G.Warning("1.2", "PUT PUT");
+                    G.Warning("1.3", "PUT PUT");
+                    G.Warning("1.2", "PUT PUT"); //does not get added
+                    G.Warning("1.3", "PUT PUT VARIATION1"); //gets added
+                    G.Warning("1.3", "PUT PUT VARIATION2"); //gets added
+                    G.Warning("1.3", "PUT PUT VARIATION3"); //gets added
+                    G.Warning("1.3", "PUT PUT VARIATION4"); //gets added
+                    G.Warning("1.3", "PUT PUT VARIATION5"); //gets added
+                    G.Warning("1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
+                    new Writeln("Extra text1");
+                    new Writeln("Extra text2");
+                }
+            }
+        }
+
         public static IVariable currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarString(Program.options.folder_working);

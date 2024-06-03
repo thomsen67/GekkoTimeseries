@@ -111,9 +111,11 @@ namespace Gekko
         public string global_fence_black_folders_write = "";  //delimit with semicolon
         public string global_fence_white_folders_write = "";  //delimit with semicolon
         public bool global_fence_sys = true;  //can switch SYS fencing off
+
         public string global_warnings_ignore = "";  //for instance "2.3, 4, 7.1".
-        public int global_warnings_limit = 5;
-        public string global_warnings_find = "";
+        public int global_warnings_limit = 5; //At sub-level. 0: no warnings stored/printed, -1: infinite, -2: pause at all warnings.
+        public bool global_warnings_print = true;  //set false to not have warnings printed while running (always summary at end).
+        public string global_warnings_pauseat = "";  //find particular warning
 
         // ----    REMEMBER
         // ----    REMEMBER
@@ -404,9 +406,10 @@ namespace Gekko
             Add("GLOBAL FENCE BLACK FOLDERS WRITE", Globals.xnameOrString);
             Add("GLOBAL FENCE WHITE FOLDERS WRITE", Globals.xnameOrString);
             Add("GLOBAL FENCE SYS", Globals.xbool);
-            Add("GLOBAL WARNINGS IGNORE", Globals.xstring);  //warnings to ignore
-            Add("GLOBAL WARNINGS LIMIT", Globals.xsint);  //0: no warnings, -1: show all warnings, -2: pause at all warnings.
-            Add("GLOBAL WARNINGS FIND", Globals.xstring);  //find particular message
+            Add("GLOBAL WARNINGS IGNORE", Globals.xstring); 
+            Add("GLOBAL WARNINGS LIMIT", Globals.xsint);  
+            Add("GLOBAL WARNINGS PAUSEAT", Globals.xstring);
+            Add("GLOBAL WARNINGS PRINT", Globals.xbool);
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
