@@ -295,17 +295,17 @@ namespace Gekko
             else
             {
                 new Error("Expected option global warnings limit to be >= -2.");
-            }            
-
-            if (!G.NullOrBlanks(Program.options.global_warnings_pauseat) && G.Contains(s, Program.options.global_warnings_pauseat))
-            {                
-                popup = 2;  //overrides any popup == 1
-            }
+            }                        
 
             if (this.ignore.ContainsKey(s))
             {
                 add = false;
                 print = false;
+            }
+
+            if (!G.NullOrBlanks(Program.options.global_warnings_pauseat))
+            {                
+                if (G.Contains(this.GetWarningText(s, info), Program.options.global_warnings_pauseat.Trim())) popup = 2;
             }
 
             // ------------------------------------------------
@@ -331,29 +331,33 @@ namespace Gekko
                         //already seen
                     }
                 }
-            }
-
-            string w1, w2;
-            this.GetText(s, null, out w1, out w2);
-            string warningText = w1 + " " + w2 + " " + info;
+            }            
 
             if (print)
-            {                         
-                new Warning(warningText);
+            {                
+                new Warning(this.GetWarningText(s, info));
             }
 
             if (popup == 1)
-            {
+            {                
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                w.textBox1.Text = "+++ WARNING: " + warningText + "." + G.NL + G.NL + "Press [Enter] to continue";
+                w.textBox1.Text = "+++ WARNING: " + this.GetWarningText(s, info) + "." + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }
             else if (popup == 2)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pauseat + "' encountered as part of the warning message '" + warningText + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
+                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pauseat + "' encountered as part of the warning message '" + this.GetWarningText(s, info) + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = '';" + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }            
+        }
+
+        private string GetWarningText(string s, string info)
+        {
+            string w1, w2;
+            this.GetText(s, null, out w1, out w2);
+            string warningText = w1 + " " + w2 + " " + info;
+            return warningText;
         }
 
         public void GetIgnores()
@@ -25531,10 +25535,12 @@ namespace Gekko
             string global_fence_white_folders_read_REMEMBER = Program.options.global_fence_white_folders_read;
             string global_fence_black_folders_write_REMEMBER = Program.options.global_fence_black_folders_write;
             string global_fence_white_folders_write_REMEMBER = Program.options.global_fence_white_folders_write;
+
             bool global_fence_sys_REMEMBER = Program.options.global_fence_sys;
             string global_warnings_ignore_REMEMBER = Program.options.global_warnings_ignore;
             int global_warnings_limit_REMEMBER = Program.options.global_warnings_limit;
-            string global_warnings_stopat_REMEMBER = Program.options.global_warnings_pauseat;
+            string global_warnings_pauseat_REMEMBER = Program.options.global_warnings_pauseat;
+            bool global_warnings_print_REMEMBER = Program.options.global_warnings_print;
 
             // ------------------------------------------------------
             Program.options = new Options();  //resetting these
@@ -25553,7 +25559,8 @@ namespace Gekko
 
             Program.options.global_warnings_ignore = global_warnings_ignore_REMEMBER;
             Program.options.global_warnings_limit = global_warnings_limit_REMEMBER;
-            Program.options.global_warnings_pauseat = global_warnings_stopat_REMEMBER;
+            Program.options.global_warnings_pauseat = global_warnings_pauseat_REMEMBER;
+            Program.options.global_warnings_print = global_warnings_print_REMEMBER;
 
             // ------------------------------------------------------
 
