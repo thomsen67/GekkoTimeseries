@@ -215,7 +215,8 @@ namespace Gekko
         
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
         public int counter = 0;
-        public Dictionary<string, bool> ignore = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ignore0 = new Dictionary<string, bool>(); //no dot, like '3' or '5'.
+        public Dictionary<string, bool> ignore1 = new Dictionary<string, bool>(); //one dot, like '2.3' or '5.2'.
 
         public Dictionary<string, string> warningStrings = new Dictionary<string, string>()
         {
@@ -295,13 +296,16 @@ namespace Gekko
             else
             {
                 new Error("Expected option global warnings limit to be >= -2.");
-            }                        
+            }
 
-            if (this.ignore.ContainsKey(s))
+            string s1, s1s2;
+            this.GetNumbers(s, out s1, out s1s2);
+
+            if (this.ignore0.ContainsKey(s1) || this.ignore1.ContainsKey(s1s2))
             {
                 add = false;
                 print = false;
-            }
+            }            
 
             if (!G.NullOrBlanks(Program.options.global_warnings_pauseat))
             {                
@@ -362,21 +366,32 @@ namespace Gekko
 
         public void GetIgnores()
         {
+            this.ignore0 = new Dictionary<string, bool>();
+            this.ignore1 = new Dictionary<string, bool>();
             if (!G.NullOrBlanks(Program.options.global_warnings_ignore))
             {
                 string[] ss = Program.options.global_warnings_ignore.Split(',');
-                Dictionary<string, bool> ignore = new Dictionary<string, bool>();
+                Dictionary<string, bool> ignore2 = new Dictionary<string, bool>();
                 foreach (string s2 in ss)
                 {
                     string s = s2.Trim();
                     //Element must be something like "2" or "2.3".
                     if (G.NullOrBlanks(s)) new Error("Empty element: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                    if (s.Split('.').Length - 1 > 1) new Error("Element '" + s + "' with > 1 dots ('.'): option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    int n = G.Count(s, ".");
+                    if (n > 1) new Error("Element '" + s + "' with > 1 dots ('.'): option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
                     if (!G.IsInteger(s.Replace(".", ""))) new Error("Invalid element '" + s + "': option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                    if (ignore.ContainsKey(s)) new Error("Dublets encountered: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                    ignore.Add(s, false);
-                }
-                this.ignore = ignore;  //at the moment, option global warning ignore = ... can only be set in a gekko.ini next to Gekko.exe. So when this method is run, Globals.warningPool i brand new. And Globals.warningPool.ignore will not be changed until Gekko is closed and reopened.
+
+                    if (n == 0)
+                    {
+                        if (this.ignore0.ContainsKey(s)) new Error("Dublets encountered: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                        this.ignore0.Add(s, false);
+                    }
+                    else if (n == 1)
+                    {
+                        if (this.ignore1.ContainsKey(s)) new Error("Dublets encountered: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                        this.ignore1.Add(s, false);
+                    }
+                }                
             }
         }
 
