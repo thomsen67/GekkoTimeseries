@@ -1941,8 +1941,7 @@ namespace Gekko
                 {
                     //not the end of the world if green light is not set
                 }
-                p.ReportToRunStatus(true);
-                Gui.PrintTotalErrors(p);
+                p.ReportToRunStatus(true);                
 
                 List<string> traceList = null;
                 if (Globals.dependencyTracking.Count() > 0)
@@ -1996,27 +1995,28 @@ namespace Gekko
                         }
                     }
                 }
+                Gui.PrintTotalErrors(p);
             }
         }
 
         public static void PrintTotalErrors(P p)
         {
+            Globals.warningPool.Report();  //show any warnings
+
             if (Globals.numberOfWarnings + Globals.numberOfErrors > 0)
             {
                 G.Writeln();
                 if (Globals.numberOfErrors > 0 || Globals.numberOfSkippedLines > 0)
                 {
-                    if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the job");
-                    else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the job");
+                    if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the job (see above)", Color.Red);
+                    else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the job (see above)", Color.Red);
                 }                
                 if (Globals.numberOfSkippedLines > 0)
                 {
                     if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the job");
                     else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the job");
                 }
-            }
-
-            Globals.warningPool.Report();  //show any warnings
+            }            
             
             if (Globals.bugfixMissing1.Count > 0)
             {

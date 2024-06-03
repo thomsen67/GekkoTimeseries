@@ -333,30 +333,27 @@ namespace Gekko
                 }
             }
 
+            string w1, w2;
+            this.GetText(s, null, out w1, out w2);
+            string warningText = w1 + " " + w2 + " " + info;
+
             if (print)
-            {
-                string w1, w2;
-                this.GetText(s, null, out w1, out w2);
-                string warningText = w1 + " " + w2 + " " + info;
+            {                         
                 new Warning(warningText);
             }
 
             if (popup == 1)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                w.textBox1.Text = s + "'." + G.NL + G.NL + "Press [Enter] to continue";
+                w.textBox1.Text = "+++ WARNING: " + warningText + "." + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }
             else if (popup == 2)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
-                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pauseat + "' encountered as part of the warning message '" + s + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
+                w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pauseat + "' encountered as part of the warning message '" + warningText + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = ''.;" + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
-            }
-            
-            //ignore
-            //limit (maybe print all, maybe pause all)
-            //find            
+            }            
         }
 
         public void GetIgnores()
