@@ -65,6 +65,13 @@ namespace Gekko
         Simple
     }
 
+    public enum EWarningType
+    {
+        NoUsing,
+        UsingWithTypeId,
+        UsingWithoutTypeId
+    }
+
     public enum EWrapType
     {
         Writeln,  //normal
@@ -263,9 +270,12 @@ namespace Gekko
             {"3.1", "OPEN<ref> problem" },
             {"3.2", "Missing variable" },
             {"3.3", "Reading problem (protobuf)" },
-            {"3.4", "Reading problem (AREMOS)" },
-            {"3.5", "Reading problem (PC-AXIS)" },
-            {"3.6", "Reading problem (PCIM)" },
+            {"3.4", "AREMOS reading problem" },
+            {"3.5", "PC-AXIS reading problem" },
+            {"3.6", "PCIM reading problem" },
+            {"3.7", "GDX reading problem" },
+            {"3.8", "PC-AXIS time problem" },
+            {"3.9", "PC-AXIS time gaps" },
             // =========================================================
             // =========================================================
             {"4", "Equation html browser" },
@@ -298,6 +308,7 @@ namespace Gekko
             {"9", "Library" },
             // ---------------------------------------------------------
             {"9.1", "Name problem" },
+            {"9.2", "Name collision" },
             // =========================================================
             // =========================================================
             {"10", "File system" },
@@ -388,26 +399,33 @@ namespace Gekko
             {"26", "Translate" },
             // ---------------------------------------------------------
             {"26.1", "Investigation" },
+            {"26.2", "AREMOS problem" },
             // =========================================================
             // =========================================================
-            {"27", "" },
+            {"27", "Fencing" },
             // ---------------------------------------------------------
-            {"27.1", "" },
+            {"27.1", "Illegal folder" },
             // =========================================================
             // =========================================================
-            {"28", "" },
+            {"28", "Data tracing" },
             // ---------------------------------------------------------
-            {"28.1", "" },
+            {"28.1", "Version problem" },
+            {"28.2", "Write problem" },
             // =========================================================
             // =========================================================
-            {"29", "" },
+            {"29", "Seasonal adjustment" },
             // ---------------------------------------------------------
-            {"29.1", "" },
+            {"29.1", "Calculation problem" },
             // =========================================================
             // =========================================================
-            {"30", "" },
+            {"30", "Copying" },
             // ---------------------------------------------------------
-            {"30.1", "" },
+            {"30.1", "Missing TO part" },
+            // =========================================================
+            // =========================================================
+            {"31", "Compare" },
+            // ---------------------------------------------------------
+            {"31.1", "Missing values" },
 
         };
 
@@ -502,7 +520,7 @@ namespace Gekko
             {
                 if (!isUsingType)
                 {
-                    new Warning(this.GetWarningText(s, info));
+                    new Warning(EWarningType.NoUsing, this.GetWarningText(s, info));
                 }
             }
 
@@ -1059,7 +1077,7 @@ namespace Gekko
             //We check first as if working folder is reading, then as if it is writing.
             if (!(this.CheckBlackAndWhitelist(Program.options.folder_working, false, true)) || !(this.CheckBlackAndWhitelist(Program.options.folder_working, false, false)))
             {
-                using (Warning txt = new Warning()) //Remove #kjlasfa87iads if this is no longer a warning
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "27.1")) //Remove #kjlasfa87iads if this is no longer a warning
                 {
                     txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
                     txt.MainNewLineTight();
@@ -2974,13 +2992,23 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            using (Warning txt = new Warning("2.1"))
+            if (Globals.runningOnTTComputer && text == "w")
             {
-                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "2.1"))
+                {
+                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                }
+
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "31.1"))
+                {
+                    txt.MainAdd("There are many missing values when computing historical variability for.");
+                    txt.MoreAdd("For the period , % of reference databank values are missing values, ");
+                    txt.MoreAdd("and for the period , % of reference databank values are missing values.");
+                }
             }
 
             if (text == "flowgraph1" || text == "flowgraph2")
@@ -7164,7 +7192,7 @@ namespace Gekko
                                 }
                                 if (!success)
                                 {                                    
-                                    using (var txt = new Warning())
+                                    using (var txt = new Warning(EWarningType.UsingWithTypeId, "28.1"))
                                     {
                                         if (unknowVersion) txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ", but Gekko " + Globals.gekkoVersion + " only supports data trace versions: " + Stringlist.GetListWithCommas(Globals.traceVersions) + ".");
                                         else txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ". This data trace version is known to Gekko " + Globals.gekkoVersion + ", but reading the traces failed.");
@@ -9383,7 +9411,7 @@ namespace Gekko
 
             if (pxAllowAnyTimeDimensionIndex)
             {
-                using (Warning txt = new Warning())
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "3.8"))
                 {
                     txt.MainAdd("The time dimension is not defined last in the .px file, and therefore an experimental module is used.");
                     txt.MoreAdd("The time dimension is not defined last in the .px file, since either CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
@@ -9411,7 +9439,7 @@ namespace Gekko
 
             if (holes != null)
             {
-                using (Warning txt = new Warning())
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "3.9"))
                 {
                     txt.MainAdd("There are gaps in the data: for some of the observations, there is a gap > 1 between the date of the observation and the previous date that contains data");
 
@@ -12041,7 +12069,7 @@ namespace Gekko
                     }
                 }
 
-                using (Warning txt = new Warning())
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "29.1"))
                 {
                     txt.MainAdd("The X12A component did not produce any adjusted timeseries. See more info/logging in the tempX12aFile... files here: " + Globals.localTempFilesLocation + ".");
                     if (extra != null)
@@ -18389,7 +18417,7 @@ namespace Gekko
                 if (o.opt_tobank != null)
                 {
                     //Make an error for Gekko 3.2
-                    using (Warning txt = new Warning())
+                    using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "30.1"))
                     {                        
                         txt.MainAdd("COPY <tobank=...> option is used, but the COPY statement itself is missing a TO part.");
                         txt.MoreAdd("A COPY statement without the TO part always copies variables into the first-position databank, and in that case, any <tobank=...> is ignored. In order to copy a variable x from the databank b1 to the databank b2 you cannot use 'COPY <frombank=b1 tobank=b2> x;', but should instead use 'COPY <frombank=b1 tobank=b2> x to *;'. Note: this warning will become an error in Gekko 3.2. To avoid the warning, just remove the <tobank=...> part of the COPY statement.");
@@ -23748,7 +23776,7 @@ namespace Gekko
 
                 if (traceFail)
                 {
-                    using (var txt = new Warning())
+                    using (var txt = new Warning(EWarningType.UsingWithTypeId, "28.2"))
                     {
                         try { File.Delete(pathAndFilename3); } catch { }  //a corrupted trace.data may be present: get it wiped out before zipping!
                         try { foreach (SeriesMetaInformation meta in th.metas) meta.traceID2 = null; } catch { } //some of these may have been constructed: wipe them out!
@@ -24477,13 +24505,13 @@ namespace Gekko
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    new Warning("File '" + realPathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
+                    new Warning(EWarningType.NoUsing, "File '" + realPathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
                     Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
                 }
                 catch (Exception e)
                 {
-                    new Warning("File '" + realPathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                    new Warning(EWarningType.NoUsing, "File '" + realPathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
                 }
@@ -24591,11 +24619,11 @@ namespace Gekko
                     success = false;
                     if (type == "copy")
                     {
-                        new Warning("File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "'seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                        new Warning(EWarningType.NoUsing, "File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "'seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     else if (type == "delete")
                     {
-                        new Warning("File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                        new Warning(EWarningType.NoUsing, "File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
@@ -27160,7 +27188,7 @@ namespace Gekko
             Globals.linkAction.TryGetValue(n, out ga);
             if (ga == null || ga.action == null)
             {
-                using (Warning w = new Warning())
+                using (Warning w = new Warning(EWarningType.UsingWithTypeId, "8.1"))
                 {
                     w.MainAdd("Link of type '" + ga.type.ToString() + "' has expired. ");
                     if (ga.type == EGekkoActionTypes.Ols)
@@ -34658,7 +34686,7 @@ namespace Gekko
             double l2 = (double)lag2Problem / (double)lagCounter;
             if (history && lagCounter > 0 && l > 0.8d)
             {
-                using (Warning txt = new Warning())
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "31.1"))
                 {
                     txt.MainAdd("There are many missing values when computing historical variability for " + tStart.ToString() + ".");
                     txt.MoreAdd("For the period " + tStart.Add(-1).ToString() + ", " + Math.Round(l1 * 100, 0) + "% of reference databank values are missing values, ");

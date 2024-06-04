@@ -5524,7 +5524,7 @@ namespace Gekko
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                using (Warning text = new Warning())
+                using (Warning text = new Warning(EWarningType.UsingWithTypeId, "9.2"))
                 {
                     SameFunctionOrProcedureNameWarning(text, name);
                 }
@@ -11090,7 +11090,7 @@ namespace Gekko
 
                     if (Translator_AREMOS_Gekko30.warning)
                     {
-                        using (Warning text = new Warning())
+                        using (Warning text = new Warning(EWarningType.UsingWithTypeId, "26.2"))
                         {
                             text.MainAdd("Possible problem with AREMOS name(s) with consecutive #'s.");
                             text.MoreAdd("The translator has problems with names that start with # and contain additional #'s.");

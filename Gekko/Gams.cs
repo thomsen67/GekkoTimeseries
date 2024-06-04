@@ -3752,8 +3752,8 @@ namespace Gekko
                                 G.Writeln("", ETabs.Output);
                             }
                         };
-                        
-                        using (Warning txt = new Warning())
+
+                        using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "3.7"))
                         {
                             //#0897aef todo
                             txt.MainAdd((paramsWithoutTimeDimensionCounter.Count() + varsWithoutTimeDimensionCounter.Count()) + " variables/parameters without explicit time domain/dimension encountered");

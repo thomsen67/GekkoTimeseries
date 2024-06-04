@@ -2076,7 +2076,7 @@ namespace Gekko
                         txt.MainAdd("The change is made in order to make Gekko handle a left-hand side $ exactly like GAMS.");
                     }                
                 };
-                new Warning("In Gekko >= 3.1.16, using $ on the left-hand side has changed behavior if the condition contains timeseries. In the job just run, this affects " + Globals.bugfixLhsDollar + " values/observations (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
+                new Warning(EWarningType.NoUsing, "In Gekko >= 3.1.16, using $ on the left-hand side has changed behavior if the condition contains timeseries. In the job just run, this affects " + Globals.bugfixLhsDollar + " values/observations (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
             }
 
             if (Globals.runningOnTTComputer && Globals.numberOfTimeWindowErrors > 0)

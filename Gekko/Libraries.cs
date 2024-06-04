@@ -970,7 +970,7 @@ namespace Gekko
                             functionNamesLower.Add(name);
                             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
                             {
-                                using (Warning text = new Warning())
+                                using (Warning text = new Warning(EWarningType.UsingWithTypeId, "9.2"))
                                 {
                                     O.SameFunctionOrProcedureNameWarning(text, name);
                                 }

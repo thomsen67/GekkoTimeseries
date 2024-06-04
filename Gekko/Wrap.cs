@@ -596,31 +596,30 @@ namespace Gekko
     /// Inherits from Wrap class. For easier syntax when constructing.
     /// </summary>
     public class Warning : Wrap
-    {
-        /// <summary>
-        /// Object of Wrap type
-        /// </summary>
-        public Warning() : base(EWrapType.Warning)
-        {
-        }
+    {        
 
         /// <summary>
         /// Two ways to used it: standalone "new Warning("Beware...");" or assignemt with "using (Warning txt = new Warning("2.3")) {...}"
         /// </summary>
         /// <param name="s"></param>
-        public Warning(string s) : base(EWrapType.Warning)
+        public Warning(EWarningType warningType, string s) : base(EWrapType.Warning)
         {
-            string s1, s1s2; bool isXDotY;
-            WarningPool.GetNumbers(s, out s1, out s1s2, out isXDotY);
-            if (isXDotY)
-            {
-                this.SetTypeID(s1s2);
-                //Do nothing for something like "using (Warning txt = new Warning("3.1")) {...}"
-            }
-            else
+            if (warningType == EWarningType.NoUsing)
             {
                 this.MainAdd(s);
                 this.Exe1();
+            }
+            else if (warningType == EWarningType.UsingWithTypeId)
+            {
+                this.SetTypeID(s);  //or something like "using (Warning txt = new Warning("3.1")) {...}"
+            }
+            else if (warningType == EWarningType.UsingWithoutTypeId)
+            {
+                //or something like "using (Warning txt = new Warning()) {...}"
+            }
+            else
+            {
+                //ignore, should not be possible
             }
         }
     }
