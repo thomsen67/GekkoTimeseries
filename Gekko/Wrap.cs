@@ -41,6 +41,7 @@ namespace Gekko
         private List<WrapHelper5> storageMore = new List<WrapHelper5>(); //link regarding more information
         private EWrapType type = EWrapType.Writeln;
         private bool throwExceptionForError = true;
+        private string typeId = null;  //"1.3", "7.2" etc.
 
         /// <summary>
         /// Constructor.
@@ -102,6 +103,11 @@ namespace Gekko
         public void MainNewLineTight()
         {
             this.storageMain.Add(new WrapHelper5(0));
+        }
+
+        public void SetTypeID(string typeId)
+        {
+            this.typeId = typeId;
         }
 
         /// <summary>
@@ -235,6 +241,19 @@ namespace Gekko
             //The message in main tab
             //-------------------------------
             this.ConsolidateLines("main");
+
+            if (this.type == EWrapType.Warning && this.typeId != null)  //a warning type like "2.1" or "7.3". Only for Warning objects.
+            {
+                //Only deals with text in main tab
+                string warningText = null;
+                try { warningText = this.storageMain[0].consolidated; } catch { };
+                if (!G.NullOrBlanks(warningText))
+                {
+                    bool shouldPrint = true;
+                    Globals.warningPool.WAdd(this.typeId, warningText, true, out shouldPrint);
+                    if (shouldPrint == false) return;  //no printing of this warning
+                }
+            }
 
             if (tab == ETabs.Output)
             {
@@ -586,13 +605,23 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Do not assign to anything. Usage: new Warning("Beware...");
+        /// Two ways to used it: standalone "new Warning("Beware...");" or assignemt with "using (Warning txt = new Warning("2.3")) {...}"
         /// </summary>
         /// <param name="s"></param>
         public Warning(string s) : base(EWrapType.Warning)
         {
-            this.MainAdd(s);
-            this.Exe1();
+            string s1, s1s2; bool isXDotY;
+            WarningPool.GetNumbers(s, out s1, out s1s2, out isXDotY);
+            if (isXDotY)
+            {
+                this.SetTypeID(s1s2);
+                //Do nothing for something like "using (Warning txt = new Warning("3.1")) {...}"
+            }
+            else
+            {
+                this.MainAdd(s);
+                this.Exe1();
+            }
         }
     }
 

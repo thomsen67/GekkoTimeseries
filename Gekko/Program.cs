@@ -265,7 +265,7 @@ namespace Gekko
             {"3.3", "Reading problem (protobuf)" },
             {"3.4", "Reading problem (AREMOS)" },
             {"3.5", "Reading problem (PC-AXIS)" },
-            {"3.5", "Reading problem (PCIM)" },
+            {"3.6", "Reading problem (PCIM)" },
             // =========================================================
             // =========================================================
             {"4", "Equation html browser" },
@@ -417,7 +417,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <param name="info"></param>
-        public void WAdd(string s, string info)  //WAdd() so it is easier to find by search like .Wadd("1.1"
+        public void WAdd(string s, string info, bool isUsingType, out bool shouldPrint)  //WAdd() so it is easier to find by search like .Wadd("1.1"
         {
 
             // ============= Limits ====================================
@@ -458,8 +458,8 @@ namespace Gekko
                 new Error("Expected option global warnings limit to be >= -2.");
             }
 
-            string s1, s1s2;
-            this.GetNumbers(s, out s1, out s1s2);
+            string s1, s1s2; bool isXDotY;
+            WarningPool.GetNumbers(s, out s1, out s1s2, out isXDotY);
 
             if (this.ignore0.ContainsKey(s1) || this.ignore1.ContainsKey(s1s2))
             {
@@ -495,11 +495,15 @@ namespace Gekko
                         //already seen
                     }
                 }
-            }            
+            }
 
+            shouldPrint = print;  //This bool is not used if isUsingType==false.
             if (print)
-            {                
-                new Warning(this.GetWarningText(s, info));
+            {
+                if (!isUsingType)
+                {
+                    new Warning(this.GetWarningText(s, info));
+                }
             }
 
             if (popup == 1)
@@ -651,8 +655,8 @@ namespace Gekko
         private void GetText(string s, Dictionary<string, bool> level2, out string w1, out string w2)
         {
             //kvp.Key is alway something like "1.1", "5.3" and so on. Each of these have 1 or more elements.  
-            string s1, s1s2;
-            this.GetNumbers(s, out s1, out s1s2);
+            string s1, s1s2; bool isXDotY;
+            WarningPool.GetNumbers(s, out s1, out s1s2, out isXDotY);
             if (level2 != null && !level2.ContainsKey(s1s2)) level2.Add(s1s2, false); //"1.1", "3.2", etc.
             this.GetTextHelper(s1, s1s2, out w1, out w2);
         }
@@ -664,13 +668,21 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="s1"></param>
         /// <param name="s1s2"></param>
-        private void GetNumbers(string s, out string s1, out string s1s2)
+        public static void GetNumbers(string s, out string s1, out string s1s2, out bool isXDotY)
         {
+            if (G.NullOrBlanks(s))
+            {
+                s1 = "0"; s1s2 = "0.0"; isXDotY = false;
+                return;
+            }
+            isXDotY = true;
             string[] ss = s.Split('.');
             if (ss.Length == 1) ss = new string[2] { s.Trim(), "0" };
-            if (ss.Length != 2) ss = new string[2] { "0", "0" };  //so it does not crash
+            else if (ss.Length != 2) ss = new string[2] { "0", "0" };  //so it does not crash (length == 0, 3, 4, ...)
             s1 = ss[0].Trim();
             string s2 = ss[1].Trim();
+            if (s1 == "0" || s2 == "0") isXDotY = false;
+            if (!G.IsInteger(s1) || !G.IsInteger(s2)) isXDotY = false;
             s1s2 = s1 + "." + s2;
         }
 
@@ -2962,6 +2974,14 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            using (Warning txt = new Warning("2.1"))
+            {
+                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+                txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
+            }
 
             if (text == "flowgraph1" || text == "flowgraph2")
             {

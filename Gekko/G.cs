@@ -3892,11 +3892,12 @@ namespace Gekko
         /// <summary>
         /// First argument always "x.y"! Used for the warning pool.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="typeId"></param>
         /// <param name="s"></param>
-        public static void Warning(string type, string s)
+        public static void Warning(string typeId, string s)
         {
-            Globals.warningPool.WAdd(type, s);
+            bool discard;
+            Globals.warningPool.WAdd(typeId, s, false, out discard);
         }
 
         /// <summary>
