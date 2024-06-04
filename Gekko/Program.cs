@@ -255,12 +255,13 @@ namespace Gekko
             // ---------------------------------------------------------
             {"2.1", "Empty string" },
             {"2.2", "Small number" },
+            {"2.3", "Missing values" },
             // =========================================================
             // =========================================================
             {"3", "Databank" },
             // ---------------------------------------------------------
             {"3.1", "OPEN<ref> problem" },
-            {"3.2", "Non-existing variable" },
+            {"3.2", "Missing variable" },
             {"3.3", "Reading problem (protobuf)" },
             {"3.4", "Reading problem (AREMOS)" },
             {"3.5", "Reading problem (PC-AXIS)" },
@@ -283,9 +284,10 @@ namespace Gekko
             {"6.2", "GAMS parse error (other type)" },
             // =========================================================
             // =========================================================
-            {"7", "GAMS decomp" },
+            {"7", "Decomp" },
             // ---------------------------------------------------------
-            {"7.1", "Variable problem" },
+            {"7.1", "Variable problem (GAMS)" },
+            {"7.2", "Operator problem (Gekko)" },
             // =========================================================
             // =========================================================
             {"8", "Interface" },
@@ -301,6 +303,7 @@ namespace Gekko
             {"10", "File system" },
             // ---------------------------------------------------------
             {"10.1", "Path problem" },
+            {"10.2", "Protobuffer file problem" },
             // =========================================================
             // =========================================================
             {"11", "Mode" },
@@ -326,34 +329,84 @@ namespace Gekko
             {"14.1", "File problem" },
             // =========================================================
             // =========================================================
-            {"15", "" },
+            {"15", "GAMS raw model file reading" },
             // ---------------------------------------------------------
-            {"15.1", "" },
+            {"15.1", "Missing file" },
             // =========================================================
             // =========================================================
-            {"16", "" },
+            {"16", "Smooth" },
             // ---------------------------------------------------------
-            {"16.1", "" },
+            {"16.1", "Missing data" },
             // =========================================================
             // =========================================================
-            {"17", "" },
+            {"17", "Wildcard" },
             // ---------------------------------------------------------
-            {"17.1", "" },
+            {"17.1", "Frequency problem" },
             // =========================================================
             // =========================================================
-            {"18", "" },
+            {"18", "Pipe" },
             // ---------------------------------------------------------
-            {"18.1", "" },
+            {"18.1", "Syntax suggestion" },
             // =========================================================
             // =========================================================
-            {"19", "" },
+            {"19", "Zip" },
             // ---------------------------------------------------------
-            {"19.1", "" },
+            {"19.1", "File problem" },
             // =========================================================
             // =========================================================
-            {"20", "" },
+            {"20", "Time periods" },
             // ---------------------------------------------------------
-            {"20.1", "" },
+            {"20.1", "Filtering" },
+            // =========================================================
+            // =========================================================
+            {"21", "Shell" },
+            // ---------------------------------------------------------
+            {"21.1", "System commmand" },
+            // =========================================================
+            // =========================================================
+            {"22", "Csv" },
+            // ---------------------------------------------------------
+            {"22.1", "Format problem" },
+            // =========================================================
+            // =========================================================
+            {"23", "Prn" },
+            // ---------------------------------------------------------
+            {"23.1", "Format problem" },
+            // =========================================================
+            // =========================================================
+            {"24", "Model" },
+            // ---------------------------------------------------------
+            {"24.1", "Formula code" },
+            // =========================================================
+            // =========================================================
+            {"25", "" },
+            // ---------------------------------------------------------
+            {"25.1", "" },
+            // =========================================================
+            // =========================================================
+            {"26", "" },
+            // ---------------------------------------------------------
+            {"26.1", "" },
+            // =========================================================
+            // =========================================================
+            {"27", "" },
+            // ---------------------------------------------------------
+            {"27.1", "" },
+            // =========================================================
+            // =========================================================
+            {"28", "" },
+            // ---------------------------------------------------------
+            {"28.1", "" },
+            // =========================================================
+            // =========================================================
+            {"29", "" },
+            // ---------------------------------------------------------
+            {"29.1", "" },
+            // =========================================================
+            // =========================================================
+            {"30", "" },
+            // ---------------------------------------------------------
+            {"30.1", "" },
 
         };
 
@@ -11109,7 +11162,7 @@ namespace Gekko
                             string[] files = Directory.GetFiles(Path.GetDirectoryName(rawpath), temp, SearchOption.AllDirectories);
                             if (files.Length == 0)
                             {
-                                new Warning("Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
+                                G.Warning("15.1", "Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
                             }
                             else
                             {
@@ -11153,7 +11206,7 @@ namespace Gekko
                             }
                             else
                             {
-                                new Warning("Did not find raw.gms as this file path: " + rawpath);
+                                G.Warning("15.1", "Did not find raw.gms as this file path: " + rawpath);
                             }
                         }
                         zipper.ZipAndCleanup();
@@ -16554,7 +16607,7 @@ namespace Gekko
             if (realStart.IsNull())
             {
                 //do nothing, the lhs series is not touched (but may be created here)
-                new Warning("Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
+                G.Warning("16.1", "Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
             }
             else
             {
@@ -16670,7 +16723,7 @@ namespace Gekko
 
                     if (realStartOverlay.IsNull())
                     {
-                        new Warning("The overlay series '" + overlay.GetName() + "' has no observations");
+                        G.Warning("15.1", "The overlay series '" + overlay.GetName() + "' has no observations");
                     }
                     else
                     {
@@ -19181,7 +19234,7 @@ namespace Gekko
                 }
             }
 
-            if (freqWarning != null) new Warning(freqWarning); //Gekko 3.2  --> maybe make this an error
+            if (freqWarning != null) G.Warning("17.1", freqWarning); //Gekko 3.2  --> maybe make this an error
 
             return outputs;
         }
@@ -20584,7 +20637,7 @@ namespace Gekko
                 {
                     if (!mute)
                     {
-                        if (G.Equal(fileName, "con")) new Warning("Please use PIPE<stop> instead of PIPE con");
+                        if (G.Equal(fileName, "con")) G.Warning("18.1", "Please use PIPE<stop> instead of PIPE con");
                     }
                 }
                 else
@@ -20600,7 +20653,7 @@ namespace Gekko
                         G.Writeln2("Directing output to main window");
                     if (G.Equal(fileName, "con"))
                     {
-                        new Warning("Please use PIPE<stop> instead of PIPE con");
+                        G.Warning("18.1", "Please use PIPE<stop> instead of PIPE con");
                     }
                 }
             }
@@ -21187,7 +21240,7 @@ namespace Gekko
                 {
                     message = "" + e?.Message; innerException = "" + e?.InnerException;
                     success = false;
-                    new Warning("Trying to extract the file '" + entry.FullName + "' from inside the zip file '" + zipFileWithPath + "'. Blocked? Retrying... (" + (i * gap) + " seconds)");
+                    G.Warning("19.1", "Trying to extract the file '" + entry.FullName + "' from inside the zip file '" + zipFileWithPath + "'. Blocked? Retrying... (" + (i * gap) + " seconds)");
                     //new random folder for such files
                     Globals.tempFiles = Program.CreateTempFolderPath("tempfiles");  //new path name
                     try
@@ -22227,7 +22280,7 @@ namespace Gekko
             else
             {
                 G.Writeln("[none]");
-                new Warning("Nothing is filtered out, so filter has no effect!");
+                G.Warning("20.1", "Nothing is filtered out, so filter has no effect!");
             }
             Globals.globalPeriodTimeFilters2 = negativeFilter;
             if (Program.options.timefilter == false)
@@ -22396,7 +22449,7 @@ namespace Gekko
                                 int exitCode = process.ExitCode;
                                 if (exitCode != 0)
                                 {
-                                    new Warning("System call exited with code: " + exitCode + ". System command: " + commandLine);
+                                    G.Warning("21.1", "System call exited with code: " + exitCode + ". System command: " + commandLine);
                                     //fail = true;
                                 }
                             }
@@ -22415,7 +22468,7 @@ namespace Gekko
                                 }
                                 catch (Exception e)
                                 {
-                                    new Warning("Could not write output from system command");
+                                    G.Warning("21.1", "Could not write output from system command");
                                     //fail = true;
                                 }
                             }
@@ -23733,7 +23786,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     //Hmmm: this will not abort if Error()
-                    new Warning("Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
+                    G.Warning("10.2", "Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
                     throw;
                 }
             }
@@ -24114,7 +24167,7 @@ namespace Gekko
             {                
                 if (!System.IO.Directory.Exists(folderInfo.FullName))
                 {
-                    new Warning("Zip file could not be created");  //should not be possible                        
+                    G.Warning("19.1", "Zip file could not be created");  //should not be possible                        
                 }
 
                 int sleepMs = 10;
@@ -24797,14 +24850,14 @@ namespace Gekko
             {
                 if (G.Equal(Program.options.interface_csv_delimiter, "comma") && G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
                 {
-                    new Warning("Using comma both as decimal separator and field delimiter for csv is not advised");
+                    G.Warning("22.1", "Using comma both as decimal separator and field delimiter for csv is not advised");
                 }
             }
             else if (fileType == EdataFormat.Prn)
             {
                 if (G.Equal(Program.options.interface_prn_delimiter, "comma") && G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
                 {
-                    new Warning("Using comma both as decimal separator and field delimiter for prn is not advised");
+                    G.Warning("23.1", "Using comma both as decimal separator and field delimiter for prn is not advised");
                 }
             }
 
@@ -29245,46 +29298,7 @@ namespace Gekko
                 precedentsTemp.Add(listItem + Globals.lagIndicator + "0", "");
                 precedents.Add(precedentsTemp);
             }
-        }
-
-        public static void CreateLeftSideVariableIfNeeded(List<Dictionary<string, string>> precedentsWithLagIndicator, string variable)
-        {            
-            if (Program.databanks.GetFirst().GetIVariable(variable) == null)
-            {
-                if (!variable.ToLower().StartsWith("xx"))
-                {
-                    IssueCreateWarning(variable);
-                }
-                new Note("Variable " + variable + " not found in databank -- is created");
-                Series tempTs = new Series(Program.options.freq, variable);
-                Program.databanks.GetFirst().AddIVariable(tempTs.name, tempTs);
-
-                for (int i = 0; i < precedentsWithLagIndicator.Count; i++)
-                {
-                    Dictionary<string, string> d = precedentsWithLagIndicator[i];
-                    foreach (string prec in d.Keys)
-                    {
-                        string variable2 = "";
-                        int lag = 0;
-
-                        if (prec.Contains(Globals.lagIndicator + Globals.lagIndicator))
-                        {
-                            //drop to issue this warning if this is the case: genr nyvar = nyvar(2001m1) $
-                            //that will give NaN with no warning/explanation given.
-                        }
-                        else
-                        {
-                            G.ExtractVariableAndLag(prec, out variable2, out lag);
-                            if (G.Equal(variable, variable2) && lag != 0)
-                            {
-                                new Warning("The non-existing variable " + variable + " appears with lag or leads on right hand side -- so this will produce missing values");
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        }        
 
         private static void IssueCreateWarning(string variable)
         {
@@ -29327,7 +29341,7 @@ namespace Gekko
                             {
                                 //p<m>@fy                --------- this is not really meaningful
                                 banks.Add(Globals.Ref);
-                                if (!hasIssuedWarning) new Warning("Note that you are using @-variables in combination with the <m> (multiplier) option");
+                                if (!hasIssuedWarning) G.Warning("7.2", "Note that you are using @-variables in combination with the <m> (multiplier) option");
                                 hasIssuedWarning = true;
                             }
                             else
@@ -29345,7 +29359,7 @@ namespace Gekko
                                 {
                                     //p<b>@fy                --------- this is not really meaningful
                                     banks.Add(Globals.Ref);
-                                    if (!hasIssuedWarning) new Warning("Note that you are using @-variables in combination with the <r> (reference) option");
+                                    if (!hasIssuedWarning) G.Warning("7.2", "Note that you are using @-variables in combination with the <r> (reference) option");
                                     hasIssuedWarning = true;
                                 }
                                 else
@@ -33844,13 +33858,13 @@ namespace Gekko
                     {
                         if (code.Length <= 1)
                         {
-                            new Warning("Formula code regarding '" + var + "' seems problematic: " + code);
+                            G.Warning("24.1", "Formula code regarding '" + var + "' seems problematic: " + code);
                         }
                         if (code.Length >= 2)
                         {
                             if (code.Substring(0, 1) != "_")
                             {
-                                new Warning("Formula code regarding '" + var + "' does not start with '_' or 'i' or 'y': " + code);
+                                G.Warning("24.1", "Formula code regarding '" + var + "' does not start with '_' or 'i' or 'y': " + code);
                             }
                             else
                             {
@@ -33877,13 +33891,13 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    new Warning("There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
+                                    G.Warning("24.1", "There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
                                 }
                             }
                         }
                         else
                         {
-                            new Warning("There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
+                            G.Warning("24.1", "There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
                         }
                     }
                 }
@@ -35275,7 +35289,7 @@ namespace Gekko
 
                 if (this.nanCounter > 0)
                 {
-                    new Warning("Encountered " + this.nanCounter + " instances of 'NaN' in the file. These are set to missing -- proper .tsd syntax is to use '1.000000E+15' to indicate a missing value");
+                    G.Warning("2.3", "Encountered " + this.nanCounter + " instances of 'NaN' in the file. These are set to missing -- proper .tsd syntax is to use '1.000000E+15' to indicate a missing value");
                 }
 
                 if (this.conversionMessage)
