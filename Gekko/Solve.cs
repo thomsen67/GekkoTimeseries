@@ -1071,7 +1071,7 @@ namespace Gekko
                 }
             }
 
-            if (!(G.Equal(so.method, "gauss") || G.Equal(so.method, "newton") || G.Equal(so.method, "res") || G.Equal(so.method, "reverted") || G.Equal(so.method, "eigen"))) new Warning("Seems to be a problem with model type");
+            if (!(G.Equal(so.method, "gauss") || G.Equal(so.method, "newton") || G.Equal(so.method, "res") || G.Equal(so.method, "reverted") || G.Equal(so.method, "eigen"))) G.Warning("24.2", "Seems to be a problem with model type");
             //isRes is true if called by Res(), isReverted if called by Efter()
 
             Program.ErrorContainer ec = new Program.ErrorContainer();
@@ -1583,7 +1583,7 @@ namespace Gekko
                             }
                             if (ft == ftMax - 1)
                             {
-                                new Warning(extra + "Fair-Taylor algorithm did not converge in " + (ft + 1) + " " + extra2 + "FT-iterations (" + G.SecondsFormat((DateTime.Now - dtFt).TotalMilliseconds) + ")");
+                                G.Warning("25.1", extra + "Fair-Taylor algorithm did not converge in " + (ft + 1) + " " + extra2 + "FT-iterations (" + G.SecondsFormat((DateTime.Now - dtFt).TotalMilliseconds) + ")");
                                 a = aFinalResultFromShockLoop;
                                 goto JumpOut;
                             }

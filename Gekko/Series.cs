@@ -579,7 +579,7 @@ namespace Gekko
                             if (Globals.runningOnTTComputer)
                             {
                                 //for instance, printing montly data ending in m10, where m11 and m12 are also shown
-                                new Warning("TT error: tooSmallTooLarge with no smpl");
+                                new Warning("TTH: Error: tooSmallTooLarge with no smpl");
                             }
                         }
                         else
