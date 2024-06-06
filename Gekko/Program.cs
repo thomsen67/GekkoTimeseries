@@ -269,13 +269,6 @@ namespace Gekko
             // ---------------------------------------------------------
             {"w3.1", "OPEN<ref> problem" },
             {"w3.2", "Missing variable" },
-            {"w3.3", "Reading problem (protobuf)" },
-            {"w3.4", "AREMOS reading problem" },
-            {"w3.5", "PC-AXIS reading problem" },
-            {"w3.6", "PCIM reading problem" },
-            {"w3.7", "GDX reading problem" },
-            {"w3.8", "PC-AXIS time problem" },
-            {"w3.9", "PC-AXIS time gaps" },
             // =========================================================
             // =========================================================
             {"w4", "Equation html browser" },
@@ -283,7 +276,7 @@ namespace Gekko
             {"w4.1", "Json file" },
             // =========================================================
             // =========================================================
-            {"w5", "Funtion asbRename()" },
+            {"w5", "Function asbRename()" },
             // ---------------------------------------------------------
             {"w5.1", "Dublet problem" },
             // =========================================================
@@ -375,12 +368,12 @@ namespace Gekko
             {"w21.1", "System commmand" },
             // =========================================================
             // =========================================================
-            {"w22", "Csv" },
+            {"w22", "Csv file reading" },
             // ---------------------------------------------------------
             {"w22.1", "Format problem" },
             // =========================================================
             // =========================================================
-            {"w23", "Prn" },
+            {"w23", "Prn file reading" },
             // ---------------------------------------------------------
             {"w23.1", "Format problem" },
             // =========================================================
@@ -425,12 +418,34 @@ namespace Gekko
             // =========================================================
             {"w31", "Compare" },
             // ---------------------------------------------------------
-            {"w31.1", "Missing values" },
+            {"w31.1", "Missing values" },            
             // =========================================================
-            {"w1000", "System" },
+            // =========================================================
+            {"w32", "Gbk file reading" },
             // ---------------------------------------------------------
-            {"w1000.1", "Internal Gekko warning" },
-
+            {"w32.1", "Reading problem (protobuf)" },
+            // =========================================================
+            // =========================================================
+            {"w33", "AREMOS file reading" },
+            // ---------------------------------------------------------
+            {"w33.1", "Problem reading file" },
+            // =========================================================
+            // =========================================================
+            {"w34", "PC-AXIS file reading" },
+            // ---------------------------------------------------------
+            {"w34.1", "Could not read file" },
+            {"w34.2", "PC-AXIS time problem" },
+            {"w34.3", "PC-AXIS time gaps" },
+            // =========================================================
+            // =========================================================
+            {"w35", "PCIM file reading" },
+            // ---------------------------------------------------------
+            {"w35.1", "Problem reading file" },
+            // =========================================================
+            // =========================================================
+            {"w36", "Gdx file reading" },
+            // ---------------------------------------------------------
+            {"w36.1", "Problem with gdx (GAMS) file" },
         };
 
         /// <summary>
@@ -4354,7 +4369,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {                    
-                    G.Warning("w3.3", "Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
+                    G.Warning("w32.1", "Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
                     throw;
                 }
             }
@@ -8272,13 +8287,13 @@ namespace Gekko
                             //for instance quarterly x.sol (not x.q)
                             if (true)
                             {
-                                G.Warning("w3.4", "Changed " + name1 + "." + name2 + " into " + name1 + "__" + name2 + "!" + G.ConvertFreq(freq));
+                                G.Warning("w33.1", "Changed " + name1 + "." + name2 + " into " + name1 + "__" + name2 + "!" + G.ConvertFreq(freq));
                                 name += "__" + name2;
                             }
                             else
                             {
                                 //this gave problems, better to use "__"
-                                G.Warning("w3.4", "Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
+                                G.Warning("w33.1", "Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
                                 name += "_" + name2;
                             }
                         }
@@ -8474,7 +8489,7 @@ namespace Gekko
             GekkoTime endYear;
             string warning = null;
             ReadPx(databank, oRead.array, null, null, null, null, pxLinesText, oRead.isVariablecode, p, out vars, out warning, out startYear, out endYear);
-            if (warning != null) G.Warning("w3.5", warning);
+            if (warning != null) G.Warning("w34.1", warning);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;
@@ -8660,7 +8675,7 @@ namespace Gekko
                     readInfo.endPerResultingBank = readInfo.endPerInFile;
 
 
-                    if (firstYearWarnings > 0) G.Warning("w3.6", firstYearWarnings + " variables had data before databank time period (data skipped)");
+                    if (firstYearWarnings > 0) G.Warning("w35.1", firstYearWarnings + " variables had data before databank time period (data skipped)");
 
                     //readInfo.databank.info1 = readInfo.info1;
                     //readInfo.databank.date = readInfo.date;
@@ -9411,7 +9426,7 @@ namespace Gekko
 
             if (pxAllowAnyTimeDimensionIndex)
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w3.8"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w34.2"))
                 {
                     txt.MainAdd("The time dimension is not defined last in the .px file, and therefore an experimental module is used.");
                     txt.MoreAdd("The time dimension is not defined last in the .px file, since either CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
@@ -9428,18 +9443,18 @@ namespace Gekko
             if (hyphenFound)
             {
                 //Only for !isArray
-                G.Warning("w3.5", "Hyphens ('-') in names have been removed");
+                G.Warning("w34.1", "Hyphens ('-') in names have been removed");
             }
 
             if (underscoreFound)
             {
                 //Only for !isArray
-                G.Warning("w3.5", "Underscores ('_') in names have been removed");
+                G.Warning("w34.1", "Underscores ('_') in names have been removed");
             }
 
             if (holes != null)
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w3.9"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w34.3"))
                 {
                     txt.MainAdd("There are gaps in the data: for some of the observations, there is a gap > 1 between the date of the observation and the previous date that contains data");
 
