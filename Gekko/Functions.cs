@@ -3896,7 +3896,7 @@ namespace Gekko
                     }
                     catch
                     {
-                        G.Warning("5.1", "This line could not be put into dictionary: " + line + ", skipping...");
+                        G.Warning("w5.1", "This line could not be put into dictionary: " + line + ", skipping...");
                     }
                 }
 
@@ -5946,30 +5946,30 @@ namespace Gekko
                 //Do not delete: used in unit tests
                 if (d == 1)
                 {                    
-                    G.Warning("2.1", "MORE MORE MORE");
-                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
-                    G.Warning("1.1", "ADD ADD");
-                    G.Warning("1.2", "PUT PUT");
-                    G.Warning("1.3", "PUT PUT");
-                    G.Warning("1.2", "PUT PUT"); //does not get added, already there
-                    G.Warning("1.3", "PUT PUT VARIATION"); //gets added
+                    G.Warning("w2.1", "MORE MORE MORE");
+                    G.Warning("w2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("w1.1", "ADD ADD");
+                    G.Warning("w1.2", "PUT PUT");
+                    G.Warning("w1.3", "PUT PUT");
+                    G.Warning("w1.2", "PUT PUT"); //does not get added, already there
+                    G.Warning("w1.3", "PUT PUT VARIATION"); //gets added
                     new Writeln("Extra text1");
                     new Writeln("Extra text2");
                 }
                 else if (d == 2)
                 {                    
-                    G.Warning("2.1", "MORE MORE MORE");
-                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
-                    G.Warning("1.1", "ADD ADD");
-                    G.Warning("1.2", "PUT PUT");
-                    G.Warning("1.3", "PUT PUT");
-                    G.Warning("1.2", "PUT PUT"); //not added (identical)
-                    G.Warning("1.3", "PUT PUT VARIATION1");
-                    G.Warning("1.3", "PUT PUT VARIATION2");
-                    G.Warning("1.3", "PUT PUT VARIATION3");
-                    G.Warning("1.3", "PUT PUT VARIATION4");
-                    G.Warning("1.3", "PUT PUT VARIATION5"); //not added with limit = 5
-                    G.Warning("1.3", "PUT PUT VARIATION6"); //not added with limit = 5
+                    G.Warning("w2.1", "MORE MORE MORE");
+                    G.Warning("w2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("w1.1", "ADD ADD");
+                    G.Warning("w1.2", "PUT PUT");
+                    G.Warning("w1.3", "PUT PUT");
+                    G.Warning("w1.2", "PUT PUT"); //not added (identical)
+                    G.Warning("w1.3", "PUT PUT VARIATION1");
+                    G.Warning("w1.3", "PUT PUT VARIATION2");
+                    G.Warning("w1.3", "PUT PUT VARIATION3");
+                    G.Warning("w1.3", "PUT PUT VARIATION4");
+                    G.Warning("w1.3", "PUT PUT VARIATION5"); //not added with limit = 5
+                    G.Warning("w1.3", "PUT PUT VARIATION6"); //not added with limit = 5
                     new Writeln("Extra text1");
                     new Writeln("Extra text2");
                 }
@@ -5977,18 +5977,18 @@ namespace Gekko
                 {
                     //Show popup at each warning
                     Program.options.global_warnings_limit = 3;
-                    G.Warning("2.1", "MORE MORE MORE");
-                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
-                    G.Warning("1.1", "ADD ADD");
-                    G.Warning("1.2", "PUT PUT");
-                    G.Warning("1.3", "PUT PUT");
-                    G.Warning("1.2", "PUT PUT"); //does not get added
-                    G.Warning("1.3", "PUT PUT VARIATION1"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION2"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION3"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION4"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION5"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
+                    G.Warning("w2.1", "MORE MORE MORE");
+                    G.Warning("w2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("w1.1", "ADD ADD");
+                    G.Warning("w1.2", "PUT PUT");
+                    G.Warning("w1.3", "PUT PUT");
+                    G.Warning("w1.2", "PUT PUT"); //does not get added
+                    G.Warning("w1.3", "PUT PUT VARIATION1"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION2"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION3"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION4"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION5"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
                     new Writeln("Extra text1");
                     new Writeln("Extra text2");
                 }
@@ -5996,18 +5996,18 @@ namespace Gekko
                 {
                     //Show popup at each warning
                     Program.options.global_warnings_pauseat = "file READing. Eq name with '__'. PUT PUT VARIA";
-                    G.Warning("2.1", "MORE MORE MORE");
-                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
-                    G.Warning("1.1", "ADD ADD");
-                    G.Warning("1.2", "PUT PUT");
-                    G.Warning("1.3", "PUT PUT");
-                    G.Warning("1.2", "PUT PUT"); //does not get added
-                    G.Warning("1.3", "PUT PUT VARIATION1"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION2"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION3"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION4"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION5"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
+                    G.Warning("w2.1", "MORE MORE MORE");
+                    G.Warning("w2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("w1.1", "ADD ADD");
+                    G.Warning("w1.2", "PUT PUT");
+                    G.Warning("w1.3", "PUT PUT");
+                    G.Warning("w1.2", "PUT PUT"); //does not get added
+                    G.Warning("w1.3", "PUT PUT VARIATION1"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION2"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION3"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION4"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION5"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
                     new Writeln("Extra text1");
                     new Writeln("Extra text2");
                 }
@@ -6015,18 +6015,18 @@ namespace Gekko
                 {
                     Program.options.global_warnings_ignore = "1";
                     Globals.warningPool.GetIgnores();
-                    G.Warning("2.1", "MORE MORE MORE");
-                    G.Warning("2.2", "EXTRA EXTRA EXTRA");
-                    G.Warning("1.1", "ADD ADD");
-                    G.Warning("1.2", "PUT PUT");
-                    G.Warning("1.3", "PUT PUT");
-                    G.Warning("1.2", "PUT PUT"); //does not get added
-                    G.Warning("1.3", "PUT PUT VARIATION1"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION2"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION3"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION4"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION5"); //gets added
-                    G.Warning("1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
+                    G.Warning("w2.1", "MORE MORE MORE");
+                    G.Warning("w2.2", "EXTRA EXTRA EXTRA");
+                    G.Warning("w1.1", "ADD ADD");
+                    G.Warning("w1.2", "PUT PUT");
+                    G.Warning("w1.3", "PUT PUT");
+                    G.Warning("w1.2", "PUT PUT"); //does not get added
+                    G.Warning("w1.3", "PUT PUT VARIATION1"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION2"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION3"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION4"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION5"); //gets added
+                    G.Warning("w1.3", "PUT PUT VARIATION6"); //does not get added, > 5.
                     new Writeln("Extra text1");
                     new Writeln("Extra text2");
                 }

@@ -1302,12 +1302,12 @@ namespace Gekko
                 new Writeln("END ASTNODES -- " + G.Seconds(tt0));
                 if (errors.Count > 0)
                 {
-                    G.Warning("6.1", "");
+                    G.Warning("w6.1", "");
                 }
             }
             catch (Exception e)
             {
-                G.Warning("6.2", "");
+                G.Warning("w6.2", "");
             }
         }
 
@@ -2201,7 +2201,7 @@ namespace Gekko
 
                 if (iEqual == -12345)
                 {
-                    G.Warning("1.1", "GAMS file: " + tok.Offset(i).LineAndPosText());                    
+                    G.Warning("w1.1", "GAMS file: " + tok.Offset(i).LineAndPosText());                    
                     return eqCounter;
                 }
 
@@ -2211,7 +2211,7 @@ namespace Gekko
 
                 if (iSemi == -12345)
                 {
-                    G.Warning("1.2", "GAMS file: " + tok.Offset(i).LineAndPosText());                    
+                    G.Warning("w1.2", "GAMS file: " + tok.Offset(i).LineAndPosText());                    
                     return eqCounter;
                 }
 
@@ -2296,7 +2296,7 @@ namespace Gekko
             catch
             {
                 //Hopefully will not happen, but more so a bad line does not crash the whole thing
-                G.Warning("1.7", "Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());                
+                G.Warning("w1.7", "Parsing error in GAMS file: " + tok.Offset(i).LineAndPosText());                
                 return eqCounter;
             }
 
@@ -2331,23 +2331,23 @@ namespace Gekko
                 if (eqnameGams.Contains("__"))
                 {
                     //new Error("Eqname '" + eqnameGams + "': did not expect '__' substring in name");
-                    G.Warning("1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");                    
+                    G.Warning("w1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");                    
                 }
                 string[] ss = eqnameGams.Split('_');
                 if (ss.Length <= 1)
                 {
                     //new Error("Eqname '" + eqnameGams + "': did not find any '_' separators");
-                    G.Warning("1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");                    
+                    G.Warning("w1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");                    
                 }
                 if (!G.Equal(ss[0], "e"))
                 {
                     //new Error("Eqname '" + eqnameGams + "': expected it to start with 'e_'");
-                    G.Warning("1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");                    
+                    G.Warning("w1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");                    
                 }
                 if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
                 {
                     //new Error("Eqname '" + eqnameGams + "': could not resolve variable name");
-                    G.Warning("1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");                    
+                    G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");                    
                 }
                 lhs = ss[1];
             }
@@ -2435,7 +2435,7 @@ namespace Gekko
                 }
                 if (eqs.Count > 1)
                 {
-                    G.Warning("7.1", "Variable '" + varname + "' appears in several equations, first one is picked");
+                    G.Warning("w7.1", "Variable '" + varname + "' appears in several equations, first one is picked");
                 }
                 found = eqs[0];  //#820948324: pick the first one, a variable name may point to several equations, for instance if y is present on the lhs in several equations.
             }
@@ -3753,7 +3753,7 @@ namespace Gekko
                             }
                         };
 
-                        using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "3.7"))
+                        using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w3.7"))
                         {
                             //#0897aef todo
                             txt.MainAdd((paramsWithoutTimeDimensionCounter.Count() + varsWithoutTimeDimensionCounter.Count()) + " variables/parameters without explicit time domain/dimension encountered");

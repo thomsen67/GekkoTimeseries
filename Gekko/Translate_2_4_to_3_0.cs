@@ -2513,7 +2513,7 @@ namespace Gekko
             string d = null; if (decorate) d = "/decorated";
             new Writeln("Investigated" + d + " " + log.Count + " .gcm files, of which " + hits + " were rootified. Cf. rootify_log.txt in your working folder");
 
-            if (failed > 0) G.Warning("26.1", failed + " .gcm files failed investigation, cf. log");
+            if (failed > 0) G.Warning("w26.1", failed + " .gcm files failed investigation, cf. log");
 
             if (dict.Count > 0)
             {

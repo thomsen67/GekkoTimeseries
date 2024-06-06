@@ -160,7 +160,7 @@ namespace Gekko
             
             if (openType == EOpenType.Ref)
             {
-                G.Warning("3.1", "OPEN<ref> is for advanced users, and will put the existing " + Globals.Ref + " in the list of 'normal' databanks");
+                G.Warning("w3.1", "OPEN<ref> is for advanced users, and will put the existing " + Globals.Ref + " in the list of 'normal' databanks");
             }
             //bool readFromFile = false;
             //Does not read the actual bank, but just arranges for the bank to be read into the right 'slot'

@@ -1318,7 +1318,7 @@ namespace Gekko
                     //BTW: when getting here, the value of index is most likely < -100.000.000,
                     //because GetArrayIndex() has essentially already failed. Not pretty, but
                     //cannot be fixed before Gekko 4.0.
-                    new Error("This error may arise in statements where the left-hand side variable appears on the right-hand side too (like for instance x = x + 10; or x <dyn> = x[-1] + 10;), but where x is not defined beforehand.");
+                    new Error("Internal data array is null regarding series '" + this.GetNameAndParentDatabank() + "'. This error may arise in statements where the left-hand side variable appears on the right-hand side too (like for instance x = x + 10; or x <dyn> = x[-1] + 10;), but where x is not defined beforehand.");
                 }
 
                 double n = Math.Max(this.data.GetDataArray_ONLY_INTERNAL_USE().Length, 4);  //the length could be 1 (or maybe even 0), so we translate 0, 1, 2, 3 into 4 which will become 6 with 1.5 times expandRate.

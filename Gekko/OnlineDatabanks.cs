@@ -41,7 +41,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Warning("13.1", "The .json file does not seem correctly formatted. " + e.Message);
+                G.Warning("w13.1", "The .json file does not seem correctly formatted. " + e.Message);
             }
 
             bool saved = false;
@@ -66,7 +66,7 @@ namespace Gekko
                 catch { }
                 if (tableName == null)
                 {
-                    G.Warning("13.1", "You should use \"table\": \"...\", in the .json file");
+                    G.Warning("w13.1", "You should use \"table\": \"...\", in the .json file");
                 }
             }
             
@@ -78,7 +78,7 @@ namespace Gekko
             catch { }
             if (format == null || !G.Equal(format, "px"))
             {
-                G.Warning("13.1", "You should use \"format\": \"px\", in the .json file");
+                G.Warning("w13.1", "You should use \"format\": \"px\", in the .json file");
             }
 
             List<string> codesHeaderJson = null;
@@ -95,7 +95,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    G.Warning("13.1", "The \"variables\" field in the .json file seems malformed");
+                    G.Warning("w13.1", "The \"variables\" field in the .json file seems malformed");
                 }
             }
 
@@ -183,7 +183,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Warning("13.2", "DOWNLOAD<file> failed: is '" + fileName + "' blocked?");
+                        G.Warning("w13.2", "DOWNLOAD<file> failed: is '" + fileName + "' blocked?");
                     }
                 }
                 else
@@ -197,7 +197,7 @@ namespace Gekko
                     h.gekkoCode = o1.gekkocode;
                     h.dataFile = o1.fileName;
                     Program.ReadPx(Program.databanks.GetFirst(), o1.opt_array, h, source, tableName, codesHeaderJson, pxLinesText, false, o1.p, out vars, out warning, out perStart, out perEnd);
-                    if (warning != null) G.Warning("13.2", warning);
+                    if (warning != null) G.Warning("w13.2", warning);
                 }
             }
         }

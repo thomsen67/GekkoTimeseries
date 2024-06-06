@@ -817,7 +817,7 @@ namespace Gekko
             catch { };
             if (rv == null)
             {
-                G.Warning("10.1", "The path name seems invalid: '" + RemoveLibraryCheatString(inputPathAndFilename) + "'");
+                G.Warning("w10.1", "The path name seems invalid: '" + RemoveLibraryCheatString(inputPathAndFilename) + "'");
                 rv = inputPathAndFilename;
             }
             return rv;
@@ -3171,7 +3171,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Warning("3.2", "Variable " + dbName + Globals.symbolBankColon + nameWithFreq + " does not exist for deletion");
+                    G.Warning("w3.2", "Variable " + dbName + Globals.symbolBankColon + nameWithFreq + " does not exist for deletion");
                     return iv;
                 }
             }
@@ -5524,7 +5524,7 @@ namespace Gekko
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                using (Warning text = new Warning(EWarningType.UsingWithTypeId, "9.2"))
+                using (Warning text = new Warning(EWarningType.UsingWithTypeId, "w9.2"))
                 {
                     SameFunctionOrProcedureNameWarning(text, name);
                 }
@@ -5536,7 +5536,7 @@ namespace Gekko
                     if (G.Equal(s, name.Substring(Globals.procedure.Length)))
                     {
                         //But you cannot even define a procedure with a Gekko command name...
-                        G.Warning("9.1", "Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
+                        G.Warning("w9.1", "Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
                     }
                 }
             }
@@ -7005,14 +7005,14 @@ namespace Gekko
                         {
                             if (Globals.modeIntendedWarning)
                             {
-                                G.Warning("11.1", "General READ is not intended for data-mode. Please use IMPORT, or consider READ<first>");
+                                G.Warning("w11.1", "General READ is not intended for data-mode. Please use IMPORT, or consider READ<first>");
                             }
                         }
                         if (isRead && !isTo && oRead.openType == EOpenType.Ref)
                         {
                             if (Globals.modeIntendedWarning)
                             {
-                                G.Warning("11.1", "READ<ref> is not intended for data-mode.");
+                                G.Warning("w11.1", "READ<ref> is not intended for data-mode.");
                             }
                         }
                     }
@@ -7257,7 +7257,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Warning("11.1", "CLONE is not intended for data-mode (cf. MODE)");
+                        G.Warning("w11.1", "CLONE is not intended for data-mode (cf. MODE)");
                     }
                 }
             }
@@ -8472,7 +8472,7 @@ namespace Gekko
 
                 if (G.Equal(Program.options.interface_mode, "sim"))
                 {
-                    G.Warning("11.1", "READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE). For instance, 'READ databk TO *;' instead of 'OPEN databk;'");
+                    G.Warning("w11.1", "READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE). For instance, 'READ databk TO *;' instead of 'OPEN databk;'");
                 }
             }
         }
@@ -10089,7 +10089,7 @@ namespace Gekko
                             //not series (including array-series and vals)                                                        
                             if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
                             {
-                                G.Warning("12.1", "Skipped one variable for printing");
+                                G.Warning("w12.1", "Skipped one variable for printing");
                             }
                             else if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
                             {                                
@@ -10113,7 +10113,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Warning("11.2", "MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                        G.Warning("w11.2", "MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                     }
                 }
                                 
@@ -10530,7 +10530,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Warning("11.3", "SIM is not intended for data-mode (cf. MODE).");
+                        G.Warning("w11.3", "SIM is not intended for data-mode (cf. MODE).");
                     }
                 }
             }
@@ -10551,7 +10551,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Warning("11.3", "MODEL is not intended for data-mode (cf. MODE).");
+                        G.Warning("w11.3", "MODEL is not intended for data-mode (cf. MODE).");
                     }
                 }
             }
@@ -11090,7 +11090,7 @@ namespace Gekko
 
                     if (Translator_AREMOS_Gekko30.warning)
                     {
-                        using (Warning text = new Warning(EWarningType.UsingWithTypeId, "26.2"))
+                        using (Warning text = new Warning(EWarningType.UsingWithTypeId, "w26.2"))
                         {
                             text.MainAdd("Possible problem with AREMOS name(s) with consecutive #'s.");
                             text.MoreAdd("The translator has problems with names that start with # and contain additional #'s.");

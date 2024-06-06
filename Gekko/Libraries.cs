@@ -970,7 +970,7 @@ namespace Gekko
                             functionNamesLower.Add(name);
                             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
                             {
-                                using (Warning text = new Warning(EWarningType.UsingWithTypeId, "9.2"))
+                                using (Warning text = new Warning(EWarningType.UsingWithTypeId, "w9.2"))
                                 {
                                     O.SameFunctionOrProcedureNameWarning(text, name);
                                 }
@@ -986,7 +986,7 @@ namespace Gekko
                                 if (G.Equal(s5, name))
                                 {
                                     //Can happen in libraries
-                                    G.Warning("9.1", "Beware that user " + G.FromLibraryToFunctionProcedureName(Globals.procedure + name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
+                                    G.Warning("w9.1", "Beware that user " + G.FromLibraryToFunctionProcedureName(Globals.procedure + name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
                                 }
                             }
                         }

@@ -476,8 +476,7 @@ namespace Gekko
                 new Error("Expected option global warnings limit to be >= -2.");
             }
 
-            string s1, s1s2; bool isXDotY;
-            WarningPool.GetNumbers(s, out s1, out s1s2, out isXDotY);
+            string s1, s1s2; WarningPool.SplitByDot(s, out s1, out s1s2);
 
             if (this.ignore0.ContainsKey(s1) || this.ignore1.ContainsKey(s1s2))
             {
@@ -557,11 +556,12 @@ namespace Gekko
                 foreach (string s2 in ss)
                 {
                     string s = s2.Trim();
-                    //Element must be something like "2" or "2.3".
+                    //Element must be something like "w2" or "w2.3".
                     if (G.NullOrBlanks(s)) new Error("Empty element: option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
                     int n = G.Count(s, ".");
                     if (n > 1) new Error("Element '" + s + "' with > 1 dots ('.'): option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
-                    if (!G.IsInteger(s.Replace(".", ""))) new Error("Invalid element '" + s + "': option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    if (!G.Equal(s.Substring(0, 1), "w")) new Error("Invalid element '" + s + "': option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
+                    if (!G.IsInteger(s.Substring(1).Replace(".", ""))) new Error("Invalid element '" + s + "': option global warnings ignore = '" + Program.options.global_warnings_ignore + "'");
 
                     if (n == 0)
                     {
@@ -673,34 +673,30 @@ namespace Gekko
         private void GetText(string s, Dictionary<string, bool> level2, out string w1, out string w2)
         {
             //kvp.Key is alway something like "1.1", "5.3" and so on. Each of these have 1 or more elements.  
-            string s1, s1s2; bool isXDotY;
-            WarningPool.GetNumbers(s, out s1, out s1s2, out isXDotY);
+            string s1, s1s2; WarningPool.SplitByDot(s, out s1, out s1s2);
             if (level2 != null && !level2.ContainsKey(s1s2)) level2.Add(s1s2, false); //"1.1", "3.2", etc.
             this.GetTextHelper(s1, s1s2, out w1, out w2);
         }
 
         /// <summary>
-        /// For a string s like "2.3", it returns "2" and "2.3". For "2" it will return "2" and "2.0". 
+        /// For a string s like "w2.3", it returns "w2" and "w2.3". For "w2" it will return "w2" and "w2.0". 
         /// Will handle blanks etc. If illegal, it will return "0" and "0.0".
         /// </summary>
         /// <param name="s"></param>
         /// <param name="s1"></param>
         /// <param name="s1s2"></param>
-        public static void GetNumbers(string s, out string s1, out string s1s2, out bool isXDotY)
+        public static void SplitByDot(string s, out string s1, out string s1s2)
         {
             if (G.NullOrBlanks(s))
             {
-                s1 = "0"; s1s2 = "0.0"; isXDotY = false;
+                s1 = "0"; s1s2 = "0.0";
                 return;
-            }
-            isXDotY = true;
+            }            
             string[] ss = s.Split('.');
             if (ss.Length == 1) ss = new string[2] { s.Trim(), "0" };
             else if (ss.Length != 2) ss = new string[2] { "0", "0" };  //so it does not crash (length == 0, 3, 4, ...)
             s1 = ss[0].Trim();
-            string s2 = ss[1].Trim();
-            if (s1 == "0" || s2 == "0") isXDotY = false;
-            if (!G.IsInteger(s1) || !G.IsInteger(s2)) isXDotY = false;
+            string s2 = ss[1].Trim();            
             s1s2 = s1 + "." + s2;
         }
 
@@ -1077,7 +1073,7 @@ namespace Gekko
             //We check first as if working folder is reading, then as if it is writing.
             if (!(this.CheckBlackAndWhitelist(Program.options.folder_working, false, true)) || !(this.CheckBlackAndWhitelist(Program.options.folder_working, false, false)))
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "27.1")) //Remove #kjlasfa87iads if this is no longer a warning
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w27.1")) //Remove #kjlasfa87iads if this is no longer a warning
                 {
                     txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
                     txt.MainNewLineTight();
@@ -2994,7 +2990,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "w")
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "2.1"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w2.1"))
                 {
                     txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
                     txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
@@ -3003,7 +2999,7 @@ namespace Gekko
                     txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
                 }
 
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "31.1"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w31.1"))
                 {
                     txt.MainAdd("There are many missing values when computing historical variability for.");
                     txt.MoreAdd("For the period , % of reference databank values are missing values, ");
@@ -4354,7 +4350,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {                    
-                    G.Warning("3.3", "Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
+                    G.Warning("w3.3", "Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
                     throw;
                 }
             }
@@ -7192,7 +7188,7 @@ namespace Gekko
                                 }
                                 if (!success)
                                 {                                    
-                                    using (var txt = new Warning(EWarningType.UsingWithTypeId, "28.1"))
+                                    using (var txt = new Warning(EWarningType.UsingWithTypeId, "w28.1"))
                                     {
                                         if (unknowVersion) txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ", but Gekko " + Globals.gekkoVersion + " only supports data trace versions: " + Stringlist.GetListWithCommas(Globals.traceVersions) + ".");
                                         else txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ". This data trace version is known to Gekko " + Globals.gekkoVersion + ", but reading the traces failed.");
@@ -7960,11 +7956,11 @@ namespace Gekko
                 readInfo.variables = counter;
                 if (emptyWarnings > 0)
                 {
-                    G.Warning("2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");                    
+                    G.Warning("w2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");                    
                 }
                 if (smallWarnings > 0)
                 {
-                    G.Warning("2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                    G.Warning("w2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
                 }
             }
         }
@@ -8272,13 +8268,13 @@ namespace Gekko
                             //for instance quarterly x.sol (not x.q)
                             if (true)
                             {
-                                G.Warning("3.4", "Changed " + name1 + "." + name2 + " into " + name1 + "__" + name2 + "!" + G.ConvertFreq(freq));
+                                G.Warning("w3.4", "Changed " + name1 + "." + name2 + " into " + name1 + "__" + name2 + "!" + G.ConvertFreq(freq));
                                 name += "__" + name2;
                             }
                             else
                             {
                                 //this gave problems, better to use "__"
-                                G.Warning("3.4", "Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
+                                G.Warning("w3.4", "Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
                                 name += "_" + name2;
                             }
                         }
@@ -8474,7 +8470,7 @@ namespace Gekko
             GekkoTime endYear;
             string warning = null;
             ReadPx(databank, oRead.array, null, null, null, null, pxLinesText, oRead.isVariablecode, p, out vars, out warning, out startYear, out endYear);
-            if (warning != null) G.Warning("3.5", warning);
+            if (warning != null) G.Warning("w3.5", warning);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;
@@ -8660,7 +8656,7 @@ namespace Gekko
                     readInfo.endPerResultingBank = readInfo.endPerInFile;
 
 
-                    if (firstYearWarnings > 0) G.Warning("3.6", firstYearWarnings + " variables had data before databank time period (data skipped)");
+                    if (firstYearWarnings > 0) G.Warning("w3.6", firstYearWarnings + " variables had data before databank time period (data skipped)");
 
                     //readInfo.databank.info1 = readInfo.info1;
                     //readInfo.databank.date = readInfo.date;
@@ -9411,7 +9407,7 @@ namespace Gekko
 
             if (pxAllowAnyTimeDimensionIndex)
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "3.8"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w3.8"))
                 {
                     txt.MainAdd("The time dimension is not defined last in the .px file, and therefore an experimental module is used.");
                     txt.MoreAdd("The time dimension is not defined last in the .px file, since either CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
@@ -9428,18 +9424,18 @@ namespace Gekko
             if (hyphenFound)
             {
                 //Only for !isArray
-                G.Warning("3.5", "Hyphens ('-') in names have been removed");
+                G.Warning("w3.5", "Hyphens ('-') in names have been removed");
             }
 
             if (underscoreFound)
             {
                 //Only for !isArray
-                G.Warning("3.5", "Underscores ('_') in names have been removed");
+                G.Warning("w3.5", "Underscores ('_') in names have been removed");
             }
 
             if (holes != null)
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "3.9"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w3.9"))
                 {
                     txt.MainAdd("There are gaps in the data: for some of the observations, there is a gap > 1 between the date of the observation and the previous date that contains data");
 
@@ -11211,7 +11207,7 @@ namespace Gekko
                             string[] files = Directory.GetFiles(Path.GetDirectoryName(rawpath), temp, SearchOption.AllDirectories);
                             if (files.Length == 0)
                             {
-                                G.Warning("15.1", "Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
+                                G.Warning("w15.1", "Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
                             }
                             else
                             {
@@ -11255,7 +11251,7 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Warning("15.1", "Did not find raw.gms as this file path: " + rawpath);
+                                G.Warning("w15.1", "Did not find raw.gms as this file path: " + rawpath);
                             }
                         }
                         zipper.ZipAndCleanup();
@@ -12069,7 +12065,7 @@ namespace Gekko
                     }
                 }
 
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "29.1"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w29.1"))
                 {
                     txt.MainAdd("The X12A component did not produce any adjusted timeseries. See more info/logging in the tempX12aFile... files here: " + Globals.localTempFilesLocation + ".");
                     if (extra != null)
@@ -16656,7 +16652,7 @@ namespace Gekko
             if (realStart.IsNull())
             {
                 //do nothing, the lhs series is not touched (but may be created here)
-                G.Warning("16.1", "Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
+                G.Warning("w16.1", "Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
             }
             else
             {
@@ -16772,7 +16768,7 @@ namespace Gekko
 
                     if (realStartOverlay.IsNull())
                     {
-                        G.Warning("15.1", "The overlay series '" + overlay.GetName() + "' has no observations");
+                        G.Warning("w15.1", "The overlay series '" + overlay.GetName() + "' has no observations");
                     }
                     else
                     {
@@ -18417,7 +18413,7 @@ namespace Gekko
                 if (o.opt_tobank != null)
                 {
                     //Make an error for Gekko 3.2
-                    using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "30.1"))
+                    using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w30.1"))
                     {                        
                         txt.MainAdd("COPY <tobank=...> option is used, but the COPY statement itself is missing a TO part.");
                         txt.MoreAdd("A COPY statement without the TO part always copies variables into the first-position databank, and in that case, any <tobank=...> is ignored. In order to copy a variable x from the databank b1 to the databank b2 you cannot use 'COPY <frombank=b1 tobank=b2> x;', but should instead use 'COPY <frombank=b1 tobank=b2> x to *;'. Note: this warning will become an error in Gekko 3.2. To avoid the warning, just remove the <tobank=...> part of the COPY statement.");
@@ -19283,7 +19279,7 @@ namespace Gekko
                 }
             }
 
-            if (freqWarning != null) G.Warning("17.1", freqWarning); //Gekko 3.2  --> maybe make this an error
+            if (freqWarning != null) G.Warning("w17.1", freqWarning); //Gekko 3.2  --> maybe make this an error
 
             return outputs;
         }
@@ -20686,7 +20682,7 @@ namespace Gekko
                 {
                     if (!mute)
                     {
-                        if (G.Equal(fileName, "con")) G.Warning("18.1", "Please use PIPE<stop> instead of PIPE con");
+                        if (G.Equal(fileName, "con")) G.Warning("w18.1", "Please use PIPE<stop> instead of PIPE con");
                     }
                 }
                 else
@@ -20702,7 +20698,7 @@ namespace Gekko
                         G.Writeln2("Directing output to main window");
                     if (G.Equal(fileName, "con"))
                     {
-                        G.Warning("18.1", "Please use PIPE<stop> instead of PIPE con");
+                        G.Warning("w18.1", "Please use PIPE<stop> instead of PIPE con");
                     }
                 }
             }
@@ -21289,7 +21285,7 @@ namespace Gekko
                 {
                     message = "" + e?.Message; innerException = "" + e?.InnerException;
                     success = false;
-                    G.Warning("19.1", "Trying to extract the file '" + entry.FullName + "' from inside the zip file '" + zipFileWithPath + "'. Blocked? Retrying... (" + (i * gap) + " seconds)");
+                    G.Warning("w19.1", "Trying to extract the file '" + entry.FullName + "' from inside the zip file '" + zipFileWithPath + "'. Blocked? Retrying... (" + (i * gap) + " seconds)");
                     //new random folder for such files
                     Globals.tempFiles = Program.CreateTempFolderPath("tempfiles");  //new path name
                     try
@@ -22329,7 +22325,7 @@ namespace Gekko
             else
             {
                 G.Writeln("[none]");
-                G.Warning("20.1", "Nothing is filtered out, so filter has no effect!");
+                G.Warning("w20.1", "Nothing is filtered out, so filter has no effect!");
             }
             Globals.globalPeriodTimeFilters2 = negativeFilter;
             if (Program.options.timefilter == false)
@@ -22498,7 +22494,7 @@ namespace Gekko
                                 int exitCode = process.ExitCode;
                                 if (exitCode != 0)
                                 {
-                                    G.Warning("21.1", "System call exited with code: " + exitCode + ". System command: " + commandLine);
+                                    G.Warning("w21.1", "System call exited with code: " + exitCode + ". System command: " + commandLine);
                                     //fail = true;
                                 }
                             }
@@ -22517,7 +22513,7 @@ namespace Gekko
                                 }
                                 catch (Exception e)
                                 {
-                                    G.Warning("21.1", "Could not write output from system command");
+                                    G.Warning("w21.1", "Could not write output from system command");
                                     //fail = true;
                                 }
                             }
@@ -23776,7 +23772,7 @@ namespace Gekko
 
                 if (traceFail)
                 {
-                    using (var txt = new Warning(EWarningType.UsingWithTypeId, "28.2"))
+                    using (var txt = new Warning(EWarningType.UsingWithTypeId, "w28.2"))
                     {
                         try { File.Delete(pathAndFilename3); } catch { }  //a corrupted trace.data may be present: get it wiped out before zipping!
                         try { foreach (SeriesMetaInformation meta in th.metas) meta.traceID2 = null; } catch { } //some of these may have been constructed: wipe them out!
@@ -23835,7 +23831,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     //Hmmm: this will not abort if Error()
-                    G.Warning("10.2", "Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
+                    G.Warning("w10.2", "Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
                     throw;
                 }
             }
@@ -24216,7 +24212,7 @@ namespace Gekko
             {                
                 if (!System.IO.Directory.Exists(folderInfo.FullName))
                 {
-                    G.Warning("19.1", "Zip file could not be created");  //should not be possible                        
+                    G.Warning("w19.1", "Zip file could not be created");  //should not be possible                        
                 }
 
                 int sleepMs = 10;
@@ -24899,14 +24895,14 @@ namespace Gekko
             {
                 if (G.Equal(Program.options.interface_csv_delimiter, "comma") && G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
                 {
-                    G.Warning("22.1", "Using comma both as decimal separator and field delimiter for csv is not advised");
+                    G.Warning("w22.1", "Using comma both as decimal separator and field delimiter for csv is not advised");
                 }
             }
             else if (fileType == EdataFormat.Prn)
             {
                 if (G.Equal(Program.options.interface_prn_delimiter, "comma") && G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
                 {
-                    G.Warning("23.1", "Using comma both as decimal separator and field delimiter for prn is not advised");
+                    G.Warning("w23.1", "Using comma both as decimal separator and field delimiter for prn is not advised");
                 }
             }
 
@@ -27188,7 +27184,7 @@ namespace Gekko
             Globals.linkAction.TryGetValue(n, out ga);
             if (ga == null || ga.action == null)
             {
-                using (Warning w = new Warning(EWarningType.UsingWithTypeId, "8.1"))
+                using (Warning w = new Warning(EWarningType.UsingWithTypeId, "w8.1"))
                 {
                     w.MainAdd("Link of type '" + ga.type.ToString() + "' has expired. ");
                     if (ga.type == EGekkoActionTypes.Ols)
@@ -29390,7 +29386,7 @@ namespace Gekko
                             {
                                 //p<m>@fy                --------- this is not really meaningful
                                 banks.Add(Globals.Ref);
-                                if (!hasIssuedWarning) G.Warning("7.2", "Note that you are using @-variables in combination with the <m> (multiplier) option");
+                                if (!hasIssuedWarning) G.Warning("w7.2", "Note that you are using @-variables in combination with the <m> (multiplier) option");
                                 hasIssuedWarning = true;
                             }
                             else
@@ -29408,7 +29404,7 @@ namespace Gekko
                                 {
                                     //p<b>@fy                --------- this is not really meaningful
                                     banks.Add(Globals.Ref);
-                                    if (!hasIssuedWarning) G.Warning("7.2", "Note that you are using @-variables in combination with the <r> (reference) option");
+                                    if (!hasIssuedWarning) G.Warning("w7.2", "Note that you are using @-variables in combination with the <r> (reference) option");
                                     hasIssuedWarning = true;
                                 }
                                 else
@@ -33907,13 +33903,13 @@ namespace Gekko
                     {
                         if (code.Length <= 1)
                         {
-                            G.Warning("24.1", "Formula code regarding '" + var + "' seems problematic: " + code);
+                            G.Warning("w24.1", "Formula code regarding '" + var + "' seems problematic: " + code);
                         }
                         if (code.Length >= 2)
                         {
                             if (code.Substring(0, 1) != "_")
                             {
-                                G.Warning("24.1", "Formula code regarding '" + var + "' does not start with '_' or 'i' or 'y': " + code);
+                                G.Warning("w24.1", "Formula code regarding '" + var + "' does not start with '_' or 'i' or 'y': " + code);
                             }
                             else
                             {
@@ -33940,13 +33936,13 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    G.Warning("24.1", "There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
+                                    G.Warning("w24.1", "There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
                                 }
                             }
                         }
                         else
                         {
-                            G.Warning("24.1", "There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
+                            G.Warning("w24.1", "There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
                         }
                     }
                 }
@@ -34686,7 +34682,7 @@ namespace Gekko
             double l2 = (double)lag2Problem / (double)lagCounter;
             if (history && lagCounter > 0 && l > 0.8d)
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "31.1"))
+                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w31.1"))
                 {
                     txt.MainAdd("There are many missing values when computing historical variability for " + tStart.ToString() + ".");
                     txt.MoreAdd("For the period " + tStart.Add(-1).ToString() + ", " + Math.Round(l1 * 100, 0) + "% of reference databank values are missing values, ");
@@ -35338,7 +35334,7 @@ namespace Gekko
 
                 if (this.nanCounter > 0)
                 {
-                    G.Warning("2.3", "Encountered " + this.nanCounter + " instances of 'NaN' in the file. These are set to missing -- proper .tsd syntax is to use '1.000000E+15' to indicate a missing value");
+                    G.Warning("w2.3", "Encountered " + this.nanCounter + " instances of 'NaN' in the file. These are set to missing -- proper .tsd syntax is to use '1.000000E+15' to indicate a missing value");
                 }
 
                 if (this.conversionMessage)

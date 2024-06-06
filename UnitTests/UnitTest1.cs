@@ -4328,7 +4328,7 @@ namespace UnitTests
             G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
             //bank/ref
-            I("reset;");            
+            I("reset;");
             I("time 2001 2001;");
             I("open <edit> b1;");
             I("x = 2.2;");
@@ -8342,7 +8342,7 @@ namespace UnitTests
         {
             //==================== INDEX ===========================================
 
-            I("RESET;"); 
+            I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("index f* to #mylist;                                      //finds all series in Work and puts them in #mylist");
@@ -10187,7 +10187,7 @@ namespace UnitTests
         public void _Test_Fence()
         {
             //We are cheating and changing the options directly!
-            
+
             try
             {
 
@@ -10229,7 +10229,7 @@ namespace UnitTests
                     I("x = 2;");
                     FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
                     I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig';");
-                    I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");                    
+                    I("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
 
                     // -----------------------------------------------------------------
                     //           Blacklist
@@ -10375,7 +10375,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Sheet_Matrix()
-        {            
+        {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
             I("#m = [1, 2; 3, 4];");
@@ -10403,22 +10403,22 @@ namespace UnitTests
                 else if (i == 2) Program.options.global_warnings_limit = limit;
                 else if (i == 3)
                 {
-                    Program.options.global_warnings_ignore = "2, 1.2";
+                    Program.options.global_warnings_ignore = "w2, w1.2";
                     Globals.warningPool.GetIgnores();
                 }
                 Globals.unitTestScreenOutput.Clear();
                 I("warning(2);");
                 if (i == 3) Assert.AreEqual(2, Globals.warningPool.storage.Count);
                 else Assert.AreEqual(5, Globals.warningPool.storage.Count);
-                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.1"));
-                else Assert.AreEqual(1, Globals.warningPool.storage["2.1"].storage.Count);
-                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("2.2"));
-                else Assert.AreEqual(1, Globals.warningPool.storage["2.2"].storage.Count);
-                Assert.AreEqual(1, Globals.warningPool.storage["1.1"].storage.Count);
-                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("1.2"));
-                else Assert.AreEqual(1, Globals.warningPool.storage["1.2"].storage.Count); //2 identical are added, 1 stored                    
-                if (i == 2) Assert.AreEqual(limit, Globals.warningPool.storage["1.3"].storage.Count);
-                else Assert.AreEqual(5, Globals.warningPool.storage["1.3"].storage.Count); //is pruned off at 5, even though 6 are added.                    
+                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("w2.1"));
+                else Assert.AreEqual(1, Globals.warningPool.storage["w2.1"].storage.Count);
+                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("w2.2"));
+                else Assert.AreEqual(1, Globals.warningPool.storage["w2.2"].storage.Count);
+                Assert.AreEqual(1, Globals.warningPool.storage["w1.1"].storage.Count);
+                if (i == 3) Assert.IsFalse(Globals.warningPool.storage.ContainsKey("w1.2"));
+                else Assert.AreEqual(1, Globals.warningPool.storage["w1.2"].storage.Count); //2 identical are added, 1 stored                    
+                if (i == 2) Assert.AreEqual(limit, Globals.warningPool.storage["w1.3"].storage.Count);
+                else Assert.AreEqual(5, Globals.warningPool.storage["w1.3"].storage.Count); //is pruned off at 5, even though 6 are added.                    
                 Globals.warningPool.Report();
                 //There are 9 and 8 and 6 here: one completely identical message does not get into dict
                 if (i == 2) Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There were 8 distinct WARNING messages"));
@@ -10432,6 +10432,13 @@ namespace UnitTests
             }
         }
 
+        [TestMethod]
+        public void _Test_EmptySeries()
+        {
+            I("reset;");
+            I("create x;");
+            I("y = -x;");
+        }
 
         [TestMethod]
         public void _Test_Invalid_Period()
