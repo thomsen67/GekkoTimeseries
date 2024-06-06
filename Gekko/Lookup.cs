@@ -1525,12 +1525,14 @@ namespace Gekko
                                     //this is very similar to the same code regarding 1 x 1 MATRIX
                                     if (O.UseFlexFreq(smpl.t1, smpl.t2, lhs_series.freq))
                                     {
-                                        //different freqs, for instance x!q = 2 when global freq is !a                                        
+                                        //different freqs, for instance x!q = 2 when global freq is !a
+                                        //SLACK: why looping over GekkoTime and not using arrays? But probably rather rare.
                                         foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);
                                     }
                                     else
                                     {
                                         //same freq
+                                        //SLACK: why looping over GekkoTime and not using arrays? But probably rather rare.
                                         foreach (GekkoTime t in smpl.Iterate12()) lhs_series.SetData(t, d);
                                     }
                                 }

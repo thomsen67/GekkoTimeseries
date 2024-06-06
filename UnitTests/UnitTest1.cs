@@ -10433,11 +10433,23 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_EmptySeries()
+        public void _Test_NullSeries()
         {
             I("reset;");
             I("create x;");
             I("y = -x;");
+
+            I("reset;");
+            I("create x;");
+            I("x <dyn> = x[-1] + 1;");
+
+            I("reset; option bugfix nullseries = no;");
+            I("create x;");
+            FAIL("y = -x;");
+
+            I("reset; option bugfix nullseries = no;");
+            I("create x;");
+            FAIL("x <dyn> = x[-1] + 1;");
         }
 
         [TestMethod]

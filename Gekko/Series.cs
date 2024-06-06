@@ -1229,6 +1229,19 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
 
+            if (Program.options.bugfix_nullseries)
+            {
+                if (this.type == ESeriesType.Normal)
+                {
+                    if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null && !gt.IsNull())  //gt can probably never be null anyway
+                    {
+                        //Will keep any .dataOffsetLag, but that should not matter since
+                        //it is filled with only missing values anyway.
+                        InitDataArray(gt);
+                    }                                       
+                }                
+            }
+
             int rv = FromGekkoTimeToArrayIndexAbstract(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub, this.data.anchorPeriod.subsub), this.GetAnchorPeriodPositionInArray());
             return rv;
         }
@@ -1394,7 +1407,6 @@ namespace Gekko
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless error #10");
-                //throw new GekkoException();
             }
             else
             {
