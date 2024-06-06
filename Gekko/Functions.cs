@@ -3803,6 +3803,32 @@ namespace Gekko
             Program.PrintNonSeries(v3, "The following " + v3.Count() + " strings are in list #2, but not in list #1:", 0, null);
         }
 
+        public static IVariable allmiss(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            if (x.Type() == EVariableType.Series)
+            {
+                Series x_series = x as Series;
+                if (x_series.type == ESeriesType.Timeless)
+                {
+                    double d = x_series.GetTimelessData();
+                    if (G.isNumericalError(d)) return Globals.scalarVal1;
+                    else return Globals.scalarVal0;
+                }
+                else if (x_series.type == ESeriesType.Normal || x_series.type == ESeriesType.Light)
+                {
+                    GekkoTime t1 = x_series.GetRealDataPeriodFirst();
+                    if (t1.IsNull()) return Globals.scalarVal1;
+                    else return Globals.scalarVal0;
+                }
+                else new Error("You cannot use allMiss() on an array-parentseries.");
+            }
+            else
+            {
+                new Error("The allMiss() function expect a timeseries variable type");                
+            }
+            return Globals.scalarVal0;  //will never get here
+        }
+
         public static IVariable asbrename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable name, IVariable file, IVariable decorate)
         {
             string s = null;

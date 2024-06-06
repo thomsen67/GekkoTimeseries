@@ -10433,9 +10433,54 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_AllMiss()
+        {
+            I("reset; time 2001 2003;");
+            I("x = m();");
+            I("%am = x.allMiss();");
+            _AssertScalarVal(First(), "%am", 1d);
+
+            I("reset; time 2001 2003;");
+            I("x = m();");
+            I("x <2002 2002> = 1;");
+            I("%am = x.allMiss();");
+            _AssertScalarVal(First(), "%am", 0d);
+
+            I("reset; time 2001 2003;");
+            I("create x;");            
+            I("%am = x.allMiss();");
+            _AssertScalarVal(First(), "%am", 1d);
+
+            // ================
+
+            I("reset; time 2001 2003;");
+            I("x = timeless(m());");
+            I("%am = x.allMiss();");
+            _AssertScalarVal(First(), "%am", 1d);
+
+            I("reset; time 2001 2003;");
+            I("x = timeless(1);");
+            I("%am = x.allMiss();");
+            _AssertScalarVal(First(), "%am", 0d);            
+
+            // ================
+
+            I("reset; time 2001 2003; x = series(1);");
+            I("x[a] = m();");
+            I("%am = x[a].allMiss();");
+            _AssertScalarVal(First(), "%am", 1d);
+
+            I("reset; time 2001 2003; x = series(1);");
+            I("x[a] = m();");
+            I("x[a] <2002 2002> = 1;");
+            I("%am = x[a].allMiss();");
+            _AssertScalarVal(First(), "%am", 0d);            
+        }
+
+        [TestMethod]
         public void _Test_NullSeries()
         {
-            I("reset;");
+            I("reset; time 2001 2003;");
             I("create x;");
             I("y = -x;");
 
