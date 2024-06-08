@@ -13931,7 +13931,7 @@ namespace UnitTests
                         //Not good, but would be rare though, see also #8iso8ufd8su
                         //Cf. Globals.traceEndoRhsFix1
                         Assert.AreEqual(6061, th.traces.Count);
-                        Assert.AreEqual(142, th.MaxDepth());
+                        Assert.AreEqual(108, th.MaxDepth());
                     }
                 }
             }
@@ -14597,9 +14597,6 @@ namespace UnitTests
             I("x2 = 100;");
             I("x2 <2002 2005> ^= dif(x1);");
             I("x2 <2003 2005> %= 2;");
-            
-            
-
 
             //Tests that assure repeated commands do not just accumulate traces.            
 
@@ -14667,8 +14664,6 @@ namespace UnitTests
                 Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
                 Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
             }
-
-
         }
 
         [TestMethod]
@@ -15439,6 +15434,42 @@ namespace UnitTests
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t2.super);
 
             Assert.Inconclusive("The trace2 databank should have 2 traces, and the statements around read should have 2 traces too...");
+        }
+
+        [TestMethod]
+        public void _Test_TraceCopyRefinement()
+        {
+            //This tests a fix for IsSimilarTrace(), in the code starting at #0osd8sskjd
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    I("reset; time 2001 2003;");
+                    I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                    I("x1 = 2;");
+                    I("x2 = 3;");
+                    I("write sletmig;");
+                    if (i == 0) I("reset;");
+                    I("time 2001 2003;");
+                    string s = null;
+                    I("open sletmig;");
+                    if (j == 0) s = "copy <respect> sletmig:*;";
+                    else s = "copy sletmig:*;";
+                    I(s);
+                    I("y = x1 + x2;");
+                    Series y = O.GetIVariableFromString("y!a", ECreatePossibilities.NoneReportError) as Series;
+                    Trace2 trace = y.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                    Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());  //2+1 = 3, where 1 is divider
+                    Trace2 traceY1 = trace.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                    Trace2 traceY2 = trace.GetPrecedents_BewareOnlyInternalUse()[2].trace;
+                    Assert.AreEqual(s, traceY1.GetContents().text);
+                    Assert.AreEqual(s, traceY2.GetContents().text);
+                    Trace2 traceY11 = traceY1.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                    Assert.AreEqual("x1 = 2;", traceY11.GetContents().text);
+                    Trace2 traceY21 = traceY2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                    Assert.AreEqual("x2 = 3;", traceY21.GetContents().text);
+                }
+            }
         }
 
         [TestMethod]

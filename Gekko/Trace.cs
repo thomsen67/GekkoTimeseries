@@ -371,18 +371,35 @@ namespace Gekko
         /// then --> we do not add this trace.
         /// For instance reset; x &lt;2014 2024> = 2; for val %t = 2014 to 2024; x[%t] = x[%t] + 2; end;
         /// This loop will produce a network of references, accumulating more and more for traces near 2024.
-        /// The if here makes sure we do not get a lot of non-interesting dublets.
+        /// The if here makes sure we do not get a lot of non-interesting dublets. But beware that something like copy b:*; for
+        /// some timeseries will make their first traces look identical even though sub-traces under copy b:*; can be
+        /// different because it is different timeseries. That is handled.
         /// </summary>
         /// <param name="lastTrace"></param>
         /// <param name="newTrace"></param>
         /// <returns></returns>
         private static bool IsSimilarTrace(Trace2 lastTrace, Trace2 newTrace)
-        {
-            bool similar = true;
-            if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) > 1000000) similar = false;
-            if (lastTrace.GetContents().text != newTrace.GetContents().text) similar = false;
-            if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) similar = false;
-            return similar;
+        {            
+            if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) > 1000000) return false;
+            if (lastTrace.GetContents().text != newTrace.GetContents().text) return false;
+            if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) return false;
+                        
+            try
+            {
+                //Now we test sub-traces, cf. _Test_TraceCopyRefinement() and #0osd8sskjd.
+                if (lastTrace.precedents.Count() != lastTrace.precedents.Count()) return false;
+                if (lastTrace.precedents.Count() > 0)
+                {
+                    for (int i = 0; i < lastTrace.precedents.Count(); i++)
+                    {
+                        Trace2 lastTrace_sub = lastTrace.precedents[i].trace;
+                        Trace2 newTrace_sub = newTrace.precedents[i].trace;
+                        if (!lastTrace_sub.traceContents.id.Equals(newTrace_sub.traceContents.id)) return false;
+                    }
+                }
+            }
+            catch { };  //remove try-catch in Gekko 4.0
+            return true;
         }
 
         /// <summary>
