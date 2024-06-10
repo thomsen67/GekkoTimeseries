@@ -2047,7 +2047,7 @@ namespace Gekko.Parser.Gek
                             for (int i = 0; i < node[0].ChildrenCount(); i++)
                             {
                                 O.ELoopType loopType = O.ELoopType.List;
-                                try  //remove try in Gekko 3.2
+                                try  //remove try in Gekko 4.0
                                 {
                                     loopType = LoopType(node, i);
                                 }
@@ -2072,14 +2072,14 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("IVariable ").A(node.forLoop[i].Item2).A(" = ").A(listsname).A("[" + i + "]").A("[" + iname + "]").End();
 
-                                if (Globals.fixFor3_2)
+                                if (Globals.fixForGekko4_0)
                                 {
                                     //This never works: #m2 = 1, 2; for string % i2 = #m2; tell %i2; end;
                                     //But this works: #m1 = a, b; #m2 = 1, 2; for string % i1 = #m1 string %i2 = #m2; tell %i1 + ' ' + %i2; end;
-                                    //--> the code below makes the parallel loop fail, it would need strings(#m2) to work in Gekko 3.2.
+                                    //--> the code below makes the parallel loop fail, it would need strings(#m2) to work in Gekko 4.0
                                     //    write in error message O.TypeCheck... that strings(...) could solve issue.
                                     string type = null;
-                                    try  //remove try in Gekko 3.2
+                                    try  //remove try in Gekko 4.0
                                     {
                                         type = node[0][i][0][0].Text;
                                         CheckTypeInFunctionDefProcedureDefForDef("for-loop", type, varnames[i]);

@@ -8212,7 +8212,7 @@ namespace Gekko
 
         public class Close
         {
-            public string name = null;  //NOT TRUE --> only if '*' is indicated, not used otherwise. Remove in Gekko 3.2.
+            public string name = null;  //NOT TRUE --> only if '*' is indicated, not used otherwise. Remove in Gekko 4.0
             public List listItems = null;
             public string opt_save = null;
             public void Exe()

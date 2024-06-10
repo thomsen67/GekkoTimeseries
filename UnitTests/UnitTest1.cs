@@ -8874,6 +8874,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_AREMOS_ras()
         {
+            Assert.Fail();
             Databank work = First();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\AREMOS\Ras';");
@@ -10395,7 +10396,6 @@ namespace UnitTests
         {
             for (int i = 0; i < 4; i++)
             {
-
                 int limit = 4;
                 I("reset;"); Program.options = new Options();  //no resurrection!
                 Globals.warningPool = new WarningPool();
@@ -13931,7 +13931,7 @@ namespace UnitTests
                         //Not good, but would be rare though, see also #8iso8ufd8su
                         //Cf. Globals.traceEndoRhsFix1
                         Assert.AreEqual(6061, th.traces.Count);
-                        Assert.AreEqual(108, th.MaxDepth());
+                        Assert.AreEqual(142, th.MaxDepth());
                     }
                 }
             }
@@ -15437,12 +15437,12 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_TraceCopyRefinement()
+        public void _Test_TraceIsSimilartrace()
         {
             //This tests a fix for IsSimilarTrace(), in the code starting at #0osd8sskjd
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++)  //reset or not
             {
-                for (int j = 0; j < 2; j++)
+                for (int j = 0; j < 3; j++)
                 {
                     I("reset; time 2001 2003;");
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
@@ -15454,7 +15454,8 @@ namespace UnitTests
                     string s = null;
                     I("open sletmig;");
                     if (j == 0) s = "copy <respect> sletmig:*;";
-                    else s = "copy sletmig:*;";
+                    else if (j == 1) s = "copy sletmig:*;";
+                    else s = "for val %i = 1 to 2; x{%i} = 100 * %i; end;";
                     I(s);
                     I("y = x1 + x2;");
                     Series y = O.GetIVariableFromString("y!a", ECreatePossibilities.NoneReportError) as Series;

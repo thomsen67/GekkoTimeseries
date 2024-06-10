@@ -237,12 +237,13 @@ namespace Gekko
         /// Get all traces from series rhs into trace (later put inside lhs series).
         /// The method is used for assignments, and assignments automatically identify all series "asked" on the rhs.
         /// When altering something regarding traces, make sure precedentsNames is also altered!
+        /// Dividers are inserted to separate each rhs-trace-collection from the next.
         /// See also AddRangeFromSeries2().
         /// </summary>
         /// <param name="lhsTrace"></param>
         /// <param name="rhs"></param>
         public static void AddRangeFromSeries1(Trace2 lhsTrace, Series rhs)
-        {
+        {                        
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
 
             if (lhsTrace.GetContents().precedentsNames == null) lhsTrace.GetContents().precedentsNames = new List<string>();
@@ -293,7 +294,7 @@ namespace Gekko
                             // HMM double loop RHS+LHS if n is large
                             //
                             if (i1 + 1 > lhsTrace.precedents.Count()) break;  //cannot get to n1
-                            TraceAndPeriods2 previousLhsTraceTap = lhsTrace.precedents.GetStorage()[lhsTrace.precedents.Count() - (i1 + 1)];
+                            TraceAndPeriods2 previousLhsTraceTap = lhsTrace.precedents.GetStorage()[lhsTrace.precedents.Count() - (i1 + 1)];  //looks at the last one, then the second last one.
                             if (Object.ReferenceEquals(previousLhsTraceTap, rhsTraceTap)) goto LabelDoNotAddAsChild; //actually same, faster check. Can this even happen?
                             if (IsSimilarTrace(previousLhsTraceTap.trace, rhsTrace)) goto LabelDoNotAddAsChild;
                         }
@@ -379,26 +380,45 @@ namespace Gekko
         /// <param name="newTrace"></param>
         /// <returns></returns>
         private static bool IsSimilarTrace(Trace2 lastTrace, Trace2 newTrace)
-        {            
+        {
+            //We cannot compare periods, because we want x[%t] to be able to prune out similar traces over different periods.
+            if (Globals.traceSimilarFix1 && G.Equal(lastTrace.GetContents().name, newTrace.GetContents().name))
+            {
+                //cannot be a similar trace, if x{%i} == ... in two traces defines a differnet LHS variable!
+                //Now even if "b:x!a" is the same in both traces, and the code line is the same, could it still be a
+                //different series object? Yes, in principle, but it would be a bit weird, involving another "b" bank.
+                //Traces do not point back to their series objects, so hard to test this more rigorously.
+                return false;  
+            }
             if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) > 1000000) return false;
             if (lastTrace.GetContents().text != newTrace.GetContents().text) return false;
             if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) return false;
-                        
-            try
-            {
-                //Now we test sub-traces, cf. _Test_TraceCopyRefinement() and #0osd8sskjd.
-                if (lastTrace.precedents.Count() != lastTrace.precedents.Count()) return false;
-                if (lastTrace.precedents.Count() > 0)
+            if (Globals.traceSimilarFix2)
+            {                
+                try
                 {
-                    for (int i = 0; i < lastTrace.precedents.Count(); i++)
+                    //Now we test sub-traces, cf. _Test_TraceCopyRefinement() and #0osd8sskjd.
+                    //When we get here, .name, .text (code), .commandFileAndLine are the same, and we are in same session.
+                    //This may for instance be: collapse {%i}!a = {%i}!q;, where the children trace shows
+                    //the quarterly series. But also stuff like: copy b:*; is relevant here.
+                    //Much of this is caught by traceSimilarFix1, no??
+                    //But still, if for some generic {%i} code the LHS name and code line is the same, this test can maybe
+                    //catch the rare case that the traces are still not in reality pointing back to the same series object.
+                    //Probably good to leave this switched on, but if problems arise (too many traces), try to switch it off.
+                    if (lastTrace.precedents.Count() != newTrace.precedents.Count()) return false;  //not similar enough if children count differs
+                    if (lastTrace.precedents.Count() > 0)
                     {
-                        Trace2 lastTrace_sub = lastTrace.precedents[i].trace;
-                        Trace2 newTrace_sub = newTrace.precedents[i].trace;
-                        if (!lastTrace_sub.traceContents.id.Equals(newTrace_sub.traceContents.id)) return false;
+                        for (int i = 0; i < lastTrace.precedents.Count(); i++)
+                        {
+                            Trace2 lastTrace_sub = lastTrace.precedents[i].trace;
+                            Trace2 newTrace_sub = newTrace.precedents[i].trace;
+                            if (lastTrace_sub.GetId() != newTrace_sub.GetId()) return false;
+                        }
                     }
                 }
+                catch { };  //remove try-catch in Gekko 4.0
             }
-            catch { };  //remove try-catch in Gekko 4.0
+
             return true;
         }
 
@@ -1427,7 +1447,7 @@ namespace Gekko
                 if (xChildTrace.trace.type == ETraceType.Divider)
                 {
                     dividerCounter++;
-                    if (counter == 0 || counter == xChildTraces.Count - 1) new Error("Divider problem"); //TODO TODO TODO remove this check for Gekko 3.2
+                    if (counter == 0 || counter == xChildTraces.Count - 1) new Error("Divider problem"); //TODO TODO TODO remove this check for Gekko 4.0
                     divided.Add(current);
                     current = new List<TraceAndPeriods2>();
                 }
@@ -1439,7 +1459,7 @@ namespace Gekko
             if (current != null) divided.Add(current);
             if (true)
             {                
-                //TODO TODO TODO remove this check for Gekko 3.2                
+                //TODO TODO TODO remove this check for Gekko 4.0
                 int n = 0;
                 foreach (List<TraceAndPeriods2> xx in divided)
                 {
@@ -1536,7 +1556,7 @@ namespace Gekko
         {
             string label = null;
             try
-            {                
+            {
                 if (nameWithFreq != null)
                 {
                     //Why should it ever be == null, and why try... (fix Gekko 4.0)                    
@@ -1545,7 +1565,7 @@ namespace Gekko
                         if (db == null) continue;  //ever so?
                         string name2 = G.Chop_SetBank(nameWithFreq, db.GetName());
                         Series ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
-                        if (ts != null)
+                        if (ts?.meta?.trace2 != null)
                         {
                             foreach (TraceAndPeriods2 tap in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                             {

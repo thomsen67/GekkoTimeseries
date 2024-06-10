@@ -644,7 +644,7 @@ namespace Gekko
                         n += kvp.Value.storage.Count;
                     }
 
-                    txt.MainAdd("There were " + n + " distinct WARNING messages while running the job (" + G.GetLinkAction("show messages", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
+                    txt.MainAdd("There were " + n + " distinct WARNING messages while running the job (" + G.GetLinkAction("show warnings", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
                 }
             }
         }
@@ -12349,8 +12349,8 @@ namespace Gekko
         /// <returns></returns>
         public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
         {
-            //For Gekko 3.2, clean up the two first parameters (should be just 1).
-            //For Gekko 3.2, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
+            //For Gekko 4.0, clean up the two first parameters (should be just 1).
+            //For Gekko 4.0, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
             //Or make sure the label, source etc. objects are cleaned with ReplaceWhitespaceWith1Blank().
 
             bool danish = false;
@@ -16871,7 +16871,7 @@ namespace Gekko
         {
             // TODO: If file contains a subfolder (like "\sub1\xx.csv), this is ok for working folder, but when called with for
             // instance folder \command1, \command2 etc., it should not be allowed to glue these on for instance \sub1\xx.csv.
-            // Not super important. Maybe consider this for Gekko 3.2...
+            // Not super important. Maybe consider this for Gekko 4.0...
 
             //This method can be called with path = null or path = "", in that case it reduces to
             //only adding the working folder if file is without colon.
@@ -18431,11 +18431,11 @@ namespace Gekko
             {
                 if (o.opt_tobank != null)
                 {
-                    //Make an error for Gekko 3.2
+                    //Make an error for Gekko 4.0
                     using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w30.1"))
                     {                        
                         txt.MainAdd("COPY <tobank=...> option is used, but the COPY statement itself is missing a TO part.");
-                        txt.MoreAdd("A COPY statement without the TO part always copies variables into the first-position databank, and in that case, any <tobank=...> is ignored. In order to copy a variable x from the databank b1 to the databank b2 you cannot use 'COPY <frombank=b1 tobank=b2> x;', but should instead use 'COPY <frombank=b1 tobank=b2> x to *;'. Note: this warning will become an error in Gekko 3.2. To avoid the warning, just remove the <tobank=...> part of the COPY statement.");
+                        txt.MoreAdd("A COPY statement without the TO part always copies variables into the first-position databank, and in that case, any <tobank=...> is ignored. In order to copy a variable x from the databank b1 to the databank b2 you cannot use 'COPY <frombank=b1 tobank=b2> x;', but should instead use 'COPY <frombank=b1 tobank=b2> x to *;'. Note: this warning will become an error in Gekko 4.0. To avoid the warning, just remove the <tobank=...> part of the COPY statement.");
                     }
                 }
                 o.names2 = new Gekko.List();
@@ -18516,7 +18516,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    //ultra safety: remove this try-catch in Gekko 3.2
+                    //ultra safety: remove this try-catch in Gekko 4.0
                 }
 
                 if (truncateTemp != null && existing != null && iv.Type() == EVariableType.Series && existing.Type() == EVariableType.Series)
@@ -19127,7 +19127,7 @@ namespace Gekko
 
                     if (freqLhs != null && freqRhs != null && freqRhs != "*" && !G.Equal(freqLhs, freqRhs))
                     {
-                        freqWarning = "Frequency mismatch: beware that some series before TO/AS are of different frequency than corresponding series after TO/AS (the frequency part of the latter names is ignored). This warning will become an error in Gekko 3.2.";
+                        freqWarning = "Frequency mismatch: beware that some series before TO/AS are of different frequency than corresponding series after TO/AS (the frequency part of the latter names is ignored). This warning will become an error in Gekko 4.0.";
                     }
 
                     if (bankRhs == null && tobank != null) bankRhs = tobank;  //overwrites "naked" vars, so "COPY <tobank=b> a, b to c, d;" is same as "COPY a, b to b:c, b:d;"
@@ -19298,7 +19298,7 @@ namespace Gekko
                 }
             }
 
-            if (freqWarning != null) G.Warning("w17.1", freqWarning); //Gekko 3.2  --> maybe make this an error
+            if (freqWarning != null) G.Warning("w17.1", freqWarning); //Gekko 4.0  --> maybe make this an error
 
             return outputs;
         }
@@ -34742,7 +34742,7 @@ namespace Gekko
         /// <summary>
         /// Pick out a freq from ConvertDateFreqsToAllFreqs(). Used to convert frequencies.
         /// NOTE: can one not just use method from GekkoTime class?? Why convert all and pick????
-        /// Fix this for Gekko 3.2.
+        /// Fix this for Gekko 4.0.
         /// </summary>
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>

@@ -57,7 +57,9 @@ namespace Gekko
         public const bool traceUsesOrMayUseRealDataPeriod = true;  //for some traces, the real data period is used, so missings may truncate it. So if a command has actually run over some period, and it produces missings, its trace may completely disappear. In that case, the user just sees missing for some period, but cannot se the code line "producing" this missing. If this needs to be fixed, the varible acts as a pointer to these places.
         public const bool traceEndoRhsFix1 = true;   //fix hall or mirrors for x[%t] = x[%t] + ...
         public const bool traceEndoRhsFix2 = true;   //fix for  x = 1; x = x + 1; x = x + 1; ...
-        
+        public const bool traceSimilarFix2 = false;
+        public const bool traceSimilarFix1 = false;
+
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
         public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;
@@ -94,7 +96,7 @@ namespace Gekko
         public static bool decompVar = false;  //default: false
         public static bool decompFixTimelessProblem = true;
 
-        public const bool fixFor3_2 = false;
+        public const bool fixForGekko4_0 = false;
 
         public const string cacheExtension = ".cache";  //used for libraries and databanks (models have .mdl)
         public const string cacheExtensionModel = ".mdl";  //used for models
