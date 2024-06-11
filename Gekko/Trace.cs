@@ -382,7 +382,7 @@ namespace Gekko
         private static bool IsSimilarTrace(Trace2 lastTrace, Trace2 newTrace)
         {
             //We cannot compare periods, because we want x[%t] to be able to prune out similar traces over different periods.
-            if (Globals.traceSimilarFix1 && G.Equal(lastTrace.GetContents().name, newTrace.GetContents().name))
+            if (Globals.traceSimilarFix1 && !G.Equal(lastTrace.GetContents().name, newTrace.GetContents().name))
             {
                 //cannot be a similar trace, if x{%i} == ... in two traces defines a differnet LHS variable!
                 //Now even if "b:x!a" is the same in both traces, and the code line is the same, could it still be a

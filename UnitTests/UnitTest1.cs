@@ -15457,18 +15457,23 @@ namespace UnitTests
                     else if (j == 1) s = "copy sletmig:*;";
                     else s = "for val %i = 1 to 2; x{%i} = 100 * %i; end;";
                     I(s);
+                    string s2 = s;
+                    if (j == 2) s2 = s2.Replace("for val %i = 1 to 2; ", "").Replace(" end;", "");
                     I("y = x1 + x2;");
                     Series y = O.GetIVariableFromString("y!a", ECreatePossibilities.NoneReportError) as Series;
                     Trace2 trace = y.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
                     Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());  //2+1 = 3, where 1 is divider
                     Trace2 traceY1 = trace.GetPrecedents_BewareOnlyInternalUse()[0].trace;
                     Trace2 traceY2 = trace.GetPrecedents_BewareOnlyInternalUse()[2].trace;
-                    Assert.AreEqual(s, traceY1.GetContents().text);
-                    Assert.AreEqual(s, traceY2.GetContents().text);
-                    Trace2 traceY11 = traceY1.GetPrecedents_BewareOnlyInternalUse()[0].trace;
-                    Assert.AreEqual("x1 = 2;", traceY11.GetContents().text);
-                    Trace2 traceY21 = traceY2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
-                    Assert.AreEqual("x2 = 3;", traceY21.GetContents().text);
+                    Assert.AreEqual(s2, traceY1.GetContents().text);
+                    Assert.AreEqual(s2, traceY2.GetContents().text);
+                    if (j <= 1)
+                    {
+                        Trace2 traceY11 = traceY1.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                        Assert.AreEqual("x1 = 2;", traceY11.GetContents().text);
+                        Trace2 traceY21 = traceY2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                        Assert.AreEqual("x2 = 3;", traceY21.GetContents().text);
+                    }
                 }
             }
         }
