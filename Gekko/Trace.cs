@@ -387,38 +387,12 @@ namespace Gekko
                 //cannot be a similar trace, if x{%i} == ... in two traces defines a differnet LHS variable!
                 //Now even if "b:x!a" is the same in both traces, and the code line is the same, could it still be a
                 //different series object? Yes, in principle, but it would be a bit weird, involving another "b" bank.
-                //Traces do not point back to their series objects, so hard to test this more rigorously.
+                //Traces do not point back to their series objects: if they did, object equality could be used.
                 return false;  
             }
             if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) > 1000000) return false;
             if (lastTrace.GetContents().text != newTrace.GetContents().text) return false;
             if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) return false;
-            if (Globals.traceSimilarFix2)
-            {                
-                try
-                {
-                    //Now we test sub-traces, cf. _Test_TraceCopyRefinement() and #0osd8sskjd.
-                    //When we get here, .name, .text (code), .commandFileAndLine are the same, and we are in same session.
-                    //This may for instance be: collapse {%i}!a = {%i}!q;, where the children trace shows
-                    //the quarterly series. But also stuff like: copy b:*; is relevant here.
-                    //Much of this is caught by traceSimilarFix1, no??
-                    //But still, if for some generic {%i} code the LHS name and code line is the same, this test can maybe
-                    //catch the rare case that the traces are still not in reality pointing back to the same series object.
-                    //Probably good to leave this switched on, but if problems arise (too many traces), try to switch it off.
-                    if (lastTrace.precedents.Count() != newTrace.precedents.Count()) return false;  //not similar enough if children count differs
-                    if (lastTrace.precedents.Count() > 0)
-                    {
-                        for (int i = 0; i < lastTrace.precedents.Count(); i++)
-                        {
-                            Trace2 lastTrace_sub = lastTrace.precedents[i].trace;
-                            Trace2 newTrace_sub = newTrace.precedents[i].trace;
-                            if (lastTrace_sub.GetId() != newTrace_sub.GetId()) return false;
-                        }
-                    }
-                }
-                catch { };  //remove try-catch in Gekko 4.0
-            }
-
             return true;
         }
 
