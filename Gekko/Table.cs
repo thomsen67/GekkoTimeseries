@@ -313,7 +313,7 @@ namespace Gekko
                 Cell c = _data[xy];
                 string s = "";
 
-                G.Warning("Tried to override data in position (" + xy.Row + ", " + xy.Col + ") in table object.");
+                G.Warning("w37.2", "Tried to override data in position (" + xy.Row + ", " + xy.Col + ") in table object.");
 
                 string s2 = GetCellContent(c);
                 G.Writeln("           " + s2);
@@ -1305,7 +1305,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Warning("Table insert: expected code 'n' or 'p' or 'd'")
+                        G.Warning("w37.1", "Table insert: expected code 'n' or 'p' or 'd'");
                     }
                 }
                 else
@@ -1324,7 +1324,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Warning("Table insert: expected code 'n' or 'p' or 'd'");
+                        G.Warning("w37.1", "Table insert: expected operator 'n' or 'p' or 'd'");
                     }
                 }
                 counter++;
@@ -1886,7 +1886,7 @@ namespace Gekko
                         int col = -12345;
                         if (!int.TryParse(s, out col))
                         {
-                            G.Warning("XML table: could not convert '" + s + "' to list of integers");
+                            G.Warning("w37.2", "XML table: could not convert '" + s + "' to list of integers");
                         }
                         killCols.Add(col);
                     }
@@ -2287,7 +2287,7 @@ namespace Gekko
                 string value = achild.Value;
                 if (a.Set(name, value) == false)
                 {
-                    G.Warning("XML table has duplicate attribute name: " + name);
+                    G.Warning("w37.2", "XML table has duplicate attribute name: " + name);
                 }
             }
         }
@@ -2855,7 +2855,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     ok = false;
-                    G.Warning("Problem with style-sheets, may impact the menus (files styles.css and table.png)");
+                    G.Warning("w39.1", "Problem with style-sheets, may impact the menus (files styles.css and table.png)");
                 }
 
                 G.Writeln();
@@ -2913,7 +2913,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Warning("Converting menus: file name: " + newfile);
+                            G.Warning("w39.2", "Converting menus: file name: " + newfile);
                         }
                         string path = Path.GetDirectoryName(newfile);
                         if (!Directory.Exists(path))

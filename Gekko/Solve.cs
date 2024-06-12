@@ -3875,7 +3875,7 @@ namespace Gekko
                     eqEndo = eh.equationNumber;
                 }
             }
-            if (eqEndo == -12345) G.Warning("Variable " + endo + " is not found as left-hand side var");
+            if (eqEndo == -12345) G.Warning("w25.2", "Variable " + endo + " is not found as left-hand side var");
             return eqEndo;
         }
 
@@ -4274,7 +4274,7 @@ namespace Gekko
                     for (int i = 1; i < al.Count; i++)
                     {
                         int number = al[i];
-                        if (number == exoBtype) G.Warning("Internal error #32108743");
+                        if (number == exoBtype) G.Warning("w25.2", "Internal error #32108743");
                     }
                     al.Add(exoBtype);
                 }
@@ -4450,7 +4450,7 @@ namespace Gekko
 
             if (!(simulEpi.Count == 0))
             {
-                G.Warning("Error in feedback/recursive");
+                G.Warning("w25.2", "Error in feedback/recursive");
             }
 
             //=================================

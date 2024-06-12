@@ -918,12 +918,12 @@ namespace Gekko
 
                     if (missingsAtStart > 0)
                     {
-                        G.Warning(missingsAtStart + " missing values at start of sample");
+                        G.Warning("w38.1", missingsAtStart + " missing values at start of sample");
                     }
 
                     if (missingsAtEnd > 0)
                     {
-                        G.Warning(missingsAtEnd + " missing values at end of sample");
+                        G.Warning("w38.1", missingsAtEnd + " missing values at end of sample");
                     }
 
                     if (missingsAtStart > 0 || missingsAtEnd > 0)
