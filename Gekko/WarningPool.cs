@@ -488,10 +488,11 @@ namespace Gekko
                             {
                                 string w3 = kvp2.Key.Trim();
                                 if (!w3.EndsWith(".")) w3 += ".";
-                                m.Add(new WarningPoolHelper() { s = w1 + " " + w2 + " " + w3 + "¤" + kvp.Key, i = kvp2.Value });
+                                string ss = w1 + " " + w2;
+                                if (w1 == null && w2 == null) ss = "[Warning text problem].";  //should not happen
+                                m.Add(new WarningPoolHelper() { s = ss + " " + w3, id = kvp.Key, i = kvp2.Value });
                             }
                         }
-
                         this.PrintWarnings(m, false);
                     };
 
@@ -502,7 +503,7 @@ namespace Gekko
                     }
 
                     string s5 = "There were " + n + " distinct WARNING messages";
-                    if (n <= 1) s5 = "There was " + n + " distinct WARNING message";
+                    if (n == 1) s5 = "There was " + n + " distinct WARNING message";
                     txt.MainAdd(s5 + " while running the job (" + G.GetLinkAction("show warnings", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
 
                     if (Globals.runningOnTTComputer || G.IsUnitTesting())
@@ -512,7 +513,7 @@ namespace Gekko
                         {
                             string w1, w2;
                             this.GetText(kvp.Key, null, out w1, out w2);
-                            if (w1.Contains(Globals.internalGekkoWarningString)) hasInternalWarnings = true;
+                            if (w1 != null && w1.Contains(Globals.internalGekkoWarningString)) hasInternalWarnings = true;
                         }
                         if (hasInternalWarnings)
                         {
@@ -539,7 +540,6 @@ namespace Gekko
             using (Writeln txt3 = new Writeln())
             {
                 txt3.tab = ETabs.Output;
-                txt3.lineWidth *= 2;
                 List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList(); //sort chronologically                            
                 if (showId)
                 {
@@ -550,12 +550,23 @@ namespace Gekko
                     txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers (you may use id's to turn off particular warnings).");
                 }
                 txt3.MainNewLine();
+                txt3.MainAdd("-----------------------------------------------------------------------");
+                txt3.MainNewLine();
+
+                GekkoDictionary<string, int> dublets = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
                 foreach (WarningPoolHelper wph in m2)
-                {
-                    string[] ss = wph.s.Split('¤');
-                    if (showId) txt3.MainAdd(ss[1] + ": " + ss[0]);
-                    else txt3.MainAdd(ss[0]);
-                    txt3.MainNewLineTight();
+                {                    
+                    if (showId) txt3.MainAdd(wph.id + ": " + wph.s);
+                    else txt3.MainAdd(wph.s);
+                    txt3.MainNewLine();
+                    if (dublets.ContainsKey(wph.id)) dublets[wph.id] += 1;
+                    else dublets.Add(wph.id, 1);
+                    if (Program.options.global_warnings_limit > 0 && dublets[wph.id] >= Program.options.global_warnings_limit)
+                    {
+                        txt3.MainAdd("...[possibly more of above type, cf. 'option global warnings limit']...");
+                        txt3.MainNewLine();
+                    }
                 }
             }
         }
@@ -633,6 +644,7 @@ namespace Gekko
     public class WarningPoolHelper
     {
         public string s;
+        public string id;
         public int i;
     }
 

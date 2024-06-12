@@ -2455,6 +2455,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "w")
             {
+                
+                G.Warning("w2.3", "Here is a warning1");
                 G.WarningInternal("This is bad!");
                 
                 using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w2.1"))
@@ -2466,12 +2468,21 @@ namespace Gekko
                     txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
                 }
 
+                G.Warning("w2.3", "Here is a warning2");
+
                 using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w31.1"))
                 {
                     txt.MainAdd("There are many missing values when computing historical variability for.");
                     txt.MoreAdd("For the period , % of reference databank values are missing values, ");
                     txt.MoreAdd("and for the period , % of reference databank values are missing values.");
                 }
+                               
+                
+                G.Warning("w2.3", "Here is a warning3");
+                G.Warning("w2.3", "Here is a warning4");
+                G.Warning("w2.3", "Here is a warning5");
+                
+                
             }
 
             if (text == "flowgraph1" || text == "flowgraph2")

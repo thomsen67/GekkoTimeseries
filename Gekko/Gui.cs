@@ -614,7 +614,7 @@ namespace Gekko
                         {
                             //May fail if xml file is corrupted
                             //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
-                            string s11 = e.InnerException.Message;
+                            string s11 = e?.InnerException.Message;
                             MessageBox.Show("Gekko: The user settings file seems corrupted. Working folder set to desktop folder: " + desktop + "\n\nYou may consider deleting the user settings file, cf. this message:\n" + s11);
                             Program.options.folder_working = desktop;
                         }
@@ -1554,8 +1554,11 @@ namespace Gekko
                     new Writeln(" --- TTH start ---"); 
                     new Writeln(e2.Message);
                     new Writeln(e2.ToString());
-                    new Writeln(e2.InnerException.Message);
-                    new Writeln(e2.InnerException.ToString());
+                    if (e2.InnerException != null)
+                    {
+                        new Writeln(e2.InnerException.Message);
+                        new Writeln(e2.InnerException.ToString());
+                    }
                     new Writeln(e2.StackTrace);
                     new Writeln(" --- TTH end ---");
                 }
