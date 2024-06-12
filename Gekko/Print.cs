@@ -2215,10 +2215,7 @@ namespace Gekko
 
         private static void Mismatch()
         {
-            if (Globals.runningOnTTComputer)
-            {
-                new Error("Mismatch (only TT computer)", false);
-            }
+            G.WarningInternal("Mismatch (only TT computer)");
         }
 
         private static EPrtCollapseTypes GetCollapseType(O.Prt o, EPrintTypes type)

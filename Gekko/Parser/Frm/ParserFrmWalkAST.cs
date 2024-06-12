@@ -1528,7 +1528,7 @@ namespace Gekko.Parser.Frm
                     //variable is to be damped in Gauss-Seidel
                     if (model.dampVariables.ContainsKey(var))
                     {
-                        new Error("It seems the same damp variable appears multiple times", false);
+                        G.Warning("It seems the same damp variable appears multiple times");
                     }
                     else
                     {

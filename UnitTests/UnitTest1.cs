@@ -13732,18 +13732,7 @@ namespace UnitTests
                 }
             }
         }
-
-
-        [TestMethod]
-        public void _Test_TraceAllMissings()
-        {
-            I("reset;");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("time 2020 2025;");
-            I("aaaaa = 100;");
-            I("import <tsd all> jul05_missing.tsd;");  //has an 'aaaaa' with all missings
-        }
-
+        
         [TestMethod]
         public void _Test_TraceEndogenousOnRhs()
         {

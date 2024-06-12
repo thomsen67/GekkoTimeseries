@@ -10086,7 +10086,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Internal error 9329329", false);
+                    G.Warning("Internal error 9329329");
                     //value = a[varNumber, t];
                 }
 
@@ -27965,7 +27965,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Unkonwn variable type", false);  //why new exception
+                    G.Warning("Unkonwn variable type");
                     //SERIES: should not be possible
                 }
             }
@@ -31548,7 +31548,7 @@ namespace Gekko
                     }
                     if (error)
                     {
-                        new Error("Could not parse indices in '" + var3 + "'", false);
+                        G.Warning("Could not parse indices in '" + var3 + "'");
                         G.Writeln(line);
                         G.Writeln();
                     }
@@ -35105,7 +35105,7 @@ namespace Gekko
                     success = true;
                 }
             }
-            if (!success) new Error("Variable " + var1 + " was not found as left-hand side variable in model", false);
+            if (!success) G.Warning("Variable " + var1 + " was not found as left-hand side variable in model");
         }
 
         /// <summary>
