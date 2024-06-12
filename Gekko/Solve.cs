@@ -2763,7 +2763,7 @@ namespace Gekko
 
                         if (Program.options.solve_print_details)
                         {
-                            if (Globals.runningOnTTComputer) G.Writeln("New " + residuals.Length + "x" + residuals.Length + " Jacobi matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
+                            if (Globals.runningOnTTComputer) G.Writeln("New " + residuals.Length + "x" + residuals.Length + " Jacobi matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Globals.warningColorInternal);
                             else G.Writeln("New Jacobi " + residuals.Length + "x" + residuals.Length + " matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
                         }
 
@@ -2773,7 +2773,7 @@ namespace Gekko
                         bool ok = Program.InvertMatrix(residuals, dx);  //jacobyMatrix is also used
                         if (Program.options.solve_print_details)
                         {
-                            if (Globals.runningOnTTComputer) G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
+                            if (Globals.runningOnTTComputer) G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Globals.warningColorInternal);
                             else G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
                         }
 

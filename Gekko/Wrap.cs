@@ -220,6 +220,10 @@ namespace Gekko
             {
                 marginFirst = Globals.warningString;
                 color = Globals.warningColor;
+                if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                {
+                    if (this.storageMain[0].storage[0].Contains(Globals.internalGekkoWarningString)) color = Globals.warningColorInternal;
+                }
             }
             else if (this.type == EWrapType.Note)
             {

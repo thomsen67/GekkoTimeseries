@@ -1290,7 +1290,7 @@ namespace Gekko
                         {
                             //Do nothing, so this check can never crash due to somthing missing or being null regarding periods.
                             //Should never be thrown, so should have no cost.
-                            if (Globals.runningOnTTComputer) new Writeln("TTH: Dates check problem!");
+                            G.WarningInternal("TTH: Dates check problem!");
                         }
 
                         if (b)

@@ -1345,7 +1345,7 @@ namespace Gekko
 
                                 if (Globals.decompFixTimelessProblem && modelGamsScalar.isTimeless[dp.variable])
                                 {
-                                    if (Globals.runningOnTTComputer && add != 0) new Error("TTH: Expected add = 0 here");
+                                    if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
                                     add2 = t.Subtract(modelGamsScalar.tBasis);
                                     //problem is that exudl gets a dp.date that seems fixed to first period.
                                     //check hos this .precedents[eqNumber] list is made, perhaps indicate

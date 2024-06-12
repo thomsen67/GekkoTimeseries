@@ -478,14 +478,8 @@ namespace Gekko.Parser.Gek
                         if (CountErrors(statement.errorDictionary) != CountErrors(originalErrors))
                         {
                             if (Globals.runningOnTTComputer)
-                            {
-                                new Writeln("");
-                                new Writeln("---------------------");
-                                new Writeln("---------------------");
-                                new Writeln("TTH: Dict mismatch");
-                                new Writeln("---------------------");
-                                new Writeln("---------------------");
-                                new Writeln("");
+                            {                                
+                                G.WarningInternal("TTH: Error messages: Dict mismatch");
                             }
                         }
 

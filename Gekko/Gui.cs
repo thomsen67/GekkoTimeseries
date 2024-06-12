@@ -924,7 +924,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: (1) Monitor: input left " + left + " top " + top + " --> llimit = " + z + " * " + physicalWidth + " * " + factor + " = " + z * physicalWidth * factor);
+                //new Writeln("TTH: (1) Monitor: input left " + left + " top " + top + " --> llimit = " + z + " * " + physicalWidth + " * " + factor + " = " + z * physicalWidth * factor);
             }
 
             if (left > z * physicalWidth * factor || top > z * physicalHeight * factor)
@@ -934,7 +934,7 @@ namespace Gekko
             
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: (2) Monitor: output left " + left + " top " + top);
+                //new Writeln("TTH: (2) Monitor: output left " + left + " top " + top);
             }
             return new Point(left, top);
         }
@@ -2081,7 +2081,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer && Globals.numberOfTimeWindowErrors > 0)
             {
-                new Error("TTH: There were " + Globals.numberOfTimeWindowErrors + " time window errors.", false);
+                G.WarningInternal("TTH: There were " + Globals.numberOfTimeWindowErrors + " time window errors.");
             }
 
             if (p.hasBeenCmdFile)

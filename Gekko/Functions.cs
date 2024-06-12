@@ -6627,13 +6627,20 @@ namespace Gekko
 
         private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
         {
-            foreach (FileInfo file in directoryInfo.GetFiles())
+            try
             {
-                if (G.Equal(file.Name.Trim(), rootHelper.rootFileName.Trim()))
+                foreach (FileInfo file in directoryInfo.GetFiles())
                 {
-                    rootHelper.roots.Add(file.FullName.Trim());
-                    break;  //no need to carry on, cannot have dublets
+                    if (G.Equal(file.Name.Trim(), rootHelper.rootFileName.Trim()))
+                    {
+                        rootHelper.roots.Add(file.FullName.Trim());
+                        break;  //no need to carry on, cannot have dublets
+                    }
                 }
+            }
+            catch 
+            {
+                new Error("Root() function: problems finding files in folder '" + directoryInfo.FullName + "'");
             }
             DirectoryInfo parent = directoryInfo.Parent;
             if (parent == null) return;

@@ -209,7 +209,7 @@ namespace Gekko
             //also works for array-subseries
             if (this.name == null)
             {
-                if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Parent problem (.name)");
+                if (Globals.runningOnTTComputer) G.WarningInternal("TTH: Parent problem (.name)");
             }
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
@@ -579,7 +579,7 @@ namespace Gekko
                             if (Globals.runningOnTTComputer)
                             {
                                 //for instance, printing montly data ending in m10, where m11 and m12 are also shown
-                                new Warning(EWarningType.NoUsing, "TTH: Error: tooSmallTooLarge with no smpl");
+                                G.WarningInternal("TTH: Error: tooSmallTooLarge with no smpl");
                             }
                         }
                         else

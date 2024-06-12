@@ -1356,7 +1356,7 @@ namespace Gekko.Parser.Gek
                 {
                     foreach (string s in inputFileLines2)
                     {
-                        G.Writeln("-debug- " + s, Color.Orange);
+                        G.Writeln("-debug- " + s, Globals.warningColorInternal);
 
                     }
                 }

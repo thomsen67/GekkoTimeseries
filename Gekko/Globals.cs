@@ -66,7 +66,9 @@ namespace Gekko
         public static DependencyTracking dependencyTracking = new DependencyTracking();
         public const int dependencyTrackingSysNumber = 9;
                 
-        public static WarningPool warningPool = new WarningPool();        
+        public static WarningPool warningPool = new WarningPool();
+        public const string internalGekkoWarningString = "Internal Gekko warning";
+        public const string INTERNAL = "INTERNAL";
 
         public const string eqs1 = "------------- scalar -------------";
         public const string eqs2 = "<no raw eqs>";
@@ -939,6 +941,7 @@ namespace Gekko
         public static string noteString = "+++ NOTE: ";
 
         //public static System.Drawing.Color warningColor = System.Drawing.Color.OrangeRed;
+        public static System.Drawing.Color warningColorInternal = System.Drawing.Color.DarkOrange;
         public static System.Drawing.Color warningColor = System.Drawing.Color.FromArgb(51, 102, 204);
         public static System.Windows.Media.Color GrayExcelLine = System.Windows.Media.Color.FromArgb(255, 208, 215, 229); //as in Excel
         public static System.Windows.Media.Color GrayExcelSelect = System.Windows.Media.Color.FromArgb(255, 234, 236, 245);  //as in Excel

@@ -223,7 +223,7 @@ namespace Gekko
         public GekkoDictionary<string, WarningInfo> storage = new GekkoDictionary<string, WarningInfo>(StringComparer.OrdinalIgnoreCase);
         public int counter = 0;
         public Dictionary<string, bool> ignore0 = new Dictionary<string, bool>(); //no dot, like '3' or '5'.
-        public Dictionary<string, bool> ignore1 = new Dictionary<string, bool>(); //one dot, like '2.3' or '5.2'.
+        public Dictionary<string, bool> ignore1 = new Dictionary<string, bool>(); //one dot, like '2.3' or '5.2'.        
 
         public Dictionary<string, string> warningStrings = new Dictionary<string, string>()
         {
@@ -446,6 +446,22 @@ namespace Gekko
             {"w36", "Gdx file reading" },
             // ---------------------------------------------------------
             {"w36.1", "Problem with gdx (GAMS) file" },
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =============== INTERNAL WARNINGS =======================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            // =========================================================
+            {"w0", Globals.internalGekkoWarningString },
+            // ---------------------------------------------------------
+            {"w0.1", "System problem" },
         };
 
         /// <summary>
@@ -454,8 +470,23 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <param name="info"></param>
-        public void WAdd(string s, string info, bool isUsingType, out bool shouldPrint)  //WAdd() so it is easier to find by search like .Wadd("1.1"
+        public void WAdd(string s2, string info, bool isUsingType, out bool shouldPrint)  //WAdd() so it is easier to find by search like .Wadd("1.1"
         {
+            string s = s2;
+            bool isInternal = false;
+            if (G.Equal(s, Globals.INTERNAL))
+            {                
+                s = "w0.1";
+                if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                {
+                    isInternal = true;  //For Gekko developer
+                }
+                else
+                {
+                    shouldPrint = false;
+                    return;  //Ignore this completely if it is a "normal" user calling it
+                }
+            }
 
             // ============= Limits ====================================
 
@@ -464,31 +495,31 @@ namespace Gekko
             this.storage.TryGetValue(s, out wi);
             int n = 0; if (wi != null) n = wi.storage.Count;
 
-            bool add = false;
-            bool print = Program.options.global_warnings_print;  //normally true
-            int popup = 0;  //1:normal popup, 2:find-popup.
+            bool setting1of3_add = false;
+            bool setting2of3_print = Program.options.global_warnings_print;  //normally true
+            int setting3of3_popup = 0;  //1:normal popup, 2:find-popup.
 
             if (Program.options.global_warnings_limit >= 0)
             {
                 if (n < Program.options.global_warnings_limit)  //limit like e.g. 5
                 {
-                    add = true;
+                    setting1of3_add = true;
                 }
                 else
                 {
-                    print = false;
+                    setting2of3_print = false;
                 }
             }
             else if (Program.options.global_warnings_limit == -1)  //add/print all, same as int.MaxValue
             {
-                add = true;
-                print = true;
+                setting1of3_add = true;
+                setting2of3_print = true;
             }
             else if (Program.options.global_warnings_limit == -2)  //pause each
             {
-                popup = 1;
-                add = true;
-                print = true;
+                setting3of3_popup = 1;
+                setting1of3_add = true;
+                setting2of3_print = true;
             }
             else
             {
@@ -499,20 +530,30 @@ namespace Gekko
 
             if (this.ignore0.ContainsKey(s1) || this.ignore1.ContainsKey(s1s2))
             {
-                add = false;
-                print = false;
+                setting1of3_add = false;
+                setting2of3_print = false;
             }            
 
             if (!G.NullOrBlanks(Program.options.global_warnings_pauseat))
             {                
-                if (G.Contains(this.GetWarningText(s, info), Program.options.global_warnings_pauseat.Trim())) popup = 2;
+                if (G.Contains(this.GetWarningText(s, info), Program.options.global_warnings_pauseat.Trim())) setting3of3_popup = 2;
+            }
+
+            if (isInternal)
+            {
+                //No matter options, these are added and printed with no popup.
+                setting1of3_add = true;
+                setting2of3_print = true;
+                setting3of3_popup = 0;
             }
 
             // ------------------------------------------------
             // ------------------------------------------------
+            // ----- setting_... are processed ----------------
+            // ------------------------------------------------
             // ------------------------------------------------
 
-            if (add)
+            if (setting1of3_add)
             {
                 if (wi == null)
                 {
@@ -533,8 +574,8 @@ namespace Gekko
                 }
             }
 
-            shouldPrint = print;  //This bool is not used if isUsingType==false.
-            if (print)
+            shouldPrint = setting2of3_print;  //This bool is not used if isUsingType==false.
+            if (setting2of3_print)
             {
                 if (!isUsingType)
                 {
@@ -542,13 +583,13 @@ namespace Gekko
                 }
             }
 
-            if (popup == 1)
+            if (setting3of3_popup == 1)
             {                
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
                 w.textBox1.Text = "+++ WARNING: " + this.GetWarningText(s, info) + "." + G.NL + G.NL + "Press [Enter] to continue";
                 w.ShowDialog();
             }
-            else if (popup == 2)
+            else if (setting3of3_popup == 2)
             {
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Pause);
                 w.textBox1.Text = "Warning text '" + Program.options.global_warnings_pauseat + "' encountered as part of the warning message '" + this.GetWarningText(s, info) + "'." + G.NL + G.NL + "To switch such pausing off, use: option interface pause = '';" + G.NL + G.NL + "Press [Enter] to continue";
@@ -638,14 +679,37 @@ namespace Gekko
                         this.PrintWarnings(m, false);
                     };
 
-                    int n = 0;                    
+                    int n = 0;
                     foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
                     {
                         n += kvp.Value.storage.Count;
                     }
 
-                    txt.MainAdd("There were " + n + " distinct WARNING messages while running the job (" + G.GetLinkAction("show warnings", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
-                }
+                    string s5 = "There were " + n + " distinct WARNING messages";
+                    if (n <= 1) s5 = "There was " + n + " distinct WARNING message";
+                    txt.MainAdd(s5 + " while running the job (" + G.GetLinkAction("show warnings", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
+
+                    if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                    {
+                        bool hasInternalWarnings = false;
+                        foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)
+                        {
+                            string w1, w2;
+                            this.GetText(kvp.Key, null, out w1, out w2);
+                            if (w1.Contains(Globals.internalGekkoWarningString)) hasInternalWarnings = true;
+                        }
+                        if (hasInternalWarnings)
+                        {
+                            txt.MainNewLine();
+                            txt.MainAdd("=====> TTH: Internal warnings, See list!");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("=====> TTH: Internal warnings, See list!");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("=====> TTH: Internal warnings, See list!");
+                            txt.MainNewLineTight();
+                        }
+                    }
+                }                
             }
         }
 
@@ -3009,6 +3073,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "w")
             {
+                G.WarningInternal("This is bad!");
+                
                 using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w2.1"))
                 {
                     txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
@@ -6044,7 +6110,8 @@ namespace Gekko
                                                     GekkoTime t2 = tsImported.GetRealDataPeriodLast();
                                                     if (t1.IsNull())
                                                     {
-                                                        //can happen that a series is empty of data
+                                                        //Can happen that a series is empty of data
+                                                        //When merging into existing 
                                                         trace = new Trace2(ETraceType.Normal, true);
                                                     }
                                                     else
@@ -6121,11 +6188,6 @@ namespace Gekko
                                                                 Gekko.Trace2.PushIntoSeries(tsExisting, tap.trace, ETracePushType.Sibling, false); //x = 1
                                                             }
                                                         }
-
-                                                        //if (precedents != null && precedents.Count() > 0)
-                                                        //{
-                                                        //    Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0].trace, ETracePushType.Sibling, false); //x = 1
-                                                        //}
                                                     }
                                                     else
                                                     {
@@ -15392,7 +15454,7 @@ namespace Gekko
 
                 string x = G.Substring(s, start, end);
                 string drop = G.Substring(s, end + 1, lineEnd);  //"prt xx, " with col at last blank will drop ", " which is too much. At col 1 less it would be "," and ok.
-                if (Globals.runningOnTTComputer) new Writeln("TTH: input = {" + x + "} drop = {" + drop + "}");
+                //if (Globals.runningOnTTComputer) new Writeln("TTH: input = {" + x + "} drop = {" + drop + "}");
 
                 bool dropProblem1 = false;
                 if (drop != null && drop.Length > 1) dropProblem1 = true;
@@ -15416,7 +15478,7 @@ namespace Gekko
 
                     if (x2.StartsWith("@")) x2 = "Ref:" + x2.Substring(1);
 
-                    if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
+                    //if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
                     try { names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var); } catch { };
 
                     if (names != null)
@@ -16033,7 +16095,7 @@ namespace Gekko
                 {
                     foreach (string s in inputFileLines2)
                     {
-                        G.Writeln("-debug- " + s, Color.Orange);
+                        G.Writeln("-debug- " + s, Globals.warningColorInternal);
 
                     }
                 }

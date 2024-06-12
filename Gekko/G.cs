@@ -3900,6 +3900,11 @@ namespace Gekko
             Globals.warningPool.WAdd(typeId, s, false, out discard);
         }
 
+        public static void WarningInternal(string s)
+        {
+            G.Warning(Globals.INTERNAL, s);
+        }
+
         /// <summary>
         /// Check if the week number is legal (some years have 52 weeks, some have 53 weeks). If reportError = false, 
         /// the method returns true if there is a problem/error.

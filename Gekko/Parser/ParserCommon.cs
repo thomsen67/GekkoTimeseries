@@ -19,7 +19,7 @@ namespace Gekko.Parser
         /// <param name="lexer4"></param>
         public static void DebugTokens(Cmd3Lexer lexer3, Cmd4Lexer lexer4)
         {
-            G.Writeln("Debugging tokens (Globals.debugTokens)", Color.Orange);
+            G.Writeln("Debugging tokens (Globals.debugTokens)", Globals.warningColorInternal);
             IToken token;
             for (int i = 0; i < 100; i++)
             {
@@ -31,7 +31,7 @@ namespace Gekko.Parser
                 if (s1 == "}") s1 = "[rightcurly]";
                 int i2 = token.Type;
                 string s = "Token " + i + ": '" + s1 + "' " + i2.ToString();
-                Console.WriteLine(s, Color.Orange);
+                Console.WriteLine(s, Globals.warningColorInternal);
             }
             MessageBox.Show("See console, 100 tokens printed. See start of Cmd3Lexer.cs to translate numbers.");
         }

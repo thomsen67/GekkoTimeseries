@@ -327,7 +327,7 @@ namespace Gekko
                             // x = x + 1; x = x + 0;
                             //
                             // because of the alternation. But that would take two consecutive x-with-lagged-endo, which would be rare.
-
+                            
                             if (rhsTrace.precedents.Count() > 0)
                             {
                                 foreach (TraceAndPeriods2 kvp2 in rhsTrace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
@@ -910,7 +910,7 @@ namespace Gekko
                             }
                             else
                             {
-                                if (Globals.runningOnTTComputer) new Writeln("TTH: Clone dict dublet problem");
+                                if (Globals.runningOnTTComputer) G.WarningInternal("TTH: Clone dict dublet problem");
                             }
                         }
                         else
@@ -985,7 +985,7 @@ namespace Gekko
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
                 ts.meta.trace2.PrecedentsShadowing(traceThatIsGoingToBeAdded);
                 //In unit tests, trace period (t1/t2) is always present here, so no null periods.
-                if ((Globals.runningOnTTComputer || G.IsUnitTesting()) && traceThatIsGoingToBeAdded.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1: " + traceThatIsGoingToBeAdded.traceContents.text);
+                if (traceThatIsGoingToBeAdded.traceContents.period.t1.IsNull()) G.WarningInternal("*** TTH: Trace problem #1: " + traceThatIsGoingToBeAdded.traceContents.text);                
             }
             else if (type == ETracePushType.NewParent)
             {
@@ -1161,7 +1161,6 @@ namespace Gekko
                 meta.ToID();
             }
             databank.traces = th.tracesDepth2.Keys.ToList();
-            if (Globals.runningOnTTComputer) new Writeln("TTH: " + databank.traces.Count + " traces written");
         }        
 
         public static void PrintTraceHelper(Trace2 trace, bool all)
@@ -1268,8 +1267,6 @@ namespace Gekko
                 sta.SetApartmentState(ApartmentState.STA);
                 sta.Start();
             }
-
-            if (Globals.runningOnTTComputer) new Writeln("TTH: items " + Globals.itemCounter);
             return nn;
         }
 
@@ -1395,7 +1392,7 @@ namespace Gekko
                     }
                     else if (isDublet)
                     {
-                        if (Globals.runningOnTTComputer || G.IsUnitTesting()) MessageBox.Show("Trace problem #2: Invalid dublet!");
+                        G.WarningInternal("Trace problem #2: Invalid dublet!");
                     }
                 }
             }

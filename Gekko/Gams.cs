@@ -1234,7 +1234,7 @@ namespace Gekko
                         bool b = modelGamsScalar.isTimeless[dp.variable];
                         if (b && dp.date != 0)
                         {
-                            new Error("TTH: Expected timeless .date = 0");
+                            G.WarningInternal("TTH: Expected timeless .date = 0");
                         }
                     }
                     if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets
