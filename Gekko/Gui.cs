@@ -1707,9 +1707,9 @@ namespace Gekko
             toolStripButton3.Enabled = true;
             Globals.dateStamp = Program.GetDateStamp();  //takes a small amount of time to generate, so we put it in globally for later use in SERIES statements etc. Around midnight, this may be 1 day off.....!
 
-            Globals.bugfixMissing1 = new List<string>();
-            Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            Globals.bugfixLhsDollar = 0;
+            //Globals.bugfixMissing1 = new List<string>();
+            //Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            //Globals.bugfixLhsDollar = 0;
 
             //Blinking icon when running a statement
             //Not active/blinking when Gekko is idle

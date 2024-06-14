@@ -3792,7 +3792,7 @@ namespace Gekko
                 if (rhsData[i] == Globals.skippedObservationArtificialNumber)
                 {
                     //skip if LHS $ tells it to skip
-                    Globals.bugfixLhsDollar++;
+                    //Globals.bugfixLhsDollar++;
                 }
                 else
                 {
@@ -5025,11 +5025,11 @@ namespace Gekko
             }
             catch { }
             string s = G.ReplaceGlueSymbols(ss) + "  --->   " + originalFileName + ", line " + lineNumber;
-            if (!Globals.bugfixMissing2.ContainsKey(s))
-            {
-                Globals.bugfixMissing1.Add(s);
-                Globals.bugfixMissing2.Add(s, null);
-            }
+            //if (!Globals.bugfixMissing2.ContainsKey(s))
+            //{
+            //    Globals.bugfixMissing1.Add(s);
+            //    Globals.bugfixMissing2.Add(s, null);
+            //}
         }
 
         /// <summary>
