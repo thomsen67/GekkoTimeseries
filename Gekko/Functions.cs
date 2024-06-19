@@ -3824,7 +3824,7 @@ namespace Gekko
             }
             else
             {
-                new Error("The allMiss() function expect a timeseries variable type");                
+                new Error("The allMiss() function expects a timeseries variable type");                
             }
             return Globals.scalarVal0;  //will never get here
         }

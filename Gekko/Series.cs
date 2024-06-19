@@ -3209,16 +3209,20 @@ namespace Gekko
             this.storage.Add(mmi, iv);
             Series ts = iv as Series;  //always so
             if (ts != null) ts.mmi = mmi;  //so that the sub-series points to the mmi object, which in turn points to the array-series
+            if (mmi.parent != null) mmi.parent.SetDirty(true);  //Gekko 4.0: mmi.parent probably never null
         }
 
         public void RemoveIVariable(MultidimItem mmi)
         {
-            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
+            if (this.storage.ContainsKey(mmi))
+            {
+                this.storage.Remove(mmi);
+            }
             else
             {
                 new Error("Could not remove variable");
-                //throw new GekkoException();
             }
+            if (mmi.parent != null) mmi.parent.SetDirty(true);  //Gekko 4.0: mmi.parent probably never null
         }
 
         /// <summary>

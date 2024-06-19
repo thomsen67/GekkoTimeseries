@@ -3181,8 +3181,7 @@ namespace Gekko
                 //%x or #x
                 if (indexes != null)
                 {
-                    new Error("Name like " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " not allowed");
-                    //throw new GekkoException();
+                    new Error("Name like " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " not allowed");                    
                 }
                 else
                 {
@@ -3206,22 +3205,19 @@ namespace Gekko
 
                     if (iv_series.type == ESeriesType.ArraySuper)
                     {
-                        new Error("Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
-                        //throw new GekkoException();
+                        new Error("Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");                        
                     }
 
                     IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
 
                     if (iv2 == null)
                     {
-                        new Error("Array-series " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " does not exist");
-                        //throw new GekkoException();
+                        new Error("Array-series " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " does not exist");                        
                     }
                     else
                     {
                         iv_series.dimensionsStorage.RemoveIVariable(mmi);
                     }
-
                 }
                 else
                 {

@@ -323,6 +323,7 @@ namespace Gekko
         public void RemoveIVariable(string name)
         {
             if (this.storage.ContainsKey(name)) this.storage.Remove(name);
+            this.isDirty = true;
         }
 
         /// <summary>
