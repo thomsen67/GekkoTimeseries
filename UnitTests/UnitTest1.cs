@@ -33667,6 +33667,64 @@ print(df2)
         }
 
         [TestMethod]
+        public void _Test_UserFunctionsSeries()
+        {
+            //Completely standard
+            I("reset; time 2001 2003;");
+            I("function series test(series x); return 2*x; end;");
+            I("x = 100, 102, 101;");
+            I("y = test(x);");
+            _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2001, 200d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 204d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 202d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
+
+            //No sideeffects on x
+            I("reset; time 2001 2003;");
+            I("function void test(series x); x *= 2; y = x; print x; end;");
+            I("x = 100, 102, 101;");
+            I("test(x);");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2001, 200d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 204d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 202d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
+
+            //X does not even exist anywhere
+            I("reset; time 2001 2003;");
+            I("function void test(series x); x *= 2; prt x; end;");
+            I("y = 100, 102, 101;");
+            I("test(y);");
+            FAIL("prt x;");
+
+            //For some reason, assignment "x = 3" goes bad, becomes %x = 3.
+            I("reset;");                        
+            I("function void expand(series x); x = 3; %s = type(x); mem; end;");            
+            I("time 2001 2004;");
+            I("x = 1, 2, m(), 4;");
+            I("expand(x);");
+            I("prt x;");
+
+
+            if (false)
+            {
+                I("reset;");
+                I("function void expand(series x, date %t2); disp x; if (%t2 > x.fromSeries('dataEnd')); series <x.fromSeries('dataEnd') + 1 %t2> x %= 0; p x; end; end;");
+                I("date %t2 = 2007;");
+                I("time 2001 2004;");
+                I("x = 1, 2, m(), 4;");
+                I("expand(x, %t2);");
+                I("prt <2000 2010 n> x;");
+            }
+        }
+
+        [TestMethod]
         public void _Test_Databank_Compatibility()
         {
 

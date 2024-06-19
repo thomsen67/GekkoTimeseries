@@ -35527,6 +35527,7 @@ namespace Gekko
 
         public string GetCurrentLibrary(int i)
         {
+            if (i < 0) return null;  //does not happen normally, but can happen with --rungenr1/2.
             return stackCurrentLibrary[i];
         }
 

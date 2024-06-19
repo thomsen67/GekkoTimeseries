@@ -761,7 +761,7 @@ namespace Gekko
                 //  Note: on the RHS, a series may be normal series, timeless series, array-series.
 
                 //The following is hard to refactor, but the switches keeps it modularized.
-
+                
                 if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
                 {
                     // -----------------------------------------------------------------------------------
@@ -1050,19 +1050,21 @@ namespace Gekko
                                                 rhs_series.TooSmallOrTooLarge(ii1, ii2, out tooSmall, out tooLarge);
                                                 if (tooSmall > 0 || tooLarge > 0)
                                                 {
-                                                    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
-                                                    return;
+                                                    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);                                                    
                                                 }
 
-                                                int destinationStart = 0;
-                                                double[,] destination = m.data;
-                                                double[] source = rhs_series.GetDataSequenceUnsafePointerReadOnlyBEWARE();
-                                                //see #0985324985237
-                                                Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
-                                                IVariable lhsNew = m;
-                                                //if (Series.MissingZero()) G.ReplaceNaNWith0(m.data); --> NO! Series light do not get replacement
-                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                                G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                                if (smpl.gekkoError == null)
+                                                {
+                                                    int destinationStart = 0;
+                                                    double[,] destination = m.data;
+                                                    double[] source = rhs_series.GetDataSequenceUnsafePointerReadOnlyBEWARE();
+                                                    //see #0985324985237
+                                                    Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
+                                                    IVariable lhsNew = m;
+                                                    //if (Series.MissingZero()) G.ReplaceNaNWith0(m.data); --> NO! Series light do not get replacement
+                                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                    G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                                }
                                             }
                                             else
                                             {
@@ -1388,15 +1390,17 @@ namespace Gekko
                                                     rhs_series_beware.TooSmallOrTooLarge(rhs_series_beware.GetArrayIndex(tt1), rhs_series_beware.GetArrayIndex(tt2), out tooSmall, out tooLarge);
                                                     if (tooSmall > 0 || tooLarge > 0)
                                                     {
-                                                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
-                                                        return;
+                                                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);                                                        
                                                     }
                                                 }
 
-                                                int index1, index2;
-                                                //may enlarge the array with NaNs first and last
-                                                double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);
-                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Series.MissingZero(rhs_series_beware), hasSkips);
+                                                if (smpl.gekkoError == null)
+                                                {
+                                                    int index1, index2;
+                                                    //may enlarge the array with NaNs first and last
+                                                    double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);
+                                                    lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Series.MissingZero(rhs_series_beware), hasSkips);
+                                                }
                                             }
                                             else
                                             {
@@ -1404,8 +1408,8 @@ namespace Gekko
                                                 //if (hasSkips) new Error("The combination of a series operator and a left-side $-condition involving series is not yet implemented (for instance y $ (z == 2) <d> = x; where z is a timeseries and <d> is an operator).");
                                                 OperatorHelperSeries(smpl, lhs_series, rhs_series_beware, operatorType);
                                             }
-                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                                            LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
+
+                                            if(smpl.gekkoError == null) LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                                         }
                                         break;
                                     case ESeriesType.Timeless:
@@ -1671,66 +1675,69 @@ namespace Gekko
                         default:
                             {
                                 new Error("Expected IVariable to be 1 of 7 types");
-                                //throw new GekkoException();
                             }
                             break;
                     }  //end switch
 
-                    if (create)
+                    if (smpl.gekkoError == null)
                     {
-                        AddIvariableWithOverwrite(ib, varnameWithFreq, removeFirst, lhs_series);
-                    }
-                    else
-                    {
-                        //nothing to do, either already existing in bank/map or array-subseries
-                    }
 
-                    if (keep)
-                    {
-                        GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
-
-                        GekkoTime t3 = smpl.t3; //why t3 and not t2? Never mind, t2 and t3 are equal most of the time
-                        if (O.UseFlexFreq(t3, t3, lhs_series.freq)) t3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, t3);
-                        if (O.UseFlexFreq(tLast, tLast, lhs_series.freq)) tLast = GekkoTime.ConvertFreqsLast(lhs_series.freq, tLast);                        
-
-                        foreach (GekkoTime t in new GekkoTimeIterator(t3.Add(1), tLast))
+                        if (create)
                         {
-                            //runs after the <...> period or globals period until data ends
-                            //so the updates outside of sample.
-                            double rel = original.GetData(smpl, t) / original.GetData(smpl, t.Add(-1));
-                            lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, removeFirst, lhs_series);
                         }
-                    }
-
-                    if (Program.options.series_failsafe)
-                    {
-                        //only for debugging                        
-                        ReportSeriesMissingValue(lhs_series, smpl.t1, smpl.t2);
-                    }
-
-                    if (keep || operatorType == ESeriesUpdTypes.d || operatorType == ESeriesUpdTypes.p || operatorType == ESeriesUpdTypes.m || operatorType == ESeriesUpdTypes.q || operatorType == ESeriesUpdTypes.mp || operatorType == ESeriesUpdTypes.dl)
-                    {
-                        //All these operators somehow include the LHS on the RHS (maybe lagged).
-                        //Operators <n> or <l> are <..nothing..> are not included.
-                        //<keep> also triggers this.
-                        Program.RegisterANewTracePrecedent(lhs_series, ib, false, true);  //false because it is as IF it also were on RHS!
-                    }
-
-                    if (Program.options.databank_trace)
-                    {
-                        //We do not count the following ConvertFreqs... in Globals.traceTime. Can't be much.
-                        GekkoTime xt1 = smpl.t1; GekkoTime xt2 = smpl.t2; GekkoTime xt3 = smpl.t3;
-                        if (O.UseFlexFreq(smpl.t1, smpl.t2, smpl.t3, lhs_series.freq))
+                        else
                         {
-                            //We need to do this because any of smpl.t1/t2/t3 may have different freq
-                            //from lhs_series. This will not happen often, but with x!a <2001q1 2010m5> = ... and the like.
-                            //SLACK: the conversions happen later on, too, if they are relevant.
-                            //       --> so there is some double work here.
-                            xt1 = GekkoTime.ConvertFreqsFirst(lhs_series.freq, smpl.t1, null);
-                            xt2 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t2);
-                            xt3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t3);
+                            //nothing to do, either already existing in bank/map or array-subseries
                         }
-                        LookupHandleTrace(xt1, xt2, xt3, ib, lhs_series, isArraySubSeries, o, smpl.p);
+
+                        if (keep)
+                        {
+                            GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
+
+                            GekkoTime t3 = smpl.t3; //why t3 and not t2? Never mind, t2 and t3 are equal most of the time
+                            if (O.UseFlexFreq(t3, t3, lhs_series.freq)) t3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, t3);
+                            if (O.UseFlexFreq(tLast, tLast, lhs_series.freq)) tLast = GekkoTime.ConvertFreqsLast(lhs_series.freq, tLast);
+
+                            foreach (GekkoTime t in new GekkoTimeIterator(t3.Add(1), tLast))
+                            {
+                                //runs after the <...> period or globals period until data ends
+                                //so the updates outside of sample.
+                                double rel = original.GetData(smpl, t) / original.GetData(smpl, t.Add(-1));
+                                lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
+                            }
+                        }
+
+                        if (Program.options.series_failsafe)
+                        {
+                            //only for debugging                        
+                            ReportSeriesMissingValue(lhs_series, smpl.t1, smpl.t2);
+                        }
+
+                        if (keep || operatorType == ESeriesUpdTypes.d || operatorType == ESeriesUpdTypes.p || operatorType == ESeriesUpdTypes.m || operatorType == ESeriesUpdTypes.q || operatorType == ESeriesUpdTypes.mp || operatorType == ESeriesUpdTypes.dl)
+                        {
+                            //All these operators somehow include the LHS on the RHS (maybe lagged).
+                            //Operators <n> or <l> are <..nothing..> are not included.
+                            //<keep> also triggers this.
+                            Program.RegisterANewTracePrecedent(lhs_series, ib, false, true);  //false because it is as IF it also were on RHS!
+                        }
+
+                        if (Program.options.databank_trace)
+                        {
+                            //We do not count the following ConvertFreqs... in Globals.traceTime. Can't be much.
+                            GekkoTime xt1 = smpl.t1; GekkoTime xt2 = smpl.t2; GekkoTime xt3 = smpl.t3;
+                            if (O.UseFlexFreq(smpl.t1, smpl.t2, smpl.t3, lhs_series.freq))
+                            {
+                                //We need to do this because any of smpl.t1/t2/t3 may have different freq
+                                //from lhs_series. This will not happen often, but with x!a <2001q1 2010m5> = ... and the like.
+                                //SLACK: the conversions happen later on, too, if they are relevant.
+                                //       --> so there is some double work here.
+                                xt1 = GekkoTime.ConvertFreqsFirst(lhs_series.freq, smpl.t1, null);
+                                xt2 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t2);
+                                xt3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t3);
+                            }
+                            LookupHandleTrace(xt1, xt2, xt3, ib, lhs_series, isArraySubSeries, o, smpl.p);
+                        }
                     }
                 }
             }
