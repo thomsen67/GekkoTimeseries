@@ -3800,7 +3800,9 @@ ASTPLACEHOLDER [0]
                                 {
                                     //public static void Dispatch(GekkoSmpl smpl, IVariable lhs, IVariable rhs, EVariableType lhsType, IBank ib, string varnameWithFreq, string freq, bool isArraySubSeries, Series arraySubSeries, Assignment o)
                                     //lookupCode = "O.Lookup(" + ", " + ivTempVar + ", " + lookupSettings + ",  + ", " + optionsString + ")";
-                                    node.Code.CA("O.Dispatch(" + Globals.smpl + ", " + internalName + ", " + ivTempVar + ", EVariableType." + type+", null, "+s+", null, false, null, null);" + G.NL);
+                                    string s5 = "null";
+                                    if (s != null) s5 = Globals.QT + s + Globals.QT;
+                                    node.Code.CA("O.Dispatch(" + Globals.smpl + ", " + internalName + ", " + ivTempVar + ", EVariableType." + type + ", null, " + s5 + ", null, false, null, " + optionsString + ");" + G.NL);
                                 }
                                 else
                                 {
@@ -5708,6 +5710,11 @@ ASTPLACEHOLDER [0]
             return s;
         }
 
+        /// <summary>
+        /// Get simple name like "x", "%x" or "#m", no bank or freq indicator.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private static string GetSimpleName(ASTNode node)
         {
             string s = null;
