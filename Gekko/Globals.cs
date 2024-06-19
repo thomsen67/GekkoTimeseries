@@ -87,6 +87,7 @@ namespace Gekko
         public const string scalarModelLstFolder = "LST";
 
         public static bool bugfixDollarOperator = true;
+        public static bool bugfixLhsIsFunctionParameter = true;
         
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";

@@ -3796,7 +3796,16 @@ ASTPLACEHOLDER [0]
                         {
                             if (isLeftSideVariable && ivTempVar != null)
                             {
-                                node.Code.CA(internalName + " = " + ivTempVar + ";" + G.NL);
+                                if (Globals.bugfixLhsIsFunctionParameter)
+                                {
+                                    //public static void Dispatch(GekkoSmpl smpl, IVariable lhs, IVariable rhs, EVariableType lhsType, IBank ib, string varnameWithFreq, string freq, bool isArraySubSeries, Series arraySubSeries, Assignment o)
+                                    //lookupCode = "O.Lookup(" + ", " + ivTempVar + ", " + lookupSettings + ",  + ", " + optionsString + ")";
+                                    node.Code.CA("O.Dispatch(" + Globals.smpl + ", " + internalName + ", " + ivTempVar + ", EVariableType." + type+", null, "+s+", null, false, null, null);" + G.NL);
+                                }
+                                else
+                                {
+                                    node.Code.CA(internalName + " = " + ivTempVar + ";" + G.NL);
+                                }
                             }
                             else
                             {
