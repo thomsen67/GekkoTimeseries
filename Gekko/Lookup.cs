@@ -751,13 +751,26 @@ namespace Gekko
                     lhs = ib.GetIVariable(varnameWithFreq, true); //may return null
                 }                
                 
-                Dispatch(smpl, lhs, rhs, lhsType, ib, varnameWithFreq, freq, isArraySubSeries, arraySubSeries, o);
+                Dispatch(smpl, lhs, rhs, lhsType, ib, varnameWithFreq, freq, isArraySubSeries, arraySubSeries, false, o);
             }
 
             return;
         }
-
-        public static void Dispatch(GekkoSmpl smpl, IVariable lhs, IVariable rhs, EVariableType lhsType, IBank ib, string varnameWithFreq, string freq, bool isArraySubSeries, Series arraySubSeries, Assignment o)
+        
+        /// <summary>
+        /// Gets lhs updated from rhs. Method *can* return the updated object, only relevant when isFunctionVariable == true.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="lhsType"></param>
+        /// <param name="ib"></param>
+        /// <param name="varnameWithFreq"></param>
+        /// <param name="freq"></param>
+        /// <param name="isArraySubSeries"></param>
+        /// <param name="arraySubSeries"></param>
+        /// <param name="o"></param>
+        public static IVariable Dispatch(GekkoSmpl smpl, IVariable lhs, IVariable rhs, EVariableType lhsType, IBank ib, string varnameWithFreq, string freq, bool isArraySubSeries, Series arraySubSeries, bool isFunctionVariable, Assignment o)
         {
             //We divide into three groups depending on LHS name:
             //  A. LHS variable starts with '%'
@@ -769,6 +782,8 @@ namespace Gekko
             //  Note: on the RHS, a series may be normal series, timeless series, array-series.
 
             //The following is hard to refactor, but the switches keeps it modularized.
+
+            IVariable rv = null;
 
             if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
             {
@@ -1748,6 +1763,8 @@ namespace Gekko
                     }
                 }
             }
+
+            return rv;
         }
 
         public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, GekkoTime t3, IBank ib, Series lhs_series, bool isArraySubSeries, Assignment o, P p)

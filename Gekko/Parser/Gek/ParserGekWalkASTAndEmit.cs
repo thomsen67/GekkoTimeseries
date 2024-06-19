@@ -3800,9 +3800,9 @@ ASTPLACEHOLDER [0]
                                 {
                                     //public static void Dispatch(GekkoSmpl smpl, IVariable lhs, IVariable rhs, EVariableType lhsType, IBank ib, string varnameWithFreq, string freq, bool isArraySubSeries, Series arraySubSeries, Assignment o)
                                     //lookupCode = "O.Lookup(" + ", " + ivTempVar + ", " + lookupSettings + ",  + ", " + optionsString + ")";
-                                    string s5 = "null";
-                                    if (s != null) s5 = Globals.QT + s + Globals.QT;
-                                    node.Code.CA("O.Dispatch(" + Globals.smpl + ", " + internalName + ", " + ivTempVar + ", EVariableType." + type + ", null, " + s5 + ", null, false, null, " + optionsString + ");" + G.NL);
+                                    string name = "rv" + ++Globals.counter;
+                                    string s5 = "null"; if (s != null) s5 = Globals.QT + s + Globals.QT;
+                                    node.Code.CA("IVariable " + name + " = O.Dispatch(" + Globals.smpl + ", " + internalName + ", " + ivTempVar + ", EVariableType." + type + ", null, " + s5 + ", null, false, null, true, " + optionsString + ");" + G.NL);
                                 }
                                 else
                                 {
