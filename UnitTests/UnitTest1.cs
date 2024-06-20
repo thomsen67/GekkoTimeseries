@@ -33703,25 +33703,24 @@ print(df2)
             I("test(y);");
             FAIL("prt x;");
 
-            //For some reason, assignment "x = 3" goes bad, becomes %x = 3.
-            I("reset;");                        
-            I("function void expand(series x); x = 3; %s = type(x); mem; end;");            
+            I("reset;");
+            I("function void expand(series x); x = 3; %s = type(x); mem; end;");
             I("time 2001 2004;");
             I("x = 1, 2, m(), 4;");
             I("expand(x);");
             I("prt x;");
+            _AssertScalarString(First(), "%s", "series");
 
+            I("reset;");
+            I("function void expand(series x, date %t2); disp x; if (%t2 > x.fromSeries('dataEnd')); series <x.fromSeries('dataEnd') + 1 %t2> x %= 0; p x; end; end;");
+            I("date %t2 = 2007;");
+            I("time 2001 2004;");
+            I("x = 1, 2, m(), 4;");
+            I("expand(x, %t2);");
+            I("prt <2000 2010 n> x;");
 
-            if (false)
-            {
-                I("reset;");
-                I("function void expand(series x, date %t2); disp x; if (%t2 > x.fromSeries('dataEnd')); series <x.fromSeries('dataEnd') + 1 %t2> x %= 0; p x; end; end;");
-                I("date %t2 = 2007;");
-                I("time 2001 2004;");
-                I("x = 1, 2, m(), 4;");
-                I("expand(x, %t2);");
-                I("prt <2000 2010 n> x;");
-            }
+            Assert.Fail("Finish this test! Maybe with all types!");
+
         }
 
         [TestMethod]
