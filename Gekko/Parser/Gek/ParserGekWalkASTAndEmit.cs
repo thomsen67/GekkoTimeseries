@@ -3803,6 +3803,7 @@ ASTPLACEHOLDER [0]
                                     string name = "rv" + ++Globals.counter;
                                     string s5 = "null"; if (s != null) s5 = Globals.QT + s + Globals.QT;
                                     node.Code.CA("IVariable " + name + " = O.Dispatch(" + Globals.smpl + ", " + internalName + ", " + ivTempVar + ", EVariableType." + type + ", null, " + s5 + ", null, false, null, true, " + optionsString + ");" + G.NL);
+                                    node.Code.A("if (" + name + " != null) { " + internalName + " = " + name + "; }" + G.NL);
                                 }
                                 else
                                 {

@@ -808,8 +808,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + lhsType.ToString().ToLower() + " type");
-                    //throw new GekkoException();
+                    new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + lhsType.ToString().ToLower() + " type");                 
                 }
 
                 switch (rhs.Type())
@@ -832,8 +831,15 @@ namespace Gekko
                                         {
                                             // VAL %x = Series Timeless
                                             IVariable lhsNew = new ScalarVal(rhsExpression_series.GetTimelessData());
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                            G.ServiceMessage("val " + varnameWithFreq + " updated ", smpl.p);
+                                            if (isFunctionVariable)
+                                            {
+                                                rv = lhsNew;
+                                            }
+                                            else
+                                            {                                                
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                G.ServiceMessage("val " + varnameWithFreq + " updated ", smpl.p);
+                                            }
                                         }
                                         else
                                         {
@@ -862,14 +868,28 @@ namespace Gekko
                             if (lhsType == EVariableType.Val || lhsType == EVariableType.Var)
                             {
                                 IVariable lhsNew = new ScalarVal(((ScalarVal)rhs).val);
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("val " + varnameWithFreq + " updated ", smpl.p);
+                                if (isFunctionVariable)
+                                {
+                                    rv = lhsNew;
+                                }
+                                else
+                                {                                    
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("val " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else if (lhsType == EVariableType.Date)
                             {
                                 IVariable lhsNew = new ScalarDate(rhs.ConvertToDate(GetDateChoices.Strict));
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("date " + varnameWithFreq + " updated ", smpl.p);
+                                if (isFunctionVariable)
+                                {
+                                    rv = lhsNew;
+                                }
+                                else
+                                {                                    
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("date " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -887,8 +907,15 @@ namespace Gekko
                             if (lhsType == EVariableType.String || lhsType == EVariableType.Var)
                             {
                                 IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("string " + varnameWithFreq + " updated ", smpl.p);
+                                if (isFunctionVariable)
+                                {
+                                    rv = lhsNew;
+                                }
+                                else
+                                {                                    
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("string " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -907,8 +934,15 @@ namespace Gekko
                             if (lhsType == EVariableType.Date || lhsType == EVariableType.Var)
                             {
                                 IVariable lhsNew = new ScalarDate(((ScalarDate)rhs).date);
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("date " + varnameWithFreq + " updated ", smpl.p);
+                                if (isFunctionVariable)
+                                {
+                                    rv = lhsNew;
+                                }
+                                else
+                                {
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("date " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -944,8 +978,15 @@ namespace Gekko
                             if (lhsType == EVariableType.Val || lhsType == EVariableType.Var)
                             {
                                 IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("val " + varnameWithFreq + " updated ", smpl.p);
+                                if (isFunctionVariable)
+                                {
+                                    rv = lhsNew;
+                                }
+                                else
+                                {                                    
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("val " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -1024,10 +1065,7 @@ namespace Gekko
                                             //                                        
 
                                             //method will only work if smpl freq is same as series freq
-                                            int n = smpl.Observations12();
-                                            //int i1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
-                                            //int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);                                                
-                                            //double[] source = rhs_series.GetDataArray();
+                                            int n = smpl.Observations12();                                           
 
                                             int i1; int i2;
                                             double[] source = rhs_series.GetDataSequenceUnsafePointerReadOnlyBEWARE(out i1, out i2, smpl.t1, smpl.t2);
@@ -1042,9 +1080,15 @@ namespace Gekko
 
                                             if (Series.MissingZero(rhs_series)) G.ReplaceNaNWith0(m.data);
 
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-
-                                            G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                            if (isFunctionVariable)
+                                            {
+                                                rv = lhsNew;
+                                            }
+                                            else
+                                            {
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                            }
                                         }
                                         else
                                         {
@@ -1085,8 +1129,15 @@ namespace Gekko
                                                 Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
                                                 IVariable lhsNew = m;
                                                 //if (Series.MissingZero()) G.ReplaceNaNWith0(m.data); --> NO! Series light do not get replacement
-                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                                G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                                if (isFunctionVariable)
+                                                {
+                                                    rv = lhsNew;
+                                                }
+                                                else
+                                                {
+                                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                    G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                                }
                                             }
                                         }
                                         else
@@ -1107,9 +1158,16 @@ namespace Gekko
                                             int n = smpl.Observations12();
                                             double d = rhs_series.GetDataSequenceUnsafePointerAlterBEWARE()[0];
                                             if (Series.MissingZero(rhs_series) && G.isNumericalError(d)) d = 0d;
-                                            Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
-                                            G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                            Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries
+                                            if (isFunctionVariable)
+                                            {
+                                                rv = m;
+                                            }
+                                            else
+                                            {
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
+                                                G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                            }
                                         }
                                         else
                                         {
@@ -1171,8 +1229,16 @@ namespace Gekko
                             //---------------------------------------------------------         
                             if (lhsType == EVariableType.List || lhsType == EVariableType.Var)
                             {
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(0, null, null));
-                                G.ServiceMessage("list " + varnameWithFreq + " updated ", smpl.p);
+                                IVariable rhs_clone = rhs.DeepClone(0, null, null);
+                                if (isFunctionVariable)
+                                {
+                                    rv = rhs_clone;
+                                }
+                                else
+                                {
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs_clone);
+                                    G.ServiceMessage("list " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -1188,8 +1254,16 @@ namespace Gekko
 
                             if (lhsType == EVariableType.Map || lhsType == EVariableType.Var)
                             {
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(0, null, null));
-                                G.ServiceMessage("map " + varnameWithFreq + " updated ", smpl.p);
+                                IVariable rhs_clone = rhs.DeepClone(0, null, null);
+                                if (isFunctionVariable)
+                                {
+                                    rv = rhs_clone;
+                                }
+                                else
+                                {
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs_clone);
+                                    G.ServiceMessage("map " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -1207,8 +1281,15 @@ namespace Gekko
                                 Matrix m = rhs.DeepClone(0, null, null) as Matrix;
                                 if (o.opt_colnames != null) m.colnames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
                                 if (o.opt_rownames != null) m.rownames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
-                                G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                if (isFunctionVariable)
+                                {
+                                    rv = m;
+                                }
+                                else
+                                {
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
+                                    G.ServiceMessage("matrix " + varnameWithFreq + " updated ", smpl.p);
+                                }
                             }
                             else
                             {
@@ -1332,6 +1413,12 @@ namespace Gekko
                             txt.MoreAdd("Note: When data tracing is activated (which it is per default in Gekko >= 3.1.16), an invalid series statement period will generally crash the data tracing part in any case and result in an error.");
                         }
                     }
+                }
+
+                if (isFunctionVariable)
+                {
+                    //Do nothing: just a pointer to show that we will arrive here if "x = ..." is encountered inside a function/procedure
+                    //body, where "series x" is a parameter. In that case, the x series object is kept, but its contents are changed.
                 }
 
                 switch (rhs.Type())
