@@ -10213,8 +10213,7 @@ namespace Gekko
 
                 if (keys.Count == 0)
                 {
-                    G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
-                    throw new GekkoException();
+                    new Error("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");                    
                 }
                 keys.Sort(Multidim.CompareMultidimItems);
 

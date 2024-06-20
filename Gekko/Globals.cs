@@ -86,9 +86,9 @@ namespace Gekko
         public const string scalarModelSolve = "@solve(";
         public const string scalarModelLstFolder = "LST";
 
-        public static bool bugfixDollarOperator = true;
+        public static bool bugfixDollarOperator = true;        
         public static bool bugfixLhsIsFunctionParameter = true;
-        
+
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
 
@@ -638,6 +638,7 @@ namespace Gekko
         public static bool initializeDataArrayWithNaN = true;
         public static bool simulationCheckThatAllDataGetsFromBArrayToTimeSeries = true;
 
+        public const string lhsFunctionParameterName = "[parameter]";
         public const string seriesArraySubName = "[array]";
         public const string seriesArraySuperName = "intermediate_expression";
 

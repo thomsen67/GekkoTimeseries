@@ -326,7 +326,6 @@ namespace Gekko
             if (this.type != ESeriesType.Normal)
             {
                 new Error("SERIES constructor 3");
-                //throw new GekkoException();
             }
 
             this.type = type;
@@ -339,8 +338,14 @@ namespace Gekko
             {
                 if (!this.name.Contains(Globals.freqIndicator))
                 {
-                    new Error("Missing freq indicator, see G.AddFreqToName()");
-                    //throw new GekkoException();
+                    //This should only happen for function arguments like "function void f(series x); ... ; end;"
+                    //where something like "x = ..." (not really recommended to do...) calls Dispatch() in a way
+                    //that no frequency is glued on "x". For these cases, we add a kind of phoney freq indicator,
+                    //which will be the current frequency. The thing is that this name (for instance "x!a" is not
+                    //used later on if it is a function argument, because a variable like "x!a" is never added to
+                    //any databank.
+                    this.name = G.Chop_AddFreq(variableName, frequency);
+                    //new Error("Missing freq indicator, see G.AddFreqToName()");
                 }
             }
             this.meta = new SeriesMetaInformation();

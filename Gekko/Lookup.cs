@@ -749,7 +749,7 @@ namespace Gekko
                 {
                     //ib can be == null with an indexer on the lhs, like #m.#n.%s
                     lhs = ib.GetIVariable(varnameWithFreq, true); //may return null
-                }                
+                }
                 
                 Dispatch(smpl, lhs, rhs, lhsType, ib, varnameWithFreq, freq, isArraySubSeries, arraySubSeries, false, o);
             }
@@ -1430,7 +1430,10 @@ namespace Gekko
                             string freq_rhs = G.ConvertFreq(rhs_series_beware.freq);
                             if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                             {
-                                new Error("Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
+                                if (!isFunctionVariable)
+                                {
+                                    new Error("Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
+                                }
                             }
 
                             if (Program.options.series_dyn_check)
@@ -1536,11 +1539,10 @@ namespace Gekko
                                         }
                                         else
                                         {
-
                                             if (create)
                                             {
                                                 lhs_series = rhs_series_beware.DeepClone(0, null, null) as Series;  //so that it becomes timeless, too                                                
-                                                lhs_series.name = varnameWithFreq; ;
+                                                lhs_series.name = varnameWithFreq;
                                                 double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
                                                 if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
                                                 {
@@ -1580,8 +1582,7 @@ namespace Gekko
                                             }
                                             LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                                         }
-                                        //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);                                           
-
+                                        //Potentially added to databank later on
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1610,11 +1611,9 @@ namespace Gekko
                                             kvp.Key.parent = lhs_series;
                                             (kvp.Value as Series).mmi.parent = lhs_series;
                                         }
-                                        removeFirst = lhs != null;
-                                        //lhs_series = clone;
-                                        //AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
-                                        //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                        removeFirst = lhs != null;                                        
                                         LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
+                                        //Potentially added to databank later on
                                     }
                                     break;
                                 default:
@@ -1686,11 +1685,8 @@ namespace Gekko
                             // x = LIST
                             //---------------------------------------------------------
                             // stuff below also handles array-timeseries just fine 
-
                             List rhs_list = rhs as List;
-
                             HelperListdata(smpl, lhs_series, operatorType, rhs_list);
-
                             //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                             LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                         }
@@ -1794,7 +1790,15 @@ namespace Gekko
 
                     if (create)
                     {
-                        AddIvariableWithOverwrite(ib, varnameWithFreq, removeFirst, lhs_series);
+                        if (isFunctionVariable)
+                        {
+                            lhs_series.name = Globals.lhsFunctionParameterName + Globals.freqIndicator + G.ConvertFreq(lhs_series.freq);
+                            rv = lhs_series;
+                        }
+                        else
+                        {
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, removeFirst, lhs_series);
+                        }
                     }
                     else
                     {
