@@ -33696,13 +33696,14 @@ print(df2)
             _AssertSeries(First(), "y!a", 2003, 202d, sharedDelta);
             _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
 
-            //X does not even exist anywhere
+            //x does not even exist anywhere
             I("reset; time 2001 2003;");
             I("function void test(series x); x *= 2; prt x; end;");
             I("y = 100, 102, 101;");
             I("test(y);");
             FAIL("prt x;");
 
+            //Just a test regarding a former bug
             I("reset;");
             I("function void expand(series x); x = 3; %s = type(x); mem; end;");
             I("time 2001 2004;");
@@ -33711,16 +33712,79 @@ print(df2)
             I("prt x;");
             _AssertScalarString(First(), "%s", "series");
 
+            //Just a test regarding a former bug
             I("reset;");
-            I("function void expand(series x, date %t2); disp x; if (%t2 > x.fromSeries('dataEnd')); series <x.fromSeries('dataEnd') + 1 %t2> x %= 0; p x; end; end;");
+            I("function void expand(series x, date %t2); disp x; if (%t2 > x.fromSeries('dataEnd')); series <x.fromSeries('dataEnd') + 1 %t2> x %= 0; y <2000 %t2> = x; end; end;");
             I("date %t2 = 2007;");
             I("time 2001 2004;");
             I("x = 1, 2, m(), 4;");
             I("expand(x, %t2);");
             I("prt <2000 2010 n> x;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2005, 4d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2006, 4d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2007, 4d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2008, double.NaN, sharedDelta);
 
-            Assert.Fail("Finish this test! Maybe with all types!");
+            //
+            // Test of non-series arguments being altered: string, val, date, list, matrix, map
+            //
 
+            I("reset;");
+            I("function void f(string %x); %x += '100'; %y = %x; end;");
+            I("%x = '1';");
+            I("f(%x);");
+            _AssertScalarString(First(), "%x", "1");
+            _AssertScalarString(First(), "%y", "1100");
+
+            I("reset;");
+            I("function void f(val %x); %x += 100; %y = %x; end;");
+            I("%x = 1;");
+            I("f(%x);");
+            _AssertScalarVal(First(), "%x", 1d, sharedDelta);
+            _AssertScalarVal(First(), "%y", 101d, sharedDelta);                       
+
+            I("reset;");
+            I("function void f(date %x); %x += 4; %y = %x; end;");
+            I("%x = 2001q1;");
+            I("f(%x);");
+            _AssertScalarDate(First(), "%x", EFreq.Q, 2001, 1);
+            _AssertScalarDate(First(), "%y", EFreq.Q, 2002, 1);
+
+            I("reset;");
+            I("function void f(list #x); #x += x, y; #y = #x; end;");
+            I("#x = a, b;");
+            I("f(#x);");
+            _AssertListString(First(), "#x", new StringOrList("a", "b"));
+            _AssertListString(First(), "#y", new StringOrList("a", "b", "x", "y"));
+
+            I("reset;");
+            I("function void f(matrix #x); #x = [1, 2, 3]; #y = #x; end;");
+            I("#x = [1, 2; 3, 4];");
+            I("f(#x);");
+            _AssertMatrix(First(), "#x", "rows", 2);
+            _AssertMatrix(First(), "#x", "cols", 2);
+            _AssertMatrix(First(), "#y", "rows", 1);
+            _AssertMatrix(First(), "#y", "cols", 3);
+
+            I("reset;");
+            I("function void f(map #x); #x = (%s = 'a'); #y = #x; end;");
+            I("#x = (%s = 'b');");
+            I("f(#x);");
+            I("%s1 = #y.%s;");
+            I("%s2 = #x.%s;");
+            _AssertScalarString(First(), "%s1", "a");
+            _AssertScalarString(First(), "%s2", "b");
         }
 
         [TestMethod]
