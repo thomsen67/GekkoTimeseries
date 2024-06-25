@@ -26490,12 +26490,40 @@ namespace Gekko
             //TODO: what if periods do not fit together?
             //SLACK: could use array-copy...?
 
+            Series ts_collapse = new Series(t1_low.freq, null); //has no name
+            try
+            {
+                //This is only to test how the series collapses (aggregates), compared to the indicator series.                
+                CollapseHelper ch = new CollapseHelper();
+                ch.method = "total";                
+                CollapseHelper(ts_collapse, ts_indicator, ch);
+            }
+            catch
+            {
+                new Error("Could not collapse the series into " + t1_low.freq.Pretty() + " frequency (the indicator frequency)");
+            }
+
             double[,] y = new double[m, 1];
             int counter = -1;
+            double rMax = double.MinValue;
+            double rMin = double.MaxValue;
             foreach (GekkoTime t in new GekkoTimeIterator(t1_low, t2_low))
             {
                 counter++;
                 y[counter, 0] = ts_rhs.GetDataSimple(t);
+                //Problem with this is that ts_indicator = 500 and ts_rhs = -500 will give r = 1... But that would be crazy input anyway.
+                rMax = Math.Max(rMax, ts_collapse.GetDataSimple(t) / ts_rhs.GetDataSimple(t));
+                rMin = Math.Min(rMin, ts_collapse.GetDataSimple(t) / ts_rhs.GetDataSimple(t));
+            }
+
+            double crit = 2d;  //What should this be? There is a relativity problem here. Something like a sine curve fluctuating around 0 does not necessarily give bad results. But it will give a warning here. Still, with a factor = 2, a lot of bad stuff will be caught.
+            if (!G.isNumericalError(rMax) && rMax != double.MinValue && rMax >= crit)
+            {
+                G.Warning("w41.1", "At one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMax, 2) + " larger than the low-frequency input series. This may invalidate the Denton method results.");
+            }
+            if (!G.isNumericalError(rMin) && rMin != double.MaxValue && rMin <= 1d / crit)
+            {
+                G.Warning("w41.1", "At one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMin, 2) + " smaller than the low-frequency input series. This may invalidate the Denton method results.");
             }
 
             double[,] z = new double[n, 1];
