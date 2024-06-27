@@ -9337,7 +9337,42 @@ namespace UnitTests
             _AssertSeries(First(), "ts4", EFreq.M, 2000, 6, double.NaN, sharedDelta);
             _AssertSeries(First(), "ts4", EFreq.M, 2000, 7, double.NaN, sharedDelta);
 
+            // ============== array-series =====================
 
+            I("reset;");
+            I("x = series(2);");
+            I("x[a, b] <2003 2009> = 1, 1, 2, 3, 4, 5, 5;");
+            I("truncate <2005 2007> x[a, b];");
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2005, 2d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2006, 3d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2007, 4d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2008, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2009, double.NaN, sharedDelta);
+            
+            // --------------------
+            
+            I("reset;");
+            I("x = series(2);");
+            I("x[a, b] <2003 2009> = 1, 1, 2, 3, 4, 5, 5;");
+            I("x[c, d] <2003 2009> = 11, 11, 12, 13, 14, 15, 15;");
+            I("truncate <2005 2007> x;");  //should handle the sub-series
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2005, 2d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2006, 3d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2007, 4d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2008, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b" }, 2009, double.NaN, sharedDelta);
+            //---
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2005, 12d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2006, 13d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2007, 14d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2008, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "d" }, 2009, double.NaN, sharedDelta);
         }
 
 

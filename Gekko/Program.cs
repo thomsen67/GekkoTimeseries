@@ -23178,14 +23178,15 @@ namespace Gekko
                     //----------------------
                     // truncate the periods
                     //----------------------
+                    CloneHelper cloneHelper = new CloneHelper();
                     GekkoDictionary<string, IVariable> databankWithFewerPeriods = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
                     foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
                     {
                         Series ts = kvp.Value as Series;
                         if (ts != null)
-                        {
-                            Series tsClone = ts.DeepClone(0, null, null) as Series;
-                            tsClone.Truncate(yr1, yr2);
+                        {                            
+                            Series tsClone = ts.DeepClone(0, null, cloneHelper) as Series;                            
+                            tsClone.Truncate(yr1, yr2);                            
                             databankWithFewerPeriods.Add(kvp.Key, tsClone);
                         }
                     }
@@ -26519,11 +26520,11 @@ namespace Gekko
             double crit = 2d;  //What should this be? There is a relativity problem here. Something like a sine curve fluctuating around 0 does not necessarily give bad results. But it will give a warning here. Still, with a factor = 2, a lot of bad stuff will be caught.
             if (!G.isNumericalError(rMax) && rMax != double.MinValue && rMax >= crit)
             {
-                G.Warning("w41.1", "At one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMax, 2) + " larger than the low-frequency input series. This may invalidate the Denton method results.");
+                G.Warning("w41.1", "At at least one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMax, 2) + " larger than the low-frequency input series. This may invalidate the Denton method results.");
             }
             if (!G.isNumericalError(rMin) && rMin != double.MaxValue && rMin <= 1d / crit)
             {
-                G.Warning("w41.1", "At one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMin, 2) + " smaller than the low-frequency input series. This may invalidate the Denton method results.");
+                G.Warning("w41.1", "At at least one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMin, 2) + " smaller than the low-frequency input series. This may invalidate the Denton method results.");
             }
 
             double[,] z = new double[n, 1];

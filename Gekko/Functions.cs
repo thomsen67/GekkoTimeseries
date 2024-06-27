@@ -5754,7 +5754,18 @@ namespace Gekko
             DateTime dt = GekkoTime.DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
-        }                   
+        }
+
+        public static void scramble(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            //scramble(0.1) means +- 10% noise is added.
+            double d = x.ConvertToVal();
+            Databank db = Program.databanks.GetFirst();
+            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.Scramble, d);            
+            db.isDirty = true;
+            new Writeln("Scrambled data");
+        }
+
 
         public static void tracedelete2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {            

@@ -57,7 +57,8 @@ namespace Gekko
     {        
         GetAllMetasAndTraces,
         OnlyGetMetas,
-        TrimWithTimeShadowing
+        TrimWithTimeShadowing,
+        Scramble  //not actually used for traces
     }
 
     [ProtoContract]
@@ -394,18 +395,7 @@ namespace Gekko
             if (lastTrace.GetContents().text != newTrace.GetContents().text) return false;
             if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) return false;
             return true;
-        }
-
-        /// <summary>
-        /// Removes time-shadowed traces from a Gekko databank. Used just before writing the databank.
-        /// Too costly to run all the time when traces change.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <returns></returns>
-        public static TraceHelper TraceTrim(Databank db)
-        {
-            return Trace2.CollectAllTraces(db, ETraceHelper.TrimWithTimeShadowing);
-        }
+        }        
 
         /// <summary>
         /// Used in trace: .precedentsNames. For a series x!a in databank b, theres is a prefix {i}¤ on names, where i is an integer from 1 to 8.
@@ -1090,12 +1080,18 @@ namespace Gekko
             GekkoTimeSpansSimple temp5 = new GekkoTimeSpansSimple();
             temp5.SetStorage(rv);
             return temp5;
-        }        
+        }
 
         public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type)
+        {
+            return CollectAllTraces(databank, type, double.NaN);
+        }
+
+        public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type, double scramble)
         {            
             TraceHelper th1 = new TraceHelper();
             th1.type = type;
+            th1.scramble = scramble;
             foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
             {
                 kvp.Value.DeepTrace(th1);
@@ -1741,6 +1737,7 @@ namespace Gekko
     public class TraceHelper
     {
         public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
+        public double scramble = double.NaN;  //for scramble() function
         public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
         

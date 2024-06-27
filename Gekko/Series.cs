@@ -378,7 +378,7 @@ namespace Gekko
         /// <summary>
         /// Truncates the Series object, so that the starting period
         /// and ending period are as given. Beware: this will usually mean that data is deleted. Used to truncate
-        /// a databank to a particular time period. Note: You may wish to use Trim() after a Truncate(). Note: only works for annual timeseries.
+        /// a databank to a particular time period. Note: You may wish to use Trim() after a Truncate().
         /// </summary>
         /// <param name="start">The start period.</param>
         /// <param name="end">The end period.</param>
@@ -393,12 +393,10 @@ namespace Gekko
             if (start.freq != end.freq)
             {
                 new Error("Truncate start and end have different frequencies");
-                //throw new GekkoException();
             }
             if (this.freq != start.freq)
             {
-                new Error("Series is freq: " + this.freq.Pretty() + ", which is different from truncate freq: " + start.freq.Pretty());
-                //throw new GekkoException();
+                new Error("Series is freq: " + this.freq.Pretty() + ", which is different from truncate freq: " + start.freq.Pretty());                
             }
             if (this.type == ESeriesType.Timeless) return;
             if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -408,10 +406,20 @@ namespace Gekko
             int newFirst = Math.Max(this.meta.firstPeriodPositionInArray, indexStart);
             int newLast = Math.Min(this.meta.lastPeriodPositionInArray, indexEnd);
 
+            if (this.type == ESeriesType.ArraySuper)
+            {
+                //Truncate the sub-series
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                {                    
+                    (kvp.Value as Series).Truncate(start, end);  //kvp.Value can only be normal series                    
+                }
+            }
+
             if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
                 //do nothing, could be a series defined like x = m(); 
                 //in that case, this.meta.firstPeriodPositionInArray and this.meta.lastPeriodPositionInArray will be strange too
+                //Also, ESeriesType.ArraySuper gets here.
             }
             else
             {
@@ -2830,7 +2838,7 @@ namespace Gekko
             //Always make sure new fields are remembered in the DeepClone() method
 
             //.isNotFoundArraySub... field is not cloned
-            //the .isDirty and .parentDatabank fields are not cloned
+            //the .isDirty and .parentDatabank fields are not cloned            
 
             Series tsCopy = new Series(this.freq, this.name);  //this will create the .meta object - the .data object is always there
 
@@ -2858,7 +2866,7 @@ namespace Gekko
                 tsCopy.dimensions = this.dimensions;
                 tsCopy.dimensionsStorage = new Multidim();
                 foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
-                {
+                {                    
                     MultidimItem item = kvp.Key.Clone();
                     item.parent = tsCopy;  //must be re-pointed
                     Series subseries = kvp.Value.DeepClone(depth + 1, truncate, cloneHelper) as Series;
@@ -2894,11 +2902,7 @@ namespace Gekko
                     }
 
                     if (this.meta.trace2 != null)
-                    {
-                        //if (this.name == "fcip!q")
-                        //{
-
-                        //}
+                    {                        
                         tsCopy.meta.trace2 = this.meta.trace2.DeepClone(depth + 1, cloneHelper);
                     }
 
@@ -2926,12 +2930,43 @@ namespace Gekko
             else
             {
                 th.seriesObjectCount++;
-                if (this.meta != null)
+                if (th.type == ETraceHelper.Scramble)
                 {
-                    if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.OnlyGetMetas) th.metas.Add(this.meta);
-                    if (this.meta.trace2 != null && th.type != ETraceHelper.OnlyGetMetas)
+                    double factor = th.scramble; //for instance 0.1 for 10% noise
+                    GekkoTime t1 = this.GetRealDataPeriodFirst();
+                    GekkoTime t2 = this.GetRealDataPeriodLast();
+                    double sum = 0d;
+                    int count = 0;
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                     {
-                        this.meta.trace2.DeepTrace(th, Globals.traceDeepStartDepth);
+                        double d = this.GetDataSimple(t);
+                        if (!G.isNumericalError(d) && d != 0d)
+                        {
+                            sum += Math.Abs(d);
+                            count++;
+                        }
+                    }
+                    if (count > 0)
+                    {
+                        double avg = sum / (double)count;
+                        foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                        {
+                            double d = this.GetDataSimple(t);
+                            double r = 2 * Globals.random.NextDouble() - 1d;  //uniform [-1; 1].
+                            double d2 = d + factor * r * avg;  //adds +- 0.10 x average value, if factor is = 0.10.
+                            this.SetData(t, d2);
+                        }
+                    }
+                }
+                else
+                {
+                    if (this.meta != null)
+                    {
+                        if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.OnlyGetMetas) th.metas.Add(this.meta);
+                        if (this.meta.trace2 != null && th.type != ETraceHelper.OnlyGetMetas)
+                        {
+                            this.meta.trace2.DeepTrace(th, Globals.traceDeepStartDepth);
+                        }
                     }
                 }
             }

@@ -281,7 +281,7 @@ namespace Gekko
             // =========================================================
             {"w0", Globals.internalGekkoWarningString },
             // ---------------------------------------------------------
-            {"w0.1", "System problem" },
+            {"w0.1", "System problem" },  //See #khssjksd7j
         };
 
         /// <summary>
@@ -560,7 +560,15 @@ namespace Gekko
                 GekkoDictionary<string, int> dublets = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (WarningPoolHelper wph in m2)
-                {                    
+                {
+                    if (wph.id == "w0.1")  //See #khssjksd7j
+                    {
+                        if (!Globals.runningOnTTComputer)
+                        {                            
+                            continue;  //skip internal warnings for normal users.
+                        }
+                    }
+                    
                     if (showId) txt3.MainAdd(wph.id + ": " + wph.s);
                     else txt3.MainAdd(wph.s);
                     txt3.MainNewLine();
