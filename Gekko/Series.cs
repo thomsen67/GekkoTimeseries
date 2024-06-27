@@ -380,28 +380,28 @@ namespace Gekko
         /// and ending period are as given. Beware: this will usually mean that data is deleted. Used to truncate
         /// a databank to a particular time period. Note: You may wish to use Trim() after a Truncate().
         /// </summary>
-        /// <param name="start">The start period.</param>
-        /// <param name="end">The end period.</param>
+        /// <param name="t1">The start period.</param>
+        /// <param name="t2">The end period.</param>
         /// <exception cref="GekkoException">
         /// </exception>
-        public void Truncate(GekkoTime start, GekkoTime end)
+        public void Truncate(GekkoTime t1_input, GekkoTime t2_input)
         {
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
             // ----------------------------------------------------------------------------
 
-            if (start.freq != end.freq)
+            if (t1_input.freq != t2_input.freq)
             {
                 new Error("Truncate start and end have different frequencies");
-            }
-            if (this.freq != start.freq)
-            {
-                new Error("Series is freq: " + this.freq.Pretty() + ", which is different from truncate freq: " + start.freq.Pretty());                
-            }
+            }            
+            
             if (this.type == ESeriesType.Timeless) return;
             if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            int indexStart = this.GetArrayIndex(start);
-            int indexEnd = this.GetArrayIndex(end);
+
+            GekkoSmplSimple span = GekkoTime.ConvertFreqs(this.freq, new GekkoSmplSimple(t1_input, t2_input));
+
+            int indexStart = this.GetArrayIndex(span.t1);
+            int indexEnd = this.GetArrayIndex(span.t2);
 
             int newFirst = Math.Max(this.meta.firstPeriodPositionInArray, indexStart);
             int newLast = Math.Min(this.meta.lastPeriodPositionInArray, indexEnd);
@@ -411,7 +411,7 @@ namespace Gekko
                 //Truncate the sub-series
                 foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {                    
-                    (kvp.Value as Series).Truncate(start, end);  //kvp.Value can only be normal series                    
+                    (kvp.Value as Series).Truncate(span.t1, span.t2);  //kvp.Value can only be normal series                    
                 }
             }
 

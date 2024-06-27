@@ -9309,6 +9309,19 @@ namespace UnitTests
             _AssertSeries(First(), "ts4", 2008, double.NaN, sharedDelta);
             _AssertSeries(First(), "ts4", 2009, double.NaN, sharedDelta);
 
+            I("RESET;");
+            I("option freq a;");
+            I("create ts4;");
+            I("SERIES <2003 2009> ts4 = (1, 1, 2, 3, 4, 5, 5);");
+            I("truncate <2005q2 2007q3> ts4;");  //must also work with wrong freq
+            _AssertSeries(First(), "ts4", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", 2005, 2d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2006, 3d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2007, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2008, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", 2009, double.NaN, sharedDelta);
+
             //quarters
             I("RESET;");
             I("option freq q;");

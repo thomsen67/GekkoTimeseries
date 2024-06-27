@@ -18107,13 +18107,11 @@ namespace Gekko
                 {
                     //READ<2010 2020 respect>
                     new Error("You cannot mix dates and 'respect' in the option field");
-                    //throw new GekkoException();                    
                 }
                 else if (G.Equal(all, "yes"))
                 {
                     //IMPORT<2010 2020 all>
                     new Error("You cannot mix dates and 'all' in the option field");
-                    //throw new GekkoException();
                 }
                 else
                 {
