@@ -2267,7 +2267,7 @@ namespace Gekko
                 Series y0_series = y0a_series;
                 if (y0a_series.type != ESeriesType.Light)
                 {
-                    y0_series = y0a.DeepClone(0, null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+                    y0_series = y0a.DeepClone(0, null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks... //No need for CloneHelper dict.
                 }
 
                 d.cellsQuo.storage.Add(residualName, y0_series);
@@ -2293,7 +2293,7 @@ namespace Gekko
                     y0Ref_series = y0aRef_series;
                     if (y0aRef_series.type != ESeriesType.Light)
                     {
-                        y0Ref_series = y0aRef.DeepClone(0, null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+                        y0Ref_series = y0aRef.DeepClone(0, null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks... //No need for CloneHelper dict.
                     }
                     d.cellsRef.storage.Add(residualName, y0Ref_series);
                 }

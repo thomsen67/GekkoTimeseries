@@ -18015,7 +18015,7 @@ namespace Gekko
                 if (!injectingToExistingSeries)
                 {
                     //Brand new variable object is created                    
-                    IVariable iv_clone = iv.DeepClone(0, truncateTemp, ch);
+                    IVariable iv_clone = iv.DeepClone(0, truncateTemp, ch);  //using that CloneHelper deeper down which is ok
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
                     Series ts_clone = iv_clone as Series;
@@ -23184,8 +23184,9 @@ namespace Gekko
                     {
                         Series ts = kvp.Value as Series;
                         if (ts != null)
-                        {                            
-                            Series tsClone = ts.DeepClone(0, null, cloneHelper) as Series;                            
+                        {
+                            //Gekko 4.0: Can't the two following lines not be merged, where DeepClone() also truncates??
+                            Series tsClone = ts.DeepClone(0, null, cloneHelper) as Series;  //will use that cloneHelper (dict) deeper down, which is fine.                            
                             tsClone.Truncate(yr1, yr2);                            
                             databankWithFewerPeriods.Add(kvp.Key, tsClone);
                         }
