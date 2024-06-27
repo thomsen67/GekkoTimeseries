@@ -2932,31 +2932,7 @@ namespace Gekko
                 th.seriesObjectCount++;
                 if (th.type == ETraceHelper.Scramble)
                 {
-                    double factor = th.scramble; //for instance 0.1 for 10% noise
-                    GekkoTime t1 = this.GetRealDataPeriodFirst();
-                    GekkoTime t2 = this.GetRealDataPeriodLast();
-                    double sum = 0d;
-                    int count = 0;
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-                    {
-                        double d = this.GetDataSimple(t);
-                        if (!G.isNumericalError(d) && d != 0d)
-                        {
-                            sum += Math.Abs(d);
-                            count++;
-                        }
-                    }
-                    if (count > 0)
-                    {
-                        double avg = sum / (double)count;
-                        foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-                        {
-                            double d = this.GetDataSimple(t);
-                            double r = 2 * Globals.random.NextDouble() - 1d;  //uniform [-1; 1].
-                            double d2 = d + factor * r * avg;  //adds +- 0.10 x average value, if factor is = 0.10.
-                            this.SetData(t, d2);
-                        }
-                    }
+                    Scramble(th.scramble);
                 }
                 else
                 {
@@ -2968,6 +2944,40 @@ namespace Gekko
                             this.meta.trace2.DeepTrace(th, Globals.traceDeepStartDepth);
                         }
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Scramble all timeseries data, with a given noise level. Looks at the series average of abs values,
+        /// and adds noise to that average (so numerically low numbers do not just stay low, if other values are higher).
+        /// </summary>
+        /// <param name="factor"></param>
+        private void Scramble(double factor)
+        {
+            //factor: for instance 0.1 for 10% noise
+            GekkoTime t1 = this.GetRealDataPeriodFirst();
+            GekkoTime t2 = this.GetRealDataPeriodLast();
+            double sum = 0d;
+            int count = 0;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                double d = this.GetDataSimple(t);
+                if (!G.isNumericalError(d) && d != 0d)
+                {
+                    sum += Math.Abs(d);
+                    count++;
+                }
+            }
+            if (count > 0)
+            {
+                double avg = sum / (double)count;
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    double d = this.GetDataSimple(t);
+                    double r = 2 * Globals.random.NextDouble() - 1d;  //uniform [-1; 1].
+                    double d2 = d + factor * r * avg;  //adds +- 0.10 x average value, if factor is = 0.10.
+                    this.SetData(t, d2);
                 }
             }
         }
