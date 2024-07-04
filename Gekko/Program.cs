@@ -22387,11 +22387,17 @@ namespace Gekko
                 Series ts2 = list2 as Series;
                 if (ts1.freq != ts2.freq) new Error("The two input series have different frequencies");
                 if (ts1.type == ESeriesType.ArraySuper || ts2.type == ESeriesType.ArraySuper) new Error("Array-series input is not allowed (pick dimensions with x[...]).");
-                GekkoTime ts1_start = ts1.GetRealDataPeriodFirst();
-                GekkoTime ts2_start = ts2.GetRealDataPeriodFirst();
-                if (ts1_start.IsNull()) new Error("The first input series has no data");
-                if (ts2_start.IsNull()) new Error("The second input series has no data");
-                GekkoTime tStart_real = G.GekkoMax(ts1_start, ts2_start);  //start period where both are non-missing
+                GekkoTime tStart_real = GekkoTime.tNull;
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                {
+                    if (!G.isNumericalError(ts1.GetDataSimple(t)) && !G.isNumericalError(ts2.GetDataSimple(t)))
+                    {
+                        //if both are non-missing
+                        tStart_real = t;
+                        break;
+                    }
+                }
+                if (tStart_real.IsNull()) new Error("Too many missings in the two input series in order to compute index");    
                 Series p = new Series(EFreq.A, "p!a");
                 Series q = new Series(EFreq.A, "q!a");
                 p.SetData(tStart_real, 1d);

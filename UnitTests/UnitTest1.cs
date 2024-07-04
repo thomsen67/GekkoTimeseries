@@ -33371,14 +33371,65 @@ print(df2)
             //The following numbers are created in a spreadsheet
             _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);  //cf. table above
-            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); //cf. table above
-            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  //cf. table above
-            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta); //cf. table above
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); 
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta); 
             _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = m(), 12, 11, 15, 4;");
+            I("d = 8, 13, 10, 14, 7;");
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); 
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = m(), 12, 11, 15, 4;");
+            I("d = 8, m(), 10, 14, 7;");
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta); 
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = m(), 12, 11, 15, 4;");
+            I("d = 8, 13, 10, m(), 7;");
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2021, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
 
         }
 
