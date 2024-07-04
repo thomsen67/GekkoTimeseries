@@ -32912,20 +32912,7 @@ print(df2)
 
         [TestMethod]
         public void _Test_PriceIndexFunctions()
-        {
-
-            I("reset;");
-            I("time 2018 2022;");
-            I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
-            I("p2 = 1.22, 1.23, 1.24, 1.25, 1.26;");
-            I("q1 = 2, 3, 4, 5, 6;");
-            I("q2 = 12, 13, 14, 15, 16;");
-            I("q = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).q;");
-            I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");
-            I("prt p1, p2, q1, q2;");
-            I("prt p, q;");
-
-
+        {            
             // Quarterly
             // Quarterly
             // Quarterly
@@ -33284,7 +33271,16 @@ print(df2)
             // ========== When series begin with missing values =====================================
             // ======================================================================================
             // ======================================================================================
-                        
+
+            //The laspchain() below will give this:
+            //
+            //             p              %              q         %
+            //2018         0.9833         M        16.9629         M
+            //2019         0.9916      0.85        19.2409     13.43
+            //2020         1.0000      0.84        21.5200     11.84
+            //2021         1.0084      0.84        23.8000     10.59
+            //2022         1.0168      0.84        26.0808      9.58
+
             I("reset;");
             I("time 2018 2022;");            
             I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
@@ -33292,27 +33288,17 @@ print(df2)
             I("q1 = 2, 3, 4, 5, 6;");
             I("q2 = 12, 13, 14, 15, 16;");
             I("q = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).q;");
-            I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");            
-            _AssertSeries(First(), "p!a", 2018, 0.9833, sharedTableDelta);            
-            _AssertSeries(First(), "q!a", 2018, 16.9629, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);
-
-            I("reset;");
-            I("time 2019 2022;");
-            I("p1 = 1.03, 1.04, 1.05, 1.06;");
-            I("p2 = 1.23, 1.24, 1.25, 1.26;");
-            I("q1 = 3, 4, 5, 6;");
-            I("q2 = 13, 14, 15, 16;");
-            I("q = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).q;");
             I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");
             I("prt p1, p2, q1, q2;");
             I("prt p, q;");
-            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9833, sharedTableDelta);            
+            _AssertSeries(First(), "q!a", 2018, 16.9629, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta); 
             _AssertSeries(First(), "q!a", 2019, 19.2409, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);            
 
+            //Same results as above with 2019-2022
             I("reset;");
             I("time 2018 2022;");
             I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
@@ -33321,12 +33307,10 @@ print(df2)
             I("q2 = 12, 13, 14, 15, 16;");
             I("q = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).q;");
             I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");
-            I("prt p1, p2, q1, q2;");
-            I("prt p, q;");
             _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2019, 19.2409, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta);  //cf. table above
+            _AssertSeries(First(), "q!a", 2019, 19.2409, sharedTableDelta); //cf. table above
             _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);
 

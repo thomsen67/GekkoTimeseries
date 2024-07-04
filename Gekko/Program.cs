@@ -22355,7 +22355,7 @@ namespace Gekko
             Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
             Series q = new Series(EFreq.A, "q!a");
 
-            double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+            double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];  //may be NaN if all missings in that period
             counter = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
