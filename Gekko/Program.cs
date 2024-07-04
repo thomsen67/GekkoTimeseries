@@ -22181,7 +22181,7 @@ namespace Gekko
 
         /// <summary>
         /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes. Call either with a list of strings (list1/list2) or
-        /// direct data (list1_data/list2_data).
+        /// direct data (list1_data/list2_data). In the latter case, list1
         /// </summary>
         /// <param name="function"></param>
         /// <param name="list1"></param>
@@ -22201,6 +22201,7 @@ namespace Gekko
 
             if (list1 != null)
             {
+                if (list1.Type() != EVariableType.List || list2.Type() != EVariableType.List) new Error("Expected input to include two lists of strings");
                 //string list input
                 varsP = Stringlist.GetListOfStringsFromList((List)list1);
                 varsX = Stringlist.GetListOfStringsFromList((List)list2);
@@ -22239,7 +22240,7 @@ namespace Gekko
             int indexYearI = -12345;
             int counter = -1;
             bool found = false;
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
                 counter++;
                 if (t.EqualsGekkoTime(indexYear))
@@ -22250,10 +22251,7 @@ namespace Gekko
                 }
             }
 
-            if (!found)
-            {
-                new Error("with index year in Laspeyres function: seems outside time period");
-            }            
+            if (!found) new Error("with index year in Laspeyres function: seems outside time period");              
 
             double[,] aX = null;
             double[,] aP = null;
@@ -22294,27 +22292,36 @@ namespace Gekko
             int n = aX.GetLength(0);  //number of vars
 
             int obs = GekkoTime.Observations(tStart, tEnd);
-            int obs2 = GekkoTime.Observations(tStart, indexYear);
+            int start = -12345;
 
-            double[,] xx = new double[5, obs];
-            //Seems [3, ...] is not used
+            double[,] xx = G.CreateArrayDouble(5, obs, double.NaN);  //puts .NaN in for safety. Seems [3, ...] is not used.
+
+            //Find starting period (non-missing)
+            for (int i = 0; i < obs; i++)
+            {
+                if (start == -12345 && !LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
+                {
+                    start = i;
+                }
+            }
+            if (start == -12345) start = 0;  //No period not containing missings. Just set start = 0 --> will produce all missing values for the results.
 
             if (G.Equal(function, "laspchain"))
             {
                 double index = 1d;
-                xx[4, 0] = 1d;
-                for (int i = 0; i < obs; i++)
+                xx[4, start] = 1d;
+                for (int i = start; i < obs; i++)
                 {
                     double sum = 0d;
                     double sum1 = 0d;
                     for (int j = 0; j < n; j++)
                     {
                         sum += aX[j, i] * aP[j, i];
-                        if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
+                        if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
                     }
                     xx[0, i] = sum;   //total cost
                     xx[1, i] = sum1;  //total cost at previous period prices
-                    if (i > 0)
+                    if (i > start)
                     {
                         xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
                         index = index * xx[2, i];
@@ -22325,6 +22332,7 @@ namespace Gekko
             }
             else if (G.Equal(function, "laspfixed"))
             {
+                //We do not use start here: does not accumulate, so we keep it as it is
                 for (int i = 0; i < obs; i++)
                 {
                     double sum = 0d;
@@ -22352,25 +22360,34 @@ namespace Gekko
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
                 counter++;
-
-                if (true)  //price = 1 in index year
-                {
-                    q.SetData(t, xx[4, counter] * priceInIndexYear);
-                    p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
-                }
-                else
-                {
-                    //FIXME
-                    //4 skal være = 0 in index
-                    q.SetData(t, xx[4, counter] / xx[4, indexYearI] * xx[0, indexYearI]);
-                    p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
-                }
+                q.SetData(t, xx[4, counter] * priceInIndexYear);
+                p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
             }
 
             Map m = new Map();
             m.AddIVariable(p.GetName(), p);
             m.AddIVariable(q.GetName(), q);
             return m;
+        }
+
+        /// <summary>
+        /// Parameter i is the period being investigated.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="aX"></param>
+        /// <param name="aP"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        private static bool LaspeyresHasMissingForThisPeriod(int i, double[,] aX, double[,] aP, int n)
+        {            
+            for (int j = 0; j < n; j++)
+            {
+                if (G.isNumericalError(aX[j, i]) || G.isNumericalError(aP[j, i]))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
