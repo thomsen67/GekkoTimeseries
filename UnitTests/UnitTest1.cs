@@ -33352,6 +33352,34 @@ print(df2)
             _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
 
+
+
+            // ======================================================================================
+            // ======================================================================================
+            // ========== Accumulation of value and d-prices ========================================
+            // ======================================================================================
+            // ======================================================================================
+
+            //This function is also known as "kaedepris2".
+                        
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = 10, 12, 11, 15, 4;");
+            I("d = 8, 13, 10, 14, 7;");            
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            //The following numbers are created in a spreadsheet
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);  //cf. table above
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); //cf. table above
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  //cf. table above
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta); //cf. table above
+            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
         }
 
         [TestMethod]

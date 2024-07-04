@@ -3085,6 +3085,36 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Max function for GekkoTime.
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
+        public static GekkoTime GekkoMax(GekkoTime t1, GekkoTime t2)
+        {
+            if (t1.IsNull() || t2.IsNull()) new Error("On or more Gekko periods are null");
+            if (t1.freq != t2.freq) new Error("Mismatch of frequencies");
+            GekkoTime t = t1;
+            if (t2.StrictlyLargerThan(t1)) t = t2;
+            return t;
+        }
+
+        /// <summary>
+        /// Min function for GekkoTime.
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
+        public static GekkoTime GekkoMin(GekkoTime t1, GekkoTime t2)
+        {
+            if (t1.IsNull() || t2.IsNull()) new Error("On or more Gekko periods are null");
+            if (t1.freq != t2.freq) new Error("Mismatch of frequencies");
+            GekkoTime t = t1;
+            if (t2.StrictlySmallerThan(t1)) t = t2;
+            return t;
+        }
+
+        /// <summary>
         /// BEWARE: can return null (= error)!! Another "interface" to the substring method, with start end end position, instead of using length. Indexes are 0-based.
         /// The positions are inclusive.
         /// </summary>
@@ -3900,6 +3930,10 @@ namespace Gekko
             Globals.warningPool.WAdd(typeId, s, false, out discard);
         }
 
+        /// <summary>
+        /// Internal Gekko system warnings
+        /// </summary>
+        /// <param name="s"></param>
         public static void WarningInternal(string s)
         {
             G.Warning(Globals.INTERNAL, s);

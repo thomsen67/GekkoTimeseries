@@ -22192,182 +22192,241 @@ namespace Gekko
         /// <returns></returns>
         public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, List<SeriesAndBool>list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
-            EFreq freq = EFreq.None;
+            Map m = null;
 
-            List<string> varsP = null;
-            List<string> varsX = null;
-            List<SeriesAndBool> tempP = null;
-            List<SeriesAndBool> tempX = null;
-
-            if (list1 != null)
+            if (list1 == null || (list1.Type() == EVariableType.List && list2.Type() == EVariableType.List))
             {
-                if (list1.Type() != EVariableType.List || list2.Type() != EVariableType.List) new Error("Expected input to include two lists of strings");
-                //string list input
-                varsP = Stringlist.GetListOfStringsFromList((List)list1);
-                varsX = Stringlist.GetListOfStringsFromList((List)list2);
-                tempP = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsP, null, Program.options.freq);
-                tempX = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsX, null, Program.options.freq);
-                //EFreq freq2 = EFreq.None;
-                foreach (SeriesAndBool sab in tempP)
+                EFreq freq = EFreq.None;
+
+                List<string> varsP = null;
+                List<string> varsX = null;
+                List<SeriesAndBool> tempP = null;
+                List<SeriesAndBool> tempX = null;
+
+                if (list1 != null)
                 {
-                    if (freq == EFreq.None)
+                    //string list input
+                    varsP = Stringlist.GetListOfStringsFromList((List)list1);
+                    varsX = Stringlist.GetListOfStringsFromList((List)list2);
+                    tempP = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsP, null, Program.options.freq);
+                    tempX = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsX, null, Program.options.freq);
+                    //EFreq freq2 = EFreq.None;
+                    foreach (SeriesAndBool sab in tempP)
                     {
-                        freq = sab.ts.freq;
-                    }
-                    else
-                    {
-                        if (freq != sab.ts.freq)
+                        if (freq == EFreq.None)
                         {
-                            new Error("Frequency mismatch: " + freq.Pretty() + " vs. " + sab.ts.freq.Pretty());
+                            freq = sab.ts.freq;
+                        }
+                        else
+                        {
+                            if (freq != sab.ts.freq)
+                            {
+                                new Error("Frequency mismatch: " + freq.Pretty() + " vs. " + sab.ts.freq.Pretty());
+                            }
+                        }
+                    }
+                    if (freq == EFreq.A)
+                    {
+                        //good, continue
+                    }
+                    else if (freq == EFreq.Q)
+                    {
+                        if (options == null || !G.Equal(O.ConvertToString(options), "annualoverlap")) new Error("For quarterly data, you must use option 'annualoverlap'");
+                        return LaspeyresQ(function, null, null, tempP, tempX, indexYear, options, tStart, tEnd);
+                    }
+                    else new Error("Only A and Q freq supported.");
+                }
+
+                if (list1 != null && list1_data != null) new Error("Series error");
+                if (list2 != null && list2_data != null) new Error("Series error");
+
+                int indexYearI = -12345;
+                int counter = -1;
+                bool found = false;
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                {
+                    counter++;
+                    if (t.EqualsGekkoTime(indexYear))
+                    {
+                        found = true;
+                        indexYearI = counter;
+                        break;
+                    }
+                }
+
+                if (!found) new Error("with index year in Laspeyres function: seems outside time period");
+
+                double[,] aX = null;
+                double[,] aP = null;
+
+                if (list1 != null)
+                {
+                    //Normal list with string names
+                    //                                
+                    aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempP, freq);
+                    aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempX, freq);
+
+                    if (varsP.Count == 0 || varsX.Count == 0)
+                    {
+                        new Error("List with 0 elements not permitted");
+                    }
+
+                    if (varsP.Count != varsX.Count)
+                    {
+                        new Error("The lists should have same number of elements");
+                    }
+
+                    foreach (string s in varsP)
+                    {
+                        if (s.StartsWith("-"))
+                        {
+                            new Error("'" + s + "': Please use subtraction in quantity list only");
                         }
                     }
                 }
-                if (freq == EFreq.A)
+                else
                 {
-                    //good, continue
-                }
-                else if (freq == EFreq.Q)
-                {
-                    if (options == null || !G.Equal(O.ConvertToString(options), "annualoverlap")) new Error("For quarterly data, you must use option 'annualoverlap'");
-                    return LaspeyresQ(function, null, null, tempP, tempX, indexYear, options, tStart, tEnd);
-                }
-                else new Error("Only A and Q freq supported.");
-            }
-
-            if (list1 != null && list1_data != null) new Error("Series error");
-            if (list2 != null && list2_data != null) new Error("Series error");
-
-            int indexYearI = -12345;
-            int counter = -1;
-            bool found = false;
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                counter++;
-                if (t.EqualsGekkoTime(indexYear))
-                {
-                    found = true;
-                    indexYearI = counter;
-                    break;
-                }
-            }
-
-            if (!found) new Error("with index year in Laspeyres function: seems outside time period");              
-
-            double[,] aX = null;
-            double[,] aP = null;
-
-            if (list1 != null)
-            {
-                //Normal list with string names
-                //                                
-                aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempP, freq);
-                aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempX, freq);                
-
-                if (varsP.Count == 0 || varsX.Count == 0)
-                {
-                    new Error("List with 0 elements not permitted");
+                    //Lists with series objects, not string names
+                    freq = list1_data[0].ts.freq;  //just tastes 1 of them
+                    aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, list1_data, freq);
+                    aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, list2_data, freq);
                 }
 
-                if (varsP.Count != varsX.Count)
-                {
-                    new Error("The lists should have same number of elements");
-                }
+                int n = aX.GetLength(0);  //number of vars
 
-                foreach (string s in varsP)
-                {
-                    if (s.StartsWith("-"))
-                    {
-                        new Error("'" + s + "': Please use subtraction in quantity list only");
-                    }
-                }
-            }
-            else
-            {
-                //Lists with series objects, not string names
-                freq = list1_data[0].ts.freq;  //just tastes 1 of them
-                aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, list1_data, freq);
-                aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, list2_data, freq);                
-            }
+                int obs = GekkoTime.Observations(tStart, tEnd);
+                int start = -12345;
 
-            int n = aX.GetLength(0);  //number of vars
+                double[,] xx = G.CreateArrayDouble(5, obs, double.NaN);  //puts .NaN in for safety. Seems [3, ...] is not used.
 
-            int obs = GekkoTime.Observations(tStart, tEnd);
-            int start = -12345;
-
-            double[,] xx = G.CreateArrayDouble(5, obs, double.NaN);  //puts .NaN in for safety. Seems [3, ...] is not used.
-
-            //Find starting period (non-missing)
-            for (int i = 0; i < obs; i++)
-            {
-                if (start == -12345 && !LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
-                {
-                    start = i;
-                }
-            }
-            if (start == -12345) start = 0;  //No period not containing missings. Just set start = 0 --> will produce all missing values for the results.
-
-            if (G.Equal(function, "laspchain"))
-            {
-                double index = 1d;
-                xx[4, start] = 1d;
-                for (int i = start; i < obs; i++)
-                {
-                    double sum = 0d;
-                    double sum1 = 0d;
-                    for (int j = 0; j < n; j++)
-                    {
-                        sum += aX[j, i] * aP[j, i];
-                        if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
-                    }
-                    xx[0, i] = sum;   //total cost
-                    xx[1, i] = sum1;  //total cost at previous period prices
-                    if (i > start)
-                    {
-                        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
-                        index = index * xx[2, i];
-                        xx[4, i] = index;                    //lasp.index multiplied (1 i start period)
-                                                             //xx[4,...] is the quantity index
-                    }
-                }
-            }
-            else if (G.Equal(function, "laspfixed"))
-            {
-                //We do not use start here: does not accumulate, so we keep it as it is
+                //Find starting period (non-missing)
                 for (int i = 0; i < obs; i++)
                 {
-                    double sum = 0d;
-                    double sum1 = 0d;
-                    for (int j = 0; j < n; j++)
+                    if (start == -12345 && !LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
                     {
-                        sum += aX[j, i] * aP[j, i];
-                        sum1 += aX[j, i] * aP[j, indexYearI];
+                        start = i;
                     }
-                    xx[0, i] = sum;  //total cost
-                    xx[1, i] = sum1; //total cost at index period prices
-                    xx[4, i] = sum1; //xx[4,...] is the quantity index
                 }
+                if (start == -12345) start = 0;  //No period not containing missings. Just set start = 0 --> will produce all missing values for the results.
+
+                if (G.Equal(function, "laspchain"))
+                {
+                    //
+                    // Laspeyres chain is generally using R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
+                    // running over <%t1+1 %t2>.
+                    // These R's can be accumulated/chained. So the development in q's is weighted together at lagged prices.
+                    // From the chain (efter adjusting for base period), we get quantitites. Prices are then just costs / quantities.
+                    //
+                    // If we already have value = 
+                    //
+                    double index = 1d;
+                    xx[4, start] = 1d;
+                    for (int i = start; i < obs; i++)
+                    {
+                        double sum = 0d;  //normal values/costs.
+                        double sum1 = 0d; //at lagged prices (d-values)
+                        for (int j = 0; j < n; j++)
+                        {
+                            sum += aX[j, i] * aP[j, i];
+                            if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
+                        }
+                        xx[0, i] = sum;   //total cost
+                        xx[1, i] = sum1;  //total cost at previous period prices
+                        if (i > start)
+                        {
+                            xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
+                            index = index * xx[2, i];
+                            xx[4, i] = index;                    //lasp.index multiplied (1 i start period)
+                                                                 //xx[4,...] is the quantity index
+                        }
+                    }
+                }
+                else if (G.Equal(function, "laspfixed"))
+                {
+                    //We do not use start here: does not accumulate, so we keep it as it is
+                    for (int i = 0; i < obs; i++)
+                    {
+                        double sum = 0d;
+                        double sum1 = 0d;
+                        for (int j = 0; j < n; j++)
+                        {
+                            sum += aX[j, i] * aP[j, i];
+                            sum1 += aX[j, i] * aP[j, indexYearI];
+                        }
+                        xx[0, i] = sum;  //total cost
+                        xx[1, i] = sum1; //total cost at index period prices
+                        xx[4, i] = sum1; //xx[4,...] is the quantity index
+                    }
+                }
+                else
+                {
+                    throw new GekkoException();
+                }
+
+                Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
+                Series q = new Series(EFreq.A, "q!a");
+
+                double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];  //may be NaN if all missings in that period
+                counter = -1;
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                {
+                    counter++;
+                    q.SetData(t, xx[4, counter] * priceInIndexYear);
+                    p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                }
+
+                m = new Map();
+                m.AddIVariable(p.GetName(), p);
+                m.AddIVariable(q.GetName(), q);
+            }
+            else if (list1.Type() == EVariableType.Series && list2.Type() == EVariableType.Series)
+            {
+                bool handleZero = true;
+                double factorZero = 100d;
+                Series ts1 = list1 as Series;
+                Series ts2 = list2 as Series;
+                if (ts1.freq != ts2.freq) new Error("The two input series have different frequencies");
+                if (ts1.type == ESeriesType.ArraySuper || ts2.type == ESeriesType.ArraySuper) new Error("Array-series input is not allowed (pick dimensions with x[...]).");
+                GekkoTime ts1_start = ts1.GetRealDataPeriodFirst();
+                GekkoTime ts2_start = ts2.GetRealDataPeriodFirst();
+                if (ts1_start.IsNull()) new Error("The first input series has no data");
+                if (ts2_start.IsNull()) new Error("The second input series has no data");
+                GekkoTime tStart_real = G.GekkoMax(ts1_start, ts2_start);  //start period where both are non-missing
+                Series p = new Series(EFreq.A, "p!a");
+                Series q = new Series(EFreq.A, "q!a");
+                p.SetData(tStart_real, 1d);
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart_real.Add(1), tEnd))
+                {
+                    //Note: ts1 or ts2 not used in period tStart_real. But tStart_real+1 contains prices from tStart_real, som implicitly the period is used.
+                    double v1 = ts1.GetDataSimple(t);
+                    double v2 = ts2.GetDataSimple(t);
+                    double r = v1 / v2;                    
+                    if (handleZero)
+                    {
+                        if (v1 == 0d && v2 != 0d) r = 1 / factorZero;
+                        else if (v1 != 0d && v2 == 0d) r = factorZero;
+                    }
+                    p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
+                }
+                double indexValue = p.GetDataSimple(indexYear);
+                if (G.isNumericalError(indexValue)) new Error("Cannot set price = 1 in index period because of missing value");
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, tEnd))
+                {
+                    p.SetData(t, p.GetDataSimple(t) / indexValue);
+                    q.SetData(t, ts1.GetDataSimple(t) / p.GetDataSimple(t));  //value divided by price
+                }
+                m = new Map();
+                m.AddIVariable(p.GetName(), p);
+                m.AddIVariable(q.GetName(), q);
             }
             else
             {
-                throw new GekkoException();
+                new Error("Expected the two variable inputs to be either two lists of strings, or two timeseries.");
             }
 
-            Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
-            Series q = new Series(EFreq.A, "q!a");
 
-            double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];  //may be NaN if all missings in that period
-            counter = -1;
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                counter++;
-                q.SetData(t, xx[4, counter] * priceInIndexYear);
-                p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
-            }
-
-            Map m = new Map();
-            m.AddIVariable(p.GetName(), p);
-            m.AddIVariable(q.GetName(), q);
             return m;
+
         }
 
         /// <summary>

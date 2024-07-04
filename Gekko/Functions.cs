@@ -1396,40 +1396,51 @@ namespace Gekko
             return new ScalarString(s);
         }
 
-        public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date, IVariable options)
+        //public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date, IVariable options)
+        public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] args)
         {
+            //7
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            IVariable result = Program.Laspeyres("laspchain", plist, xlist, null, null, date.ConvertToDate(O.GetDateChoices.Strict), options, t1, t2);
+            IVariable result = null;
+            if (args.Length == 3)
+            {
+                result = Program.Laspeyres("laspchain", args[0], args[1], null, null, args[2].ConvertToDate(O.GetDateChoices.Strict), null, t1, t2);
+            }
+            else if (args.Length == 4)  //plist, xlist, date, options    OR     values, d_values, date, options
+            {
+                result = Program.Laspeyres("laspchain", args[0], args[1], null, null, args[2].ConvertToDate(O.GetDateChoices.Strict), args[3], t1, t2);
+            }
+            else if (args.Length == 5)  //t1, t2, plist, xlist, date
+            {
+                //Delete this in Gekko 4.0
+                G.Warning("w42.1", "");
+                result = Program.Laspeyres("laspchain", args[2], args[3], null, null, args[4].ConvertToDate(O.GetDateChoices.Strict), null, args[0].ConvertToDate(O.GetDateChoices.Strict), args[1].ConvertToDate(O.GetDateChoices.Strict));
+            }
+            else new Error("Did not expect " + args.Length + " arguments for laspchain() function");
             return result;
         }
 
-        public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
+        public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] args)
         {
-            return laspchain(smpl, _t1, _t2, plist, xlist, date, null);
-        }
-
-        //legacy: do not delete yet
-        public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
-        {
-            return laspchain(smpl, t1, t2, plist, xlist, date);
-        }
-
-        public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date, IVariable options)
-        {
+            //7
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, null, null, date.ConvertToDate(O.GetDateChoices.Strict), options, t1, t2);
+            IVariable result = null;
+            if (args.Length == 3)  //plist, xlist, date
+            {
+                result = Program.Laspeyres("laspfixed", args[0], args[1], null, null, args[2].ConvertToDate(O.GetDateChoices.Strict), null, t1, t2);
+            }
+            else if (args.Length == 4)  //plist, xlist, date, options
+            {
+                result = Program.Laspeyres("laspfixed", args[0], args[1], null, null, args[2].ConvertToDate(O.GetDateChoices.Strict), args[3], t1, t2);
+            }
+            else if (args.Length == 5)  //t1, t2, plist, xlist, date
+            {
+                //Delete this in Gekko 4.0
+                G.Warning("w42.1", "");
+                result = Program.Laspeyres("laspfixed", args[2], args[3], null, null, args[4].ConvertToDate(O.GetDateChoices.Strict), null, args[0].ConvertToDate(O.GetDateChoices.Strict), args[1].ConvertToDate(O.GetDateChoices.Strict));
+            }
+            else new Error("Did not expect " + args.Length + " arguments for laspfixed() function");
             return result;
-        }
-
-        public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
-        {
-            return laspfixed(smpl, _t1, _t2, plist, xlist, date, null);
-        }
-
-        //legacy: do not delete yet
-        public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
-        {
-            return laspfixed(smpl, t1, t2, plist, xlist, date);
         }
 
         //legacy: do not delete yet
