@@ -33298,7 +33298,7 @@ print(df2)
             _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);            
 
-            //Same results as above with 2019-2022
+            //Same results as above
             I("reset;");
             I("time 2018 2022;");
             I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
@@ -33313,6 +33313,44 @@ print(df2)
             _AssertSeries(First(), "q!a", 2019, 19.2409, sharedTableDelta); //cf. table above
             _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);
+
+            //Same results as above
+            I("reset;");
+            I("time 2018 2022;");
+            I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
+            I("p2 = m(), 1.23, 1.24, 1.25, 1.26;");
+            I("q1 = 2, 3, 4, 5, 6;");
+            I("q2 = 12, m(), 14, 15, 16;");
+            I("q = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).q;");
+            I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");
+            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  //cf. table above
+            _AssertSeries(First(), "q!a", 2020, 21.5200, sharedTableDelta); //cf. table above
+            _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);
+
+            //Here we put in a missing as a "hole" in 2021 --> all following aggregates become missing for 2021 and on.
+            I("reset;");
+            I("time 2018 2022;");
+            I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
+            I("p2 = m(), 1.23, 1.24, 1.25, 1.26;");
+            I("q1 = 2, 3, 4, m(), 6;");
+            I("q2 = 12, 13, 14, 15, 16;");
+            I("q = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).q;");
+            I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");
+            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta);  //cf. table above
+            _AssertSeries(First(), "q!a", 2019, 19.2409, sharedTableDelta); //cf. table above
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  //cf. table above
+            _AssertSeries(First(), "q!a", 2020, 21.5200, sharedTableDelta); //cf. table above
+            _AssertSeries(First(), "p!a", 2021, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
 
         }
 
