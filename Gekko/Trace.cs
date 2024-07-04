@@ -870,14 +870,15 @@ namespace Gekko
         }     
 
         public Trace2 DeepClone(int depth, CloneHelper cloneHelper)
-        {            
+        {
+            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all higher depths. That should be ok.
+            
             object known = null;
             Trace2 trace2 = null;
 
             if (Program.options.bugfix_tracedepth != -1 && depth > Program.options.bugfix_tracedepth)
             {
                 //do nothing: stop the possible infinite regress here
-                cloneHelper.traceDepthTriggered = true;
             }
             else
             {
@@ -894,14 +895,7 @@ namespace Gekko
                         if (cloneHelper.dict.ContainsKey(this))
                         {
                             //Should not normally happen unless cycles in graph
-                            if (cloneHelper.traceDepthTriggered)
-                            {
-                                //ok, we ignore it
-                            }
-                            else
-                            {
-                                if (Globals.runningOnTTComputer) G.WarningInternal("TTH: Clone dict dublet problem");
-                            }
+                            if (Globals.runningOnTTComputer) G.WarningInternal("TTH: Clone dict dublet problem");
                         }
                         else
                         {
@@ -1977,6 +1971,7 @@ namespace Gekko
 
         public Precedents2 DeepClone(int depth, CloneHelper cloneHelper)
         {
+            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all higher depths. That should be ok.
             Precedents2 precedents = new Precedents2();            
             if (this.storage != null)
             {
@@ -2090,6 +2085,7 @@ namespace Gekko
 
         public TraceAndPeriods2 DeepClone(int depth, CloneHelper cloneHelper)
         {
+            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all higher depths. That should be ok.
             GekkoTimeSpansSimple gtss = null;
             if (this.periods != null)
             {

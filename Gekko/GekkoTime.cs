@@ -1110,12 +1110,7 @@ namespace Gekko
                         tt = new GekkoTime(EFreq.M, t.super, 1);
                     }
                 }
-
-
-
-
                 //WEEKLY START
-
                 else if (freq == EFreq.W)
                 {
                     if (t.freq == EFreq.A)
@@ -1148,11 +1143,7 @@ namespace Gekko
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                 }
-
                 //WEEKLY END
-
-
-
                 else if (freq == EFreq.D)
                 {
                     if (t.freq == EFreq.A)

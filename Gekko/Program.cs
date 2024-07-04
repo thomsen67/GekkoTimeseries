@@ -319,8 +319,7 @@ namespace Gekko
 
     public class CloneHelper
     {
-        public Dictionary<object, object> dict = new Dictionary<object, object>();        
-        public bool traceDepthTriggered = false;
+        public Dictionary<object, object> dict = new Dictionary<object, object>();
     }
     public class DispTraceHelpler
     {

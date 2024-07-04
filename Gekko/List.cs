@@ -528,7 +528,7 @@ namespace Gekko
 
         public IVariable DeepClone(int depth, GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
-            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all lower depths. That should be ok.
+            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all higher depths. That should be ok.
             List<IVariable> temp = new List<IVariable>();
             if (this.list == null)
             {

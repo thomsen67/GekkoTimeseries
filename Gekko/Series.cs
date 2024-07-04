@@ -2835,6 +2835,8 @@ namespace Gekko
         /// <returns>The cloned Series object.</returns>
         public IVariable DeepClone(int depth, GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
+            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all higher depths. That should be ok.
+
             //Always make sure new fields are remembered in the DeepClone() method
 
             //.isNotFoundArraySub... field is not cloned

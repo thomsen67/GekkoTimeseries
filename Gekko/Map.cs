@@ -245,6 +245,7 @@ namespace Gekko
 
         public IVariable DeepClone(int depth, GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
+            if (cloneHelper == null) cloneHelper = new CloneHelper();  //often at depth==0, and if so, the dictionary resides here for all higher depths. That should be ok.
             Map temp = new Map();
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
