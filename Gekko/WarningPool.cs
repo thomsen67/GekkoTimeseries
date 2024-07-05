@@ -319,21 +319,37 @@ namespace Gekko
             this.counter++;
             WarningInfo wi = null;
             this.storage.TryGetValue(s, out wi);
-            int n = 0; if (wi != null) n = wi.storage.Count;
+            int n1 = 0;
+            int n2 = 0;
+            if (wi != null)
+            {
+                n1 = wi.storage.Count;
+                n2 = wi.printCounter;  //how many of this type have already been printed?
+                wi.printCounter++;  //has been called 1 more time: we limit this print at 5.
+            }
 
             bool setting1of3_add = false;
             bool setting2of3_print = Program.options.global_warnings_print;  //normally true
             int setting3of3_popup = 0;  //1:normal popup, 2:find-popup.
+            bool lastPrintedWarningOfThisType = false;
 
             if (Program.options.global_warnings_limit >= 0)
             {
-                if (n < Program.options.global_warnings_limit)  //limit like e.g. 5
+                //For adding to the dictionary (for printing last), we look at n, counting different variants of types.
+                if (n1 < Program.options.global_warnings_limit)  //limit like e.g. 5
                 {
                     setting1of3_add = true;
                 }
-                else
+
+                //For printing on screen, we look at n2, counting each time a type is issued
+                if (n2 >= Program.options.global_warnings_limit)  //limit like e.g. 5                
                 {
                     setting2of3_print = false;
+                }
+
+                if (Program.options.global_warnings_limit >= 3 && n2 == Program.options.global_warnings_limit - 1)  //limit like e.g. 5                
+                {
+                    lastPrintedWarningOfThisType = true;
                 }
             }
             else if (Program.options.global_warnings_limit == -1)  //add/print all, same as int.MaxValue
@@ -405,7 +421,9 @@ namespace Gekko
             {
                 if (!isUsingType)
                 {
-                    new Warning(EWarningType.NoUsing, this.GetWarningText(s, info));
+                    string skip = null;
+                    if (lastPrintedWarningOfThisType) skip = ". --> Further warnings of this type are not printed (cf. option global warnings limit).";
+                    new Warning(EWarningType.NoUsing, this.GetWarningText(s, info + skip));
                 }
             }
 
@@ -555,11 +573,11 @@ namespace Gekko
                 List<WarningPoolHelper> m2 = m.OrderBy(o => o.i).ToList(); //sort chronologically                            
                 if (showId)
                 {
-                    txt3.MainAdd("Turn off particular warning id's with syntax like this: option global warnings ignore = '3.5, 3.6, 5, 7.1';. See {a{option¤option.htm}a}.");
+                    txt3.MainAdd("Turn off particular warning id's with syntax like this: option global warnings ignore = 'w2.1, w3.2';. See {a{option¤option.htm}a}.");
                 }
                 else
                 {
-                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers (you may use id's to turn off particular warnings).");
+                    txt3.MainAdd("Click " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " to show messages with id numbers (you may use id's to turn off particular warnings). See also these: option global warnings ignore, option global warnings limit, option global warnings pauseat, option global warnings print (cf. {a{option¤option.htm}a}).");
                 }
                 txt3.MainNewLine();
                 txt3.MainAdd("-----------------------------------------------------------------------");
@@ -676,5 +694,6 @@ namespace Gekko
     {
         //value is not used
         public GekkoDictionary<string, int> storage = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public int printCounter = 1;
     }
 }
