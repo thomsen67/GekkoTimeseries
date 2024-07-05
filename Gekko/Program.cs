@@ -22294,49 +22294,62 @@ namespace Gekko
 
                 int n = aX.GetLength(0);  //number of vars
 
-                int obs = GekkoTime.Observations(tStart, tEnd);
-                int start = -12345;
-
-                double[,] xx = G.CreateArrayDouble(5, obs, double.NaN);  //puts .NaN in for safety. Seems [3, ...] is not used.
-
-                //Find starting period (non-missing)
-                for (int i = 0; i < obs; i++)
-                {
-                    if (!LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
-                    {
-                        start = i;
-                        break;
-                    }
-                }
-                if (start == -12345) new Error(function + "(): Too many missings in the input series in order to compute indexes");
+                int obs = GekkoTime.Observations(tStart, tEnd);                
+                int start = LaspeyresGetStartPeriod(function, aX, aP, n, obs);
+                double[,] xx = G.CreateArrayDouble(6, obs, double.NaN);  //puts .NaN in for safety. Seems [3, ...] is not used.                
 
                 if (G.Equal(function, "laspchain"))
                 {
                     //
-                    // Laspeyres chain is generally using R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
-                    // for the quantity index, running over <%t1+1 %t2>.
+                    // Laspeyres chain used to be computed via R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
+                    // giving the quantity. But if one or more micro-quantities are missing in the first year, we
+                    // cannot get the aggregated quantity and thus aggregated pris.
+                    // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.
+                    // So now we are first calculating prices.
                     // These R's can be accumulated/chained. So the development in q's is weighted together at lagged prices.
                     // From the chain (efter adjusting for base period), we get quantitites. Prices are then just costs / quantities.                    
                     //
                     double index = 1d;
-                    xx[4, start] = 1d;
+                    xx[4, start] = 1d;  //quantity
+                    xx[5, start] = 1d;  //price
                     for (int i = start; i < obs; i++)
                     {
-                        double sum = 0d;  //normal values/costs.
-                        double sum1 = 0d; //at lagged prices (d-values)
-                        for (int j = 0; j < n; j++)
+                        if (false)
                         {
-                            sum += aX[j, i] * aP[j, i];
-                            if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
+                            double sum = 0d;  //normal values/costs.
+                            double sum1 = 0d; //at lagged prices (d-values)
+                            for (int j = 0; j < n; j++)
+                            {
+                                sum += aX[j, i] * aP[j, i];
+                                if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
+                            }
+                            xx[0, i] = sum;   //total cost
+                            xx[1, i] = sum1;  //total cost at previous period prices
+                            if (i > start)
+                            {
+                                xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
+                                index = index * xx[2, i];
+                                xx[4, i] = index;                    //lasp.index multiplied (1 i start period)
+                                                                     //xx[4,...] is the quantity index
+                            }
                         }
-                        xx[0, i] = sum;   //total cost
-                        xx[1, i] = sum1;  //total cost at previous period prices
-                        if (i > start)
+                        else
                         {
-                            xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
-                            index = index * xx[2, i];
-                            xx[4, i] = index;                    //lasp.index multiplied (1 i start period)
-                                                                 //xx[4,...] is the quantity index
+                            double sum = 0d;  //normal values/costs.
+                            double sum1 = 0d; //at lagged prices (d-values)
+                            for (int j = 0; j < n; j++)
+                            {
+                                sum += aX[j, i] * aP[j, i];
+                                if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
+                            }
+                            xx[0, i] = sum;   //total cost                            
+                            if (i > start)
+                            {
+                                xx[1, i] = sum1;  //total cost at previous period prices
+                                double r = xx[0, i] / xx[1, i];
+                                index = index * r;
+                                xx[5, i] = index;
+                            }
                         }
                     }
                 }
@@ -22365,13 +22378,31 @@ namespace Gekko
                 Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
                 Series q = new Series(EFreq.A, "q!a");
 
-                double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];  //may be NaN if all missings in that period
+                double priceInIndexYear = double.NaN;
+                if (G.Equal(function, "laspfixed"))
+                {
+                    priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+                }
+                else
+                {
+                    priceInIndexYear = xx[5, indexYearI];
+                }
+
                 counter = -1;
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {
                     counter++;
-                    q.SetData(t, xx[4, counter] * priceInIndexYear);
-                    p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                    if (G.Equal(function, "laspfixed"))
+                    {
+                        q.SetData(t, xx[4, counter] * priceInIndexYear);
+                        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                    }
+                    else
+                    {
+                        //chain                        
+                        p.SetData(t, xx[5, counter] / priceInIndexYear);
+                        q.SetData(t, xx[0, counter] / (xx[5, counter] / priceInIndexYear));
+                    }
                 }
 
                 m = new Map();
@@ -22396,6 +22427,22 @@ namespace Gekko
 
             return m;
 
+        }
+
+        private static int LaspeyresGetStartPeriod(string function, double[,] aX, double[,] aP, int n, int obs)
+        {
+            int start = -12345;
+            //Find starting period (non-missing)
+            for (int i = 1; i < obs; i++)
+            {
+                if (!LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
+                {
+                    start = i - 1;
+                    break;
+                }
+            }
+            if (start == -12345) start = 0;  //just make all missing values later on
+            return start;
         }
 
         /// <summary>
@@ -22426,7 +22473,7 @@ namespace Gekko
                     break;
                 }
             }
-            if (tStart_real.IsNull()) new Error(function + "(): Too many missings in the two input series in order to compute indexes");
+            if (tStart_real.IsNull()) tStart_real = tStart;  //then we just get missing values later on
             Series p = new Series(EFreq.A, "p!a");
             Series q = new Series(EFreq.A, "q!a");
             p.SetData(tStart_real.Add(-1), 1d);
@@ -22444,8 +22491,7 @@ namespace Gekko
                 }
                 p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
             }
-            double indexValue = p.GetDataSimple(indexYear);
-            if (G.isNumericalError(indexValue)) new Error(function + "(): Cannot set price = 1 in index period because of missing value");
+            double indexValue = p.GetDataSimple(indexYear);            
             Series p2 = new Series(EFreq.A, "p2!a");
             Series q2 = new Series(EFreq.A, "q2!a");
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
@@ -22469,10 +22515,11 @@ namespace Gekko
         /// <param name="n"></param>
         /// <returns></returns>
         private static bool LaspeyresHasMissingForThisPeriod(int i, double[,] aX, double[,] aP, int n)
-        {            
+        {
             for (int j = 0; j < n; j++)
             {
-                if (G.isNumericalError(aX[j, i]) || G.isNumericalError(aP[j, i]))
+                //In R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) we use current p and q and lagged p.
+                if (G.isNumericalError(aX[j, i]) || G.isNumericalError(aP[j, i]) || G.isNumericalError(aP[j, i - 1]))
                 {
                     return true;
                 }
