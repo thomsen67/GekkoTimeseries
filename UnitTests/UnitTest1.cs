@@ -33430,6 +33430,80 @@ print(df2)
             _AssertSeries(First(), "q!a", 2021, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
+
+            //
+            // Symmetry regarding lists vs. series
+            //
+            for (int ii = 0; ii <= 6; ii++)  //REMEBER to set this
+            {
+                I("reset;");
+                I("time 2018 2020;");
+                if (ii == 0)
+                {
+                    I("p1 = 1.02, 1.03, 1.04;");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = 2, 3, 4;");
+                    I("q2 = 12, 13, 14;");
+                }
+                else if (ii == 1)
+                {
+                    I("p1 = m(), 1.03, 1.04;");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = 2, 3, 4;");
+                    I("q2 = 12, 13, 14;");
+                }
+                else if (ii == 2)
+                {
+                    I("p1 = 1.02, 1.03, 1.04;");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = m(), 3, 4;");
+                    I("q2 = 12, 13, 14;");
+                }
+                else if (ii == 3)
+                {
+                    I("p1 = 1.02, m(), 1.04;");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = 2, 3, 4;");
+                    I("q2 = 12, 13, 14;");
+                }
+                else if (ii == 4)
+                {
+                    I("p1 = 1.02, 1.03, 1.04;");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = 2, m(), 4;");
+                    I("q2 = 12, 13, 14;");
+                }
+                else if (ii == 5)
+                {
+                    I("p1 = 1.02, 1.03, m();");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = 2, 3, 4;");
+                    I("q2 = 12, 13, 14;");
+                }
+                else if (ii == 6)
+                {
+                    I("p1 = 1.02, 1.03, 1.04;");
+                    I("p2 = 1.12, 1.13, 1.14;");
+                    I("q1 = 2, 3, m();");
+                    I("q2 = 12, 13, 14;");
+                }
+                else Assert.Fail();
+                I("#p = p1, p2;");
+                I("#q = q1, q2;");
+                //(a): With lists of strings
+                I("aq_a = laspchain(#p, #q, 2020).p;");
+                I("v = p1 * q1 + p2 * q2;");
+                I("vlag = p1[-1] * q1 + p2[-1] * q2;");
+                //(b): With series (accumulation)
+                //     The result is the same.
+                I("aq_b = laspchain(v, vlag, 2020).p;");
+                Series aq_a = O.GetIVariableFromString("aq_a", ECreatePossibilities.NoneReportError) as Series;
+                Series aq_b = O.GetIVariableFromString("aq_b", ECreatePossibilities.NoneReportError) as Series;
+                for (int i = 2017; i <= 2021; i++)
+                {
+                    Assert.IsTrue(G.Equals(aq_a.GetDataSimple(new GekkoTime(EFreq.A, i, 1)), aq_b.GetDataSimple(new GekkoTime(EFreq.A, i, 1))));
+                }
+            }
         }
 
         [TestMethod]

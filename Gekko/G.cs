@@ -2755,7 +2755,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Are two double numbers equal?
+        /// Are two double numbers equal? Handles missings Gekko-correctly.
         /// </summary>
         /// <param name="d1"></param>
         /// <param name="d2"></param>
@@ -2792,6 +2792,11 @@ namespace Gekko
             //      normal   |   false    ?
             //-------------------------------------
             //
+            //bool d1 = G.Equals(1d, 1d);                    --> true
+            //bool d2 = G.Equals(double.NaN, 1d);            --> false
+            //bool d3 = G.Equals(1d, double.NaN);            --> false
+            //bool d4 = G.Equals(double.NaN, double.NaN);    --> true
+
             if (G.IsBothNumericalError(d1, d2)) return true;  //see also #87342543534
             if (d1 == d2) return true;  //can only be true if neither is NaN
             return false;
