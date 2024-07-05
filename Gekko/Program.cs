@@ -22314,55 +22314,34 @@ namespace Gekko
                     xx[5, start] = 1d;  //price
                     for (int i = start; i < obs; i++)
                     {
-                        if (false)
+
+                        double sum = 0d;  //normal values/costs.
+                        double sum1 = 0d; //at lagged prices (d-values)
+                        for (int j = 0; j < n; j++)
                         {
-                            double sum = 0d;  //normal values/costs.
-                            double sum1 = 0d; //at lagged prices (d-values)
-                            for (int j = 0; j < n; j++)
-                            {
-                                sum += aX[j, i] * aP[j, i];
-                                if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
-                            }
-                            xx[0, i] = sum;   //total cost
-                            xx[1, i] = sum1;  //total cost at previous period prices
-                            if (i > start)
-                            {
-                                xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
-                                index = index * xx[2, i];
-                                xx[4, i] = index;                    //lasp.index multiplied (1 i start period)
-                                                                     //xx[4,...] is the quantity index
-                            }
+                            sum += aX[j, i] * aP[j, i];
+                            if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
                         }
-                        else
+                        xx[0, i] = sum;   //total cost                            
+                        if (i > start)
                         {
-                            double sum = 0d;  //normal values/costs.
-                            double sum1 = 0d; //at lagged prices (d-values)
-                            for (int j = 0; j < n; j++)
+                            xx[1, i] = sum1;  //total cost at previous period prices
+                            double r = xx[0, i] / xx[1, i];
+                            if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
                             {
-                                sum += aX[j, i] * aP[j, i];
-                                if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
-                            }
-                            xx[0, i] = sum;   //total cost                            
-                            if (i > start)
-                            {
-                                xx[1, i] = sum1;  //total cost at previous period prices
-                                double r = xx[0, i] / xx[1, i];
-                                if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+                                if (xx[0, i] == 0d && xx[1, i] != 0d)
                                 {
-                                    if (xx[0, i] == 0d && xx[1, i] != 0d)
-                                    {
-                                        r = 1 / Globals.factorZero;
-                                        G.Warning("w29.2", null);
-                                    }
-                                    else if (xx[0, i] != 0d && xx[1, i] == 0d)
-                                    {
-                                        r = Globals.factorZero;
-                                        G.Warning("w29.2", null);
-                                    }
+                                    r = 1 / Globals.factorZero;
+                                    G.Warning("w29.2", null);
                                 }
-                                index = index * r;
-                                xx[5, i] = index;
+                                else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                {
+                                    r = Globals.factorZero;
+                                    G.Warning("w29.2", null);
+                                }
                             }
+                            index = index * r;
+                            xx[5, i] = index;
                         }
                     }
                 }
