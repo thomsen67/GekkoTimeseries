@@ -21050,33 +21050,68 @@ write datatest;
 
             double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX);
             double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP);
+            int n = aX.GetLength(0);  //number of vars
             int obs = GekkoTime.Observations(tStart, tEnd);
             int obs2 = GekkoTime.Observations(tStart, indexYear);
 
-            double[,] xx = new double[5, obs];
+            int start = LaspeyresGetStartPeriod(function, aX, aP, n, obs);
+            double[,] xx = G.CreateArrayDouble(6, obs, double.NaN);
             //Seems [3, ...] is not used
 
             if (G.equal(function, "laspchain"))
             {
+                //double index = 1d;
+                //xx[4, 0] = 1d;
+                //for (int i = 0; i < obs; i++)
+                //{
+                //    double sum = 0d;
+                //    double sum1 = 0d;
+                //    for (int j = 0; j < varsX.Count; j++)
+                //    {
+                //        sum += aX[j, i] * aP[j, i];
+                //        if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
+                //    }
+                //    xx[0, i] = sum;  //total cost
+                //    xx[1, i] = sum1;  //total cost at previous period prices
+                //    if (i > 0)
+                //    {
+                //        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
+                //        index = index * xx[2, i];
+                //        xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
+                //                                             //xx[4,...] is the quantity index
+                //    }
+                //}
+
                 double index = 1d;
-                xx[4, 0] = 1d;
-                for (int i = 0; i < obs; i++)
+                xx[4, start] = 1d;  //quantity
+                xx[5, start] = 1d;  //price
+                for (int i = start; i < obs; i++)
                 {
-                    double sum = 0d;
-                    double sum1 = 0d;
-                    for (int j = 0; j < varsX.Count; j++)
+                    double sum = 0d;  //normal values/costs.
+                    double sum1 = 0d; //at lagged prices (d-values)
+                    for (int j = 0; j < n; j++)
                     {
                         sum += aX[j, i] * aP[j, i];
-                        if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
+                        if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
                     }
-                    xx[0, i] = sum;  //total cost
-                    xx[1, i] = sum1;  //total cost at previous period prices
-                    if (i > 0)
+                    xx[0, i] = sum;   //total cost                            
+                    if (i > start)
                     {
-                        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
-                        index = index * xx[2, i];
-                        xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
-                                                             //xx[4,...] is the quantity index
+                        xx[1, i] = sum1;  //total cost at previous period prices
+                        double r = xx[0, i] / xx[1, i];
+                        if (Globals.laspchainHandleZero)  //search this Globals var to see the other place the following logic is used
+                        {
+                            if (xx[0, i] == 0d && xx[1, i] != 0d)
+                            {
+                                r = 1 / Globals.laspchainFactorZero;
+                            }
+                            else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                            {
+                                r = Globals.laspchainFactorZero;
+                            }
+                        }
+                        index = index * r;
+                        xx[5, i] = index;
                     }
                 }
             }
@@ -21104,35 +21139,32 @@ write datatest;
             TimeSeries p = new TimeSeries(EFreq.Annual, null);
             TimeSeries x = new TimeSeries(EFreq.Annual, null);
 
-            //List<string> vars = new List<string>();
-            //vars.Add(var1);
-            //vars.Add(var2);
+            //double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
 
-            //foreach (string var in vars)
-            //{
-            //    CreateXxVariableOrIssueError(work, var);
-            //}
+            double priceInIndexYear = double.NaN;
+            if (G.equal(function, "laspfixed"))
+            {
+                priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+            }
+            else
+            {
+                priceInIndexYear = xx[5, indexYearI];
+            }
 
-            //TimeSeries p = work.GetVariable(var1);
-            //TimeSeries x = work.GetVariable(var2);
-
-            double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
             counter = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
                 counter++;
-
-                if (true)  //price = 1 in index year
+                if (G.equal(function, "laspfixed"))
                 {
                     x.SetData(t, xx[4, counter] * priceInIndexYear);
                     p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
                 }
                 else
                 {
-                    //FIXME
-                    //4 skal være = 0 in index
-                    x.SetData(t, xx[4, counter] / xx[4, indexYearI] * xx[0, indexYearI]);
-                    p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                    //chain                        
+                    p.SetData(t, xx[5, counter] / priceInIndexYear);
+                    x.SetData(t, xx[0, counter] / (xx[5, counter] / priceInIndexYear));
                 }
             }
 
@@ -21164,6 +21196,34 @@ write datatest;
         //==============================================================
 
 
+        private static bool LaspeyresHasMissingForThisPeriod(int i, double[,] aX, double[,] aP, int n)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                //In R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) we use current p and q and lagged p.
+                if (G.isNumericalError(aX[j, i]) || G.isNumericalError(aP[j, i]) || G.isNumericalError(aP[j, i - 1]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static int LaspeyresGetStartPeriod(string function, double[,] aX, double[,] aP, int n, int obs)
+        {
+            int start = -12345;
+            //Find starting period (non-missing)
+            for (int i = 1; i < obs; i++)
+            {
+                if (!LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
+                {
+                    start = i - 1;
+                    break;
+                }
+            }
+            if (start == -12345) start = 0;  //just make all missing values later on
+            return start;
+        }
 
         public static void Upd(O.Upd o)
         {

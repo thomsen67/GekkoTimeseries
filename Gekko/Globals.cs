@@ -138,7 +138,10 @@ namespace Gekko
         public const string printCode_sdp = "rdp";      
                 
         public List<Databank> bankOpen = new List<Databank>();
-        
+
+        public const bool laspchainHandleZero = true;  //for laspchain()
+        public const double laspchainFactorZero = 100d; //for laspchain()
+
         public static string ttPath3 = "GekkoCS_2.5.3";  //or "GekkoCS"
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
 
