@@ -22401,8 +22401,8 @@ namespace Gekko
                 if (tStart_real.IsNull()) new Error("Too many missings in the two input series in order to compute indexes");    
                 Series p = new Series(EFreq.A, "p!a");
                 Series q = new Series(EFreq.A, "q!a");
-                p.SetData(tStart_real, 1d);
-                foreach (GekkoTime t in new GekkoTimeIterator(tStart_real.Add(1), tEnd))
+                p.SetData(tStart_real.Add(-1), 1d);
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, tEnd))
                 {
                     //Note: ts1 or ts2 not used in period tStart_real. But tStart_real+1 contains prices from tStart_real, som implicitly the period is used.
                     double v1 = ts1.GetDataSimple(t);
@@ -22417,14 +22417,16 @@ namespace Gekko
                 }
                 double indexValue = p.GetDataSimple(indexYear);
                 if (G.isNumericalError(indexValue)) new Error("Cannot set price = 1 in index period because of missing value");
-                foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, tEnd))
+                Series p2 = new Series(EFreq.A, "p2!a");
+                Series q2 = new Series(EFreq.A, "q2!a");
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {
-                    p.SetData(t, p.GetDataSimple(t) / indexValue);
-                    q.SetData(t, ts1.GetDataSimple(t) / p.GetDataSimple(t));  //value divided by price
+                    p2.SetData(t, p.GetDataSimple(t) / indexValue);
+                    q2.SetData(t, ts1.GetDataSimple(t) / p.GetDataSimple(t));  //value divided by price
                 }
                 m = new Map();
-                m.AddIVariable(p.GetName(), p);
-                m.AddIVariable(q.GetName(), q);
+                m.AddIVariable(p.GetName(), p2);
+                m.AddIVariable(q.GetName(), q2);
             }
             else
             {
