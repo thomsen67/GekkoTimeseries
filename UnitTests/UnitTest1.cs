@@ -33430,7 +33430,6 @@ print(df2)
             _AssertSeries(First(), "q!a", 2021, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
-
         }
 
         [TestMethod]

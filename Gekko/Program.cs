@@ -22302,12 +22302,13 @@ namespace Gekko
                 //Find starting period (non-missing)
                 for (int i = 0; i < obs; i++)
                 {
-                    if (start == -12345 && !LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
+                    if (!LaspeyresHasMissingForThisPeriod(i, aX, aP, n))
                     {
                         start = i;
+                        break;
                     }
                 }
-                if (start == -12345) start = 0;  //No period not containing missings. Just set start = 0 --> will produce all missing values for the results.
+                if (start == -12345) new Error("Too many missings in the input series in order to compute indexes");
 
                 if (G.Equal(function, "laspchain"))
                 {
@@ -22397,7 +22398,7 @@ namespace Gekko
                         break;
                     }
                 }
-                if (tStart_real.IsNull()) new Error("Too many missings in the two input series in order to compute index");    
+                if (tStart_real.IsNull()) new Error("Too many missings in the two input series in order to compute indexes");    
                 Series p = new Series(EFreq.A, "p!a");
                 Series q = new Series(EFreq.A, "q!a");
                 p.SetData(tStart_real, 1d);
