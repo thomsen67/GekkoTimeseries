@@ -33382,12 +33382,12 @@ print(df2)
 
             I("reset;");
             I("time 2018 2022;");
-            I("x = m(), 12, 11, 15, 4;");
-            I("d = 8, 13, 10, 14, 7;");
+            I("x = 10, 12, 11, 15, 4;");
+            I("d = m(), 13, 10, 14, 7;");
             I("q = laspchain(x, d, 2020).q;");
             I("p = laspchain(x, d, 2020).p;");
-            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] ad d[2018] are not used at all for price index!
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
             _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
             _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); 
             _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  
@@ -33405,8 +33405,8 @@ print(df2)
             I("p = laspchain(x, d, 2020).p;");
             _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2019, double.NaN, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2019, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta); 
             _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
@@ -33416,12 +33416,12 @@ print(df2)
 
             I("reset;");
             I("time 2018 2022;");
-            I("x = m(), 12, 11, 15, 4;");
-            I("d = 8, 13, 10, m(), 7;");
+            I("x = 10, 12, 11, 15, 4;");
+            I("d = m(), 13, 10, m(), 7;");
             I("q = laspchain(x, d, 2020).q;");
             I("p = laspchain(x, d, 2020).p;");
-            _AssertSeries(First(), "p!a", 2018, double.NaN, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] ad d[2018] are not used at all for price index!
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
             _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);

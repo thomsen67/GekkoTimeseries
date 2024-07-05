@@ -22422,7 +22422,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {
                     p2.SetData(t, p.GetDataSimple(t) / indexValue);
-                    q2.SetData(t, ts1.GetDataSimple(t) / p.GetDataSimple(t));  //value divided by price
+                    q2.SetData(t, ts1.GetDataSimple(t) / p2.GetDataSimple(t));  //value divided by price
                 }
                 m = new Map();
                 m.AddIVariable(p.GetName(), p2);
