@@ -202,6 +202,7 @@ namespace Gekko
             {"w29", "Seasonal adjustment" },
             // ---------------------------------------------------------
             {"w29.1", "Calculation problem" },
+            {"w29.2", "Laspchain() function: note that incoming prices are probably 0 for some periods, and that this is handled differently i Gekko >= 3.1.20" },
             // =========================================================
             // =========================================================
             {"w30", "Copying" },
@@ -499,7 +500,9 @@ namespace Gekko
                                 if (!w3.EndsWith(".")) w3 += ".";
                                 string ss = w1 + " " + w2;
                                 if (w1 == null && w2 == null) ss = "[Warning text problem].";  //should not happen
-                                m.Add(new WarningPoolHelper() { s = ss + " " + w3, id = kvp.Key, i = kvp2.Value });
+                                string s5 = ss + " " + w3;
+                                if (w3 == ".") s5 = ss;
+                                m.Add(new WarningPoolHelper() { s = s5, id = kvp.Key, i = kvp2.Value });
                             }
                         }
                         this.PrintWarnings(m, false);

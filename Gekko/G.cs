@@ -3925,13 +3925,14 @@ namespace Gekko
         }
 
         /// <summary>
-        /// First argument always "x.y"! Used for the warning pool.
+        /// First argument always "x.y"! Used for the warning pool. Second argument may be null.
         /// </summary>
         /// <param name="typeId"></param>
         /// <param name="s"></param>
         public static void Warning(string typeId, string s)
         {
             bool discard;
+            if (s == null) s = "";
             Globals.warningPool.WAdd(typeId, s, false, out discard);
         }
 

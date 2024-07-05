@@ -1302,12 +1302,12 @@ namespace Gekko
                 new Writeln("END ASTNODES -- " + G.Seconds(tt0));
                 if (errors.Count > 0)
                 {
-                    G.Warning("w6.1", "");
+                    G.Warning("w6.1", null);
                 }
             }
             catch (Exception e)
             {
-                G.Warning("w6.2", "");
+                G.Warning("w6.2", null);
             }
         }
 

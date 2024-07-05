@@ -10442,6 +10442,14 @@ namespace UnitTests
         [TestMethod]
         public void _Test_WarningPool()
         {
+            I("reset;"); Program.options = new Options();  //no resurrection!
+            Globals.warningPool = new WarningPool();
+            Globals.unitTestScreenOutput.Clear();
+            I("warning(6);");
+            string s = Globals.unitTestScreenOutput.ToString();
+            int c = G.Count(s, "1-2.3");
+            Assert.AreEqual(5, c);  //do not print > 5 times for the same overall warning
+
             for (int i = 0; i < 4; i++)
             {
                 int limit = 4;
@@ -33434,7 +33442,7 @@ print(df2)
             //
             // Symmetry regarding lists vs. series
             //
-            for (int ii = 0; ii <= 6; ii++)  //REMEBER to set this
+            for (int ii = 0; ii <= 7; ii++)  //REMEBER to set this
             {
                 I("reset;");
                 I("time 2018 2021;");
@@ -33487,6 +33495,13 @@ print(df2)
                     I("q1 = 2, 3, m(), 5;");
                     I("q2 = 12, 13, 14, 15;");
                 }
+                else if (ii == 7)
+                {
+                    I("p1 = 1.02, 0, 1.04, 1.05;");  //0-prices
+                    I("p2 = 1.12, 0, 1.14, 1.15;");  //0-prices
+                    I("q1 = 2, 3, 4, 5;");
+                    I("q2 = 12, 13, 14, 15;");
+                }
                 else Assert.Fail();
                 I("#p = p1, p2;");
                 I("#q = q1, q2;");
@@ -33501,7 +33516,9 @@ print(df2)
                 Series aq_b = O.GetIVariableFromString("aq_b", ECreatePossibilities.NoneReportError) as Series;
                 for (int i = 2017; i <= 2022; i++)
                 {
-                    Assert.IsTrue(G.Equals(aq_a.GetDataSimple(new GekkoTime(EFreq.A, i, 1)), aq_b.GetDataSimple(new GekkoTime(EFreq.A, i, 1))));
+                    double v1 = aq_a.GetDataSimple(new GekkoTime(EFreq.A, i, 1));
+                    double v2 = aq_b.GetDataSimple(new GekkoTime(EFreq.A, i, 1));
+                    Assert.IsTrue(G.Equals(v1, v2));
                 }
             }
         }

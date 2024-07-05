@@ -6078,6 +6078,19 @@ namespace Gekko
                     new Writeln("Extra text1");
                     new Writeln("Extra text2");
                 }
+                else if (d == 6)
+                {                    
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");
+                    G.Warning("w2.1", "1-2-3");                                        
+                }
             }
         }
 
