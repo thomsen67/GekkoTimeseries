@@ -22347,6 +22347,19 @@ namespace Gekko
                             {
                                 xx[1, i] = sum1;  //total cost at previous period prices
                                 double r = xx[0, i] / xx[1, i];
+                                if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+                                {
+                                    if (xx[0, i] == 0d && xx[1, i] != 0d)
+                                    {
+                                        r = 1 / Globals.factorZero;
+                                        G.Warning("w29.2", null);
+                                    }
+                                    else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                    {
+                                        r = Globals.factorZero;
+                                        G.Warning("w29.2", null);
+                                    }
+                                }
                                 index = index * r;
                                 xx[5, i] = index;
                             }
@@ -22457,9 +22470,7 @@ namespace Gekko
         /// <returns></returns>
         private static Map LaspeyresChainSeries(string function, Series value, Series valueAtLaggedPrices, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
         {
-            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index.
-            bool handleZero = true;
-            double factorZero = 100d;
+            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index.            
             // -----
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
             if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
@@ -22484,10 +22495,10 @@ namespace Gekko
                 double v1 = value.GetDataSimple(t);
                 double v2 = valueAtLaggedPrices.GetDataSimple(t);
                 double r = v1 / v2;
-                if (handleZero)
+                if (Globals.handleZero)
                 {
-                    if (v1 == 0d && v2 != 0d) r = 1 / factorZero;
-                    else if (v1 != 0d && v2 == 0d) r = factorZero;
+                    if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
+                    else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
                 }
                 p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
             }
