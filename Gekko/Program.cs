@@ -325,7 +325,7 @@ namespace Gekko
         {
             if (this.blacklist_read.Count() > 0)
             {
-                G.Writeln("+++ Blacklist read = ");
+                G.Write("+++ Blacklist read = ");
                 foreach (string s in this.blacklist_read)
                 {
                     G.Write(s + "; ");
@@ -334,7 +334,7 @@ namespace Gekko
             }
             if (this.blacklist_write.Count() > 0)
             {
-                G.Writeln("+++ Blacklist write = ");
+                G.Write("+++ Blacklist write = ");
                 foreach (string s in this.blacklist_write)
                 {
                     G.Write(s + "; ");
@@ -345,7 +345,7 @@ namespace Gekko
             {
                 if (this.whitelist_read.Count() > 0)
                 {
-                    G.Writeln("+++ Whitelist read = ");
+                    G.Write("+++ Whitelist read = ");
                     foreach (string s in this.whitelist_read)
                     {
                         G.Write(s + "; ");
@@ -354,7 +354,7 @@ namespace Gekko
                 }
                 if (this.whitelist_write.Count() > 0)
                 {
-                    G.Writeln("+++ Whitelist write = ");
+                    G.Write("+++ Whitelist write = ");
                     foreach (string s in this.whitelist_write)
                     {
                         G.Write(s + "; ");
@@ -363,7 +363,7 @@ namespace Gekko
                 }
             }
             G.Writeln();
-            G.Writeln("You may change these settings in the system gekko.ini file.");
+            //G.Writeln("You may change these settings in the system gekko.ini file.");
             G.Writeln("You may change fencing in the file " + Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName) + ". If you are using your own local version of Gekko, this is all fine. If Gekko is opened from a network folder, beware that changing the gekko.ini changes Gekko settings for all the users using that particular Gekko version (if gekko.ini resides in a write-protected folder, you need write access). After adjusting the " + Globals.autoExecCmdFileName + " file, you need to close and relaunch Gekko.");
         }
 
