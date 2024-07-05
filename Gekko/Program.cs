@@ -20998,179 +20998,239 @@ write datatest;
                 G.Writeln();
                 G.Writeln2("*** ERROR: Index functions only work for annual frequency at the moment");
                 throw new GekkoException();
-            }                        
-                        
-            int indexYearI = -12345;
-            int counter = -1;
-            bool found = false;
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
+            }
+
+            if (G.equal(function, "laspchain") && list1.Type() == EVariableType.TimeSeries && list2.Type() == EVariableType.TimeSeries)
             {
-                counter++;
-                if (t.IsSamePeriod(indexYear))
+                Tuple<TimeSeries, TimeSeries> m = LaspeyresChainSeries(function, list1 as MetaTimeSeries, list2 as MetaTimeSeries, indexYear, tStart, tEnd);
+                MetaTimeSeries mp = new MetaTimeSeries(m.Item1);
+                MetaTimeSeries mx = new MetaTimeSeries(m.Item2);
+                return new GekkoTuple.Tuple2(mp, mx);
+            }
+            else
+            {
+                int indexYearI = -12345;
+                int counter = -1;
+                bool found = false;
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
                 {
-                    found = true;
-                    indexYearI = counter;
-                    break;
+                    counter++;
+                    if (t.IsSamePeriod(indexYear))
+                    {
+                        found = true;
+                        indexYearI = counter;
+                        break;
+                    }
                 }
-            }
 
-            if (!found)
-            {
-                G.Writeln();
-                G.Writeln("*** ERROR with index year in Laspeyres function: seems outside time period");
-                throw new GekkoException();
-            }                      
-
-            List<string> varsP = ((MetaList)list1).list;
-            List<string> varsX = ((MetaList)list2).list;
-
-            if (varsP.Count == 0 || varsX.Count == 0)
-            {
-                G.Writeln();
-                G.Writeln("*** ERROR: list with 0 elements not permitted");
-                throw new GekkoException();
-            }
-
-            if (varsP.Count != varsX.Count)
-            {
-                G.Writeln();
-                G.Writeln("*** ERROR: the lists should have same number of elements");
-                throw new GekkoException();
-            }
-
-            foreach (string s in varsP)
-            {
-                if (s.StartsWith("-"))
+                if (!found)
                 {
                     G.Writeln();
-                    G.Writeln("*** ERROR: '" + s + "': Please use subtraction in quantity list only");
+                    G.Writeln("*** ERROR with index year in Laspeyres function: seems outside time period");
                     throw new GekkoException();
                 }
-            }
 
-            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX);
-            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP);
-            int n = aX.GetLength(0);  //number of vars
-            int obs = GekkoTime.Observations(tStart, tEnd);
-            int obs2 = GekkoTime.Observations(tStart, indexYear);
+                List<string> varsP = ((MetaList)list1).list;
+                List<string> varsX = ((MetaList)list2).list;
 
-            int start = LaspeyresGetStartPeriod(function, aX, aP, n, obs);
-            double[,] xx = G.CreateArrayDouble(6, obs, double.NaN);
-            //Seems [3, ...] is not used
-
-            if (G.equal(function, "laspchain"))
-            {
-                //double index = 1d;
-                //xx[4, 0] = 1d;
-                //for (int i = 0; i < obs; i++)
-                //{
-                //    double sum = 0d;
-                //    double sum1 = 0d;
-                //    for (int j = 0; j < varsX.Count; j++)
-                //    {
-                //        sum += aX[j, i] * aP[j, i];
-                //        if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
-                //    }
-                //    xx[0, i] = sum;  //total cost
-                //    xx[1, i] = sum1;  //total cost at previous period prices
-                //    if (i > 0)
-                //    {
-                //        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
-                //        index = index * xx[2, i];
-                //        xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
-                //                                             //xx[4,...] is the quantity index
-                //    }
-                //}
-
-                double index = 1d;
-                xx[4, start] = 1d;  //quantity
-                xx[5, start] = 1d;  //price
-                for (int i = start; i < obs; i++)
+                if (varsP.Count == 0 || varsX.Count == 0)
                 {
-                    double sum = 0d;  //normal values/costs.
-                    double sum1 = 0d; //at lagged prices (d-values)
-                    for (int j = 0; j < n; j++)
+                    G.Writeln();
+                    G.Writeln("*** ERROR: list with 0 elements not permitted");
+                    throw new GekkoException();
+                }
+
+                if (varsP.Count != varsX.Count)
+                {
+                    G.Writeln();
+                    G.Writeln("*** ERROR: the lists should have same number of elements");
+                    throw new GekkoException();
+                }
+
+                foreach (string s in varsP)
+                {
+                    if (s.StartsWith("-"))
                     {
-                        sum += aX[j, i] * aP[j, i];
-                        if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
+                        G.Writeln();
+                        G.Writeln("*** ERROR: '" + s + "': Please use subtraction in quantity list only");
+                        throw new GekkoException();
                     }
-                    xx[0, i] = sum;   //total cost                            
-                    if (i > start)
+                }
+
+                double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX);
+                double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP);
+                int n = aX.GetLength(0);  //number of vars
+                int obs = GekkoTime.Observations(tStart, tEnd);
+                int obs2 = GekkoTime.Observations(tStart, indexYear);
+
+                int start = LaspeyresGetStartPeriod(function, aX, aP, n, obs);
+                double[,] xx = G.CreateArrayDouble(6, obs, double.NaN);
+                //Seems [3, ...] is not used
+
+                if (G.equal(function, "laspchain"))
+                {
+                    //double index = 1d;
+                    //xx[4, 0] = 1d;
+                    //for (int i = 0; i < obs; i++)
+                    //{
+                    //    double sum = 0d;
+                    //    double sum1 = 0d;
+                    //    for (int j = 0; j < varsX.Count; j++)
+                    //    {
+                    //        sum += aX[j, i] * aP[j, i];
+                    //        if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
+                    //    }
+                    //    xx[0, i] = sum;  //total cost
+                    //    xx[1, i] = sum1;  //total cost at previous period prices
+                    //    if (i > 0)
+                    //    {
+                    //        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
+                    //        index = index * xx[2, i];
+                    //        xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
+                    //                                             //xx[4,...] is the quantity index
+                    //    }
+                    //}
+
+                    double index = 1d;
+                    xx[4, start] = 1d;  //quantity
+                    xx[5, start] = 1d;  //price
+                    for (int i = start; i < obs; i++)
                     {
-                        xx[1, i] = sum1;  //total cost at previous period prices
-                        double r = xx[0, i] / xx[1, i];
-                        if (Globals.laspchainHandleZero)  //search this Globals var to see the other place the following logic is used
+                        double sum = 0d;  //normal values/costs.
+                        double sum1 = 0d; //at lagged prices (d-values)
+                        for (int j = 0; j < n; j++)
                         {
-                            if (xx[0, i] == 0d && xx[1, i] != 0d)
-                            {
-                                r = 1 / Globals.laspchainFactorZero;
-                            }
-                            else if (xx[0, i] != 0d && xx[1, i] == 0d)
-                            {
-                                r = Globals.laspchainFactorZero;
-                            }
+                            sum += aX[j, i] * aP[j, i];
+                            if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
                         }
-                        index = index * r;
-                        xx[5, i] = index;
+                        xx[0, i] = sum;   //total cost                            
+                        if (i > start)
+                        {
+                            xx[1, i] = sum1;  //total cost at previous period prices
+                            double r = xx[0, i] / xx[1, i];
+                            if (Globals.laspchainHandleZero)  //search this Globals var to see the other place the following logic is used
+                            {
+                                if (xx[0, i] == 0d && xx[1, i] != 0d)
+                                {
+                                    r = 1 / Globals.laspchainFactorZero;
+                                }
+                                else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                {
+                                    r = Globals.laspchainFactorZero;
+                                }
+                            }
+                            index = index * r;
+                            xx[5, i] = index;
+                        }
                     }
                 }
-            }
-            else if (G.equal(function, "laspfixed"))
-            {
-                for (int i = 0; i < obs; i++)
+                else if (G.equal(function, "laspfixed"))
                 {
-                    double sum = 0d;
-                    double sum1 = 0d;
-                    for (int j = 0; j < varsX.Count; j++)
+                    for (int i = 0; i < obs; i++)
                     {
-                        sum += aX[j, i] * aP[j, i];
-                        sum1 += aX[j, i] * aP[j, indexYearI];
+                        double sum = 0d;
+                        double sum1 = 0d;
+                        for (int j = 0; j < varsX.Count; j++)
+                        {
+                            sum += aX[j, i] * aP[j, i];
+                            sum1 += aX[j, i] * aP[j, indexYearI];
+                        }
+                        xx[0, i] = sum;  //total cost
+                        xx[1, i] = sum1;  //total cost at index period prices
+                        xx[4, i] = sum1; //xx[4,...] is the quantity index
                     }
-                    xx[0, i] = sum;  //total cost
-                    xx[1, i] = sum1;  //total cost at index period prices
-                    xx[4, i] = sum1; //xx[4,...] is the quantity index
-                }
-            }
-            else
-            {
-                throw new GekkoException();
-            }
-
-            TimeSeries p = new TimeSeries(EFreq.Annual, null);
-            TimeSeries x = new TimeSeries(EFreq.Annual, null);
-
-            //double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
-
-            double priceInIndexYear = double.NaN;
-            if (G.equal(function, "laspfixed"))
-            {
-                priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
-            }
-            else
-            {
-                priceInIndexYear = xx[5, indexYearI];
-            }
-
-            counter = -1;
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                counter++;
-                if (G.equal(function, "laspfixed"))
-                {
-                    x.SetData(t, xx[4, counter] * priceInIndexYear);
-                    p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
                 }
                 else
                 {
-                    //chain                        
-                    p.SetData(t, xx[5, counter] / priceInIndexYear);
-                    x.SetData(t, xx[0, counter] / (xx[5, counter] / priceInIndexYear));
+                    throw new GekkoException();
+                }
+
+                TimeSeries p = new TimeSeries(EFreq.Annual, null);
+                TimeSeries x = new TimeSeries(EFreq.Annual, null);
+
+                //double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+
+                double priceInIndexYear = double.NaN;
+                if (G.equal(function, "laspfixed"))
+                {
+                    priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+                }
+                else
+                {
+                    priceInIndexYear = xx[5, indexYearI];
+                }
+
+                counter = -1;
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                {
+                    counter++;
+                    if (G.equal(function, "laspfixed"))
+                    {
+                        x.SetData(t, xx[4, counter] * priceInIndexYear);
+                        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                    }
+                    else
+                    {
+                        //chain                        
+                        p.SetData(t, xx[5, counter] / priceInIndexYear);
+                        x.SetData(t, xx[0, counter] / (xx[5, counter] / priceInIndexYear));
+                    }
+                }
+                MetaTimeSeries mp = new MetaTimeSeries(p);
+                MetaTimeSeries mx = new MetaTimeSeries(x);
+                return new GekkoTuple.Tuple2(mp, mx);
+            }            
+        }
+
+        private static Tuple<TimeSeries, TimeSeries> LaspeyresChainSeries(string function, MetaTimeSeries metavalue, MetaTimeSeries metavalueAtLaggedPrices, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
+        {
+            TimeSeries value = metavalue.ts;
+            TimeSeries valueAtLaggedPrices = metavalueAtLaggedPrices.ts;
+            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index.            
+            // -----
+            if (value.freqEnum != valueAtLaggedPrices.freqEnum)
+            {
+                G.Writeln2("*** ERROR: " + function + "(): The two input series have different frequencies");
+            }
+            GekkoTime tStart_real = Globals.tNull;
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            {
+                if (!G.isNumericalError(value.GetData(t)) && !G.isNumericalError(valueAtLaggedPrices.GetData(t)))
+                {
+                    //if both are non-missing
+                    tStart_real = t;
+                    break;
                 }
             }
-
-            MetaTimeSeries mp = new MetaTimeSeries(p);
-            MetaTimeSeries mx = new MetaTimeSeries(x);
-            return new GekkoTuple.Tuple2(mp, mx);
+            if (tStart_real.IsNull()) tStart_real = tStart;  //then we just get missing values later on
+            TimeSeries p = new TimeSeries(EFreq.Annual, "p!a");
+            TimeSeries q = new TimeSeries(EFreq.Annual, "q!a");
+            p.SetData(tStart_real.Add(-1), 1d);
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, tEnd))
+            {
+                //Note: ts1 or ts2 not used in period tStart_real.
+                //But tStart_real+1 contains prices from tStart_real, soimplicitly the period is used.
+                double v1 = value.GetData(t);
+                double v2 = valueAtLaggedPrices.GetData(t);
+                double r = v1 / v2;
+                if (Globals.laspchainHandleZero)
+                {
+                    if (v1 == 0d && v2 != 0d) r = 1 / Globals.laspchainFactorZero;
+                    else if (v1 != 0d && v2 == 0d) r = Globals.laspchainFactorZero;
+                }
+                p.SetData(t, p.GetData(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
+            }
+            double indexValue = p.GetData(indexYear);
+            TimeSeries p2 = new TimeSeries(EFreq.Annual, "p2!a");
+            TimeSeries q2 = new TimeSeries(EFreq.Annual, "q2!a");
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            {
+                p2.SetData(t, p.GetData(t) / indexValue);
+                //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
+                q2.SetData(t, value.GetData(t) / p2.GetData(t));
+            }
+            Tuple<TimeSeries, TimeSeries> m = new Tuple<TimeSeries, TimeSeries>(p2, q2);
+            return m;
         }
 
 
