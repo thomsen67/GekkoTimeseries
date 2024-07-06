@@ -22474,7 +22474,7 @@ namespace Gekko
                 //But tStart_real+1 contains prices from tStart_real, soimplicitly the period is used.
                 double v1 = value.GetDataSimple(t);
                 double v2 = valueAtLaggedPrices.GetDataSimple(t);
-                double r = v1 / v2;
+                double r = G.HandleNumericalError(v1 / v2);
                 if (Globals.handleZero)
                 {
                     if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
@@ -22487,9 +22487,9 @@ namespace Gekko
             Series q2 = new Series(EFreq.A, "q2!a");
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
-                p2.SetData(t, p.GetDataSimple(t) / indexValue);
+                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t) / indexValue));
                 //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
-                q2.SetData(t, value.GetDataSimple(t) / p2.GetDataSimple(t));  
+                q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
             }
             Map m = new Map();
             m.AddIVariable(p.GetName(), p2);
