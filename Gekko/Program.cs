@@ -21213,7 +21213,7 @@ write datatest;
                 //But tStart_real+1 contains prices from tStart_real, soimplicitly the period is used.
                 double v1 = value.GetData(t);
                 double v2 = valueAtLaggedPrices.GetData(t);
-                double r = v1 / v2;
+                double r = G.HandleNumericalError(v1 / v2);
                 if (Globals.laspchainHandleZero)
                 {
                     if (v1 == 0d && v2 != 0d) r = 1 / Globals.laspchainFactorZero;
@@ -21226,9 +21226,9 @@ write datatest;
             TimeSeries q2 = new TimeSeries(EFreq.Annual, "q2!a");
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
-                p2.SetData(t, p.GetData(t) / indexValue);
+                p2.SetData(t, G.HandleNumericalError(p.GetData(t) / indexValue));
                 //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
-                q2.SetData(t, value.GetData(t) / p2.GetData(t));
+                q2.SetData(t, G.HandleNumericalError(value.GetData(t) / p2.GetData(t)));
             }
             Tuple<TimeSeries, TimeSeries> m = new Tuple<TimeSeries, TimeSeries>(p2, q2);
             return m;
