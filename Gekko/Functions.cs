@@ -427,6 +427,18 @@ namespace Gekko
             return tuple;
         }
 
+        public static GekkoTuple.Tuple2 laspchain(GekkoTime t, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
+        {            
+            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.GetDate(O.GetDateChoices.Strict), t1.GetDate(O.GetDateChoices.Strict), t2.GetDate(O.GetDateChoices.Strict));
+            return tuple;
+        }
+
+        public static GekkoTuple.Tuple2 laspfixed(GekkoTime t, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
+        {
+            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspfixed", plist, xlist, O.GetDate(date), t1.GetDate(O.GetDateChoices.Strict), t2.GetDate(O.GetDateChoices.Strict));
+            return tuple;
+        }
+
         public static IVariable hpfilter(GekkoTime t, IVariable rightSide, IVariable ilambda)
         {
             return hpfilter(t, null, null, rightSide, ilambda, new ScalarVal(0d));

@@ -21026,7 +21026,7 @@ write datatest;
                 if (!found)
                 {
                     G.Writeln();
-                    G.Writeln("*** ERROR with index year in Laspeyres function: seems outside time period");
+                    G.Writeln("*** ERROR with index period in Laspeyres function: seems outside time period");
                     throw new GekkoException();
                 }
 
