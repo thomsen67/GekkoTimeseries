@@ -21107,7 +21107,7 @@ write datatest;
                         if (i > start)
                         {
                             xx[1, i] = sum1;  //total cost at previous period prices
-                            double r = xx[0, i] / xx[1, i];
+                            double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);                            
                             if (Globals.laspchainHandleZero)  //search this Globals var to see the other place the following logic is used
                             {
                                 if (xx[0, i] == 0d && xx[1, i] != 0d)
@@ -21153,11 +21153,11 @@ write datatest;
                 double priceInIndexYear = double.NaN;
                 if (G.equal(function, "laspfixed"))
                 {
-                    priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+                    priceInIndexYear = G.HandleNumericalError(xx[0, indexYearI] / xx[4, indexYearI]);
                 }
                 else
                 {
-                    priceInIndexYear = xx[5, indexYearI];
+                    priceInIndexYear = G.HandleNumericalError(xx[5, indexYearI]);  //Handle...()just for safety
                 }
 
                 counter = -1;
@@ -21166,14 +21166,15 @@ write datatest;
                     counter++;
                     if (G.equal(function, "laspfixed"))
                     {
-                        x.SetData(t, xx[4, counter] * priceInIndexYear);
-                        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                        x.SetData(t, G.HandleNumericalError(xx[4, counter] * priceInIndexYear));
+                        p.SetData(t, G.HandleNumericalError(xx[0, counter] / xx[4, counter]) / priceInIndexYear);
                     }
                     else
                     {
                         //chain                        
-                        p.SetData(t, xx[5, counter] / priceInIndexYear);
-                        x.SetData(t, xx[0, counter] / (xx[5, counter] / priceInIndexYear));
+                        double d = G.HandleNumericalError(xx[5, counter] / priceInIndexYear);
+                        p.SetData(t, d);
+                        x.SetData(t, G.HandleNumericalError(xx[0, counter] / d));
                     }
                 }
                 MetaTimeSeries mp = new MetaTimeSeries(p);

@@ -1360,6 +1360,17 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Change any plus or minus infinity into NaN.
+        /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public static double HandleNumericalError(double f)
+        {
+            if (Double.IsInfinity(f)) return double.NaN;
+            return f;
+        }
+
+        /// <summary>
         /// 1950 --> 1950.
         /// 50   --> 1950.
         /// 2010 --> 2010.

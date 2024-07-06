@@ -139,7 +139,7 @@ namespace Gekko
                 
         public List<Databank> bankOpen = new List<Databank>();
 
-        public const bool laspchainHandleZero = true;  //for laspchain()
+        public const bool laspchainHandleZero = false;  //for laspchain() ===> only affects when all microprices are == 0 for one and only one period. Disabled.
         public const double laspchainFactorZero = 100d; //for laspchain()
 
         public static string ttPath3 = "GekkoCS_2.5.3";  //or "GekkoCS"
