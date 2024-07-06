@@ -3925,6 +3925,17 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Change any plus or minus infinity into NaN.
+        /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public static double HandleNumericalError(double f)
+        {
+            if (Double.IsInfinity(f)) return double.NaN;
+            return f;
+        }
+
+        /// <summary>
         /// First argument always "x.y"! Used for the warning pool. Second argument may be null.
         /// </summary>
         /// <param name="typeId"></param>

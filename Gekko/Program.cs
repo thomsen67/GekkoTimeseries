@@ -22326,7 +22326,7 @@ namespace Gekko
                         if (i > start)
                         {
                             xx[1, i] = sum1;  //total cost at previous period prices
-                            double r = xx[0, i] / xx[1, i];
+                            double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);
                             if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
                             {
                                 if (xx[0, i] == 0d && xx[1, i] != 0d)
@@ -22373,12 +22373,12 @@ namespace Gekko
                 double priceInIndexYear = double.NaN;
                 if (G.Equal(function, "laspfixed"))
                 {
-                    priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+                    priceInIndexYear = G.HandleNumericalError(xx[0, indexYearI] / xx[4, indexYearI]);
                 }
                 else
                 {
-                    priceInIndexYear = xx[5, indexYearI];
-                }
+                    priceInIndexYear = G.HandleNumericalError(xx[5, indexYearI]);  //Handle...()just for safety
+                }                
 
                 counter = -1;
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
@@ -22386,14 +22386,15 @@ namespace Gekko
                     counter++;
                     if (G.Equal(function, "laspfixed"))
                     {
-                        q.SetData(t, xx[4, counter] * priceInIndexYear);
-                        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+                        q.SetData(t, G.HandleNumericalError(xx[4, counter] * priceInIndexYear));
+                        p.SetData(t, G.HandleNumericalError(xx[0, counter] / xx[4, counter]) / priceInIndexYear);
                     }
                     else
                     {
-                        //chain                        
-                        p.SetData(t, xx[5, counter] / priceInIndexYear);
-                        q.SetData(t, xx[0, counter] / (xx[5, counter] / priceInIndexYear));
+                        //chain
+                        double d = G.HandleNumericalError(xx[5, counter] / priceInIndexYear);
+                        p.SetData(t, d);
+                        q.SetData(t, G.HandleNumericalError(xx[0, counter] / d));
                     }
                 }
 
