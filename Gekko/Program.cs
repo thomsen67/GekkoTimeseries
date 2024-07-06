@@ -22254,7 +22254,7 @@ namespace Gekko
                     }
                 }
 
-                if (!found) new Error(function + "(): index year seems outside time period");
+                if (!found) new Error(function + "(): index period seems outside time period " + tStart.ToString() + "-" + tEnd.ToString());
 
                 double[,] aX = null;
                 double[,] aP = null;
