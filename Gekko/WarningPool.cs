@@ -518,9 +518,9 @@ namespace Gekko
                                 if (!w3.EndsWith(".")) w3 += ".";
                                 string ss = w1 + " " + w2;
                                 if (w1 == null && w2 == null) ss = "[Warning text problem].";  //should not happen
-                                string s5 = ss + " " + w3;
-                                if (w3 == ".") s5 = ss;
-                                m.Add(new WarningPoolHelper() { s = s5, id = kvp.Key, i = kvp2.Value });
+                                string s9 = ss + " " + w3;
+                                if (w3 == ".") s9 = ss;
+                                m.Add(new WarningPoolHelper() { s = s9, id = kvp.Key, i = kvp2.Value });
                             }
                         }
                         this.PrintWarnings(m, false);
