@@ -10237,6 +10237,8 @@ namespace UnitTests
         {
             //We are cheating and changing the options directly!
 
+            string note = Globals.noteString + "The working folder ";
+
             try
             {
 
@@ -10263,17 +10265,17 @@ namespace UnitTests
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
                     string s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+                    Assert.IsTrue(s.Contains(note) && s.Contains("+++ Whitelist"));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsFalse(s.Contains("+++ WARNING: "));
+                    Assert.IsFalse(s.Contains(note));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsFalse(s.Contains("+++ WARNING: "));
+                    Assert.IsFalse(s.Contains(note));
 
                     I("x = 2;");
                     FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
@@ -10295,17 +10297,17 @@ namespace UnitTests
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsFalse(s.Contains("+++ WARNING: "));
+                    Assert.IsFalse(s.Contains(note));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+                    Assert.IsTrue(s.Contains(note) && s.Contains("+++ Blacklist"));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Blacklist"));
+                    Assert.IsTrue(s.Contains(note) && s.Contains("+++ Blacklist"));
 
                     I("x = 2;");
                     I("write '" + Globals.ttPath2 + @"\regres\Databanks\sletmig';");
@@ -10369,17 +10371,17 @@ namespace UnitTests
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+                    Assert.IsTrue(s.Contains(note) && s.Contains("+++ Whitelist"));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+                    Assert.IsTrue(s.Contains(note) && s.Contains("+++ Whitelist"));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s.Contains("+++ WARNING: ") && s.Contains("+++ Whitelist"));
+                    Assert.IsTrue(s.Contains(note) && s.Contains("+++ Whitelist"));
 
                     // ------------------
 
@@ -10394,17 +10396,17 @@ namespace UnitTests
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsFalse(s.Contains("+++ WARNING: "));
+                    Assert.IsFalse(s.Contains(note));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsFalse(s.Contains("+++ WARNING: "));
+                    Assert.IsFalse(s.Contains(note));
 
                     Globals.unitTestScreenOutput.Clear();
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2';");
                     s = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsFalse(s.Contains("+++ WARNING: "));
+                    Assert.IsFalse(s.Contains(note));
                 }
 
             }
@@ -10447,7 +10449,7 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear();
             I("warning(6);");
             string s = Globals.unitTestScreenOutput.ToString();
-            int c = G.Count(s, "1-2.3");
+            int c = G.Count(s, "1-2-3");
             Assert.AreEqual(5, c);  //do not print > 5 times for the same overall warning
 
             for (int i = 0; i < 4; i++)
@@ -19289,7 +19291,7 @@ namespace UnitTests
             I("y[2004] = m();");
             FAIL("OLS y = x1, x2;");
             I("y[2005] = 6;");
-            I("y[2004] = 5;");
+            I("y[2004] = 5;");            
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2 missing values at end of sample"));
 
             Globals.unitTestScreenOutput.Clear();

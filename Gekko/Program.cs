@@ -537,13 +537,12 @@ namespace Gekko
             //We check first as if working folder is reading, then as if it is writing.
             if (!(this.CheckBlackAndWhitelist(Program.options.folder_working, false, true)) || !(this.CheckBlackAndWhitelist(Program.options.folder_working, false, false)))
             {
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w27.1")) //Remove #kjlasfa87iads if this is no longer a warning
+                using (Note txt = new Note())  //More simple to use a Note() than a warning()
                 {
                     txt.MainAdd("The working folder '" + Program.options.folder_working + "' is not consistent with fencing options.");
                     txt.MainNewLineTight();
                     this.FencingMessage(txt, false);
-                }
-                Globals.numberOfWarnings--; //See #kjlasfa87iads, to avoid a "number of warnings" message.
+                }                
             }
         }
 

@@ -913,28 +913,22 @@ namespace Gekko
 
                     if (missingsAtStart > 0 || missingsAtEnd > 0)
                     {
-                        G.Writeln();
-                    }
-
-                    if (missingsAtStart > 0)
-                    {
-                        G.Warning("w38.1", missingsAtStart + " missing values at start of sample");
-                    }
-
-                    if (missingsAtEnd > 0)
-                    {
-                        G.Warning("w38.1", missingsAtEnd + " missing values at end of sample");
-                    }
-
-                    if (missingsAtStart > 0 || missingsAtEnd > 0)
-                    {
+                        string txt = null;
+                        if (missingsAtStart > 0)
+                        {
+                            txt += "There were " + missingsAtStart + " missing values at start of sample. ";
+                        }
+                        if (missingsAtEnd > 0)
+                        {
+                            txt += "There were " + missingsAtEnd + " missing values at end of sample. ";
+                        }
                         t1 = t1.Add(missingsAtStart);
                         t2 = t2.Add(-missingsAtEnd);
                         if (t1.SmallerThanOrEqual(t2))
                         {
-                            G.Writeln("           Suggested OLS period: <" + t1.ToString() + " " + t2.ToString() + ">", Color.Red);
+                            txt += "Suggested OLS period: <" + t1.ToString() + " " + t2.ToString() + ">.";
                         }
-                        throw new GekkoException();
+                        new Error(txt);
                     }
 
                     if (e.Message != null && e.Message != "")
@@ -1081,7 +1075,6 @@ namespace Gekko
                 break;  //no more missings
             Label1:;
             }
-
             return missingsAtStart;
         }
 
