@@ -168,6 +168,13 @@ namespace Gekko
         Unknown
     }
 
+    public class LaspeyresOptions
+    {
+        public bool annualOverlap = false;
+        public bool zeros1 = false;
+        public bool zeros2 = false;
+    }
+
     public class EquationTextHelper
     {
         public bool showTime = false;
@@ -22192,6 +22199,7 @@ namespace Gekko
         public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, List<SeriesAndBool>list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
             Map m = null;
+            LaspeyresOptions opt = GetLaspeyresOptions(options, function);
 
             if (list1 == null || (list1.Type() == EVariableType.List && list2.Type() == EVariableType.List))
             {
@@ -22230,7 +22238,7 @@ namespace Gekko
                     }
                     else if (freq == EFreq.Q)
                     {
-                        if (options == null || !G.Equal(O.ConvertToString(options), "annualoverlap")) new Error(function + "(): For quarterly data, you must use option 'annualoverlap'");
+                        if (!opt.annualOverlap) new Error(function + "(): For quarterly data, you must use option 'annualoverlap'");
                         return LaspeyresQ(function, null, null, tempP, tempX, indexYear, options, tStart, tEnd);
                     }
                     else new Error(function + "(): Only A and Q freq supported.");
@@ -22293,7 +22301,7 @@ namespace Gekko
 
                 int n = aX.GetLength(0);  //number of vars
 
-                int obs = GekkoTime.Observations(tStart, tEnd);                
+                int obs = GekkoTime.Observations(tStart, tEnd);
                 int start = LaspeyresGetStartPeriod(function, aX, aP, n, obs);
                 double[,] xx = G.CreateArrayDouble(6, obs, double.NaN);  //puts .NaN in for safety. Seems [3, ...] is not used.                
 
@@ -22313,7 +22321,6 @@ namespace Gekko
                     xx[5, start] = 1d;  //price
                     for (int i = start; i < obs; i++)
                     {
-
                         double sum = 0d;  //normal values/costs.
                         double sum1 = 0d; //at lagged prices (d-values)
                         for (int j = 0; j < n; j++)
@@ -22326,7 +22333,22 @@ namespace Gekko
                         {
                             xx[1, i] = sum1;  //total cost at previous period prices
                             double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);
-                            if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+
+                            if (opt.zeros1)
+                            {
+                                if (xx[0, i] == 0d)
+                                {
+                                    r = 1d;
+                                }
+                            }
+                            else if (opt.zeros2)
+                            {
+                                if (xx[0, i] == 0d && xx[1, i] == 0d)
+                                {
+                                    r = 1d;
+                                }
+                            }
+                            else if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
                             {
                                 if (xx[0, i] == 0d && xx[1, i] != 0d)
                                 {
@@ -22377,7 +22399,7 @@ namespace Gekko
                 else
                 {
                     priceInIndexYear = G.HandleNumericalError(xx[5, indexYearI]);  //Handle...()just for safety
-                }                
+                }
 
                 counter = -1;
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
@@ -22403,7 +22425,7 @@ namespace Gekko
             }
             else if (G.Equal(function, "laspchain") && list1.Type() == EVariableType.Series && list2.Type() == EVariableType.Series)
             {
-                m = LaspeyresChainSeries(function, list1 as Series, list2 as Series, indexYear, tStart, tEnd);
+                m = LaspeyresChainSeries(function, list1 as Series, list2 as Series, indexYear, tStart, tEnd, opt);
             }
             else
             {
@@ -22418,7 +22440,46 @@ namespace Gekko
             }
 
             return m;
+        }
 
+
+        /// <summary>
+        /// EXtracts two strings from for instance "ab-cd" --> "ab" and "cd". The resulting strings may become null.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        private static LaspeyresOptions GetLaspeyresOptions(IVariable options, string function)
+        {
+            string o1 = null; //annualoverlap
+            string o2 = null; //0-handling            
+            if (options != null)
+            {
+                string sOptions = O.ConvertToString(options);
+                if (!G.NullOrBlanks(sOptions))
+                {
+                    string[] ss = sOptions.Split('-');
+                    if (ss.Length == 1) o1 = ss[0];
+                    else if (ss.Length == 2) { o1 = ss[0]; o2 = ss[1]; }
+                    else new Error("Did not expect more than one '-' in " + function + "() option");
+                }
+            }
+            LaspeyresOptions o = new LaspeyresOptions();
+            if (o1 != null)
+            {
+                if (G.Equal(o1, "annualoverlap")) o.annualOverlap = true;
+                else if (G.Equal(o1, "zeros1")) o.zeros1 = true;
+                else if (G.Equal(o1, "zeros2")) o.zeros2 = true;
+                else new Error("Expected option 'annualoverlap', 'zeros1' or 'zeros2', not '" + o1 + "'");
+            }
+            if (o2 != null)
+            {
+                if (G.Equal(o2, "annualoverlap")) o.annualOverlap = true;
+                else if (G.Equal(o2, "zeros1")) o.zeros1 = true;
+                else if (G.Equal(o2, "zeros2")) o.zeros2 = true;
+                else new Error("Expected option 'annualoverlap', 'zeros1' or 'zeros2', not '" + o2 + "'");
+            }
+            return o;
         }
 
         private static int LaspeyresGetStartPeriod(string function, double[,] aX, double[,] aP, int n, int obs)
@@ -22447,10 +22508,11 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        private static Map LaspeyresChainSeries(string function, Series value, Series valueAtLaggedPrices, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
+        private static Map LaspeyresChainSeries(string function, Series value, Series valueAtLaggedPrices, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd, LaspeyresOptions opt)
         {
             //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index.            
-            // -----
+            // -----                       
+
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
             if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
             GekkoTime tStart_real = GekkoTime.tNull;
@@ -22474,7 +22536,22 @@ namespace Gekko
                 double v1 = value.GetDataSimple(t);
                 double v2 = valueAtLaggedPrices.GetDataSimple(t);
                 double r = G.HandleNumericalError(v1 / v2);
-                if (Globals.handleZero)
+
+                if (opt.zeros1)
+                {
+                    if (v1 == 0d)
+                    {
+                        r = 1d;
+                    }
+                }
+                else if (opt.zeros2)
+                {
+                    if (v1 == 0d && v2 == 0d)
+                    {
+                        r = 1d;
+                    }
+                }
+                else if (Globals.handleZero)
                 {
                     if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
                     else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
