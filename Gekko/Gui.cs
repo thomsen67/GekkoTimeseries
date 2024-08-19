@@ -3010,6 +3010,7 @@ namespace Gekko
                 Program.CutPlot();
                 Program.CutDecomp1();
                 Program.CutDecomp2();
+                Program.CutTrace();
                 Program.CutPrint(print);
             }
             catch { }
@@ -3037,7 +3038,18 @@ namespace Gekko
             }
             catch { }
         }
-        
+
+        private void allTRACEToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //Close all decomp
+                Program.CutTrace();
+                Program.CutPrint(true);
+            }
+            catch { }
+        }
+
         private void cutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SendKeys.SendWait("^x");

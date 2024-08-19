@@ -1180,7 +1180,7 @@ namespace Gekko.Parser.Gek
                         string type = "null";
                         if (node[2].ChildrenCount() > 0) type = "O.ConvertToString(" + node[2][0].Code.ToString() + ")";
                         node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         GetCodeFromAllChildren(node, node[3]);  //options
                         node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -1193,7 +1193,7 @@ namespace Gekko.Parser.Gek
                         node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
                         if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".indicator = " + node[2][0].Code + ";" + G.NL);
                         if (node[3].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".type = " + "O.ConvertToString(" + node[3][0][0].Code.ToString() + ")" + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -1269,7 +1269,7 @@ namespace Gekko.Parser.Gek
                         if (node[0][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[0][0].Text + "`;");
                         GetCodeFromAllChildren(node, node[1]);
                         node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -2818,7 +2818,7 @@ namespace Gekko.Parser.Gek
                         if (node[2] != null) node.Code.A(node[2].Code); //px file dump
                         if (node[3] != null) node.Code.A(node[3].Code); //options
                         node.Code.A("o" + Num(node) + ".p = p;");
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -2902,7 +2902,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".t2 = O.ConvertToDate(" + node[1][1].Code + ", O.GetDateChoices.Strict);" + G.NL);
                         }
                         if (node[2] != null) node.Code.A(node[2].Code);  //options
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -3407,7 +3407,7 @@ namespace Gekko.Parser.Gek
                                 //may be overwritten with explicit source
                                 //maybe later on introduce a #calc list with such meta information
                                 //sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
-                                sb.A("o" + Num(node) + ".opt_trace = @`" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
+                                sb.A("o" + Num(node) + ".opt_trace = @`" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true) + "`;" + G.NL);
                             }
 
                             string type = HandleVar(node[3].Text);  //2 is options   
@@ -4438,7 +4438,7 @@ ASTPLACEHOLDER [0]
                             node.Code.A("List<int> bankNumbers = null;" + G.NL);
                         }
 
-                        string givenLabel = null;
+                        string givenLabel = null;  //Is this used at all??? Remove in Gekko 4.0.
                         if (node.Text != "ASTTABLESETVALUESELEMENT")
                         {
                             if (node.specialExpressionAndLabelInfo[2] != "")
@@ -4534,7 +4534,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                         if (node[3] != null) node.Code.A(node[2].Code); //options
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -4561,7 +4561,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                         if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
                         if (node[0].ChildrenCount() > 0) node.Code.A(node[0][0].Code);  //method option
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -4576,7 +4576,7 @@ ASTPLACEHOLDER [0]
                         {                            
                             node.Code.A("o" + Num(node) + ".rhs.Add(" + node[i].Code + ");" + G.NL);
                         }
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -4632,7 +4632,7 @@ ASTPLACEHOLDER [0]
                         bool isLoop = node.listLoopAnchor != null && node.listLoopAnchor.Count > 0;
                         isLoop = true;
 
-                        node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
 
                         string methodName = "Evalcode" + ++Globals.counter;
 
@@ -4682,7 +4682,7 @@ ASTPLACEHOLDER [0]
                         // Old DECOMP, will be obsolete
                         //
                         node.Code.A("O.Decomp1 o" + Num(node) + " = new O.Decomp1();" + G.NL);
-                        node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         GetCodeFromAllChildren(node);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -4740,7 +4740,7 @@ ASTPLACEHOLDER [0]
                     {
                         node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);
                         node.Code.A("o" + Num(node) + ".type = @`" + node.Text + "`;" + G.NL);
-                        node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         GetCodeFromAllChildren(node);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -4854,7 +4854,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("O.Read o" + Num(node) + " = new O.Read();" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         GetCodeFromAllChildren(node);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -5028,7 +5028,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A(node[0].Code);  //options
                         GetCodeFromAllChildren(node, node[0]);  //options
                         node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }

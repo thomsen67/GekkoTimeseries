@@ -862,6 +862,25 @@ namespace Gekko
             catch { };  //fail silently
         }
 
+        delegate void CloseTraceCallback(WindowTreeViewWithTable w);
+        public static void CloseTrace(WindowTreeViewWithTable w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new CloseTraceCallback(CloseTrace), new object[] { w });
+                }
+                else
+                {                    
+                    Globals.ch.windowsTraceCloseCounter++;
+                    w.Close();
+                }
+            }
+            catch { };  //fail silently
+        }
+
         //weird delegate pattern, but it works!
         delegate void GetDecompSizesCallback(WindowDecomp w);
         public static void GetDecompSizes(WindowDecomp w)

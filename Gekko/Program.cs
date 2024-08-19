@@ -2457,7 +2457,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
+        {            
             if (Globals.runningOnTTComputer && text == "w")
             {
                 
@@ -9977,6 +9977,10 @@ namespace Gekko
                 i++;
             }
             foreach (WindowDecomp g in Globals.windowsDecomp2)
+            {
+                i++;
+            }
+            foreach (WindowTreeViewWithTable g in Globals.windowsTrace)
             {
                 i++;
             }
@@ -20850,11 +20854,12 @@ namespace Gekko
 
         public static void CutPrint(bool print)
         {
-            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
+            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter + Globals.ch.windowsTraceCloseCounter > 0)
             {
                 G.Writeln();
-                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT window" + G.S(Globals.ch.windowsGraphCloseCounter));
+                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP window" + G.S(Globals.ch.windowsDecompCloseCounter));
+                if (Globals.ch.windowsTraceCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsTraceCloseCounter + " TRACE windows" + G.S(Globals.ch.windowsTraceCloseCounter));
             }
         }
 
@@ -20893,6 +20898,18 @@ namespace Gekko
                 CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
             }
             Globals.windowsGraph = new List<Graph>();
+        }
+
+        public static void CutTrace()
+        {
+            List<WindowTreeViewWithTable> windowsTrace = new List<WindowTreeViewWithTable>();
+            windowsTrace.AddRange(Globals.windowsTrace);
+            for (int i = 0; i < windowsTrace.Count; i++)
+            {
+                if (windowsTrace[i] == null) continue;
+                CrossThreadStuff.CloseTrace(windowsTrace[i]);  //fails silently
+            }
+            Globals.windowsTrace = new List<WindowTreeViewWithTable>();
         }
 
         /// <summary>

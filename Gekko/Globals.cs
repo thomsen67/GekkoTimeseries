@@ -714,6 +714,7 @@ namespace Gekko
         public static List<Graph> windowsGraph = new List<Graph>();
         public static List<Window1> windowsDecomp = new List<Window1>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
+        public static List<WindowTreeViewWithTable> windowsTrace = new List<WindowTreeViewWithTable>();
         public static CounterHelper ch = new CounterHelper();
 
         public static string helpStartPage = "introduction";
@@ -1038,5 +1039,6 @@ namespace Gekko
         public int windowsDecompUpdateCounter = 0;
         public int windowsGraphUpdateFailedCounter = 0;
         public int windowsDecompUpdateFailedCounter = 0;
+        public int windowsTraceCloseCounter = 0;
     }
 }

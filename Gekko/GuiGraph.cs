@@ -551,8 +551,7 @@ namespace Gekko
             {
                 if (Globals.windowsGraph != null && this != null) Globals.windowsGraph.Remove(this);
             }
-            catch { }
-            
+            catch { }            
         }
     }
 

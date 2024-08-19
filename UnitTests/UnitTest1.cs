@@ -32331,15 +32331,24 @@ print(df2)
         {
             //-----------------------------------------------------------
             //----------------- testing quarterly model -----------------
-            //----------------- also tests data for DJZ-vars ------------
+            //----------------- Also tests data for DJZ-vars ------------
+            //----------------- It has been tested (by printing) that 
+            //----------------- traces are only updated when variables
+            //----------------- change values.
             //-----------------------------------------------------------
+            //
+            //frml _i y = c + i + g(-1);
+            //frml _gjrd c = 0.4 * y + 0.4 * y(-1);
+            //
+
             I("RESET;");
             I("OPTION freq q;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("model lilleq;");
             I("read lilleq;");
+            //I("prt <1999q4 2001q2 n> y, c, i, g;");
             I("time 2000q1 2001q1;");
-            I("SIM;");
+            I("sim;");
 
             double delta = 0.001d;
 
@@ -32394,12 +32403,25 @@ print(df2)
             _AssertSeries(First(), "jrc", EFreq.Q, 2001, 2, double.NaN, delta);
 
             _AssertSeries(First(), "zc", EFreq.Q, 1999, 4, double.NaN, delta);
-            _AssertSeries(First(), "c", EFreq.Q, 2000, 1, 200d, delta);
-            _AssertSeries(First(), "c", EFreq.Q, 2000, 2, 400d, delta);
-            _AssertSeries(First(), "c", EFreq.Q, 2000, 3, 533.3333d, delta);
-            _AssertSeries(First(), "c", EFreq.Q, 2000, 4, 622.2222d, delta);
-            _AssertSeries(First(), "c", EFreq.Q, 2001, 1, 681.4815d, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 2000, 1, 200d, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 2000, 2, 400d, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 2000, 3, 533.3333d, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 2000, 4, 622.2222d, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 2001, 1, 681.4815d, delta);
             _AssertSeries(First(), "zc", EFreq.Q, 2001, 2, double.NaN, delta);
+            //I("prt <1999q4 2001q2 n> y, c, i, g, dc, zc, jrc;");
+            I("dc = 1; zc += 100;");
+            I("sim;");            
+            //I("prt <1999q4 2001q2 n> y, c, i, g, dc, zc, jrc;");
+            I("dc = 0;");
+            I("sim;");
+            _AssertSeries(First(), "c", EFreq.Q, 1999, 4, 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 1, 200d + 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 2, 400d + 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 3, 533.3333d + 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 4, 622.2222d + 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2001, 1, 681.4815d + 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2001, 2, double.NaN, delta);
 
         }
 

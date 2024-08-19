@@ -793,6 +793,11 @@ namespace Gekko
             //DataGridRow row = sender as DataGridRow;			
             //Item xx = row.Item as Item;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Globals.windowsTrace != null && this != null) Globals.windowsTrace.Remove(this);
+        }
     }
 
     

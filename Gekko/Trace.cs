@@ -1247,6 +1247,7 @@ namespace Gekko
                     }
 
                     WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                    Globals.windowsTrace.Add(w);
                     w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
                     string v = null;
                     if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";

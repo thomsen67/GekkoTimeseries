@@ -4226,12 +4226,23 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="handleDoubleQuote"></param>
+        /// <returns></returns>
+        public static string ReplaceGlueSymbols(string s)
+        {
+            return ReplaceGlueSymbols(s, false);
+        }
+
+        /// <summary>
         /// Internal method. Before a .gcm file is parsed, some "glue" symbols are added to aid parsing. These are removed here.
         /// Use to transform parser errors containing parts of the .gcm code.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string ReplaceGlueSymbols(string s)
+        public static string ReplaceGlueSymbols(string s, bool handleDoubleQuote)
         {
             //See replacement in new errors: #9j5n34jererjn
             if (s == null) return s;
@@ -4248,6 +4259,11 @@ namespace Gekko
             s = Regex.Replace(s, "s___eries", "series", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____er", "ser", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____eries", "series", RegexOptions.IgnoreCase);
+
+            if (handleDoubleQuote)
+            {
+                s = G.HandleQuoteInQuote(s);
+            }
 
             return s;
         }

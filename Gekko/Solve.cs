@@ -1863,7 +1863,7 @@ namespace Gekko
                         if (Program.model.modelGekko.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
                         {
                             //should change according to b[] arrays, but does not get written back.
-                            string var = Program.model.modelGekko.varsBTypeInverted[i];                            
+                            string var = Program.model.modelGekko.varsBTypeInverted[i];
                             new Error("While backwriting from SIM command -- please report this error to the Gekko editor. Variable: " + var);
                         }
                     }
@@ -2059,7 +2059,7 @@ namespace Gekko
             //TODO: this loop could be speed-optimized. Having the list of Series pre-done would help,
             //      instead of this looping. Maybe even a list of pointers to x[]-arrays pre-done.
             //      But still, reading in and out of a[] is not that costly.
-            //      HMM, is the loop also writing back exogenous vars?
+            //      HMM, is the loop also writing back exogenous vars? Probably so.
             if (!work.editable)
             {
                 //NB: This check is here, to avoid having to do it for each timeseries later on.
@@ -2068,70 +2068,81 @@ namespace Gekko
                 new Error("You are trying to simulate with a first-position databank ('" + work.name + "') that is non-editable");
             }
             DateTime dt4 = DateTime.Now;
+            int obsDiff = obsWithLags - obsSimPeriod;
 
-            //string s = O.ShowDatesAsString(tStart, tEnd);
             string src = "Solve (sim) " + Path.GetFileName(Program.model.modelGekko.modelInfo.fileName) + ", hash = " + Program.model.modelGekko.modelHashTrue + "";    //string stamp = Program.GetDateStampCache();
             foreach (ATypeData atd in Program.model.modelGekko.varsAType.Values)
             {
-                string var = atd.varName;
+                string variableName = atd.varName;
                 int id = atd.aNumber;
-                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), true) as Series;  //Could have an A-array with Series... . This is conceptually a RHS variable assignment (Trace())
+                Series ts = work.GetIVariable(variableName + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), true) as Series;  //Could have an A-array with Series... . This is conceptually a RHS variable assignment (Trace())
 
-                if (ts == null && SolveCommon.IsDjz(var))
+                if (ts == null && SolveCommon.IsDjz(variableName))
                 {
                     //can be autocreated, this probably will never happen, since it is already created,
                     //see #7235432894539
-                    ts = new Series(Program.options.freq, var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq));
-                    work.AddIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), ts);
+                    ts = new Series(Program.options.freq, variableName + Globals.freqIndicator + G.ConvertFreq(Program.options.freq));
+                    work.AddIVariable(variableName + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), ts);
                 }
 
                 //??? what if above is null??? << create it if djz?
                 int index1 = -12345;
                 int index2 = -12345;
                 double[] x_beware_if_changed = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);  //do not optionally change NaN to 0 here
+                int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
 
                 //#98726527
 
-                int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
-                Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x_beware_if_changed, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
-                if (bNumberPointers != null)
+                bool hasChanged = false;  //only used/changed if Program.options.databank_trace == true
+                try  //remove this try in Gekko 4.0
                 {
-                    int b = bNumberPointers[id];
-                    if (b != -12345)
+                    for (int i = 0; i < length; i++)
                     {
-                        if (endoNoLagPointers[b] == 1)
+                        //This takes some time to check for exogeneous variables over a long period.
+                        //But we avoid a lot of complications regarding which variables are free to
+                        //change and which are not.
+                        double d1 = a[id, obsDiff + i];
+                        double d2 = x_beware_if_changed[index1 + i];
+                        if (!G.Equals(d1, d2))  //Handles missings                        
                         {
-                            if (Program.options.databank_trace)
-                            {
-                                try
-                                {
-                                    DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                                    Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
-                                    trace.GetContents().text = src;
-                                    trace.GetContents().name = ts.GetNameAndParentDatabank();
-                                    trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                    //trace can only have null period if SIM period is null --> not possible
-                                    Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling, false);
-                                    Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
-                                }
-                                catch
-                                {
-                                    new Error(Globals.traceError);
-                                }
-                            }
-                                                    
-                            //ts.meta.source = src;
-                            ts.Stamp();
-                            ts.SetDirty(true);
-                        }
-                        else
-                        {
-                            //do nothing
+                            hasChanged = true;
+                            break;  //important to break to avoid too much checking
                         }
                     }
                 }
+                catch { }
+
+                //Use normal array copy (without "8") for Gekko 4.0, this is not faster!
+                Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * obsDiff, x_beware_if_changed, 8 * index1, 8 * length); //TODO: what if out of bounds regarding x???
+
+                if (hasChanged)
+                {
+                    if (Program.options.databank_trace)
+                    {
+                        try
+                        {
+                            DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                            Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
+                            trace.GetContents().text = src;
+                            trace.GetContents().name = ts.GetNameAndParentDatabank();
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            //trace can only have null period if SIM period is null --> not possible
+                            Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling, false);
+                            Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        }
+                        catch
+                        {
+                            new Error(Globals.traceError);
+                        }
+                    }
+
+                    //ts.meta.source = src;
+                    ts.Stamp();
+                    ts.SetDirty(true);
+                }
+
+                if (debug) G.WritelnGray("reading back from a[]: " + (DateTime.Now - dt4).TotalMilliseconds / 1000d);
             }
-            if (debug) G.WritelnGray("reading back from a[]: " + (DateTime.Now - dt4).TotalMilliseconds / 1000d);
         }
     }
 

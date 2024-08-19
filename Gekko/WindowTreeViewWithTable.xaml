@@ -5,7 +5,8 @@
 	x:Class="Gekko.WindowTreeViewWithTable"
 	Width="800"
 	Height="600"
-	WindowStartupLocation="CenterScreen">    
+	WindowStartupLocation="CenterScreen"
+    Closing="Window_Closing">
 
     <Window.Resources>
         <GridLength x:Key="TreeToggleWidth">20</GridLength>        

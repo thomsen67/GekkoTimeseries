@@ -1710,6 +1710,12 @@ namespace Gekko.Parser.Gek
                     //#0osjfsk123
                     string[] ss = ast.Text.Split(Globals.parserExpressionSeparator);                    
                     cmdNode.Text = G.ReplaceGlueSymbols(ss[0]);
+                    if (true)
+                    {
+                        //Here, we COULD remove comments like "//" or "/* ... */, from ss[1] used in tracing etc
+                        //But we abstain for now, would need some splitting and parsing.
+                        //A simple line like "y = 2 * x;" //comment will not show the comment part. Probably only multilines etc.
+                    }
                     cmdNode.specialExpressionAndLabelInfo = ss;
                 }
             }
