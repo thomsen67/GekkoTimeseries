@@ -8831,6 +8831,95 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_RepStar()
+        {
+
+            for (int i = 0; i < 2; i++)
+            {
+                string star = "*";
+                if (i == 0) star = "3";
+
+                I("reset; option freq q; time 2001 2002;");
+                I("x = 1, 2, 3, 4 rep 2, 5 rep " + star + ";");  //1, 2, 3, 4, 4, 5, 5, 5
+                Test1();
+
+                I("reset; option freq q; time 2000 2003;");
+                I("x <2001q1 2002q4> = 1, 2, 3, 4 rep 2, 5 rep " + star + ";");
+                Test1();
+
+                I("reset; option freq q; time 2000 2003;");
+                I("x <2001 2002> = 1, 2, 3, 4 rep 2, 5 rep " + star + ";");
+                Test1();
+
+                // -------------- with += --------------------------
+
+                I("reset; option freq q; time 2001 2002;");
+                I("x <2001 2002> = 100;");
+                I("x += 1, 2, 3, 4 rep 2, 5 rep " + star + ";");  //101, 102, 103, 104, 104, 105, 105, 105
+                Test2();
+
+                I("reset; option freq q; time 2000 2003;");
+                I("x <2001 2002> = 100;");
+                I("x <2001q1 2002q4> += 1, 2, 3, 4 rep 2, 5 rep " + star + ";");
+                Test2();
+
+                I("reset; option freq q; time 2000 2003;");
+                I("x <2001 2002> = 100;");
+                I("x <2001 2002> += 1, 2, 3, 4 rep 2, 5 rep " + star + ";");
+                Test2();
+
+                // -------------- with + --------------------------
+
+                I("reset; option freq q; time 2001 2002;");
+                I("x <2001 2002> = 100;");
+                I("x = x + (1, 2, 3, 4 rep 2, 5 rep " + star + ");");  //101, 102, 103, 104, 104, 105, 105, 105
+                Test2();
+
+                I("reset; option freq q; time 2000 2003;");
+                I("x <2001 2002> = 100;");
+                I("x <2001q1 2002q4> = x + (1, 2, 3, 4 rep 2, 5 rep " + star + ");");
+                Test2();
+
+                I("reset; option freq q; time 2000 2003;");
+                I("x <2001 2002> = 100;");
+                I("x <2001 2002> = x + (1, 2, 3, 4 rep 2, 5 rep " + star + ");");
+                Test2();
+            }
+
+            I("reset; option freq a; time 2000 2010;");
+            I("#m = (1, 2, 3, 4 rep 2, 5 rep *);");  //rep * is just ignored for non-series calculations
+            _AssertListSize(First(), "#m", 6);            
+
+            void Test1() 
+            {
+                _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 1d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 2d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 3d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 4d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 4d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 5d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 5d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 5d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, double.NaN, sharedDelta);
+            }
+
+            void Test2()
+            {
+                _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 101d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 102d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 103d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 104d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 104d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 105d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 105d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 105d, sharedDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, double.NaN, sharedDelta);
+            }
+        }
+
+        [TestMethod]
         public void _Test_Cache_Matrix()
         {
             //When using cache, remember to use BeforeProtobufWrite() and AfterProtobufRead(),

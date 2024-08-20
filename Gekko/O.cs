@@ -1847,13 +1847,11 @@ namespace Gekko
                         if (i + 2 < x.Length)
                         {
                             new Error("You can only use 'REP *' on the last element in a list");
-                            //throw new GekkoException();
                         }
                         ScalarVal sv = iv as ScalarVal;
                         if (sv == null)
                         {
                             new Error("You can only use 'REP *' toghether with values");
-                            //throw new GekkoException();
                         }
                         ScalarVal sv2 = new ScalarVal(sv.val);
                         sv2.hasRepStar = true;

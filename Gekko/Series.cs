@@ -1980,18 +1980,50 @@ namespace Gekko
                 {
                     //For instance y = x + (1, 2, 3), returns a series light for (1, 2, 3), over local sample, and with same freq as sample
                     List x2_list = x2 as List;
-                    if (x2_list.Count() != smpl.Observations12())
+
+                    bool hasRepStar = false;
+                    if (x2_list.Count() > 0)
                     {
-                        new Error("List with " + x2_list.Count() + " elements, expected " + smpl.Observations12() + " elements corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
-                        //throw new GekkoException();
+                        ScalarVal last = x2_list.list[x2_list.Count() - 1] as ScalarVal;  //last one
+                        if (last != null)
+                        {
+                            hasRepStar = last.hasRepStar;
+                        }
                     }
-                    Series ts = new Series(ESeriesType.Light, smpl.t1.Add(-Globals.smplOffset), smpl.t2); //new series light
+
+                    GekkoTime t1 = smpl.t1;
+                    GekkoTime t2 = smpl.t2;
+                    if (O.UseFlexFreq(t1, t2, x1.freq)) O.Helper_Convert12(smpl, x1.freq, out t1, out t2);
+
+                    if (hasRepStar)
+                    {
+                        if (x2_list.Count() > GekkoTime.Observations(t1, t2))
+                        {
+                            new Error("List with " + x2_list.Count() + " elements and 'rep *', expected at most " + GekkoTime.Observations(t1, t2) + " elements corresponding to " + t1.ToString() + "-" + t2.ToString());
+                        }
+                    }
+                    else
+                    {
+                        if (x2_list.Count() != GekkoTime.Observations(t1, t2))
+                        {
+                            new Error("List with " + x2_list.Count() + " elements, expected " + GekkoTime.Observations(t1, t2) + " elements corresponding to " + t1.ToString() + "-" + t2.ToString());
+                        }
+                    }
+
+                    Series ts = new Series(ESeriesType.Light, t1.Add(-Globals.smplOffset), t2); //new series light
                     int i = -1;
-                    foreach (GekkoTime t in smpl.Iterate12())
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                     {
                         i++;
-                        double d = x2_list.list[i].ConvertToVal();
-                        ts.SetData(t, d);
+                        if (hasRepStar && i >= x2_list.Count()) //hasRepStar can only be true if list has at least 1 element.
+                        {
+                            ts.SetData(t, x2_list.list[x2_list.Count() - 1].ConvertToVal());
+                        }
+                        else
+                        {
+                            double d = x2_list.list[i].ConvertToVal();                            
+                            ts.SetData(t, d);
+                        }
                     }
                     x2_series = ts;
                 }
