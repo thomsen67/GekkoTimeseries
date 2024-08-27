@@ -3936,7 +3936,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// First argument always "x.y"! Used for the warning pool. Second argument may be null.
+        /// First argument always "w{x}.{y}"! Used for the warning pool. Second argument may be null.
         /// </summary>
         /// <param name="typeId"></param>
         /// <param name="s"></param>

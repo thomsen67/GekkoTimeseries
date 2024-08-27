@@ -3246,9 +3246,9 @@ namespace Gekko
             {
                 new Note("'OPTION gams time detect_auto = yes' ignored in 'OPTION gams fast = yes' mode");
             }
+            
             try
-            {
-                
+            {                
                 string msg = string.Empty;
                 string producer = string.Empty;
                 int errNr = 0;
@@ -3269,21 +3269,29 @@ namespace Gekko
                 List<string> paramsWithoutTimeDimensionCounter = new List<string>();
                 List<string> varsWithoutTimeDimensionCounter = new List<string>();
 
-                gdxcs gdx = new gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
-                if (msg != string.Empty)
+                gdxcs gdx = null;
+                try
                 {
-                    new Error("Could not load GDX library. Message: " + msg, false);
+                    gdx = new gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
+                }
+                catch
+                {
+                    new Error("Could not create GAMS/gdx environment", false);
                     GdxErrorMessage();
                     throw new GekkoException();
                 }
+                
+                if (msg != string.Empty)
+                {
+                    G.Warning("w36.2", null);
+                }
+
                 if (true)
                 {
                     rc = gdx.gdxOpenRead(file, ref errNr);
                     if (errNr != 0)
-                    {
-                        {
-                            new Error("gdx io error");
-                        }
+                    {                        
+                        new Error("gdx io error");                        
                     }
                     int timeIndex = -12345;
                     int uelCount = -1; int uelHighest = -1;
@@ -3347,7 +3355,7 @@ namespace Gekko
                             
                             if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                             {
-                                new Error("gdx error");
+                                new Error("Gdx error, starting the reader");
                             }
                             
                             while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
@@ -3415,7 +3423,7 @@ namespace Gekko
                                     for (d = 0; d < gdxDimensions; d++) couldBeTime[d] = null;
 
                                     //Tasting the variable/parameter to see if time is there...
-                                    if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) new Error("gdx error");
+                                    if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) new Error("Gdx error, starting the reader");
                                     while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                                     {
                                         //a new record
@@ -3484,7 +3492,7 @@ namespace Gekko
                                 else if (varType == 2) varsWithoutTimeDimensionCounter.Add(varName);
                             }
 
-                            if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) new Error("gdx error");                            
+                            if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) new Error("Gdx error, starting the reader");                            
 
                             int hasTimeDimension = 0;
                             if (timeDimNr != -12345) hasTimeDimension = 1;
@@ -3798,12 +3806,12 @@ namespace Gekko
                 errNr = gdx.gdxClose();
                 if (errNr != 0)
                 {
-                    new Error("gdx io error");
+                    new Error("Gdx io error");
                 }
             }
             catch (Exception e)
             {
-                new Error("GDX import failed with an unexpected error.");
+                new Error("The external GAMS gdx reader failed with an unexpected error.");
             }
         }
 
@@ -3821,47 +3829,48 @@ namespace Gekko
             gekkoDimensions = gdxDimensions - hasTimeDimension;
             isMultiDim = true;
             if (gekkoDimensions == 0) isMultiDim = false;
-        }        
+        }
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
 
-            DateTime t = DateTime.Now;
-            double[] gdxValues = G.CreateArrayDouble(gamsglobals.val_max, 0d);
-            gdxValues[gamsglobals.val_scale] = 1d;
-
-            string prefix = Program.options.gams_time_prefix.Trim().ToLower();
-            bool hasPrefix = prefix.Length > 0;
-            //string file = AddExtension(file2, "." + "gdx");
-            int offset = (int)Program.options.gams_time_offset;
-            DateTime dt1 = DateTime.Now;
-            int skippedSets = 0;
-            int exportedSets = 0;
-            int counterVariables = 0;
-            int counterParameters = 0;
-            int yearMax = int.MinValue;
-            int yearMin = int.MaxValue;
-
-            string gamsDir = null; GAMSWorkspace ws = null;
-            GetGAMSWorkspace(ref gamsDir, ref ws);
-
-            EFreq freq = EFreq.A;
-            if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.U;
-            else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Q;
-            else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.M;
-
-            double[] d = new double[1];  //used for sets
-
-            int syCnt = 0, uelCnt = 0;
-
-            //GAMSWorkspace ws = null;
-
-            List<string> timelessProblems = new List<string>();  //only used in rare cases
-
-            if (true)
+            try
             {
+
+                DateTime t = DateTime.Now;
+                double[] gdxValues = G.CreateArrayDouble(gamsglobals.val_max, 0d);
+                gdxValues[gamsglobals.val_scale] = 1d;
+
+                string prefix = Program.options.gams_time_prefix.Trim().ToLower();
+                bool hasPrefix = prefix.Length > 0;
+                //string file = AddExtension(file2, "." + "gdx");
+                int offset = (int)Program.options.gams_time_offset;
+                DateTime dt1 = DateTime.Now;
+                int skippedSets = 0;
+                int exportedSets = 0;
+                int counterVariables = 0;
+                int counterParameters = 0;
+                int yearMax = int.MinValue;
+                int yearMin = int.MaxValue;
+
+                string gamsDir = null; GAMSWorkspace ws = null;
+                GetGAMSWorkspace(ref gamsDir, ref ws);
+
+                EFreq freq = EFreq.A;
+                if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.U;
+                else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Q;
+                else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.M;
+
+                double[] d = new double[1];  //used for sets
+
+                int syCnt = 0, uelCnt = 0;
+
+                //GAMSWorkspace ws = null;
+
+                List<string> timelessProblems = new List<string>();  //only used in rare cases
+
                 string Msg = string.Empty;
 
                 string Sysdir;
@@ -3878,32 +3887,33 @@ namespace Gekko
                 int VarTyp = 0;
                 int D;
 
-                gdxcs gdx = new gdxcs(gamsDir, ref Msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
-                //GdxFast gdx = new gdxcs(Sysdir, ref Msg);
+                gdxcs gdx = null;
+
+                try
+                {
+                    gdx = new gdxcs(gamsDir, ref Msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...) //GdxFast gdx = new gdxcs(Sysdir, ref Msg);
+                }
+                catch
+                {
+                    new Error("Could not create GAMS/gdx environment", false);
+                    GdxErrorMessage();
+                    throw new GekkoException();
+                }
+
                 if (Msg != string.Empty)
                 {
-                    if (false)
-                    {
-                        Console.WriteLine("**** Could not load GDX library");
-                        Console.WriteLine("**** " + Msg);
-                    }
+                    G.Warning("w43.1", null);
                 }
-                gdx.gdxGetDLLVersion(ref Msg);
-                if (false)
-                {
-                    Console.WriteLine("Using GDX DLL version: " + Msg);
-                }                
 
                 if (true)
-                {                    
+                {
 
                     gdx.gdxOpenWrite(pathAndFilename, "Gekko", ref ErrNr);
                     if (ErrNr != 0)
                     {
-                        //xp_example1.ReportIOError(ErrNr);
                         new Error("GAMS gdx write error number " + ErrNr);
                     }
-                    //int counter = 0;
+
                     foreach (ToFrom bnv in list)
                     {
                         string inputVariableName = bnv.s1;
@@ -3993,8 +4003,8 @@ namespace Gekko
                             //counter++;
 
                             //Choose if the (array)series is a variable or parameter (in GAMS sense).
-                            int dt_ = gamsglobals.dt_var;                            
-                            if (ts.meta != null && ts.meta.fix == EFixedType.Parameter) dt_ = gamsglobals.dt_par;                            
+                            int dt_ = gamsglobals.dt_var;
+                            if (ts.meta != null && ts.meta.fix == EFixedType.Parameter) dt_ = gamsglobals.dt_par;
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, dt_, 0) == 0)
                             {
                                 new Error("Internal GAMS/gdx problem (variable '" + inputVariableName + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
@@ -4056,7 +4066,7 @@ namespace Gekko
 
                 ErrNr = gdx.gdxClose();
                 if (ErrNr != 0)
-                {                    
+                {
                     throw new GekkoException();
                 }
 
@@ -4088,6 +4098,10 @@ namespace Gekko
                     };
                     new Note(timelessProblems.Count + " timeless array-subseries were converted to normal timeseries (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
                 }
+            }
+            catch (Exception e)
+            {
+                new Error("The external GAMS gdx writer failed with an unexpected error.");
             }
         }
 
