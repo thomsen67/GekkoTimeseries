@@ -18520,7 +18520,7 @@ namespace UnitTests
         {
             // !
             // !
-            // !
+            // ! Large model
             // ! This also produces a gamsscalar.json for users. See the GAMS appendix in the help system.
             // !
             // !
@@ -18573,6 +18573,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_GAMSScalar2()
         {
+            //
+            // Small model
+            //
             Program.Flush();
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\Models\";

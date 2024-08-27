@@ -4380,7 +4380,7 @@ namespace Gekko
                 {
                     using (Error err = new Error())
                     {
-                        err.MainAdd("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
+                        err.MainAdd("*** ERROR: Gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
                         err.MainNewLineTight();
                         err.MainAdd("Technical error:");
                         err.MainNewLineTight();
