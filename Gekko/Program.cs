@@ -9423,10 +9423,9 @@ namespace Gekko
             string varName = G.Chop_GetName(name); // ts.name;
             if (isCaps) varName = varName.ToUpper();
 
-            if (ts.freq == EFreq.A)
+            if (ts.freq != EFreq.A)
             {
                 new Error("WRITE <tsp> only implemented for annual data");
-                //throw new GekkoException();
             }
 
             res.WriteLine("smpl " + per1.super + " " + per2.super + ";");
