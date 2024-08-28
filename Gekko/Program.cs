@@ -2460,7 +2460,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
-                bool adam = true;
+                bool adam = false;
 
                 if (adam)
                 {
@@ -2487,7 +2487,7 @@ namespace Gekko
                     o.t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
                 }
                 o.opt_prtcode = O.ConvertToString((new ScalarString("d")));
-                
+
                 Model model = Program.model;
 
                 G.CheckLegalPeriod(o.t1, o.t2);
@@ -2536,12 +2536,37 @@ namespace Gekko
                 for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
 
                 model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
-                Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
+                //Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
 
 
+
+
+
+                DecompFind decompFind = o.decompFind;
+                WindowDecomp windowDecomp = null;
+
+                windowDecomp = new WindowDecomp(decompFind);
+                windowDecomp.decompFind.SetWindow(windowDecomp);
+                Globals.windowsDecomp2.Add(windowDecomp);
+                windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+                windowDecomp.SetRadioButtons();
+                windowDecomp.isInitializing = false;
+
+                if (true)
+                {
+                    windowDecomp.RecalcCellsWithNewTypeHelper(decompFind.model);
+                    decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
+                    windowDecomp.ShowDialog();
+                }
+                else
+                {
+                    GekkoTime per1 = decompOptions2.t1;
+                    GekkoTime per2 = decompOptions2.t2;
+                    GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+                    DecompDatas dd = new DecompDatas();
+                    DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, decompFind.decompOptions2, ref dd, decompFind.model);
+                }               
                 
-
-
 
                 return;
 
@@ -2553,25 +2578,25 @@ namespace Gekko
 
 
 
-                Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
-                RunGekkoCommands("model<gms> makro.zip;", "", 0, new P());
-                RunGekkoCommands("read makro1;", "", 0, new P());
-                GekkoTime per1 = new GekkoTime(EFreq.A, 2030, 1, 1);
-                GekkoTime per2 = new GekkoTime(EFreq.A, 2035, 1, 1);
-                GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-                DecompOptions2 do2 = new DecompOptions2();
-                DecompFind df = new DecompFind(EDecompFindNavigation.Decomp, 0, do2, null, model);
-                df.decompOptions2.new_from = new List<string>() { "e_qbnp" };
-                df.decompOptions2.new_select = new List<string>() { "qbnp" };
-                df.decompOptions2.new_endo = new List<string>() { "qbnp" };
-                df.decompOptions2.decompOperator = new DecompOperator();
-                df.decompOptions2.decompOperator.isRaw = false;
-                df.decompOptions2.decompOperator.type = Gekko.Decomp.EContribType.D;
-                df.decompOptions2.decompOperator.lowLevel = Gekko.Decomp.ELowLevel.OnlyQuo;
-                DecompDatas dd = new DecompDatas();
-                //dd.MAIN_data = new DecompData();
-                model.modelGamsScalar.MaybeLoadDataIntoModel(df.depth, do2.t1, do2.t2);
-                DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, df.decompOptions2, ref dd, Program.model);
+                //Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                //RunGekkoCommands("model<gms> makro.zip;", "", 0, new P());
+                //RunGekkoCommands("read makro1;", "", 0, new P());
+                //GekkoTime per1 = new GekkoTime(EFreq.A, 2030, 1, 1);
+                //GekkoTime per2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+                //GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+                //DecompOptions2 do2 = new DecompOptions2();
+                //DecompFind df = new DecompFind(EDecompFindNavigation.Decomp, 0, do2, null, model);
+                //df.decompOptions2.new_from = new List<string>() { "e_qbnp" };
+                //df.decompOptions2.new_select = new List<string>() { "qbnp" };
+                //df.decompOptions2.new_endo = new List<string>() { "qbnp" };
+                //df.decompOptions2.decompOperator = new DecompOperator();
+                //df.decompOptions2.decompOperator.isRaw = false;
+                //df.decompOptions2.decompOperator.type = Gekko.Decomp.EContribType.D;
+                //df.decompOptions2.decompOperator.lowLevel = Gekko.Decomp.ELowLevel.OnlyQuo;
+                //DecompDatas dd = new DecompDatas();
+                ////dd.MAIN_data = new DecompData();
+                //model.modelGamsScalar.MaybeLoadDataIntoModel(df.depth, do2.t1, do2.t2);
+                //DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, df.decompOptions2, ref dd, Program.model);
 
 
 

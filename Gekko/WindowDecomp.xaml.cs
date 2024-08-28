@@ -1949,7 +1949,7 @@ namespace Gekko
             }
         }
 
-        private void RecalcCellsWithNewTypeHelper(Model model)
+        public void RecalcCellsWithNewTypeHelper(Model model)
         {
             this.decompFind.decompOptions2.code = this.decompFind.decompOptions2.ToCode();
             SetRadioButtonsDefaults();

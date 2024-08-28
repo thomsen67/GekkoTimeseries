@@ -2017,35 +2017,6 @@ namespace Gekko
                     }
                     else
                     {
-
-                        //if (Globals.runningOnTTComputer)
-                        //{
-                        //    if (Globals.decompWindowCounter == 0)
-                        //    {
-                        //        int dpiXb = 0;
-                        //        int dpiYb = 0;
-                        //        double scaleX = 0d;
-                        //        double scaleY = 0d;
-                        //        try
-                        //        {
-                        //            var dpiXProperty = typeof(System.Windows.SystemParameters).GetProperty("DpiX", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-                        //            var dpiYProperty = typeof(System.Windows.SystemParameters).GetProperty("Dpi", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-                        //            dpiXb = (int)dpiXProperty.GetValue(null, null);
-                        //            dpiYb = (int)dpiYProperty.GetValue(null, null);
-                        //            scaleX = (dpiXb / 96d) * 100d;
-                        //            scaleY = (dpiYb / 96d) * 100d;
-                        //        }
-                        //        catch
-                        //        {
-                        //            scaleX = 150d;  //seems pretty normal these days
-                        //            scaleY = 150d;
-                        //        }
-                        //        MessageBox.Show("Screen dpi x-scale = " + scaleX + "%, y-scale = " + scaleY + "%");
-
-                        //    }
-                        //    Globals.decompWindowCounter++;
-                        //}
-
                         windowDecomp.ShowDialog();
                         if (Globals.showDecompTable)
                         {
