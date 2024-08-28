@@ -2460,7 +2460,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
-                bool adam = false;
+                bool adam = true;
+                bool showGUI = false;
 
                 if (adam)
                 {
@@ -2493,23 +2494,9 @@ namespace Gekko
                 G.CheckLegalPeriod(o.t1, o.t2);
 
                 DecompOptions2 decompOptions2 = new DecompOptions2();
-                //decompOptions2.modelType = G.GetModelType();
-                //decompOptions2.showErrors = false; //
                 decompOptions2.t1 = o.t1;
                 decompOptions2.t2 = o.t2;
-                //decompOptions2.expressionOld = o.label;
-                //decompOptions2.expression = o.expression;
-                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
-                //if (G.Equal(o.opt_shares, "yes")) decompOptions2.isShares = true;
-                //if (G.Equal(o.opt_count, "yes") && G.Equal(o.opt_names, "yes")) new Error("You cannot use option <count> and <names> at the same time");
-                //if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;
-                //if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
-                //if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
-                //if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
-                //if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
-                //if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
-                //if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
-                //if (G.Equal(o.opt_expand, "yes")) decompOptions2.expand = true;
+                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());                
 
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
@@ -2521,13 +2508,13 @@ namespace Gekko
                 if (adam)
                 {
                     decompOptions2.new_select = new List<string>() { "fY" };
-                    decompOptions2.new_from = new List<string>() { "E_fY" };
+                    decompOptions2.new_from = new List<string>() { "e_fY" };  //small 'e'
                     decompOptions2.new_endo = new List<string>() { "fY" };
                 }
                 else
                 {
                     decompOptions2.new_select = new List<string>() { "qBNP" };
-                    decompOptions2.new_from = new List<string>() { "E_qBNP" };
+                    decompOptions2.new_from = new List<string>() { "e_qBNP" };  
                     decompOptions2.new_endo = new List<string>() { "qBNP" };
                 }
 
@@ -2538,22 +2525,17 @@ namespace Gekko
                 model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
                 //Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
 
+                // =========
 
-
-
-
-                DecompFind decompFind = o.decompFind;
-                WindowDecomp windowDecomp = null;
-
-                windowDecomp = new WindowDecomp(decompFind);
-                windowDecomp.decompFind.SetWindow(windowDecomp);
-                Globals.windowsDecomp2.Add(windowDecomp);
-                windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-                windowDecomp.SetRadioButtons();
-                windowDecomp.isInitializing = false;
-
-                if (true)
+                if (showGUI)
                 {
+                    DecompFind decompFind = o.decompFind;
+                    WindowDecomp windowDecomp = new WindowDecomp(decompFind);
+                    windowDecomp.decompFind.SetWindow(windowDecomp);
+                    Globals.windowsDecomp2.Add(windowDecomp);
+                    windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+                    windowDecomp.SetRadioButtons();
+                    windowDecomp.isInitializing = false;
                     windowDecomp.RecalcCellsWithNewTypeHelper(decompFind.model);
                     decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
                     windowDecomp.ShowDialog();
@@ -2563,9 +2545,94 @@ namespace Gekko
                     GekkoTime per1 = decompOptions2.t1;
                     GekkoTime per2 = decompOptions2.t2;
                     GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-                    DecompDatas dd = new DecompDatas();
-                    DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, decompFind.decompOptions2, ref dd, decompFind.model);
-                }               
+                    DecompDatas decompDatas = new DecompDatas();
+                    DecompOutput decompOutput2 = Gekko.Decomp.DecompMain(smpl, per1, per2, decompOptions2, ref decompDatas, model);
+
+                    GekkoTime gt1, gt2;
+                    Gekko.Decomp.DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
+
+                    DateTime t0 = DateTime.Now;
+
+                    Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
+
+                    int perLag = -2;
+                    string lhsString = "Expression value";
+                    int parentI = 0;
+
+                    int funcCounter = 0;
+                    
+                    Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, model.modelGamsScalar);
+                    
+                    if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+                    decompDatas.MAIN_data = null;
+
+                    if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
+
+                    List<string> expressionTexts = new List<string>();
+                    int ii = -1;
+                    foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+                    {
+                        ii++;
+                        string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
+
+                        int jj = -1;
+
+                        foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                        {
+                            jj++;  //will be = 0
+                            DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                            Gekko.Decomp.DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
+                        }
+                    }
+
+                    if (operatorOneOf3Types == Gekko.Decomp.EContribType.D) decompDatas.hasD = true;
+                    else if (operatorOneOf3Types == Gekko.Decomp.EContribType.RD) decompDatas.hasRD = true;
+                    else if (operatorOneOf3Types == Gekko.Decomp.EContribType.M) decompDatas.hasM = true;
+
+                    if (decompOptions2.link[parentI].varnames == null)
+                    {
+                        //does this ever happen?
+                        decompOptions2.link[parentI].varnames = Globals.decompResidualName;
+                    }
+
+                    bool[] used = new bool[decompDatas.storage.Count];
+                    used[0] = true;  //primary equation
+
+                    GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+                    //decomp period by period, showing lags/leads.
+
+                    if (decompOptions2.decompOperator.lowLevel == Gekko.Decomp.ELowLevel.BothQuoAndRef)  //<mp>
+                    {
+                        bool refreshObjects = true;
+                        foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                        {
+                            Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                            refreshObjects = false;
+                        }
+                        foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                        {
+                            Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                        }
+                    }
+                    else
+                    {
+                        int deduct = 0;
+                        //why deduct not enough??
+                        if (decompOptions2.decompOperator.isDoubleDifQuo || decompOptions2.decompOperator.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                        bool refreshObjects = true;
+                        foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
+                        {
+                            Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                            refreshObjects = false;
+                        }
+                    }
+
+                    DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
+
+                    DecompOutput decompOutput = Gekko.Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+
+                }
                 
 
                 return;

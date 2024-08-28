@@ -884,7 +884,7 @@ namespace Gekko
             return rv;
         }
 
-        private static void InitDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas, Model model)
+        public static void InitDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas, Model model)
         {
             decompDatas.storage = new List<List<DecompData>>();
             int ii = -1;
@@ -1242,7 +1242,7 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <param name="operatorOneOf3Types"></param>
         /// <param name="parentI"></param>
-        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
+        public static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
             GekkoDictionaryBlanks<int> endo = new GekkoDictionaryBlanks<int>();
             GekkoDictionaryBlanks<int> exo = new GekkoDictionaryBlanks<int>();
@@ -1626,7 +1626,7 @@ namespace Gekko
             return nul;
         }
 
-        private static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, int ii, int jj)
+        public static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, int ii, int jj)
         {
             MergeDecompDict(dd.cellsContribD, decompDatas.storage[ii][jj].cellsContribD);
             MergeDecompDict(dd.cellsContribDRef, decompDatas.storage[ii][jj].cellsContribDRef);

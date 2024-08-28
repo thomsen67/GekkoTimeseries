@@ -162,7 +162,7 @@ namespace Gekko
                 foreach (string eqName in eqNames)
                 {
                     if (eqName == null) continue;  //probably not necessary
-                    if (!eqName.StartsWith(Globals.gekkoEquationPrefix)) continue;
+                    if (!eqName.ToLower().StartsWith(Globals.gekkoEquationPrefix)) continue;
                     string s1 = null;
                     EquationHelper eh = Program.FindEquationByMeansOfVariableName(eqName.Substring(Globals.gekkoEquationPrefix.Length));
                     if (eh != null) s1 = eh.equationText + G.NL + G.NL;
