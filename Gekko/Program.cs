@@ -2457,38 +2457,104 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {            
-            if (Globals.runningOnTTComputer && text == "w")
+        {
+            if (Globals.runningOnTTComputer && text == "d")
             {
-                
-                G.Warning("w2.3", "Here is a warning1");
-                G.WarningInternal("This is bad!");
-                
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w2.1"))
-                {
-                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                    txt.MainAdd("WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW WWW ");
-                }
 
-                G.Warning("w2.3", "Here is a warning2");
+                Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                RunGekkoCommands("model<gms> makro.zip;", "", 0, new P());
+                RunGekkoCommands("read makro1;", "", 0, new P());
+                O.Decomp2 o = new O.Decomp2();
+                o.type = @"ASTDECOMP3";
+                o.label = @"decomp <2028 2035 m> qBNP from E_qBNP endo qBNP rows vars, lags cols time";
+                o.t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
+                o.t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+                o.opt_prtcode = O.ConvertToString((new ScalarString("d")));
+                //o.select.Add(O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("qBNP") })));
+                //o.from.Add(O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("E_qBNP") })));
+                //o.endo.Add(O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("qBNP") })));                
 
-                using (Warning txt = new Warning(EWarningType.UsingWithTypeId, "w31.1"))
-                {
-                    txt.MainAdd("There are many missing values when computing historical variability for.");
-                    txt.MoreAdd("For the period , % of reference databank values are missing values, ");
-                    txt.MoreAdd("and for the period , % of reference databank values are missing values.");
-                }
-                               
-                
-                G.Warning("w2.3", "Here is a warning3");
-                G.Warning("w2.3", "Here is a warning4");
-                G.Warning("w2.3", "Here is a warning5");
-                
-                
+                Model model = Program.model;
+
+                G.CheckLegalPeriod(o.t1, o.t2);
+
+                DecompOptions2 decompOptions2 = new DecompOptions2();
+                //decompOptions2.modelType = G.GetModelType();
+                //decompOptions2.showErrors = false; //
+                decompOptions2.t1 = o.t1;
+                decompOptions2.t2 = o.t2;
+                //decompOptions2.expressionOld = o.label;
+                //decompOptions2.expression = o.expression;
+                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
+                //if (G.Equal(o.opt_shares, "yes")) decompOptions2.isShares = true;
+                //if (G.Equal(o.opt_count, "yes") && G.Equal(o.opt_names, "yes")) new Error("You cannot use option <count> and <names> at the same time");
+                //if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;
+                //if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
+                //if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
+                //if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
+                //if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
+                //if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
+                //if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
+                //if (G.Equal(o.opt_expand, "yes")) decompOptions2.expand = true;
+
+                decompOptions2.isNew = true;
+                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
+
+                Gekko.Decomp.ResetRowsColsSelection(decompOptions2);
+
+                decompOptions2.type = o.type;
+
+                decompOptions2.new_select = new List<string>() { "qBNP" }; // O.Restrict(o.select[0] as List, false, false, false, true);
+                decompOptions2.new_from = new List<string>() { "E_qBNP" }; // O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.                
+                decompOptions2.new_endo = new List<string>() { "qBNP" }; // O.Restrict(o.endo[0] as List, false, false, false, true);
+
+                for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
+                for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
+                for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
+
+                model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
+                Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
+
+                return;
+
+
+
+
+
+
+
+
+
+                Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                RunGekkoCommands("model<gms> makro.zip;", "", 0, new P());
+                RunGekkoCommands("read makro1;", "", 0, new P());
+                GekkoTime per1 = new GekkoTime(EFreq.A, 2030, 1, 1);
+                GekkoTime per2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+                GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+                DecompOptions2 do2 = new DecompOptions2();
+                DecompFind df = new DecompFind(EDecompFindNavigation.Decomp, 0, do2, null, model);
+                df.decompOptions2.new_from = new List<string>() { "e_qbnp" };
+                df.decompOptions2.new_select = new List<string>() { "qbnp" };
+                df.decompOptions2.new_endo = new List<string>() { "qbnp" };
+                df.decompOptions2.decompOperator = new DecompOperator();
+                df.decompOptions2.decompOperator.isRaw = false;
+                df.decompOptions2.decompOperator.type = Gekko.Decomp.EContribType.D;
+                df.decompOptions2.decompOperator.lowLevel = Gekko.Decomp.ELowLevel.OnlyQuo;
+                DecompDatas dd = new DecompDatas();
+                //dd.MAIN_data = new DecompData();
+                model.modelGamsScalar.MaybeLoadDataIntoModel(df.depth, do2.t1, do2.t2);
+                DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, df.decompOptions2, ref dd, Program.model);
+
+
+
+
+
+
+
+
+                return;
             }
+
 
             if (text == "flowgraph1" || text == "flowgraph2")
             {
