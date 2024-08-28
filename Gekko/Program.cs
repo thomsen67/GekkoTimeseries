@@ -2460,20 +2460,34 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
+                bool adam = true;
 
-                Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
-                RunGekkoCommands("model<gms> makro.zip;", "", 0, new P());
-                RunGekkoCommands("read makro1;", "", 0, new P());
+                if (adam)
+                {
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
+                    RunGekkoCommands("model jul05;", "", 0, new P());
+                    RunGekkoCommands("read jul05;", "", 0, new P());
+                }
+                else
+                {
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                    RunGekkoCommands("model<gms>makro.zip;", "", 0, new P());
+                    RunGekkoCommands("read makro1;", "", 0, new P());
+                }
                 O.Decomp2 o = new O.Decomp2();
                 o.type = @"ASTDECOMP3";
-                o.label = @"decomp <2028 2035 m> qBNP from E_qBNP endo qBNP rows vars, lags cols time";
-                o.t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
-                o.t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+                if (adam)
+                {
+                    o.t1 = new GekkoTime(EFreq.A, 2006, 1, 1);
+                    o.t2 = new GekkoTime(EFreq.A, 2010, 1, 1);
+                }
+                else
+                {
+                    o.t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
+                    o.t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+                }
                 o.opt_prtcode = O.ConvertToString((new ScalarString("d")));
-                //o.select.Add(O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("qBNP") })));
-                //o.from.Add(O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("E_qBNP") })));
-                //o.endo.Add(O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("qBNP") })));                
-
+                
                 Model model = Program.model;
 
                 G.CheckLegalPeriod(o.t1, o.t2);
@@ -2504,9 +2518,18 @@ namespace Gekko
 
                 decompOptions2.type = o.type;
 
-                decompOptions2.new_select = new List<string>() { "qBNP" }; // O.Restrict(o.select[0] as List, false, false, false, true);
-                decompOptions2.new_from = new List<string>() { "E_qBNP" }; // O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.                
-                decompOptions2.new_endo = new List<string>() { "qBNP" }; // O.Restrict(o.endo[0] as List, false, false, false, true);
+                if (adam)
+                {
+                    decompOptions2.new_select = new List<string>() { "fY" };
+                    decompOptions2.new_from = new List<string>() { "E_fY" };
+                    decompOptions2.new_endo = new List<string>() { "fY" };
+                }
+                else
+                {
+                    decompOptions2.new_select = new List<string>() { "qBNP" };
+                    decompOptions2.new_from = new List<string>() { "E_qBNP" };
+                    decompOptions2.new_endo = new List<string>() { "qBNP" };
+                }
 
                 for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
                 for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
@@ -2514,6 +2537,11 @@ namespace Gekko
 
                 model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
                 Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
+
+
+                
+
+
 
                 return;
 
