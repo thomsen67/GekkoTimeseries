@@ -2460,7 +2460,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
-                bool adam = true;
+                bool adam = false;
                 bool showGUI = false;
 
                 if (adam)
