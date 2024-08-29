@@ -1748,12 +1748,12 @@ namespace Gekko
         // Turtle name start
         // ----------------------------
 
-        private static string ConvertToTurtleName(string s, int lag, GekkoTime t)
+        public static string ConvertToTurtleName(string s, int lag, GekkoTime t)
         {
             return G.HandleBlanksRemove(s + "¤[" + t.Add(lag).ToString() + "]");
         }
 
-        private static string ConvertToTurtleName(string s, int lag)
+        public static string ConvertToTurtleName(string s, int lag)
         {
             string slag = lag.ToString();
             if (lag > 0) slag = "+" + slag;
@@ -2259,7 +2259,6 @@ namespace Gekko
                     if (y0aRef == null)
                     {
                         new Error("DECOMP expects the expression to be of series type");
-                        //throw new GekkoException();
                     }
                     y0Ref_series = y0aRef_series;
                     if (y0aRef_series.type != ESeriesType.Light)

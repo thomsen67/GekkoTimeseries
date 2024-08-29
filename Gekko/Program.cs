@@ -2462,6 +2462,7 @@ namespace Gekko
             {
                 bool adam = false;
                 bool showGUI = false;
+                bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
 
                 if (adam)
                 {
@@ -2505,26 +2506,23 @@ namespace Gekko
 
                 decompOptions2.type = o.type;
 
+                string lhsName = null;
+                string eqName = null;
+                
                 if (adam)
                 {
-                    decompOptions2.new_select = new List<string>() { "fY" };
-                    decompOptions2.new_from = new List<string>() { "e_fY" };  //small 'e'
-                    decompOptions2.new_endo = new List<string>() { "fY" };
+                    lhsName = "fY";
+                    eqName = "e_" + lhsName;  //small "e"
                 }
                 else
                 {
-                    //decompOptions2.new_select = new List<string>() { "qBNP" };
-                    //decompOptions2.new_from = new List<string>() { "e_qBNP" };  
-                    //decompOptions2.new_endo = new List<string>() { "qBNP" };
-
-                    //decompOptions2.new_select = new List<string>() { "vtKilde" };
-                    //decompOptions2.new_from = new List<string>() { "e_vtKilde" };
-                    //decompOptions2.new_endo = new List<string>() { "vtKilde" };
-
-                    decompOptions2.new_select = new List<string>() { "vtKommune[tot]" };
-                    decompOptions2.new_from = new List<string>() { "E_ftKommune_tot" };
-                    decompOptions2.new_endo = new List<string>() { "vtKommune[tot]" };                    
+                    lhsName = "vtKommune[tot]";
+                    eqName = "E_ftKommune_tot";
                 }
+
+                decompOptions2.new_select = new List<string>() { lhsName };
+                decompOptions2.new_from = new List<string>() { eqName}; 
+                decompOptions2.new_endo = new List<string>() { lhsName };
 
                 for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
                 for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
@@ -2578,30 +2576,30 @@ namespace Gekko
                     decompDatas.MAIN_data = null;
 
                     if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
+                                        
+                    string residualName = Program.GetDecompResidualName(0, 1);
+                    DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
 
-                    List<string> expressionTexts = new List<string>();
-                    int ii = -1;
-                    foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
-                    {
-                        ii++;
-                        string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
-
-                        int jj = -1;
-
-                        foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
-                        {
-                            jj++;  //will be = 0
-                            DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-                            Gekko.Decomp.DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
-                        }
-                    }
-                    if (false)
-                    {
-                        MakePivot_DeleteMeAtSomePoint(model, decompOptions2, per1, per2, smpl, decompDatas, operatorOneOf3Types, lhsString, parentI);
+                    List<string> vars = new List<string>();
+                    foreach (string var in dd.cellsContribD.storage.Keys)
+                    {                        
+                        int lag; string name;
+                        Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
+                        vars.Add(G.Chop_RemoveBank(name));
                     }
 
+                    GekkoTime tUsedHere = decompOptions2.t1;
+                    tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
+                    string s2 = G.Chop_DimensionAddLast(eqName, tUsedHere.ToString(), false);
+                    EquationTextHelper helper = new EquationTextHelper();
+                    string eq = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+
+                    if (pivot)
+                    {
+                        Gekko.Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);
+                        DecompOutput decompOutput = MakePivot_DeleteMeAtSomePoint(model, decompOptions2, per1, per2, smpl, decompDatas, operatorOneOf3Types, lhsString, parentI);
+                    }
                 }
-
 
                 return;
 
@@ -3088,7 +3086,7 @@ namespace Gekko
             else G.Writeln(text);            
         }
 
-        private static void MakePivot_DeleteMeAtSomePoint(Model model, DecompOptions2 decompOptions2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDatas decompDatas, Decomp.EContribType operatorOneOf3Types, string lhsString, int parentI)
+        private static DecompOutput MakePivot_DeleteMeAtSomePoint(Model model, DecompOptions2 decompOptions2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDatas decompDatas, Decomp.EContribType operatorOneOf3Types, string lhsString, int parentI)
         {
             if (operatorOneOf3Types == Gekko.Decomp.EContribType.D) decompDatas.hasD = true;
             else if (operatorOneOf3Types == Gekko.Decomp.EContribType.RD) decompDatas.hasRD = true;
@@ -3135,7 +3133,7 @@ namespace Gekko
 
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
-            DecompOutput decompOutput = Gekko.Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+            return Gekko.Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
         }
 
         /// <summary>
