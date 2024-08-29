@@ -216,6 +216,8 @@ namespace Gekko
         /// <returns></returns>
         public GetEquationTextHelper GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
         {
+            GetEquationTextHelper rv = new GetEquationTextHelper();
+
             bool hit = false;  //if anything is found
             List<string> eqs2 = new List<string>();
             foreach (string s in eqs)
@@ -224,52 +226,45 @@ namespace Gekko
             }
             TwoStrings two = this.GetEquationTextFoldedScalar(eqs2);
 
-            if (!G.NullOrBlanks(two.s1) || !G.NullOrBlanks(two.s2)) hit = true;
+            if (!G.NullOrBlanks(two.s1) || !G.NullOrBlanks(two.s2)) hit = true;                        
 
-            string resultingText = null;
-
-            //Now, we are creating these three:
+            //Now, we are creating these three (and the resulting text)
             // -- s_scalarModel
             // -- s_gekkoSyntax
             // -- s_gamsOrFrnSyntax
-
-            string s_scalarModel = null;
+            
             int i = -1;
             foreach (string s in eqs)
             {
                 i++;
-                if (i > 0) s_scalarModel += G.NL;
+                if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
                 {
-                    s_scalarModel += this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0) + G.NL;
-                    if (!s_scalarModel.Contains(Globals.eqs6)) hit = true;
+                    rv.s_scalarModel += this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0) + G.NL;
+                    if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else
                 {
-                    s_scalarModel += Globals.eqs5 + G.NL;
+                    rv.s_scalarModel += Globals.eqs5 + G.NL;
                 }
             }            
-            string s_gekkoSyntax = two.s1;     //For ADAM-like it is raw .frm equation. For GAMS-like it is GAMS translated into Gekko.
-            string s_gamsOrFrnSyntax = two.s2; //For ADAM-like it is .frn equation.     For GAMS-like it is raw GAMS.
+            rv.s_gekkoSyntax = two.s1;     //For ADAM-like it is raw .frm equation. For GAMS-like it is GAMS translated into Gekko.
+            rv.s_gamsOrFrnSyntax = two.s2; //For ADAM-like it is .frn equation.     For GAMS-like it is raw GAMS.
             if (this.modelGekko != null)
             {
-                resultingText += s_gekkoSyntax;
-                resultingText += Globals.eqs4 + G.NL + G.NL + s_gamsOrFrnSyntax;
+                rv.resultingText += rv.s_gekkoSyntax;
+                rv.resultingText += Globals.eqs4 + G.NL + G.NL + rv.s_gamsOrFrnSyntax;
             }
             else
             {                
-                if (G.NullOrBlanks(s_gekkoSyntax)) s_gekkoSyntax = Globals.eqs2 + G.NL;
-                if (G.NullOrBlanks(s_gamsOrFrnSyntax)) s_gamsOrFrnSyntax = Globals.eqs2 + G.NL;
-                resultingText += s_gekkoSyntax + G.NL;
-                resultingText += Globals.eqs1 + G.NL + G.NL + s_scalarModel + G.NL;
-                resultingText += Globals.eqs3 + G.NL + G.NL + s_gamsOrFrnSyntax + G.NL;
+                if (G.NullOrBlanks(rv.s_gekkoSyntax)) rv.s_gekkoSyntax = Globals.eqs2 + G.NL;
+                if (G.NullOrBlanks(rv.s_gamsOrFrnSyntax)) rv.s_gamsOrFrnSyntax = Globals.eqs2 + G.NL;
+                rv.resultingText += rv.s_gekkoSyntax + G.NL;
+                rv.resultingText += Globals.eqs1 + G.NL + G.NL + rv.s_scalarModel + G.NL;
+                rv.resultingText += Globals.eqs3 + G.NL + G.NL + rv.s_gamsOrFrnSyntax + G.NL;
             }            
-            GetEquationTextHelper rv = new GetEquationTextHelper();
+            
             if (!hit) rv.hasHit = false;
-            rv.resultingText = resultingText;
-            rv.s_gekkoSyntax = s_gekkoSyntax;
-            rv.s_scalarModel = s_scalarModel;
-            rv.s_gamsOrFrnSyntax = s_gamsOrFrnSyntax;
             return rv;
         }
 

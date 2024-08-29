@@ -4101,7 +4101,8 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                new Error("The external GAMS gdx writer failed with an unexpected error.");
+                new Error("The external GAMS gdx writer failed with an unexpected error.", false);
+                throw;
             }
         }
 

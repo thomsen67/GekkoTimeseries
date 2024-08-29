@@ -2457,11 +2457,11 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
+        {            
             if (Globals.runningOnTTComputer && text == "d")
             {
-                bool adam = true;
-                bool showGUI = true;
+                bool adam = false;
+                bool showGUI = false;
                 bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
 
                 if (adam)
@@ -2491,6 +2491,7 @@ namespace Gekko
                 o.opt_prtcode = O.ConvertToString((new ScalarString("d")));
 
                 Model model = Program.model;
+                ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
                 G.CheckLegalPeriod(o.t1, o.t2);
 
@@ -2528,7 +2529,7 @@ namespace Gekko
                 for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
                 for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
 
-                model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
+                modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
                 //Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
 
                 // =========
@@ -2570,7 +2571,7 @@ namespace Gekko
 
                     int funcCounter = 0;
 
-                    Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, model.modelGamsScalar);
+                    Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
 
                     if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
                     decompDatas.MAIN_data = null;
@@ -2589,12 +2590,34 @@ namespace Gekko
                     }
 
                     GekkoTime tUsedHere = decompOptions2.t1;
-                    tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
+                    tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
                     string s2 = G.Chop_DimensionAddLast(eqName, tUsedHere.ToString(), false);
                     EquationTextHelper helper = new EquationTextHelper();
                     GetEquationTextHelper helper2 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                    string html = helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
+                    string html1 = helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
+                    new Writeln(html1);
+
+                    // ==================================================
+                    //  Klikker vtKommune[15]
+                    // ==================================================
+                    string variableName = "vtKommune[15]";
+                    int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+                    if (aNumber == -12345) new Error("Hov");
+                    int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
+                    PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+                    List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+                    if (eqNumbers == null) new Error("Hov");
+                    List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariable(variableName, tUsedHere, eqNumbers, model);
+
+                    string html2 = null;
+                    html2 += "Equations containing " + variableName + ":" + G.NL;
+                    foreach (EqHelper eqHelper in eqsNew)
+                    {
+                        html2 += eqHelper.eqNameWithLag;
+                        html2 += G.NL;
+                    }
+                    new Writeln(html2);
 
                     if (pivot)
                     {
