@@ -2460,8 +2460,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
-                bool adam = false;
-                bool showGUI = false;
+                bool adam = true;
+                bool showGUI = true;
                 bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
 
                 if (adam)
@@ -2592,7 +2592,9 @@ namespace Gekko
                     tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
                     string s2 = G.Chop_DimensionAddLast(eqName, tUsedHere.ToString(), false);
                     EquationTextHelper helper = new EquationTextHelper();
-                    string eq = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+                    GetEquationTextHelper helper2 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+
+                    string html = helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
 
                     if (pivot)
                     {
@@ -16972,8 +16974,9 @@ namespace Gekko
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), false);
-                        string eq = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
-                        if (!eq.EndsWith("."))
+                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+                        string eq = temp.resultingText;
+                        if (temp.hasHit)
                         {
                             using (var txt = new Writeln("", int.MaxValue, Color.Empty, false, ETabs.Main))
                             {

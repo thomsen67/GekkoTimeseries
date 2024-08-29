@@ -32,6 +32,15 @@ using System.Linq;
 
 namespace Gekko
 {
+    public class GetEquationTextHelper
+    {
+        public string resultingText;
+        public string s_scalarModel;
+        public string s_gekkoSyntax;
+        public string s_gamsOrFrnSyntax;
+        public bool hasHit = true;
+    }
+
     [Serializable]
     public class Model2Cache
     {        
@@ -192,19 +201,20 @@ namespace Gekko
             {
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), false));
             }
-            s = model.GetEquationText(eqNames, helper, t0);
+            s = model.GetEquationText(eqNames, helper, t0).resultingText;
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
 
         /// <summary>
         /// The central equation text method. Gets equation text from both folded and unfolded equations.
+        /// Returns the resulting text, but also the three parts of it (fields s_...).
         /// </summary>
         /// <param name="eq"></param>
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public string GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
+        public GetEquationTextHelper GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
         {
             bool hit = false;  //if anything is found
             List<string> eqs2 = new List<string>();
@@ -216,39 +226,50 @@ namespace Gekko
 
             if (!G.NullOrBlanks(two.s1) || !G.NullOrBlanks(two.s2)) hit = true;
 
-            string sUnfolded = null;
+            string resultingText = null;
+
+            //Now, we are creating these three:
+            // -- s_scalarModel
+            // -- s_gekkoSyntax
+            // -- s_gamsOrFrnSyntax
+
+            string s_scalarModel = null;
             int i = -1;
             foreach (string s in eqs)
             {
                 i++;
-                if (i > 0) sUnfolded += G.NL;
+                if (i > 0) s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
                 {
-                    sUnfolded += this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0) + G.NL;
-                    if (!sUnfolded.Contains(Globals.eqs6)) hit = true;
+                    s_scalarModel += this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0) + G.NL;
+                    if (!s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else
                 {
-                    sUnfolded += Globals.eqs5 + G.NL;
+                    s_scalarModel += Globals.eqs5 + G.NL;
                 }
-            }
-            string rv = null;            
+            }            
+            string s_gekkoSyntax = two.s1;     //For ADAM-like it is raw .frm equation. For GAMS-like it is GAMS translated into Gekko.
+            string s_gamsOrFrnSyntax = two.s2; //For ADAM-like it is .frn equation.     For GAMS-like it is raw GAMS.
             if (this.modelGekko != null)
             {
-                rv += two.s1;
-                rv += Globals.eqs4 + G.NL + G.NL + two.s2;
+                resultingText += s_gekkoSyntax;
+                resultingText += Globals.eqs4 + G.NL + G.NL + s_gamsOrFrnSyntax;
             }
             else
-            {
-                string s1 = two.s1;
-                string s2 = two.s2;
-                if (G.NullOrBlanks(s1)) s1 = Globals.eqs2 + G.NL;
-                if (G.NullOrBlanks(s2)) s2 = Globals.eqs2 + G.NL;
-                rv += s1 + G.NL;
-                rv += Globals.eqs1 + G.NL + G.NL + sUnfolded + G.NL;
-                rv += Globals.eqs3 + G.NL + G.NL + s2 + G.NL;
-            }
-            if (!hit) rv += ".";  //signals no hit (hacky, but oh well)
+            {                
+                if (G.NullOrBlanks(s_gekkoSyntax)) s_gekkoSyntax = Globals.eqs2 + G.NL;
+                if (G.NullOrBlanks(s_gamsOrFrnSyntax)) s_gamsOrFrnSyntax = Globals.eqs2 + G.NL;
+                resultingText += s_gekkoSyntax + G.NL;
+                resultingText += Globals.eqs1 + G.NL + G.NL + s_scalarModel + G.NL;
+                resultingText += Globals.eqs3 + G.NL + G.NL + s_gamsOrFrnSyntax + G.NL;
+            }            
+            GetEquationTextHelper rv = new GetEquationTextHelper();
+            if (!hit) rv.hasHit = false;
+            rv.resultingText = resultingText;
+            rv.s_gekkoSyntax = s_gekkoSyntax;
+            rv.s_scalarModel = s_scalarModel;
+            rv.s_gamsOrFrnSyntax = s_gamsOrFrnSyntax;
             return rv;
         }
 
