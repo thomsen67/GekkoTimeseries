@@ -2513,9 +2513,17 @@ namespace Gekko
                 }
                 else
                 {
-                    decompOptions2.new_select = new List<string>() { "qBNP" };
-                    decompOptions2.new_from = new List<string>() { "e_qBNP" };  
-                    decompOptions2.new_endo = new List<string>() { "qBNP" };
+                    //decompOptions2.new_select = new List<string>() { "qBNP" };
+                    //decompOptions2.new_from = new List<string>() { "e_qBNP" };  
+                    //decompOptions2.new_endo = new List<string>() { "qBNP" };
+
+                    //decompOptions2.new_select = new List<string>() { "vtKilde" };
+                    //decompOptions2.new_from = new List<string>() { "e_vtKilde" };
+                    //decompOptions2.new_endo = new List<string>() { "vtKilde" };
+
+                    decompOptions2.new_select = new List<string>() { "vtKommune[tot]" };
+                    decompOptions2.new_from = new List<string>() { "E_ftKommune_tot" };
+                    decompOptions2.new_endo = new List<string>() { "vtKommune[tot]" };                    
                 }
 
                 for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
@@ -2546,7 +2554,10 @@ namespace Gekko
                     GekkoTime per2 = decompOptions2.t2;
                     GekkoSmpl smpl = new GekkoSmpl(per1, per2);
                     DecompDatas decompDatas = new DecompDatas();
-                    DecompOutput decompOutput2 = Gekko.Decomp.DecompMain(smpl, per1, per2, decompOptions2, ref decompDatas, model);
+                    if (false)
+                    {
+                        DecompOutput decompOutput2 = Gekko.Decomp.DecompMain(smpl, per1, per2, decompOptions2, ref decompDatas, model);
+                    }
 
                     GekkoTime gt1, gt2;
                     Gekko.Decomp.DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
@@ -2560,9 +2571,9 @@ namespace Gekko
                     int parentI = 0;
 
                     int funcCounter = 0;
-                    
+
                     Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, model.modelGamsScalar);
-                    
+
                     if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
                     decompDatas.MAIN_data = null;
 
@@ -2584,56 +2595,13 @@ namespace Gekko
                             Gekko.Decomp.DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
-
-                    if (operatorOneOf3Types == Gekko.Decomp.EContribType.D) decompDatas.hasD = true;
-                    else if (operatorOneOf3Types == Gekko.Decomp.EContribType.RD) decompDatas.hasRD = true;
-                    else if (operatorOneOf3Types == Gekko.Decomp.EContribType.M) decompDatas.hasM = true;
-
-                    if (decompOptions2.link[parentI].varnames == null)
+                    if (false)
                     {
-                        //does this ever happen?
-                        decompOptions2.link[parentI].varnames = Globals.decompResidualName;
+                        MakePivot_DeleteMeAtSomePoint(model, decompOptions2, per1, per2, smpl, decompDatas, operatorOneOf3Types, lhsString, parentI);
                     }
-
-                    bool[] used = new bool[decompDatas.storage.Count];
-                    used[0] = true;  //primary equation
-
-                    GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-                    //decomp period by period, showing lags/leads.
-
-                    if (decompOptions2.decompOperator.lowLevel == Gekko.Decomp.ELowLevel.BothQuoAndRef)  //<mp>
-                    {
-                        bool refreshObjects = true;
-                        foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                        {
-                            Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
-                            refreshObjects = false;
-                        }
-                        foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                        {
-                            Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
-                        }
-                    }
-                    else
-                    {
-                        int deduct = 0;
-                        //why deduct not enough??
-                        if (decompOptions2.decompOperator.isDoubleDifQuo || decompOptions2.decompOperator.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
-                        bool refreshObjects = true;
-                        foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
-                        {
-                            Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
-                            refreshObjects = false;
-                        }
-                    }
-
-                    DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
-
-                    DecompOutput decompOutput = Gekko.Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
 
                 }
-                
+
 
                 return;
 
@@ -3118,7 +3086,57 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);            
-        }        
+        }
+
+        private static void MakePivot_DeleteMeAtSomePoint(Model model, DecompOptions2 decompOptions2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDatas decompDatas, Decomp.EContribType operatorOneOf3Types, string lhsString, int parentI)
+        {
+            if (operatorOneOf3Types == Gekko.Decomp.EContribType.D) decompDatas.hasD = true;
+            else if (operatorOneOf3Types == Gekko.Decomp.EContribType.RD) decompDatas.hasRD = true;
+            else if (operatorOneOf3Types == Gekko.Decomp.EContribType.M) decompDatas.hasM = true;
+
+            if (decompOptions2.link[parentI].varnames == null)
+            {
+                //does this ever happen?
+                decompOptions2.link[parentI].varnames = Globals.decompResidualName;
+            }
+
+            bool[] used = new bool[decompDatas.storage.Count];
+            used[0] = true;  //primary equation
+
+            GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            //decomp period by period, showing lags/leads.
+
+            if (decompOptions2.decompOperator.lowLevel == Gekko.Decomp.ELowLevel.BothQuoAndRef)  //<mp>
+            {
+                bool refreshObjects = true;
+                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                {
+                    Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                    refreshObjects = false;
+                }
+                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                {
+                    Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                }
+            }
+            else
+            {
+                int deduct = 0;
+                //why deduct not enough??
+                if (decompOptions2.decompOperator.isDoubleDifQuo || decompOptions2.decompOperator.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                bool refreshObjects = true;
+                foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
+                {
+                    Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                    refreshObjects = false;
+                }
+            }
+
+            DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
+
+            DecompOutput decompOutput = Gekko.Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+        }
 
         /// <summary>
         /// From the variable pv, flood the adjacent variables with color color.
