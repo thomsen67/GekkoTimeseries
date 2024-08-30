@@ -3907,6 +3907,10 @@ namespace Gekko
 
                 if (true)
                 {
+                    if (Globals.graneFix)
+                    {
+                        new Writeln("Grane1 --> pathAndFilename = " + pathAndFilename);
+                    }
 
                     gdx.gdxOpenWrite(pathAndFilename, "Gekko", ref ErrNr);
                     if (ErrNr != 0)

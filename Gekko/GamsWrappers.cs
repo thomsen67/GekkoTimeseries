@@ -367,7 +367,13 @@ namespace Gekko
         private delegate int gdxOpenWrite_t(IntPtr pgdx, string FileName, string Producer, ref int ErrNr);
         private static gdxOpenWrite_t dll_gdxOpenWrite;
         private static int d_gdxOpenWrite(IntPtr pgdx, string FileName, string Producer, ref int ErrNr)
-        { gdxErrorHandling("gdxOpenWrite could not be loaded"); return 0; }
+        {
+            if (Globals.graneFix)
+            {
+                new Writeln("Grane9 --> gdxOpenWrite could not be loaded");
+            }
+            gdxErrorHandling("gdxOpenWrite could not be loaded"); return 0; 
+        }
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int gdxOpenWriteEx_t(IntPtr pgdx, string FileName, string Producer, int Compr, ref int ErrNr);
         private static gdxOpenWriteEx_t dll_gdxOpenWriteEx;
@@ -2569,6 +2575,33 @@ namespace Gekko
 
         public int gdxOpenWrite(string FileName, string Producer, ref int ErrNr)
         {
+            if (Globals.graneFix)
+            {
+                new Writeln("Grane2 --> FileName = " + FileName);
+                new Writeln("Grane3 --> Producer = " + Producer);
+                new Writeln("Grane4 --> ErrNr = " + ErrNr);
+                bool isNull = false;
+                if (pgdx == null) isNull = true;
+                new Writeln("Grane5 --> isNull = " + isNull);
+                if (!isNull) new Writeln("Grane6 --> " + pgdx.ToString());                
+                bool exists = System.IO.File.Exists(FileName);
+                new Writeln("Grane7 --> exists = " + exists);
+                bool isBlocked = false;
+                if (exists)
+                {
+                    try
+                    {
+                        using (Stream stream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                        {
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        isBlocked = true;
+                    }
+                }
+                new Writeln("Grane8 --> isBlocked = " + isBlocked);
+            }
             return dll_gdxOpenWrite(pgdx, FileName, Producer, ref ErrNr);
         }
 

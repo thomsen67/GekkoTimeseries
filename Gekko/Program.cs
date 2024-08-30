@@ -2595,7 +2595,9 @@ namespace Gekko
                     EquationTextHelper helper = new EquationTextHelper();
                     GetEquationTextHelper helper2 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                    string html1 = helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
+                    string html1 = null;
+                    html1 += "vtKommune[tot] from E_ftKommune_tot" + G.NL + G.NL;
+                    html1 += helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
                     new Writeln(html1);
 
                     // ==================================================

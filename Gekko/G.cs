@@ -5134,6 +5134,31 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Checks if a file is blocked by the filesystem/Windows. This method may exist somewhere else, something
+        /// like it was possibly being used in Gekko 2.x.
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <returns></returns>
+        public static bool IsBlocked(string FileName) 
+        {            
+            bool isBlocked = false;
+            if (System.IO.File.Exists(FileName))
+            {
+                try
+                {
+                    using (Stream stream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    {
+                    }
+                }
+                catch (Exception ex)
+                {
+                    isBlocked = true;
+                }
+            }
+            return isBlocked;
+        }
+
+        /// <summary>
         /// /// Gets a MD5 hash from text. Seems to be the fastest reasonable hash available (faster than SHA). Not parallel though. See G.GetMd5FromFile().
         /// </summary>
         /// <param name="inputText"></param>

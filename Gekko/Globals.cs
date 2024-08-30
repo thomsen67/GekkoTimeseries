@@ -37,7 +37,9 @@ namespace Gekko
     /// </summary>
 
     public class Globals
-    {        
+    {
+        public static bool graneFix = true;
+        
         public static bool stars = true; //#8ujklasdfas        
 
         public const string smpl = "§¤£";  //this line must be at top
