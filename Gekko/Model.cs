@@ -1429,24 +1429,27 @@ namespace Gekko
             List<string> rv = null;
             if (type == 1)
             {
-                rv = this.dict_FromEqNumberToEqName.ToList();                
+                rv = this.dict_FromEqNumberToEqName.ToList();
             }
-            GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            foreach (string s2 in this.dict_FromEqNumberToEqName)
+            else
             {
-                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
-                if (type == 2)
+                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s2 in this.dict_FromEqNumberToEqName)
                 {
-                    if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
+                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                    if (type == 2)
+                    {
+                        if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
+                    }
+                    else if (type == 3)
+                    {
+                        if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                    }
+                    else new Error("Unexpected");
                 }
-                else if (type == 3)
-                {
-                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
-                }
-                else new Error("Unexpected");
+                rv = temp.Keys.ToList();
             }
-            rv = temp.Keys.ToList();
-            rv.Sort();
+            //rv.Sort(); //Users can use sort() themselves
             return rv;
         }
 

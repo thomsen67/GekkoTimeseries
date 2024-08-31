@@ -5159,7 +5159,6 @@ namespace Gekko
                 if (!G.Equal(sort, "natural"))
                 {
                     new Error("Expected 'natural' argument");
-                    //throw new GekkoException();
                 }
             }
 

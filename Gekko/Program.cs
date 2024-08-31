@@ -2457,7 +2457,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {            
+        {
             if (Globals.runningOnTTComputer && text == "d")
             {
                 bool adam = false;
@@ -2493,149 +2493,235 @@ namespace Gekko
                 Model model = Program.model;
                 ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
-                G.CheckLegalPeriod(o.t1, o.t2);
+                int count = 0;
 
-                DecompOptions2 decompOptions2 = new DecompOptions2();
-                decompOptions2.t1 = o.t1;
-                decompOptions2.t2 = o.t2;
-                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());                
-
-                decompOptions2.isNew = true;
-                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
-
-                Gekko.Decomp.ResetRowsColsSelection(decompOptions2);
-
-                decompOptions2.type = o.type;
-
-                string lhsName = null;
-                string eqName = null;
-                
-                if (adam)
+                int n = modelGamsScalar.CountEqs(1);
+                for (int i = 0; i < n; i++)
                 {
-                    lhsName = "fY";
-                    eqName = "e_" + lhsName;  //small "e"
-                }
-                else
-                {
-                    lhsName = "vtKommune[tot]";
-                    eqName = "E_ftKommune_tot";
-                }
+                    string eqName27 = modelGamsScalar.dict_FromEqNumberToEqName[i];                    
+                    ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName27, false);
+                    //var x = helper2.name;
+                    var eqName2 = helper2.resultingFullName;
 
-                decompOptions2.new_select = new List<string>() { lhsName };
-                decompOptions2.new_from = new List<string>() { eqName}; 
-                decompOptions2.new_endo = new List<string>() { lhsName };
-
-                for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
-                for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
-                for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
-
-                modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
-                //Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
-
-                // =========
-
-                if (showGUI)
-                {
-                    DecompFind decompFind = o.decompFind;
-                    WindowDecomp windowDecomp = new WindowDecomp(decompFind);
-                    windowDecomp.decompFind.SetWindow(windowDecomp);
-                    Globals.windowsDecomp2.Add(windowDecomp);
-                    windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-                    windowDecomp.SetRadioButtons();
-                    windowDecomp.isInitializing = false;
-                    windowDecomp.RecalcCellsWithNewTypeHelper(decompFind.model);
-                    decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
-                    windowDecomp.ShowDialog();
-                }
-                else
-                {
-                    GekkoTime per1 = decompOptions2.t1;
-                    GekkoTime per2 = decompOptions2.t2;
-                    GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-                    DecompDatas decompDatas = new DecompDatas();
-                    if (false)
+                    if (helper2.time.Equals(o.t1))
                     {
-                        DecompOutput decompOutput2 = Gekko.Decomp.DecompMain(smpl, per1, per2, decompOptions2, ref decompDatas, model);
-                    }
+                        new Writeln("EQUATION = " + eqName2);
+                        count++;
+                        foreach (PeriodAndVariable dp in modelGamsScalar.precedents[i].vars)
+                        {
+                            //foreach precedent variable
+                            GekkoTime tUsedHere = o.t1;
+                            string variableName = modelGamsScalar.GetVarNameA(dp.variable);
+                            
 
-                    GekkoTime gt1, gt2;
-                    Gekko.Decomp.DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
+                            {
+                                DecompOptions2 decompOptions2 = new DecompOptions2();
+                                decompOptions2.t1 = o.t1;
+                                decompOptions2.t2 = o.t2;
+                                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
+                                decompOptions2.new_select = new List<string>() { variableName };
+                                decompOptions2.new_from = new List<string>() { eqName2 };
+                                decompOptions2.new_endo = new List<string>() { variableName };
 
-                    DateTime t0 = DateTime.Now;
+                                GekkoTime per1 = decompOptions2.t1;
+                                GekkoTime per2 = decompOptions2.t2;
+                                GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+                                DecompDatas decompDatas = new DecompDatas();
 
-                    Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
+                                GekkoTime gt1, gt2;
+                                Gekko.Decomp.DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
 
-                    int perLag = -2;
-                    string lhsString = "Expression value";
-                    int parentI = 0;
+                                DateTime t0 = DateTime.Now;
 
-                    int funcCounter = 0;
+                                Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
 
-                    Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
+                                int perLag = -2;
+                                string lhsString = "Expression value";
+                                int parentI = 0;
 
-                    if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
-                    decompDatas.MAIN_data = null;
+                                int funcCounter = 0;
 
-                    if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
-                                        
-                    string residualName = Program.GetDecompResidualName(0, 1);
-                    DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                                Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
 
-                    List<string> vars = new List<string>();
-                    foreach (string var in dd.cellsContribD.storage.Keys)
-                    {                        
-                        int lag; string name;
-                        Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
-                        vars.Add(G.Chop_RemoveBank(name));
-                    }
+                                if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+                                decompDatas.MAIN_data = null;
 
-                    GekkoTime tUsedHere = decompOptions2.t1;
-                    tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
-                    string s2 = G.Chop_DimensionAddLast(eqName, tUsedHere.ToString(), false);
-                    EquationTextHelper helper = new EquationTextHelper();
-                    GetEquationTextHelper helper2 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+                                if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
 
-                    string html1 = null;
-                    html1 += "vtKommune[tot] from E_ftKommune_tot" + G.NL + G.NL;
-                    html1 += helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
-                    new Writeln(html1);
+                                string residualName = Program.GetDecompResidualName(0, 1);
+                                DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
 
-                    // ==================================================
-                    //  Klikker vtKommune[15]
-                    // ==================================================
-                    string variableName = "vtKommune[15]";
-                    int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-                    if (aNumber == -12345) new Error("Hov");
-                    int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
-                    PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-                    List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-                    if (eqNumbers == null) new Error("Hov");
-                    List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariable(variableName, tUsedHere, eqNumbers, model);
+                                List<string> vars = new List<string>();
+                                foreach (string var in dd.cellsContribD.storage.Keys)
+                                {
+                                    int lag; string name;
+                                    Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
+                                    vars.Add(G.Chop_RemoveBank(name));
+                                }
+                                                                
+                                tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
+                                string s2 = G.Chop_DimensionAddLast(eqName2, tUsedHere.ToString(), false);
+                                EquationTextHelper helper = new EquationTextHelper();
+                                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                    string html2 = null;
-                    html2 += "Equations containing " + variableName + ":" + G.NL;
-                    foreach (EqHelper eqHelper in eqsNew)
-                    {
-                        html2 += eqHelper.eqNameWithLag;
-                        html2 += G.NL;
-                    }
-                    new Writeln(html2);
+                                string html1 = null;
+                                html1 += variableName + " from " + eqName2 + G.NL + G.NL;
+                                html1 += helper22.s_gamsOrFrnSyntax + G.NL + G.NL + helper22.s_scalarModel;
+                                new Writeln(html1);
 
-                    if (pivot)
-                    {
-                        Gekko.Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);
-                        DecompOutput decompOutput = MakePivot_DeleteMeAtSomePoint(model, decompOptions2, per1, per2, smpl, decompDatas, operatorOneOf3Types, lhsString, parentI);
+                            }
+
+
+                            new Writeln("PRECEDENT VARIABLE = " + variableName);
+                            int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+                            if (aNumber == -12345) new Error("Hov");
+                            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
+                            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+                            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+                            if (eqNumbers == null) new Error("Hov");
+                            List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
+
+                            string html2 = null;
+                            html2 += "FIND " + variableName + ":" + G.NL;
+                            foreach (EqHelper eqHelper in eqsNew)
+                            {
+                                html2 += eqHelper.eqNameWithLag;
+                                html2 += G.NL;
+                            }
+                            new Writeln(html2);                            
+                        }
+                        if (count > 1) return;
+                        new Writeln(" ============================================ ");
                     }
                 }
 
                 return;
 
+                //BEWARE: omits time dimension, so 
 
+                {
 
+                    G.CheckLegalPeriod(o.t1, o.t2);
 
+                    DecompOptions2 decompOptions2 = new DecompOptions2();
+                    decompOptions2.t1 = o.t1;
+                    decompOptions2.t2 = o.t2;
+                    decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
 
+                    decompOptions2.isNew = true;
+                    o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
 
+                    Gekko.Decomp.ResetRowsColsSelection(decompOptions2);
 
+                    decompOptions2.type = o.type;
+
+                    string lhsName = null;
+                    string eqName = null;
+
+                    if (adam)
+                    {
+                        lhsName = "fY";
+                        eqName = "e_" + lhsName;  //small "e"
+                    }
+                    else
+                    {
+                        lhsName = "vtKommune[tot]";
+                        eqName = "E_ftKommune_tot";
+                    }
+
+                    decompOptions2.new_select = new List<string>() { lhsName };
+                    decompOptions2.new_from = new List<string>() { eqName };
+                    decompOptions2.new_endo = new List<string>() { lhsName };
+
+                    for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
+                    for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
+                    for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
+
+                    modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
+                    //Gekko.Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
+
+                    // =========
+
+                    {
+
+                        GekkoTime per1 = decompOptions2.t1;
+                        GekkoTime per2 = decompOptions2.t2;
+                        GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+                        DecompDatas decompDatas = new DecompDatas();
+
+                        GekkoTime gt1, gt2;
+                        Gekko.Decomp.DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
+
+                        DateTime t0 = DateTime.Now;
+
+                        Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
+
+                        int perLag = -2;
+                        string lhsString = "Expression value";
+                        int parentI = 0;
+
+                        int funcCounter = 0;
+
+                        Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
+
+                        if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+                        decompDatas.MAIN_data = null;
+
+                        if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
+
+                        string residualName = Program.GetDecompResidualName(0, 1);
+                        DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+
+                        List<string> vars = new List<string>();
+                        foreach (string var in dd.cellsContribD.storage.Keys)
+                        {
+                            int lag; string name;
+                            Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
+                            vars.Add(G.Chop_RemoveBank(name));
+                        }
+
+                        GekkoTime tUsedHere = decompOptions2.t1;
+                        tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
+                        string s2 = G.Chop_DimensionAddLast(eqName, tUsedHere.ToString(), false);
+                        EquationTextHelper helper = new EquationTextHelper();
+                        GetEquationTextHelper helper2 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+
+                        string html1 = null;
+                        html1 += "vtKommune[tot] from E_ftKommune_tot" + G.NL + G.NL;
+                        html1 += helper2.s_gamsOrFrnSyntax + G.NL + G.NL + helper2.s_scalarModel;
+                        new Writeln(html1);
+
+                        // ==================================================
+                        //  Klikker vtKommune[15]
+                        // ==================================================
+                        string variableName = "vtKommune[15]";
+                        int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+                        if (aNumber == -12345) new Error("Hov");
+                        int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
+                        PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+                        List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+                        if (eqNumbers == null) new Error("Hov");
+                        List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
+
+                        string html2 = null;
+                        html2 += "Equations containing " + variableName + ":" + G.NL;
+                        foreach (EqHelper eqHelper in eqsNew)
+                        {
+                            html2 += eqHelper.eqNameWithLag;
+                            html2 += G.NL;
+                        }
+                        new Writeln(html2);
+
+                        if (pivot)
+                        {
+                            Gekko.Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);
+                            DecompOutput decompOutput = MakePivot_DeleteMeAtSomePoint(model, decompOptions2, per1, per2, smpl, decompDatas, operatorOneOf3Types, lhsString, parentI);
+                        }
+
+                    }
+                }
+
+                return;
 
 
                 //Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
@@ -2657,11 +2743,6 @@ namespace Gekko
                 ////dd.MAIN_data = new DecompData();
                 //model.modelGamsScalar.MaybeLoadDataIntoModel(df.depth, do2.t1, do2.t2);
                 //DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, df.decompOptions2, ref dd, Program.model);
-
-
-
-
-
 
 
 

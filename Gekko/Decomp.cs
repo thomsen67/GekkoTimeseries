@@ -4869,7 +4869,7 @@ namespace Gekko
                     new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
                     return;
                 }
-                List<EqHelper> eqsNew = FindEquationsThatContainGivenVariable(variableName, o.tSelected, eqNumbers, model);
+                List<EqHelper> eqsNew = FindEquationsThatContainGivenVariableSorted(variableName, o.tSelected, eqNumbers, model);
 
                 //This seems to just gather material for the GUI representation
                 int lineCounter = -1;
@@ -4947,7 +4947,7 @@ namespace Gekko
         /// <param name="vars"></param>
         /// <param name="eqNumbers"></param>
         /// <returns></returns>
-        public static List<EqHelper> FindEquationsThatContainGivenVariable(string variableName, GekkoTime tSelected, List<int> eqNumbers, Model model)
+        public static List<EqHelper> FindEquationsThatContainGivenVariableSorted(string variableName, GekkoTime tSelected, List<int> eqNumbers, Model model)
         {
             //Get a list of helper objects corresponding to each scalar equation the variable is part of
             List<EqHelper> scalarEquations = new List<EqHelper>();
