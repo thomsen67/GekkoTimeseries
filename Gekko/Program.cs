@@ -34045,7 +34045,6 @@ namespace Gekko
             {
                 //tried random name 100 times, this should never happen... 100 blocked files at one time not very realistic...
                 new Error("Could not make local copy of tsd file (filename problem)");
-                //throw new GekkoException();
             }
             return tempPath;
         }
