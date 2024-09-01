@@ -3308,8 +3308,24 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="oldValue"></param>
+        /// <param name="newValue"></param>
+        /// <param name="comparisonType"></param>
+        /// <param name="maxtimes2"></param>
+        /// <returns></returns>
+        public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2)
+        {
+            return Replace(str, oldValue, @newValue, comparisonType, maxtimes2, false);
+        }
+
+        /// <summary>
         /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another 
-        /// specified string according the type of search to use for the specified string.
+        /// specified string according the type of search to use for the specified string. Set checkBoundary if you do not want
+        /// "bc" to match inside "abcd", but match inside "+bc+" (for instance) --> good for replacing variable names, also names
+        /// like x[i,j]. Set maxtimes2=0 to indicate infinite.
         /// </summary>
         /// <param name="str">The string performing the replace method.</param>
         /// <param name="oldValue">The string to be replaced.</param>
@@ -3318,7 +3334,7 @@ namespace Gekko
         /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>A string that is equivalent to the current string except that all instances of <paramref name="oldValue"/> are replaced with <paramref name="newValue"/>. 
         /// If <paramref name="oldValue"/> is not found in the current instance, the method returns the current instance unchanged.</returns>        
-        public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2)
+        public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2, bool checkBoundary)
         {
             int maxtimes = maxtimes2;
             if (maxtimes2 <= 0) maxtimes = int.MaxValue;
@@ -3362,6 +3378,10 @@ namespace Gekko
 
             while ((foundAt = str.IndexOf(oldValue, startSearchFromIndex, comparisonType)) != valueNotFound)
             {
+                if (checkBoundary)
+                {
+                    if (!G.IsDelimited(str, foundAt, oldValue.Length)) continue;
+                }
 
                 // Append all characters until the found replacement.
                 int @charsUntilReplacment = foundAt - startSearchFromIndex;

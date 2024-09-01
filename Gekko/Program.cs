@@ -2507,12 +2507,19 @@ namespace Gekko
                     {
                         //new Writeln("EQUATION = " + eqName2);
                         count++;
+
+                        List<string> precedents = new List<string>();
                         foreach (PeriodAndVariable dp in modelGamsScalar.precedents[i].vars)
                         {
-                            //foreach precedent variable
-                            GekkoTime tUsedHere = o.t1;
-                            string variableName = modelGamsScalar.GetVarNameA(dp.variable);                            
+                            //foreach precedent variable                            
+                            string variableName = modelGamsScalar.GetVarNameA(dp.variable);
+                            precedents.Add(variableName);
+                        }
 
+                        foreach (string variableName in precedents)
+                        {
+                            //foreach precedent variable                                                    
+                            GekkoTime tUsedHere = o.t1;
                             {
                                 DecompOptions2 decompOptions2 = new DecompOptions2();
                                 decompOptions2.t1 = o.t1;
@@ -2565,8 +2572,23 @@ namespace Gekko
 
                                 StringBuilder html1 = new StringBuilder();
                                 EquationBrowser.WriteHtml(html1, "EQUATION " + eqName2 + " (endo " + variableName + ")");
-                                EquationBrowser.WriteHtml(html1, helper22.s_gamsOrFrnSyntax);
-                                EquationBrowser.WriteHtml(html1, helper22.s_scalarModel);
+
+                                string s5 = helper22.s_gamsOrFrnSyntax;
+                                string s6 = helper22.s_scalarModel;
+                                foreach (string variableName2 in precedents)
+                                {
+                                    s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2), StringComparison.OrdinalIgnoreCase, 0, true);
+                                    s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2), StringComparison.OrdinalIgnoreCase, 0, true);
+                                }
+
+                                EquationBrowser.WriteHtml(html1, s5);
+                                EquationBrowser.WriteHtml(html1, s6);
+
+                                foreach (string variableName2 in precedents)
+                                {                                    
+                                    EquationBrowser.WriteHtml(html1, EquationBrowser.HtmlLink(variableName2));
+                                }
+
                                 EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
 
                                 StringBuilder x = new StringBuilder();
