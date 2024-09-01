@@ -2460,6 +2460,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
+                string op = "d";
+                int max = 10;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
                 bool adam = false;
@@ -2490,7 +2492,7 @@ namespace Gekko
                     o.t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
                     o.t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
                 }
-                o.opt_prtcode = O.ConvertToString((new ScalarString("d")));
+                o.opt_prtcode = O.ConvertToString((new ScalarString(op)));                
 
                 Model model = Program.model;
                 ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
@@ -2562,19 +2564,42 @@ namespace Gekko
                                 if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
 
                                 string residualName = Program.GetDecompResidualName(0, 1);
+                                string table = null;
                                 try
                                 {
+                                    table += "<table cellpadding=`10`>";
                                     DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-                                    List<string> vars = new List<string>();
-                                    foreach (string var in dd.cellsContribD.storage.Keys)
+                                    
+                                    table += "<tr><td></td>";
+                                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                                    {
+                                        table += "<td>" + t.ToString() + "</td>";
+                                    }
+                                    table += "</tr>";
+
+                                    foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                                     {
                                         int lag; string name;
-                                        Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
-                                        vars.Add(G.Chop_RemoveBank(name));
+                                        Gekko.Decomp.ConvertFromTurtleName(kvp.Key, true, out name, out lag);
+                                        string name2 = G.Chop_RemoveBank(name).Replace("zzzzzzzzy", "RESIDUAL");
+                                        table += "<tr>";
+                                        table += "<td>";
+                                        table += name2;
+                                        table += "</td>";                                        
+                                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                                        {
+                                            table += "<td>";                                            
+                                            double value = kvp.Value.GetDataSimple(t);
+                                            table += G.FormatNumber(value, "f15.4", true, false);
+                                            table += "</td>";
+                                        }
+                                        table += "</tr>";
                                     }
+                                    table += "</table>";
                                 }
                                 catch
                                 {
+                                    table = null;
                                 }                                
 
                                 tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
@@ -2582,9 +2607,10 @@ namespace Gekko
                                 EquationTextHelper helper = new EquationTextHelper();
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                                StringBuilder html1 = new StringBuilder();
-                                EquationBrowser.WriteHtml(html1, "VARIABLE = " + variableName);
-                                EquationBrowser.WriteHtml(html1, "EQUATION = " + eqName2);
+                                StringBuilder html1 = new StringBuilder();                                
+                                EquationBrowser.WriteHtml(html1, "VARIABLE: " + variableName);
+                                EquationBrowser.WriteHtml(html1, Program.GetVariableExplanation1Line(variableName));
+                                EquationBrowser.WriteHtml(html1, "EQUATION: " + eqName2);
 
                                 string s5 = helper22.s_gamsOrFrnSyntax;
                                 string s6 = helper22.s_scalarModel;
@@ -2592,23 +2618,23 @@ namespace Gekko
                                 if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
                                 foreach (string variableName2 in precedents)
                                 {
-                                    s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2), StringComparison.OrdinalIgnoreCase, 0, true);
-                                    s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2), StringComparison.OrdinalIgnoreCase, 0, true);
+                                    s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.GetVariableExplanation1Line(variableName2)), StringComparison.OrdinalIgnoreCase, 0, true);
+                                    s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.GetVariableExplanation1Line(variableName2)), StringComparison.OrdinalIgnoreCase, 0, true);
                                 }
 
                                 EquationBrowser.WriteHtml(html1, s5);
                                 EquationBrowser.WriteHtml(html1, s6);
 
-                                EquationBrowser.WriteHtml(html1, "Variables: ");
-                                string vars2 = null;
-                                bool first = true;
-                                foreach (string variableName2 in precedents)
-                                {
-                                    if (!first) vars2 += ", ";
-                                    vars2 += EquationBrowser.HtmlLink(variableName2);
-                                    first = false;
-                                }
-                                EquationBrowser.WriteHtml(html1, vars2);
+                                //EquationBrowser.WriteHtml(html1, "Variables: ");
+                                //string vars2 = null;
+                                //bool first = true;
+                                //foreach (string variableName2 in precedents)
+                                //{
+                                //    if (!first) vars2 += ", ";
+                                //    vars2 += EquationBrowser.HtmlLink(variableName2);
+                                //    first = false;
+                                //}
+                                //EquationBrowser.WriteHtml(html1, vars2);
 
                                 EquationBrowser.WriteHtml(html1, "Related equations:");
                                 bool first2 = true;
@@ -2624,6 +2650,8 @@ namespace Gekko
                                 EquationBrowser.WriteHtml(html1, s8);
 
                                 EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
+
+                                if (table != null) html1.AppendLine(table);
 
                                 StringBuilder x = new StringBuilder();
                                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
@@ -2653,9 +2681,11 @@ namespace Gekko
                                 EquationBrowser.WriteHtml(html2, "FIND " + variableName + ":");
                                 foreach (EqHelper eqHelper in eqsNew)
                                 {
+                                    EquationTextHelper helper = new EquationTextHelper();
+                                    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
                                     string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
                                     string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");
-                                    EquationBrowser.WriteHtml(html2, link);
+                                    EquationBrowser.WriteHtml(html2, link + " -----> " + helper22.s_gamsOrFrnSyntax);
                                 }
                                 StringBuilder x2 = new StringBuilder();
                                 x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
@@ -2676,7 +2706,7 @@ namespace Gekko
                                 }
                             }
                         }
-                        if (count > 50) return;                        
+                        if (count > max) return;                        
                     }
                 }
 

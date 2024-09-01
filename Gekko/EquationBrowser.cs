@@ -1481,7 +1481,14 @@ namespace Gekko
 
         public static string HtmlLink(string txt, string link)
         {
-            return "<a href = \"" + link + "\" >" + txt + "</a>";
+            return HtmlLink(txt, link, null);
+        }
+
+        public static string HtmlLink(string txt, string link, string tooltip)
+        {
+            string s = null;
+            if (tooltip != null) s = " title = \"" + tooltip + "\"";
+            return "<a href = \"" + link + "\"" + s + ">" + txt + "</a>";
         }
 
         private static void InsertLinksIntoEquation(string equationText, bool html, StringBuilder sb)
