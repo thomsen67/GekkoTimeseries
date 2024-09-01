@@ -595,7 +595,10 @@ namespace Gekko
                         }
                     }
                     catch { }
-                    if (showErrors) new Error("Could not find the equation '" + s2 + "'." + s3);
+                    if (showErrors)
+                    {
+                        new Error("Could not find the equation '" + s2 + "'." + s3);
+                    }
                 }
                 //int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[s2];
                 elementPeriod.eqNumber = eqNumber;

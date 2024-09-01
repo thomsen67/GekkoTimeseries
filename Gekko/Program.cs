@@ -2460,6 +2460,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "d")
             {
+                string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
+                G.DeleteFolder(path, "css", false);
                 bool adam = false;
                 bool showGUI = false;
                 bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
@@ -2494,6 +2496,7 @@ namespace Gekko
                 ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
                 int count = 0;
+                GekkoDictionary<string, bool> seen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
                 int n = modelGamsScalar.CountEqs(1);
                 for (int i = 0; i < n; i++)
@@ -2501,7 +2504,7 @@ namespace Gekko
                     string eqName27 = modelGamsScalar.dict_FromEqNumberToEqName[i];                    
                     ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName27, false);
                     //var x = helper2.name;
-                    var eqName2 = helper2.resultingFullName;
+                    var eqName2 = helper2.resultingFullName;                    
 
                     if (helper2.time.Equals(o.t1))
                     {
@@ -2518,9 +2521,13 @@ namespace Gekko
 
                         foreach (string variableName in precedents)
                         {
+                            string fileName1 = eqName2 + "__" + variableName + ".html";                                                        
+
                             //foreach precedent variable                                                    
                             GekkoTime tUsedHere = o.t1;
+                            if (!seen.ContainsKey(fileName1))
                             {
+                                new Writeln(fileName1);
                                 DecompOptions2 decompOptions2 = new DecompOptions2();
                                 decompOptions2.t1 = o.t1;
                                 decompOptions2.t2 = o.t2;
@@ -2547,7 +2554,7 @@ namespace Gekko
 
                                 int funcCounter = 0;
 
-                                Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
+                                Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
 
                                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
                                 decompDatas.MAIN_data = null;
@@ -2555,26 +2562,34 @@ namespace Gekko
                                 if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
 
                                 string residualName = Program.GetDecompResidualName(0, 1);
-                                DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-
-                                List<string> vars = new List<string>();
-                                foreach (string var in dd.cellsContribD.storage.Keys)
+                                try
                                 {
-                                    int lag; string name;
-                                    Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
-                                    vars.Add(G.Chop_RemoveBank(name));
+                                    DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                                    List<string> vars = new List<string>();
+                                    foreach (string var in dd.cellsContribD.storage.Keys)
+                                    {
+                                        int lag; string name;
+                                        Gekko.Decomp.ConvertFromTurtleName(var, true, out name, out lag);
+                                        vars.Add(G.Chop_RemoveBank(name));
+                                    }
                                 }
-                                                                
+                                catch
+                                {
+                                }                                
+
                                 tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
                                 string s2 = G.Chop_DimensionAddLast(eqName2, tUsedHere.ToString(), false);
                                 EquationTextHelper helper = new EquationTextHelper();
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
                                 StringBuilder html1 = new StringBuilder();
-                                EquationBrowser.WriteHtml(html1, "EQUATION " + eqName2 + " (endo " + variableName + ")");
+                                EquationBrowser.WriteHtml(html1, "VARIABLE = " + variableName);
+                                EquationBrowser.WriteHtml(html1, "EQUATION = " + eqName2);
 
                                 string s5 = helper22.s_gamsOrFrnSyntax;
                                 string s6 = helper22.s_scalarModel;
+                                int index = s6.IndexOf("..");
+                                if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
                                 foreach (string variableName2 in precedents)
                                 {
                                     s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2), StringComparison.OrdinalIgnoreCase, 0, true);
@@ -2584,10 +2599,29 @@ namespace Gekko
                                 EquationBrowser.WriteHtml(html1, s5);
                                 EquationBrowser.WriteHtml(html1, s6);
 
+                                EquationBrowser.WriteHtml(html1, "Variables: ");
+                                string vars2 = null;
+                                bool first = true;
                                 foreach (string variableName2 in precedents)
-                                {                                    
-                                    EquationBrowser.WriteHtml(html1, EquationBrowser.HtmlLink(variableName2));
+                                {
+                                    if (!first) vars2 += ", ";
+                                    vars2 += EquationBrowser.HtmlLink(variableName2);
+                                    first = false;
                                 }
+                                EquationBrowser.WriteHtml(html1, vars2);
+
+                                EquationBrowser.WriteHtml(html1, "Related equations:");
+                                bool first2 = true;
+                                string s8 = null;
+                                foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
+                                {
+                                    string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                                    string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");
+                                    if (!first2) s8 += ", ";
+                                    s8 += link;
+                                    first2 = false;
+                                }
+                                EquationBrowser.WriteHtml(html1, s8);
 
                                 EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
 
@@ -2598,57 +2632,51 @@ namespace Gekko
                                 x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
                                 x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
                                 x.AppendLine("    <title>" + "EQUATION " + eqName2 + " (endo " + variableName + ")" + "</title>");
-                                x.AppendLine("  </head>");                                
+                                x.AppendLine("  </head>");
                                 x.AppendLine("  <body>");
                                 x.Append(html1);
                                 x.AppendLine("  </body>");
-                                x.AppendLine("</html>");                                
-                                using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\Browser\" + eqName2 + "__" + variableName + ".html", null, Program.GekkoFileReadOrWrite.Write))
+                                x.AppendLine("</html>");
+                                using (FileStream fs = Program.WaitForFileStream(path + fileName1, null, Program.GekkoFileReadOrWrite.Write))
                                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                                 {
                                     sw.Write(x.Replace('`', '\"'));
                                 }
-
                             }
 
-
-                            new Writeln("PRECEDENT VARIABLE = " + variableName);
-                            int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-                            if (aNumber == -12345) new Error("Hov");
-                            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
-                            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-                            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-                            if (eqNumbers == null) new Error("Hov");
-                            List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
-
-                            StringBuilder html2 = new StringBuilder();
-                            EquationBrowser.WriteHtml(html2, "FIND " + variableName + ":");
-                            foreach (EqHelper eqHelper in eqsNew)
+                            string fileName2 = variableName + ".html";
+                            if (!seen.ContainsKey(fileName2))
                             {
-                                string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");                                
-                                EquationBrowser.WriteHtml(html2, link);
-                            }
-                            StringBuilder x2 = new StringBuilder();
-                            x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
-                            x2.AppendLine("<html>");
-                            x2.AppendLine("  <head>");
-                            x2.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
-                            x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-                            x2.AppendLine("    <title>" + "EQUATION " + eqName2 + " (endo " + variableName + ")" + "</title>");
-                            x2.AppendLine("  </head>");
-                            x2.AppendLine("  <body>");
-                            x2.Append(html2);
-                            x2.AppendLine("  </body>");
-                            x2.AppendLine("</html>");                            
-                            using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\Browser\" + variableName + ".html", null, Program.GekkoFileReadOrWrite.Write))
-                            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                            {
-                                sw.Write(x2.Replace('`', '\"'));
+                                new Writeln(fileName1);
+                                List<EqHelper> eqsNew = GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar);
+                                StringBuilder html2 = new StringBuilder();
+                                EquationBrowser.WriteHtml(html2, "FIND " + variableName + ":");
+                                foreach (EqHelper eqHelper in eqsNew)
+                                {
+                                    string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                                    string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");
+                                    EquationBrowser.WriteHtml(html2, link);
+                                }
+                                StringBuilder x2 = new StringBuilder();
+                                x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+                                x2.AppendLine("<html>");
+                                x2.AppendLine("  <head>");
+                                x2.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
+                                x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+                                x2.AppendLine("    <title>" + "EQUATION " + eqName2 + " (endo " + variableName + ")" + "</title>");
+                                x2.AppendLine("  </head>");
+                                x2.AppendLine("  <body>");
+                                x2.Append(html2);
+                                x2.AppendLine("  </body>");
+                                x2.AppendLine("</html>");
+                                using (FileStream fs = Program.WaitForFileStream(path + fileName2, null, Program.GekkoFileReadOrWrite.Write))
+                                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                                {
+                                    sw.Write(x2.Replace('`', '\"'));
+                                }
                             }
                         }
-                        if (count > 1) return;
-                        new Writeln(" ============================================ ");
+                        if (count > 50) return;                        
                     }
                 }
 
@@ -3249,6 +3277,18 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);            
+        }
+
+        private static List<EqHelper> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
+        {
+            int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+            if (aNumber == -12345) new Error("Hov");
+            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
+            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+            if (eqNumbers == null) new Error("Hov");
+            List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
+            return eqsNew;
         }
 
         private static DecompOutput MakePivot_DeleteMeAtSomePoint(Model model, DecompOptions2 decompOptions2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDatas decompDatas, Decomp.EContribType operatorOneOf3Types, string lhsString, int parentI)

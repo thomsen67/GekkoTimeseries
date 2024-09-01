@@ -4581,7 +4581,8 @@ namespace Gekko
         /// <summary>
         /// Delete an entire folder, with omit.        /// 
         /// If total == true, BEWARE that you are pointing to the RIGHT folder always. Otherwise,
-        /// a lot may be damaged. Not sure how this works for nested folders. To delete everything,
+        /// a lot may be damaged. Not sure how this works for nested folders. 
+        /// omitType is without dot, for instance "css". To delete everything,
         /// it is perhaps best to simply use the C# Directory.Delete(topPath, true).
         /// </summary>
         /// <param name="s"></param>
