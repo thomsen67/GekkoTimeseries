@@ -2511,8 +2511,7 @@ namespace Gekko
                         {
                             //foreach precedent variable
                             GekkoTime tUsedHere = o.t1;
-                            string variableName = modelGamsScalar.GetVarNameA(dp.variable);
-                            
+                            string variableName = modelGamsScalar.GetVarNameA(dp.variable);                            
 
                             {
                                 DecompOptions2 decompOptions2 = new DecompOptions2();
@@ -2564,10 +2563,29 @@ namespace Gekko
                                 EquationTextHelper helper = new EquationTextHelper();
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                                string html1 = null;
-                                html1 += "DECOMP " + variableName + " from " + eqName2 + G.NL + G.NL;
-                                html1 += helper22.s_gamsOrFrnSyntax + G.NL + G.NL + helper22.s_scalarModel;
-                                new Writeln(html1);
+                                StringBuilder html1 = new StringBuilder();
+                                EquationBrowser.WriteHtml(html1, "EQUATION " + eqName2 + " (endo " + variableName + ")");
+                                EquationBrowser.WriteHtml(html1, helper22.s_gamsOrFrnSyntax);
+                                EquationBrowser.WriteHtml(html1, helper22.s_scalarModel);
+                                EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
+
+                                StringBuilder x = new StringBuilder();
+                                x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+                                x.AppendLine("<html>");
+                                x.AppendLine("  <head>");
+                                x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
+                                x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+                                x.AppendLine("    <title>" + "EQUATION " + eqName2 + " (endo " + variableName + ")" + "</title>");
+                                x.AppendLine("  </head>");                                
+                                x.AppendLine("  <body>");
+                                x.Append(html1);
+                                x.AppendLine("  </body>");
+                                x.AppendLine("</html>");                                
+                                using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\Browser\" + eqName2 + "__" + variableName + ".html", null, Program.GekkoFileReadOrWrite.Write))
+                                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                                {
+                                    sw.Write(x.Replace('`', '\"'));
+                                }
 
                             }
 
@@ -2581,15 +2599,31 @@ namespace Gekko
                             if (eqNumbers == null) new Error("Hov");
                             List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
 
-                            string html2 = null;
-                            html2 += "FIND " + variableName + ":" + G.NL;
+                            StringBuilder html2 = new StringBuilder();
+                            EquationBrowser.WriteHtml(html2, "FIND " + variableName + ":");
                             foreach (EqHelper eqHelper in eqsNew)
                             {
-                                html2 += eqHelper.eqNameWithLag;
-                                html2 += G.NL;
+                                string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");                                
+                                EquationBrowser.WriteHtml(html2, link);
                             }
-                            new Writeln(html2);
-                            new Writeln(" -------------------------------------------- ");
+                            StringBuilder x2 = new StringBuilder();
+                            x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+                            x2.AppendLine("<html>");
+                            x2.AppendLine("  <head>");
+                            x2.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
+                            x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+                            x2.AppendLine("    <title>" + "EQUATION " + eqName2 + " (endo " + variableName + ")" + "</title>");
+                            x2.AppendLine("  </head>");
+                            x2.AppendLine("  <body>");
+                            x2.Append(html2);
+                            x2.AppendLine("  </body>");
+                            x2.AppendLine("</html>");                            
+                            using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\Browser\" + variableName + ".html", null, Program.GekkoFileReadOrWrite.Write))
+                            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                            {
+                                sw.Write(x2.Replace('`', '\"'));
+                            }
                         }
                         if (count > 1) return;
                         new Writeln(" ============================================ ");

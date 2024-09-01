@@ -1474,12 +1474,12 @@ namespace Gekko
             sb.Append("<pre><code>"); sb.Append(sb2); sb.Append("</code></pre>");
         }
 
-        private static string HtmlLink(string txt)
+        public static string HtmlLink(string txt)
         {
             return HtmlLink(txt, txt.ToLower() + ".html");
         }
 
-        private static string HtmlLink(string txt, string link)
+        public static string HtmlLink(string txt, string link)
         {
             return "<a href = \"" + link + "\" >" + txt + "</a>";
         }
