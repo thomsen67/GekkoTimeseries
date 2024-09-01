@@ -2505,7 +2505,7 @@ namespace Gekko
 
                     if (helper2.time.Equals(o.t1))
                     {
-                        new Writeln("EQUATION = " + eqName2);
+                        //new Writeln("EQUATION = " + eqName2);
                         count++;
                         foreach (PeriodAndVariable dp in modelGamsScalar.precedents[i].vars)
                         {
@@ -2565,7 +2565,7 @@ namespace Gekko
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
                                 string html1 = null;
-                                html1 += variableName + " from " + eqName2 + G.NL + G.NL;
+                                html1 += "DECOMP " + variableName + " from " + eqName2 + G.NL + G.NL;
                                 html1 += helper22.s_gamsOrFrnSyntax + G.NL + G.NL + helper22.s_scalarModel;
                                 new Writeln(html1);
 
@@ -2588,7 +2588,8 @@ namespace Gekko
                                 html2 += eqHelper.eqNameWithLag;
                                 html2 += G.NL;
                             }
-                            new Writeln(html2);                            
+                            new Writeln(html2);
+                            new Writeln(" -------------------------------------------- ");
                         }
                         if (count > 1) return;
                         new Writeln(" ============================================ ");
