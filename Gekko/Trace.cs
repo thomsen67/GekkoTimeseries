@@ -941,8 +941,9 @@ namespace Gekko
                 int len = "---".Length;
                 if (s1 != null) len = s1.Length;
                 s2 += G.Blanks(50 - len - 2 * d) + " --> period: " + period;
-                s2 += ", stamp: " + this.GetId().stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-            }            
+                //s2 += ", stamp: " + this.GetId().stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOW!
+                s2 += ", stamp: " + this.GetId().stamp.ToString("g", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            }
             return new TwoStrings(s1, s2);
         }
 
@@ -1555,8 +1556,10 @@ namespace Gekko
 
         public static void GetStampAsString(TraceID2 id, out string stamp, out string stampDetailed)
         {
-            stamp = id.stamp.ToString("d", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-            stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ", #" + id.counter;
+            stamp = id.stamp.ToString("d", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;
+            //stamp = id.stamp.ToString("d", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOW!
+            //stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ", #" + id.counter;  //This is SLOOOW!
         }
 
         public static void GetActivePeriodsAsString(GekkoTimeSpansSimple periods, ref string active, ref string activeDetailed)

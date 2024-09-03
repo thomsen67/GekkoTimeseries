@@ -2461,7 +2461,7 @@ namespace Gekko
             if (Globals.runningOnTTComputer && text == "d")
             {
                 string op = "d";
-                int max = 10;
+                int max = int.MaxValue;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
                 bool adam = false;
@@ -2499,6 +2499,7 @@ namespace Gekko
 
                 int count = 0;
                 GekkoDictionary<string, bool> seen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                GekkoDictionary<string, bool> seenPlot = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
                 int n = modelGamsScalar.CountEqs(1);
                 for (int i = 0; i < n; i++)
@@ -2510,7 +2511,7 @@ namespace Gekko
 
                     if (helper2.time.Equals(o.t1))
                     {
-                        //new Writeln("EQUATION = " + eqName2);
+                        new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
                         count++;
 
                         List<string> precedents = new List<string>();
@@ -2529,6 +2530,7 @@ namespace Gekko
                             GekkoTime tUsedHere = o.t1;
                             if (!seen.ContainsKey(fileName1))
                             {
+                                seen.Add(fileName1, false);
                                 new Writeln(fileName1);
                                 DecompOptions2 decompOptions2 = new DecompOptions2();
                                 decompOptions2.t1 = o.t1;
@@ -2573,7 +2575,7 @@ namespace Gekko
                                     table += "<tr><td></td>";
                                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                     {
-                                        table += "<td>" + t.ToString() + "</td>";
+                                        table += "<td align = `right`>" + t.ToString() + "</td>";
                                     }
                                     table += "</tr>";
 
@@ -2588,7 +2590,7 @@ namespace Gekko
                                         table += "</td>";                                        
                                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                         {
-                                            table += "<td>";                                            
+                                            table += "<td align = `right`>";                                            
                                             double value = kvp.Value.GetDataSimple(t);
                                             table += G.FormatNumber(value, "f15.4", true, false);
                                             table += "</td>";
@@ -2607,10 +2609,10 @@ namespace Gekko
                                 EquationTextHelper helper = new EquationTextHelper();
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                                StringBuilder html1 = new StringBuilder();                                
-                                EquationBrowser.WriteHtml(html1, "VARIABLE: " + variableName);
-                                EquationBrowser.WriteHtml(html1, Program.GetVariableExplanation1Line(variableName));
-                                EquationBrowser.WriteHtml(html1, "EQUATION: " + eqName2);
+                                StringBuilder html1 = new StringBuilder();
+                                EquationBrowser.WriteHtml(html1, "VARIABLE: <span style=`color: green`>" + variableName + "</span>");
+                                EquationBrowser.WriteHtml(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
+                                EquationBrowser.WriteHtml(html1, "EQUATION: <span style=`color: green`>" + eqName2 + "</span>");
 
                                 string s5 = helper22.s_gamsOrFrnSyntax;
                                 string s6 = helper22.s_scalarModel;
@@ -2618,23 +2620,48 @@ namespace Gekko
                                 if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
                                 foreach (string variableName2 in precedents)
                                 {
-                                    s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.GetVariableExplanation1Line(variableName2)), StringComparison.OrdinalIgnoreCase, 0, true);
-                                    s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.GetVariableExplanation1Line(variableName2)), StringComparison.OrdinalIgnoreCase, 0, true);
+                                    //s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2))), StringComparison.OrdinalIgnoreCase, 0);
+                                    //s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2))), StringComparison.OrdinalIgnoreCase, 0);
+                                    //s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html"), StringComparison.OrdinalIgnoreCase, 0);
                                 }
 
-                                EquationBrowser.WriteHtml(html1, s5);
-                                EquationBrowser.WriteHtml(html1, s6);
+                                html1.Append("<hr>");
+                                //EquationBrowser.WriteHtml(html1, s5);
+                                EquationBrowser.WriteHtmlPreCode(html1, s5);
+                                html1.Append("<hr>");
+                                //EquationBrowser.WriteHtml(html1, s6);
+                                EquationBrowser.WriteHtmlPreCode(html1, s6);
+                                html1.Append("<hr>");
 
-                                //EquationBrowser.WriteHtml(html1, "Variables: ");
-                                //string vars2 = null;
-                                //bool first = true;
-                                //foreach (string variableName2 in precedents)
-                                //{
-                                //    if (!first) vars2 += ", ";
-                                //    vars2 += EquationBrowser.HtmlLink(variableName2);
-                                //    first = false;
-                                //}
-                                //EquationBrowser.WriteHtml(html1, vars2);
+                                EquationBrowser.WriteHtml(html1, "Variables: ");
+                                string vars2 = null;                                
+                                foreach (string variableName2 in precedents)
+                                {
+                                    EquationBrowser.WriteHtml(html1, EquationBrowser.HtmlLink(variableName2) + " " + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2)));
+                                }                                                                
+
+                                try
+                                {
+                                    if (!seenPlot.ContainsKey(variableName))
+                                    {
+                                        seenPlot.Add(variableName, false);
+                                        //only plot the series from Work
+                                        Program.RunGekkoCommands("plot <" + per1.ToString() + " " + per2.ToString() + " > " + variableName + " file='" + path + variableName + ".svg';", "", 0, new P());
+                                        html1.AppendLine("<img src = `" + variableName + ".svg" + "`>");
+                                        html1.AppendLine("<p/>");
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                                catch
+                                {
+                                }
+
+                                if (false)
+                                {
+                                    EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
+                                }
 
                                 EquationBrowser.WriteHtml(html1, "Related equations:");
                                 bool first2 = true;
@@ -2649,9 +2676,11 @@ namespace Gekko
                                 }
                                 EquationBrowser.WriteHtml(html1, s8);
 
-                                EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
-
-                                if (table != null) html1.AppendLine(table);
+                                if (table != null)
+                                {
+                                    EquationBrowser.WriteHtml(html1, "Time-decomposition (absolute changes):");
+                                    html1.AppendLine(table);
+                                }
 
                                 StringBuilder x = new StringBuilder();
                                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
@@ -2675,18 +2704,30 @@ namespace Gekko
                             string fileName2 = variableName + ".html";
                             if (!seen.ContainsKey(fileName2))
                             {
+                                seen.Add(fileName2, false);
                                 new Writeln(fileName1);
                                 List<EqHelper> eqsNew = GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar);
                                 StringBuilder html2 = new StringBuilder();
-                                EquationBrowser.WriteHtml(html2, "FIND " + variableName + ":");
+                                EquationBrowser.WriteHtml(html2, variableName + " occurs in the following equations:");
+                                EquationBrowser.WriteHtml(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
+                                string table = "<table cellpadding=`10`>";                                
                                 foreach (EqHelper eqHelper in eqsNew)
                                 {
+                                    table += "<tr>";
                                     EquationTextHelper helper = new EquationTextHelper();
                                     GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
                                     string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
                                     string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");
-                                    EquationBrowser.WriteHtml(html2, link + " -----> " + helper22.s_gamsOrFrnSyntax);
-                                }
+                                    table += "<td style=`vertical-align:top`>";
+                                    table += link;
+                                    table += "</td>";
+                                    table += "<td style=`vertical-align:top`>";
+                                    table += helper22.s_gamsOrFrnSyntax;
+                                    table += "</td>";
+                                    table += "</tr>";
+                                }                                
+                                html2.AppendLine(table);
+
                                 StringBuilder x2 = new StringBuilder();
                                 x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
                                 x2.AppendLine("<html>");
@@ -9517,7 +9558,8 @@ namespace Gekko
                 if (culture == null) x = String.Format(format, d);
                 else
                 {
-                    CultureInfo ci = CultureInfo.CreateSpecificCulture(culture);  //for instance "da-DK", "en-US", "fr-FR", etc.
+                    CultureInfo ci = CultureInfo.GetCultureInfo(culture);  //for instance "da-DK", "en-US", "fr-FR", etc.
+                    //CultureInfo ci = CultureInfo.CreateSpecificCulture(culture);  //This is SLOOOW!
                     x = String.Format(ci, format, d);
                 }
             }
@@ -12896,6 +12938,7 @@ namespace Gekko
         /// <returns></returns>
         public static string SpecialXmlChars(string text)
         {
+            if (text == null) return text;
             text = text.Replace("&", "&amp;");
             text = text.Replace("<", "&lt;");
             text = text.Replace(">", "&gt;");
@@ -15956,6 +15999,7 @@ namespace Gekko
         /// <summary>
         /// finds [a*b?] patterns, handled like {'a*b?'}. 
         /// Problem is that [a*b] looks like a matrix definition, therefore this code.
+        /// Beware: because of Regex this method is rather slow, so take care using it in a tight loop.
         /// </summary>
         /// <param name="inside"></param>
         /// <returns></returns>
@@ -24267,7 +24311,8 @@ namespace Gekko
         {
             string code = "G";
             if (shortTime) code = "g";  //no seconds
-            string now = date1.ToString(code, CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+            string now = date1.ToString(code, CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            //string now = date1.ToString(code, CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOOW!!
             return now;
         }
 
@@ -24281,7 +24326,8 @@ namespace Gekko
         /// <returns></returns>
         public static DateTime GetDateTimePrettyInverse(string input)
         {
-            CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture(Globals.languageDaDK);
+            CultureInfo cultureInfo = CultureInfo.GetCultureInfo(Globals.languageDaDK);
+            //CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture(Globals.languageDaDK);  //This is SLOOOW!
 
             //See https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings
 
@@ -24325,16 +24371,22 @@ namespace Gekko
 
         public static string GetDateStamp()
         {
-            //See also #80927435209843
+            //See also #80927435209843            
+            //DateTime.UtcNow.ToString() does not appear to run significantly faster
+            //than DateTime.Now.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            //Super fast: an idea could be to cache the date and only update it if Environment.TickCount has changed somewhat. But probably not worth the effort.
+
             DateTime date1 = DateTime.Now;
-            string now = date1.ToString("d", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+            string now = date1.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            //string now = date1.ToString("d", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOOW!!! CreateSpecificCulture() sniffs around on the computer :-(, whereas GetCultureInfo() just uses a cached object.
             return now;
         }
 
         public static string GetTimeStamp()
         {
             DateTime date1 = DateTime.Now;
-            string now = date1.ToString("T", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+            string now = date1.ToString("T", CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            //string now = date1.ToString("T", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));   //This is SLOOOOW!!!
             return now;
         }
 

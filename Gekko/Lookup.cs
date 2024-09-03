@@ -488,7 +488,9 @@ namespace Gekko
             IVariable rv = null;
             string frombank = null;
 
-            if (Program.CheckIfLooksLikeWildcard2(dbName) || Program.CheckIfLooksLikeWildcard(varnameWithFreq))
+            //varnameWithFreq is screened first on a much faster method, and only if true, the slower method is called (that uses RegEx).
+            //This speeds up a tight loop with a series statement up a lot, like 50% faster. So RegEx is costly.
+            if ((Program.CheckIfLooksLikeWildcard2(dbName) || (Program.CheckIfLooksLikeWildcard2(varnameWithFreq) && Program.CheckIfLooksLikeWildcard(varnameWithFreq))))
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
 

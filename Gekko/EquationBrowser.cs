@@ -1469,7 +1469,7 @@ namespace Gekko
             sb3.Append(levelFormatted + " " + pchFormatted + " ");
         }
 
-        private static void WriteHtmlPreCode(StringBuilder sb, string sb2)
+        public static void WriteHtmlPreCode(StringBuilder sb, string sb2)
         {
             sb.Append("<pre><code>"); sb.Append(sb2); sb.Append("</code></pre>");
         }

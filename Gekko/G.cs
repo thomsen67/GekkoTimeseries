@@ -3305,21 +3305,7 @@ namespace Gekko
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Overload.
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="oldValue"></param>
-        /// <param name="newValue"></param>
-        /// <param name="comparisonType"></param>
-        /// <param name="maxtimes2"></param>
-        /// <returns></returns>
-        public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2)
-        {
-            return Replace(str, oldValue, @newValue, comparisonType, maxtimes2, false);
-        }
+        }        
 
         /// <summary>
         /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another 
@@ -3334,7 +3320,7 @@ namespace Gekko
         /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>A string that is equivalent to the current string except that all instances of <paramref name="oldValue"/> are replaced with <paramref name="newValue"/>. 
         /// If <paramref name="oldValue"/> is not found in the current instance, the method returns the current instance unchanged.</returns>        
-        public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2, bool checkBoundary)
+        public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2)
         {
             int maxtimes = maxtimes2;
             if (maxtimes2 <= 0) maxtimes = int.MaxValue;
@@ -3378,11 +3364,6 @@ namespace Gekko
 
             while ((foundAt = str.IndexOf(oldValue, startSearchFromIndex, comparisonType)) != valueNotFound)
             {
-                if (checkBoundary)
-                {
-                    if (!G.IsDelimited(str, foundAt, oldValue.Length)) continue;
-                }
-
                 // Append all characters until the found replacement.
                 int @charsUntilReplacment = foundAt - startSearchFromIndex;
                 bool isNothingToAppend = @charsUntilReplacment == 0;
@@ -3590,7 +3571,8 @@ namespace Gekko
                 {
                     string pd2 = Path.Combine(pd, "gekko.exe");
                     DateTime modification = File.GetLastWriteTime(pd2);
-                    exe = " (gekko.exe: " + modification.ToString("g", CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ")";
+                    exe = " (gekko.exe: " + modification.ToString("g", CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ")";
+                    //exe = " (gekko.exe: " + modification.ToString("g", CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ")";  //This is SLOOW!
                 }
                 catch { }
 
