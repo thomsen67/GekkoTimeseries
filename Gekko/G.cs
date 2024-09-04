@@ -541,6 +541,10 @@ namespace Gekko
             //freq is added for all no-sigil rhs
             //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
 
+            //For a simple timeseries loop, the below gives 17% more speed.
+            //if (varname.StartsWith("%")) return varname;
+            //else return varname + "!a";+
+
             bool hasSigil = G.Chop_HasSigil(varname);
 
             string varnameWithFreq = varname;
@@ -555,7 +559,6 @@ namespace Gekko
                     else varnameWithFreq = varname + Globals.freqIndicator + G.ConvertFreq(Program.options.freq);
                 }
             }
-
             return varnameWithFreq;
         }
 

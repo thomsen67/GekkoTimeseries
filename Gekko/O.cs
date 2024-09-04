@@ -4062,7 +4062,6 @@ namespace Gekko
             if (ss2.Length > 2)
             {
                 new Error("More than 1 freq indicators ('!') in '" + input + "'");
-                //throw new GekkoException();
             }
             else if (ss2.Length == 2)
             {

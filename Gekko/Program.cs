@@ -2458,6 +2458,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            
             if (Globals.runningOnTTComputer && text == "d")
             {
                 string op = "d";
@@ -24371,14 +24372,28 @@ namespace Gekko
 
         public static string GetDateStamp()
         {
+            //Why not store this as .UtcNow instead?
+            
+            //.UtcNow is about 4 times faster than .Now. But .Now can calculate around 6 mio times per second versus 22 mio. for .UtcNow.
+            //So .Now is unlikely as bottlenack.
+            //With .Now and CultureInfo.GetCultureInfo(), it is around 2 mio times per second. But with
+            //.Now and CultureInfo.CreateSpecificCulture() it is only around 12.500 per second. Really BAD! Factor 150 worse!!
+
             //See also #80927435209843            
             //DateTime.UtcNow.ToString() does not appear to run significantly faster
             //than DateTime.Now.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));
             //Super fast: an idea could be to cache the date and only update it if Environment.TickCount has changed somewhat. But probably not worth the effort.
-
+            
             DateTime date1 = DateTime.Now;
-            string now = date1.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));
-            //string now = date1.ToString("d", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOOW!!! CreateSpecificCulture() sniffs around on the computer :-(, whereas GetCultureInfo() just uses a cached object.
+            string now = null;
+            if (Program.options.bugfix_speed)
+            {
+                now = date1.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            }
+            else
+            {
+                now = date1.ToString("d", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOOW!!! CreateSpecificCulture() sniffs around on the computer :-(, whereas GetCultureInfo() just uses a cached object.
+            }            
             return now;
         }
 

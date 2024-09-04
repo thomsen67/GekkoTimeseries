@@ -488,9 +488,20 @@ namespace Gekko
             IVariable rv = null;
             string frombank = null;
 
+            bool wild = false;
+            if (Program.options.bugfix_speed)
+            {
+                //CheckIfLooksLikeWildcard2() is much faster
+                wild = Program.CheckIfLooksLikeWildcard2(dbName) || (Program.CheckIfLooksLikeWildcard2(varnameWithFreq) && Program.CheckIfLooksLikeWildcard(varnameWithFreq));
+            }
+            else
+            {
+                wild = Program.CheckIfLooksLikeWildcard2(dbName) || Program.CheckIfLooksLikeWildcard(varnameWithFreq);
+            }
+
             //varnameWithFreq is screened first on a much faster method, and only if true, the slower method is called (that uses RegEx).
             //This speeds up a tight loop with a series statement up a lot, like 50% faster. So RegEx is costly.
-            if ((Program.CheckIfLooksLikeWildcard2(dbName) || (Program.CheckIfLooksLikeWildcard2(varnameWithFreq) && Program.CheckIfLooksLikeWildcard(varnameWithFreq))))
+            if (wild)
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
 
@@ -1926,6 +1937,7 @@ namespace Gekko
         {
             if (!isArraySubSeries)
             {
+                //if (!Program.options.bugfix_speed) lhs_series.meta.stamp = Program.GetDateStamp(); --> gives a little more speed with Program.options.bugfix_speed == true, but not dramatic
                 lhs_series.meta.stamp = Program.GetDateStamp();
                 if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
                 if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
