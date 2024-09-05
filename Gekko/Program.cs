@@ -2458,7 +2458,26 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            
+            if (Globals.runningOnTTComputer && text == "t")
+            {
+
+                DateTime t000 = DateTime.UtcNow;
+                for (int i = 0; i < 1e6; i++)
+                {
+                    DateTime dt0 = DateTime.UtcNow;
+                    double ms = (DateTime.UtcNow - dt0).TotalMilliseconds;
+                }
+                new Writeln("ms = " + (DateTime.UtcNow - t000).TotalMilliseconds);
+
+                new Writeln("ms1 = " + (DateTime.Now - DateTime.Now).TotalMilliseconds);
+                new Writeln("ms2 = " + (DateTime.UtcNow - DateTime.Now).TotalMilliseconds);
+                new Writeln("ms3 = " + (DateTime.Now - DateTime.UtcNow).TotalMilliseconds);
+                new Writeln("ms4 = " + (DateTime.UtcNow - DateTime.UtcNow).TotalMilliseconds);
+
+                new Writeln("Now " + DateTime.Now.ToString());
+                new Writeln("UtcNow " + DateTime.UtcNow.ToString());
+            }
+
             if (Globals.runningOnTTComputer && text == "d")
             {
                 string op = "d";
