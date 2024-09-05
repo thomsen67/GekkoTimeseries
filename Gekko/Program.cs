@@ -5969,7 +5969,7 @@ namespace Gekko
                                     {                                        
                                         try
                                         {
-                                            DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                                             //When arriving here, it is a READ/IMPORT, not OPEN.
                                             //There are these combinations:
                                             //
@@ -6114,7 +6114,7 @@ namespace Gekko
                                                     Gekko.Trace2.PushIntoSeries(tsImported, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                                                 }
                                             }
-                                            Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                                         }
                                         catch
                                         {
@@ -9278,7 +9278,7 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
                                 Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
@@ -9289,7 +9289,7 @@ namespace Gekko
                                 //trace can only have null period if px date range is null, not possible
                                 Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
-                            Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -9340,7 +9340,7 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
                                 Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
@@ -9351,7 +9351,7 @@ namespace Gekko
                                 //trace can only have null period if px file has null period --> not possible
                                 Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
-                            Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -10310,7 +10310,7 @@ namespace Gekko
             {                
                 try
                 {
-                    DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                     bool onlyTraceSeries = false;
                     string x_lhs = "";
                     if (isLhs) x_lhs = "LHS";
@@ -10321,7 +10321,7 @@ namespace Gekko
                     {                        
                         Globals.traceContainer.Add(iv);  //uses dictionary internally
                     }
-                    Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                 }
                 catch
                 {
@@ -18363,14 +18363,14 @@ namespace Gekko
                 {                    
                     try
                     {
-                        DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         //We don't want the parent trace to have null-time.                                                            
                         Trace2 trace = new Trace2(ETraceType.Normal, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = o.gekkocode + ";";
                         trace.GetContents().name = ts.GetNameAndParentDatabank();
                         trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                         Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -18504,14 +18504,14 @@ namespace Gekko
                                 try
                                 {
                                     //injecting
-                                    DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                                     Trace2 trace = new Trace2(ETraceType.Normal, truncateTemp.t1, truncateTemp.t2, true);
                                     trace.GetContents().text = o.gekkocode + ";";
                                     trace.GetContents().name = existing_series.GetNameAndParentDatabank();
                                     trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                                     trace.AddRangeFromSeries2(existing_series, iv_series);
                                     Gekko.Trace2.PushIntoSeries(existing_series, trace, ETracePushType.Sibling, false);
-                                    Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                                 }
                                 catch (Exception e)
                                 {
@@ -18533,7 +18533,7 @@ namespace Gekko
                     {                        
                         try
                         {
-                            DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
 
                             GekkoTime xt1 = ts_clone.GetRealDataPeriodFirst();
                             GekkoTime xt2 = ts_clone.GetRealDataPeriodLast();
@@ -18548,7 +18548,7 @@ namespace Gekko
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
                             newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                            Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -26598,7 +26598,7 @@ namespace Gekko
                 {                    
                     try
                     {
-                        DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = gekkocode + ";";
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
@@ -26606,7 +26606,7 @@ namespace Gekko
                         trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -26927,7 +26927,7 @@ namespace Gekko
                 {                    
                     try
                     {
-                        DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = gekkocode + ";";
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
@@ -26935,7 +26935,7 @@ namespace Gekko
                         trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
