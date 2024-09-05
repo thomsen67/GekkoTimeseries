@@ -18955,9 +18955,7 @@ namespace Gekko
                 }
                 else if (lhsHasStarOrQuestion)
                 {
-                    //There is a star or question in bank, name or freq, or a range in name                    
-
-                    List<string> listOfAllOpenBanks = GetListOfAllBanks();
+                    //There is a star or question in bank, name or freq, or a range in name                                        
                     List<string> db_banks = new List<string>();
                     if (bankLhs == null)
                     {
@@ -18965,6 +18963,7 @@ namespace Gekko
                     }
                     else
                     {
+                        List<string> listOfAllOpenBanks = GetListOfAllBanks();
                         db_banks = MatchWildcard(bankLhs, listOfAllOpenBanks);
                     }
 
@@ -19527,13 +19526,11 @@ namespace Gekko
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
             //Not sorted at the end
             List<string> inputs = new List<string>();
-
             Wildcard wc = new Wildcard(wild1, RegexOptions.IgnoreCase);
             foreach (string n2 in stringsThatCanBeMatched)
-            {
+            {                
                 if (wc.IsMatch(n2)) inputs.Add(n2);
             }
-            //if (sort) inputs.Sort(StringComparer.OrdinalIgnoreCase);
             return inputs;
         }
 
