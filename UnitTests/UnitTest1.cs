@@ -4668,6 +4668,21 @@ namespace UnitTests
             _AssertSeries(First(), "x", 2005, 3d * 1.01d * 1.03d, sharedDelta);
             _AssertSeries(First(), "x", 2006, 3d * 1.01d * 1.03d * 1.05d, sharedDelta);
             _AssertSeries(First(), "x", 2007, double.NaN, sharedDelta);
+            // test of <keep=d>
+            I("RESET; TIME 2001 2006;");
+            I("x = (0.5, 1.5, 1, 1.01, 1.01+0.03, 1.01+0.03+0.05);"); //0.01, 0.03, 0.05 abs change
+            I("v = 2;");
+            I("<2001 2003 m keep=d> x = v + 0;");  //adds 2 in 2001-2003, then follow old abs change
+            _AssertSeries(First(), "x", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", 2001, 2.5d, sharedDelta);
+            _AssertSeries(First(), "x", 2002, 3.5d, sharedDelta);
+            _AssertSeries(First(), "x", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "x", 2004, 3d + 0.01d, sharedDelta);
+            _AssertSeries(First(), "x", 2005, 3d + 0.01d + 0.03d, sharedDelta);
+            _AssertSeries(First(), "x", 2006, 3d + 0.01d + 0.03d + 0.05d, sharedDelta);
+            _AssertSeries(First(), "x", 2007, double.NaN, sharedDelta);
+            // test of others
+            FAIL("<2001 2003 m keep=dp> x = v + 0;");  //All other than p or d fail.
 
             //Then a check of left-hand functions dif(), diff(), pch(), dlog(), log()
             //These are converted into codes <d>, <d>, <p>, <dl>, <l>, and these codes are tested too.            

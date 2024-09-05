@@ -1383,11 +1383,27 @@ namespace Gekko
 
                 //TODO: error if more than 1 is set
                 ESeriesUpdTypes operatorType = GetOperatorType(o);
-                bool keep = false; if (o != null && G.Equal(o.opt_keep, "p")) keep = true;
+                EKeep keep = EKeep.none;
+                if (o != null)
+                {
+                    if (G.Equal(o.opt_keep, "p"))
+                    {
+                        keep = EKeep.p;
+                    }
+                    else if (G.Equal(o.opt_keep, "d"))
+                    {
+                        keep = EKeep.d;
+                    }
+                    else if (!G.NullOrBlanks(o.opt_keep))
+                    {
+                        new Error("Option <keep=...> is only implemented for operators 'd' and 'p'");
+                    }
+                }
 
                 Series original = null;
-                if (keep || false)
+                if (keep != EKeep.none)
                 {
+                    if (lhs_series == null) new Error("Problem with option <keep=...>: the series does not exist beforehand");
                     original = (Series)lhs_series.DeepClone(0, null, null);
                 }
 
@@ -1818,7 +1834,7 @@ namespace Gekko
                         //nothing to do, either already existing in bank/map or array-subseries
                     }
 
-                    if (keep)
+                    if (keep != EKeep.none)
                     {
                         GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
 
@@ -1830,8 +1846,17 @@ namespace Gekko
                         {
                             //runs after the <...> period or globals period until data ends
                             //so the updates outside of sample.
-                            double rel = original.GetData(smpl, t) / original.GetData(smpl, t.Add(-1));
-                            lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
+                            if (keep == EKeep.p)
+                            {
+                                double rel = original.GetData(smpl, t) / original.GetData(smpl, t.Add(-1));
+                                lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
+                            }
+                            else if (keep == EKeep.d)
+                            {
+                                double abs = original.GetData(smpl, t) - original.GetData(smpl, t.Add(-1));
+                                lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) + abs);
+                            }
+                            else new Error("Internal error #6732005y83264");  //should not be possible
                         }
                     }
 
@@ -1841,7 +1866,7 @@ namespace Gekko
                         ReportSeriesMissingValue(lhs_series, smpl.t1, smpl.t2);
                     }
 
-                    if (keep || operatorType == ESeriesUpdTypes.d || operatorType == ESeriesUpdTypes.p || operatorType == ESeriesUpdTypes.m || operatorType == ESeriesUpdTypes.q || operatorType == ESeriesUpdTypes.mp || operatorType == ESeriesUpdTypes.dl)
+                    if (keep != EKeep.none || operatorType == ESeriesUpdTypes.d || operatorType == ESeriesUpdTypes.p || operatorType == ESeriesUpdTypes.m || operatorType == ESeriesUpdTypes.q || operatorType == ESeriesUpdTypes.mp || operatorType == ESeriesUpdTypes.dl)
                     {
                         //All these operators somehow include the LHS on the RHS (maybe lagged).
                         //Operators <n> or <l> are <..nothing..> are not included.

@@ -1479,6 +1479,12 @@ namespace Gekko
         //Gnuplot
     }
 
+    public enum EKeep 
+    {
+        none,
+        p,
+        d
+    }
     public enum ESeriesUpdTypes
     {
         none,
