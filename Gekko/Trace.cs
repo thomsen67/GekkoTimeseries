@@ -916,7 +916,7 @@ namespace Gekko
         {
             string s = null;     
             //The stamp is in UTC time, so we ask for it in local time for printing on screen.
-            s += this.GetId().stamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") + "|" + this.GetId().counter;
+            s += this.GetId().StampInLocalTime().ToString("dd/MM/yyyy HH:mm:ss") + "|" + this.GetId().counter;
             return s;
         }
 
@@ -943,7 +943,7 @@ namespace Gekko
                 if (s1 != null) len = s1.Length;
                 s2 += G.Blanks(50 - len - 2 * d) + " --> period: " + period;
                 //s2 += ", stamp: " + this.GetId().stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOW!
-                s2 += ", stamp: " + this.GetId().stamp.ToLocalTime().ToString("g", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
+                s2 += ", stamp: " + this.GetId().StampInLocalTime().ToString("g", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
             }
             return new TwoStrings(s1, s2);
         }
@@ -1558,8 +1558,8 @@ namespace Gekko
         public static void GetStampAsString(TraceID2 id, out string stamp, out string stampDetailed)
         {
             //The .stamp is in UTC time, so needs to be converted for printing
-            stamp = id.stamp.ToLocalTime().ToString("d", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
-            stampDetailed = id.stamp.ToLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;
+            stamp = id.StampInLocalTime().ToString("d", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            stampDetailed = id.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;
             //stamp = id.stamp.ToString("d", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOW!
             //stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ", #" + id.counter;  //This is SLOOOW!
         }
@@ -1698,7 +1698,7 @@ namespace Gekko
         /// The change from .Now to .UtcNow will make older data traces 2 hours off for Danish users. Probably ok.
         /// </summary>
         [ProtoMember(1)]
-        public readonly DateTime stamp = DateTime.UtcNow;  //faster than .Now and also more universal since it counts "tics" from the same Coordinated Universal Time.
+        private readonly DateTime stamp = DateTime.UtcNow;  //faster than .Now and also more universal since it counts "tics" from the same Coordinated Universal Time.
 
         /// <summary>
         /// Used to distinguish traces, especially if these are pruned off. Will be numerically > 0, and when counter is < 0 it means that the trace is stored in en external file (pruned off).
@@ -1717,6 +1717,11 @@ namespace Gekko
         {
             this.stamp = stamp;
             this.counter = counter;
+        }
+
+        public DateTime StampInLocalTime() 
+        {
+            return this.stamp.ToLocalTime();
         }
 
         public override bool Equals(object o)
