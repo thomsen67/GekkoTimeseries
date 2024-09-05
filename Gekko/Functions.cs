@@ -782,7 +782,7 @@ namespace Gekko
                         }
                         else if (G.Equal(type, "stamp2"))
                         {
-                            GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, tap.trace.GetId().stamp);
+                            GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, tap.trace.GetId().stamp.ToLocalTime());  //We must return this in the local time, not UTC time. Conversion only relevant around midnight, and mostly for daily frequency. But this is like returning a string, like for printing.
                             m.Add(new ScalarDate(gt));
                         }
                         else if (G.Equal(type, "name"))

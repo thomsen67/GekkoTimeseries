@@ -39,7 +39,6 @@ namespace Gekko
     public class Globals
     {
         public static bool graneFix = false;
-        public static bool jonasFix = false;
         
         public static bool stars = true; //#8ujklasdfas        
 

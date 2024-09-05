@@ -2466,14 +2466,11 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "t")
             {
-
-                DateTime t000 = DateTime.UtcNow;
                 for (int i = 0; i < 1e6; i++)
                 {
                     DateTime dt0 = DateTime.UtcNow;
                     double ms = (DateTime.UtcNow - dt0).TotalMilliseconds;
-                }
-                new Writeln("ms = " + (DateTime.UtcNow - t000).TotalMilliseconds);
+                }                
 
                 new Writeln("ms1 = " + (DateTime.Now - DateTime.Now).TotalMilliseconds);
                 new Writeln("ms2 = " + (DateTime.UtcNow - DateTime.Now).TotalMilliseconds);
@@ -2482,6 +2479,21 @@ namespace Gekko
 
                 new Writeln("Now " + DateTime.Now.ToString());
                 new Writeln("UtcNow " + DateTime.UtcNow.ToString());
+
+                DateTime den = DateTime.Now;
+                DateTime uk = DateTime.UtcNow;
+                double span = (den - uk).TotalMilliseconds;
+                new Writeln("Span = " + span);
+
+                DateTime den1 = den.ToLocalTime();
+                DateTime uk1 = uk.ToLocalTime();
+                string sden1 = den1.ToString();
+                string duk1 = uk1.ToString();
+
+                new Writeln("A "+TimeZoneInfo.ConvertTimeFromUtc(uk, TimeZoneInfo.Local).ToString());
+                new Writeln("A pure " + uk.ToString());
+                new Writeln("A next " + uk.ToLocalTime().ToString());
+                new Writeln("B "+TimeZoneInfo.ConvertTimeFromUtc(den, TimeZoneInfo.Local).ToString());
             }
 
             if (Globals.runningOnTTComputer && text == "d")
@@ -24403,7 +24415,7 @@ namespace Gekko
 
             //See also #80927435209843            
             //DateTime.UtcNow.ToString() does not appear to run significantly faster
-            //than DateTime.Now.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            //than DateTime.Now.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));GetCultureInfo(
             //Super fast: an idea could be to cache the date and only update it if Environment.TickCount has changed somewhat. But probably not worth the effort.
             
             DateTime date1 = DateTime.Now;
