@@ -414,26 +414,26 @@ namespace Gekko
             {
                 if (isFirst)
                 {
-                    if (isCurrentFreq) prefix = "1";
-                    else prefix = "2";
+                    if (isCurrentFreq) prefix = Globals.number1;
+                    else prefix = Globals.number2;
                 }
                 else
                 {
-                    if (isCurrentFreq) prefix = "3";
-                    else prefix = "4";
+                    if (isCurrentFreq) prefix = Globals.number3;
+                    else prefix = Globals.number4;
                 }
             }
             else
             {
                 if (isFirst)
                 {
-                    if (isCurrentFreq) prefix = "5";
-                    else prefix = "6";
+                    if (isCurrentFreq) prefix = Globals.number5;
+                    else prefix = Globals.number6;
                 }
                 else
                 {
-                    if (isCurrentFreq) prefix = "7";
-                    else prefix = "8";
+                    if (isCurrentFreq) prefix = Globals.number7;
+                    else prefix = Globals.number8;
                 }
             }
             return prefix + Globals.tracePrecedentsTypeDelimiter + rhs.GetNameAndParentDatabank();
@@ -1694,11 +1694,11 @@ namespace Gekko
         /// Switched from .Now to .UtcNow 5/9 2024, because .Now counts ticks since local time new Year 1900, but .UtcNow counts ticks
         /// since British New Year 1900. Local ticks will just confuse, with users in different time zones.
         /// And also, .UtcNow runs 3-4x faster than .Now (because .UtcNow is closer to the metal and does not have to look up which
-        /// time zone the user happens to be in right now, imagine stepping out of a plane and changing time zone on computer).
+        /// time zone the user happens to be in right now in this second).
         /// The change from .Now to .UtcNow will make older data traces 2 hours off for Danish users. Probably ok.
         /// </summary>
         [ProtoMember(1)]
-        private readonly DateTime stamp = DateTime.UtcNow;  //faster than .Now and also more universal since it counts "tics" from the same Coordinated Universal Time.
+        private readonly DateTime stamp = DateTime.UtcNow;  //Use .StampInLocalTime() when printing etc.!!! Faster than .Now and also more universal since it counts "tics" from the same Coordinated Universal Time.
 
         /// <summary>
         /// Used to distinguish traces, especially if these are pruned off. Will be numerically > 0, and when counter is < 0 it means that the trace is stored in en external file (pruned off).
@@ -1732,7 +1732,7 @@ namespace Gekko
         }
         public override string ToString()
         {
-            return this.stamp.ToLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
+            return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
         }
 
         public override int GetHashCode()

@@ -1021,10 +1021,14 @@ namespace Gekko
         
         public static CommandMemory commandMemory = new CommandMemory();
 
-        //public static List<string> bugfixMissing1 = new List<string>();
-        //public static GekkoDictionary<string, string> bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        //public static int bugfixLhsDollar = 0;
-
+        public const string number1 = "1";
+        public const string number2 = "2";
+        public const string number3 = "3";
+        public const string number4 = "4";
+        public const string number5 = "5";
+        public const string number6 = "6";
+        public const string number7 = "7";
+        public const string number8 = "8";
     }
 
     public class CommandMemory
