@@ -8514,12 +8514,128 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_TraceSpeed()
+        public void _Test_Speed()
         {
-            Assert.Inconclusive();
-            I("reset; for val %i = 1950 to 2010; x <%i %i> = 100 + %i; end; x = 0; for val %i = 1 to 1000; x += 1; end;");
-            //to the test, make sure trace percentage is < 3%.
-            Assert.Fail();
+            //See also c:\Thomas\Gekko\regres\Speed2 to run tests with Gekko.exe.
+
+            //64-bit uses about 30% less time than 32-bit on this
+            //Speed3_g30 kørte med ca. 10.3k/s på 3.1.20 64-bit.
+            //Med lhs_series.meta.stamp = Program.GetDateStamp(); slået fra blev det til: 65k/s, dvs. faktor > 6.
+            //  Dette har ikke været et problem for array-serier, da stamp ikke sættes når x[i] opdateres.
+            //Hvis også Program.CheckIfLooksLikeWildcard2(dbName) || Program.CheckIfLooksLikeWildcard(varnameWithFreq)) er switched væk,
+            //  fås op mod 100k/s.
+            //Faster G.AddFreq() would give extra 20% or so.
+            //4/9 2024: Like a factor 10-15 x speedup with option bugfix speed = yes.
+            //6/9 2024: With speedup we have around 110k/s with traces (25% trace use), and 150k/s without traces.
+            //          No speedup:          around  10k/s with traces ( 3% trace use), and  10k/s without traces.
+
+            //These unit tests, both when using "Run tests" not "Debug tests", seem to run in 64-bit.
+            //But still they are 2 to 2.5x slower for "Run tests" than running Gekko.exe stand-alone.
+            //But we can use them for speed tests anyway.
+
+            //I("tell gekkoInfo('short5');"); return;
+
+            string n = "1e+5";
+            double n2 = double.Parse(n);
+
+            I("reset;");
+            I("option bugfix speed = yes;");
+            I("option databank trace = yes;");
+            I("val %n = " + n + ";");
+            I("val %periods = 20;");
+            I("val %summax = 5;");
+            I("date %t2 = 2000 + %periods;");
+            I("time 1995 %t2;");
+            I("for val %i = 1 to %summax; x{%i} = %i; end;");
+            I("index x* to #m;");
+            I("interpolate x4!q = x1;");
+            I("%x = 1;");
+            I("time 2000 %t2;");
+
+            for (int i = 1; i <= 6; i++)
+            {
+                string code = null;
+                if (i == 1)
+                {
+                    code = "ser y = x1 + x1[-1] + x2 + x2[-1] + x3[2000] + %x + 1 + 2;";
+                }
+                else if (i == 2)
+                {
+                    code = "interpolate y!q = x1;";
+                }
+                else if (i == 3)
+                {
+                    code = "collapse y = x4!q;";
+                }
+                else if (i == 4)
+                {
+                    code = "y = sum({#m});";
+                }
+                else if (i == 5)
+                {
+                    code = "y = x1.replace(m(), 0);";
+                }
+                else if (i == 6)
+                {
+                    code = "index <mute> x* to #mm;";
+                }
+                else Assert.Fail();
+
+                double msMin = double.MaxValue;         
+                for (int j = 0; j < 5; j++)
+                {
+                    DateTime t0 = DateTime.UtcNow;
+                    I("option interface mute = yes; for val %k = 1 to %n; " + code + " end; option interface mute = no;");
+                    double ms = (DateTime.UtcNow - t0).TotalMilliseconds;
+                    msMin = Math.Min(msMin, ms);
+                }
+
+                new Writeln("Code " + i + ": " + code);
+                new Writeln("--> Time = " + msMin / 1000d + ", speed = " + n2 / msMin * 1000d);
+                
+                double cps = n2 / msMin * 1000d;
+                double p = 15d;  //+-15%, also speedups will fail, and in that case the target can be adjusted.
+
+                if (i == 1)
+                {
+                    double target = 37000;
+                    Helper_Speed(cps, target, p);
+                }
+                else if (i == 2)
+                {                    
+                    double target = 31000;
+                    Helper_Speed(cps, target, p);
+                }
+                else if (i == 3)
+                {                    
+                    double target = 31000;
+                    Helper_Speed(cps, target, p);
+                }
+                else if (i == 4)
+                {                    
+                    double target = 42000;
+                    Helper_Speed(cps, target, p);
+                }
+                else if (i == 5)
+                {                    
+                    double target = 91000;
+                    Helper_Speed(cps, target, p);
+                }
+                else if (i == 6)
+                {                    
+                    double target = 69000;
+                    Helper_Speed(cps, target, p);
+                }
+                else Assert.Fail();               
+            }
+        }
+
+        private static void Helper_Speed(double cps, double target, double p)
+        {
+            //% deviation
+            double temp = 100d * (cps - target) / target;
+            new Writeln("Measured = " + cps + ", Target = " + target + ", %diff = " + temp + ", positive %diff is good");
+            Assert.AreEqual(temp, 0d, p);
         }
 
         [TestMethod]

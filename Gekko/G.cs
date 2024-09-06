@@ -56,6 +56,10 @@ namespace Gekko
         public static string NL = "\r\n";  //official Windows, cf. https://stackoverflow.com/questions/3986093/in-c-whats-the-difference-between-n-and-r-n
         public static char NL2 = '\n';     //best for counting number of newlines, since Windows accepts both \r\n and \n as newline. Mac uses \r, hmm, never mind.
 
+        // ------------------------------------------------------------------------------------------------
+        // Compare strings start
+        // ------------------------------------------------------------------------------------------------
+
         /// <summary>
         /// Compares two strings, ignoring case (so "aBc" == "Abc"). If one but not the other
         /// is null, it returns false. If both are null, it returns true.
@@ -66,7 +70,9 @@ namespace Gekko
         public static bool Equal(string s1, string s2)
         {
             //s1 or s2 may be null
-            return (string.Compare(s1, s2, true) == 0);  //true for ignoreCase                
+            return (string.Compare(s1, s2, true) == 0);  //true for ignoreCase
+            //For Gekko 3.2 maybe use this, probably faster:
+            //return (string.Compare(s1, s2, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public static string Equal(string s1, List<string> s3)
@@ -74,6 +80,8 @@ namespace Gekko
             string rv = null;
             foreach (string s2 in s3)
             {
+                //For Gekko 3.2 maybe use this, probably faster:
+                //if (string.Compare(s1, s2, StringComparison.OrdinalIgnoreCase) == 0);
                 if (string.Compare(s1, s2, true) == 0)  //true for ignoreCase                
                 {
                     rv = s2;
@@ -82,6 +90,44 @@ namespace Gekko
             }
             return rv;
         }
+
+        /// <summary>
+        /// Fastest version of StartsWith(), use if case-insensitive is not required (the method is like 5x faster than G.StartsWith()).
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
+        public static bool StartsWithCaseSensitiveFast(string s1, string s2)
+        {
+            //This is like 10x faster than s1.StartsWith(s2), which looks for current culture first. Here we are just comparing bytes, not worrying if "ae" is same as "æ".
+            return s1.StartsWith(s2, StringComparison.Ordinal);  
+        }
+
+        /// <summary>
+        /// Like 5x slower than G.StartsWithCaseSensitive(), but still ok fast because it uses Ordinal comparison.
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
+        public static bool StartsWith(string s1, string s2)
+        {
+            return s1.StartsWith(s2, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Search for string inside string (case-insensitive). For instance Contains('Peartree', 'TREE') == true.
+        /// </summary>
+        /// <param name="s1">String to search (e.g. 'peartree')</param>
+        /// <param name="s2">Sub-string to search for (e.g. 'tree')</param>
+        /// <returns>True if match</returns>
+        public static bool Contains(string s1, string s2)
+        {
+            return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        // ------------------------------------------------------------------------------------------------
+        // Compare strings end
+        // ------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// In a double[] array, replaces missing values with 0
@@ -119,18 +165,7 @@ namespace Gekko
         public static string ReplaceTurtle(string s)
         {
             return s.Replace("¤[0]", "").Replace("¤", "");
-        }
-
-        /// <summary>
-        /// Search for string inside string (case-insensitive). For instance Contains('Peartree', 'TREE') == true.
-        /// </summary>
-        /// <param name="s1">String to search (e.g. 'peartree')</param>
-        /// <param name="s2">Sub-string to search for (e.g. 'tree')</param>
-        /// <returns>True if match</returns>
-        public static bool Contains(string s1, string s2)
-        {
-            return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
+        }        
 
         /// <summary>
         /// Fast parse of a simple string into an integer. Strings like '123', '007', no minus, delimiters. ...

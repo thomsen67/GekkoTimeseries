@@ -170,7 +170,7 @@ namespace Gekko
         /// <returns></returns>
         public string GetName()
         {            
-            if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
+            if (this.name == null || G.StartsWithCaseSensitiveFast(this.name, Globals.seriesArraySubName))
             {
                 if (this.mmi == null)
                 {
@@ -211,7 +211,7 @@ namespace Gekko
             {
                 if (Globals.runningOnTTComputer) G.WarningInternal("TTH: Parent problem (.name)");
             }
-            if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
+            if (this.name == null || G.StartsWithCaseSensitiveFast(this.name, Globals.seriesArraySubName))
             {
                 return this.mmi?.parent?.meta?.parentDatabank;
             }

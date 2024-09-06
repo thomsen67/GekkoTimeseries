@@ -4094,10 +4094,10 @@ namespace Gekko
 
             if (rest != null)
             {
+                //Gekko 3.2: use G.StartsWith...Fast and make similar for EndsWith.
                 if (!(rest.StartsWith("[") && rest.EndsWith("]")))
                 {
                     new Error("Expected indexer to start with '[' and end with ']'");
-                    //throw new GekkoException();
                 }
                 indexes = rest.Substring(1, rest.Length - 2).Split(',');
                 for (int i = 0; i < indexes.Length; i++)
@@ -4115,7 +4115,6 @@ namespace Gekko
             if (ss.Length > 2)
             {
                 new Error("More than 1 colons (':') in '" + input + "'");
-                //throw new GekkoException();
             }
             dbName = null;
             varName = null;
@@ -4144,7 +4143,6 @@ namespace Gekko
             if (string.IsNullOrWhiteSpace(name))
             {
                 new Error("Name cannot be null");
-                //throw new GekkoException();
             }
             string s = name.Trim();
             if (bank != null) s = bank.Trim() + Globals.symbolBankColon + s;

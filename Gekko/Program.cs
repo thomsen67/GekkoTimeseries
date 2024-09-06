@@ -2465,35 +2465,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer && text == "t")
-            {
-                for (int i = 0; i < 1e6; i++)
-                {
-                    DateTime dt0 = DateTime.UtcNow;
-                    double ms = (DateTime.UtcNow - dt0).TotalMilliseconds;
-                }                
-
-                new Writeln("ms1 = " + (DateTime.Now - DateTime.Now).TotalMilliseconds);
-                new Writeln("ms2 = " + (DateTime.UtcNow - DateTime.Now).TotalMilliseconds);
-                new Writeln("ms3 = " + (DateTime.Now - DateTime.UtcNow).TotalMilliseconds);
-                new Writeln("ms4 = " + (DateTime.UtcNow - DateTime.UtcNow).TotalMilliseconds);
-
-                new Writeln("Now " + DateTime.Now.ToString());
-                new Writeln("UtcNow " + DateTime.UtcNow.ToString());
-
-                DateTime den = DateTime.Now;
-                DateTime uk = DateTime.UtcNow;
-                double span = (den - uk).TotalMilliseconds;
-                new Writeln("Span = " + span);
-
-                DateTime den1 = den.ToLocalTime();
-                DateTime uk1 = uk.ToLocalTime();
-                string sden1 = den1.ToString();
-                string duk1 = uk1.ToString();
-
-                new Writeln("A "+TimeZoneInfo.ConvertTimeFromUtc(uk, TimeZoneInfo.Local).ToString());
-                new Writeln("A pure " + uk.ToString());
-                new Writeln("A next " + uk.ToLocalTime().ToString());
-                new Writeln("B "+TimeZoneInfo.ConvertTimeFromUtc(den, TimeZoneInfo.Local).ToString());
+            {                
             }
 
             if (Globals.runningOnTTComputer && text == "d")
@@ -19415,7 +19387,7 @@ namespace Gekko
         public static bool IsListfileArtificialName(string varnameWithFreq)
         {
             if (varnameWithFreq == null) return false;
-            return varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___");
+            return G.StartsWithCaseSensitiveFast(varnameWithFreq, Globals.symbolCollection + Globals.listfile + "___");
         }
 
         /// <summary>
@@ -24406,17 +24378,14 @@ namespace Gekko
 
         public static string GetDateStamp()
         {
-            //Why not store this as .UtcNow instead?
+            //Why not store this as .UtcNow instead? Do this for Gekko 4.0...!
             
-            //.UtcNow is about 4 times faster than .Now. But .Now can calculate around 6 mio times per second versus 22 mio. for .UtcNow.
-            //So .Now is unlikely as bottlenack.
             //With .Now and CultureInfo.GetCultureInfo(), it is around 2 mio times per second. But with
             //.Now and CultureInfo.CreateSpecificCulture() it is only around 12.500 per second. Really BAD! Factor 150 worse!!
 
             //See also #80927435209843            
             //DateTime.UtcNow.ToString() does not appear to run significantly faster
-            //than DateTime.Now.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK));GetCultureInfo(
-            //Super fast: an idea could be to cache the date and only update it if Environment.TickCount has changed somewhat. But probably not worth the effort.
+            //than DateTime.Now.ToString("d", CultureInfo.GetCultureInfo(Globals.languageDaDK)).            
             
             DateTime date1 = DateTime.Now;
             string now = null;
