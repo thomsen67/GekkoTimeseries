@@ -1899,7 +1899,7 @@ namespace Gekko
         public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, GekkoTime t3, IBank ib, Series lhs_series, bool isArraySubSeries, Assignment o, P p)
         {                        
             if (Program.options.databank_trace)
-            {
+            {                
                 Databank databank = null;
                 Databank parentDatabank = lhs_series.GetParentDatabank();  //for subseries where ib will be = null
                 if (parentDatabank != null) databank = parentDatabank;

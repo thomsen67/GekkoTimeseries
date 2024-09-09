@@ -156,6 +156,7 @@ namespace Gekko
                 {
                     throw new GekkoException(this);
                 }
+
                 else
                 {
                     GekkoException ge = e as GekkoException;

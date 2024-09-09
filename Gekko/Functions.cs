@@ -1536,7 +1536,7 @@ namespace Gekko
         /// </summary>
         public static IVariable tic(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            Globals.tictoc = DateTime.Now;
+            Globals.tictoc = DateTime.Now;  //Gekko 4.0: use UtcNow. Maybe also do a now() function counting UTC or ticks or something fast.
             return GekkoNull.gekkoNull;
         }
 

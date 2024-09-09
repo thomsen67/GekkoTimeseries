@@ -3423,7 +3423,8 @@ namespace Gekko
                     GekkoTime tt1_20 = smpl.t1;
                     GekkoTime tt2_20 = smpl.t2;
                     int counter = -1;
-                    foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                    GekkoTimeIterator gti = new GekkoTimeIterator(smpl.t1, smpl.t2);
+                    foreach (GekkoTime t_20 in gti)
                     {
                         counter++;
                         smpl.t1 = t_20;
