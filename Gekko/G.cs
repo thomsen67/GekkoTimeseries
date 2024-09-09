@@ -588,7 +588,7 @@ namespace Gekko
             {
                 //Series has '!' added
                 //In VAL v = 100, there will be no freq added.
-                if (!varname.Contains(Globals.freqIndicator.ToString()))
+                if (!G.Contains(varname, Globals.freqIndicatorString))
                 {
                     if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
                     else varnameWithFreq = varname + Globals.freqIndicator + G.ConvertFreq(Program.options.freq);

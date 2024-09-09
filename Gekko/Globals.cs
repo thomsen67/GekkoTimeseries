@@ -690,7 +690,8 @@ namespace Gekko
         public static string lagIndicator = "¤";
         public static string leftParenthesisIndicator = "[";
         public static string rightParenthesisIndicator = "]";
-        public const char freqIndicator = '!';  //see also #09832752                
+        public const char freqIndicator = '!';  //see also #09832752
+        public const string freqIndicatorString = "!";
 
         public static string protectSymbol = "\u2714";
 
