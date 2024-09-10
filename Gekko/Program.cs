@@ -27163,15 +27163,51 @@ namespace Gekko
         /// <param name="t2_low"></param>
         private static void Denton(Series ts_lhs, Series ts_rhs, Series ts_indicator, EFreq freq_lhs, EFreq freq_rhs, GekkoTime t1_high, GekkoTime t2_high, GekkoTime t1_low, GekkoTime t2_low)
         {
-            //Denton tries to match the differences in the produced series y (high-freq) to the differences in
-            //the indicator series x as closely as possible, while making sure that the produces series
-            //collapses into the low-freq series z.
-            //This looks like R[t] = y[t]-y[t-1] - (x[t]-x[t-1]), but at the very start we do not know y[t-1] and x[t-1] and we
-            //assume that they are equal: R[1] = y[1] - x[1]. But imagine t being quarterly and y[t] = x[t] = 1, and annual z = 4.
-            //This could be a perfect match. But now imagine that z = 8, with the same indicator x series.
-            //Now, we cannot set y[t] = constant 2, because of the first observation that would be R = 2-1 = 1. Therefore, 
-            //the algorithm would set the first y < 2, and y[t] would oscillate towards 2.
-            //To avoid this behavior, we could scale the indicator so that it (collapsed) matches the low-freq series.
+            //https://web-archive.oecd.org/2012-06-15/158845-21779760.pdf
+            //
+            //We have an annual series y. We have a quarterly indicator series z. We try to produce a quarterly series x, where
+            //y = collapse(x), and where x and y somehow are "similar". Similar can be defined as
+            //penalty function p(x, z) = delta(x - z), or p = x-z - (x[-1]-z[-1]).
+            //n = m*k, where k is 4 for quarterly, and m is number of years.
+            //Let us say that p = t(x-z)*A*(x-z), where A is n x n.
+            //Let us say that B is a n x m matrix like this:
+            // [ 1  0  0  ... ]
+            // [ 1  0  0  ... ]
+            // [ 1  0  0  ... ]
+            // [ 1  0  0  ... ]
+            // [ 0  1  0  ... ]
+            // [ 0  1  0  ... ]
+            // [ 0  1  0  ... ]
+            // [ 0  1  0  ... ]
+            // [ 0  0  1  ... ]
+            // [ ...      ... ]
+            //Hence, collapse is y = t(B)*x.
+            //
+            //Penalty function: in the quarterly residuals, it is (for the first four periods):
+            //
+            // [ 1  0  0  0 ]   [ x1-z1 ]
+            // [-1  1  0  0 ]   [ x2-z2 ]
+            // [ 1 -1  1  0 ]   [ x3-z3 ]
+            // [ 1  0 -1  1 ]   [ x4-z4 ]
+            //
+            //Afterwards, the resulting vector is quared, but misaligned levels for x1 and z1 (because the y annual series
+            //does not align with the quarterly z) gives the level problem. So Denton-Cholette simply sets
+            //the very first 1 value in the matrix = 0, so the first contribution disappears. Then the matrix cannot be 
+            //inverted, and the standard Denton does not work. But the larger problem/matrices does work.
+            //
+            //Solution is
+            //
+            // [x     ]    =   inv( [ A       B ]  ) * [ A     0 ] *  [ z ]           where  r = y - t(B)*z
+            // [lambda]             [ t(B)    0 ]      [ t(B)  I ]    [ r ]
+            //
+            // So we have inv( n+m x n+m )  *  n+m x n+m  *   n+m x 1    =   n+m x 1
+            // The penalty could be squared sum of time-differences in residuals (here for three quarters):
+            // (x1-z1-(x0-z0))**2 + (x2-z2-(x1-z1))**2 + (x3-z3-(x2-z2))**2 + ...
+            // We do not have x0-z0, so we set it = 0. This means that for the first component of the squared sum,
+            // we have (x1-z2)**2, so misaligned levels here af BAD!
+            //
+            // Denton-Cholette removes the first row, or the (x1-z2)**2 part of the squared sum.
+            //
             //
             //reset;
             //option freq q;
@@ -27285,7 +27321,7 @@ namespace Gekko
                 {
                     b[i * k + j, i] = 1;
                 }
-            }
+            }            
 
             double[,] ai = new double[n, n];
             for (int i = 0; i < n; i++)
@@ -27296,9 +27332,94 @@ namespace Gekko
                 }
             }
 
+            
+
             double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
             double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
             double[,] x = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
+
+            if (true)
+            {
+                double[,] a = new double[n, n];
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (i == j) a[i, j] = 1;
+                        if (i < n - 2 && i + 1 == j) a[i, j + 1] = -1;
+                    }
+                }
+
+                // --------
+
+                double[,] large1 = new double[n + m, n + m];
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        large1[i, j] = a[i, j];
+                    }
+                }
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        large1[i, j + n] = b[i, j];
+                    }
+                }
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        large1[j + n, i] = b[i, j];
+                    }
+                }
+
+                // ---------
+
+                double[,] large2 = new double[n + m, n + m];
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        large2[i, j] = a[i, j];
+                    }
+                }
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        large2[j + n, i] = b[i, j];
+                    }
+                }
+
+                for (int i = 0; i < m; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        if (i == j) large2[j + n, i + n] = 1;
+                    }
+                }
+
+                // ---------
+
+                double[,] large3 = new double[n + m, 1];
+                for (int i = 0; i < n; i++)
+                {
+                    large3[i, 0] = z[i, 0];
+                }
+                for (int i = 0; i < m; i++)
+                {
+                    large3[i + n, 0] = r[i, 0];
+                }
+
+                // ---------
+
+                double[,] invert = Program.InvertMatrix(large1);
+                double[,] result1 = Program.MultiplyMatrices(invert, large2);
+                double[,] result2 = Program.MultiplyMatrices(result1, large3);
+
+            }
 
             counter = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
