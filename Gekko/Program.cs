@@ -27340,15 +27340,19 @@ namespace Gekko
 
             if (true)
             {
-                double[,] a = new double[n, n];
+                double[,] d = new double[n, n];
                 for (int i = 0; i < n; i++)
                 {
                     for (int j = 0; j < n; j++)
                     {
-                        if (i == j) a[i, j] = 1;
-                        if (i < n - 2 && i + 1 == j) a[i, j + 1] = -1;
+                        if (i == j) d[i, j] = 1;
+                        if (i > 0 && i - 1 == j) d[i, j] = -1;
                     }
                 }
+
+                // --------
+
+                double[,] a = Program.MultiplyMatrices(Program.Transpose(d), d);
 
                 // --------
 
@@ -27415,6 +27419,7 @@ namespace Gekko
 
                 // ---------
 
+                
                 double[,] invert = Program.InvertMatrix(large1);
                 double[,] result1 = Program.MultiplyMatrices(invert, large2);
                 double[,] result2 = Program.MultiplyMatrices(result1, large3);
