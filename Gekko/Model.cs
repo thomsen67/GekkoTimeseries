@@ -1192,11 +1192,11 @@ namespace Gekko
 
         /// <summary>
         /// For any eval of GAMS scalar model, we must consider loading
-        /// data into the model arrays. For now, it always returns true.
-        /// Later on, keep track of First/Ref databank changes...
+        /// data into the model arrays. The 'Refresh' button can refresh the data from databanks to the values stored in the scalar model.        
+        /// 
         /// </summary>
         /// <returns></returns>
-        public void MaybeLoadDataIntoModel(int depth, GekkoTime gt1, GekkoTime gt2)
+        public void MaybeLoadDataIntoModel(int depth, GekkoTime gt1, GekkoTime gt2, bool forceRefresh)
         {
             bool hasPeriodChanged = false;
             bool hasDatabankChanged = true;  //in the longer run, keep track of that
@@ -1226,14 +1226,12 @@ namespace Gekko
                     {                    
                     }
                 }                
-            }
-            else
-            {                
-            }
+            }            
 
             bool shouldUpdate = false;
             if (hasDatabankChanged || hasPeriodChanged) shouldUpdate = true;
-            if (depth > 0) shouldUpdate = false;  //do not update sub-windows
+            if (depth > 0) shouldUpdate = false;  //do not update sub-windows (unless refreshing, see below)
+            if (forceRefresh) shouldUpdate = true;  //always overrides
             if (!shouldUpdate) return; //never returns
 
             DateTime t0 = DateTime.Now;

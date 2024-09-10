@@ -2524,22 +2524,8 @@ namespace Gekko
             catch (Exception e2)
             {
             }
-        }        
+        }               
         
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            UpdateDecomp();
-        }
-
-        public void UpdateDecomp()
-        {
-            if (!this.isInitializing)
-            {
-                //this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.localBanks = null;  //clearing this, forcing window to use vales from Gekko databanks
-                this.RecalcCellsWithNewType(decompFind.model);
-            }
-        }
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
@@ -2934,6 +2920,15 @@ namespace Gekko
                 RecalcCellsWithNewType(decompFind.model);
             }
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {                
+                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
     }
 
     public class GekkoDockPanel2 : DockPanel
@@ -3014,7 +3009,7 @@ namespace Gekko
         public bool guiDecompIsSelectingAll = false;
         public Dictionary<string, int> guiDecompChangedCells = new Dictionary<string, int>();
         public Table guiDecompValues = new Table();
-        public LocalBanks localBanks = null;
+        public LocalBanks localBanks = null;  //Seems to be unused, remove in Gekko 4.0
         public string modelHash = null;
         //-------- GUI stuff end ----------------        
         
