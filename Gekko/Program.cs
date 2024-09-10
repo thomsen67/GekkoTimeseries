@@ -27244,6 +27244,8 @@ namespace Gekko
             //q3           1.9972         1.0000
             //q4           1.9967         1.0000
 
+            bool isCholette = true;
+
             int m = GekkoTime.Observations(t1_low, t2_low); //low freq periods
             int n = GekkoTime.Observations(t1_high, t2_high); //high freq periods
 
@@ -27330,13 +27332,13 @@ namespace Gekko
                 {
                     ai[i, j] = Math.Min(i + 1, j + 1);
                 }
-            }
-
-            
+            }            
 
             double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
             double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
             double[,] x = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
+
+            double[,] x_Cholette = null;
 
             if (true)
             {
@@ -27422,7 +27424,7 @@ namespace Gekko
                 
                 double[,] invert = Program.InvertMatrix(large1);
                 double[,] result1 = Program.MultiplyMatrices(invert, large2);
-                double[,] result2 = Program.MultiplyMatrices(result1, large3);
+                x_Cholette = Program.MultiplyMatrices(result1, large3);
 
             }
 
@@ -27431,6 +27433,7 @@ namespace Gekko
             {
                 counter++;
                 ts_lhs.SetData(t, x[counter, 0]);
+                double fejl = x[counter, 0] - x_Cholette[counter, 0];
             }
         }
 
