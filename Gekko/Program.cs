@@ -23513,7 +23513,7 @@ namespace Gekko
                     //first argument (the databank) is only used if list = null
                     if (isDefault)
                     {                        
-                        return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);                        
+                        return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
                     }
                     if (writeType == EDatabankWriteType.Tsd)
                     {
@@ -23786,8 +23786,21 @@ namespace Gekko
             return "Tip: try 'DISP " + name + ";' to see the dimensions.";
         }
 
-
-        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        /// <summary>
+        /// Write gbk databank (the native format of Gekko, may include traces).
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="yr1"></param>
+        /// <param name="yr2"></param>
+        /// <param name="file"></param>
+        /// <param name="isCaps"></param>
+        /// <param name="list"></param>
+        /// <param name="writeOption"></param>
+        /// <param name="writeAllVariables"></param>
+        /// <param name="isCloseCommand"></param>
+        /// <param name="noTrace"></param>
+        /// <returns></returns>
+        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand, bool noTrace)
         {
             if (databank.storage.Count == 0)
             {
@@ -23829,7 +23842,6 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            //if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -23849,8 +23861,7 @@ namespace Gekko
             else
             {
                 //in the very rare case, any files here will be overwritten
-            }
-            //pathAndFilename = tempTsdxPath + "\\" + "databank" + ".tsd";
+            }            
 
             CreateDatabankXmlInfo(databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
 
@@ -23865,6 +23876,8 @@ namespace Gekko
             GekkoDictionary<string, IVariable> databankWithFewerVariables = null;
             GekkoDictionary<string, IVariable> storageOriginal = databank.storage;  //for resetting back to this afterwards
 
+            int traceCount = 0;
+
             try
             {
                 if (writeAllVariables == false)
@@ -23875,10 +23888,7 @@ namespace Gekko
                     //-----------------------
                     databankWithFewerVariables = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
                     foreach (ToFrom var in list)
-                    {
-                        //Databank db = GetBankFromBankNameVersion(var.bank);
-                        //IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
-
+                    {                        
                         IVariable xx = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
 
                         string varnameWithFreq = G.Chop_GetNameAndFreq(var.s2);
@@ -23919,17 +23929,22 @@ namespace Gekko
                 }
 
                 bool traceFail = false;
-                
                 TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
-                try
+                List<Trace2> tracesToWrite = null;
+                if (!noTrace)
                 {
-                    Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces                    
+                    try
+                    {
+                        Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces                    
+                    }
+                    catch (Exception e) { traceFail = true; }
+                    tracesToWrite = databank.traces;
+                    databank.traces = null;
                 }
-                catch (Exception e) { traceFail = true; }
-                List<Trace2> tracesToWrite = databank.traces;
-                databank.traces = null;
-                
-                Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are writing data and traces in parallel. 
+
+                List<int> workToDo = new List<int>() { 0, 1 };
+                if (noTrace) workToDo = new List<int>() { 0 };  //do not do traces
+                Parallel.ForEach(workToDo, number => //At least we are writing data and traces in parallel. 
                 {
                     if (number == 0)
                     {
@@ -23952,34 +23967,36 @@ namespace Gekko
                     //      The databank is dead, as it is in the process of being closed anyway.
                 }
 
-                try
+                if (!noTrace)
                 {
-                    databank.traces = tracesToWrite;
-                    Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.                    
-                }
-                catch (Exception e)
-                {
-                    traceFail = true;
-                }
-                finally
-                {
-                    if (databank != null) databank.traces = null;  //important!
+                    try
+                    {
+                        databank.traces = tracesToWrite;
+                        Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.                    
+                    }
+                    catch (Exception e)
+                    {
+                        traceFail = true;
+                    }
+                    finally
+                    {
+                        if (databank != null) databank.traces = null;  //important!
+                    }
                 }
 
                 count = databank.storage.Count;  //must be before the finally
+                if (tracesToWrite != null) traceCount = tracesToWrite.Count;
 
                 if (traceFail)
                 {
                     using (var txt = new Warning(EWarningType.UsingWithTypeId, "w28.2"))
                     {
                         try { File.Delete(pathAndFilename3); } catch { }  //a corrupted trace.data may be present: get it wiped out before zipping!
-                        try { foreach (SeriesMetaInformation meta in th.metas) meta.traceID2 = null; } catch { } //some of these may have been constructed: wipe them out!
-                        int c = 0; if (tracesToWrite != null) c = tracesToWrite.Count;
-                        txt.MainAdd("Writing " + c + " data traces to .gbk file failed for unknown reasons (but the data part of the file may be ok).");
+                        try { foreach (SeriesMetaInformation meta in th.metas) meta.traceID2 = null; } catch { } //some of these may have been constructed: wipe them out!                        
+                        txt.MainAdd("Writing " + traceCount + " data traces to .gbk file failed for unknown reasons (but the data part of the file may be ok).");
                         txt.MainAdd(Globals.traceError);
                     }
                 }
-
             }
             finally
             {
@@ -23993,8 +24010,7 @@ namespace Gekko
 
             if (true)
             {
-                G.Writeln();
-                G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
+                new Writeln("Wrote " + count + " variable" + G.S(count) + " and " + traceCount + " trace" + G.S(traceCount) + " to " + pathAndFileNameResultingFile + " (" + G.Seconds(t) + ")");
                 if (isUsingOptionFolderBank)
                 {
                     if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
@@ -25493,7 +25509,7 @@ namespace Gekko
         }
 
 
-        public static void MaybeWriteOpenDatabank(Databank removed)
+        public static void MaybeWriteOpenDatabank(Databank removed, bool noTrace)
         {
             if (Program.IsDatabankDirty(removed))
             {
@@ -25507,7 +25523,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.WriteRemovedDatabank(removed);
+                    Program.WriteRemovedDatabank(removed, noTrace);
                 }
             }
         }
@@ -25527,7 +25543,7 @@ namespace Gekko
 
             int w = -12345;
             int b = -12345;
-            MaybeWriteOpenDatabanks(ref w, ref b);
+            MaybeWriteOpenDatabanks(ref w, ref b, false);  //We write traces here, because this is not a CLOSE<trace=no>*, but a RESET/RESTART.
             Databank w2 = Program.databanks.storage[w]; w2.Clear();
             Databank b2 = Program.databanks.storage[b]; b2.Clear();
             Program.databanks.storage.Clear();
@@ -25804,7 +25820,7 @@ namespace Gekko
             return gekkoBuiltInFunctions;
         }
 
-        public static void MaybeWriteOpenDatabanks(ref int w, ref int b)
+        public static void MaybeWriteOpenDatabanks(ref int w, ref int b, bool noTrace)
         {
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
@@ -25813,12 +25829,12 @@ namespace Gekko
                 else if (G.Equal(Program.databanks.storage[i].name, Globals.Ref)) b = i;
                 else
                 {
-                    MaybeWriteOpenDatabank(Program.databanks.storage[i]);
+                    MaybeWriteOpenDatabank(Program.databanks.storage[i], noTrace);
                 }
             }
         }
 
-        public static void WriteRemovedDatabank(Databank removed)
+        public static void WriteRemovedDatabank(Databank removed, bool noTrace)
         {
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
             if (removed.FileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
@@ -25880,7 +25896,7 @@ namespace Gekko
             if (!skipWrite)
             {
                 Globals.dependencyTracking.Add(2, "Write", false, removed.FileNameWithPath);
-                n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+                n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true, noTrace);
             }
         }
 
@@ -27353,7 +27369,12 @@ namespace Gekko
                         if (i > 0 && i - 1 == j) d[i, j] = -1;
                     }
                 }
-                d[0, 0] = 0;  //This is the whole Cholette trick!!
+                d[0, 0] = 0;  //This is the whole Cholette trick!! Without the trick, we get exactly the same as the Denton method.
+                              //NOTE: in the d matrix, this makes the first row all zeroes. Then when calculating
+                              //      t(d)*d, we get the same result as we would get if the d row was removed altogether.
+                              //      In that case we would get (n x n-1) * (n-1 x n) = n x n, but the result would be the same.
+                              //      Cf. this in Gekko: #m1 = [0, 0, 0; 3, 4, 5; 7, 8, 9]; #m2 = [3, 4, 5; 7, 8, 9];
+                              //                         p t(#m1)*#m1, t(#m2)*#m2;
 
                 // --------
 
@@ -27440,7 +27461,6 @@ namespace Gekko
                 counter++;
                 if (isCholette) ts_lhs.SetData(t, x_Cholette[counter, 0]);
                 else ts_lhs.SetData(t, x_Denton[counter, 0]);
-                //double fejl = x_Denton[counter, 0] - x_Cholette[counter, 0];
             }
         }
 

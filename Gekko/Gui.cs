@@ -735,7 +735,7 @@ namespace Gekko
                 //Write any pending OPEN databanks:
                 int w = -12345;
                 int b = -12345;
-                Program.MaybeWriteOpenDatabanks(ref w, ref b);  //w and b are not used
+                Program.MaybeWriteOpenDatabanks(ref w, ref b, false);  //w and b are not used. We write traces here, because this is not a CLOSE<trace=no>*, but a user closing the main window.
 
                 if (track) MessageBox.Show("28");
                 if (Globals.pipeFileHelper.pipeFile != null)
@@ -1453,10 +1453,9 @@ namespace Gekko
                     {
                         G.Writeln();
                         G.Writeln("Starting to pack zip file...");
-
                         SolveDataInOut.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null, null);
                         Zipper zipper = new Zipper("gekko_sim_error.zip");
-                        Program.WriteGbk(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<ToFrom>(), "" + Globals.extensionDatabank + "", true, false);
+                        Program.WriteGbk(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<ToFrom>(), "" + Globals.extensionDatabank + "", true, false, false);
                         Program.WaitForFileCopy(Globals.modelPathAndFileName, zipper.tempFolder + "\\model.frm"); ;
                         Program.Pipe(zipper.tempFolder + "\\simerror.txt", null);
                         G.Writeln(Globals.packSim.tStart.ToString() + " " + Globals.packSim.tEnd.ToString());
@@ -1464,7 +1463,6 @@ namespace Gekko
                         Program.options.Write();
                         Program.Pipe("con", null);
                         zipper.ZipAndCleanup();
-
                         G.Writeln();
                         G.Writeln("Packed simulation error report into file 'gekko_sim_error.zip' in the working folder");
                         G.Writeln("You may send the zip file to the Gekko editor for evaluation (and possible fixing)");

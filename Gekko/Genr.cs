@@ -23,91 +23,101 @@ namespace Gekko
 
             //[[commandStart]]1
             p.SetStack(@"¤1"); O.InitSmpl(smpl, p);
-            O.Assignment o1 = new O.Assignment();
-            o1.opt_trace = @"y=1";
 
-
-            Globals.precedentsSeries = null;
-            Action assign_34 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar32 = i33;
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar32, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o1)
-                ;
-            };
-            Func<bool> check_34 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar32 = i33;
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar32.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar32, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o1)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_34, check_34, o1, p);
+            Program.options.freq = O.XNameOrString2Freq("freq", (new ScalarString("q")));
+            O.PrintOptions("Program.options.freq", false);
+            O.HandleOptions("Program.options.freq", 0, p);
 
             //[[commandEnd]]1
 
 
             //[[commandStart]]2
-            p.SetStack(@"¤1"); O.InitSmpl(smpl, p);
-            O.Assignment o2 = new O.Assignment();
-            o2.opt_trace = @"y<2015 2024 dyn>=y[-1]+1";
-            smpl.t0 = O.ConvertToDate(i38, O.GetDateChoices.FlexibleStart);
+            p.SetStack(@"¤2"); O.InitSmpl(smpl, p);
+
+            O.Time o2 = new O.Time();
+            o2.t1 = O.ConvertToDate(new ScalarDate(GekkoTime.FromStringToGekkoTime("2001q1")), O.GetDateChoices.FlexibleStart);
             ;
-            smpl.t1 = O.ConvertToDate(i38, O.GetDateChoices.FlexibleStart);
-            ;
-            smpl.t2 = O.ConvertToDate(i39, O.GetDateChoices.FlexibleEnd);
-            ;
-            smpl.t3 = O.ConvertToDate(i39, O.GetDateChoices.FlexibleEnd);
+            o2.t2 = O.ConvertToDate(new ScalarDate(GekkoTime.FromStringToGekkoTime("2002q4")), O.GetDateChoices.FlexibleEnd);
             ;
 
-            o2.opt_dyn = "yes";
+            o2.Exe();
+
+            //[[commandEnd]]2
+
+
+            //[[commandStart]]3
+            p.SetStack(@"¤3"); O.InitSmpl(smpl, p);
+            O.Assignment o3 = new O.Assignment();
+            o3.opt_trace = @"x = 1";
+
 
             Globals.precedentsSeries = null;
-            Action assign_40 = () =>
+            Action assign_3 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar35 = O.Add(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag, O.Negate(smpl, i36)
-                ), smpl, O.EIndexerType.IndexerLag, O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl, i36)
-                ), i37);
+                IVariable ivTmpvar1 = i2;
                 O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar35, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
+                O.Lookup(smpl, null, null, "x", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
                 ;
             };
-            Func<bool> check_40 = () =>
+            Func<bool> check_3 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar35 = O.Add(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag, O.Negate(smpl, i36)
-                ), smpl, O.EIndexerType.IndexerLag, O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl, i36)
-                ), i37);
+                IVariable ivTmpvar1 = i2;
                 O.AdjustT0(smpl, 2);
-                if (ivTmpvar35.Type() != EVariableType.Series) return false;
+                if (ivTmpvar1.Type() != EVariableType.Series) return false;
                 O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar35, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
+                O.Lookup(smpl, null, null, "x", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
                 ;
                 return O.Dynamic2(smpl);
             };
-            O.RunAssigmentMaybeDynamic(smpl, assign_40, check_40, o2, p);
+            O.RunAssigmentMaybeDynamic(smpl, assign_3, check_3, o3, p);
 
-            //[[commandEnd]]2
+            //[[commandEnd]]3
+
+
+            //[[commandStart]]4
+            p.SetStack(@"¤4"); O.InitSmpl(smpl, p);
+            O.Assignment o4 = new O.Assignment();
+            o4.opt_trace = @"%v = avgt(<2000q1 2003q4>, x/x)";
+
+
+            Globals.precedentsSeries = null;
+            Action assign_5 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar4 = Functions.avgt(smpl, new ScalarDate(GekkoTime.FromStringToGekkoTime("2000q1")), new ScalarDate(GekkoTime.FromStringToGekkoTime("2003q4")), O.Divide(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null)));
+                O.AdjustT0(smpl, 2);
+                O.Lookup(smpl, null, null, "%v", null, ivTmpvar4, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
+                ;
+            };
+            Func<bool> check_5 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar4 = Functions.avgt(smpl, new ScalarDate(GekkoTime.FromStringToGekkoTime("2000q1")), new ScalarDate(GekkoTime.FromStringToGekkoTime("2003q4")), O.Divide(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null)));
+                O.AdjustT0(smpl, 2);
+                if (ivTmpvar4.Type() != EVariableType.Series) return false;
+                O.Dynamic1(smpl);
+                O.Lookup(smpl, null, null, "%v", null, ivTmpvar4, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
+                ;
+                return O.Dynamic2(smpl);
+            };
+            O.RunAssigmentMaybeDynamic(smpl, assign_5, check_5, o4, p);
+
+            //[[commandEnd]]4
         }
 
 
-        public static readonly ScalarVal i33 = new ScalarVal(1d, 0);
-        public static readonly ScalarVal i36 = new ScalarVal(1d, 0);
-        public static readonly ScalarVal i37 = new ScalarVal(1d, 0);
-        public static readonly ScalarVal i38 = new ScalarVal(2015d, 0);
-        public static readonly ScalarVal i39 = new ScalarVal(2024d, 0);
+        public static readonly ScalarVal i2 = new ScalarVal(1d, 0);
 
         public static void CodeLines(P p)
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
             C0(smpl, p);
+
+
+
         }
     }
 }

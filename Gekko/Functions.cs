@@ -3115,7 +3115,6 @@ namespace Gekko
         public static IVariable avgt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
             IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
             double d = 0d;
@@ -3607,12 +3606,6 @@ namespace Gekko
         {
             return pow(smpl, _t1, _t2, x1, x2);
         }
-
-        //public static IVariable nothing(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
-        //{            
-        //    Program.RevertSmpl(smplOriginal, smpl);
-        //    return x1;
-        //}
 
         [MyCustom(Lag = "lag=1")]
         public static IVariable pch(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)

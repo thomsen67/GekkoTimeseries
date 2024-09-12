@@ -2892,7 +2892,8 @@ closeOpt1:				    ISNOTQUAL
                           | leftAngle2 localOptions RIGHTANGLE                         -> ^(ASTOPT1 localOptions)      
                           | leftAngle closeOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 closeOpt1h* localOptions?)
                             ;
-closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
+closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)		
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						    ;		
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4038,7 +4039,8 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)	
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
-						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
+						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)                          
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

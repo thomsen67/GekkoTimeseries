@@ -8203,6 +8203,7 @@ namespace Gekko
             public string name = null;  //NOT TRUE --> only if '*' is indicated, not used otherwise. Remove in Gekko 4.0
             public List listItems = null;
             public string opt_save = null;
+            public string opt_trace = null;
             public void Exe()
             {
 
@@ -8272,7 +8273,7 @@ namespace Gekko
                     }
                     else
                     {
-                        Program.MaybeWriteOpenDatabank(removed);
+                        Program.MaybeWriteOpenDatabank(removed, G.Equal(this.opt_trace, "no"));
                     }
                 }
                 if (databanks.Count > 0)
@@ -10894,7 +10895,6 @@ namespace Gekko
             public string fileName = null;
             public List list1 = null;
             public List list2 = null;
-            //public List<string> listItems = null;
             
             public string opt_tsd = null;
             public string opt_tsdx = null;
@@ -10920,6 +10920,8 @@ namespace Gekko
             public string type = null; //write or export
             public string opt_dateformat = null;
             public string opt_datetype = null;
+            public string opt_trace = null;
+
 
             public void Exe()
             {
