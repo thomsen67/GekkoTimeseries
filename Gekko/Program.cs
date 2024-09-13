@@ -27270,6 +27270,10 @@ namespace Gekko
             //q3           1.9972         1.0000
             //q4           1.9967         1.0000
 
+            double ZERO_DOT_FIVE = 0.5d;
+            double TWO_THOUSAND = 2000d;
+            double FOUR = 4;
+
             EDentonType dentonType = EDentonType.None;
             if (G.Equal(method, "dentona1")) dentonType = EDentonType.Dentona1;
             else if (G.Equal(method, "cholettea1")) dentonType = EDentonType.Cholettea1;
@@ -27383,11 +27387,7 @@ namespace Gekko
                 //TODO TODO
                 //TODO TODO Remove temp variables from Work bank
                 //TODO TODO
-                //TODO TODO
-
-                double ZERO_DOT_FIVE = 0.5d;
-                double TWO_THOUSAND = 2000d;
-                double FOUR = 4;
+                //TODO TODO                
 
                 Series z_adjusted = new Series(freq_lhs, null);
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
@@ -27523,7 +27523,8 @@ namespace Gekko
             {
                 counter++;
                 if (dentonType == EDentonType.Dentona1) ts_lhs.SetData(t, x_Denton[counter, 0]);
-                else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1) ts_lhs.SetData(t, x_Cholette[counter, 0]);
+                else if (dentonType == EDentonType.Cholettea1) ts_lhs.SetData(t, x_Cholette[counter, 0]);
+                else if (dentonType == EDentonType.Olsena1) ts_lhs.SetData(t, FOUR * x_Cholette[counter, 0]);
                 else new Error("Wrong type");
             }
         }
