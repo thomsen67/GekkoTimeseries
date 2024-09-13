@@ -27321,14 +27321,14 @@ namespace Gekko
                 new Error("Could not collapse the series into " + t1_y.freq.Pretty() + " frequency (the indicator frequency)");
             }
 
-            double[,] y = new double[m, 1];
+            double[,] y_array = new double[m, 1];
             int counter = -1;
             double rMax = double.MinValue;
             double rMin = double.MaxValue;
             foreach (GekkoTime t in new GekkoTimeIterator(t1_y, t2_y))
             {
                 counter++;
-                y[counter, 0] = y.GetDataSimple(t);
+                y_array[counter, 0] = y.GetDataSimple(t);
                 //Problem with this is that ts_indicator = 500 and ts_rhs = -500 will give r = 1... But that would be crazy input anyway.
                 rMax = Math.Max(rMax, ts_collapse.GetDataSimple(t) / y.GetDataSimple(t));
                 rMin = Math.Min(rMin, ts_collapse.GetDataSimple(t) / y.GetDataSimple(t));
@@ -27366,7 +27366,7 @@ namespace Gekko
                 }
             }
 
-            double[,] z = new double[n, 1];
+            double[,] z_array = new double[n, 1];
 
             if (dentonType == EDentonType.Olsena1)
             {
@@ -27396,16 +27396,16 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
-                    double x = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
-                    z_adjusted.SetData(t, x / FOUR);
+                    double value = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
+                    z_adjusted.SetData(t, value / FOUR);
                 }
 
-                z = new double[n, 1];
+                z_array = new double[n, 1];
                 counter = -1;
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     counter++;
-                    z[counter, 0] = z_adjusted.GetDataSimple(t);
+                    z_array[counter, 0] = z_adjusted.GetDataSimple(t);
                 }
             }
             else
@@ -27414,11 +27414,11 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     counter++;
-                    z[counter, 0] = z.GetDataSimple(t);
+                    z_array[counter, 0] = z.GetDataSimple(t);
                 }
             }
 
-            double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
+            double[,] r = Program.SubtractMatrixMatrix(y_array, Program.MultiplyMatrices(Program.Transpose(b), z_array), y_array.GetLength(0), y_array.GetLength(1));
             double[,] x_Denton = null;
             double[,] x_Cholette = null;
             double[,] z_Olsen = null;
@@ -27426,7 +27426,7 @@ namespace Gekko
             if (dentonType == EDentonType.Dentona1)
             {
                 double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
-                x_Denton = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
+                x_Denton = Program.AddMatrixMatrix(z_array, Program.MultiplyMatrices(c, r), z_array.GetLength(0), z_array.GetLength(1));
             }
             else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1)
             {                
@@ -27506,7 +27506,7 @@ namespace Gekko
                 double[,] large3 = new double[n + m, 1];
                 for (int i = 0; i < n; i++)
                 {
-                    large3[i, 0] = z[i, 0];
+                    large3[i, 0] = z_array[i, 0];
                 }
                 for (int i = 0; i < m; i++)
                 {
