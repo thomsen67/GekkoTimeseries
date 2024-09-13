@@ -8,9 +8,19 @@ using System.IO;
 
 namespace Gekko
 {
+    public class EstimationOutput
+    {
+        public Matrix name_param;
+        public Matrix name_t;
+        public Matrix name_se;
+        public Matrix name_stats;
+        public Matrix name_covar;
+        public Matrix name_corr;
+    }
+
     public static class Estimation
     {
-        public static void Ols(O.Ols o)
+        public static EstimationOutput Ols(O.Ols o)
         {
             // ------------------------------------------
             //n = number of obs
@@ -48,6 +58,8 @@ namespace Gekko
 
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
+
+            EstimationOutput output = new EstimationOutput();
 
             IVariable lhs = o.expressions[0];
             List<IVariable> rhs = new List<IVariable>();
@@ -262,7 +274,6 @@ namespace Gekko
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq3, z3);
                     }
                 }
-
             }
 
             //Recursive estimation
@@ -549,7 +560,6 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
 
-
             Program.options.print_width = widthRemember;
 
             if (o.opt_dump != null)
@@ -606,9 +616,18 @@ namespace Gekko
                 catch
                 {
                     new Error("OLS<dump> failed: is the file '" + fileName + "' blocked?");
-                    //throw new GekkoException();
                 }
             }
+
+            //Used in Denton-Olsen
+            output.name_param = name_param;
+            output.name_t = name_t;
+            output.name_se = name_se;
+            output.name_stats = name_stats;     
+            output.name_covar = name_covar;
+            output.name_corr = name_corr;
+
+            return output;
         }
 
         private static bool OLSRecursiveDfOk(int df)
