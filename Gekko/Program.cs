@@ -27371,6 +27371,7 @@ namespace Gekko
 
             double[,] x_Denton = null;
             double[,] x_Cholette = null;
+            double[,] z_Olsen = null;
 
             if (dentonType == EDentonType.Dentona1)
             {
@@ -27404,13 +27405,24 @@ namespace Gekko
                     //TODO TODO
                     //TODO TODO
 
-                    Series z_olsen = new Series(freq_lhs, null);
+                    double ZERO_DOT_FIVE = 0.5d;
+                    double TWO_THOUSAND = 2000d;
+
+                    Series z_adjusted = new Series(freq_lhs, null);
                     foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
                     {
-                        double trendQ = Functions.helper_time(t).ConvertToVal();
-                        z_olsen.SetData(t, output.name_param.data[0, 0] * ts_indicator.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0]);
+                        double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
+                        double x = output.name_param.data[0, 0] * ts_indicator.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
+                        z_adjusted.SetData(t, x);
                     }
 
+                    z_Olsen = new double[n, 1];
+                    counter = -1;
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                    {
+                        counter++;
+                        z_Olsen[counter, 0] = ts_indicator.GetDataSimple(t);
+                    }
                 }
 
                 double[,] d = new double[n, n];
