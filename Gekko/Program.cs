@@ -27176,17 +27176,20 @@ namespace Gekko
         /// <summary>
         /// Denton method. Beware that if the indicator is very off (not summing reasonably to low-freq series), the result is bad.
         /// </summary>
-        /// <param name="ts_lhs"></param>
-        /// <param name="ts_rhs"></param>
-        /// <param name="ts_indicator"></param>
-        /// <param name="freq_lhs"></param>
-        /// <param name="freq_rhs"></param>
-        /// <param name="t1_high"></param>
-        /// <param name="t2_high"></param>
-        /// <param name="t1_low"></param>
-        /// <param name="t2_low"></param>
-        private static void Denton(Series ts_lhs, Series ts_rhs, Series ts_indicator, EFreq freq_lhs, EFreq freq_rhs, GekkoTime t1_high, GekkoTime t2_high, GekkoTime t1_low, GekkoTime t2_low, string method)
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="freq_x"></param>
+        /// <param name="freq_y"></param>
+        /// <param name="t1_x"></param>
+        /// <param name="t2_x"></param>
+        /// <param name="t1_y"></param>
+        /// <param name="t2_y"></param>
+        private static void Denton(Series x, Series y, Series z, EFreq freq_x, EFreq freq_y, GekkoTime t1_x, GekkoTime t2_x, GekkoTime t1_y, GekkoTime t2_y, string method)
         {
+            //   x!q = interpolate(y!a, z!q), where y!a is low-freq series, z!q is high-freq indicator series, and x!q is
+            //                                high-freq result series, where y!a = collapse(x!q).
+            //
             //https://web-archive.oecd.org/2012-06-15/158845-21779760.pdf
             //
             //Se corresponding R code etc. under _Test_Interpolate()
@@ -27270,7 +27273,7 @@ namespace Gekko
             //q3           1.9972         1.0000
             //q4           1.9967         1.0000
 
-            double ZERO_DOT_FIVE = 0.5d;
+            double ZERO_DOT_FIVE = 0.5d;  //not really important since constant term catches it
             double TWO_THOUSAND = 2000d;
             double FOUR = 4;
 
@@ -27279,19 +27282,19 @@ namespace Gekko
             else if (G.Equal(method, "cholettea1")) dentonType = EDentonType.Cholettea1;
             else if (G.Equal(method, "olsena1")) dentonType = EDentonType.Olsena1;
 
-            int m = GekkoTime.Observations(t1_low, t2_low); //low freq periods
-            int n = GekkoTime.Observations(t1_high, t2_high); //high freq periods
+            int m = GekkoTime.Observations(t1_y, t2_y); //low freq periods
+            int n = GekkoTime.Observations(t1_x, t2_x); //high freq periods
 
             int k = -12345;
-            if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
+            if (freq_x == EFreq.Q && freq_y == EFreq.A)
             {
                 k = Globals.freqQSubperiods; //4
             }
-            else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
+            else if (freq_x == EFreq.M && freq_y == EFreq.A)
             {
                 k = Globals.freqMSubperiods; //12
             }
-            else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
+            else if (freq_x == EFreq.M && freq_y == EFreq.Q)
             {
                 k = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
             }
@@ -27305,30 +27308,30 @@ namespace Gekko
             //TODO: what if periods do not fit together?
             //SLACK: could use array-copy...?
 
-            Series ts_collapse = new Series(t1_low.freq, null); //has no name
+            Series ts_collapse = new Series(t1_y.freq, null); //has no name
             try
             {
                 //This is only to test how the series collapses (aggregates), compared to the indicator series.                
                 CollapseHelper ch = new CollapseHelper();
                 ch.method = "total";                
-                CollapseHelper(ts_collapse, ts_indicator, ch);
+                CollapseHelper(ts_collapse, z, ch);
             }
             catch
             {
-                new Error("Could not collapse the series into " + t1_low.freq.Pretty() + " frequency (the indicator frequency)");
+                new Error("Could not collapse the series into " + t1_y.freq.Pretty() + " frequency (the indicator frequency)");
             }
 
             double[,] y = new double[m, 1];
             int counter = -1;
             double rMax = double.MinValue;
             double rMin = double.MaxValue;
-            foreach (GekkoTime t in new GekkoTimeIterator(t1_low, t2_low))
+            foreach (GekkoTime t in new GekkoTimeIterator(t1_y, t2_y))
             {
                 counter++;
-                y[counter, 0] = ts_rhs.GetDataSimple(t);
+                y[counter, 0] = y.GetDataSimple(t);
                 //Problem with this is that ts_indicator = 500 and ts_rhs = -500 will give r = 1... But that would be crazy input anyway.
-                rMax = Math.Max(rMax, ts_collapse.GetDataSimple(t) / ts_rhs.GetDataSimple(t));
-                rMin = Math.Min(rMin, ts_collapse.GetDataSimple(t) / ts_rhs.GetDataSimple(t));
+                rMax = Math.Max(rMax, ts_collapse.GetDataSimple(t) / y.GetDataSimple(t));
+                rMin = Math.Min(rMin, ts_collapse.GetDataSimple(t) / y.GetDataSimple(t));
             }
 
             if (dentonType == EDentonType.Dentona1)
@@ -27367,20 +27370,20 @@ namespace Gekko
 
             if (dentonType == EDentonType.Olsena1)
             {
-                Series z_collapse = new Series(freq_rhs, null);  //the name will not be used for anything --> the series is temporary
+                Series z_collapse = new Series(freq_y, null);  //the name will not be used for anything --> the series is temporary
                 CollapseHelper helper = new CollapseHelper();
                 helper.method = "avg";
-                Program.CollapseHelper(z_collapse, ts_indicator, helper);  //Corresponds to collapse(z!q, 'avg')
-                Series trend = new Series(freq_rhs, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_low, t2_low))
+                Program.CollapseHelper(z_collapse, z, helper);  //Corresponds to collapse(z!q, 'avg')
+                Series trend = new Series(freq_y, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_y, t2_y))
                 {
                     trend.SetData(t, t.super - 2000);
                 }
 
                 O.Ols ols = new O.Ols();
-                ols.t1 = t1_low;
-                ols.t2 = t2_low;
-                ols.expressions = new List<IVariable>() { ts_rhs, z_collapse, trend };
+                ols.t1 = t1_y;
+                ols.t2 = t2_y;
+                ols.expressions = new List<IVariable>() { y, z_collapse, trend };
                 ols.expressionsText = new List<string>() { "Low-freq series", "Avg-collapsed indicator", "trend" };
                 EstimationOutput output = Estimation.Ols(ols);
                 //TODO TODO
@@ -27389,17 +27392,17 @@ namespace Gekko
                 //TODO TODO
                 //TODO TODO                
 
-                Series z_adjusted = new Series(freq_lhs, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                Series z_adjusted = new Series(freq_x, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
-                    double x = output.name_param.data[0, 0] * ts_indicator.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
+                    double x = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
                     z_adjusted.SetData(t, x / FOUR);
                 }
 
                 z = new double[n, 1];
                 counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     counter++;
                     z[counter, 0] = z_adjusted.GetDataSimple(t);
@@ -27408,10 +27411,10 @@ namespace Gekko
             else
             {
                 counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     counter++;
-                    z[counter, 0] = ts_indicator.GetDataSimple(t);
+                    z[counter, 0] = z.GetDataSimple(t);
                 }
             }
 
@@ -27519,12 +27522,12 @@ namespace Gekko
             else new Error("Wrong method");
 
             counter = -1;
-            foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+            foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
             {
                 counter++;
-                if (dentonType == EDentonType.Dentona1) ts_lhs.SetData(t, x_Denton[counter, 0]);
-                else if (dentonType == EDentonType.Cholettea1) ts_lhs.SetData(t, x_Cholette[counter, 0]);
-                else if (dentonType == EDentonType.Olsena1) ts_lhs.SetData(t, FOUR * x_Cholette[counter, 0]);
+                if (dentonType == EDentonType.Dentona1) x.SetData(t, x_Denton[counter, 0]);
+                else if (dentonType == EDentonType.Cholettea1) x.SetData(t, x_Cholette[counter, 0]);
+                else if (dentonType == EDentonType.Olsena1) x.SetData(t, FOUR * x_Cholette[counter, 0]);
                 else new Error("Wrong type");
             }
         }
