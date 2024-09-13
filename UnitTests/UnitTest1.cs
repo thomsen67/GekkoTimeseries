@@ -24709,9 +24709,8 @@ print(df2)
             //        Denton
             // ================================
 
-            for (int i = 0; i < 2; i++)  //command or function
+            for (int i = 0; i < 4; i++)  //command or function, denton or cholette
             {
-
                 I("reset;");
                 I("%t1 = 2001a;");
                 I("%t2 = 2005a;");
@@ -24722,33 +24721,67 @@ print(df2)
                 I("y!a  <%t1 %t2>                   = 500,                  400,                  300,                  400,                  500;");
                 I("z!q  <%t1_highfreq %t2_highfreq> = 50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100;");
 
-                if (i == 0) I("interpolate z2!q = y!a indicator=z!q dentona1;");
-                else I("z2!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1');");
+                if (i == 0) I("interpolate x!q = y!a indicator=z!q dentona1;");
+                else if (i == 1) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1');");
+                else if (i == 2) I("interpolate x!q = y!a indicator=z!q cholettea1;");
+                else if (i == 3) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1');");
+                else Assert.Fail();
 
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 1, 66.9868d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 2, 126.9868d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 3, 180.0000d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 4, 126.0263d, sharedTableDelta);
+                if (i == 0 || i == 1)
+                {
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 66.9868d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 126.9868d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 180.0000d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 126.0263d, sharedTableDelta);
 
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 1, 65.0658d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 2, 104.6553d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 3, 144.7947d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 4, 85.4842d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 65.0658d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 104.6553d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 144.7947d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 85.4842d, sharedTableDelta);
 
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 1, 26.7237d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 2, 72.5300d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 3, 122.9032d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 4, 77.8432d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, 26.7237d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 2, 72.5300d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 3, 122.9032d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 77.8432d, sharedTableDelta);
 
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 1, 37.3501d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 2, 96.2128d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 3, 154.4314d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 4, 112.0058d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, 37.3501d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 2, 96.2128d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 3, 154.4314d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 4, 112.0058d, sharedTableDelta);
 
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 1, 68.9360d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 2, 124.1337d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 3, 177.5988d, sharedTableDelta);
-                _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 4, 129.3314d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 1, 68.9360d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.1337d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.5988d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.3314d, sharedTableDelta);
+                }
+                else if (i == 2 || i == 3)
+                {
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 79.29799d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 127.57880d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 174.14040d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 118.98281d, sharedTableDelta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 62.10602d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 104.51289d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 146.20344d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 87.17765d, sharedTableDelta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, 27.43553d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 2, 72.56447d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 3, 122.56447d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 77.43553d, sharedTableDelta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, 37.17765d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 2, 96.20344d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 3, 154.51289d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 4, 112.10602d, sharedTableDelta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 1, 68.98281d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.14040d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.57880d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.29799d, sharedTableDelta);
+                }
+                else Assert.Fail();
 
                 // Cf. Denton: Adjustment of Monthly or Quarterly Series to Annual Totals: An Approach Based on Quadratic Minimization
                 // https://www.oecd.org/sdd/21779760.pdf page 101, column delta(x-z).
@@ -24830,6 +24863,18 @@ print(df2)
                 // 3  26.72367   72.52999  122.90316   77.84319
                 // 4  37.35007   96.21279  154.43136  112.00577
                 // 5  68.93603  124.13372  177.59885  129.33141
+
+                //With "denton-cholette" instead
+
+                //       Qtr1        Qtr2        Qtr3        Qtr4
+                //1  79.29799   127.57880   174.14040   118.98281
+                //2  62.10602   104.51289   146.20344    87.17765
+                //3  27.43553    72.56447   122.56447    77.43553
+                //4  37.17765    96.20344   154.51289   112.10602
+                //5  68.98281   124.14040   177.57880   129.29799
+
+
+
             }
 
             // ================================

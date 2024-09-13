@@ -27181,6 +27181,8 @@ namespace Gekko
         {
             //https://web-archive.oecd.org/2012-06-15/158845-21779760.pdf
             //
+            //Se corresponding R code etc. under _Test_Interpolate()
+            //
             //We have an annual series y. We have a quarterly indicator series z. We try to produce a quarterly series x, where
             //y = collapse(x), and where x and y somehow are "similar". Similar can be defined as
             //penalty function p(x, z) = delta(x - z), or p = x-z - (x[-1]-z[-1]).

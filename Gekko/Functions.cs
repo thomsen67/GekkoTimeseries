@@ -4357,7 +4357,7 @@ namespace Gekko
             if (x.Length > 1 + offset)
             {
                 string s = O.ConvertToString(x[1 + offset]);
-                if (G.Equal(s, "repeat") || G.Equal(s, "prorate") || G.Equal(s, "dentona1"))
+                if (G.Equal(s, "repeat") || G.Equal(s, "prorate") || G.Equal(s, "dentona1") || G.Equal(s, "cholettea1"))
                 {
                     method = s;
                     if (x.Length == 3 + offset) new Error("If you state a method as argument #(" + (3 + offset - 1) + "), you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
