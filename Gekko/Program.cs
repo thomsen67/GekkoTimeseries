@@ -27341,14 +27341,6 @@ namespace Gekko
                 G.Warning("w41.2", null);
             }
 
-            double[,] z = new double[n, 1];
-            counter = -1;
-            foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
-            {
-                counter++;
-                z[counter, 0] = ts_indicator.GetDataSimple(t);
-            }
-
             double[,] b = new double[n, m];
             for (int i = 0; i < m; i++)
             {
@@ -27366,9 +27358,64 @@ namespace Gekko
                     ai[i, j] = Math.Min(i + 1, j + 1);
                 }
             }
-            
-            double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
 
+            double[,] z = new double[n, 1];
+
+            if (dentonType == EDentonType.Olsena1)
+            {
+                Series z_collapse = new Series(freq_rhs, null);  //the name will not be used for anything --> the series is temporary
+                CollapseHelper helper = new CollapseHelper();
+                helper.method = "avg";
+                Program.CollapseHelper(z_collapse, ts_indicator, helper);  //Corresponds to collapse(z!q, 'avg')
+                Series trend = new Series(freq_rhs, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_low, t2_low))
+                {
+                    trend.SetData(t, t.super - 2000);
+                }
+
+                O.Ols ols = new O.Ols();
+                ols.t1 = t1_low;
+                ols.t2 = t2_low;
+                ols.expressions = new List<IVariable>() { ts_rhs, z_collapse, trend };
+                ols.expressionsText = new List<string>() { "Low-freq series", "Avg-collapsed indicator", "trend" };
+                EstimationOutput output = Estimation.Ols(ols);
+                //TODO TODO
+                //TODO TODO
+                //TODO TODO Remove temp variables from Work bank
+                //TODO TODO
+                //TODO TODO
+
+                double ZERO_DOT_FIVE = 0.5d;
+                double TWO_THOUSAND = 2000d;
+                double FOUR = 4;
+
+                Series z_adjusted = new Series(freq_lhs, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                {
+                    double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
+                    double x = output.name_param.data[0, 0] * ts_indicator.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
+                    z_adjusted.SetData(t, x / FOUR);
+                }
+
+                z = new double[n, 1];
+                counter = -1;
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                {
+                    counter++;
+                    z[counter, 0] = z_adjusted.GetDataSimple(t);
+                }
+            }
+            else
+            {
+                counter = -1;
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+                {
+                    counter++;
+                    z[counter, 0] = ts_indicator.GetDataSimple(t);
+                }
+            }
+
+            double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
             double[,] x_Denton = null;
             double[,] x_Cholette = null;
             double[,] z_Olsen = null;
@@ -27379,52 +27426,7 @@ namespace Gekko
                 x_Denton = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
             }
             else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1)
-            {
-
-                if (dentonType == EDentonType.Olsena1)
-                {
-                    Series z_collapse = new Series(freq_rhs, null);  //the name will not be used for anything --> the series is temporary
-                    CollapseHelper helper = new CollapseHelper();
-                    helper.method = "avg";
-                    Program.CollapseHelper(z_collapse, ts_indicator, helper);  //Corresponds to collapse(z!q, 'avg')
-                    Series trend = new Series(freq_rhs, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1_low, t2_low))
-                    {
-                        trend.SetData(t, t.super - 2000);
-                    }
-
-                    O.Ols ols = new O.Ols();
-                    ols.t1 = t1_low;
-                    ols.t2 = t2_low;
-                    ols.expressions = new List<IVariable>() { ts_rhs, z_collapse, trend };
-                    ols.expressionsText = new List<string>() { "Low-freq series", "Avg-collapsed indicator", "trend" };
-                    EstimationOutput output = Estimation.Ols(ols);
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO Remove temp variables from Work bank
-                    //TODO TODO
-                    //TODO TODO
-
-                    double ZERO_DOT_FIVE = 0.5d;
-                    double TWO_THOUSAND = 2000d;
-
-                    Series z_adjusted = new Series(freq_lhs, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
-                    {
-                        double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
-                        double x = output.name_param.data[0, 0] * ts_indicator.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
-                        z_adjusted.SetData(t, x);
-                    }
-
-                    z_Olsen = new double[n, 1];
-                    counter = -1;
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
-                    {
-                        counter++;
-                        z_Olsen[counter, 0] = ts_indicator.GetDataSimple(t);
-                    }
-                }
-
+            {                
                 double[,] d = new double[n, n];
                 for (int i = 0; i < n; i++)
                 {
@@ -27521,7 +27523,7 @@ namespace Gekko
             {
                 counter++;
                 if (dentonType == EDentonType.Dentona1) ts_lhs.SetData(t, x_Denton[counter, 0]);
-                else if (dentonType == EDentonType.Cholettea1) ts_lhs.SetData(t, x_Cholette[counter, 0]);
+                else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1) ts_lhs.SetData(t, x_Cholette[counter, 0]);
                 else new Error("Wrong type");
             }
         }
