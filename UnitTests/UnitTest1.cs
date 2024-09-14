@@ -24872,9 +24872,69 @@ print(df2)
                 //3  27.43553    72.56447   122.56447    77.43553
                 //4  37.17765    96.20344   154.51289   112.10602
                 //5  68.98281   124.14040   177.57880   129.29799
+            }
 
 
+            if (true)  //Olsen
+            {
+                //
+                // ========= total =================
+                // 
 
+                I("reset;");
+                I("option freq a;");
+                I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
+                I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
+                I("time 80 2013;");
+                I("q!a = m();");
+                I("gq!q = m();");
+                I("time 2014 2023;");
+                I("z!q /= 4;");  //To simulate an indicator of 'total' type.
+                I("interpolate x!q = y!a indicator = z!q olsena1;");
+
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 673.3915d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 674.3258d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 675.6091d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 677.6049d, sharedTableDelta);
+
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 722.6228d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 716.6252d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 719.4512d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 722.6968d, sharedTableDelta);
+
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 773.0040d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9204d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.5519d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.8335d, sharedTableDelta);
+
+                //
+                // ========= avg =================
+                // 
+
+                I("reset;");
+                I("option freq a;");
+                I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
+                I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
+                I("time 80 2013;");
+                I("q!a = m();");
+                I("gq!q = m();");
+                I("time 2014 2023;");            
+                I("interpolate x!q = y!a indicator=z!q olsena1avg;"); 
+
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 2691.2736d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 2698.2774d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 2702.9790d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 2711.1949d, sharedTableDelta);
+
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 2911.4184d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 2837.6004, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 2878.1021d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 2898.4630d, sharedTableDelta);
+
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 3093.6077d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 3095.8816d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 3097.7063d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 3098.0438d, sharedTableDelta);
             }
 
             // ================================

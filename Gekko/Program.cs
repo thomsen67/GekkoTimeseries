@@ -27306,9 +27306,6 @@ namespace Gekko
 
             if (n != m * k) new Error("Expected indicator to have " + (m * k) + " periods, got " + n);
 
-            double adjustAvg = 1d;
-            if (dentonType == EDentonType.Olsena1avg) adjustAvg = k;  //for instance 4, if "avg" and !a --> !q
-
             //TODO: what if periods do not fit together?
             //SLACK: could use array-copy...?
 
@@ -27416,7 +27413,7 @@ namespace Gekko
                 {
                     double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
                     double value = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
-                    z_adjusted.SetData(t, value / adjustAvg);  //if z is an avg-indicator, we need to scale it down
+                    z_adjusted.SetData(t, value / k);  //value will have same level as y!a, so we scale it down for use in Denton-Cholette
                 }
 
                 z_array = new double[n, 1];
@@ -27546,7 +27543,8 @@ namespace Gekko
                 counter++;
                 if (dentonType == EDentonType.Dentona1) x.SetData(t, x_Denton[counter, 0]);
                 else if (dentonType == EDentonType.Cholettea1) x.SetData(t, x_Cholette[counter, 0]);
-                else if (dentonType == EDentonType.Olsena1 || dentonType == EDentonType.Olsena1avg) x.SetData(t, adjustAvg * x_Cholette[counter, 0]);  //if z is an avg-indicator, we need to scale it up
+                else if (dentonType == EDentonType.Olsena1) x.SetData(t, x_Cholette[counter, 0]);
+                else if (dentonType == EDentonType.Olsena1avg) x.SetData(t, k * x_Cholette[counter, 0]);  //We need to scale it up with k after Denton-Cholette
                 else new Error("Wrong type");
             }
         }
