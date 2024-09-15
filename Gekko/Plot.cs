@@ -23,10 +23,10 @@ namespace Gekko
     {
         public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, PlotHelper plotHelper, P p)
         {
-            
+
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
-                        
+
             int decompSvgOverallWidth = 0;
             int decompSvgOverallHeight = 0;
 
@@ -84,7 +84,7 @@ namespace Gekko
             bool firstXLabelFix = true;
 
             bool isInside = false;  //corresponds to "at"
-            if (highestFreq == EFreq.A || highestFreq == EFreq.U)
+            if (IsAOrUHighestFreq(highestFreq))
             {
                 //annual
                 if (G.Equal(Program.options.plot_xlabels_annual, "between")) isInside = true;
@@ -105,7 +105,7 @@ namespace Gekko
             double decompXZoom = 1d;
             string key2 = null;
             if (plotHelper.isDecompPlot)
-            {   
+            {
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 0.9;  //overall size of canvas, relative to 600x480                
                 decompFontFactor = d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
@@ -498,10 +498,10 @@ namespace Gekko
             }
             else
             {
-                fontsize = 0.75 * fontsize;                
-            }            
+                fontsize = 0.75 * fontsize;
+            }
 
-            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSvgSize);           
+            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSvgSize);
 
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);
@@ -594,7 +594,7 @@ namespace Gekko
             if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
 
 
-            if ((highestFreq == EFreq.A || highestFreq == EFreq.U))
+            if (IsAOrUHighestFreq(highestFreq))
             {
                 //annual or undated
                 if (numberOfObs > 140)
@@ -686,7 +686,7 @@ namespace Gekko
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = Program.PlotTableTime(gt.freq, gt) + GetXAdjustmentForInsideTics(isInside);
-                //if (!isInside) d += -0.5;
+                if (G.Equal(Program.options.plot_xlabels_nonannual, "at") && !IsAOrUHighestFreq(highestFreq)) d += -0.5;
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -694,7 +694,7 @@ namespace Gekko
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = (Program.PlotTableTime(gt.freq, gt) + Program.PlotTableTime(gt.freq, gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside);
-                //if (!isInside) d += -0.5;
+                if (G.Equal(Program.options.plot_xlabels_nonannual, "at") && !IsAOrUHighestFreq(highestFreq)) d += -0.5;
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -702,7 +702,7 @@ namespace Gekko
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = (Program.PlotTableTime(gt.freq, gt) + Program.PlotTableTime(gt.freq, gt.Add(1))) / 2d + GetXAdjustmentForInsideTics(isInside);
-                //if (!isInside) d += -0.5;
+                if (G.Equal(Program.options.plot_xlabels_nonannual, "at") && !IsAOrUHighestFreq(highestFreq)) d += -0.5;
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -804,7 +804,7 @@ namespace Gekko
             if (plotHelper.isDecompPlot)
             {
                 if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
-                {                    
+                {
                     if (overallZoom < 0.999 || overallZoom > 1.001)
                     {
                         int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
@@ -827,6 +827,11 @@ namespace Gekko
                 CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
             }
             return plotFileName;
+        }
+
+        private static bool IsAOrUHighestFreq(EFreq highestFreq)
+        {
+            return highestFreq == EFreq.A || highestFreq == EFreq.U;
         }
 
         private static void CallGnuplotMakeWindow(O.Prt o, List<string> labelsNonBroken, string emfName)
@@ -1506,7 +1511,7 @@ namespace Gekko
 
         private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)
         {
-            if (!isInside && (highestFreq == EFreq.A || highestFreq == EFreq.U)) return -0.5;
+            if (!isInside && IsAOrUHighestFreq(highestFreq)) return -0.5;
             else return 0d;            
         }
 
@@ -1565,7 +1570,7 @@ namespace Gekko
 
         private static int HandleXTicsAt(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics, EFreq highestFreq)
         {
-            if (highestFreq == EFreq.A || highestFreq == EFreq.U)
+            if (IsAOrUHighestFreq(highestFreq))
             {
                 //do nothing
                 ticsTxt = null;
