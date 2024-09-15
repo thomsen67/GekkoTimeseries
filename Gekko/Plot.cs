@@ -685,21 +685,21 @@ namespace Gekko
             foreach (string s in xlines)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
-                double d = Program.PlotTableTime(highestFreq, gt) + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = Program.PlotTableTime(highestFreq, gt) + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlinebefores)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
-                double d = (Program.PlotTableTime(highestFreq, gt) + Program.PlotTableTime(highestFreq, gt.Add(-1))) / 2d + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = (Program.PlotTableTime(highestFreq, gt) + Program.PlotTableTime(highestFreq, gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlineafters)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
-                double d = (Program.PlotTableTime(highestFreq, gt) + Program.PlotTableTime(highestFreq, gt.Add(1))) / 2d + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = (Program.PlotTableTime(highestFreq, gt) + Program.PlotTableTime(highestFreq, gt.Add(1))) / 2d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
