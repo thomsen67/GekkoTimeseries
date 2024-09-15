@@ -27401,6 +27401,7 @@ namespace Gekko
                 if (dentonType == EDentonType.Olsena1avg) s = "Avg-";
                 ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator", "trend" };
                 EstimationOutput output = Estimation.Ols(ols);
+
                 //TODO TODO
                 //TODO TODO
                 //TODO TODO Remove temp variables from Work bank
@@ -28226,7 +28227,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Concert a GekkoTime into a PLOT-suitable double.
+        /// Convert a GekkoTime into a PLOT-suitable double. Note: annual 2001 becomes 2001.5!
         /// </summary>
         /// <param name="freqHere"></param>
         /// <param name="t"></param>

@@ -3040,30 +3040,7 @@ namespace Gekko
             if (G.IsEnglishLetter(c) || c == '_')
                 return true;
             else return false;
-        }
-
-        /// <summary>
-        /// Convert a GekkoTime to floating point. Used for PLOT.
-        /// </summary>
-        /// <param name="gt"></param>
-        /// <returns></returns>
-        public static double FromDateToFloating(GekkoTime gt)
-        {
-            double d = double.NaN;
-            if (gt.freq == EFreq.A || gt.freq == EFreq.U)
-            {
-                d = gt.super;
-            }
-            else if (gt.freq == EFreq.Q)
-            {
-                d = (double)gt.super + ((double)gt.sub - 1d) / 4d;
-            }
-            else if (gt.freq == EFreq.M)
-            {
-                d = (double)gt.super + ((double)gt.sub - 1d) / 12d;
-            }
-            return d;
-        }
+        }        
 
         /// <summary>
         /// Overload.
