@@ -83,7 +83,7 @@ namespace Gekko
             int count = containerExplode.Count;
             bool firstXLabelFix = true;
 
-            bool isInside = false;  //corresponds to at
+            bool isInside = false;  //corresponds to "at"
             if (highestFreq == EFreq.A || highestFreq == EFreq.U)
             {
                 //annual
@@ -685,21 +685,24 @@ namespace Gekko
             foreach (string s in xlines)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
-                double d = Program.PlotTableTime(highestFreq, gt) + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = Program.PlotTableTime(gt.freq, gt) + GetXAdjustmentForInsideTics(isInside);
+                //if (!isInside) d += -0.5;
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlinebefores)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
-                double d = (Program.PlotTableTime(highestFreq, gt) + Program.PlotTableTime(highestFreq, gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = (Program.PlotTableTime(gt.freq, gt) + Program.PlotTableTime(gt.freq, gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside);
+                //if (!isInside) d += -0.5;
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlineafters)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
-                double d = (Program.PlotTableTime(highestFreq, gt) + Program.PlotTableTime(highestFreq, gt.Add(1))) / 2d + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = (Program.PlotTableTime(gt.freq, gt) + Program.PlotTableTime(gt.freq, gt.Add(1))) / 2d + GetXAdjustmentForInsideTics(isInside);
+                //if (!isInside) d += -0.5;
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -1504,13 +1507,13 @@ namespace Gekko
         private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)
         {
             if (!isInside && (highestFreq == EFreq.A || highestFreq == EFreq.U)) return -0.5;
+            else return 0d;            
+        }
+
+        private static double GetXAdjustmentForInsideTics(bool isInside)
+        {
+            if (!isInside) return -0.5;
             else return 0d;
-            //if (!isInside) return 0d;
-            //int sub = 1;
-            //if (highestFreq == EFreq.Q) sub = 4;
-            //else if (highestFreq == EFreq.M) sub = 12;
-            //double adj = 1d / sub / 2d;
-            //return adj;
         }
 
         private static bool NotNullAndNotNo(string s)
