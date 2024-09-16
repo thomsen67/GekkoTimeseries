@@ -26968,7 +26968,7 @@ namespace Gekko
             //In principle, the generic methodology used for D freq destination could be used for all freqs here.
             //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
 
-            if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
+            if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
             {
                 //good
             }
@@ -26983,7 +26983,7 @@ namespace Gekko
             if (t1_rhs.IsNull()) new Error("It seems the input series " + ts_rhs.GetNameAndFreqPretty(true) + " has no data.");
             GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries            
 
-            if (G.Equal(method, "dentona1") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
+            if (G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
             {
                 if (ts_indicator == null) new Error("It seems no indicator series is provided.");
                 GekkoTime t1_indicator = ts_indicator.GetRealDataPeriodFirst();
@@ -27279,6 +27279,11 @@ namespace Gekko
             bool isAvg = false;
             EDentonType dentonType = EDentonType.None;
             if (G.Equal(method, "dentona1")) dentonType = EDentonType.Dentona1;
+            else if (G.Equal(method, "dentona1avg"))
+            {
+                dentonType = EDentonType.Dentona1;
+                isAvg = true;
+            }
             else if (G.Equal(method, "cholettea1")) dentonType = EDentonType.Cholettea1;
             else if (G.Equal(method, "cholettea1avg"))
             {

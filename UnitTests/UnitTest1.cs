@@ -24709,7 +24709,7 @@ print(df2)
             //        Denton
             // ================================
 
-            for (int i = 0; i < 6; i++)  //command/function, denton/cholette/choletteavg
+            for (int i = 0; i < 8; i++)  //command/function, denton/cholette/choletteavg
             {
                 I("reset;");
                 I("%t1 = 2001a;");
@@ -24722,20 +24722,22 @@ print(df2)
                 I("y!a  <%t1 %t2>                   = 500,                  400,                  300,                  400,                  500;");
                 I("z!q  <%t1_highfreq %t2_highfreq> = 50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100;");
 
-                if (i == 4 || i == 5)
+                if (i == 2 || i == 3 || i == 6 || i == 7)
                 {
                     I("z!q <%t1_highfreq %t2_highfreq> *= 4;");
                 }
 
                 if (i == 0) I("interpolate x!q = y!a indicator=z!q dentona1;");
                 else if (i == 1) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1');");
-                else if (i == 2) I("interpolate x!q = y!a indicator=z!q cholettea1;");
-                else if (i == 3) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1');");
-                else if (i == 4) I("interpolate x!q = y!a indicator=z!q cholettea1avg;");
-                else if (i == 5) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1avg');");
+                else if (i == 2) I("interpolate x!q = y!a indicator=z!q dentona1avg;");
+                else if (i == 3) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1avg');");
+                else if (i == 4) I("interpolate x!q = y!a indicator=z!q cholettea1;");
+                else if (i == 5) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1');");
+                else if (i == 6) I("interpolate x!q = y!a indicator=z!q cholettea1avg;");
+                else if (i == 7) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1avg');");
                 else Assert.Fail();
 
-                if (i == 0 || i == 1)
+                if (i == 0 || i == 1 || i == 2 || i == 3)
                 {
                     //Taken from R ('denton')
                     
@@ -24764,7 +24766,7 @@ print(df2)
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.5988d, sharedTableDelta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.3314d, sharedTableDelta);
                 }
-                else if (i == 2 || i == 3 || i == 4 || i == 5)
+                else if (i == 4 || i == 5 || i == 6 || i == 7)
                 {
                     //Taken from R ('denton-cholette')
 
