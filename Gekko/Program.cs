@@ -28236,7 +28236,7 @@ namespace Gekko
         {
             double tt = ((ScalarVal)Functions.helper_time(t)).val;
             if (freqHere == EFreq.A || freqHere == EFreq.U) tt += 0.5d;  //annual years should be 2020.5 to be centered correctly
-            return tt;
+            return tt; 
         }
 
 
