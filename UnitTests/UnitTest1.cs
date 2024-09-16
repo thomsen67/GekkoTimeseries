@@ -24954,6 +24954,56 @@ print(df2)
                 _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 3098.0438d, delta);
             }
 
+            if (true)
+            {
+                // ===================================================================
+                //  FIXED POINT: tests Denton, Cholette and Olsen on perfect data
+                // ===================================================================
+
+                for (int i = 0; i < 6; i++) {
+
+                    I("reset;");
+                    I("time 2001 2005;");
+                    I("z!q = 10, 12, 10, 12,   20, 22, 20, 22,   10, 12, 10, 12,    20, 22, 20, 22,   10, 12, 10, 12;");
+                    I("y = 44, 84, 44, 84, 44;");
+
+                    if (i == 0) 
+                    {
+                        I("interpolate x!q = y indicator = z!q dentona1;");
+                    }
+                    else if (i == 1)
+                    {
+                        I("z!q *= 4;");
+                        I("interpolate x!q = y indicator = z!q dentona1avg;");
+                    }
+                    else if (i == 2)
+                    {
+                        I("interpolate x!q = y indicator = z!q cholettea1;");
+                    }
+                    else if (i == 3)
+                    {
+                        I("z!q *= 4;");
+                        I("interpolate x!q = y indicator = z!q cholettea1avg;");
+                    }
+                    else if (i == 4)
+                    {
+                        I("interpolate x!q = y indicator = z!q olsena1;");
+                    }
+                    else if (i == 5)
+                    {
+                        I("z!q *= 4;");
+                        I("interpolate x!q = y indicator = z!q olsena1avg;");
+                    }
+
+                    I("dif!q = z!q - x!q;");
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.Q, 2001, 1), new GekkoTime(EFreq.Q, 2005, 4)))
+                    {
+                        _AssertSeries(First(), "dif!q", EFreq.Q, t.super, t.sub, 0d, sharedDelta);
+                    }
+                }
+            }
+
             // ================================
             //        A to Q
             // ================================
