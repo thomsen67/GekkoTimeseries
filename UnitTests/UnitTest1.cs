@@ -24709,11 +24709,12 @@ print(df2)
             //        Denton
             // ================================
 
-            for (int i = 0; i < 4; i++)  //command or function, denton or cholette
+            for (int i = 0; i < 6; i++)  //command/function, denton/cholette/choletteavg
             {
                 I("reset;");
                 I("%t1 = 2001a;");
                 I("%t2 = 2005a;");
+                I("time %t1 %t2;");
                 I("%t1_highfreq = 2001q1;");
                 I("%t2_highfreq = 2005q4;");
                 //Data: Denton's example:                
@@ -24721,14 +24722,23 @@ print(df2)
                 I("y!a  <%t1 %t2>                   = 500,                  400,                  300,                  400,                  500;");
                 I("z!q  <%t1_highfreq %t2_highfreq> = 50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100;");
 
+                if (i == 4 || i == 5)
+                {
+                    I("z!q <%t1_highfreq %t2_highfreq> *= 4;");
+                }
+
                 if (i == 0) I("interpolate x!q = y!a indicator=z!q dentona1;");
                 else if (i == 1) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1');");
                 else if (i == 2) I("interpolate x!q = y!a indicator=z!q cholettea1;");
                 else if (i == 3) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1');");
+                else if (i == 4) I("interpolate x!q = y!a indicator=z!q cholettea1avg;");
+                else if (i == 5) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1avg');");
                 else Assert.Fail();
 
                 if (i == 0 || i == 1)
                 {
+                    //Taken from R ('denton')
+                    
                     _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 66.9868d, sharedTableDelta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 126.9868d, sharedTableDelta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 180.0000d, sharedTableDelta);
@@ -24754,8 +24764,10 @@ print(df2)
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.5988d, sharedTableDelta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.3314d, sharedTableDelta);
                 }
-                else if (i == 2 || i == 3)
+                else if (i == 2 || i == 3 || i == 4 || i == 5)
                 {
+                    //Taken from R ('denton-cholette')
+
                     _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 79.29799d, sharedTableDelta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 127.57880d, sharedTableDelta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 174.14040d, sharedTableDelta);
