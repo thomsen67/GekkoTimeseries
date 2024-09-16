@@ -27320,6 +27320,8 @@ namespace Gekko
 
             if (n != m * k) new Error("Expected indicator to have " + (m * k) + " periods, got " + n);
 
+            double factor = 1d; if (isAvg) factor = k;
+
             //TODO: what if periods do not fit together?
             //SLACK: could use array-copy...?
 
@@ -27428,7 +27430,7 @@ namespace Gekko
                 {
                     double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
                     double value = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
-                    z_adjusted.SetData(t, value / k);  //value will always have same level as y!a, so we scale it down for use in Denton-Cholette
+                    z_adjusted.SetData(t, value / factor);  //value will always have same level as y!a, so we scale it down for use in Denton-Cholette
                 }
 
                 z_array = new double[n, 1];
@@ -27550,9 +27552,7 @@ namespace Gekko
                 double[,] result1 = Program.MultiplyMatrices(invert, large2);
                 x_Cholette = Program.MultiplyMatrices(result1, large3);
             }            
-            else new Error("Wrong method");
-
-            double factor = 1d; if (isAvg) factor = k;
+            else new Error("Wrong method");            
 
             counter = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
