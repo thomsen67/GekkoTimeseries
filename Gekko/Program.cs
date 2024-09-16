@@ -27453,7 +27453,6 @@ namespace Gekko
             double[,] r = Program.SubtractMatrixMatrix(y_array, Program.MultiplyMatrices(Program.Transpose(b), z_array), y_array.GetLength(0), y_array.GetLength(1));
             double[,] x_Denton = null;
             double[,] x_Cholette = null;
-            double[,] z_Olsen = null;
 
             if (dentonType == EDentonType.Dentona1)
             {
@@ -27553,17 +27552,20 @@ namespace Gekko
             }            
             else new Error("Wrong method");
 
+            double factor = 1d; if (isAvg) factor = k;
+
             counter = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
             {
                 counter++;
-                if (dentonType == EDentonType.Dentona1) x.SetData(t, x_Denton[counter, 0]);
-                else if (dentonType == EDentonType.Cholettea1) x.SetData(t, x_Cholette[counter, 0]);
-                else if (dentonType == EDentonType.Olsena1)
+                if (dentonType == EDentonType.Dentona1)
                 {
-                    if (isAvg) x.SetData(t, k * x_Cholette[counter, 0]);
-                    else x.SetData(t, x_Cholette[counter, 0]);
-                }                
+                    x.SetData(t, factor * x_Denton[counter, 0]);
+                }
+                else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1)
+                {
+                    x.SetData(t, factor * x_Cholette[counter, 0]);
+                }
                 else new Error("Wrong type");
             }
         }

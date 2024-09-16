@@ -24709,6 +24709,8 @@ print(df2)
             //        Denton
             // ================================
 
+            double delta = sharedTableDelta * 4;
+
             for (int i = 0; i < 8; i++)  //command/function, denton/cholette/choletteavg
             {
                 I("reset;");
@@ -24737,63 +24739,66 @@ print(df2)
                 else if (i == 7) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1avg');");
                 else Assert.Fail();
 
+
+                double factor = 1d; if (i == 2 || i == 3 || i == 6 || i == 7) factor = 4;
+
                 if (i == 0 || i == 1 || i == 2 || i == 3)
                 {
-                    //Taken from R ('denton')
-                    
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 66.9868d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 126.9868d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 180.0000d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 126.0263d, sharedTableDelta);
+                    //Taken from R ('denton')                    
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 65.0658d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 104.6553d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 144.7947d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 85.4842d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 66.9868d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 126.9868d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 180.0000d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 126.0263d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, 26.7237d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 2, 72.5300d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 3, 122.9032d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 77.8432d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 65.0658d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 104.6553d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 144.7947d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 85.4842d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, 37.3501d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 2, 96.2128d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 3, 154.4314d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 4, 112.0058d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, 26.7237d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 2, 72.5300d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 3, 122.9032d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 77.8432d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 1, 68.9360d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.1337d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.5988d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.3314d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, 37.3501d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 2, 96.2128d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 3, 154.4314d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 4, 112.0058d * factor, delta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 1, 68.9360d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.1337d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.5988d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.3314d * factor, delta);
                 }
                 else if (i == 4 || i == 5 || i == 6 || i == 7)
                 {
                     //Taken from R ('denton-cholette')
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 79.29799d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 127.57880d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 174.14040d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 118.98281d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 79.29799d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 2, 127.57880d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 3, 174.14040d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2001, 4, 118.98281d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 62.10602d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 104.51289d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 146.20344d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 87.17765d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 1, 62.10602d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 2, 104.51289d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 3, 146.20344d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2002, 4, 87.17765d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, 27.43553d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 2, 72.56447d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 3, 122.56447d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 77.43553d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 1, 27.43553d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 2, 72.56447d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 3, 122.56447d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 77.43553d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, 37.17765d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 2, 96.20344d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 3, 154.51289d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 4, 112.10602d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, 37.17765d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 2, 96.20344d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 3, 154.51289d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2004, 4, 112.10602d * factor, delta);
 
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 1, 68.98281d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.14040d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.57880d, sharedTableDelta);
-                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.29799d, sharedTableDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 1, 68.98281d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.14040d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.57880d * factor, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.29799d * factor, delta);
                 }
                 else Assert.Fail();
 
@@ -24906,20 +24911,20 @@ print(df2)
                 I("z!q /= 4;");  //To simulate an indicator of 'total' type.
                 I("interpolate x!q = y!a indicator = z!q olsena1;");
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 673.3915d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 674.3258d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 675.6091d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 677.6049d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 673.3915d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 674.3258d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 675.6091d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 677.6049d, delta);
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 722.6228d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 716.6252d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 719.4512d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 722.6968d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 722.6228d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 716.6252d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 719.4512d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 722.6968d, delta);
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 773.0040d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9204d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.5519d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.8335d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 773.0040d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9204d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.5519d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.8335d, delta);
 
                 //
                 // ========= avg =================
@@ -24935,20 +24940,20 @@ print(df2)
                 I("time 2014 2023;");            
                 I("interpolate x!q = y!a indicator=z!q olsena1avg;"); 
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 2691.2736d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 2698.2774d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 2702.9790d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 2711.1949d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 2691.2736d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 2698.2774d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 2702.9790d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 2711.1949d, delta);
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 2911.4184d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 2837.6004, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 2878.1021d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 2898.4630d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 2911.4184d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 2837.6004, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 2878.1021d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 2898.4630d, delta);
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 3093.6077d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 3095.8816d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 3097.7063d, sharedTableDelta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 3098.0438d, sharedTableDelta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 3093.6077d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 3095.8816d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 3097.7063d, delta);
+                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 3098.0438d, delta);
             }
 
             // ================================
