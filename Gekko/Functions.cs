@@ -5845,6 +5845,33 @@ namespace Gekko
             tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
         }
 
+        public static IVariable adamtrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            //Series ts = O.GetIVariableFromString(O.ConvertToString(x), O.ECreatePossibilities.NoneReportError) as Series;
+            Series ts = x as Series;
+            List<string> adams = new List<string>();
+            if (ts == null) new Error("Expected series type");
+            TraceHelper th1 = new TraceHelper();
+            th1.type = ETraceHelper.GetAllMetasAndTraces;                        
+            ts.DeepTrace(th1);
+            foreach (Trace2 trace in th1.traces.Keys)
+            {
+                string text = trace.traceContents.text;
+                List<string> precedentsNames = trace.traceContents.precedentsNames;
+                if (precedentsNames != null)
+                {
+                    foreach (string pname in precedentsNames)
+                    {
+                        string s = pname.Split('¤')[1];
+                        string bank = G.Chop_GetBank(s);
+                        if (G.Equal(bank, "adambk")) adams.Add(G.Chop_RemoveFreq(G.Chop_RemoveBank(s)));  //TODO: could be faster
+                    }
+                }
+            }
+            List m = new List(adams);
+            return m;
+        }
+
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             //NOTE: Does not include the invisible traces assigned to each series object

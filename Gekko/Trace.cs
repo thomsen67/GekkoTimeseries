@@ -94,8 +94,8 @@ namespace Gekko
         public string dataFile = null;
 
         [ProtoMember(7)]
-        public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
-                
+        public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces. See #9khsigra7ioau.
+
         public TraceContents2()
         {
             //for protobuf
