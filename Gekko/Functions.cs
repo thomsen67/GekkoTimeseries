@@ -5856,15 +5856,25 @@ namespace Gekko
         {            
             if (x.Length == 0) new Error("Expected > 0 arguments to tracebank() function");
             List<string> names = new List<string>();
+            
+            if (x.Length == 2 || x.Length == 3)
+            {
+                string name = null;
+                string bankname = null;
+                string stype = null;
 
-            if (x.Length == 2)
-            {
-            }
-            else if (x.Length == 3)
-            {
-                string name = O.ConvertToString(x[0]);  //TODO: Accept series object maybe, at least for precedents
-                string bankname = O.ConvertToString(x[1]);
-                string stype = O.ConvertToString(x[2]);
+                if (x.Length == 2)
+                {                    
+                    bankname = O.ConvertToString(x[0]);
+                    stype = O.ConvertToString(x[1]);
+                }
+                else
+                {
+                    name = O.ConvertToString(x[0]);  //TODO: Accept series object maybe, at least for precedents
+                    bankname = O.ConvertToString(x[1]);
+                    stype = O.ConvertToString(x[2]);
+                }
+
                 ETraceBank type = ETraceBank.None;
                 if (G.Equal(stype, "precedents")) type = ETraceBank.Precedents;
                 else if (G.Equal(stype, "dependents")) type = ETraceBank.Dependents;

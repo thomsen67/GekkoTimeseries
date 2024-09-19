@@ -10505,16 +10505,36 @@ namespace Gekko
         /// <param name="ts"></param>
         /// <returns></returns>
         public static GekkoDictionary<string, bool> TraceGetPrecedents(string name, string bankname)
-        {
-            Series ts = O.GetIVariableFromString(name, O.ECreatePossibilities.NoneReportError) as Series;
-            if (ts == null) new Error("Expected input name to be a series name");
+        {            
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            TraceHelper th1 = new TraceHelper();
-            th1.type = ETraceHelper.GetAllMetasAndTraces;
-            ts.DeepTrace(th1);
-            foreach (Trace2 trace in th1.traces.Keys)
+         
+            if (name == null)
             {
-                TraceGetPrecedentsHelper(trace, bankname, found);
+                foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage) 
+                {
+                    //will include array-series, which is ok here -- we look at all of them
+                    if (kvp.Value.Type() != EVariableType.Series) continue;
+                    Series ts = kvp.Value as Series;
+                    TraceHelper th1 = new TraceHelper();
+                    th1.type = ETraceHelper.GetAllMetasAndTraces;
+                    ts.DeepTrace(th1);
+                    foreach (Trace2 trace in th1.traces.Keys)
+                    {
+                        TraceGetPrecedentsHelper(trace, bankname, found);
+                    }
+                }
+            }
+            else
+            {
+                Series ts = O.GetIVariableFromString(name, O.ECreatePossibilities.NoneReportError) as Series;
+                if (ts == null) new Error("Expected input name to be a series name");                
+                TraceHelper th1 = new TraceHelper();
+                th1.type = ETraceHelper.GetAllMetasAndTraces;
+                ts.DeepTrace(th1);
+                foreach (Trace2 trace in th1.traces.Keys)
+                {
+                    TraceGetPrecedentsHelper(trace, bankname, found);
+                }
             }
 
             return found;
@@ -10568,22 +10588,46 @@ namespace Gekko
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-            string nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(name), Program.options.freq);
-
-            GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
-            foreach (KeyValuePair<string, IVariable> kvp in flat)
+            if (name == null)
             {
-                if (kvp.Value.Type() != EVariableType.Series) continue;
-                Series ts = kvp.Value as Series;
-                if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
                 
-                TraceHelper th1 = new TraceHelper();
-                th1.type = ETraceHelper.GetAllMetasAndTraces;
-                ts.DeepTrace(th1);                
-
-                foreach (Trace2 trace in th1.traces.Keys)
+                GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
+                foreach (KeyValuePair<string, IVariable> kvp in flat)
                 {
-                      TraceGetDependentsHelper(nameWithFreq, trace, bankname, found, kvp.Key);
+                    if (kvp.Value.Type() != EVariableType.Series) continue;
+                    Series ts = kvp.Value as Series;
+                    if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
+
+                    TraceHelper th1 = new TraceHelper();
+                    th1.type = ETraceHelper.GetAllMetasAndTraces;
+                    ts.DeepTrace(th1);
+
+                    foreach (Trace2 trace in th1.traces.Keys)
+                    {
+                        TraceGetDependentsHelper(null, trace, bankname, found, kvp.Key);
+                    }
+                }
+            }
+            else
+            {
+
+                string nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(name), Program.options.freq);
+
+                GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
+                foreach (KeyValuePair<string, IVariable> kvp in flat)
+                {
+                    if (kvp.Value.Type() != EVariableType.Series) continue;
+                    Series ts = kvp.Value as Series;
+                    if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
+
+                    TraceHelper th1 = new TraceHelper();
+                    th1.type = ETraceHelper.GetAllMetasAndTraces;
+                    ts.DeepTrace(th1);
+
+                    foreach (Trace2 trace in th1.traces.Keys)
+                    {
+                        TraceGetDependentsHelper(nameWithFreq, trace, bankname, found, kvp.Key);
+                    }
                 }
             }
 
@@ -10600,7 +10644,7 @@ namespace Gekko
                     string aname = TraceGetPrecedentsHelper2(bankname, pname);
                     if (aname != null)
                     {
-                        if (G.Equal(aname, adamName))
+                        if (adamName == null || G.Equal(aname, adamName))
                         {
                             if (!found.ContainsKey(dependentName)) 
                                 found.Add(dependentName, false);

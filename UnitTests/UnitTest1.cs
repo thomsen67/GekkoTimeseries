@@ -8517,17 +8517,35 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceBank()
         {
+            //
+            //
+            //   "x[i,j] versus x[i, j]
+            //
+            //
+            
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("read scramble;");  //MAKROBK, scrambled data
             I("#m = tracebank('qbnp', 'adambk', 'precedents');");
-            _AssertListSize(First(), "#m", 62);
+            _AssertListSize(First(), "#m", 62);  //ADAM-vars
 
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("read scramble;");  //MAKROBK, scrambled data
             I("#m = tracebank('Syk', 'adambk', 'dependents');");
-            _AssertListSize(First(), "#m", 5);
+            _AssertListSize(First(), "#m", 5);  //MAKRO-vars
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = tracebank('adambk', 'precedents');");
+            _AssertListSize(First(), "#m", 1882); //ADAM-vars
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = tracebank('adambk', 'dependents');");
+            _AssertListSize(First(), "#m", 9457); //MAKRO-vars
         }
 
         [TestMethod]
