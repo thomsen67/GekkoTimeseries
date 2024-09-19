@@ -10552,7 +10552,7 @@ namespace Gekko
             string aname = null;
             if (G.Equal(bank, bankname))
             {
-                aname = G.Chop_RemoveFreq(G.Chop_RemoveBank(s)); //TODO: could be faster, but is inside an IF, so oh well...                        
+                aname = G.Chop_RemoveBank(s); //TODO: could be faster, but is inside an IF, so oh well...                        
             }
 
             return aname;
@@ -10568,6 +10568,8 @@ namespace Gekko
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
+            string nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(name), Program.options.freq);
+
             GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
             foreach (KeyValuePair<string, IVariable> kvp in flat)
             {
@@ -10577,19 +10579,12 @@ namespace Gekko
                 
                 TraceHelper th1 = new TraceHelper();
                 th1.type = ETraceHelper.GetAllMetasAndTraces;
-                ts.DeepTrace(th1);
-
-                string name_clean = G.Chop_GetName(name);
-
-                if (G.Equal(kvp.Key, "vtkilde!a"))
-                {
-                }
+                ts.DeepTrace(th1);                
 
                 foreach (Trace2 trace in th1.traces.Keys)
                 {
-                      TraceGetDependentsHelper(name_clean, trace, bankname, found, kvp.Key);
+                      TraceGetDependentsHelper(nameWithFreq, trace, bankname, found, kvp.Key);
                 }
-
             }
 
             return found;
