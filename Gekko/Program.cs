@@ -10574,22 +10574,48 @@ namespace Gekko
                 if (kvp.Value.Type() != EVariableType.Series) continue;
                 Series ts = kvp.Value as Series;
                 if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
-
+                
                 TraceHelper th1 = new TraceHelper();
                 th1.type = ETraceHelper.GetAllMetasAndTraces;
                 ts.DeepTrace(th1);
 
-                foreach (Trace2 trace in th1.traces.Keys)
+                string name_clean = G.Chop_GetName(name);
+
+                if (G.Equal(kvp.Key, "vtkilde!a"))
                 {
-                    TraceGetPrecedentsHelper(trace, bankname, found);
                 }
 
-            }         
+                foreach (Trace2 trace in th1.traces.Keys)
+                {
+                      TraceGetDependentsHelper(name_clean, trace, bankname, found, kvp.Key);
+                }
+
+            }
 
             return found;
         }
 
-        
+        private static void TraceGetDependentsHelper(string adamName, Trace2 trace, string bankname, GekkoDictionary<string, bool> found, string dependentName)
+        {
+            List<string> precedentsNames = trace.traceContents.precedentsNames;
+            if (precedentsNames != null)
+            {
+                foreach (string pname in precedentsNames)
+                {
+                    string aname = TraceGetPrecedentsHelper2(bankname, pname);
+                    if (aname != null)
+                    {
+                        if (G.Equal(aname, adamName))
+                        {
+                            if (!found.ContainsKey(dependentName)) 
+                                found.Add(dependentName, false);
+                        }
+                    }
+                }
+            }
+        }
+
+
         /// <summary>
         /// Error message.
         /// </summary>

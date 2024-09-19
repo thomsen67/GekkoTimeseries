@@ -8526,8 +8526,8 @@ namespace UnitTests
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("read scramble;");  //MAKROBK, scrambled data
-            I("#m = tracebank('qbnp', 'adambk', 'dependents');");
-            _AssertListSize(First(), "#m", 62);
+            I("#m = tracebank('Syk', 'adambk', 'dependents');");
+            _AssertListSize(First(), "#m", 5);
         }
 
         [TestMethod]
