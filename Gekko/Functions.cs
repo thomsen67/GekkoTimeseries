@@ -5873,14 +5873,14 @@ namespace Gekko
                 GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
                 if (type == ETraceBank.Precedents)
-                {
-                    Series ts = O.GetIVariableFromString(name, O.ECreatePossibilities.NoneReportError) as Series;
-                    if (ts == null) new Error("Expected input name to be a series name");
-                    found = Program.TraceGetPrecedents(ts, bankname);
+                {                    
+                    //precedents
+                    found = Program.TraceGetPrecedents(name, bankname);
                 }
                 else
                 {
-                    //dependents
+                    //dependents                    
+                    found = Program.TraceGetDependents(name, bankname);
                 }                
 
                 names = found.Keys.ToList();

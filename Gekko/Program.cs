@@ -10504,34 +10504,92 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetPrecedents(Series ts, string bankname)
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(string name, string bankname)
         {
+            Series ts = O.GetIVariableFromString(name, O.ECreatePossibilities.NoneReportError) as Series;
+            if (ts == null) new Error("Expected input name to be a series name");
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             TraceHelper th1 = new TraceHelper();
             th1.type = ETraceHelper.GetAllMetasAndTraces;
             ts.DeepTrace(th1);
             foreach (Trace2 trace in th1.traces.Keys)
             {
-                string text = trace.traceContents.text;
-                List<string> precedentsNames = trace.traceContents.precedentsNames;
-                if (precedentsNames != null)
-                {
-                    foreach (string pname in precedentsNames)
-                    {
-                        string s = pname.Split('¤')[1];
-                        string bank = G.Chop_GetBank(s);
-                        if (G.Equal(bank, bankname))
-                        {
-                            string aname = G.Chop_RemoveFreq(G.Chop_RemoveBank(s)); //TODO: could be faster, but is inside an IF, so oh well...
-                            if (!found.ContainsKey(aname)) found.Add(aname, false);
-                        }
-                    }
-                }
+                TraceGetPrecedentsHelper(trace, bankname, found);
             }
 
             return found;
         }
 
+        /// <summary>
+        /// For a trace, it adds to the found list all names in precedentsNames that contains the bankname as databank.
+        /// </summary>
+        /// <param name="trace"></param>
+        /// <param name="bankname"></param>
+        /// <param name="found"></param>
+        private static void TraceGetPrecedentsHelper(Trace2 trace, string bankname, GekkoDictionary<string, bool> found)
+        {
+            List<string> precedentsNames = trace.traceContents.precedentsNames;
+            if (precedentsNames != null)
+            {
+                foreach (string pname in precedentsNames)
+                {
+                    string aname = TraceGetPrecedentsHelper2(bankname, pname);
+                    if (aname != null && !found.ContainsKey(aname)) found.Add(aname, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// For a variable name like "3¤adambk:x!a", it returns "x" if the bank is correct (== bankname). Can return null.
+        /// </summary>
+        /// <param name="bankname"></param>
+        /// <param name="pname"></param>
+        /// <returns></returns>
+        private static string TraceGetPrecedentsHelper2(string bankname, string pname)
+        {
+            string s = pname.Split('¤')[1];
+            string bank = G.Chop_GetBank(s);
+            string aname = null;
+            if (G.Equal(bank, bankname))
+            {
+                aname = G.Chop_RemoveFreq(G.Chop_RemoveBank(s)); //TODO: could be faster, but is inside an IF, so oh well...                        
+            }
+
+            return aname;
+        }
+
+        /// <summary>
+        /// For a given input series x (can be array-series), a list of normal series or subseries names is returned,
+        /// where the names are found inside the traces of x.
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns></returns>
+        public static GekkoDictionary<string, bool> TraceGetDependents(string name, string bankname)
+        {
+            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
+            foreach (KeyValuePair<string, IVariable> kvp in flat)
+            {
+                if (kvp.Value.Type() != EVariableType.Series) continue;
+                Series ts = kvp.Value as Series;
+                if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
+
+                TraceHelper th1 = new TraceHelper();
+                th1.type = ETraceHelper.GetAllMetasAndTraces;
+                ts.DeepTrace(th1);
+
+                foreach (Trace2 trace in th1.traces.Keys)
+                {
+                    TraceGetPrecedentsHelper(trace, bankname, found);
+                }
+
+            }         
+
+            return found;
+        }
+
+        
         /// <summary>
         /// Error message.
         /// </summary>

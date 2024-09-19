@@ -169,6 +169,35 @@ namespace Gekko
             }
         }
 
+        public GekkoDictionary<string, IVariable> StorageFlattenedArrayTimeseries()
+        {
+            GekkoDictionary<string, IVariable> rv = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                if (kvp.Value.Type() == EVariableType.Series)
+                {
+                    Series ts = kvp.Value as Series;
+                    if (ts.type == ESeriesType.ArraySuper)
+                    {
+                        foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
+                        {
+                            Series ts2 = kvp2.Value as Series;
+                            rv.Add(ts2.GetName(), ts2);
+                        }
+                    }
+                    else
+                    {
+                        rv.Add(kvp.Key, kvp.Value);
+                    }
+                }
+                else
+                {
+                    rv.Add(kvp.Key, kvp.Value);
+                }
+            }
+            return rv;
+        }
+
         public void Clear() 
         {
             if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");            
