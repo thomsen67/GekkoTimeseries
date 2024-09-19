@@ -65,6 +65,13 @@ namespace Gekko
             Cols
         }
 
+        public enum ETraceBank
+        {
+            None,
+            Precedents,
+            Dependents
+        }
+
         public enum ESumType
         {
             Min,
@@ -5845,32 +5852,46 @@ namespace Gekko
             tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
         }
 
-        public static IVariable adamtrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        {
-            //Series ts = O.GetIVariableFromString(O.ConvertToString(x), O.ECreatePossibilities.NoneReportError) as Series;
-            Series ts = x as Series;
-            List<string> adams = new List<string>();
-            if (ts == null) new Error("Expected series type");
-            TraceHelper th1 = new TraceHelper();
-            th1.type = ETraceHelper.GetAllMetasAndTraces;                        
-            ts.DeepTrace(th1);
-            foreach (Trace2 trace in th1.traces.Keys)
+        public static IVariable tracebank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {            
+            if (x.Length == 0) new Error("Expected > 0 arguments to tracebank() function");
+            List<string> names = new List<string>();
+
+            if (x.Length == 2)
             {
-                string text = trace.traceContents.text;
-                List<string> precedentsNames = trace.traceContents.precedentsNames;
-                if (precedentsNames != null)
-                {
-                    foreach (string pname in precedentsNames)
-                    {
-                        string s = pname.Split('¤')[1];
-                        string bank = G.Chop_GetBank(s);
-                        if (G.Equal(bank, "adambk")) adams.Add(G.Chop_RemoveFreq(G.Chop_RemoveBank(s)));  //TODO: could be faster
-                    }
-                }
             }
-            List m = new List(adams);
+            else if (x.Length == 3)
+            {
+                string name = O.ConvertToString(x[0]);  //TODO: Accept series object maybe, at least for precedents
+                string bankname = O.ConvertToString(x[1]);
+                string stype = O.ConvertToString(x[2]);
+                ETraceBank type = ETraceBank.None;
+                if (G.Equal(stype, "precedents")) type = ETraceBank.Precedents;
+                else if (G.Equal(stype, "dependents")) type = ETraceBank.Dependents;
+                else new Error("Tracebank(): the type must be 'precedents' or 'dependents'");
+
+                GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+                if (type == ETraceBank.Precedents)
+                {
+                    Series ts = O.GetIVariableFromString(name, O.ECreatePossibilities.NoneReportError) as Series;
+                    if (ts == null) new Error("Expected input name to be a series name");
+                    found = Program.TraceGetPrecedents(ts, bankname);
+                }
+                else
+                {
+                    //dependents
+                }                
+
+                names = found.Keys.ToList();
+                names.Sort(StringComparer.OrdinalIgnoreCase);
+            }
+            else new Error("Expected 2 or 3 arguments to tracebank() function");
+            
+            List m = new List(names);
             return m;
         }
+        
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {

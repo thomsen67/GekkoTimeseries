@@ -10499,6 +10499,40 @@ namespace Gekko
         }
 
         /// <summary>
+        /// For a given input series x (can be array-series), a list of normal series or subseries names is returned,
+        /// where the names are found inside the traces of x.
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns></returns>
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(Series ts, string bankname)
+        {
+            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            TraceHelper th1 = new TraceHelper();
+            th1.type = ETraceHelper.GetAllMetasAndTraces;
+            ts.DeepTrace(th1);
+            foreach (Trace2 trace in th1.traces.Keys)
+            {
+                string text = trace.traceContents.text;
+                List<string> precedentsNames = trace.traceContents.precedentsNames;
+                if (precedentsNames != null)
+                {
+                    foreach (string pname in precedentsNames)
+                    {
+                        string s = pname.Split('¤')[1];
+                        string bank = G.Chop_GetBank(s);
+                        if (G.Equal(bank, bankname))
+                        {
+                            string aname = G.Chop_RemoveFreq(G.Chop_RemoveBank(s)); //TODO: could be faster, but is inside an IF, so oh well...
+                            if (!found.ContainsKey(aname)) found.Add(aname, false);
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        /// <summary>
         /// Error message.
         /// </summary>
         /// <param name="lineNumber"></param>

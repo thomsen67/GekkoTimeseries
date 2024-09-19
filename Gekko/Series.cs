@@ -2952,6 +2952,11 @@ namespace Gekko
             return tsCopy;
         }
 
+        /// <summary>
+        /// Will fetch information traces. If the variable is a super-arrayseries, all the sub-series are searched.
+        /// So if x exists for x[a] and x[b], using the method on x returns results from both x[a] and x[b].
+        /// </summary>
+        /// <param name="th"></param>
         public void DeepTrace(TraceHelper th)
         {            
             if (this.type == ESeriesType.ArraySuper)

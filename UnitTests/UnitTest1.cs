@@ -8513,6 +8513,23 @@ namespace UnitTests
             Assert.IsTrue(s.Contains("Note: *:*!* instead of work:* --> 4 matches"));
         }
 
+
+        [TestMethod]
+        public void _Test_TraceBank()
+        {
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = tracebank('qbnp', 'adambk', 'precedents');");
+            _AssertListSize(First(), "#m", 62);
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = tracebank('qbnp', 'adambk', 'dependents');");
+            _AssertListSize(First(), "#m", 62);
+        }
+
         [TestMethod]
         public void _Test_Speed()
         {
