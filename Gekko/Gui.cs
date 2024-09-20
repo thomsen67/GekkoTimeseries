@@ -2342,7 +2342,6 @@ namespace Gekko
                             catch
                             {
                                 new Error("Could not copy styles.css from Gekko program folder");
-                                //throw new GekkoException();
                             }
                         }
                     }

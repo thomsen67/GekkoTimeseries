@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Threading;
+using System.Text;
 
 // Simplificed overview
 //
@@ -1741,6 +1742,15 @@ namespace Gekko
             hash = hash * 31 + this.counter.GetHashCode();
             return hash;
         }
+    }
+
+    public class TraceHelper2
+    {
+        public StringBuilder html = null;
+        public int  depthMax = -1;
+        public int counter = 0;
+        public int counterMax = -1;
+        public int pixels = 0;
     }
 
     public class TraceHelper

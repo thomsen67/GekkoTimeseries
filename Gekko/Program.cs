@@ -2481,6 +2481,9 @@ namespace Gekko
                 string op = "d";
                 EFreq freq = EFreq.A;
                 int max = int.MaxValue;
+                int depthMax = 2;
+                int countMax = 4;
+                int pixels = 20;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
                 bool adam = false;
@@ -2717,8 +2720,18 @@ namespace Gekko
                                         {
                                             GekkoTimeSpansSimple gtss = tap.periods;
                                             Trace2 trace = tap.trace;
-                                            TraceHelper th = new TraceHelper();
+                                            TraceHelper2 th = new TraceHelper2();
+                                            th.html = html1;
+                                            th.depthMax = depthMax;
+                                            th.counterMax = countMax;
+                                            th.pixels = pixels;
+                                            th.html.AppendLine(@"<div>");
+                                            th.html.AppendLine(@"<ul>");
+                                            th.html.AppendLine(@"<li class=`folder`>");
                                             WalkTracesForHtml(trace, th, 0);
+                                            th.html.AppendLine(@"</div>");
+                                            th.html.AppendLine(@"</ul>");
+                                            th.html.AppendLine(@"</li>");
                                         }
                                     }
                                 }
@@ -2730,15 +2743,248 @@ namespace Gekko
                                 x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
                                 x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
                                 x.AppendLine("    <title>" + "EQUATION " + eqName2 + " (endo " + variableName + ")" + "</title>");
+
+                                string css = @"<style>        
+        html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-size:12px;
+        }
+    
+        ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        li {            
+            cursor: pointer;
+        }        
+    
+        .img-size {
+            height:1em;
+        }        
+    
+        .nested {
+            display: none;
+        }
+        .open > .nested {
+            display: block;
+        }
+    
+        .list-item-content {
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+        }
+    
+        /* Set different widths for the columns */
+        .list-item-content > div:nth-child(1) {
+            width: 30px; /* First column */
+            padding: 5px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;            
+        }
+        
+        .list-item-content > div:nth-child(2) {
+            width: 200px; /* Second column */
+            padding: 5px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+        
+        .list-item-content > div:nth-child(3) {
+            width: 200px; /* Third column */
+            padding: 5px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+
+        .list-item-content > div:nth-child(4) {
+            width: 200px; /* Third column */
+            padding: 5px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+
+        .list-item-content > div:nth-child(5) {
+            width: 200px; /* Third column */
+            padding: 5px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+    
+        /* Textbox at the bottom */
+        textarea {
+            width: 800px;
+            height: 50px;
+            margin-top: 5px;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;  
+            font-size:12px;
+            background-color: #fefce7;
+            overflow: auto;
+        }
+    
+        .extra-content {
+            display: none;
+        }
+    
+        .selected {
+            background-color: #0078d7;
+            color: white;
+        }
+    </style>";
+
+                                x.AppendLine(css);
+
+                                string js = @"<script>
+    let currentSelected = null;
+
+    // Function to calculate the deepest level of visible list items
+    function calculateMaxIndentation() {
+        let maxIndentationLevel = 0;
+
+        // Loop through all visible .list-item-content elements
+        document.querySelectorAll('.list-item-content').forEach(item => {
+            // Check visibility of current item
+            if (isElementVisible(item)) {
+                const level = calculateIndentationLevel(item);
+                if (level > maxIndentationLevel) {
+                    maxIndentationLevel = level;
+                }
+            }
+        });
+
+        // Adjust the width of the first column based on the maximum indentation level
+        const firstColumnWidth = 50 + maxIndentationLevel * 20; // Base width 50px + 20px per indentation level
+        document.querySelectorAll('.list-item-content > div:nth-child(1)').forEach(div => {
+            div.style.width = ¤${firstColumnWidth}px¤;
+        });
+    }
+
+    // Helper function to check if an element is visible
+    function isElementVisible(item) {
+        // An item is visible if all its parent folders are open
+        let parentFolder = item.closest('li.folder');
+        while (parentFolder) {
+            if (!parentFolder.classList.contains('open')) {
+                return false; // Not visible if a parent folder is closed
+            }
+            parentFolder = parentFolder.closest('ul').closest('li.folder');
+        }
+        return true;
+    }
+
+    // Function to calculate the indentation level of a given list item
+    function calculateIndentationLevel(item) {
+        let level = 0;
+        let currentElement = item.closest('li');
+
+        while (currentElement && currentElement.closest('ul')) {
+            level++;
+            currentElement = currentElement.closest('ul').closest('li');
+        }
+
+        return level;
+    }
+
+    // Handle folder icon click (expand/collapse)
+    document.querySelectorAll('.folder-icon').forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            const folder = this.closest('.folder');
+            folder.classList.toggle('open');
+            
+            // Change folder icon
+            if (folder.classList.contains('open')) {
+                this.innerHTML = '<img class=`img-size` src=`checked.png`>';
+            } else
+                                {
+                                    this.innerHTML = '<img class=`img-size` src =`normal.png`>';
+                                }
+
+                                // Recalculate the column width
+                                calculateMaxIndentation();
+
+                                e.stopPropagation();
+                            });
+            });
+
+            // Handle row selection
+            document.querySelectorAll('.list-item-content').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.closest('.folder-icon'))
+                    {
+                        return;
+                    }
+
+                    if (currentSelected)
+                    {
+                        currentSelected.classList.remove('selected');
+                    }
+
+                    currentSelected = this;
+                    currentSelected.classList.add('selected');
+
+                    let extraContent = this.parentElement.querySelector('.extra-content').textContent.trim();
+                    extraContent = extraContent.replace(/\\n/g, '\n');
+                    document.getElementById('output').value = extraContent;
+
+                    e.stopPropagation();
+                });
+        });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e)
+        {
+            if (!currentSelected) return;
+            let nextRow = null;
+            if (e.key === 'ArrowDown')
+            {
+                nextRow = currentSelected.parentElement.nextElementSibling?.querySelector('.list-item-content');
+            }
+            else if (e.key === 'ArrowUp')
+            {
+                nextRow = currentSelected.parentElement.previousElementSibling?.querySelector('.list-item-content');
+            }
+            if (nextRow)
+            {
+                currentSelected.classList.remove('selected');
+                currentSelected = nextRow;
+                currentSelected.classList.add('selected');
+
+                let extraContent = currentSelected.parentElement.querySelector('.extra-content').textContent.trim();
+                extraContent = extraContent.replace(/\\n/g, '\n');
+                document.getElementById('output').value = extraContent;
+            }
+        });
+
+    // Initial column width calculation on load
+    calculateMaxIndentation();
+</script>";
+
                                 x.AppendLine("  </head>");
                                 x.AppendLine("  <body>");
                                 x.Append(html1);
+                                x.Append("<textarea id = `output` readonly></textarea>");
+                                x.AppendLine(js);
                                 x.AppendLine("  </body>");
                                 x.AppendLine("</html>");
                                 using (FileStream fs = Program.WaitForFileStream(path + fileName1, null, Program.GekkoFileReadOrWrite.Write))
                                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                                 {
-                                    sw.Write(x.Replace('`', '\"'));
+                                    sw.Write(x.Replace('`', '\"').Replace('¤', '`'));
                                 }
                             }
 
@@ -3366,18 +3612,37 @@ namespace Gekko
             else G.Writeln(text);            
         }
 
-        public static void WalkTracesForHtml(Trace2 trace, TraceHelper th, int depth)
+        public static void WalkTracesForHtml(Trace2 trace, TraceHelper2 th, int depth)
         {
+            th.counter++;
+            th.html.AppendLine(@"<div class=`list-item-content`>");            
+            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png`></span><span>  qBNP</span></div>");
+            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB </div>");
+            th.html.AppendLine(@"<div style = `margin-left:-" + (depth * th.pixels) + "px`>Size: 2MB 2MB 2MB</div>");
+            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
+            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
+            th.html.AppendLine(@"</div>");
+            th.html.AppendLine(@"<div class=`extra-content`>Name: vBNP!a\nCode: vBNP = vIO[cTot, Tot] + vIO[gTot, Tot] + vIO[iTot, Tot] + vIO[xTot, Tot] - vM[Tot];\nPeriod: 2015-2019, Active: 2015-2019\nStamp: 26-06-2024 15:09:41, #6645381576356028070\nFile: p:\TTH\NY\Anettes_problem\MAKRO\Data\Makrobk\Progs\Iodata\io_randtotaler2.gcm line 72\nVars: vIO[cTot, tot], vIO[gtot, tot], vIO[itot, Tot], vIO[xTot, tot], vM[tot]</div>");
             if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
-                foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                if (depth >= th.depthMax || th.counter >= th.counterMax)
                 {
-                    if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
-                    WalkTracesForHtml(traceAndPeriods.trace, th, depth + 1);
+                    //th.html.AppendLine(@"<p>TRUNCATED</p>");
                 }
-            }
+                else
+                {
+                    th.html.AppendLine(@"<ul class=`nested`>");
+                    foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                    {
+                        if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
+                        th.html.AppendLine(@"<li class=`folder`>");
+                        WalkTracesForHtml(traceAndPeriods.trace, th, depth + 1);
+                        th.html.AppendLine(@"</li>");
+                    }
+                    th.html.AppendLine(@"</ul>");
+                }
+            }            
         }
-
 
         private static List<EqHelper> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
         {
