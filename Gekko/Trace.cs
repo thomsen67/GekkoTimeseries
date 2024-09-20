@@ -1197,8 +1197,7 @@ namespace Gekko
             int nn = 0;
 
             if (!G.IsUnitTesting())
-            {               
-
+            {
                 Thread sta = new Thread(delegate ()
                 {
                     Globals.itemCounter = 0;

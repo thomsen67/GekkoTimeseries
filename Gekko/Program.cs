@@ -2479,12 +2479,16 @@ namespace Gekko
             if (Globals.runningOnTTComputer && text == "d")
             {
                 string op = "d";
+                EFreq freq = EFreq.A;
                 int max = int.MaxValue;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
                 bool adam = false;
                 bool showGUI = false;
                 bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
+                
+                Program.options.databank_search = false;
+
 
                 if (adam)
                 {
@@ -2497,6 +2501,7 @@ namespace Gekko
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
                     RunGekkoCommands("model<gms>makro.zip;", "", 0, new P());
                     RunGekkoCommands("read makro1;", "", 0, new P());
+                    RunGekkoCommands(@"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
                 }
                 O.Decomp2 o = new O.Decomp2();
                 o.type = @"ASTDECOMP3";
@@ -2664,13 +2669,14 @@ namespace Gekko
                                     {
                                         seenPlot.Add(variableName, false);
                                         //only plot the series from Work
-                                        Program.RunGekkoCommands("plot <" + per1.ToString() + " " + per2.ToString() + " > " + variableName + " file='" + path + variableName + ".svg';", "", 0, new P());
-                                        html1.AppendLine("<img src = `" + variableName + ".svg" + "`>");
-                                        html1.AppendLine("<p/>");
+                                        Program.RunGekkoCommands("plot <" + per1.ToString() + " " + per2.ToString() + " > " + variableName + " file='" + path + variableName + ".svg';", "", 0, new P());                                        
                                     }
                                     else
                                     {
+                                        //Just reference it
                                     }
+                                    html1.AppendLine("<img src = `" + variableName + ".svg" + "`>");
+                                    html1.AppendLine("<p/>");
                                 }
                                 catch
                                 {
@@ -2698,6 +2704,23 @@ namespace Gekko
                                 {
                                     EquationBrowser.WriteHtml(html1, "Time-decomposition (absolute changes):");
                                     html1.AppendLine(table);
+                                }
+
+                                if (true)
+                                {
+                                    //Traces
+                                    Series ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+
+                                    if (ts != null)
+                                    {
+                                        foreach (TraceAndPeriods2 tap in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                                        {
+                                            GekkoTimeSpansSimple gtss = tap.periods;
+                                            Trace2 trace = tap.trace;
+                                            TraceHelper th = new TraceHelper();
+                                            WalkTracesForHtml(trace, th, 0);
+                                        }
+                                    }
                                 }
 
                                 StringBuilder x = new StringBuilder();
@@ -2765,7 +2788,7 @@ namespace Gekko
                                 }
                             }
                         }
-                        if (count > max) return;                        
+                        if (count > max) return;
                     }
                 }
 
@@ -2894,31 +2917,6 @@ namespace Gekko
 
                     }
                 }
-
-                return;
-
-
-                //Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
-                //RunGekkoCommands("model<gms> makro.zip;", "", 0, new P());
-                //RunGekkoCommands("read makro1;", "", 0, new P());
-                //GekkoTime per1 = new GekkoTime(EFreq.A, 2030, 1, 1);
-                //GekkoTime per2 = new GekkoTime(EFreq.A, 2035, 1, 1);
-                //GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-                //DecompOptions2 do2 = new DecompOptions2();
-                //DecompFind df = new DecompFind(EDecompFindNavigation.Decomp, 0, do2, null, model);
-                //df.decompOptions2.new_from = new List<string>() { "e_qbnp" };
-                //df.decompOptions2.new_select = new List<string>() { "qbnp" };
-                //df.decompOptions2.new_endo = new List<string>() { "qbnp" };
-                //df.decompOptions2.decompOperator = new DecompOperator();
-                //df.decompOptions2.decompOperator.isRaw = false;
-                //df.decompOptions2.decompOperator.type = Gekko.Decomp.EContribType.D;
-                //df.decompOptions2.decompOperator.lowLevel = Gekko.Decomp.ELowLevel.OnlyQuo;
-                //DecompDatas dd = new DecompDatas();
-                ////dd.MAIN_data = new DecompData();
-                //model.modelGamsScalar.MaybeLoadDataIntoModel(df.depth, do2.t1, do2.t2);
-                //DecompOutput decompOutput = Gekko.Decomp.DecompMain(smpl, per1, per2, df.decompOptions2, ref dd, Program.model);
-
-
 
                 return;
             }
@@ -3367,6 +3365,19 @@ namespace Gekko
             if (nocr) G.Write(text);
             else G.Writeln(text);            
         }
+
+        public static void WalkTracesForHtml(Trace2 trace, TraceHelper th, int depth)
+        {
+            if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+            {
+                foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                {
+                    if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
+                    WalkTracesForHtml(traceAndPeriods.trace, th, depth + 1);
+                }
+            }
+        }
+
 
         private static List<EqHelper> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
         {
