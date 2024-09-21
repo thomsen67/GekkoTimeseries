@@ -2476,36 +2476,42 @@ namespace Gekko
             {                
             }
 
-            if (Globals.runningOnTTComputer && text == "d")
+            if (Globals.runningOnTTComputer && (text == "d"))
             {
                 string op = "d";
                 EFreq freq = EFreq.A;
-                int max = int.MaxValue;
+                int max = 1; // int.MaxValue;
                 int depthMax = 2;
                 int countMax = 4;
                 int pixels = 20;
                 int firstColWidth = 200;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "checked.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "normal.png");
                 bool adam = false;
                 bool showGUI = false;
                 bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
                 
                 Program.options.databank_search = false;
 
-
-                if (adam)
+                if (true)
                 {
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
-                    RunGekkoCommands("model jul05;", "", 0, new P());
-                    RunGekkoCommands("read jul05;", "", 0, new P());
-                }
-                else
-                {
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
-                    RunGekkoCommands("model<gms>makro.zip;", "", 0, new P());
-                    RunGekkoCommands("read makro1;", "", 0, new P());
-                    RunGekkoCommands(@"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    if (adam)
+                    {
+                        Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
+                        RunGekkoCommands("reset;", "", 0, new P());
+                        RunGekkoCommands("model jul05;", "", 0, new P());
+                        RunGekkoCommands("read jul05;", "", 0, new P());
+                    }
+                    else
+                    {
+                        Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                        RunGekkoCommands("reset;", "", 0, new P());
+                        RunGekkoCommands("model<gms>makro.zip;", "", 0, new P());
+                        RunGekkoCommands("read makro1;", "", 0, new P());
+                        RunGekkoCommands(@"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    }
                 }
                 O.Decomp2 o = new O.Decomp2();
                 o.type = @"ASTDECOMP3";
@@ -2540,6 +2546,7 @@ namespace Gekko
                     {
                         new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
                         count++;
+                        if (count > max) return;
 
                         List<string> precedents = new List<string>();
                         foreach (PeriodAndVariable dp in modelGamsScalar.precedents[i].vars)
@@ -2726,10 +2733,23 @@ namespace Gekko
                                             th.depthMax = depthMax;
                                             th.counterMax = countMax;
                                             th.pixels = pixels;
+                                            th.freq = freq;
                                             th.html.AppendLine(@"<div>");
                                             th.html.AppendLine(@"<ul>");
-                                            th.html.AppendLine(@"<li class=`folder`>");
-                                            WalkTracesForHtml(trace, th, 0);
+
+                                            th.html.AppendLine(@"< li class=`folder`>");
+                                            th.html.AppendLine(@"<div class=`list-item-content`>");
+                                            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + pixels + ";`></span><span>Name</span></div>");
+                                            th.html.AppendLine(@"<div style = `margin-left:" + pixels + "px`> Code </div>");
+                                            th.html.AppendLine(@"<div>Active</div>");
+                                            th.html.AppendLine(@" <div>Stamp</div>");
+                                            th.html.AppendLine(@"<div>File</div>");
+                                            th.html.AppendLine(@"</div>");
+                                            th.html.AppendLine(@"<div class=`extra-content`>Click a line to see details, click the v-shaped arrows to expand/collapse.</div>");
+                                            th.html.AppendLine(@"</li>");
+
+                                            th.html.AppendLine(@" <li class=`folder`>");
+                                            WalkTracesForHtml(trace, gtss, th, 0);
                                             th.html.AppendLine(@"</div>");
                                             th.html.AppendLine(@"</ul>");
                                             th.html.AppendLine(@"</li>");
@@ -2747,7 +2767,7 @@ namespace Gekko
 
                                 string css = @"<style>        
         html {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size:12px;
         }
     
@@ -2774,22 +2794,22 @@ namespace Gekko
             display: flex;
             justify-content: flex-start;
             width: 100%;
+            font-size:12px;
         }
     
         /* Set different widths for the columns */
         .list-item-content > div:nth-child(1) {
-            width: 200px; /* First column */
+            width: " + firstColWidth + @"px;
             padding: 5px;
-
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;            
         }
         
         .list-item-content > div:nth-child(2) {
-            width: 200px; /* Second column */
+            width: 400px;
             padding: 5px;
-
+            padding-left: 8;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -2797,9 +2817,9 @@ namespace Gekko
         }
         
         .list-item-content > div:nth-child(3) {
-            width: 200px; /* Third column */
+            width: 90px;
             padding: 5px;
-
+            padding-left: 8;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -2807,9 +2827,9 @@ namespace Gekko
         }
 
         .list-item-content > div:nth-child(4) {
-            width: 200px; /* Third column */
+            width: 80px;
             padding: 5px;
-
+            padding-left: 8;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -2817,23 +2837,24 @@ namespace Gekko
         }
 
         .list-item-content > div:nth-child(5) {
-            width: 200px; /* Third column */
+            width: 200px;
             padding: 5px;
-
+            padding-left: 8;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            border-left: 1px solid #ccc; 
+            border-left: 1px solid #ccc;             
         }
     
         /* Textbox at the bottom */
         textarea {
-            width: 800px;
-            height: 50px;
+            width: 1000px;
+            height: 150px;
             margin-top: 5px;
+            margin-left: 20px;
             padding: 10px;
             font-family: 'Courier New', Courier, monospace;  
-            font-size:12px;
+            font-size:13px;
             background-color: #fefce7;
             overflow: auto;
         }
@@ -3033,9 +3054,8 @@ namespace Gekko
                                 {
                                     sw.Write(x2.Replace('`', '\"'));
                                 }
-                            }
-                        }
-                        if (count > max) return;
+                            }                            
+                        }                        
                     }
                 }
 
@@ -3613,17 +3633,19 @@ namespace Gekko
             else G.Writeln(text);            
         }
 
-        public static void WalkTracesForHtml(Trace2 trace, TraceHelper2 th, int depth)
+        public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth)
         {
             th.counter++;
+            TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);
             th.html.AppendLine(@"<div class=`list-item-content`>");
-            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png`></span><span>  " + G.Chop_RemoveBank(trace.traceContents.name) + "</span></div>");
-            th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + "px`>Size: 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB </div>");
-            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
-            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
-            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
+            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png`></span><span>  " + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
+            th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
+            th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
+            th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
+            th.html.AppendLine(@"<div>" + traceItem.File + @"</div>");
             th.html.AppendLine(@"</div>");
-            th.html.AppendLine(@"<div class=`extra-content`>Name: vBNP!a\nCode: vBNP = vIO[cTot, Tot] + vIO[gTot, Tot] + vIO[iTot, Tot] + vIO[xTot, Tot] - vM[Tot];\nPeriod: 2015-2019, Active: 2015-2019\nStamp: 26-06-2024 15:09:41, #6645381576356028070\nFile: p:\TTH\NY\Anettes_problem\MAKRO\Data\Makrobk\Progs\Iodata\io_randtotaler2.gcm line 72\nVars: vIO[cTot, tot], vIO[gtot, tot], vIO[itot, Tot], vIO[xTot, tot], vM[tot]</div>");
+            string extra = Trace2.FromTraceItemToDetailedText(traceItem, true);
+            th.html.AppendLine(@"<div class=`extra-content`>" + extra + @"</div>");
             if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
                 if (depth >= th.depthMax || th.counter >= th.counterMax)
@@ -3637,7 +3659,7 @@ namespace Gekko
                     {
                         if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
                         th.html.AppendLine(@"<li class=`folder`>");
-                        WalkTracesForHtml(traceAndPeriods.trace, th, depth + 1);
+                        WalkTracesForHtml(traceAndPeriods.trace, traceAndPeriods.periods, th, depth + 1);
                         th.html.AppendLine(@"</li>");
                     }
                     th.html.AppendLine(@"</ul>");

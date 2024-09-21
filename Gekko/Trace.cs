@@ -1203,11 +1203,11 @@ namespace Gekko
                 {
                     Globals.itemCounter = 0;
                     TreeGridModel model = new TreeGridModel();                    
-                    Item temp = null;
+                    TraceItem temp = null;
                     
                     if (true)
                     {                    
-                        Item item = trace.FromTraceToTreeViewItem(null);
+                        TraceItem item = trace.FromTraceToTreeViewItem(null);
                         //At startup, we need to get two levels in: depth=0 and depth=1.
                         List<TraceAndPeriods2> taps1 = trace.TimeShadow2();
                         if (taps1 != null && taps1.Count > 0)
@@ -1216,7 +1216,7 @@ namespace Gekko
                             {
                                 if (!Program.options.databank_trace_divide && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                 Trace2 trace1 = tap1.trace;
-                                Item item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
+                                TraceItem item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
                                 item.GetChildren().Add(item1);
                                 ExpandTraceInTraceViewer(item1);
 
@@ -1230,7 +1230,7 @@ namespace Gekko
                                         bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
                                         if (!ignore)
                                         {
-                                            Item item2 = trace2.FromTraceToTreeViewItem(tap2.periods);
+                                            TraceItem item2 = trace2.FromTraceToTreeViewItem(tap2.periods);
                                             item1.GetChildren().Add(item2);
                                             ExpandTraceInTraceViewer(item2);
                                         }
@@ -1243,7 +1243,7 @@ namespace Gekko
                         temp = item;
                     }
 
-                    foreach (Item item in temp.GetChildren())
+                    foreach (TraceItem item in temp.GetChildren())
                     {
                         model.Add(item);
                     }
@@ -1308,7 +1308,29 @@ namespace Gekko
             }            
         }
 
-        public static void ExpandTraceInTraceViewer(Item item)
+        /// <summary>
+        /// From a TraceItem (which stems from a Trace), this extracts information (detailed) to show at the
+        /// bottom of the trace viewer, or similarly in the html browser. In this string, there are no
+        /// size restrictions, and the "detailed" fields of TraceItem are used.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static string FromTraceItemToDetailedText(TraceItem item, bool html)
+        {
+            string text = null;
+            text = item.CodeDetailed + G.NL;
+            text += " ------------------------------------------------- " + G.NL;            
+            text += "Name: " + item.NameDetailed;            
+            if (!G.NullOrBlanks(item.Label)) text += " ('" + item.Label + "')";
+            text += G.NL;            
+            text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;
+            text += "Stamp: " + item.StampDetailed + G.NL;
+            text += "File: " + item.FileDetailed + G.NL;            
+            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames);
+            return text;
+        }
+
+        public static void ExpandTraceInTraceViewer(TraceItem item)
         {
             //
             //             item
@@ -1323,7 +1345,7 @@ namespace Gekko
             // has same id as the grandChildTrace. If so, kill it.
             //
 
-            foreach (Item childItem in item.GetChildren()) //is already expanded, else .TimeShadow2() would be used.
+            foreach (TraceItem childItem in item.GetChildren()) //is already expanded, else .TimeShadow2() would be used.
             {                
                 Trace2 childTrace = childItem.trace;
                 if (childTrace.type == ETraceType.Divider) continue; //dividers are not shown                
@@ -1337,7 +1359,7 @@ namespace Gekko
                         bool ignore = IgnoreNephew(item.trace.TimeShadow2(), childTrace, grandChildTrace.trace);
                         if (!ignore)
                         {                            
-                            Item itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods);
+                            TraceItem itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods);
                             childItem.GetChildren().Add(itemGrandChild);
                         }
                     }
@@ -1434,7 +1456,7 @@ namespace Gekko
             return divided;
         }
 
-        public Item FromTraceToTreeViewItem(GekkoTimeSpansSimple periods)
+        public TraceItem FromTraceToTreeViewItem(GekkoTimeSpansSimple periods)
         {           
 
             // =========================================================================
@@ -1503,7 +1525,7 @@ namespace Gekko
                 if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                                
             }
 
-            Item newItem = new Item(name, nameDetailed, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, label, precedentsNames, hasChildren);
+            TraceItem newItem = new TraceItem(name, nameDetailed, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, label, precedentsNames, hasChildren);
             newItem.trace = this;
             return newItem;
         }
@@ -1751,6 +1773,7 @@ namespace Gekko
         public int counter = 0;
         public int counterMax = -1;
         public int pixels = 0;
+        public EFreq freq = EFreq.A;
     }
 
     public class TraceHelper

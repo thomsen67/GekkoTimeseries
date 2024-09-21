@@ -89,7 +89,7 @@ namespace Gekko
         /// </summary>
         protected virtual void OnExpanding()
         {
-            Trace2.ExpandTraceInTraceViewer(this as Item);
+            Trace2.ExpandTraceInTraceViewer(this as TraceItem);
         }        
 
         protected virtual void OnExpanded() { }
@@ -638,7 +638,7 @@ namespace Gekko
         }
     }
 
-    public class Item : TreeGridElement
+    public class TraceItem : TreeGridElement
     {
         public Trace2 trace = null;
         public string Name { get; private set; }
@@ -655,7 +655,7 @@ namespace Gekko
         public string Label { get; private set; }
         public List<string> PrecedentsNames { get; private set; }
 
-        public Item(string name, string nameDetailed, string code, string codeDetailed, string period, string active, string activeDetailed, string stamp, string stampDetailed, string file, string fileDetailed, string label, List<string>precedentsNames, bool hasChildren)
+        public TraceItem(string name, string nameDetailed, string code, string codeDetailed, string period, string active, string activeDetailed, string stamp, string stampDetailed, string file, string fileDetailed, string label, List<string>precedentsNames, bool hasChildren)
         {
             Globals.itemCounter++;
             // Initialize the item
@@ -717,7 +717,7 @@ namespace Gekko
             for (int count = 0; count < Roots; count++)
             {
                 // Create the root item
-                Item root = new Item(String.Format("Root {0}", count), "" + value++, "", "2020", "2020", "2020", "2020", "2020", "today", "file", "file", "", null, true);
+                TraceItem root = new TraceItem(String.Format("Root {0}", count), "" + value++, "", "2020", "2020", "2020", "2020", "2020", "today", "file", "file", "", null, true);
 
                 // Add children to the root
                 AddChildren(root);
@@ -733,11 +733,11 @@ namespace Gekko
             this.Close();
         }
 
-        private int c(Item i)
+        private int c(TraceItem i)
         {
             int cnt = i.GetChildren().Count;
 
-            foreach (Item child in i.GetChildren())
+            foreach (TraceItem child in i.GetChildren())
             {
                 cnt += c(child);
             }
@@ -745,7 +745,7 @@ namespace Gekko
             return cnt;
         }
 
-        private void AddChildren(Item item, int level = 0)
+        private void AddChildren(TraceItem item, int level = 0)
         {
             // Determine if the item will have children
             bool hasChildren = (level < Levels);
@@ -754,7 +754,7 @@ namespace Gekko
             for (int count = 0; count < ItemsPerLevel; count++)
             {
                 // Create the child
-                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "", "" + value++, "2020", "2020", "2020", "2020", "2020", "today", "file", "file", "", null, hasChildren); ;
+                TraceItem child = new TraceItem(String.Format("Child {0}, Level {1}", count, level), "", "" + value++, "2020", "2020", "2020", "2020", "2020", "today", "file", "file", "", null, hasChildren); ;
 
                 // Does the child have children?
                 if (hasChildren)
@@ -769,19 +769,11 @@ namespace Gekko
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {            
-            Item item = (sender as DataGrid).SelectedItem as Item;
-            string text = null;
-            text = "Name: " + item.NameDetailed;
-            if (!G.NullOrBlanks(item.Label)) text += " ('" + item.Label + "')";
-            text += G.NL;
-            text += "Code: " + item.CodeDetailed + G.NL;
-            text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;
-            text += "Stamp: " + item.StampDetailed + G.NL;
-            text += "File: " + item.FileDetailed + G.NL;
-            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames);
+        {
+            TraceItem item = (sender as DataGrid).SelectedItem as TraceItem;
+            string text = Trace2.FromTraceItemToDetailedText(item, false);
             WindowDecomp.RichSetText(this.text, Decomp.GetColoredEquations(text));
-        }
+        }        
 
         private void SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
