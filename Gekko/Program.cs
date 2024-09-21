@@ -2481,8 +2481,8 @@ namespace Gekko
                 string op = "d";
                 EFreq freq = EFreq.A;
                 int max = 1; // int.MaxValue;
-                int depthMax = 3;
-                int countMax = 4;
+                int depthMax = 5;
+                int countMax = 50;
                 int pixels = 20;
                 int pixelsAfterArrow = 12;
                 int firstColWidth = 200;
@@ -2893,7 +2893,7 @@ namespace Gekko
         // Adjust the width of the first column based on the maximum indentation level
         const firstColumnWidth = " + firstColWidth + @" + maxIndentationLevel * " + pixels + @";
         document.querySelectorAll('.list-item-content > div:nth-child(1)').forEach(div => {
-            div.style.width = ¤${firstColumnWidth}px¤;
+            div.style.width = `` + firstColumnWidth + `px`;
         });
     }
 
@@ -3007,7 +3007,9 @@ namespace Gekko
                                 using (FileStream fs = Program.WaitForFileStream(path + fileName1, null, Program.GekkoFileReadOrWrite.Write))
                                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                                 {
-                                    sw.Write(x.Replace('`', '\"').Replace('¤', '`'));
+                                    //BEWARE: In JavaScript, it is legal to do y = `i am a string';, where backticks indicate that {}-interpolation 
+                                    //        can be used. So if JavaScript with backticks is used, do a workaround.
+                                    sw.Write(x.Replace('`', '\"'));
                                 }
                             }
 
