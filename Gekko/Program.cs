@@ -2481,9 +2481,10 @@ namespace Gekko
                 string op = "d";
                 EFreq freq = EFreq.A;
                 int max = 1; // int.MaxValue;
-                int depthMax = 2;
+                int depthMax = 3;
                 int countMax = 4;
                 int pixels = 20;
+                int pixelsAfterArrow = 12;
                 int firstColWidth = 200;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
@@ -2722,8 +2723,9 @@ namespace Gekko
                                     //Traces
                                     Series ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
 
-                                    if (ts != null)
+                                    if (ts != null && ts?.meta?.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage() != null && ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage().Count() > 0)
                                     {
+                                        html1.AppendLine(@"<p style=`font-weight: bold;`>Data traces</p>");
                                         foreach (TraceAndPeriods2 tap in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                                         {
                                             GekkoTimeSpansSimple gtss = tap.periods;
@@ -2733,21 +2735,20 @@ namespace Gekko
                                             th.depthMax = depthMax;
                                             th.counterMax = countMax;
                                             th.pixels = pixels;
+                                            th.pixelsAfterArrow = pixelsAfterArrow;
                                             th.freq = freq;
                                             th.html.AppendLine(@"<div>");
                                             th.html.AppendLine(@"<ul>");
-
-                                            th.html.AppendLine(@"< li class=`folder`>");
+                                            th.html.AppendLine(@"<li class=`folder`>");
                                             th.html.AppendLine(@"<div class=`list-item-content`>");
-                                            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + pixels + ";`></span><span>Name</span></div>");
-                                            th.html.AppendLine(@"<div style = `margin-left:" + pixels + "px`> Code </div>");
-                                            th.html.AppendLine(@"<div>Active</div>");
-                                            th.html.AppendLine(@" <div>Stamp</div>");
-                                            th.html.AppendLine(@"<div>File</div>");
+                                            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + pixelsAfterArrow + ";`></span><span style = `font-weight: bold;`>Name</span></div>");
+                                            th.html.AppendLine(@"<div style = `margin-left:" + pixels + "px; font-weight: bold;`>Code</div>");
+                                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
+                                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
+                                            th.html.AppendLine(@"<div style = `font-weight: bold;`>File</div>");
                                             th.html.AppendLine(@"</div>");
-                                            th.html.AppendLine(@"<div class=`extra-content`>Click a line to see details, click the v-shaped arrows to expand/collapse.</div>");
+                                            th.html.AppendLine(@"<div class=`extra-content`></div>");
                                             th.html.AppendLine(@"</li>");
-
                                             th.html.AppendLine(@" <li class=`folder`>");
                                             WalkTracesForHtml(trace, gtss, th, 0);
                                             th.html.AppendLine(@"</div>");
@@ -2930,10 +2931,10 @@ namespace Gekko
             
             // Change folder icon
             if (folder.classList.contains('open')) {
-                this.innerHTML = '<img class=`img-size` src=`checked.png`>';
+                this.innerHTML = '<img class=`img-size` src=`checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
             } else
                                 {
-                                    this.innerHTML = '<img class=`img-size` src =`normal.png`>';
+                                    this.innerHTML = '<img class=`img-size` src =`normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
                                 }
 
                                 // Recalculate the column width
@@ -2999,7 +3000,7 @@ namespace Gekko
                                 x.AppendLine("  </head>");
                                 x.AppendLine("  <body>");
                                 x.Append(html1);
-                                x.Append("<textarea id = `output` readonly></textarea>");
+                                x.Append("<textarea id = `output` readonly>Click a line to see details, click the v-shaped arrows to expand/collapse.</textarea>");
                                 x.AppendLine(js);
                                 x.AppendLine("  </body>");
                                 x.AppendLine("</html>");
@@ -3638,7 +3639,7 @@ namespace Gekko
             th.counter++;
             TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);
             th.html.AppendLine(@"<div class=`list-item-content`>");
-            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png`></span><span>  " + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
+            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png` style =`margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
             th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
             th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
             th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");

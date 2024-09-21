@@ -1773,6 +1773,7 @@ namespace Gekko
         public int counter = 0;
         public int counterMax = -1;
         public int pixels = 0;
+        public int pixelsAfterArrow = 30;
         public EFreq freq = EFreq.A;
     }
 
