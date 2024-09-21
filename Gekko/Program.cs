@@ -2484,6 +2484,7 @@ namespace Gekko
                 int depthMax = 2;
                 int countMax = 4;
                 int pixels = 20;
+                int firstColWidth = 200;
                 string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";                
                 G.DeleteFolder(path, "css", false);
                 bool adam = false;
@@ -2777,7 +2778,7 @@ namespace Gekko
     
         /* Set different widths for the columns */
         .list-item-content > div:nth-child(1) {
-            width: 30px; /* First column */
+            width: 200px; /* First column */
             padding: 5px;
 
             overflow: hidden;
@@ -2868,7 +2869,7 @@ namespace Gekko
         });
 
         // Adjust the width of the first column based on the maximum indentation level
-        const firstColumnWidth = 50 + maxIndentationLevel * 20; // Base width 50px + 20px per indentation level
+        const firstColumnWidth = " + firstColWidth + @" + maxIndentationLevel * " + pixels + @";
         document.querySelectorAll('.list-item-content > div:nth-child(1)').forEach(div => {
             div.style.width = ¤${firstColumnWidth}px¤;
         });
@@ -3615,10 +3616,10 @@ namespace Gekko
         public static void WalkTracesForHtml(Trace2 trace, TraceHelper2 th, int depth)
         {
             th.counter++;
-            th.html.AppendLine(@"<div class=`list-item-content`>");            
-            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png`></span><span>  qBNP</span></div>");
-            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB </div>");
-            th.html.AppendLine(@"<div style = `margin-left:-" + (depth * th.pixels) + "px`>Size: 2MB 2MB 2MB</div>");
+            th.html.AppendLine(@"<div class=`list-item-content`>");
+            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png`></span><span>  " + G.Chop_RemoveBank(trace.traceContents.name) + "</span></div>");
+            th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + "px`>Size: 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB 2MB </div>");
+            th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
             th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
             th.html.AppendLine(@"<div>Size: 2MB 2MB 2MB</div>");
             th.html.AppendLine(@"</div>");
