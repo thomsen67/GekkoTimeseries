@@ -1188,6 +1188,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Starts up the data trace viewer. See also WalkTracesForHtml().
+        /// </summary>
+        /// <param name="trace"></param>
+        /// <param name="maxDepth"></param>
+        /// <returns></returns>
         public static int CallTraceViewer(Trace2 trace, int maxDepth)
         {
             // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
@@ -1319,13 +1325,14 @@ namespace Gekko
         {
             string text = null;
             text = item.CodeDetailed + G.NL;
-            text += " ------------------------------------------------- " + G.NL;            
-            text += "Name: " + item.NameDetailed;            
+            if (html) text += " -------------------------------------------------------------------------------------------------- " + G.NL;
+            else text += " ---------------------------------------------- " + G.NL;
+            text += "Name: " + item.NameDetailed;
             if (!G.NullOrBlanks(item.Label)) text += " ('" + item.Label + "')";
-            text += G.NL;            
+            text += G.NL;
             text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;
             text += "Stamp: " + item.StampDetailed + G.NL;
-            text += "File: " + item.FileDetailed + G.NL;            
+            text += "File: " + item.FileDetailed + G.NL;
             if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames);
             return text;
         }
