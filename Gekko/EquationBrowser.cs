@@ -1229,18 +1229,18 @@ namespace Gekko
                                 {
                                     html1.AppendLine("<hr>");
                                     html1.AppendLine(@"<p style=`font-weight: bold;`>Data traces</p>");
-                                    foreach (TraceAndPeriods2 tap in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
-                                    {
-                                        GekkoTimeSpansSimple gtss = tap.periods;
-                                        Trace2 trace = tap.trace;
-                                        TraceHelper2 th = new TraceHelper2();
-                                        th.html = html1;
-                                        th.depthMax = depthMax;
-                                        th.counterMax = countMax;
-                                        th.pixels = pixels;
-                                        th.pixelsAfterArrow = pixelsAfterArrow;
-                                        th.freq = freq;
-                                        th.html.AppendLine(@"<div>");
+
+                                    GekkoTimeSpansSimple gtss = null;
+                                    Trace2 trace = ts.meta.trace2;
+                                    TraceHelper2 th = new TraceHelper2();
+                                    th.html = html1;
+                                    th.depthMax = depthMax;
+                                    th.counterMax = countMax;
+                                    th.pixels = pixels;
+                                    th.pixelsAfterArrow = pixelsAfterArrow;
+                                    th.freq = freq;
+                                    if (false)
+                                    {                                        
                                         th.html.AppendLine(@"<ul>");
                                         th.html.AppendLine(@"<li class=`folder`>");
                                         th.html.AppendLine(@"<div class=`list-item-content`>");
@@ -1252,11 +1252,13 @@ namespace Gekko
                                         th.html.AppendLine(@"</div>");
                                         th.html.AppendLine(@"<div class=`extra-content`></div>");
                                         th.html.AppendLine(@"</li>");
-                                        th.html.AppendLine(@" <li class=`folder`>");
-                                        WalkTracesForHtml(trace, gtss, th, 0);
-                                        th.html.AppendLine(@"</div>");
-                                        th.html.AppendLine(@"</ul>");
-                                        th.html.AppendLine(@"</li>");
+                                    }
+                                    //th.html.AppendLine(@" <li class=`folder`>");
+                                    WalkTracesForHtml(trace, gtss, th, 0);
+                                    //th.html.AppendLine(@"</div>");
+                                    if (false)
+                                    {
+                                        th.html.AppendLine(@"</ul>");                                        
                                     }
                                 }
                             }
@@ -1271,7 +1273,7 @@ namespace Gekko
 
                             string css = @"<style>        
         html {
-            font-family: font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size:12px;
         }
     
@@ -1769,16 +1771,19 @@ namespace Gekko
         public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth)
         {
             th.counter++;
-            TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);
-            th.html.AppendLine(@"<div class=`list-item-content`>");
-            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png` style =`margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
-            th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
-            th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
-            th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
-            th.html.AppendLine(@"<div>" + traceItem.File + @"</div>");
-            th.html.AppendLine(@"</div>");
-            string extra = Trace2.FromTraceItemToDetailedText(traceItem, true);
-            th.html.AppendLine(@"<div class=`extra-content`>" + extra + @"</div>");
+            if (depth > 0)
+            {
+                TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);
+                th.html.AppendLine(@"<div class=`list-item-content`>");
+                th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png` style =`margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
+                th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
+                th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
+                th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
+                th.html.AppendLine(@"<div>" + traceItem.File + @"</div>");
+                th.html.AppendLine(@"</div>");
+                string extra = Trace2.FromTraceItemToDetailedText(traceItem, true);
+                th.html.AppendLine(@"<div class=`extra-content`>" + extra + @"</div>");
+            }
             if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
                 if (depth >= th.depthMax || th.counter >= th.counterMax)
@@ -1787,7 +1792,8 @@ namespace Gekko
                 }
                 else
                 {
-                    th.html.AppendLine(@"<ul class=`nested`>");
+                    if (depth == 0) th.html.AppendLine(@"<ul>");
+                    else th.html.AppendLine(@"<ul class=`nested`>");
                     foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                     {
                         if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
