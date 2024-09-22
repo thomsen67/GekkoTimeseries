@@ -9994,7 +9994,7 @@ namespace Gekko
 
         /// <summary>
         /// For a given input series x (can be array-series), a list of normal series or subseries names is returned,
-        /// where the names are found inside the traces of x.
+        /// where the names are found inside the traces of x. Does not return null, but can return empty collection.
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>

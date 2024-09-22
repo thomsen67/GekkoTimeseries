@@ -979,9 +979,9 @@ namespace Gekko
         {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
-            int produceStart = 0;
-            int produceEnd = 5;
-            int depthMax = 4;   //4. MaxValue can easily produce > 500 MB files.
+            int produceStart = 14000;
+            int produceEnd = produceStart + 5;
+            int depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
             int pixels = 20;
             int pixelsAfterArrow = 12;
@@ -990,7 +990,9 @@ namespace Gekko
             G.DeleteFolder(path, "css", false);
             File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "checked.png");
             File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "normal.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\red.png", path + "red.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "checked_red.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "normal_red.png");
+
             bool adam = false;
             bool showGUI = false;
             bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
@@ -1078,6 +1080,8 @@ namespace Gekko
                             decompOptions2.new_select = new List<string>() { variableName };
                             decompOptions2.new_from = new List<string>() { eqName2 };
                             decompOptions2.new_endo = new List<string>() { variableName };
+                            decompOptions2.rows = new List<string>() { "vars", "lags" };
+                            decompOptions2.cols = new List<string>() { "time" };
 
                             GekkoTime per1 = decompOptions2.t1;
                             GekkoTime per2 = decompOptions2.t2;
@@ -1108,20 +1112,36 @@ namespace Gekko
                             string table = null;
                             try
                             {
-                                table += "<div class=`table-container`>";
-                                table += "<table>";
+                                table += "<div class=`table-container`>" + G.NL;
+                                table += "<table>" + G.NL;
                                 DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                                decompDatas.MAIN_data = dd;
+                                var xx = decompDatas.storage[0][0] = dd;
+                                DecompOutput decompOutput = Decomp.DecompPivotToTable(per1, per2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
 
-                                table += "<thead>";
-                                table += "<tr><th></th>";
+                                table += "<thead>" + G.NL;
+                                table += "<tr><th></th>" + G.NL;
                                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                 {
                                     table += "<th align = `right`>" + t.ToString() + "</th>";
                                 }
-                                table += "</tr  >";
-                                table += "</thead>";
-                                table += "<tbody>";
+                                table += "</tr>" + G.NL;
+                                table += "</thead>" + G.NL;
+                                table += "<tbody>" + G.NL;
+
+                                List<KeyValuePair<string, Series>> rows = new List<KeyValuePair<string, Series>>();
                                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                                {
+                                    int lag; string name;
+                                    Gekko.Decomp.ConvertFromTurtleName(kvp.Key, true, out name, out lag);
+                                    string name2 = G.Chop_RemoveBank(name);
+                                    if (lag == 0 && G.Equal(name2, variableName))
+                                    {
+                                    }
+                                    rows.Add(kvp);
+                                }
+
+                                foreach (KeyValuePair<string, Series> kvp in rows)
                                 {
                                     int lag; string name;
                                     Gekko.Decomp.ConvertFromTurtleName(kvp.Key, true, out name, out lag);
@@ -1137,11 +1157,11 @@ namespace Gekko
                                         table += G.FormatNumber(value, "f15.4", true, false);
                                         table += "</td>";
                                     }
-                                    table += "</tr>";
+                                    table += "</tr>" + G.NL;
                                 }
-                                table += "</tbody>";
-                                table += "</table>";
-                                table += "</div>";
+                                table += "</tbody>" + G.NL;
+                                table += "</table>" + G.NL;
+                                table += "</div>" + G.NL;
                             }
                             catch
                             {
@@ -1254,7 +1274,30 @@ namespace Gekko
                                     th.freq = freq;                                    
                                     //th.html.AppendLine(@" <li class=`folder`>");
                                     WalkTracesForHtml(trace, gtss, th, 0);
-                                    //th.html.AppendLine(@"</div>");                                    
+                                    //th.html.AppendLine(@"</div>");
+                                    html1.AppendLine("<textarea id = `output` readonly>Click '>' to unfold sub-traces, and click a row to see more info. (Red-colored '>' at larger depths indicate that traces have been pruned off for space reasons).</textarea>");
+                                }
+                            }
+
+                            if (true)
+                            {
+                                //precedents
+                                GekkoDictionary<string, bool> found = null;
+                                try
+                                {
+                                    found = Program.TraceGetPrecedents("traces:" + variableName, "adambk");
+                                }
+                                catch { };
+                                if (found != null && found.Count > 0)
+                                {
+                                    List<string> names = found.Keys.ToList();
+                                    names.Sort(StringComparer.OrdinalIgnoreCase);
+                                    for (int i2 = 0; i2 < names.Count; i2++) names[i2] = G.Chop_RemoveFreq(names[i2]);
+                                    string s = Stringlist.GetListWithCommas(names);
+                                    html1.AppendLine("<br>");
+                                    html1.AppendLine("<br>");                                    
+                                    EquationBrowser.WriteHtmlBold(html1, "Direct and indirect ADAM-variable use:");
+                                    EquationBrowser.WriteHtml(html1, s);
                                 }
                             }
 
@@ -1562,8 +1605,7 @@ namespace Gekko
 
                             x.AppendLine("  </head>");
                             x.AppendLine("  <body>");
-                            x.Append(html1);
-                            x.Append("<textarea id = `output` readonly>Click '>' to unfold sub-traces. Click a row to see more trace info.</textarea>");
+                            x.Append(html1);                            
                             x.AppendLine(js);
                             x.AppendLine("  </body>");
                             x.AppendLine("</html>");
@@ -1836,6 +1878,7 @@ namespace Gekko
                 th.html.AppendLine(@"<div class=`list-item-content`>");
                 string visibility = null;
                 string image = "normal.png";
+                string imageExtra = null;
                 if (childrenCount == 0)
                 {
                     visibility = "visibility: hidden; ";
@@ -1845,11 +1888,12 @@ namespace Gekko
                     if (WalkTracesForHtmlIsPruned(th, depth))
                     {
                         //Has children but is pruned
-                        image = "red.png";
+                        image = "normal_red.png";
+                        imageExtra = " onclick = `alert('Sub-traces at this depth exist, but have been pruned off for space reasons in this html trace viewer.')` ";
                     }
                 }
 
-                th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`" + image + "` style =`" + visibility + "margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
+                th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`" + image + "` " + imageExtra + "style =`" + visibility + "margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
                 th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
                 th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
                 th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
