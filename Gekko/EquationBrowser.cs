@@ -979,9 +979,10 @@ namespace Gekko
         {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
-            int max = 1; // int.MaxValue;
-            int depthMax = 5;
-            int countMax = 50;
+            int produceStart = 3000;
+            int produceEnd = 3100;
+            int depthMax = 5;   //traces
+            int countMax = 50;  //traces
             int pixels = 20;
             int pixelsAfterArrow = 12;
             int firstColWidth = 200;
@@ -1045,10 +1046,11 @@ namespace Gekko
                 var eqName2 = helper2.resultingFullName;
 
                 if (helper2.time.Equals(o.t1))
-                {
-                    new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
+                {                    
                     count++;
-                    if (count > max) return;
+                    if (count < produceStart || count > produceEnd) continue;
+
+                    new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
 
                     List<string> precedents = new List<string>();
                     foreach (PeriodAndVariable dp in modelGamsScalar.precedents[i].vars)
@@ -1105,25 +1107,28 @@ namespace Gekko
                             string table = null;
                             try
                             {
-                                table += "<table cellpadding=`10`>";
+                                table += "<div class=`table-container`>";
+                                table += "<table>";
                                 DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
 
-                                table += "<tr><td></td>";
+                                table += "<thead>";
+                                table += "<tr><th></th>";
                                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                 {
-                                    table += "<td align = `right`>" + t.ToString() + "</td>";
+                                    table += "<th align = `right`>" + t.ToString() + "</th>";
                                 }
-                                table += "</tr>";
-
+                                table += "</tr  >";
+                                table += "</thead>";
+                                table += "<tbody>";
                                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                                 {
                                     int lag; string name;
                                     Gekko.Decomp.ConvertFromTurtleName(kvp.Key, true, out name, out lag);
                                     string name2 = G.Chop_RemoveBank(name).Replace("zzzzzzzzy", "RESIDUAL");
                                     table += "<tr>";
-                                    table += "<td>";
+                                    table += "<th>";
                                     table += name2;
-                                    table += "</td>";
+                                    table += "</th>";
                                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                     {
                                         table += "<td align = `right`>";
@@ -1133,7 +1138,9 @@ namespace Gekko
                                     }
                                     table += "</tr>";
                                 }
+                                table += "</tbody>";
                                 table += "</table>";
+                                table += "</div>";
                             }
                             catch
                             {
@@ -1215,7 +1222,7 @@ namespace Gekko
 
                             if (table != null)
                             {
-                                html1.AppendLine("<hr>");
+                                html1.AppendLine("<br>");
                                 EquationBrowser.WriteHtmlBold(html1, "Time-decomposition (absolute changes):");
                                 html1.AppendLine(table);
                             }
@@ -1223,11 +1230,16 @@ namespace Gekko
                             if (true)
                             {
                                 //Traces
-                                Series ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                Series ts = null;
+                                try
+                                {
+                                    ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                }
+                                catch { }
 
                                 if (ts != null && ts?.meta?.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage() != null && ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage().Count() > 0)
-                                {
-                                    html1.AppendLine("<hr>");
+                                {                                    
+                                    html1.AppendLine(@"<br>");
                                     html1.AppendLine(@"<p style=`font-weight: bold;`>Data traces</p>");
 
                                     GekkoTimeSpansSimple gtss = null;
@@ -1376,8 +1388,8 @@ namespace Gekko
 
         .table-container {
             width: 100%;
-            max-width: 200px; /* Optional: Adjust width of the container */
-            max-height: 200px; /* Optional: Adjust height of the container */
+            max-width: 1000px; /* Optional: Adjust width of the container */
+            max-height: 500px; /* Optional: Adjust height of the container */
             overflow: auto;    /* Enable scrolling */
             position: relative;
             border: 1px solid #ccc;
@@ -1387,13 +1399,23 @@ namespace Gekko
             border-collapse: collapse;
             width: 100%;
             table-layout: fixed; /* Fixed size cells */
+            font-family: Consolas;  
+            font-size:13px;
         }
 
         th, td {
-            padding: 8px;
+            padding: 5px;
             border: 1px solid #ddd;
-            width: 150px; /* Set fixed width for all cells */
-            height: 50px; /* Set fixed height for rows */
+            width: 100px;
+            height: 0px;
+            font-weight: normal;
+        }
+
+        td {            
+            text-align: right;
+        }
+
+        th {            
             text-align: left;
         }
 
@@ -1420,6 +1442,10 @@ namespace Gekko
             left: 0;
             z-index: 3; /* Prevent overlap and keep it at the top-left */
             background-color: #f1f1f1;
+        }
+
+        thead th:first-child, tbody th {
+            width: 250px; /* First col */
         }
 
     </style>";
