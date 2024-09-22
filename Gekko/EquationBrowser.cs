@@ -640,7 +640,7 @@ namespace Gekko
 
                     sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + ".svg" + "`>");
 
-                    sb.AppendLine("</p>");
+                    sb.AppendLine("<p>");
 
                     FoldingButtonStart(sb, "Vækst %");
                     sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + "___p.svg" + "`>");
@@ -1189,7 +1189,7 @@ namespace Gekko
                                     //Just reference it
                                 }
                                 html1.AppendLine("<img src = `" + variableName + ".svg" + "`>");
-                                html1.AppendLine("<p/>");
+                                html1.AppendLine("<p>");
                             }
                             catch
                             {
@@ -1373,6 +1373,55 @@ namespace Gekko
             background-color: #0078d7;
             color: white;
         }
+
+        .table-container {
+            width: 100%;
+            max-width: 200px; /* Optional: Adjust width of the container */
+            max-height: 200px; /* Optional: Adjust height of the container */
+            overflow: auto;    /* Enable scrolling */
+            position: relative;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed; /* Fixed size cells */
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            width: 150px; /* Set fixed width for all cells */
+            height: 50px; /* Set fixed height for rows */
+            text-align: left;
+        }
+
+        /* Sticky First Row (Header) */
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f1f1f1;
+            z-index: 2; /* Ensures the header is above the body rows */
+        }
+
+        /* Sticky First Column */
+        tbody th {
+            position: sticky;
+            left: 0;
+            background-color: #f1f1f1;
+            z-index: 1; /* Lower than the header row but above the body cells */
+        }
+
+        /* Empty Top-Left Cell */
+        thead th:first-child {
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 3; /* Prevent overlap and keep it at the top-left */
+            background-color: #f1f1f1;
+        }
+
     </style>";
 
                             x.AppendLine(css);
@@ -1771,7 +1820,10 @@ namespace Gekko
         public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth)
         {
             th.counter++;
-            if (depth > 0)
+            if (depth == 0)
+            {                
+            }
+            else 
             {
                 TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);
                 th.html.AppendLine(@"<div class=`list-item-content`>");
@@ -1791,13 +1843,27 @@ namespace Gekko
                     //th.html.AppendLine(@"<p>TRUNCATED</p>");
                 }
                 else
-                {
+                {                    
                     if (depth == 0) th.html.AppendLine(@"<ul>");
                     else th.html.AppendLine(@"<ul class=`nested`>");
+                    int counter = -1;
                     foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                     {
-                        if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
+                        counter++;
+                        if (traceAndPeriods.trace.type == ETraceType.Divider) continue;                        
                         th.html.AppendLine(@"<li class=`folder`>");
+
+                        if (depth == 0 && counter == 0)
+                        {
+                            th.html.AppendLine(@"<div class=`list-item-content`>");
+                            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
+                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Code</div>");
+                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
+                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
+                            th.html.AppendLine(@"<div style = `font-weight: bold;`>File</div>");
+                            th.html.AppendLine(@"</div>");                            
+                        }
+
                         WalkTracesForHtml(traceAndPeriods.trace, traceAndPeriods.periods, th, depth + 1);
                         th.html.AppendLine(@"</li>");
                     }
