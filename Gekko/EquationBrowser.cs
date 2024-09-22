@@ -979,10 +979,10 @@ namespace Gekko
         {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
-            int produceStart = 3000;
-            int produceEnd = 3100;
-            int depthMax = 5;   //traces
-            int countMax = 50;  //traces
+            int produceStart = 0;
+            int produceEnd = 5;
+            int depthMax = 4;   //4. MaxValue can easily produce > 500 MB files.
+            int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
             int pixels = 20;
             int pixelsAfterArrow = 12;
             int firstColWidth = 200;
@@ -990,6 +990,7 @@ namespace Gekko
             G.DeleteFolder(path, "css", false);
             File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "checked.png");
             File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "normal.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\red.png", path + "red.png");
             bool adam = false;
             bool showGUI = false;
             bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
@@ -1250,28 +1251,10 @@ namespace Gekko
                                     th.counterMax = countMax;
                                     th.pixels = pixels;
                                     th.pixelsAfterArrow = pixelsAfterArrow;
-                                    th.freq = freq;
-                                    if (false)
-                                    {                                        
-                                        th.html.AppendLine(@"<ul>");
-                                        th.html.AppendLine(@"<li class=`folder`>");
-                                        th.html.AppendLine(@"<div class=`list-item-content`>");
-                                        th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + pixelsAfterArrow + ";`></span><span style = `font-weight: bold;`>Name</span></div>");
-                                        th.html.AppendLine(@"<div style = `margin-left:" + pixels + "px; font-weight: bold;`>Code</div>");
-                                        th.html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
-                                        th.html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
-                                        th.html.AppendLine(@"<div style = `font-weight: bold;`>File</div>");
-                                        th.html.AppendLine(@"</div>");
-                                        th.html.AppendLine(@"<div class=`extra-content`></div>");
-                                        th.html.AppendLine(@"</li>");
-                                    }
+                                    th.freq = freq;                                    
                                     //th.html.AppendLine(@" <li class=`folder`>");
                                     WalkTracesForHtml(trace, gtss, th, 0);
-                                    //th.html.AppendLine(@"</div>");
-                                    if (false)
-                                    {
-                                        th.html.AppendLine(@"</ul>");                                        
-                                    }
+                                    //th.html.AppendLine(@"</div>");                                    
                                 }
                             }
 
@@ -1846,37 +1829,50 @@ namespace Gekko
         public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth)
         {
             th.counter++;
-            if (depth == 0)
-            {                
-            }
-            else 
+            int childrenCount = trace.GetPrecedents_BewareOnlyInternalUse().Count();
+            if (depth > 0)            
             {
-                TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);
+                TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);                
                 th.html.AppendLine(@"<div class=`list-item-content`>");
-                th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`normal.png` style =`margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
+                string visibility = null;
+                string image = "normal.png";
+                if (childrenCount == 0)
+                {
+                    visibility = "visibility: hidden; ";
+                }
+                else
+                {
+                    if (WalkTracesForHtmlIsPruned(th, depth))
+                    {
+                        //Has children but is pruned
+                        image = "red.png";
+                    }
+                }
+
+                th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`" + image + "` style =`" + visibility + "margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
                 th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
                 th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
                 th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
                 th.html.AppendLine(@"<div>" + traceItem.File + @"</div>");
                 th.html.AppendLine(@"</div>");
-                string extra = Trace2.FromTraceItemToDetailedText(traceItem, true);
+                string extra = Trace2.FromTraceItemToDetailedText(traceItem, true);                
                 th.html.AppendLine(@"<div class=`extra-content`>" + extra + @"</div>");
             }
-            if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+            if (childrenCount > 0)
             {
-                if (depth >= th.depthMax || th.counter >= th.counterMax)
+                if (WalkTracesForHtmlIsPruned(th, depth))
                 {
-                    //th.html.AppendLine(@"<p>TRUNCATED</p>");
+                    //Do not generate anything
                 }
                 else
-                {                    
+                {
                     if (depth == 0) th.html.AppendLine(@"<ul>");
                     else th.html.AppendLine(@"<ul class=`nested`>");
                     int counter = -1;
                     foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                     {
                         counter++;
-                        if (traceAndPeriods.trace.type == ETraceType.Divider) continue;                        
+                        if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
                         th.html.AppendLine(@"<li class=`folder`>");
 
                         if (depth == 0 && counter == 0)
@@ -1887,7 +1883,7 @@ namespace Gekko
                             th.html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
                             th.html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
                             th.html.AppendLine(@"<div style = `font-weight: bold;`>File</div>");
-                            th.html.AppendLine(@"</div>");                            
+                            th.html.AppendLine(@"</div>");
                         }
 
                         WalkTracesForHtml(traceAndPeriods.trace, traceAndPeriods.periods, th, depth + 1);
@@ -1896,6 +1892,11 @@ namespace Gekko
                     th.html.AppendLine(@"</ul>");
                 }
             }
+        }
+
+        private static bool WalkTracesForHtmlIsPruned(TraceHelper2 th, int depth)
+        {
+            return depth >= th.depthMax || th.counter >= th.counterMax;
         }
 
         /// <summary>
