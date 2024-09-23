@@ -1063,17 +1063,19 @@ namespace Gekko
                     if (count < produceStart || count > produceEnd) continue;
 
                     new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
-
+                    
                     List<string> precedents = new List<string>();
-                    foreach (PeriodAndVariable dp in modelGamsScalar.precedents[i].vars)
-                    {
-                        //foreach precedent variable                            
-                        string variableName = modelGamsScalar.GetVarNameA(dp.variable);
-                        precedents.Add(variableName);
+                    foreach (PeriodAndVariable dp in model.modelGamsScalar.precedents[i].vars)
+                    {                        
+                        Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod(model.modelGamsScalar);
+                        //WHAT ABOUT .Maybe2000GekkoTime(t0) for Gekko-like models????
+                        //WHAT ABOUT .Maybe2000GekkoTime(t0) for Gekko-like models????
+                        //WHAT ABOUT .Maybe2000GekkoTime(t0) for Gekko-like models????
+                        if (tup.Item2.EqualsGekkoTime(o.t1)) precedents.Add(tup.Item1);
                     }
 
                     foreach (string variableName in precedents)
-                    {
+                    {                        
                         string fileName1 = eqName2 + "__" + variableName + ".html";
 
                         //foreach precedent variable                                                    
@@ -1179,9 +1181,8 @@ namespace Gekko
                             GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
                             StringBuilder html1 = new StringBuilder();
-                            EquationBrowser.WriteHtml(html1, "VARIABLE: <span style=`color: green`>" + variableName + "</span>");
-                            EquationBrowser.WriteHtml(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
-                            EquationBrowser.WriteHtml(html1, "EQUATION: <span style=`color: green`>" + eqName2 + "</span>");
+                            EquationBrowser.WriteHtml(html1, "<span style=`color: green`>" + variableName + "</span> from equation <span style=`color: green`>" + eqName2 + "</span>");
+                            EquationBrowser.WriteHtml(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));                            
 
                             string s5 = helper22.s_gamsOrFrnSyntax;
                             string s6 = helper22.s_scalarModel;

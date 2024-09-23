@@ -10048,7 +10048,8 @@ namespace Gekko
                 foreach (string pname in precedentsNames)
                 {
                     string aname = TraceGetPrecedentsHelper2(bankname, pname);
-                    if (aname != null && !found.ContainsKey(aname)) found.Add(aname, false);
+                    if (aname != null && !found.ContainsKey(aname)) 
+                        found.Add(aname, false);
                 }
             }
         }
