@@ -1431,7 +1431,7 @@ namespace Gekko
             border: 1px solid #ccc;
         }
 
-        table {
+        .table-container table {
             border-collapse: collapse;
             width: 100%;
             table-layout: fixed; /* Fixed size cells */
@@ -1439,7 +1439,7 @@ namespace Gekko
             font-size:13px;
         }
 
-        th, td {
+        .table-container th, .table-container td {
             padding: 5px;
             border: 1px solid #ddd;
             width: 100px;
@@ -1447,16 +1447,16 @@ namespace Gekko
             font-weight: normal;
         }
 
-        td {            
+        .table-container td {            
             text-align: right;
         }
 
-        th {            
+        .table-container th {            
             text-align: left;
         }
 
         /* Sticky First Row (Header) */
-        thead th {
+        .table-container thead th {
             position: sticky;
             top: 0;
             background-color: #f1f1f1;
@@ -1464,7 +1464,7 @@ namespace Gekko
         }
 
         /* Sticky First Column */
-        tbody th {
+        .table-container tbody th {
             position: sticky;
             left: 0;
             background-color: #f1f1f1;
@@ -1472,7 +1472,7 @@ namespace Gekko
         }
 
         /* Empty Top-Left Cell */
-        thead th:first-child {
+        .table-container thead th:first-child {
             position: sticky;
             top: 0;
             left: 0;
@@ -1480,7 +1480,7 @@ namespace Gekko
             background-color: #f1f1f1;
         }
 
-        thead th:first-child, tbody th {
+        .table-container thead th:first-child, .table-container tbody th {
             width: 250px; /* First col */
         }
 
