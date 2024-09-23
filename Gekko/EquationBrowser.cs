@@ -979,7 +979,7 @@ namespace Gekko
         {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
-            int produceStart = 14000;
+            int produceStart = 9718; //14000
             int produceEnd = produceStart + 5;
             int depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
@@ -1046,11 +1046,20 @@ namespace Gekko
                 string eqName27 = modelGamsScalar.dict_FromEqNumberToEqName[i];
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName27, false);
                 //var x = helper2.name;
-                var eqName2 = helper2.resultingFullName;
+                var eqName2 = helper2.resultingFullName;                
 
                 if (helper2.time.Equals(o.t1))
                 {                    
                     count++;
+
+                    //if (G.Equal(eqName2, "e_qbnp"))
+                    //{
+                    //}
+                    //else
+                    //{
+                    //    continue;
+                    //}
+
                     if (count < produceStart || count > produceEnd) continue;
 
                     new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
