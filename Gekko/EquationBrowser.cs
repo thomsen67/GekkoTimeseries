@@ -1082,6 +1082,7 @@ namespace Gekko
                             decompOptions2.new_endo = new List<string>() { variableName };
                             decompOptions2.rows = new List<string>() { "vars", "lags" };
                             decompOptions2.cols = new List<string>() { "time" };
+                            decompOptions2.showErrors = true;
 
                             GekkoTime per1 = decompOptions2.t1;
                             GekkoTime per2 = decompOptions2.t2;
@@ -1115,45 +1116,40 @@ namespace Gekko
                                 table += "<div class=`table-container`>" + G.NL;
                                 table += "<table>" + G.NL;
                                 DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-                                decompDatas.MAIN_data = dd;
-                                var xx = decompDatas.storage[0][0] = dd;
+                                decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
                                 DecompOutput decompOutput = Decomp.DecompPivotToTable(per1, per2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+
+                                //Remember red circles
+                                Table decompTable = decompOutput.table;
 
                                 table += "<thead>" + G.NL;
                                 table += "<tr><th></th>" + G.NL;
-                                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                                for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                                 {
-                                    table += "<th align = `right`>" + t.ToString() + "</th>";
-                                }
+                                    Cell c = decompTable.Get(1, j2);
+                                    table += "<th align = `right`>" + c.CellText.TextData[0] + "</th>";
+                                }                                
+                                
                                 table += "</tr>" + G.NL;
                                 table += "</thead>" + G.NL;
                                 table += "<tbody>" + G.NL;
 
-                                List<KeyValuePair<string, Series>> rows = new List<KeyValuePair<string, Series>>();
-                                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                                for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
                                 {
-                                    int lag; string name;
-                                    Gekko.Decomp.ConvertFromTurtleName(kvp.Key, true, out name, out lag);
-                                    string name2 = G.Chop_RemoveBank(name);
-                                    if (lag == 0 && G.Equal(name2, variableName))
-                                    {
-                                    }
-                                    rows.Add(kvp);
-                                }
-
-                                foreach (KeyValuePair<string, Series> kvp in rows)
-                                {
-                                    int lag; string name;
-                                    Gekko.Decomp.ConvertFromTurtleName(kvp.Key, true, out name, out lag);
-                                    string name2 = G.Chop_RemoveBank(name).Replace("zzzzzzzzy", "RESIDUAL");
+                                    string name = decompTable.Get(i2, 1).CellText.TextData[0];
+                                    if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
+                                    name = name.Replace(" | [0]", "");
+                                    name = name.Replace(" | ", "");
+                                    name = name.Replace("Residual", "RESIDUAL");
                                     table += "<tr>";
                                     table += "<th>";
-                                    table += name2;
+                                    table += name;
                                     table += "</th>";
-                                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                                    for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                                     {
+                                        Cell c = decompTable.Get(i2, j2);
                                         table += "<td align = `right`>";
-                                        double value = kvp.Value.GetDataSimple(t);
+                                        double value = c.value_hack;
                                         table += G.FormatNumber(value, "f15.4", true, false);
                                         table += "</td>";
                                     }

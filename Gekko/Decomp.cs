@@ -3992,7 +3992,7 @@ namespace Gekko
 
                                 if (b1) //first-position databank checked
                                 {
-                                    if (model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                    if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))                                    
                                     {
                                         hit = true;
                                         goto Lbl1;
@@ -4001,7 +4001,7 @@ namespace Gekko
 
                                 if (b2) //ref databank checked
                                 {
-                                    if (model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                    if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))                                    
                                     {
                                         hit = true;
                                         goto Lbl1;
