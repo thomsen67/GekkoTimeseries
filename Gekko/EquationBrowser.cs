@@ -1063,18 +1063,23 @@ namespace Gekko
                     if (count < produceStart || count > produceEnd) continue;
 
                     new Writeln(i + " of " + n + " (" + G.FormatNumber((double)i / (double)n * 100d, "f10.2", false, false) + "%)");
-                    
-                    List<string> precedents = new List<string>();
+
+                    GekkoDictionary<string, bool> precedentsDict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, bool> precedentsWithLagsDict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);                    
                     foreach (PeriodAndVariable dp in model.modelGamsScalar.precedents[i].vars)
                     {                        
                         Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod(model.modelGamsScalar);
                         //WHAT ABOUT .Maybe2000GekkoTime(t0) for Gekko-like models????
                         //WHAT ABOUT .Maybe2000GekkoTime(t0) for Gekko-like models????
                         //WHAT ABOUT .Maybe2000GekkoTime(t0) for Gekko-like models????
-                        if (tup.Item2.EqualsGekkoTime(o.t1)) precedents.Add(tup.Item1);
+                        if (tup.Item2.EqualsGekkoTime(o.t1) && !precedentsDict.ContainsKey(tup.Item1)) precedentsDict.Add(tup.Item1, false);
+                        if (!precedentsWithLagsDict.ContainsKey(tup.Item1)) precedentsWithLagsDict.Add(tup.Item1, false);                        
                     }
+                    
+                    List<string> precedents = precedentsDict.Keys.ToList().OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    List<string> precedentsWithLags = precedentsWithLagsDict.Keys.ToList().OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
-                    foreach (string variableName in precedents)
+                    foreach (string variableName in precedents)  //excluding any variables with lags/leads here
                     {                        
                         string fileName1 = eqName2 + "__" + variableName + ".html";
 
@@ -1187,28 +1192,27 @@ namespace Gekko
                             string s5 = helper22.s_gamsOrFrnSyntax;
                             string s6 = helper22.s_scalarModel;
                             int index = s6.IndexOf("..");
-                            if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
-                            foreach (string variableName2 in precedents)
-                            {
-                                //s5 = G.Replace(s5, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2))), StringComparison.OrdinalIgnoreCase, 0);
-                                //s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html", Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2))), StringComparison.OrdinalIgnoreCase, 0);
-                                //s6 = G.Replace(s6, variableName2, EquationBrowser.HtmlLink(variableName2, variableName2 + ".html"), StringComparison.OrdinalIgnoreCase, 0);
-                            }
+                            if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();                            
 
                             html1.Append("<hr>");
-                            //EquationBrowser.WriteHtml(html1, s5);
                             EquationBrowser.WriteHtmlPreCode(html1, s5);
                             html1.Append("<hr>");
-                            //EquationBrowser.WriteHtml(html1, s6);
                             EquationBrowser.WriteHtmlPreCode(html1, s6);
                             html1.Append("<hr>");
 
-                            EquationBrowser.WriteHtml(html1, "Variables: ");
+                            html1.Append("<br>");
+                            EquationBrowser.WriteHtmlBold(html1, "Variables: ");
                             string vars2 = null;
-                            foreach (string variableName2 in precedents)
+
+                            html1.AppendLine("<table>");
+                            foreach (string variableName2 in precedentsWithLags)
                             {
-                                EquationBrowser.WriteHtml(html1, EquationBrowser.HtmlLink(variableName2) + " " + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2)));
+                                html1.AppendLine("<tr>");
+                                html1.Append("<td>" + EquationBrowser.HtmlLink(variableName2) + "</td>");
+                                html1.Append("<td>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2)) + "</td>");
+                                html1.AppendLine("</tr>");
                             }
+                            html1.AppendLine("</table>");
 
                             try
                             {
@@ -1234,7 +1238,7 @@ namespace Gekko
                                 EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
                             }
 
-                            EquationBrowser.WriteHtml(html1, "Related equations:");
+                            EquationBrowser.WriteHtmlBold(html1, "Related equations:");
                             bool first2 = true;
                             string s8 = null;
                             foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
