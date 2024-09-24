@@ -268,7 +268,7 @@ namespace Gekko
             {"w41", "Interpolate" },
             // ---------------------------------------------------------
             {"w41.1", "Denton: inconsistent levels" },
-            {"w41.2", "Denton: Please consider using Denton-Cholette ('cholettea1'), which is a much better method unless you are collapsing extremely long timeseries." },
+            {"w41.2", "Denton: Please consider using Denton-Cholette ('cholette'), which is a much better method unless you are collapsing extremely long timeseries." },
             // =========================================================
             // =========================================================
             {"w42", "Deprecated" },

@@ -75,9 +75,9 @@ namespace Gekko
     public enum EDentonType 
     {
         None,
-        Dentona1,
-        Cholettea1,
-        Olsena1
+        Denton,
+        Cholette,
+        Olsette
     }
 
     public enum EWrapType
@@ -26614,19 +26614,20 @@ namespace Gekko
         public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, Series ts_indicator, string method)
         {
             //========================================================================================================
-            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //                          FREQUENCY LOCATION, indicates where to implement more frequenciescholettea1avg
             //========================================================================================================
 
             //In principle, the generic methodology used for D freq destination could be used for all freqs here.
             //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
 
-            if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
+            //if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
+            if (G.Equal(method, "prorate") || G.Equal(method, "repeat") || G.Equal(method, "rep") || G.Equal(method, "total") || G.Equal(method, "avg") || G.Equal(method, "denton-total") || G.Equal(method, "denton-avg") || G.Equal(method, "cholette-total") || G.Equal(method, "cholette-avg") || G.Equal(method, "olsette-total") || G.Equal(method, "olsette-avg"))            
             {
                 //good
             }
             else
             {
-                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'repeat', 'prorate', 'dentona1', 'cholettea1', 'cholettea1avg', 'olsena1' or 'olsena1avg'.");
+                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'total', 'avg', 'denton-total', 'denton-avg', 'cholette-total', 'cholette-avg', 'olsette-total', 'olsette-avg' (the older options prorate/repeat are equivalent to total/avg)");
             }
 
             EFreq freq_rhs = ts_rhs.freq;
@@ -26634,8 +26635,8 @@ namespace Gekko
             GekkoTime t1_rhs = ts_rhs.GetRealDataPeriodFirst(); //start of low-freq timeseries.
             if (t1_rhs.IsNull()) new Error("It seems the input series " + ts_rhs.GetNameAndFreqPretty(true) + " has no data.");
             GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries            
-
-            if (G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
+                        
+            if (G.Equal(method, "denton-total") || G.Equal(method, "denton-avg") || G.Equal(method, "cholette-total") || G.Equal(method, "cholette-avg") || G.Equal(method, "olsette-total") || G.Equal(method, "olsette-avg"))
             {
                 if (ts_indicator == null) new Error("It seems no indicator series is provided.");
                 GekkoTime t1_indicator = ts_indicator.GetRealDataPeriodFirst();
@@ -26686,7 +26687,6 @@ namespace Gekko
                 {
                     new Error("Incompatible: low-freq series over " + t1_rhs.ToString() + "-" + t2_rhs.ToString() + ", with high-freq indicator over " + t1_indicator.ToString() + "-" + t2_indicator.ToString());
                 }
-
                 Denton(ts_lhs, ts_rhs, ts_indicator, freq_lhs, freq_rhs, t1_high, t2_high, t1_low, t2_low, method);
             }
             else
@@ -26705,11 +26705,11 @@ namespace Gekko
                     foreach (GekkoTime t5 in new GekkoTimeIterator(t1_daily, t2_daily))  //t5 is D freq
                     {
                         double divide = double.NaN;
-                        if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
+                        if (G.Equal(method, "avg") || G.Equal(method, "rep") || G.Equal(method, "repeat"))
                         {
                             divide = GekkoTimeStuff.numberOfDaysInAWeek;
                         }
-                        else if (G.Equal(method, "prorate"))
+                        else if (G.Equal(method, "total") || G.Equal(method, "prorate"))
                         {
                             GekkoTime gt7 = GekkoTime.ConvertFreqsFirst(freq_rhs, t5, null);  //first/last method will yield the same, we are converting from high-freq to lower-freq                        
                             divide = GekkoTime.Observations(GekkoTime.ConvertFreqsFirst(EFreq.D, gt7, null), GekkoTime.ConvertFreqsLast(EFreq.D, gt7));
@@ -26731,7 +26731,7 @@ namespace Gekko
                         if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
                         {
                             //Conversion from A to Q                                        
-                            if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
+                            if (G.Equal(method, "avg") || G.Equal(method, "rep") || G.Equal(method, "repeat"))
                             {
                                 for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                                 {
@@ -26739,7 +26739,7 @@ namespace Gekko
                                     ts_lhs.SetData(gt, value);
                                 }
                             }
-                            else if (G.Equal(method, "prorate"))
+                            else if (G.Equal(method, "total") || G.Equal(method, "prorate"))
                             {
                                 for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                                 {
@@ -26752,7 +26752,7 @@ namespace Gekko
                         else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
                         {
                             //Conversion from A to M
-                            if (G.Equal(method, "repeat"))
+                            if (G.Equal(method, "avg") || G.Equal(method, "rep") || G.Equal(method, "repeat"))
                             {
                                 for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
                                 {
@@ -26760,7 +26760,7 @@ namespace Gekko
                                     ts_lhs.SetData(gt, value);
                                 }
                             }
-                            else if (G.Equal(method, "prorate"))
+                            else if (G.Equal(method, "total") || G.Equal(method, "prorate"))
                             {
                                 for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
                                 {
@@ -26775,7 +26775,7 @@ namespace Gekko
                             //Conversion from Q to M
                             int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
                             int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
-                            if (G.Equal(method, "repeat"))
+                            if (G.Equal(method, "avg") || G.Equal(method, "rep") || G.Equal(method, "repeat"))
                             {
                                 for (int i = startSub; i < startSub + mInQ; i++)
                                 {
@@ -26783,7 +26783,7 @@ namespace Gekko
                                     ts_lhs.SetData(gt, value);
                                 }
                             }
-                            else if (G.Equal(method, "prorate"))
+                            else if (G.Equal(method, "total") || G.Equal(method, "prorate"))
                             {
                                 for (int i = startSub; i < startSub + mInQ; i++)
                                 {
@@ -26803,14 +26803,14 @@ namespace Gekko
                             double x = ts_rhs.GetDataSimple(t);
                             int n = GekkoTime.Observations(t1_lhs, t2_lhs);
 
-                            if (G.Equal(method, "repeat"))
+                            if (G.Equal(method, "avg") || G.Equal(method, "repeat") || G.Equal(method, "repeat"))
                             {
                                 foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
                                 {
                                     ts_lhs.SetData(t_lhs, x);
                                 }
                             }
-                            else if (G.Equal(method, "prorate"))
+                            else if (G.Equal(method, "total") || G.Equal(method, "prorate"))
                             {
                                 foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
                                 {
@@ -26896,7 +26896,7 @@ namespace Gekko
             //option freq a;
             //x = 8;
             //option freq q;
-            //z = interpolate(x!a, y!q, 'dentona1');
+            //z = interpolate(x!a, y!q, 'denton-total');
             //p<n> z!q, y!q;
             //
             //
@@ -26930,22 +26930,22 @@ namespace Gekko
 
             bool isAvg = false;
             EDentonType dentonType = EDentonType.None;
-            if (G.Equal(method, "dentona1")) dentonType = EDentonType.Dentona1;
-            else if (G.Equal(method, "dentona1avg"))
+            if (G.Equal(method, "denton-total")) dentonType = EDentonType.Denton;
+            else if (G.Equal(method, "denton-avg"))
             {
-                dentonType = EDentonType.Dentona1;
+                dentonType = EDentonType.Denton;
                 isAvg = true;
             }
-            else if (G.Equal(method, "cholettea1")) dentonType = EDentonType.Cholettea1;
-            else if (G.Equal(method, "cholettea1avg"))
+            else if (G.Equal(method, "cholette-total")) dentonType = EDentonType.Cholette;
+            else if (G.Equal(method, "cholette-avg"))
             {
-                dentonType = EDentonType.Cholettea1;
+                dentonType = EDentonType.Cholette;
                 isAvg = true;
             }
-            else if (G.Equal(method, "olsena1")) dentonType = EDentonType.Olsena1;
-            else if (G.Equal(method, "olsena1avg"))
+            else if (G.Equal(method, "olsette-total")) dentonType = EDentonType.Olsette;
+            else if (G.Equal(method, "olsette-avg"))
             {
-                dentonType = EDentonType.Olsena1;
+                dentonType = EDentonType.Olsette;
                 isAvg = true;
             }            
 
@@ -27003,7 +27003,7 @@ namespace Gekko
                 rMin = Math.Min(rMin, ts_collapse.GetDataSimple(t) / y.GetDataSimple(t));
             }
 
-            if (dentonType == EDentonType.Dentona1)
+            if (dentonType == EDentonType.Denton)
             {
                 double crit = 2d;  //What should this be? There is a relativity problem here. Something like a sine curve fluctuating around 0 does not necessarily give bad results. But it will give a warning here. Still, with a factor = 2, a lot of bad stuff will be caught.
                 if (!G.isNumericalError(rMax) && rMax != double.MinValue && rMax >= crit)
@@ -27037,18 +27037,18 @@ namespace Gekko
 
             double[,] z_array = new double[n, 1];
 
-            if (dentonType == EDentonType.Olsena1)
+            if (dentonType == EDentonType.Olsette)
             {
                 // With Denton-Olsen, we collapse the indicator z!q with total or avg, and then OLS y!a with collapse(z!q) and a trend.
                 // Now, we have that y!a and collapse(z!q) have same levels etc. Then we construct a z2!q from the OLS coefficients,
                 // so that we have an adjusted high-freq indicator. Finally, we run Denton-Cholette on y!a and z2!q.
                 //
-                // Olsena1: We assume that y!a = collapse(z!q, 'total') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
-                //          We do Cholette on z2!q/4.
+                // Olsette-total: We assume that y!a = collapse(z!q, 'total') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
+                //                We do Cholette on z2!q/4.
                 //
-                // Olsena1avg: We assume that y!a = collapse(z!q, 'avg') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
-                //          We do Cholette on z2!q/4.
-                //          We multiply the result by 4.
+                // Olsette-avg:   We assume that y!a = collapse(z!q, 'avg') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
+                //                We do Cholette on z2!q/4.
+                //                We multiply the result by 4.
                 //
                 // So same method, the difference is either 'total' or 'avg', and whether we multiply with 4 at the end.
 
@@ -27108,12 +27108,12 @@ namespace Gekko
             double[,] x_Denton = null;
             double[,] x_Cholette = null;
 
-            if (dentonType == EDentonType.Dentona1)
+            if (dentonType == EDentonType.Denton)
             {
                 double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
                 x_Denton = Program.AddMatrixMatrix(z_array, Program.MultiplyMatrices(c, r), z_array.GetLength(0), z_array.GetLength(1));
             }
-            else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1)
+            else if (dentonType == EDentonType.Cholette || dentonType == EDentonType.Olsette)
             {                
                 double[,] d = new double[n, n];
                 for (int i = 0; i < n; i++)
@@ -27210,11 +27210,11 @@ namespace Gekko
             foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
             {
                 counter++;
-                if (dentonType == EDentonType.Dentona1)
+                if (dentonType == EDentonType.Denton)
                 {
                     x.SetData(t, factor * x_Denton[counter, 0]);
                 }
-                else if (dentonType == EDentonType.Cholettea1 || dentonType == EDentonType.Olsena1)
+                else if (dentonType == EDentonType.Cholette || dentonType == EDentonType.Olsette)
                 {
                     x.SetData(t, factor * x_Cholette[counter, 0]);
                 }

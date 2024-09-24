@@ -24746,7 +24746,7 @@ print(df2)
 
             double delta = sharedTableDelta * 4;
 
-            for (int i = 0; i < 8; i++)  //command/function, denton/cholette/choletteavg
+            for (int i = 0; i < 8; i++)  //command/function, total/avg, denton/cholette/ols
             {
                 I("reset;");
                 I("%t1 = 2001a;");
@@ -24773,7 +24773,6 @@ print(df2)
                 else if (i == 6) I("interpolate x!q = y!a indicator=z!q cholettea1avg;");
                 else if (i == 7) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1avg');");
                 else Assert.Fail();
-
 
                 double factor = 1d; if (i == 2 || i == 3 || i == 6 || i == 7) factor = 4;
 
@@ -24834,7 +24833,7 @@ print(df2)
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.14040d * factor, delta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.57880d * factor, delta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.29799d * factor, delta);
-                }
+                }                
                 else Assert.Fail();
 
                 // Cf. Denton: Adjustment of Monthly or Quarterly Series to Annual Totals: An Approach Based on Quadratic Minimization
@@ -24931,62 +24930,63 @@ print(df2)
 
             if (true)  //Olsen
             {
-                //
-                // ========= total =================
-                // 
+                for (int i = 0; i < 2; i++) //for i==1 we scale down the indicator 1000x
+                {
 
-                I("reset;");
-                I("option freq a;");
-                I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
-                I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
-                I("time 80 2013;");
-                I("q!a = m();");
-                I("gq!q = m();");
-                I("time 2014 2023;");
-                I("z!q /= 4;");  //To simulate an indicator of 'total' type.
-                I("interpolate x!q = y!a indicator = z!q olsena1;");
+                    //
+                    // ========= total =================
+                    // 
 
-                //How do we know that this is right?
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 672.8079d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 674.5688d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 675.7498d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 677.8047d, delta);
+                    I("reset;");
+                    I("option freq a;");
+                    I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
+                    I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
+                    I("z!q /= 4;");  //To simulate an indicator of 'total' type.
+                    if (i == 1) I("z!q /= 1000;");  //To simulate a unit confusion
+                    I("interpolate x!q = y!a indicator = z!q olsena1;");
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 773.3959d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9654d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.4271d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.5215d, delta);
+                    //How do we know that this is right? We cannot really, but
+                    //Asger Olsen has looked at it, and it resembles Cholette a lot in this case.
 
-                //
-                // ========= avg =================
-                // 
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 672.8079d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 674.5688d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 675.7498d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 677.8047d, delta);
 
-                I("reset;");
-                I("option freq a;");
-                I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
-                I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
-                I("time 80 2013;");
-                I("q!a = m();");
-                I("gq!q = m();");
-                I("time 2014 2023;");            
-                I("interpolate x!q = y!a indicator=z!q olsena1avg;");
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 773.3959d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9654d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.4271d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.5215d, delta);
 
-                //How do we know that this is right?
+                    //
+                    // ========= avg =================
+                    // 
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 2691.2736d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 2698.2774d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 2702.9790d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 2711.1949d, delta);
+                    I("reset;");
+                    I("option freq a;");
+                    I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
+                    I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
+                    if (i == 1) I("z!q /= 1000;");  //To simulate a unit confusion
+                    I("interpolate x!q = y!a indicator=z!q olsena1avg;");
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 2911.4184d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 2837.6004, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 2878.1021d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 2898.4630d, delta);
+                    //How do we know that this is right? We cannot really, but
+                    //Asger Olsen has looked at it, and it resembles Cholette a lot in this case.
 
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 3093.6077d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 3095.8816d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 3097.7063d, delta);
-                _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 3098.0438d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 2691.2736d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 2698.2774d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 2702.9790d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 2711.1949d, delta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2020, 1, 2911.4184d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2020, 2, 2837.6004, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2020, 3, 2878.1021d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2020, 4, 2898.4630d, delta);
+
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 3093.6077d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 3095.8816d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 3097.7063d, delta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 3098.0438d, delta);
+                }
             }
 
             if (true)

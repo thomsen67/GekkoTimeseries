@@ -979,8 +979,8 @@ namespace Gekko
         {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
-            int produceStart = 0; //9718
-            int produceEnd = int.MaxValue; // produceStart + 10; 
+            int produceStart = 9718; //9718
+            int produceEnd = produceStart + 10;
             int depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
             int pixels = 20;
@@ -1079,8 +1079,8 @@ namespace Gekko
                     List<string> precedentsWithLags = precedentsWithLagsDict.Keys.ToList().OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
                     foreach (string variableName in precedents)  //excluding any variables with lags/leads here
-                    {                        
-                        string fileName1 = eqName2 + "__" + variableName + ".html";
+                    {
+                        string fileName1 = variableName + "__" + eqName2 + ".html";
 
                         //foreach precedent variable                                                    
                         GekkoTime tUsedHere = o.t1;
@@ -1247,7 +1247,7 @@ namespace Gekko
                             foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
                             {
                                 string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");
+                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName + "__" + eqNameWithLagNoBlanks + ".html");
                                 if (!first2) s8 += ", ";
                                 s8 += link;
                                 first2 = false;
@@ -1656,7 +1656,7 @@ namespace Gekko
                                 EquationTextHelper helper = new EquationTextHelper();
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
                                 string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, eqNameWithLagNoBlanks + "__" + variableName + ".html");
+                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName + "__" + eqNameWithLagNoBlanks + ".html");
                                 table += "<td style=`vertical-align:top`>";
                                 table += link;
                                 table += "</td>";
