@@ -10633,11 +10633,12 @@ namespace Gekko
             public List indicator = null;
             public string type = null;
             public string type2 = null;
+            public string opt_print = null;
             public string gekkocode = null;
             public P p = null;
             public void Exe()
             {
-                Program.Interpolate(this.lhs, this.rhs, this.indicator, this.type, this.type2, this.gekkocode, this.p);
+                Program.Interpolate(this.lhs, this.rhs, this.indicator, this.type, this.type2, this.gekkocode, G.Equal(this.opt_print, "yes"), this.p);
             }
         }
         

@@ -22850,7 +22850,7 @@ namespace Gekko
                     {
                         new Error("Inside the laspchain() function (with 'annualoverlap' option), an intermediate annual price series is constructed. However, this series has only missing values. This may be because of missing data or because the time period is too short.");
                     }
-                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, null, "repeat");
+                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, null, "repeat", false);
                     SeriesAndBool sab = new SeriesAndBool();
                     sab.ts = temp;
                     sab.b = false; //not used
@@ -22869,7 +22869,7 @@ namespace Gekko
                 pLag_annual.SetData(t, p_annual.GetDataSimple(t.Add(-1)));
             }
             Series pLag = new Series(EFreq.Q, null);
-            Program.InterpolateHelper(pLag, pLag_annual, null, "repeat");            
+            Program.InterpolateHelper(pLag, pLag_annual, null, "repeat", false);            
 
             Series p = new Series(freq, null);
             Series q = new Series(freq, null);
@@ -26436,7 +26436,7 @@ namespace Gekko
                 }
 
                 Series ts_daily = new Series(EFreq.D, null);
-                InterpolateHelper(ts_daily, ts_rhs, null, "prorate");
+                InterpolateHelper(ts_daily, ts_rhs, null, "prorate", false);
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
                 helper2.method = helper.method;
                 //if (missingLower != null) helper2.collapse_missing_d = missingLower;
@@ -26534,7 +26534,7 @@ namespace Gekko
         }
 
 
-        public static void Interpolate(List lhs, List rhs, List indicator, string method, string method2, string gekkocode, P p)
+        public static void Interpolate(List lhs, List rhs, List indicator, string method, string method2, string gekkocode, bool print, P p)
         {
             bool hasIndicator = indicator != null;
 
@@ -26585,7 +26585,7 @@ namespace Gekko
                 {
                     if (method2 != null) method += "-" + method2;  //for instance INTERPOLATE y!q = x!a indicator=z!q avg cholette, we get "avg-cholette"
                 }
-                InterpolateHelper(ts_lhs, ts_rhs, ts_indicator, method);
+                InterpolateHelper(ts_lhs, ts_rhs, ts_indicator, method, print);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
@@ -26615,7 +26615,7 @@ namespace Gekko
             return;
         }
 
-        public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, Series ts_indicator, string method)
+        public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, Series ts_indicator, string method, bool print)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -26690,7 +26690,7 @@ namespace Gekko
                 {
                     new Error("Incompatible: low-freq series over " + t1_rhs.ToString() + "-" + t2_rhs.ToString() + ", with high-freq indicator over " + t1_indicator.ToString() + "-" + t2_indicator.ToString());
                 }
-                Denton(ts_lhs, ts_rhs, ts_indicator, freq_lhs, freq_rhs, t1_high, t2_high, t1_low, t2_low, method);
+                Denton(ts_lhs, ts_rhs, ts_indicator, freq_lhs, freq_rhs, t1_high, t2_high, t1_low, t2_low, method, print);
             }
             else
             {
@@ -26700,7 +26700,7 @@ namespace Gekko
                     //We cannot just run over the RHS time period, because the freqs do not fit neatly and we first convert to D freq.
                     //First we interpolate the RHS into D freq, which makes it easier.
                     Series ts_daily = new Series(EFreq.D, null);
-                    InterpolateHelper(ts_daily, ts_rhs, null, "repeat");
+                    InterpolateHelper(ts_daily, ts_rhs, null, "repeat", print);
                     GekkoTime t1_daily = ts_daily.GetRealDataPeriodFirst();
                     if (t1_daily.IsNull()) new Error("The input series has no data.");
                     GekkoTime t2_daily = ts_daily.GetRealDataPeriodLast();
@@ -26840,7 +26840,7 @@ namespace Gekko
         /// <param name="t2_x"></param>
         /// <param name="t1_y"></param>
         /// <param name="t2_y"></param>
-        private static void Denton(Series x, Series y, Series z, EFreq freq_x, EFreq freq_y, GekkoTime t1_x, GekkoTime t2_x, GekkoTime t1_y, GekkoTime t2_y, string method)
+        private static void Denton(Series x, Series y, Series z, EFreq freq_x, EFreq freq_y, GekkoTime t1_x, GekkoTime t2_x, GekkoTime t1_y, GekkoTime t2_y, string method, bool print)
         {
             //   x!q = interpolate(y!a, z!q), where y!a is low-freq series, z!q is high-freq indicator series, and x!q is
             //                                high-freq result series, where y!a = collapse(x!q).
@@ -27064,14 +27064,31 @@ namespace Gekko
                 {
                     trend.SetData(t, t.super - 2000);
                 }
-                O.Ols ols = new O.Ols();
-                ols.t1 = t1_y;
-                ols.t2 = t2_y;
-                ols.expressions = new List<IVariable>() { y, z_collapse, trend };
-                string s = "Total-";
-                if (isAvg) s = "Avg-";
-                ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator", "trend" };
-                EstimationOutput output = Estimation.Ols(ols);
+
+                EstimationOutput output = null;
+                string muteRemember = Program.options.interface_mute;
+                try
+                {
+                    string muteHere = "yes";
+                    if (G.Equal(Program.options.interface_mute, "no") && print)
+                    {
+                        //We are not already muting, and there is a <print> option.
+                        muteHere = "no";
+                    }
+                    Program.options.interface_mute = muteHere;
+                    O.Ols ols = new O.Ols();
+                    ols.t1 = t1_y;
+                    ols.t2 = t2_y;
+                    ols.expressions = new List<IVariable>() { y, z_collapse, trend };
+                    string s = "Total-";
+                    if (isAvg) s = "Avg-";
+                    ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator", "trend" };
+                    output = Estimation.Ols(ols);
+                }
+                finally
+                {
+                    Program.options.interface_mute = muteRemember;  //always revert it
+                }
 
                 //TODO TODO
                 //TODO TODO
