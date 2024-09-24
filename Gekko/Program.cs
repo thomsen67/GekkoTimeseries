@@ -26621,13 +26621,13 @@ namespace Gekko
             //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
 
             //if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
-            if (G.Equal(method, "prorate") || G.Equal(method, "repeat") || G.Equal(method, "rep") || G.Equal(method, "total") || G.Equal(method, "avg") || G.Equal(method, "denton-total") || G.Equal(method, "denton-avg") || G.Equal(method, "cholette-total") || G.Equal(method, "cholette-avg") || G.Equal(method, "olsette-total") || G.Equal(method, "olsette-avg"))            
+            if (G.Equal(method, "prorate") || G.Equal(method, "repeat") || G.Equal(method, "rep") || G.Equal(method, "total") || G.Equal(method, "avg") || G.Equal(method, "total-denton") || G.Equal(method, "avg-denton") || G.Equal(method, "total-cholette") || G.Equal(method, "avg-cholette") || G.Equal(method, "total-olsette") || G.Equal(method, "avg-olsette"))            
             {
                 //good
             }
             else
             {
-                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'total', 'avg', 'denton-total', 'denton-avg', 'cholette-total', 'cholette-avg', 'olsette-total', 'olsette-avg' (the older options prorate/repeat are equivalent to total/avg)");
+                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'total', 'avg', 'total-denton', 'avg-denton', 'total-cholette', 'avg-cholette', 'total-olsette', 'avg-olsette' (the older options prorate/repeat are equivalent to total/avg)");
             }
 
             EFreq freq_rhs = ts_rhs.freq;
@@ -26636,7 +26636,7 @@ namespace Gekko
             if (t1_rhs.IsNull()) new Error("It seems the input series " + ts_rhs.GetNameAndFreqPretty(true) + " has no data.");
             GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries            
                         
-            if (G.Equal(method, "denton-total") || G.Equal(method, "denton-avg") || G.Equal(method, "cholette-total") || G.Equal(method, "cholette-avg") || G.Equal(method, "olsette-total") || G.Equal(method, "olsette-avg"))
+            if (G.Equal(method, "total-denton") || G.Equal(method, "avg-denton") || G.Equal(method, "total-cholette") || G.Equal(method, "avg-cholette") || G.Equal(method, "total-olsette") || G.Equal(method, "avg-olsette"))
             {
                 if (ts_indicator == null) new Error("It seems no indicator series is provided.");
                 GekkoTime t1_indicator = ts_indicator.GetRealDataPeriodFirst();
@@ -26896,7 +26896,7 @@ namespace Gekko
             //option freq a;
             //x = 8;
             //option freq q;
-            //z = interpolate(x!a, y!q, 'denton-total');
+            //z = interpolate(x!a, y!q, 'total-denton');
             //p<n> z!q, y!q;
             //
             //
@@ -26930,20 +26930,20 @@ namespace Gekko
 
             bool isAvg = false;
             EDentonType dentonType = EDentonType.None;
-            if (G.Equal(method, "denton-total")) dentonType = EDentonType.Denton;
-            else if (G.Equal(method, "denton-avg"))
+            if (G.Equal(method, "total-denton")) dentonType = EDentonType.Denton;
+            else if (G.Equal(method, "avg-denton"))
             {
                 dentonType = EDentonType.Denton;
                 isAvg = true;
             }
-            else if (G.Equal(method, "cholette-total")) dentonType = EDentonType.Cholette;
-            else if (G.Equal(method, "cholette-avg"))
+            else if (G.Equal(method, "total-cholette")) dentonType = EDentonType.Cholette;
+            else if (G.Equal(method, "avg-cholette"))
             {
                 dentonType = EDentonType.Cholette;
                 isAvg = true;
             }
-            else if (G.Equal(method, "olsette-total")) dentonType = EDentonType.Olsette;
-            else if (G.Equal(method, "olsette-avg"))
+            else if (G.Equal(method, "total-olsette")) dentonType = EDentonType.Olsette;
+            else if (G.Equal(method, "avg-olsette"))
             {
                 dentonType = EDentonType.Olsette;
                 isAvg = true;
@@ -27043,10 +27043,10 @@ namespace Gekko
                 // Now, we have that y!a and collapse(z!q) have same levels etc. Then we construct a z2!q from the OLS coefficients,
                 // so that we have an adjusted high-freq indicator. Finally, we run Denton-Cholette on y!a and z2!q.
                 //
-                // Olsette-total: We assume that y!a = collapse(z!q, 'total') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
+                // total-olsette: We assume that y!a = collapse(z!q, 'total') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
                 //                We do Cholette on z2!q/4.
                 //
-                // Olsette-avg:   We assume that y!a = collapse(z!q, 'avg') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
+                // avg-olsette:   We assume that y!a = collapse(z!q, 'avg') is not too off. We construct z2!q from OLS, z2!q has same level as y!a.
                 //                We do Cholette on z2!q/4.
                 //                We multiply the result by 4.
                 //

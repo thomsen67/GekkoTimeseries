@@ -4316,7 +4316,7 @@ namespace Gekko
             //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
             //on the full sample. Therefore, _t1 and _t2 are ignored.
 
-            // 'm' is destination frequency, y is indicator for 'denton-total'
+            // 'm' is destination frequency, y is indicator for 'total-denton'
             // --------------------------------------------------------------
             // interpolate(x)
             // interpolate(x, 'repeat')
@@ -4365,7 +4365,7 @@ namespace Gekko
             {
                 string s = O.ConvertToString(x[1 + offset]);
                 //if (G.Equal(s, "repeat") || G.Equal(s, "prorate") || G.Equal(s, "dentona1") || G.Equal(s, "dentona1avg") || G.Equal(s, "cholettea1") || G.Equal(s, "cholettea1avg") || G.Equal(s, "olsena1") || G.Equal(s, "olsena1avg"))
-                if (G.Equal(s, "prorate") || G.Equal(s, "repeat") || G.Equal(s, "total") || G.Equal(s, "avg") || G.Equal(s, "denton-total") || G.Equal(s, "denton-avg") || G.Equal(s, "cholette-total") || G.Equal(s, "cholette-avg") || G.Equal(s, "olsette-total") || G.Equal(s, "olsette-avg"))
+                if (G.Equal(s, "prorate") || G.Equal(s, "repeat") || G.Equal(s, "total") || G.Equal(s, "avg") || G.Equal(s, "total-denton") || G.Equal(s, "avg-denton") || G.Equal(s, "total-cholette") || G.Equal(s, "avg-cholette") || G.Equal(s, "total-olsette") || G.Equal(s, "avg-olsette"))
                 {
                     method = s;
                     if (x.Length == 3 + offset) new Error("If you state a method as argument #(" + (3 + offset - 1) + "), you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
