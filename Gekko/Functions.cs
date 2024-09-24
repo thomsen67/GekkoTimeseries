@@ -5852,32 +5852,47 @@ namespace Gekko
             tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
         }
 
+        public static IVariable traceadam(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            if (x.Length != 1) new Error("Expected 1 argument for traceadam() function");
+            IVariable[] temp = new IVariable[3];
+            temp[0] = x[0];
+            temp[1] = new ScalarString("adambk");
+            temp[2] = new ScalarString("precedents");
+            return tracebank(smpl, _t1, _t2, temp);
+        }
         public static IVariable tracebank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
-        {            
+        {
+            //bankname, precOrDep
+            //name, bankname, precOrDep
+
+            //bankname is always string.
+            //name is normally string but can optionally be a series object, when calling with "precedents".
+
             if (x.Length == 0) new Error("Expected > 0 arguments to tracebank() function");
             List<string> names = new List<string>();
             
             if (x.Length == 2 || x.Length == 3)
             {
-                string name = null;
+                IVariable ivName = null;
                 string bankname = null;
-                string stype = null;
+                string precOrDep = null;
 
                 if (x.Length == 2)
                 {                    
                     bankname = O.ConvertToString(x[0]);
-                    stype = O.ConvertToString(x[1]);
+                    precOrDep = O.ConvertToString(x[1]);
                 }
                 else
                 {
-                    name = O.ConvertToString(x[0]);  //TODO: Accept series object maybe, at least for precedents
+                    ivName = x[0];  //string or series object
                     bankname = O.ConvertToString(x[1]);
-                    stype = O.ConvertToString(x[2]);
+                    precOrDep = O.ConvertToString(x[2]);
                 }
 
                 ETraceBank type = ETraceBank.None;
-                if (G.Equal(stype, "precedents")) type = ETraceBank.Precedents;
-                else if (G.Equal(stype, "dependents")) type = ETraceBank.Dependents;
+                if (G.Equal(precOrDep, "precedents")) type = ETraceBank.Precedents;
+                else if (G.Equal(precOrDep, "dependents")) type = ETraceBank.Dependents;
                 else new Error("Tracebank(): the type must be 'precedents' or 'dependents'");
 
                 GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -5885,12 +5900,12 @@ namespace Gekko
                 if (type == ETraceBank.Precedents)
                 {                    
                     //precedents
-                    found = Program.TraceGetPrecedents(name, bankname);
+                    found = Program.TraceGetPrecedents(ivName, bankname);
                 }
                 else
                 {
                     //dependents                    
-                    found = Program.TraceGetDependents(name, bankname);
+                    found = Program.TraceGetDependents(ivName, bankname);
                 }                
 
                 names = found.Keys.ToList();

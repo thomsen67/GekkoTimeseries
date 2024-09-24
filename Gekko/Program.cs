@@ -9998,11 +9998,11 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetPrecedents(string name, string bankname)
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname)
         {            
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
          
-            if (name == null)
+            if (ivName == null)
             {
                 foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage) 
                 {
@@ -10020,7 +10020,17 @@ namespace Gekko
             }
             else
             {
-                Series ts = O.GetIVariableFromString(name, O.ECreatePossibilities.NoneReportError) as Series;
+                Series ts = null;
+                if (ivName.Type() == EVariableType.String)
+                {
+                    ts = O.GetIVariableFromString(O.ConvertToString(ivName), O.ECreatePossibilities.NoneReportError) as Series;
+                }
+                else if (ivName.Type() == EVariableType.Series)
+                {
+                    ts = ivName as Series;
+                }
+                else new Error("Expected the first argument to be of string or series type");                               
+                
                 if (ts == null) new Error("Expected input name to be a series name");                
                 TraceHelper th1 = new TraceHelper();
                 th1.type = ETraceHelper.GetAllMetasAndTraces;
@@ -10079,9 +10089,12 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetDependents(string name, string bankname)
+        public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            string name = null;
+            if (ivName != null) name = O.ConvertToString(ivName);
 
             if (name == null)
             {

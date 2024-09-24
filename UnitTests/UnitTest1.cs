@@ -8529,6 +8529,13 @@ namespace UnitTests
             I("#m = tracebank('qbnp', 'adambk', 'precedents');");
             _AssertListSize(First(), "#m", 62);  //ADAM-vars
 
+            //Must also work directly on series object
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = tracebank(qbnp, 'adambk', 'precedents');");
+            _AssertListSize(First(), "#m", 62);  //ADAM-vars
+
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("read scramble;");  //MAKROBK, scrambled data
@@ -8546,6 +8553,23 @@ namespace UnitTests
             I("read scramble;");  //MAKROBK, scrambled data
             I("#m = tracebank('adambk', 'dependents');");
             _AssertListSize(First(), "#m", 9457); //MAKRO-vars
+
+            //
+            // ---------- a simpler method traceadam(), not documented
+            //
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = traceadam('qbnp');");
+            _AssertListSize(First(), "#m", 62);  //ADAM-vars
+
+            //Must also work directly on series object
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("read scramble;");  //MAKROBK, scrambled data
+            I("#m = traceadam(qbnp);");
+            _AssertListSize(First(), "#m", 62);  //ADAM-vars
+
         }
 
         [TestMethod]
@@ -24928,7 +24952,7 @@ print(df2)
             }
 
 
-            if (true)  //Olsen
+            if (true)  //Olsette
             {
                 for (int i = 0; i < 2; i++) //for i==1 we scale down the indicator 1000x
                 {
