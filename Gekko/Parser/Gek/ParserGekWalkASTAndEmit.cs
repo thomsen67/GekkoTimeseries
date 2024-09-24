@@ -1193,6 +1193,7 @@ namespace Gekko.Parser.Gek
                         node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
                         if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".indicator = " + node[2][0].Code + ";" + G.NL);
                         if (node[3].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".type = " + "O.ConvertToString(" + node[3][0][0].Code.ToString() + ")" + ";" + G.NL);
+                        if (node[4].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".type2 = " + "O.ConvertToString(" + node[4][0][0].Code.ToString() + ")" + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);

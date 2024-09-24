@@ -26534,7 +26534,7 @@ namespace Gekko
         }
 
 
-        public static void Interpolate(List lhs, List rhs, List indicator, string method, string gekkocode, P p)
+        public static void Interpolate(List lhs, List rhs, List indicator, string method, string method2, string gekkocode, P p)
         {
             bool hasIndicator = indicator != null;
 
@@ -26580,7 +26580,11 @@ namespace Gekko
                     new Error("Cannot find: " + yIndicator);
                 }
 
-                if (method == null) method = Program.options.interpolate_method; // default is "repeat"
+                if (method == null) method = Program.options.interpolate_method; // default is "avg" (in Gekko 4.0: better if it is "total")
+                else
+                {
+                    if (method2 != null) method += "-" + method2;  //for instance INTERPOLATE y!q = x!a indicator=z!q avg cholette, we get "avg-cholette"
+                }
                 InterpolateHelper(ts_lhs, ts_rhs, ts_indicator, method);
 
                 ts_lhs.Stamp();
@@ -26614,13 +26618,12 @@ namespace Gekko
         public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, Series ts_indicator, string method)
         {
             //========================================================================================================
-            //                          FREQUENCY LOCATION, indicates where to implement more frequenciescholettea1avg
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
 
             //In principle, the generic methodology used for D freq destination could be used for all freqs here.
             //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
-
-            //if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1") || G.Equal(method, "dentona1avg") || G.Equal(method, "cholettea1") || G.Equal(method, "cholettea1avg") || G.Equal(method, "olsena1") || G.Equal(method, "olsena1avg"))
+            
             if (G.Equal(method, "prorate") || G.Equal(method, "repeat") || G.Equal(method, "rep") || G.Equal(method, "total") || G.Equal(method, "avg") || G.Equal(method, "total-denton") || G.Equal(method, "avg-denton") || G.Equal(method, "total-cholette") || G.Equal(method, "avg-cholette") || G.Equal(method, "total-olsette") || G.Equal(method, "avg-olsette"))            
             {
                 //good

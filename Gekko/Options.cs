@@ -152,7 +152,7 @@ namespace Gekko
         public bool interface_table_operators = true;        
         public int interface_zoom = 100;
         // ---
-        public string interpolate_method = "repeat"; //repeat|prorate
+        public string interpolate_method = "avg"; //total|avg ... (rorate/repeat are obsolete). Gekko 4.0: set this as "total" to mirror collapse.
         // ---
         public bool library_cache = true;  //if using cache on file or not        
         // ---

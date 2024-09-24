@@ -3275,7 +3275,7 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 interpolate:                interpolate2 -> ^({token("ASTINTERPOLATE¤"+($interpolate2.text), ASTINTERPOLATE, input.LT(1).Line)} interpolate2);
-interpolate2:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 (INDICATOR '=' seqOfBankvarnames3)? interpolateMethod? -> seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER seqOfBankvarnames3?) ^(ASTPLACEHOLDER interpolateMethod?) ^(ASTPLACEHOLDER interpolateMethod2?);
+interpolate2:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 (INDICATOR '=' seqOfBankvarnames3)? interpolateMethod? interpolateMethod2? -> seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER seqOfBankvarnames3?) ^(ASTPLACEHOLDER interpolateMethod?) ^(ASTPLACEHOLDER interpolateMethod2?);
 interpolateMethod:			name;
 interpolateMethod2:			name;
 

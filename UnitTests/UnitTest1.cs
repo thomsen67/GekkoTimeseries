@@ -24764,14 +24764,14 @@ print(df2)
                     I("z!q <%t1_highfreq %t2_highfreq> *= 4;");
                 }
 
-                if (i == 0) I("interpolate x!q = y!a indicator=z!q dentona1;");
-                else if (i == 1) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1');");
-                else if (i == 2) I("interpolate x!q = y!a indicator=z!q dentona1avg;");
-                else if (i == 3) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'dentona1avg');");
-                else if (i == 4) I("interpolate x!q = y!a indicator=z!q cholettea1;");
-                else if (i == 5) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1');");
-                else if (i == 6) I("interpolate x!q = y!a indicator=z!q cholettea1avg;");
-                else if (i == 7) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'cholettea1avg');");
+                if (i == 0) I("interpolate x!q = y!a indicator=z!q total denton;");
+                else if (i == 1) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'total-denton');");
+                else if (i == 2) I("interpolate x!q = y!a indicator=z!q avg denton;");
+                else if (i == 3) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'avg-denton');");
+                else if (i == 4) I("interpolate x!q = y!a indicator=z!q total cholette;");
+                else if (i == 5) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'total-cholette');");
+                else if (i == 6) I("interpolate x!q = y!a indicator=z!q avg cholette;");
+                else if (i == 7) I("x!q <2001q1 2005q4> = interpolate(y!a, z!q, 'avg-cholette');");
                 else Assert.Fail();
 
                 double factor = 1d; if (i == 2 || i == 3 || i == 6 || i == 7) factor = 4;
@@ -24943,7 +24943,7 @@ print(df2)
                     I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
                     I("z!q /= 4;");  //To simulate an indicator of 'total' type.
                     if (i == 1) I("z!q /= 1000;");  //To simulate a unit confusion
-                    I("interpolate x!q = y!a indicator = z!q olsena1;");
+                    I("interpolate x!q = y!a indicator = z!q total olsette;");
 
                     //How do we know that this is right? We cannot really, but
                     //Asger Olsen has looked at it, and it resembles Cholette a lot in this case.
@@ -24967,7 +24967,7 @@ print(df2)
                     I("y!a <1966 2023 n> = 2311.584769, 2311.057952, 2328.325004, 2369.884339, 2398.801703, 2395.158198, 2439.149943, 2464.749710, 2444.586083, 2418.468799, 2457.138477, 2448.475422, 2466.077248, 2490.933737, m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), m(), 2700.931220, 2737.261457, 2782.637957, 2824.081394, 2865.312270, 2904.253868, 2881.395987, 2946.746933, 3059.170055, 3096.309849;");
                     I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
                     if (i == 1) I("z!q /= 1000;");  //To simulate a unit confusion
-                    I("interpolate x!q = y!a indicator=z!q olsena1avg;");
+                    I("interpolate x!q = y!a indicator=z!q avg olsette;");
 
                     //How do we know that this is right? We cannot really, but
                     //Asger Olsen has looked at it, and it resembles Cholette a lot in this case.
@@ -25004,30 +25004,30 @@ print(df2)
 
                     if (i == 0) 
                     {
-                        I("interpolate x!q = y indicator = z!q dentona1;");
+                        I("interpolate x!q = y indicator = z!q total denton;");
                     }
                     else if (i == 1)
                     {
                         I("z!q *= 4;");
-                        I("interpolate x!q = y indicator = z!q dentona1avg;");
+                        I("interpolate x!q = y indicator = z!q avg denton;");
                     }
                     else if (i == 2)
                     {
-                        I("interpolate x!q = y indicator = z!q cholettea1;");
+                        I("interpolate x!q = y indicator = z!q total cholette;");
                     }
                     else if (i == 3)
                     {
                         I("z!q *= 4;");
-                        I("interpolate x!q = y indicator = z!q cholettea1avg;");
+                        I("interpolate x!q = y indicator = z!q avg cholette;");
                     }
                     else if (i == 4)
                     {
-                        I("interpolate x!q = y indicator = z!q olsena1;");
+                        I("interpolate x!q = y indicator = z!q total olsette;");
                     }
                     else if (i == 5)
                     {
                         I("z!q *= 4;");
-                        I("interpolate x!q = y indicator = z!q olsena1avg;");
+                        I("interpolate x!q = y indicator = z!q avg olsette;");
                     }
 
                     I("dif!q = z!q - x!q;");

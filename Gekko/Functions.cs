@@ -4363,8 +4363,7 @@ namespace Gekko
 
             if (x.Length > 1 + offset)
             {
-                string s = O.ConvertToString(x[1 + offset]);
-                //if (G.Equal(s, "repeat") || G.Equal(s, "prorate") || G.Equal(s, "dentona1") || G.Equal(s, "dentona1avg") || G.Equal(s, "cholettea1") || G.Equal(s, "cholettea1avg") || G.Equal(s, "olsena1") || G.Equal(s, "olsena1avg"))
+                string s = O.ConvertToString(x[1 + offset]);                
                 if (G.Equal(s, "prorate") || G.Equal(s, "repeat") || G.Equal(s, "total") || G.Equal(s, "avg") || G.Equal(s, "total-denton") || G.Equal(s, "avg-denton") || G.Equal(s, "total-cholette") || G.Equal(s, "avg-cholette") || G.Equal(s, "total-olsette") || G.Equal(s, "avg-olsette"))
                 {
                     method = s;
