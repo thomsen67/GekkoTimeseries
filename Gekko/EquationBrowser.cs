@@ -1082,6 +1082,11 @@ namespace Gekko
                     {
                         string fileName1 = variableName + "__" + eqName2 + ".html";
 
+                        //if (fileName1 == "qY[off]__E_qBVT[off].html")
+                        //{
+
+                        //}
+
                         //foreach precedent variable                                                    
                         GekkoTime tUsedHere = o.t1;
                         if (!seen.ContainsKey(fileName1))
@@ -1143,8 +1148,8 @@ namespace Gekko
                                 {
                                     Cell c = decompTable.Get(1, j2);
                                     table += "<th align = `right`>" + c.CellText.TextData[0] + "</th>";
-                                }                                
-                                
+                                }
+
                                 table += "</tr>" + G.NL;
                                 table += "</thead>" + G.NL;
                                 table += "<tbody>" + G.NL;
@@ -1154,17 +1159,19 @@ namespace Gekko
                                     string name = decompTable.Get(i2, 1).CellText.TextData[0];
                                     if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
                                     name = name.Replace(" | [0]", "");
-                                    name = name.Replace(" | ", "");                                    
+                                    name = name.Replace(" | ", "");
                                     table += "<tr>";
                                     table += "<th>";
-                                    table += name;
+                                    if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
+                                    else table += name;
                                     table += "</th>";
                                     for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                                     {
                                         Cell c = decompTable.Get(i2, j2);
                                         table += "<td align = `right`>";
-                                        double value = c.value_hack;
-                                        table += G.FormatNumber(value, "f15.4", true, false);
+                                        double value = c.number;
+                                        string valueFormatted = G.FormatNumber(value, "f15.4", true, false);
+                                        table += valueFormatted;
                                         table += "</td>";
                                     }
                                     table += "</tr>" + G.NL;
@@ -1183,19 +1190,28 @@ namespace Gekko
                             EquationTextHelper helper = new EquationTextHelper();
                             GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
-                            StringBuilder html1 = new StringBuilder();                            
+                            StringBuilder html1 = new StringBuilder();
                             html1.Append("<p>");
                             EquationBrowser.SpanHtmlColor(html1, variableName);
-                            html1.Append("&nbsp;&nbsp;from equation&nbsp;&nbsp;");
+                            html1.Append(" from equation ");
                             EquationBrowser.SpanHtmlColor(html1, eqName2);
                             html1.Append("</p>");
 
-                            EquationBrowser.WriteHtmlColorGray(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));                            
+                            EquationBrowser.WriteHtmlColorGray(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
 
                             string s5 = helper22.s_gamsOrFrnSyntax;
                             string s6 = helper22.s_scalarModel;
                             int index = s6.IndexOf("..");
-                            if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();                            
+                            if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
+
+                            //EquationBrowser.WriteHtmlBold(html1, "Equation");
+
+                            ToggleLink(html1, "Equations", "To see these equations in Gekko 3.x, you may use the following statements (or similar):");
+                            html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                            html1.AppendLine("model makro.zip;");
+                            html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
+                            html1.AppendLine("decomp &lt;d> " + variableName + " from " + eqName2 + ";");
+                            html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
 
                             html1.Append("<hr>");
                             EquationBrowser.WriteHtmlPreCode(html1, s5);
@@ -1204,7 +1220,7 @@ namespace Gekko
                             html1.Append("<hr>");
 
                             html1.Append("<br>");
-                            EquationBrowser.WriteHtmlBold(html1, "Variables: ");
+                            EquationBrowser.WriteHtmlBold(html1, "Variables");
                             string vars2 = null;
 
                             html1.AppendLine("<table class = `table1`>");
@@ -1217,6 +1233,12 @@ namespace Gekko
                             }
                             html1.AppendLine("</table>");
 
+
+                            ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
+                            html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                            html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
+                            html1.AppendLine("plot " + variableName + ";");
+                            html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
                             try
                             {
                                 if (!seenPlot.ContainsKey(variableName))
@@ -1241,7 +1263,7 @@ namespace Gekko
                                 EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + eqName2);
                             }
 
-                            EquationBrowser.WriteHtmlBold(html1, "Related equations:");
+                            EquationBrowser.WriteHtmlBold(html1, "Related equations");
                             bool first2 = true;
                             string s8 = null;
                             foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
@@ -1256,8 +1278,15 @@ namespace Gekko
 
                             if (table != null)
                             {
-                                html1.AppendLine("<br>");
-                                EquationBrowser.WriteHtmlBold(html1, "Time-decomposition (absolute changes):");
+                                html1.AppendLine("<br>");                               
+
+                                ToggleLink(html1, "Time-decomposition, absolute changes", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
+                                html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                                html1.AppendLine("model makro.zip;");
+                                html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
+                                html1.AppendLine("decomp &lt;d> " + variableName + " from " + eqName2 + ";");
+                                html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
+
                                 html1.AppendLine(table);
                             }
 
@@ -1272,11 +1301,17 @@ namespace Gekko
                                 catch { }
 
                                 if (ts != null && ts?.meta?.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage() != null && ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage().Count() > 0)
-                                {                                    
-                                    html1.AppendLine(@"<br>");                                    
+                                {
+                                    html1.AppendLine(@"<br>");
                                     html1.AppendLine(@"<br>");
                                     html1.AppendLine(@"<hr>");
-                                    html1.AppendLine(@"<p style=`font-weight: bold;`>Data traces</p>");
+                                    
+                                    ToggleLink(html1, "Data traces", "To see these data traces in Gekko 3.x, you may use the following statements (or similar):");
+                                    html1.AppendLine("read makrobk.gbk; //.gdx has no data traces");
+                                    html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
+                                    html1.AppendLine("trace2 " + variableName + ";");
+                                    html1.AppendLine("disp " + variableName + "; //click the trace link");                                    
+                                    html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
 
                                     GekkoTimeSpansSimple gtss = null;
                                     Trace2 trace = ts.meta.trace2;
@@ -1286,7 +1321,7 @@ namespace Gekko
                                     th.counterMax = countMax;
                                     th.pixels = pixels;
                                     th.pixelsAfterArrow = pixelsAfterArrow;
-                                    th.freq = freq;                                    
+                                    th.freq = freq;
                                     //th.html.AppendLine(@" <li class=`folder`>");
                                     WalkTracesForHtml(trace, gtss, th, 0);
                                     //th.html.AppendLine(@"</div>");
@@ -1310,8 +1345,8 @@ namespace Gekko
                                     for (int i2 = 0; i2 < names.Count; i2++) names[i2] = G.Chop_RemoveFreq(names[i2]);
                                     string s = Stringlist.GetListWithCommas(names);
                                     html1.AppendLine("<br>");
-                                    html1.AppendLine("<br>");                                    
-                                    EquationBrowser.WriteHtmlBold(html1, "Direct and indirect ADAM-variable use:");
+                                    html1.AppendLine("<br>");
+                                    EquationBrowser.WriteHtmlBold(html1, "Direct and indirect ADAM-variable use");
                                     EquationBrowser.WriteHtml(html1, s);
                                 }
                             }
@@ -1495,6 +1530,23 @@ namespace Gekko
             width: 150px; /* First col */
         }
 
+        .toggle-content {
+          padding: 5px;      
+          background-color: #fefce7;
+        }    
+
+        .toggle-link:after {
+          content: `\25BC`; /* Down arrow */
+          display: inline-block;
+          margin-left: 2px;
+          transform: rotate(0deg);
+          transition: transform 0.3s ease-in-out;
+        }
+
+        .toggle-link.expanded:after {
+          transform: rotate(180deg); /* Up arrow */
+         }
+
     </style>";
 
                             x.AppendLine(css);
@@ -1622,11 +1674,23 @@ namespace Gekko
 
     // Initial column width calculation on load
     calculateMaxIndentation();
+
+    const toggleLinks = document.querySelectorAll(`.toggle-link`);
+    const toggleContents = document.querySelectorAll(`.toggle-content`);
+                            toggleLinks.forEach((link, index) => {
+                            link.addEventListener(`click`, (event) => {
+        event.preventDefault();
+        toggleContents[index].style.display = toggleContents[index].style.display === `block` ? `none` : `block`;
+        link.classList.toggle(`expanded`);
+      });
+    });
+
 </script>";
 
                             x.AppendLine("  </head>");
                             x.AppendLine("  <body>");
-                            x.Append(html1);                            
+
+                            x.Append(html1);
                             x.AppendLine(js);
                             x.AppendLine("  </body>");
                             x.AppendLine("</html>");
@@ -1690,6 +1754,12 @@ namespace Gekko
             }            
 
             return;
+        }
+
+        private static void ToggleLink(StringBuilder html1, string heading, string firstLine)
+        {
+            html1.AppendLine("<p><span style=`font-weight:bold`>" + heading + "</span>&nbsp;&nbsp;<span style=`font-size: 0.8em;`>");
+            html1.Append("<a href=`#` class=`toggle-link`>Gekko code</a></span></p><div class=`toggle-content` style=`display: none;`><p>" + firstLine + "</p><pre style=`background-color: #fefce7;`><code>");
         }
 
         /// <summary>
@@ -2338,6 +2408,16 @@ namespace Gekko
         public static void SpanHtmlColor(StringBuilder sb, string s)
         {
             sb.AppendLine("<span style=`color:#993300; font-weight: bold`>" + s + "</span>");
+        }
+
+        public static void SpanHtmlBold(StringBuilder sb, string s)
+        {             
+            sb.AppendLine("<span style=`font-weight:bold`>" + s + "</span>");
+        }
+
+        public static void SpanHtmlColorGray(StringBuilder sb, string s)
+        {
+            sb.AppendLine("<span style=`color:gray;`>" + s + "</span>");
         }
 
         public static void WriteHtmlColorGray(StringBuilder sb, string s)

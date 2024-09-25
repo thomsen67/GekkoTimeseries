@@ -1930,6 +1930,11 @@ namespace Gekko
                             {
                                 counter1++;
                                 Series rhs = iv as Series;
+
+                                //
+                                // #trace: Could be a map or a list here, with traces.
+                                //
+
                                 if (rhs == null) continue;
                                 if (rhs.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
                                 Trace2.AddRangeFromSeries1(trace, rhs);
