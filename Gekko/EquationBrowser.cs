@@ -1019,7 +1019,7 @@ namespace Gekko
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
                     Program.RunGekkoCommands("reset;", "", 0, new P());
                     Program.RunGekkoCommands("model<gms>makro.zip;", "", 0, new P());
-                    Program.RunGekkoCommands("read makro1;", "", 0, new P());                    
+                    Program.RunGekkoCommands("read makro1;", "", 0, new P());
                     Program.RunGekkoCommands(@"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
                     //Program.RunGekkoCommands(@"unlock traces;", "", 0, new P());
                     //Program.RunGekkoCommands("traces:tNetAfg_y[tje, tje] <2020 2020> = 12345;", "", 0, new P());
@@ -1028,7 +1028,7 @@ namespace Gekko
 
             GekkoTime t1 = GekkoTime.tNull;
             GekkoTime t2 = GekkoTime.tNull;
-                        
+
             if (adam)
             {
                 t1 = new GekkoTime(EFreq.A, 2006, 1, 1);
@@ -1038,23 +1038,23 @@ namespace Gekko
             {
                 t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
                 t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
-            }            
+            }
 
             Model model = Program.model;
-            ModelGamsScalar modelGamsScalar = model.modelGamsScalar;                       
-            
+            ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
+
             GekkoDictionary<string, bool> seenPlot = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
-            
+
             int n = modelGamsScalar.CountEqs(1);
             for (int i = 0; i < n; i++)
-            {                
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);             
+            {
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);
                 var equationName = helper2.resultingFullName;
 
                 if (helper2.time.Equals(t1))
-                {                                  
+                {
                     EquationTextHelper helper = new EquationTextHelper();
                     helper.showTime = false;
                     List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t1);
@@ -1078,14 +1078,15 @@ namespace Gekko
 
                 string fileName1 = variableName.ToLower() + ".html";
 
+
+                GekkoTime tUsedHere = t1;
+
+                new Writeln(fileName1);
+
+                StringBuilder html1 = new StringBuilder();                
+
                 foreach (EquationNameAndNumber equationHelper in equations)
-                {                                                                    
-                    GekkoTime tUsedHere = t1;
-
-                    new Writeln(fileName1);                    
-
-                    StringBuilder html1 = new StringBuilder();
-
+                {
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
@@ -1119,7 +1120,7 @@ namespace Gekko
                     EquationBrowser.WriteHtmlPreCode(html1, s5);
                     html1.Append("<hr>");
                     EquationBrowser.WriteHtmlPreCode(html1, s6);
-                    html1.Append("<hr>");                    
+                    html1.Append("<hr>");
 
                     html1.Append("<br>");
                     EquationBrowser.WriteHtmlBold(html1, "Variables");
@@ -1139,44 +1140,47 @@ namespace Gekko
                     }
                     html1.AppendLine("</table>");
                     // ------------------------------------------------------
+                }
 
-                    ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
-                    html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                    html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("plot " + variableName + ";");
-                    html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
-                    try
+                ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
+                html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                html1.AppendLine("plot " + variableName + ";");
+                html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
+                try
+                {
+                    if (!seenPlot.ContainsKey(variableName))
                     {
-                        if (!seenPlot.ContainsKey(variableName))
-                        {
-                            seenPlot.Add(variableName, false);
-                            //only plot the series from Work
-                            Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
-                        }
-                        else
-                        {
-                            //Just reference it
-                        }
-                        html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
-                        html1.AppendLine("<p>");
+                        seenPlot.Add(variableName, false);
+                        //only plot the series from Work
+                        Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
                     }
-                    catch
+                    else
                     {
+                        //Just reference it
                     }
+                    html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
+                    html1.AppendLine("<p>");
+                }
+                catch
+                {
+                }
 
-                    EquationBrowser.WriteHtmlBold(html1, "Related equations");
-                    bool first2 = true;
-                    string s8 = null;
-                    foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
-                    {
-                        string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                        string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + "__" + eqNameWithLagNoBlanks.ToLower() + ".html");
-                        if (!first2) s8 += ", ";
-                        s8 += link;
-                        first2 = false;
-                    }
-                    EquationBrowser.WriteHtml(html1, s8);
+                EquationBrowser.WriteHtmlBold(html1, "Related equations");
+                bool first2 = true;
+                string s8 = null;
+                foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
+                {
+                    string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                    string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + "__" + eqNameWithLagNoBlanks.ToLower() + ".html");
+                    if (!first2) s8 += ", ";
+                    s8 += link;
+                    first2 = false;
+                }
+                EquationBrowser.WriteHtml(html1, s8);
 
+                foreach (EquationNameAndNumber equationHelper in equations)
+                {
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
@@ -1193,84 +1197,85 @@ namespace Gekko
                         html1.AppendLine(table);
                     }
                     // ------------------------------------------------------
+                }
 
-                    if (true)
+                if (true)
+                {
+                    //Traces
+                    Series ts = null;
+                    try
                     {
-                        //Traces
-                        Series ts = null;
-                        try
-                        {
-                            ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
-                        }
-                        catch { }
-
-                        if (ts != null && ts?.meta?.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage() != null && ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage().Count() > 0)
-                        {
-                            html1.AppendLine(@"<br>");
-                            html1.AppendLine(@"<br>");
-                            html1.AppendLine(@"<hr>");
-
-                            ToggleLink(html1, "Data traces", "To see these data traces in Gekko 3.x, you may use the following statements (or similar):");
-                            html1.AppendLine("read makrobk.gbk; //.gdx has no data traces");
-                            html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                            html1.AppendLine("trace2 " + variableName + ";");
-                            html1.AppendLine("disp " + variableName + "; //click the trace link");
-                            html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
-
-                            GekkoTimeSpansSimple gtss = null;
-                            Trace2 trace = ts.meta.trace2;
-                            TraceHelper2 th = new TraceHelper2();
-                            th.html = html1;
-                            th.depthMax = depthMax;
-                            th.counterMax = countMax;
-                            th.pixels = pixels;
-                            th.pixelsAfterArrow = pixelsAfterArrow;
-                            th.freq = freq;
-                            //th.html.AppendLine(@" <li class=`folder`>");
-                            WalkTracesForHtml(trace, gtss, th, 0);
-                            //th.html.AppendLine(@"</div>");
-                            html1.AppendLine("<textarea id = `output` readonly>Click '>' to unfold sub-traces, and click a row to see more info. (Red-colored '>' at larger depths indicate that traces have been pruned off for space reasons).</textarea>");
-                        }
+                        ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     }
+                    catch { }
 
-                    if (true)
+                    if (ts != null && ts?.meta?.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage() != null && ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage().Count() > 0)
                     {
-                        //ADAMBK-precedents
-                        GekkoDictionary<string, bool> found = null;
-                        try
-                        {
-                            found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk");
-                        }
-                        catch { };
-                        if (found != null && found.Count > 0)
-                        {
-                            List<string> names = found.Keys.ToList();
-                            names.Sort(StringComparer.OrdinalIgnoreCase);
-                            for (int i2 = 0; i2 < names.Count; i2++) names[i2] = G.Chop_RemoveFreq(names[i2]);
-                            string s = Stringlist.GetListWithCommas(names);
-                            html1.AppendLine("<br>");
-                            html1.AppendLine("<br>");
-                            EquationBrowser.WriteHtmlBold(html1, "Direct and indirect ADAM-variable use");
-                            EquationBrowser.WriteHtml(html1, s);
-                        }
-                    }
+                        html1.AppendLine(@"<br>");
+                        html1.AppendLine(@"<br>");
+                        html1.AppendLine(@"<hr>");
 
-                    StringBuilder x; string js;
-                    BrowserNewCssAndJs(pixels, pixelsAfterArrow, firstColWidth, variableName, equationHelper, out x, out js);
+                        ToggleLink(html1, "Data traces", "To see these data traces in Gekko 3.x, you may use the following statements (or similar):");
+                        html1.AppendLine("read makrobk.gbk; //.gdx has no data traces");
+                        html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                        html1.AppendLine("trace2 " + variableName + ";");
+                        html1.AppendLine("disp " + variableName + "; //click the trace link");
+                        html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
 
-                    x.AppendLine("  <body>");
-                    x.Append(html1);
-                    x.AppendLine(js);
-                    x.AppendLine("  </body>");
-                    x.AppendLine("</html>");
-                    using (FileStream fs = Program.WaitForFileStream(path + fileName1, null, Program.GekkoFileReadOrWrite.Write))
-                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                    {
-                        //BEWARE: In JavaScript, it is legal to do y = `i am a string';, where backticks indicate that {}-interpolation 
-                        //        can be used. So if JavaScript with backticks is used, do a workaround.
-                        sw.Write(x.Replace('`', '\"'));
+                        GekkoTimeSpansSimple gtss = null;
+                        Trace2 trace = ts.meta.trace2;
+                        TraceHelper2 th = new TraceHelper2();
+                        th.html = html1;
+                        th.depthMax = depthMax;
+                        th.counterMax = countMax;
+                        th.pixels = pixels;
+                        th.pixelsAfterArrow = pixelsAfterArrow;
+                        th.freq = freq;
+                        //th.html.AppendLine(@" <li class=`folder`>");
+                        WalkTracesForHtml(trace, gtss, th, 0);
+                        //th.html.AppendLine(@"</div>");
+                        html1.AppendLine("<textarea id = `output` readonly>Click '>' to unfold sub-traces, and click a row to see more info. (Red-colored '>' at larger depths indicate that traces have been pruned off for space reasons).</textarea>");
                     }
                 }
+
+                if (true)
+                {
+                    //ADAMBK-precedents
+                    GekkoDictionary<string, bool> found = null;
+                    try
+                    {
+                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk");
+                    }
+                    catch { };
+                    if (found != null && found.Count > 0)
+                    {
+                        List<string> names = found.Keys.ToList();
+                        names.Sort(StringComparer.OrdinalIgnoreCase);
+                        for (int i2 = 0; i2 < names.Count; i2++) names[i2] = G.Chop_RemoveFreq(names[i2]);
+                        string s = Stringlist.GetListWithCommas(names);
+                        html1.AppendLine("<br>");
+                        html1.AppendLine("<br>");
+                        EquationBrowser.WriteHtmlBold(html1, "Direct and indirect ADAM-variable use");
+                        EquationBrowser.WriteHtml(html1, s);
+                    }
+                }
+
+                StringBuilder x; string js;
+                BrowserNewCssAndJs(variableName, firstColWidth, pixels, pixelsAfterArrow, out x, out js);
+
+                x.AppendLine("  <body>");
+                x.Append(html1);
+                x.AppendLine(js);
+                x.AppendLine("  </body>");
+                x.AppendLine("</html>");
+                using (FileStream fs = Program.WaitForFileStream(path + fileName1, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    //BEWARE: In JavaScript, it is legal to do y = `i am a string';, where backticks indicate that {}-interpolation 
+                    //        can be used. So if JavaScript with backticks is used, do a workaround.
+                    sw.Write(x.Replace('`', '\"'));
+                }
+
 
                 //string fileName2 = variableName.ToLower() + ".html";
 
@@ -1315,12 +1320,12 @@ namespace Gekko
                 //{
                 //    sw.Write(x2.Replace('`', '\"'));
                 //}
-            }         
+            }
 
             return;
         }
 
-        private static void BrowserNewCssAndJs(int pixels, int pixelsAfterArrow, int firstColWidth, string variableName, EquationNameAndNumber equationHelper, out StringBuilder x, out string js)
+        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, out StringBuilder x, out string js)
         {
             x = new StringBuilder();
             x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
@@ -1328,7 +1333,7 @@ namespace Gekko
             x.AppendLine("  <head>");
             x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
             x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-            x.AppendLine("    <title>" + "EQUATION " + equationHelper + " (endo " + variableName + ")" + "</title>");
+            x.AppendLine("    <title>" + variableName + "</title>");
 
             string css = @"<style>        
         
