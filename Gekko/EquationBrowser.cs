@@ -1075,7 +1075,6 @@ namespace Gekko
 
                 string fileName1 = variableName.ToLower() + ".html";
 
-
                 GekkoTime tUsedHere = t1;
 
                 new Writeln(fileName1);
@@ -1163,7 +1162,7 @@ namespace Gekko
                 foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
                 {
                     string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                    string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + "__" + eqNameWithLagNoBlanks.ToLower() + ".html");
+                    string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
                     if (!first2) s8 += ", ";
                     s8 += link;
                     first2 = false;
@@ -1171,7 +1170,8 @@ namespace Gekko
                 EquationBrowser.WriteHtml(html1, s8);
 
                 foreach (EquationNameAndNumber equationHelper in equations)
-                {
+                {                    
+                    html1.Append("<div id = `#" + equationHelper.name.ToLower() + "-2` class=`content`>");
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
@@ -1188,6 +1188,7 @@ namespace Gekko
                         html1.AppendLine(table);
                     }
                     // ------------------------------------------------------
+                    html1.Append("</div>");
                 }
 
                 if (true)
@@ -1255,7 +1256,9 @@ namespace Gekko
                 BrowserNewCssAndJs(variableName, firstColWidth, pixels, pixelsAfterArrow, out x, out js);
 
                 x.AppendLine("  <body>");
-                x.Append(html1);
+                string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere);
+                x.Append(html2);
+                x.Append(html1);                
                 x.AppendLine(js);
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
@@ -1267,53 +1270,42 @@ namespace Gekko
                     sw.Write(x.Replace('`', '\"'));
                 }
 
-
-                //string fileName2 = variableName.ToLower() + ".html";
-
-                //new Writeln(fileName1);
-                //List<EqHelper> eqsNew = GetRelatedEquations(variableName, t1, model, modelGamsScalar);
-                //StringBuilder html2 = new StringBuilder();
-                //EquationBrowser.WriteHtmlColor(html2, variableName);
-                //EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
-                //EquationBrowser.WriteHtml(html2, "The variable occurs in the following equations:");
-                //string table = "<table cellpadding=`10`>";
-                //foreach (EqHelper eqHelper in eqsNew)
-                //{
-                //    table += "<tr>";
-                //    EquationTextHelper helper = new EquationTextHelper();
-                //    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
-                //    string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                //    string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + "__" + eqNameWithLagNoBlanks.ToLower() + ".html");
-                //    table += "<td style=`vertical-align:top`>";
-                //    table += link;
-                //    table += "</td>";
-                //    table += "<td style=`vertical-align:top`>";
-                //    table += helper22.s_gamsOrFrnSyntax;
-                //    table += "</td>";
-                //    table += "</tr>";
-                //}
-                //html2.AppendLine(table);
-
-                //StringBuilder x2 = new StringBuilder();
-                //x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
-                //x2.AppendLine("<html>");
-                //x2.AppendLine("  <head>");
-                //x2.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
-                //x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-                //x2.AppendLine("    <title>" + "EQUATION " + equationHelper + " (endo " + variableName + ")" + "</title>");
-                //x2.AppendLine("  </head>");
-                //x2.AppendLine("  <body>");
-                //x2.Append(html2);
-                //x2.AppendLine("  </body>");
-                //x2.AppendLine("</html>");
-                //using (FileStream fs = Program.WaitForFileStream(path + fileName2, null, Program.GekkoFileReadOrWrite.Write))
-                //using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                //{
-                //    sw.Write(x2.Replace('`', '\"'));
-                //}
+                
+                
+                
             }
 
             return;
+        }
+
+        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)
+        {
+            List<EqHelper> eqsNew = GetRelatedEquations(variableName, t1, model, modelGamsScalar);
+            StringBuilder html2 = new StringBuilder();
+            html2.AppendLine("<div id = `no-hash` class=`content`>");
+            EquationBrowser.WriteHtmlColor(html2, variableName);
+            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
+            EquationBrowser.WriteHtml(html2, "The variable occurs in the following equations:");
+            string table = "<table cellpadding=`10`>";
+            foreach (EqHelper eqHelper in eqsNew)
+            {
+                table += "<tr>";
+                EquationTextHelper helper = new EquationTextHelper();
+                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
+                string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
+                table += "<td style=`vertical-align:top`>";
+                table += link;
+                table += "</td>";
+                table += "<td style=`vertical-align:top`>";
+                table += helper22.s_gamsOrFrnSyntax;
+                table += "</td>";
+                table += "</tr>";
+            }
+            table += "</table>";
+            html2.AppendLine(table);
+            html2.AppendLine("</div>");
+            return html2.ToString();
         }
 
         private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, out StringBuilder x, out string js)
@@ -1667,13 +1659,18 @@ namespace Gekko
     contents.forEach(content => content.classList.remove('active'));
 
     // Get the hash from the URL
-    const hash = window.location.hash || '#e_qbnp'; // Default to eq1 if no hash
+    const hash = window.location.hash;
 
+    if (!hash) {
+        document.getElementById('no-hash').classList.add('active');
+    }
+    else {
     divs = 2;
     // Show the corresponding content
     for (let i = 1; i <= divs; i++) 
     {
         document.getElementById(hash + '-' + i).classList.add('active'); 
+    }
     }
     }
 
