@@ -1084,6 +1084,7 @@ namespace Gekko
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
+                    html1.Append("<div id = `#" + equationHelper.name.ToLower() + "-1` class=`content`>");
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
@@ -1137,6 +1138,7 @@ namespace Gekko
                     }
                     html1.AppendLine("</table>");
                     // ------------------------------------------------------
+                    html1.Append("</div>");
                 }
 
                 ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
@@ -1658,6 +1660,28 @@ namespace Gekko
         link.classList.toggle(`expanded`);
       });
     });
+
+    function showContent() {
+    // Hide all content initially
+    const contents = document.querySelectorAll('.content');
+    contents.forEach(content => content.classList.remove('active'));
+
+    // Get the hash from the URL
+    const hash = window.location.hash || '#e_qbnp'; // Default to eq1 if no hash
+
+    divs = 2;
+    // Show the corresponding content
+    for (let i = 1; i <= divs; i++) 
+    {
+        document.getElementById(hash + '-' + i).classList.add('active'); 
+    }
+    }
+
+    // Call showContent when the page loads
+    window.onload = showContent;
+
+    // Listen for hash changes
+    window.onhashchange = showContent;
 
 </script>";
             x.AppendLine("  </head>");
