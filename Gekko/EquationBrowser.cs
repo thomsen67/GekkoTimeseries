@@ -1079,7 +1079,6 @@ namespace Gekko
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
-
                     string fileName1 = variableName.ToLower() + "__" + equationHelper.name.ToLower() + ".html";
 
                     //foreach precedent variable                                                    
@@ -1087,105 +1086,15 @@ namespace Gekko
                     if (!seen.ContainsKey(fileName1))
                     {
                         seen.Add(fileName1, false);
-                        new Writeln(fileName1);
-                        DecompOptions2 decompOptions2 = new DecompOptions2();
-                        decompOptions2.t1 = t1;
-                        decompOptions2.t2 = t2;
-                        decompOptions2.decompOperator = new DecompOperator("d");
-                        decompOptions2.new_select = new List<string>() { variableName };
-                        decompOptions2.new_from = new List<string>() { equationHelper.name };
-                        decompOptions2.new_endo = new List<string>() { variableName };
-                        decompOptions2.rows = new List<string>() { "vars", "lags" };
-                        decompOptions2.cols = new List<string>() { "time" };
-                        decompOptions2.showErrors = true;
-
-                        GekkoTime per1 = decompOptions2.t1;
-                        GekkoTime per2 = decompOptions2.t2;
-                        GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-                        DecompDatas decompDatas = new DecompDatas();
-
-                        GekkoTime gt1, gt2;
-                        Gekko.Decomp.DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
-
-                        DateTime t0 = DateTime.Now;
-
-                        Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
-
-                        int perLag = -2;
-                        string lhsString = "Expression value";
-                        int parentI = 0;
-
-                        int funcCounter = 0;
-
-                        Gekko.Decomp.PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
-
-                        if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
-                        decompDatas.MAIN_data = null;
-
-                        if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
-
-                        string residualName = Program.GetDecompResidualName(0, 1);
-                        string table = null;
-                        try
-                        {
-                            table += "<div class=`table-container`>" + G.NL;
-                            table += "<table>" + G.NL;
-                            DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-                            decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-                            DecompOutput decompOutput = Decomp.DecompPivotToTable(per1, per2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
-
-                            //Remember red circles
-                            Table decompTable = decompOutput.table;
-
-                            table += "<thead>" + G.NL;
-                            table += "<tr><th></th>" + G.NL;
-                            for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
-                            {
-                                Cell c = decompTable.Get(1, j2);
-                                table += "<th align = `right`>" + c.CellText.TextData[0] + "</th>";
-                            }
-
-                            table += "</tr>" + G.NL;
-                            table += "</thead>" + G.NL;
-                            table += "<tbody>" + G.NL;
-
-                            for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
-                            {
-                                string name = decompTable.Get(i2, 1).CellText.TextData[0];
-                                if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
-                                name = name.Replace(" | [0]", "");
-                                name = name.Replace(" | ", "");
-                                table += "<tr>";
-                                table += "<th>";
-                                if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
-                                else table += name;
-                                table += "</th>";
-                                for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
-                                {
-                                    Cell c = decompTable.Get(i2, j2);
-                                    table += "<td align = `right`>";
-                                    double value = c.number;
-                                    string valueFormatted = G.FormatNumber(value, "f15.4", true, false);
-                                    table += valueFormatted;
-                                    table += "</td>";
-                                }
-                                table += "</tr>" + G.NL;
-                            }
-                            table += "</tbody>" + G.NL;
-                            table += "</table>" + G.NL;
-                            table += "</div>" + G.NL;
-                        }
-                        catch
-                        {
-                            table = null;
-                        }
-
-                        tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
+                        new Writeln(fileName1);                       
+                        
+                        tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
                         string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), false);
                         EquationTextHelper helper = new EquationTextHelper();
                         GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
                         StringBuilder html1 = new StringBuilder();
+
                         html1.Append("<p>");
                         EquationBrowser.SpanHtmlColor(html1, variableName);
                         html1.Append(" from equation ");
@@ -1219,10 +1128,9 @@ namespace Gekko
                         html1.AppendLine("<table class = `table1`>");
 
                         EquationTextHelper helper2 = new EquationTextHelper();
-                        helper2.showTime = false;                        
+                        helper2.showTime = false;
                         List<string> precedent2 = modelGamsScalar.GetPrecedentsNames(equationHelper.i, helper2, t1);
                         precedent2.Sort(StringComparer.OrdinalIgnoreCase);
-                        
                         foreach (string variableName2 in precedent2)
                         {
                             string varnameWithoutLag = G.Chop_RemoveLagOrLead(variableName2);
@@ -1231,7 +1139,7 @@ namespace Gekko
                             html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
                             html1.AppendLine("</tr>");
                         }
-                        html1.AppendLine("</table>"); 
+                        html1.AppendLine("</table>");
 
 
                         ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
@@ -1245,7 +1153,7 @@ namespace Gekko
                             {
                                 seenPlot.Add(variableName, false);
                                 //only plot the series from Work
-                                Program.RunGekkoCommands("plot <" + per1.ToString() + " " + per2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
+                                Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
                             }
                             else
                             {
@@ -1276,17 +1184,16 @@ namespace Gekko
                         }
                         EquationBrowser.WriteHtml(html1, s8);
 
+                        string table = BrowserDecompTable(t1, t2, variableName, equationHelper, model, modelGamsScalar);
                         if (table != null)
                         {
                             html1.AppendLine("<br>");
-
                             ToggleLink(html1, "Time-decomposition, absolute changes", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
                             html1.AppendLine("read &lt;gdx> forecast.gdx;");
                             html1.AppendLine("model &lt;gms> makro.zip;");
                             html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                             html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper + ";");
-                            html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
-
+                            html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()                            
                             html1.AppendLine(table);
                         }
 
@@ -1360,6 +1267,15 @@ namespace Gekko
                         x.AppendLine("    <title>" + "EQUATION " + equationHelper + " (endo " + variableName + ")" + "</title>");
 
                         string css = @"<style>        
+        
+        .content {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
         html {
             font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size:12px;
@@ -1753,7 +1669,101 @@ namespace Gekko
             }            
 
             return;
-        }        
+        }
+
+        private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, string variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
+        {
+            DecompOptions2 decompOptions2 = new DecompOptions2();
+            decompOptions2.t1 = t1;
+            decompOptions2.t2 = t2;
+            decompOptions2.decompOperator = new DecompOperator("d");
+            decompOptions2.new_select = new List<string>() { variableName };
+            decompOptions2.new_from = new List<string>() { equationHelper.name };
+            decompOptions2.new_endo = new List<string>() { variableName };
+            decompOptions2.rows = new List<string>() { "vars", "lags" };
+            decompOptions2.cols = new List<string>() { "time" };
+            decompOptions2.showErrors = true;
+                        
+            GekkoSmpl smpl = new GekkoSmpl(t1, t2);
+            DecompDatas decompDatas = new DecompDatas();
+
+            GekkoTime gt1, gt2;
+            Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);
+
+            DateTime t0 = DateTime.Now;
+
+            Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
+
+            int perLag = -2;
+            string lhsString = "Expression value";
+            int parentI = 0;
+
+            int funcCounter = 0;
+
+            Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
+
+            if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+            decompDatas.MAIN_data = null;
+
+            if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
+
+            string residualName = Program.GetDecompResidualName(0, 1);
+            string table = null;
+            try
+            {                
+                table += "<div class=`table-container`>" + G.NL;
+                table += "<table>" + G.NL;
+                DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
+                DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+
+                //Remember red circles
+                Table decompTable = decompOutput.table;
+
+                table += "<thead>" + G.NL;
+                table += "<tr><th></th>" + G.NL;
+                for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
+                {
+                    Cell c = decompTable.Get(1, j2);
+                    table += "<th align = `right`>" + c.CellText.TextData[0] + "</th>";
+                }
+
+                table += "</tr>" + G.NL;
+                table += "</thead>" + G.NL;
+                table += "<tbody>" + G.NL;
+
+                for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
+                {
+                    string name = decompTable.Get(i2, 1).CellText.TextData[0];
+                    if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
+                    name = name.Replace(" | [0]", "");
+                    name = name.Replace(" | ", "");
+                    table += "<tr>";
+                    table += "<th>";
+                    if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
+                    else table += name;
+                    table += "</th>";
+                    for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
+                    {
+                        Cell c = decompTable.Get(i2, j2);
+                        table += "<td align = `right`>";
+                        double value = c.number;
+                        string valueFormatted = G.FormatNumber(value, "f15.4", true, false);
+                        table += valueFormatted;
+                        table += "</td>";
+                    }
+                    table += "</tr>" + G.NL;
+                }
+                table += "</tbody>" + G.NL;
+                table += "</table>" + G.NL;
+                table += "</div>" + G.NL;
+            }
+            catch
+            {
+                table = null;
+            }
+            return table;
+        }
 
         private static void ToggleLink(StringBuilder html1, string heading, string firstLine)
         {
