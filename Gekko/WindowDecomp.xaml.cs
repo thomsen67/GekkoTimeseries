@@ -1710,7 +1710,7 @@ namespace Gekko
                         if (c.cellType == CellType.Text)
                         {
                             string var = c.CellText.TextData[0];
-                            string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);
+                            string var2 = G.Chop_RemoveLagOrLead_OLD(var, Globals.leftParenthesisIndicator);
 
                             if (G.Equal(var2, Globals.decompText0))
                             {

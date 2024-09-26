@@ -100,7 +100,7 @@ namespace Gekko
         public static bool StartsWithCaseSensitiveFast(string s1, string s2)
         {
             //This is like 10x faster than s1.StartsWith(s2), which looks for current culture first. Here we are just comparing bytes, not worrying if "ae" is same as "æ".
-            return s1.StartsWith(s2, StringComparison.Ordinal);  
+            return s1.StartsWith(s2, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Gekko
         public static string ReplaceTurtle(string s)
         {
             return s.Replace("¤[0]", "").Replace("¤", "");
-        }        
+        }
 
         /// <summary>
         /// Fast parse of a simple string into an integer. Strings like '123', '007', no minus, delimiters. ...
@@ -1202,6 +1202,68 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Ignore lag part in for instance x¤-1 or x[-1]. 
+        /// For something like [-1] or [+1] use the method Chop_RemoveLagOrLead() instead -- faster and more reliable!
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static string Chop_RemoveLagOrLead_OLD(string key, string code)
+        {
+            string variable = null;
+            if (key == null) return null;
+            if (key.Contains("|"))
+            {
+                //Total hack here
+                string[] ss = key.Split('|');
+                if (ss.Length >= 1 && G.IsIdent(ss[0].Trim())) variable = ss[0].Trim();
+            }
+            else
+            {
+                int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
+                if (indx != -1)
+                {
+                    string rest = key.Substring(indx);
+                    if (rest.Contains("'") || rest.Contains(Globals.symbolCollection.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
+                    else variable = key.Substring(0, indx - 0);
+                }
+                else variable = key;
+            }
+            return variable;
+        }
+
+        /// <summary>
+        /// Removes [-1], [+1], even [-0] or [+0], for instance x[-1] --> x, or x[a, b][-1] --> x[a, b].
+        /// The method is pretty fast, and it does some sanity checks that [...] is really a +/- int.
+        /// Note: x[0], x[2] etc. will not count as lag, x[+2] must be used.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string Chop_RemoveLagOrLead(string name)
+        {
+            List<int> m = null;
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (name[i] == '[')
+                {
+                    if (m == null) m = new List<int>();
+                    m.Add(i);
+                }
+            }
+            if (m == null) return name;
+            if (m.Count > 2) new Error("Expected at most 2 '[' in variable name");
+            int last = m[m.Count - 1];
+            string sub = name.Substring(last).Trim(); //now something like "[-1]"
+            if (sub[sub.Length - 1] != ']') return name;
+            string sub2 = G.Substring(sub, 1, sub.Length - 2).Trim();
+            if (sub2.Length < 2) return name;
+            if (!(sub2[0] == '-' || sub2[0] == '+')) return name;
+            string sub3 = sub2.Substring(1);
+            if (!G.IsInteger(sub3, false, true)) return name;  //We accept x[-0] or x[+0]
+            return G.Substring(name, 0, last - 1);
+        }
+
+        /// <summary>
         /// /// Chops up into all components
         /// </summary>
         /// <param name="input2"></param>
@@ -1334,7 +1396,7 @@ namespace Gekko
         /// <param name="merge"></param>
         /// <returns></returns>
         public static string Chop_DimensionConvertToLag(string name, GekkoTime t0, bool merge)
-        {            
+        {
             return Chop_DimensionAddLag(Chop_DimensionRemoveLast(name), t0, Chop_DimensionGetPeriod(name), merge);
         }
 
@@ -1428,38 +1490,8 @@ namespace Gekko
         /// <param name="key">Input</param>        
         public static string ExtractOnlyVariableIgnoreLag(string key)
         {
-            return ExtractOnlyVariableIgnoreLag(key, Globals.lagIndicator);
-        }
-
-        /// <summary>
-        /// Ignore lag part in for instance x[-1]
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        public static string ExtractOnlyVariableIgnoreLag(string key, string code)
-        {
-            string variable = null;
-            if (key == null) return null;
-            if (key.Contains("|"))
-            {
-                //Total hack here
-                string[] ss = key.Split('|');
-                if (ss.Length >= 1 && G.IsIdent(ss[0].Trim())) variable = ss[0].Trim();
-            }
-            else
-            {
-                int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
-                if (indx != -1)
-                {
-                    string rest = key.Substring(indx);
-                    if (rest.Contains("'") || rest.Contains(Globals.symbolCollection.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
-                    else variable = key.Substring(0, indx - 0);
-                }
-                else variable = key;
-            }
-            return variable;
-        }
+            return Chop_RemoveLagOrLead_OLD(key, Globals.lagIndicator);
+        }        
 
         /// <summary>
         /// True if between a..z or A..Z
@@ -1595,9 +1627,9 @@ namespace Gekko
             {
                 s = total.ToString("0.00") + " sec";
             }
-            
+
             if (total >= 60d)
-            {                
+            {
                 string min = "";
                 string sec = "";
                 int minutes = (int)total / 60;
@@ -1930,6 +1962,19 @@ namespace Gekko
         public static bool IsDecompOrFindThread()
         {
             return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp";
+        }
+
+        
+
+        /// <summary>
+        /// Thin wrapper on RemoveLagOrLead(), see that.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool HasLagOrLead(string name)
+        {
+            if(name == G.Chop_RemoveLagOrLead(name)) return true;
+            return false;
         }
 
         /// <summary>

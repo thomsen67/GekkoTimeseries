@@ -12065,7 +12065,7 @@ namespace Gekko
         public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag, HtmlBrowserSettings htmlBrowserSettings)
         {
             string ss = "";
-            string var2 = G.ExtractOnlyVariableIgnoreLag(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
+            string var2 = G.Chop_RemoveLagOrLead_OLD(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
             List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
             return ss2;
         }
@@ -37191,6 +37191,8 @@ namespace Gekko
         /// <summary>
         /// See if s is in dictionary. Beware: case-insensitive keys. The input string may contain blanks,
         /// which will be removed ("x[a, b]" becomes "x[a,b]"). For objects returns null if not found.
+        /// But BEWARE that for for instance int type, 0 will be returned if string is not found. If
+        /// this is a problem, use GetInt()!!
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>

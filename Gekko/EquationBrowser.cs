@@ -17,6 +17,12 @@ namespace Gekko
         public bool show_source = false;
     }
 
+    public class EquationNameAndNumber
+    {
+        public int i;
+        public string name;
+    }
+
     public class EquationBrowserHelper
     {
         public string s1;
@@ -977,6 +983,7 @@ namespace Gekko
 
         public static void BrowserNew()
         {
+
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -1018,19 +1025,20 @@ namespace Gekko
                     //Program.RunGekkoCommands("traces:tNetAfg_y[tje, tje] <2020 2020> = 12345;", "", 0, new P());
                 }
             }
-            O.Decomp2 o = new O.Decomp2();
-            o.type = @"ASTDECOMP3";
+
+            GekkoTime t1 = GekkoTime.tNull;
+            GekkoTime t2 = GekkoTime.tNull;
+                        
             if (adam)
             {
-                o.t1 = new GekkoTime(EFreq.A, 2006, 1, 1);
-                o.t2 = new GekkoTime(EFreq.A, 2010, 1, 1);
+                t1 = new GekkoTime(EFreq.A, 2006, 1, 1);
+                t2 = new GekkoTime(EFreq.A, 2010, 1, 1);
             }
             else
             {
-                o.t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
-                o.t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
-            }
-            o.opt_prtcode = O.ConvertToString((new ScalarString(op)));
+                t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
+                t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+            }            
 
             Model model = Program.model;
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
@@ -1038,7 +1046,7 @@ namespace Gekko
             GekkoDictionary<string, bool> seen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> seenPlot = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-            GekkoDictionary<string, List<string>> combos = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
+            GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
             
             int n = modelGamsScalar.CountEqs(1);
             for (int i = 0; i < n; i++)
@@ -1046,46 +1054,46 @@ namespace Gekko
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);             
                 var equationName = helper2.resultingFullName;
 
-                if (helper2.time.Equals(o.t1))
+                if (helper2.time.Equals(t1))
                 {                                  
                     EquationTextHelper helper = new EquationTextHelper();
                     helper.showTime = false;
-                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, o.t1);
+                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t1);
 
                     foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
                     {
-                        if (!combos.ContainsKey(variableName)) combos.Add(variableName, new List<string>());
-                        combos[variableName].Add(equationName);
+                        if (!combos.ContainsKey(variableName)) combos.Add(variableName, new List<EquationNameAndNumber>());
+                        combos[variableName].Add(new EquationNameAndNumber() { i = i, name = equationName });
                     }
                 }
             }
 
             int count = 0;
-            foreach (KeyValuePair<string, List<string>> kvp in combos)
+            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;                
                 string variableName = kvp.Key;
-                List<string> equations = kvp.Value;
+                List<EquationNameAndNumber> equations = kvp.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
                 new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
 
-                foreach (string equationName in equations)
+                foreach (EquationNameAndNumber equationHelper in equations)
                 {
 
-                    string fileName1 = variableName.ToLower() + "__" + equationName.ToLower() + ".html";
+                    string fileName1 = variableName.ToLower() + "__" + equationHelper.name.ToLower() + ".html";
 
                     //foreach precedent variable                                                    
-                    GekkoTime tUsedHere = o.t1;
+                    GekkoTime tUsedHere = t1;
                     if (!seen.ContainsKey(fileName1))
                     {
                         seen.Add(fileName1, false);
                         new Writeln(fileName1);
                         DecompOptions2 decompOptions2 = new DecompOptions2();
-                        decompOptions2.t1 = o.t1;
-                        decompOptions2.t2 = o.t2;
-                        decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
+                        decompOptions2.t1 = t1;
+                        decompOptions2.t2 = t2;
+                        decompOptions2.decompOperator = new DecompOperator("d");
                         decompOptions2.new_select = new List<string>() { variableName };
-                        decompOptions2.new_from = new List<string>() { equationName };
+                        decompOptions2.new_from = new List<string>() { equationHelper.name };
                         decompOptions2.new_endo = new List<string>() { variableName };
                         decompOptions2.rows = new List<string>() { "vars", "lags" };
                         decompOptions2.cols = new List<string>() { "time" };
@@ -1173,7 +1181,7 @@ namespace Gekko
                         }
 
                         tUsedHere = modelGamsScalar.Maybe2000GekkoTime(decompOptions2.t1);
-                        string s2 = G.Chop_DimensionAddLast(equationName, tUsedHere.ToString(), false);
+                        string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), false);
                         EquationTextHelper helper = new EquationTextHelper();
                         GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
 
@@ -1181,7 +1189,7 @@ namespace Gekko
                         html1.Append("<p>");
                         EquationBrowser.SpanHtmlColor(html1, variableName);
                         html1.Append(" from equation ");
-                        EquationBrowser.SpanHtmlColor(html1, equationName);
+                        EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
                         html1.Append("</p>");
 
                         EquationBrowser.WriteHtmlColorGray(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
@@ -1194,8 +1202,8 @@ namespace Gekko
                         ToggleLink(html1, "Equations", "To see these equations in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read &lt;gdx> forecast.gdx;");
                         html1.AppendLine("model &lt;gms> makro.zip;");
-                        html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
-                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationName + ";");
+                        html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper + ";");
                         html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
 
                         html1.Append("<hr>");
@@ -1211,25 +1219,24 @@ namespace Gekko
                         html1.AppendLine("<table class = `table1`>");
 
                         EquationTextHelper helper2 = new EquationTextHelper();
-                        helper2.showTime = false;
-                        List<string> precedent = modelGamsScalar.GetPrecedentsNames(modelGamsScalar.dict_FromEqNameToEqNumber.Get(equationName), helper2, o.t1);                        
-
-                        // TODO: WITH LAGS!!!!!!!
-                        // TODO: WITH LAGS!!!!!!!
-                        // TODO: WITH LAGS!!!!!!!
-                        foreach (string variableName2 in precedent)
+                        helper2.showTime = false;                        
+                        List<string> precedent2 = modelGamsScalar.GetPrecedentsNames(equationHelper.i, helper2, t1);
+                        precedent2.Sort(StringComparer.OrdinalIgnoreCase);
+                        
+                        foreach (string variableName2 in precedent2)
                         {
+                            string varnameWithoutLag = G.Chop_RemoveLagOrLead(variableName2);
                             html1.AppendLine("<tr>");
                             html1.Append("<td>" + EquationBrowser.HtmlLink(variableName2) + "</td>");
-                            html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName2)) + "</td>");
+                            html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
                             html1.AppendLine("</tr>");
                         }
-                        html1.AppendLine("</table>");
+                        html1.AppendLine("</table>"); 
 
 
                         ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                        html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
+                        html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                         html1.AppendLine("plot " + variableName + ";");
                         html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
                         try
@@ -1253,7 +1260,7 @@ namespace Gekko
 
                         if (false)
                         {
-                            EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + equationName);
+                            EquationBrowser.WriteHtml(html1, "--> decomp " + variableName + " from " + equationHelper);
                         }
 
                         EquationBrowser.WriteHtmlBold(html1, "Related equations");
@@ -1276,8 +1283,8 @@ namespace Gekko
                             ToggleLink(html1, "Time-decomposition, absolute changes", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
                             html1.AppendLine("read &lt;gdx> forecast.gdx;");
                             html1.AppendLine("model &lt;gms> makro.zip;");
-                            html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
-                            html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationName + ";");
+                            html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                            html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper + ";");
                             html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
 
                             html1.AppendLine(table);
@@ -1301,7 +1308,7 @@ namespace Gekko
 
                                 ToggleLink(html1, "Data traces", "To see these data traces in Gekko 3.x, you may use the following statements (or similar):");
                                 html1.AppendLine("read makrobk.gbk; //.gdx has no data traces");
-                                html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
+                                html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                                 html1.AppendLine("trace2 " + variableName + ";");
                                 html1.AppendLine("disp " + variableName + "; //click the trace link");
                                 html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
@@ -1350,7 +1357,7 @@ namespace Gekko
                         x.AppendLine("  <head>");
                         x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
                         x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-                        x.AppendLine("    <title>" + "EQUATION " + equationName + " (endo " + variableName + ")" + "</title>");
+                        x.AppendLine("    <title>" + "EQUATION " + equationHelper + " (endo " + variableName + ")" + "</title>");
 
                         string css = @"<style>        
         html {
@@ -1730,7 +1737,7 @@ namespace Gekko
                         x2.AppendLine("  <head>");
                         x2.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
                         x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-                        x2.AppendLine("    <title>" + "EQUATION " + equationName + " (endo " + variableName + ")" + "</title>");
+                        x2.AppendLine("    <title>" + "EQUATION " + equationHelper + " (endo " + variableName + ")" + "</title>");
                         x2.AppendLine("  </head>");
                         x2.AppendLine("  <body>");
                         x2.Append(html2);

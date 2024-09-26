@@ -482,7 +482,7 @@ namespace Gekko
             {
                 if (type == GekkoTableTypes.Left)
                 {
-                    string ss = G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator);
+                    string ss = G.Chop_RemoveLagOrLead_OLD(s, Globals.leftParenthesisIndicator);
                     ss = G.PrettifyTimeseriesHash(ss, true, true);
 
                     bool isEndogenous = false;
@@ -869,7 +869,7 @@ namespace Gekko
             {
                 string var = c.CellText.TextData[0];
 
-                string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
+                string var2 = G.PrettifyTimeseriesHash(G.Chop_RemoveLagOrLead_OLD(var, Globals.leftParenthesisIndicator), true, true);
                                 
                 DecompOptions d = this.decompOptions.Clone();                                
 
@@ -922,7 +922,7 @@ namespace Gekko
                             //G.Writeln(c.CellText.TextData[0]);
                             string var = c.CellText.TextData[0];
 
-                            string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);
+                            string var2 = G.Chop_RemoveLagOrLead_OLD(var, Globals.leftParenthesisIndicator);
 
                             if (G.Equal(var2, Globals.decompText0))
                             {
