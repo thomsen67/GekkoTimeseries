@@ -979,7 +979,7 @@ namespace Gekko
         {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
-            int produceStart = 9718; //9718
+            int produceStart = 9718;
             int produceEnd = produceStart + 10;
             int depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
@@ -1080,7 +1080,7 @@ namespace Gekko
 
                     foreach (string variableName in precedents)  //excluding any variables with lags/leads here
                     {
-                        string fileName1 = variableName + "__" + eqName2 + ".html";
+                        string fileName1 = variableName.ToLower() + "__" + eqName2.ToLower() + ".html";
 
                         //if (fileName1 == "qY[off]__E_qBVT[off].html")
                         //{
@@ -1204,11 +1204,9 @@ namespace Gekko
                             int index = s6.IndexOf("..");
                             if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
 
-                            //EquationBrowser.WriteHtmlBold(html1, "Equation");
-
                             ToggleLink(html1, "Equations", "To see these equations in Gekko 3.x, you may use the following statements (or similar):");
                             html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                            html1.AppendLine("model makro.zip;");
+                            html1.AppendLine("model &lt;gms> makro.zip;");
                             html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
                             html1.AppendLine("decomp &lt;d> " + variableName + " from " + eqName2 + ";");
                             html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
@@ -1245,13 +1243,13 @@ namespace Gekko
                                 {
                                     seenPlot.Add(variableName, false);
                                     //only plot the series from Work
-                                    Program.RunGekkoCommands("plot <" + per1.ToString() + " " + per2.ToString() + " > " + variableName + " file='" + path + variableName + ".svg';", "", 0, new P());
+                                    Program.RunGekkoCommands("plot <" + per1.ToString() + " " + per2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
                                 }
                                 else
                                 {
                                     //Just reference it
                                 }
-                                html1.AppendLine("<img src = `" + variableName + ".svg" + "`>");
+                                html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
                                 html1.AppendLine("<p>");
                             }
                             catch
@@ -1269,7 +1267,7 @@ namespace Gekko
                             foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
                             {
                                 string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName + "__" + eqNameWithLagNoBlanks + ".html");
+                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + "__" + eqNameWithLagNoBlanks.ToLower() + ".html");
                                 if (!first2) s8 += ", ";
                                 s8 += link;
                                 first2 = false;
@@ -1282,7 +1280,7 @@ namespace Gekko
 
                                 ToggleLink(html1, "Time-decomposition, absolute changes", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
                                 html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                                html1.AppendLine("model makro.zip;");
+                                html1.AppendLine("model &lt;gms> makro.zip;");
                                 html1.AppendLine("time " + o.t1.ToString() + " " + o.t2.ToString() + ";");
                                 html1.AppendLine("decomp &lt;d> " + variableName + " from " + eqName2 + ";");
                                 html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
@@ -1703,7 +1701,7 @@ namespace Gekko
                             }
                         }
 
-                        string fileName2 = variableName + ".html";
+                        string fileName2 = variableName.ToLower() + ".html";
                         if (!seen.ContainsKey(fileName2))
                         {
                             seen.Add(fileName2, false);
@@ -1720,7 +1718,7 @@ namespace Gekko
                                 EquationTextHelper helper = new EquationTextHelper();
                                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
                                 string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName + "__" + eqNameWithLagNoBlanks + ".html");
+                                string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + "__" + eqNameWithLagNoBlanks.ToLower() + ".html");
                                 table += "<td style=`vertical-align:top`>";
                                 table += link;
                                 table += "</td>";
