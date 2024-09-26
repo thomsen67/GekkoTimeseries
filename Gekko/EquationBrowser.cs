@@ -982,8 +982,7 @@ namespace Gekko
         }
 
         public static void BrowserNew()
-        {
-
+        {            
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -1042,8 +1041,6 @@ namespace Gekko
 
             Model model = Program.model;
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-
-            GekkoDictionary<string, bool> seenPlot = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
 
@@ -1114,7 +1111,7 @@ namespace Gekko
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     html1.AppendLine("model &lt;gms> makro.zip;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper + ";");
+                    html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
                     html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
                     html1.Append("<hr>");
                     EquationBrowser.WriteHtmlPreCode(html1, s5);
@@ -1149,16 +1146,8 @@ namespace Gekko
                 html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()
                 try
                 {
-                    if (!seenPlot.ContainsKey(variableName))
-                    {
-                        seenPlot.Add(variableName, false);
-                        //only plot the series from Work
-                        Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
-                    }
-                    else
-                    {
-                        //Just reference it
-                    }
+                    //only plot the series from Work
+                    Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
                     html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
                     html1.AppendLine("<p>");
                 }
@@ -1192,7 +1181,7 @@ namespace Gekko
                         html1.AppendLine("read &lt;gdx> forecast.gdx;");
                         html1.AppendLine("model &lt;gms> makro.zip;");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper + ";");
+                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
                         html1.AppendLine("</pre></code></div>");  //must end the ToggleLink()                            
                         html1.AppendLine(table);
                     }
