@@ -1192,7 +1192,7 @@ namespace Gekko
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
-                    Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
+                    //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
                     string table = BrowserDecompTable(t1, t2, variableName, equationHelper, model, modelGamsScalar);
                     if (table != null)
                     {
@@ -1740,6 +1740,8 @@ namespace Gekko
             int parentI = 0;
 
             int funcCounter = 0;
+
+            model.modelGamsScalar.MaybeLoadDataIntoModel(0, decompOptions2.t1, decompOptions2.t2, false);
 
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
 
