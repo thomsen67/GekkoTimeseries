@@ -1192,6 +1192,7 @@ namespace Gekko
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
+                    Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
                     string table = BrowserDecompTable(t1, t2, variableName, equationHelper, model, modelGamsScalar);
                     if (table != null)
                     {
@@ -1754,6 +1755,7 @@ namespace Gekko
                 table += "<div class=`table-container`>" + G.NL;
                 table += "<table>" + G.NL;
                 DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
                 decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
                 DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
 
