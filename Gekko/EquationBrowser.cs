@@ -989,17 +989,17 @@ namespace Gekko
             if (true)
             {
                 restrict.Add("qbnp", false);
-                //restrict.Add("pbnp", false);
-                //restrict.Add("vbnp", false);
-                //restrict.Add("pC[cTot]", false);
-                //restrict.Add("pG[gTot]", false);
-                //restrict.Add("pI[iTot]", false);
-                //restrict.Add("pM[tot]", false);
-                //restrict.Add("pX[xTot]", false);
-                //restrict.Add("qC[cTot]", false);
-                //restrict.Add("qI[iTot]", false);
-                //restrict.Add("qM[tot]", false);
-                //restrict.Add("qX[xTot]", false);                
+                restrict.Add("pbnp", false);
+                restrict.Add("vbnp", false);
+                restrict.Add("pC[cTot]", false);
+                restrict.Add("pG[gTot]", false);
+                restrict.Add("pI[iTot]", false);
+                restrict.Add("pM[tot]", false);
+                restrict.Add("pX[xTot]", false);
+                restrict.Add("qC[cTot]", false);
+                restrict.Add("qI[iTot]", false);
+                restrict.Add("qM[tot]", false);
+                restrict.Add("qX[xTot]", false);
             }
             int depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
@@ -1723,33 +1723,22 @@ namespace Gekko
             decompOptions2.new_endo = new List<string>() { variableName };
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
-            decompOptions2.showErrors = true;
-                        
+            decompOptions2.showErrors = true;                        
             GekkoSmpl smpl = new GekkoSmpl(t1, t2);
             DecompDatas decompDatas = new DecompDatas();
-
             GekkoTime gt1, gt2;
-            Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);
-
-            DateTime t0 = DateTime.Now;
-
-            Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
-
-            int perLag = -2;
+            Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);            
+            Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;            
             string lhsString = "Expression value";
             int parentI = 0;
-
             int funcCounter = 0;
-
+            //MaybeLoadDataIntoModel() is necessary, but DecompGetFuncExpressionsAndRecalc() seems not
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, decompOptions2.t1, decompOptions2.t2, false);
-
+            //Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
-
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
             decompDatas.MAIN_data = null;
-
             if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
-
             string residualName = Program.GetDecompResidualName(0, 1);
             string table = null;
             try
@@ -1760,7 +1749,6 @@ namespace Gekko
                 Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
                 decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
                 DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
-
                 //Remember red circles
                 Table decompTable = decompOutput.table;
 
