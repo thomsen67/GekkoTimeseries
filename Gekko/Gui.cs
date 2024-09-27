@@ -354,22 +354,6 @@ namespace Gekko
 
             G.WriteDirs("small", false);            
 
-            if (Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17" || Globals.gekkoVersion == "3.1.18")
-            {
-                using (Note note = new Note())
-                {
-                    note.MainAdd("From Gekko 3.1.16 and on, a left-hand side $-condition like \"y $ (b == 100) = 2;\" is treated differently. This only happens with timeseries inside the $ (...) condition, and if encountered you will get a warning with more explanation.");
-                }
-            }
-            
-            if (Globals.gekkoVersion == "3.1.14" || Globals.gekkoVersion == "3.1.15" || Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17")
-            {
-                using (Note note = new Note())
-                {
-                    note.MainAdd("From Gekko 3.1.14 and on, [Tab] or [Ctrl+Space] activates autocomplete of series names. For instance, \"prt x\" + [Tab] will show series starting with 'x', and \"prt x[\" + [Tab] will show elements of the array-series 'x'. See more {a{here¤user_interface.htm}a}.");
-                }
-            }            
-
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
 
@@ -2018,70 +2002,7 @@ namespace Gekko
                     else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the job");
                 }
             }
-
-            //TTH June 2024: This is > 3 years old now: out-commenting!
-            //if (Globals.bugfixMissing1.Count > 0)
-            //{
-            //    G.Writeln2("+++ WARNING (compatibility): The following statements compare whole timeseries that contain ", Globals.warningColor);
-            //    G.Writeln("    missing values. Gekko 3.1.8 implemented some changes regarding such comparisons,", Globals.warningColor);
-            //    G.Writeln("    and the following concrete comparisons differ compared to Gekko 3.1.8.", Globals.warningColor);
-
-            //    int widthRemember = Program.options.print_width;                
-            //    Program.options.print_width = int.MaxValue;
-            //    try
-            //    {
-            //        G.Writeln("", Globals.warningColor);
-            //        foreach (string s in Globals.bugfixMissing1)
-            //        {
-            //            G.Writeln("      " + s, Globals.warningColor);
-            //        }
-            //        G.Writeln("", Globals.warningColor);
-            //    }
-            //    finally
-            //    {
-            //        Program.options.print_width = widthRemember;
-            //    }                                
-            //    Action<GAO> a = (gao) =>
-            //    {
-            //        O.Help("i_missing_values");
-            //    };
-            //    G.Writeln("    Read more about missing values " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are upgrading from a Gekko version < 3.1.8 to a", Globals.warningColor);
-            //    G.Writeln("    Gekko version >= 3.1.8, this warning may come out of the blue. In that case, as a work-around,", Globals.warningColor);
-            //    G.Writeln("    you may replace the problematic IF(...) with IF_OLD(...), to emulate the behavior of", Globals.warningColor);
-            //    G.Writeln("    Gekko < 3.1.8. If you are using the trick IF(x == x) to check if a series x contains missings, ", Globals.warningColor);
-            //    G.Writeln("    you may instead use IF(x.ismiss('all').sumt() > 0) to check for missings.", Globals.warningColor);
-            //    G.Writeln("    If all this turns problematic or cumbersome, you may set OPTION bugfix missing = no, to", Globals.warningColor);
-            //    G.Writeln("    emulate Gekko < 3.1.8 completely regarding IF and missings. Using the option generally", Globals.warningColor);
-            //    G.Writeln("    is not recommended though.", Globals.warningColor);                
-
-            //    G.Writeln();
-            //}
-
-            //TTH June 2024: This is > 1 years old now: out-commenting! Pretty special too, mostly regarding GAMS-type code.
-            //if (Program.options.bugfix_lhs_dollar_warning && Globals.bugfixLhsDollar > 0)
-            //{
-            //    Action<GAO> a = (gao) =>
-            //    {
-            //        O.Cls("output");
-            //        using (Writeln txt = new Writeln("", -12345, Color.Empty, false, ETabs.Output)) 
-            //        {
-            //            txt.MainAdd("Set 'bugfix lhs dollar warning = no;' to remove this warning.");
-            //            txt.MainNewLine();
-            //            txt.MainAdd("With assignments like 'y = 1; y $ (b == 100) = 2;' Gekko first sets the series y = 1, and afterwards changes y into 2 for the observations where b == 100.");
-            //            txt.MainAdd("In Gekko < 3.1.16, y will be = 2 for those b observations that are == 100, and 0 otherwise. This changes in Gekko >= 3.1.16, where");
-            //            txt.MainAdd("y will be = 2 for those b observations that are == 100, but will be untouched otherwise (that is, in this case = 1).");
-            //            txt.MainAdd("This difference is most significant if y has been defined beforehand like in the example. If not, the difference in Gekko >= 3.1.16 will be a question of 0 versus missing value.");
-            //            txt.MainNewLine();
-            //            txt.MainAdd("To emulate Gekko < 3.1.16, you may set 'option bugfix lhs dollar = no;', which should revert to the old behavior.");
-            //            txt.MainAdd("If you do not want to set this option (which is not really recommended in general), you may omit the option and use 'y = 1; y $ (b == 100) = 2; y $ (b <> 100) = 0;' to emulate the old behavior.");
-            //            txt.MainAdd("Or alternatively use a right-hand side $: 'y = 1; y = 2 $ (b == 100);'.");
-            //            txt.MainNewLine();
-            //            txt.MainAdd("The change is made in order to make Gekko handle a left-hand side $ exactly like GAMS.");
-            //        }                
-            //    };
-            //    new Warning(EWarningType.NoUsing, "In Gekko >= 3.1.16, using $ on the left-hand side has changed behavior if the condition contains timeseries. In the job just run, this affects " + Globals.bugfixLhsDollar + " values/observations (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
-            //}
-
+            
             if (Globals.runningOnTTComputer && Globals.numberOfTimeWindowErrors > 0)
             {
                 G.WarningInternal("TTH: There were " + Globals.numberOfTimeWindowErrors + " time window errors.");

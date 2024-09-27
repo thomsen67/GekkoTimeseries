@@ -2475,7 +2475,14 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer && (text == "d"))
             {
-                EquationBrowser.BrowserNew();
+                EquationBrowser.BrowserNew(false);
+                return;
+            }
+
+            if (Globals.runningOnTTComputer && (text == "dd"))
+            {
+                EquationBrowser.BrowserNew(true);
+                return;
             }
 
 
