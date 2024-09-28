@@ -773,7 +773,6 @@ namespace Gekko
             }
 
             List<string> csCodeLines = new List<string>();
-
             List<string> equationDefs = new List<string>();
             StringBuilder eqLine = null;
 
@@ -799,73 +798,79 @@ namespace Gekko
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
             if (helper.count != semis) new Error("Not summing up");
 
-            foreach (string line in values)
+            if (false)
             {
-                if (line.Trim() == "" || line.StartsWith("*")) continue;
-                string[] ss = line.Split(split, StringSplitOptions.None);
-                int id = -12345;
-                try
+                //We don't read the endo values from gams.gms anymore: reading data from a databank is mandatory now.
+                //Do not delete this: is may be resurrected sometime, but for now we do not like data to be stored
+                //in a model.zip file inside gams.gms.
+                foreach (string line in values)
                 {
-                    id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
-                }
-                catch
-                {
-                    new Error("Could not parse integer part of the string '" + ss[0] + "'");
-                }
-                string inputName = helper.dict_FromVarNumberToVarName[id];                
-                ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
-                int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
-                if (aNumber == -12345)
-                {                    
-                    new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
-                }
-                int i1 = -12345;
-                if (Globals.decompFixTimelessProblem && helper2.time.IsNull())
-                {
-                    i1 = 0;
-                }
-                else
-                {
-                    i1 = helper2.time.Subtract(helper.tBasis);
-                }
-                int i2 = aNumber;                
-                double d;
-                string toParse = "";
-                if (ss[1].Trim() == "")
-                {
-                    //probably always so
-                    toParse = ss[2].Trim();
-                }
-                else
-                {                    
-                    toParse = ss[1].Trim();
-                }
-                if (G.Equal(toParse, "eps"))
-                {
-                    d = 0d;
-                }
-                else
-                {
+                    if (line.Trim() == "" || line.StartsWith("*")) continue;
+                    string[] ss = line.Split(split, StringSplitOptions.None);
+                    int id = -12345;
                     try
                     {
-                        d = double.Parse(toParse);
+                        id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
                     }
                     catch
                     {
-                        new Error("Could not parse the number '" + toParse + "' as a floating-point value.");
-                        throw;
+                        new Error("Could not parse integer part of the string '" + ss[0] + "'");
+                    }
+                    string inputName = helper.dict_FromVarNumberToVarName[id];
+                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
+                    int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+                    if (aNumber == -12345)
+                    {
+                        new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
+                    }
+                    int i1 = -12345;
+                    if (Globals.decompFixTimelessProblem && helper2.time.IsNull())
+                    {
+                        i1 = 0;
+                    }
+                    else
+                    {
+                        i1 = helper2.time.Subtract(helper.tBasis);
+                    }
+                    int i2 = aNumber;
+                    double d;
+                    string toParse = "";
+                    if (ss[1].Trim() == "")
+                    {
+                        //probably always so
+                        toParse = ss[2].Trim();
+                    }
+                    else
+                    {
+                        toParse = ss[1].Trim();
+                    }
+                    if (G.Equal(toParse, "eps"))
+                    {
+                        d = 0d;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            d = double.Parse(toParse);
+                        }
+                        catch
+                        {
+                            new Error("Could not parse the number '" + toParse + "' as a floating-point value.");
+                            throw;
+                        }
+                    }
+                    try
+                    {
+                        helper.a[i1][i2] = d;
+                    }
+                    catch
+                    {
+                        new Error("Index out of range when reading GAMS scalar equation");
                     }
                 }
-                try
-                {
-                    helper.a[i1][i2] = d;
-                }
-                catch
-                {
-                    new Error("Index out of range when reading GAMS scalar equation");
-                }
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
             }
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
 
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
             //if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
@@ -1096,6 +1101,19 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Reads GAMS dictionary dict.txt (made by GAMS CONVERT)
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <param name="split2"></param>
+        /// <param name="timeless"></param>
+        /// <param name="status2"></param>
+        /// <param name="substatus2"></param>
+        /// <param name="eqCounts2"></param>
+        /// <param name="varCounts2"></param>
+        /// <param name="fakeEqCounts2"></param>
+        /// <param name="fakeVarCounts2"></param>
+        /// <param name="sr"></param>
         private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
         {
             bool b = false;

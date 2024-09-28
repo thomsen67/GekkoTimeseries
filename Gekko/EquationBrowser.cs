@@ -1020,10 +1020,10 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";                    
                     Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;" + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());                    
                 }
-            }
+            }            
 
             if (limit) return;
 
@@ -1035,13 +1035,17 @@ namespace Gekko
             File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "normal_red.png");
 
             GekkoTime t1 = GekkoTime.tNull;
-            GekkoTime t2 = GekkoTime.tNull;
-            
+            GekkoTime t2 = GekkoTime.tNull;            
             t1 = Globals.globalPeriodStart;
             t2 = Globals.globalPeriodEnd;            
 
             Model model = Program.model;
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
+
+            //The following loads the databank values into the scalar model, for reuse for all the DECOMP
+            //calculations later on.
+            //BEWARE: should t1 have 2-3 periods subtraced for instance? But t1.Add(-3) does not seem to change anything.
+            model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
 
@@ -1731,9 +1735,7 @@ namespace Gekko
             Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;            
             string lhsString = "Expression value";
             int parentI = 0;
-            int funcCounter = 0;
-            //MaybeLoadDataIntoModel() is necessary, but DecompGetFuncExpressionsAndRecalc() seems not
-            model.modelGamsScalar.MaybeLoadDataIntoModel(0, decompOptions2.t1, decompOptions2.t2, false);
+            int funcCounter = 0;            
             //Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
