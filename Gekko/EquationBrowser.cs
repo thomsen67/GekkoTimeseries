@@ -1070,7 +1070,7 @@ namespace Gekko
                 }
             }
 
-            BrowserNewPlots(combos);
+            BrowserNewPlots(combos, path, restrict);
 
             int count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
@@ -1307,17 +1307,14 @@ namespace Gekko
         /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes < 1 min, even in debug mode, so this is fast!
         /// </summary>
         /// <param name="combos"></param>
-        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos)
+        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict)
         {
-            Globals.browserPlotFiles = new List<string>(); Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+            Globals.browserPlotFiles = new List<string>(); //Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
             //Generate 1 file for gnuplot to chew on
-            O.Prt o0 = null;
-            int count = 0;
+            O.Prt o0 = null;            
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
-            {
-                count++;
-                //if (count > 1000) break;
-                string variableName = kvp.Key;
+            {                
+                if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
                 o0 = new O.Prt();
                 o0.prtType = "plot";
                 o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made
@@ -1327,7 +1324,7 @@ namespace Gekko
                 ope0.labelGiven = new List<string>() { "x|[@2,5:5='x',<883>,1:5]|[@2,5:5='x',<883>,1:5]" };
                 ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                 ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
-                ope0.variable[0] = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReportError) as Series;
+                ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
                 o0.prtElements.Add(ope0);
                 o0.Exe();
             }
@@ -1343,6 +1340,17 @@ namespace Gekko
                 }
             }
             Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);
+            int count = 0;
+            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+            {                
+                if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
+                count++;
+                try
+                {
+                    File.Move(gnuplotPath + "\\" + "temp" + count + ".svg", browserPath + "\\" + kvp.Key.ToLower() + ".svg");
+                }
+                catch { }
+            }
             Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
         }
 
