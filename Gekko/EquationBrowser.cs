@@ -986,7 +986,7 @@ namespace Gekko
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            if (true)
+            if (false)
             {
                 restrict.Add("qbnp", false);
                 restrict.Add("pbnp", false);
@@ -1052,9 +1052,9 @@ namespace Gekko
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar);
-                        
-            BrowserNewPlots(combos, path, restrict);            
 
+            MessageBox.Show("!!! parallellize !!!");
+            BrowserNewPlots(combos, path, restrict);
             BrowserNewHtml(t1, t2, th, path, restrict, combos, model, modelGamsScalar);
             
             return;
@@ -1069,14 +1069,14 @@ namespace Gekko
                 count++;
                 string variableName = kvp.Key;
                 List<EquationNameAndNumber> equations = kvp.Value;
-                if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
-                new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;                
 
                 string fileName1 = variableName.ToLower() + ".html";
 
                 GekkoTime tUsedHere = t1;
-
-                new Writeln(fileName1);
+                
+                if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                //new Writeln(fileName1);
 
                 StringBuilder html1 = new StringBuilder();
 
