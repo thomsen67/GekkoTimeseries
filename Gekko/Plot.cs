@@ -137,7 +137,7 @@ namespace Gekko
             }
             int numberOfObs = GekkoTime.Observations(o.t1, o.t2);            
             int rr = Program.RandomInt();
-            if (o.plotForEquationBrowser) rr = Globals.browserPlotFiles.Count + 1;
+            if (o.isBrowser) rr = Globals.browserPlotFiles.Count + 1;
             string file1 = "temp" + rr + ".dat";
             string file2 = "temp" + rr + "." + extension;
             string file3 = "temp" + rr + ".gp";
@@ -504,7 +504,10 @@ namespace Gekko
 
             txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSvgSize);
 
-            txt.AppendLine("set output \"" + file2 + "\"");
+            string graphFileName = file2;
+            if (o.isBrowser) graphFileName = o.browserPath.Replace("\\", "\\\\");
+
+            txt.AppendLine("set output \"" + graphFileName + "\"");
             txt.AppendLine("set key " + key);
 
             if (G.Equal(Program.options.plot_decimalseparator, "comma"))
@@ -808,7 +811,7 @@ namespace Gekko
 
             string plotFileName = null;
 
-            if (o.plotForEquationBrowser)
+            if (o.isBrowser)
             {
                 return file3;  //the random number file .fp
             }

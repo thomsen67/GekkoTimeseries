@@ -1031,12 +1031,12 @@ namespace Gekko
 
             if (limit) return;
 
-            string path = @"c:\Thomas\Desktop\gekko\testing\Browser\";
+            string path = @"c:\Thomas\Desktop\gekko\testing\Browser";
             G.DeleteFolder(path, "css", false);
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "checked.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "normal.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "checked_red.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "normal_red.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\" + "checked.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\" + "normal.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\" + "checked_red.png");
+            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\" + "normal_red.png");
 
             GekkoTime t1 = GekkoTime.tNull;
             GekkoTime t2 = GekkoTime.tNull;
@@ -1274,7 +1274,7 @@ namespace Gekko
                 x.AppendLine(js);
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
-                using (FileStream fs = Program.WaitForFileStream(path + fileName1, null, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(path + "\\" + fileName1, null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     //BEWARE: In JavaScript, it is legal to do y = `i am a string';, where backticks indicate that {}-interpolation 
@@ -1347,7 +1347,7 @@ namespace Gekko
             {                
                 if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
 
-                foreach (string s in new List<string>() { "gp", "dat", "svg" })
+                foreach (string s in new List<string>() { "gp", "dat" })
                 {
                     if (File.Exists(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s))
                     {
@@ -1360,15 +1360,15 @@ namespace Gekko
                 }
 
                 o0 = new O.Prt();
+                o0.isBrowser = true;
+                o0.browserPath = browserPath + "\\" + kvp.Key.ToLower() + ".svg";
                 o0.prtType = "plot";
-                o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made
-                o0.plotForEquationBrowser = true;
-                O.Prt.Element ope0 = new O.Prt.Element();
-                //List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
-                ope0.labelGiven = new List<string>() { "x|[@2,5:5='x',<883>,1:5]|[@2,5:5='x',<883>,1:5]" };
+                o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
+                O.Prt.Element ope0 = new O.Prt.Element();                
+                ope0.labelGiven = new List<string>() { kvp.Key };
                 ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                 ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
-                ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
+                ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;                
                 o0.prtElements.Add(ope0);
                 o0.Exe();
             }            
@@ -1381,18 +1381,7 @@ namespace Gekko
                     sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
                 }
             }
-            Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);
-            int count = 0;
-            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
-            {                
-                if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
-                count++;
-                try
-                {
-                    File.Move(gnuplotPath + "\\" + "temp" + count + ".svg", browserPath + "\\" + kvp.Key.ToLower() + ".svg");
-                }
-                catch { }
-            }
+            Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);            
             Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
             if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }

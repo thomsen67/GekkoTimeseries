@@ -9778,6 +9778,9 @@ namespace Gekko
 
         public class Prt
         {
+            public bool isBrowser = false;
+            public string browserPath = null; //only used for DOC<browser>.            
+
             public bool guiGraphIsRefreshing = false;
             public string guiGraphRefreshingFilename = null;
             public bool guiGraphIsLogTransform = false;            
@@ -9790,8 +9793,7 @@ namespace Gekko
             public string emfName = null;  //name of produced emf file if PLOT
                         
             public int printStorageAsFuncCounter = -12345;
-            public bool plotForEquationBrowser = false;
-
+            
             public string guiGraphOperator = null;  //clicking in the PLOT window
                   
             public string timefilter = null;
