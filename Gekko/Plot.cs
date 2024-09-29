@@ -951,8 +951,7 @@ namespace Gekko
         }
 
         public static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData)
-        {           
-
+        {
             if (G.Equal(o.opt_dump, "yes"))
             {
                 try
@@ -1021,7 +1020,7 @@ namespace Gekko
             process.Close();
 
             //resets current dir to previous location
-            Directory.SetCurrentDirectory(currentDir);
+            if (currentDir != null) Directory.SetCurrentDirectory(currentDir);
             return emfName;
         }
 

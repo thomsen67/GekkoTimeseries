@@ -982,7 +982,7 @@ namespace Gekko
         }
 
         public static void BrowserNew(bool limit)
-        {            
+        {
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -1020,10 +1020,10 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";                    
-                    Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;" + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());                    
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
+                    Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;" + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
                 }
-            }            
+            }
 
             if (limit) return;
 
@@ -1035,9 +1035,9 @@ namespace Gekko
             File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "normal_red.png");
 
             GekkoTime t1 = GekkoTime.tNull;
-            GekkoTime t2 = GekkoTime.tNull;            
+            GekkoTime t2 = GekkoTime.tNull;
             t1 = Globals.globalPeriodStart;
-            t2 = Globals.globalPeriodEnd;            
+            t2 = Globals.globalPeriodEnd;
 
             Model model = Program.model;
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
@@ -1063,58 +1063,16 @@ namespace Gekko
 
                     foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
                     {
-                        string variableNameWithoutLagOrLead=G.Chop_RemoveLagOrLead(variableName);
+                        string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
                         if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
                         combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
                     }
                 }
             }
 
+            BrowserNewPlots(combos);
 
-            Globals.browserPlotFiles = new List<string>(); Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
-            //Generate 1 file for gnuplot to chew on
-            O.Prt o0 = null;
             int count = 0;
-            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
-            {
-                count++;
-                if (count > 3) break;
-
-                //if (n > Program.options.plot_elements_max)
-
-                string variableName = kvp.Key;
-                o0 = new O.Prt();
-                o0.prtType = "plot";
-                o0.plotForEquationBrowser = true;
-                O.Prt.Element ope0 = new O.Prt.Element();
-                //List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
-                ope0.labelGiven = new List<string>() { "x|[@2,5:5='x',<883>,1:5]|[@2,5:5='x',<883>,1:5]" };
-                ope0.labelRecordedPieces = new List<O.RecordedPieces>();
-                ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
-                ope0.variable[0] = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReportError) as Series;
-                o0.prtElements.Add(ope0);                
-                o0.Exe();
-
-                //Plot.CallGnuplot(plotTable, o, containerExplode, freq, new PlotHelper(), false, new P());
-                //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
-
-            }
-
-            string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
-            string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
-            File.Delete(fileNameWithPath);
-            using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-            {
-                foreach(string s in Globals.browserPlotFiles)
-                {
-                    sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
-                }
-            }
-            Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);
-            Globals.browserPlotFiles = null; Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
-
-            count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
@@ -1129,7 +1087,7 @@ namespace Gekko
 
                 new Writeln(fileName1);
 
-                StringBuilder html1 = new StringBuilder();                
+                StringBuilder html1 = new StringBuilder();
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
@@ -1235,7 +1193,7 @@ namespace Gekko
                 }
 
                 foreach (EquationNameAndNumber equationHelper in equations)
-                {                    
+                {
                     html1.Append("<div id = `#" + equationHelper.name.ToLower() + "-2` class=`content`>");
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
@@ -1328,7 +1286,7 @@ namespace Gekko
                 x.AppendLine("  <body>");
                 string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere);
                 x.Append(html2);
-                x.Append(html1);                
+                x.Append(html1);
                 x.AppendLine(js);
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
@@ -1339,13 +1297,53 @@ namespace Gekko
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
-
-                
-                
-                
             }
 
             return;
+        }
+
+        /// <summary>
+        /// This is for mass-producing gnuplot files, for the html browser.
+        /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes < 1 min, even in debug mode, so this is fast!
+        /// </summary>
+        /// <param name="combos"></param>
+        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos)
+        {
+            Globals.browserPlotFiles = new List<string>(); Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+            //Generate 1 file for gnuplot to chew on
+            O.Prt o0 = null;
+            int count = 0;
+            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+            {
+                count++;
+                //if (count > 1000) break;
+                string variableName = kvp.Key;
+                o0 = new O.Prt();
+                o0.prtType = "plot";
+                o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made
+                o0.plotForEquationBrowser = true;
+                O.Prt.Element ope0 = new O.Prt.Element();
+                //List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
+                ope0.labelGiven = new List<string>() { "x|[@2,5:5='x',<883>,1:5]|[@2,5:5='x',<883>,1:5]" };
+                ope0.labelRecordedPieces = new List<O.RecordedPieces>();
+                ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
+                ope0.variable[0] = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReportError) as Series;
+                o0.prtElements.Add(ope0);
+                o0.Exe();
+            }
+            string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
+            string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
+            File.Delete(fileNameWithPath);
+            using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in Globals.browserPlotFiles)
+                {
+                    sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
+                }
+            }
+            Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);
+            Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
         }
 
         private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)
