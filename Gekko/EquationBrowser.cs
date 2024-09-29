@@ -1047,31 +1047,18 @@ namespace Gekko
             //BEWARE: should t1 have 2-3 periods subtraced for instance? But t1.Add(-3) does not seem to change anything.
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
 
-            GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
+            GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar);
+                        
+            BrowserNewPlots(combos, path, restrict);            
 
-            int n = modelGamsScalar.CountEqs(1);
-            for (int i = 0; i < n; i++)
-            {
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);
-                var equationName = helper2.resultingFullName;
+            BrowserNewHtml(t1, t2, freq, depthMax, countMax, pixels, pixelsAfterArrow, firstColWidth, path, restrict, combos, model, modelGamsScalar);
+            
+            return;
+        }
 
-                if (helper2.time.Equals(t1))
-                {
-                    EquationTextHelper helper = new EquationTextHelper();
-                    helper.showTime = false;
-                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t1);
-
-                    foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
-                    {
-                        string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
-                        if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
-                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
-                    }
-                }
-            }
-
-            BrowserNewPlots(combos, path, restrict);
-
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, EFreq freq, int depthMax, int countMax, int pixels, int pixelsAfterArrow, int firstColWidth, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, Model model, ModelGamsScalar modelGamsScalar)
+        {
+            DateTime dt1 = DateTime.UtcNow;
             int count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
@@ -1298,23 +1285,83 @@ namespace Gekko
                     sw.Write(x.Replace('`', '\"'));
                 }
             }
-
+            
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
             return;
         }
 
         /// <summary>
+        /// Returns a dict where the keys are variable names, and the values are those equations that the variable is present in.
+        /// Note: conditions on time t (starting period)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="modelGamsScalar"></param>
+        /// <returns></returns>
+        private static GekkoDictionary<string, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar)
+        {
+            GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
+
+            int n = modelGamsScalar.CountEqs(1);
+            for (int i = 0; i < n; i++)
+            {
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);
+                var equationName = helper2.resultingFullName;
+
+                if (helper2.time.Equals(t))
+                {
+                    EquationTextHelper helper = new EquationTextHelper();
+                    helper.showTime = false;
+                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t);
+
+                    foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
+                    {
+                        string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
+                        if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
+                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
+                    }
+                }
+            }
+
+            return combos;
+        }
+
+        /// <summary>
         /// This is for mass-producing gnuplot files, for the html browser.
-        /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes < 1 min, even in debug mode, so this is fast!
+        /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes &lt; 1 min, even in debug mode, so this is fast!
         /// </summary>
         /// <param name="combos"></param>
         private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict)
         {
+            DateTime dt0 = DateTime.UtcNow;
             Globals.browserPlotFiles = new List<string>(); //Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+            string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
+
+            //Delete the master file
+            string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
+            try
+            {
+                File.Delete(fileNameWithPath);
+            }
+            catch { }
+
             //Generate 1 file for gnuplot to chew on
             O.Prt o0 = null;            
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {                
                 if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
+
+                foreach (string s in new List<string>() { "gp", "dat", "svg" })
+                {
+                    if (File.Exists(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s))
+                    {
+                        try
+                        {
+                            File.Delete(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s);
+                        }
+                        catch { }
+                    }
+                }
+
                 o0 = new O.Prt();
                 o0.prtType = "plot";
                 o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made
@@ -1327,10 +1374,8 @@ namespace Gekko
                 ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
                 o0.prtElements.Add(ope0);
                 o0.Exe();
-            }
-            string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
-            string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
-            File.Delete(fileNameWithPath);
+            }            
+            
             using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -1352,6 +1397,7 @@ namespace Gekko
                 catch { }
             }
             Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }
 
         private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)

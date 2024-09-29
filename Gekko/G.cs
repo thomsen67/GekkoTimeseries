@@ -1599,13 +1599,25 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get seconds elapsed since param1
+        /// Get seconds elapsed since param1. See also SecondsUtc().
         /// </summary>
         /// <param name="t0"></param>
         /// <returns></returns>
         public static string Seconds(DateTime t0)
         {
             double milliseconds = (DateTime.Now - t0).TotalMilliseconds;
+            string s = SecondsFormat(milliseconds);
+            return s;
+        }
+
+        /// <summary>
+        /// Get seconds elapsed since param1, but where param1 is in UTC time. See also Seconds().
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <returns></returns>
+        public static string SecondsUtc(DateTime t0)
+        {
+            double milliseconds = (DateTime.UtcNow - t0).TotalMilliseconds;
             string s = SecondsFormat(milliseconds);
             return s;
         }
