@@ -1775,12 +1775,13 @@ namespace Gekko
 
     public class TraceHelper2
     {
-        public StringBuilder html = null;
+        //public StringBuilder html = null;
         public int  depthMax = -1;
         public int counter = 0;
         public int counterMax = -1;
         public int pixels = 0;
         public int pixelsAfterArrow = 30;
+        public int firstColWidth = 200;
         public EFreq freq = EFreq.A;
     }
 

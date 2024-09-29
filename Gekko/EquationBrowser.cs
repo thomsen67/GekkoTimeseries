@@ -1001,13 +1001,17 @@ namespace Gekko
                 restrict.Add("qM[tot]", false);
                 restrict.Add("qX[xTot]", false);
             }
-            int depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
-            int countMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
-            int pixels = 20;
-            int pixelsAfterArrow = 12;
-            int firstColWidth = 200;
+            
+            TraceHelper2 th = new TraceHelper2();
+            th.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
+            th.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
+            th.pixels = 20;
+            th.pixelsAfterArrow = 12;
+            th.freq = freq;
+            th.firstColWidth = 200;
+
             bool adam = false;
-            bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)
+            bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)                        
 
             Program.options.databank_search = false;
 
@@ -1051,12 +1055,12 @@ namespace Gekko
                         
             BrowserNewPlots(combos, path, restrict);            
 
-            BrowserNewHtml(t1, t2, freq, depthMax, countMax, pixels, pixelsAfterArrow, firstColWidth, path, restrict, combos, model, modelGamsScalar);
+            BrowserNewHtml(t1, t2, th, path, restrict, combos, model, modelGamsScalar);
             
             return;
         }
 
-        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, EFreq freq, int depthMax, int countMax, int pixels, int pixelsAfterArrow, int firstColWidth, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, Model model, ModelGamsScalar modelGamsScalar)
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, TraceHelper2 th, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, Model model, ModelGamsScalar modelGamsScalar)
         {
             DateTime dt1 = DateTime.UtcNow;
             int count = 0;
@@ -1208,7 +1212,7 @@ namespace Gekko
                     Series ts = null;
                     try
                     {
-                        ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                        ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), th.freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     }
                     catch { }
 
@@ -1228,15 +1232,8 @@ namespace Gekko
 
                         GekkoTimeSpansSimple gtss = null;
                         Trace2 trace = ts.meta.trace2;
-                        TraceHelper2 th = new TraceHelper2();
-                        th.html = html1;
-                        th.depthMax = depthMax;
-                        th.counterMax = countMax;
-                        th.pixels = pixels;
-                        th.pixelsAfterArrow = pixelsAfterArrow;
-                        th.freq = freq;
-                        //th.html.AppendLine(@" <li class=`folder`>");
-                        WalkTracesForHtml(trace, gtss, th, 0);
+                        //th.html.AppendLine(@" <li class=`folder`>");                        
+                        WalkTracesForHtml(trace, gtss, th, 0, html1);
                         //th.html.AppendLine(@"</div>");
                         html1.AppendLine("<textarea id = `output` readonly>Click '>' to unfold sub-traces, and click a row to see more info. (Red-colored '>' at larger depths indicate that traces have been pruned off for space reasons).</textarea>");
                         html1.AppendLine("</div>");
@@ -1268,7 +1265,7 @@ namespace Gekko
                 }
 
                 StringBuilder x; string js;
-                BrowserNewCssAndJs(variableName, firstColWidth, pixels, pixelsAfterArrow, out x, out js);
+                BrowserNewCssAndJs(variableName, th.firstColWidth, th.pixels, th.pixelsAfterArrow, out x, out js);
 
                 x.AppendLine("  <body>");
                 string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere);
@@ -1973,14 +1970,14 @@ namespace Gekko
         /// <param name="gtss"></param>
         /// <param name="th"></param>
         /// <param name="depth"></param>
-        public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth)
+        public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth, StringBuilder html)
         {
             th.counter++;
             int childrenCount = trace.GetPrecedents_BewareOnlyInternalUse().Count();
             if (depth > 0)            
             {
                 TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);                
-                th.html.AppendLine(@"<div class=`list-item-content`>");
+                html.AppendLine(@"<div class=`list-item-content`>");
                 string visibility = null;
                 string image = "normal.png";
                 string imageExtra = null;
@@ -1998,14 +1995,14 @@ namespace Gekko
                     }
                 }
 
-                th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`" + image + "` " + imageExtra + "style =`" + visibility + "margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
-                th.html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
-                th.html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
-                th.html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
-                th.html.AppendLine(@"<div>" + traceItem.File + @"</div>");
-                th.html.AppendLine(@"</div>");
+                html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src=`" + image + "` " + imageExtra + "style =`" + visibility + "margin-right: " + th.pixelsAfterArrow + "`></span><span>" + G.Chop_RemoveFreq(G.Chop_RemoveBank(traceItem.Name), th.freq) + @"</span></div>");
+                html.AppendLine(@"<div style = `margin-left:" + (-(depth - 1) * th.pixels) + @"px`>" + traceItem.Code + @"</div>");
+                html.AppendLine(@"<div>" + traceItem.Active + @"</div>");
+                html.AppendLine(@"<div>" + traceItem.Stamp + @"</div>");
+                html.AppendLine(@"<div>" + traceItem.File + @"</div>");
+                html.AppendLine(@"</div>");
                 string extra = Trace2.FromTraceItemToDetailedText(traceItem, true);                
-                th.html.AppendLine(@"<div class=`extra-content`>" + extra + @"</div>");
+                html.AppendLine(@"<div class=`extra-content`>" + extra + @"</div>");
             }
             if (childrenCount > 0)
             {
@@ -2015,30 +2012,30 @@ namespace Gekko
                 }
                 else
                 {
-                    if (depth == 0) th.html.AppendLine(@"<ul>");
-                    else th.html.AppendLine(@"<ul class=`nested`>");
+                    if (depth == 0) html.AppendLine(@"<ul>");
+                    else html.AppendLine(@"<ul class=`nested`>");
                     int counter = -1;
                     foreach (TraceAndPeriods2 traceAndPeriods in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                     {
                         counter++;
                         if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
-                        th.html.AppendLine(@"<li class=`folder`>");
+                        html.AppendLine(@"<li class=`folder`>");
 
                         if (depth == 0 && counter == 0)
                         {
-                            th.html.AppendLine(@"<div class=`list-item-content`>");
-                            th.html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
-                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Code</div>");
-                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
-                            th.html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
-                            th.html.AppendLine(@"<div style = `font-weight: bold;`>File</div>");
-                            th.html.AppendLine(@"</div>");
+                            html.AppendLine(@"<div class=`list-item-content`>");
+                            html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
+                            html.AppendLine(@"<div style = `font-weight: bold;`>Code</div>");
+                            html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
+                            html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
+                            html.AppendLine(@"<div style = `font-weight: bold;`>File</div>");
+                            html.AppendLine(@"</div>");
                         }
 
-                        WalkTracesForHtml(traceAndPeriods.trace, traceAndPeriods.periods, th, depth + 1);
-                        th.html.AppendLine(@"</li>");
+                        WalkTracesForHtml(traceAndPeriods.trace, traceAndPeriods.periods, th, depth + 1, html);
+                        html.AppendLine(@"</li>");
                     }
-                    th.html.AppendLine(@"</ul>");
+                    html.AppendLine(@"</ul>");
                 }
             }
         }
