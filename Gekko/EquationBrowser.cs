@@ -1070,6 +1070,28 @@ namespace Gekko
                 }
             }
 
+            Globals.browserPlotFiles = new List<string>();
+            //Generate 1 file for gnuplot to chew on
+            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+            {
+                string variableName = kvp.Key;
+                O.Prt o0 = new O.Prt();
+                o0.prtType = "plot";
+                O.Prt.Element ope0 = new O.Prt.Element();
+                ope0.labelGiven = new List<string>() { "x|[@2,5:5='x',<883>,1:5]|[@2,5:5='x',<883>,1:5]" };
+                ope0.labelRecordedPieces = new List<O.RecordedPieces>();
+                ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
+                ope0.variable[0] = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReportError) as Series;
+                o0.prtElements.Add(ope0);
+                o0.plotForEquationBrowser = true;
+                o0.Exe();
+
+                //Plot.CallGnuplot(plotTable, o, containerExplode, freq, new PlotHelper(), false, new P());
+                //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
+
+            }
+            Globals.browserPlotFiles = null;
+
             int count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
@@ -1161,8 +1183,8 @@ namespace Gekko
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
                     try
                     {
-                        //only plot the series from Work
-                        Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
+                        //only plot the series from Work                        
+                        //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
                         html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
                         html1.AppendLine("<p>");
                     }

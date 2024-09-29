@@ -799,32 +799,47 @@ namespace Gekko
             string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
             txt.AppendLine(plotline);
 
-            string plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
+            using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter tw = G.GekkoStreamWriter(fs)) 
+            { 
+                tw.WriteLine(txt); tw.Flush(); tw.Close(); 
+            }
 
-            if (plotHelper.isDecompPlot)
+            string plotFileName = null;
+
+            if (o.plotForEquationBrowser)
             {
-                if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
-                {
-                    if (overallZoom < 0.999 || overallZoom > 1.001)
-                    {
-                        int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
-                        int h2 = (int)(((double)decompSvgOverallHeight) * overallZoom);
-                        string s = Program.GetTextFromFileWithWait(plotFileName);
-                        //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
-                        s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
-                        s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
-                        using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
-                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                        {
-                            sw.Write(s);
-                            sw.Flush();
-                        }
-                    }
-                }
+                return path + "\\" + file3;  //the random number file .fp
             }
             else
             {
-                CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
+                plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData);
+
+                if (plotHelper.isDecompPlot)
+                {
+                    if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
+                    {
+                        if (overallZoom < 0.999 || overallZoom > 1.001)
+                        {
+                            int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
+                            int h2 = (int)(((double)decompSvgOverallHeight) * overallZoom);
+                            string s = Program.GetTextFromFileWithWait(plotFileName);
+                            //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
+                            s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
+                            s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
+                            using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
+                            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                            {
+                                sw.Write(s);
+                                sw.Flush();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
+                }
             }
             return plotFileName;
         }
@@ -934,15 +949,9 @@ namespace Gekko
             }
         }
 
-        private static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData, StringBuilder txt)
+        private static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData)
         {
-            using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter tw = G.GekkoStreamWriter(fs))
-            {
-                tw.WriteLine(txt);
-                tw.Flush(); //probably not necessary
-                tw.Close(); //probably not necessary
-            }
+            
 
             if (G.Equal(o.opt_dump, "yes"))
             {
