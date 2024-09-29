@@ -135,8 +135,9 @@ namespace Gekko
             {
                 new Error("PLOT called with 0 variables");
             }
-            int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
+            int numberOfObs = GekkoTime.Observations(o.t1, o.t2);            
             int rr = Program.RandomInt();
+            if (o.plotForEquationBrowser) rr = Globals.browserPlotFiles.Count + 1;
             string file1 = "temp" + rr + ".dat";
             string file2 = "temp" + rr + "." + extension;
             string file3 = "temp" + rr + ".gp";
@@ -809,7 +810,7 @@ namespace Gekko
 
             if (o.plotForEquationBrowser)
             {
-                return path + "\\" + file3;  //the random number file .fp
+                return file3;  //the random number file .fp
             }
             else
             {
@@ -949,9 +950,8 @@ namespace Gekko
             }
         }
 
-        private static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData)
-        {
-            
+        public static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData)
+        {           
 
             if (G.Equal(o.opt_dump, "yes"))
             {

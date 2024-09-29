@@ -1070,29 +1070,51 @@ namespace Gekko
                 }
             }
 
-            Globals.browserPlotFiles = new List<string>();
+
+            Globals.browserPlotFiles = new List<string>(); Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
             //Generate 1 file for gnuplot to chew on
+            O.Prt o0 = null;
+            int count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
+                count++;
+                if (count > 3) break;
+
+                //if (n > Program.options.plot_elements_max)
+
                 string variableName = kvp.Key;
-                O.Prt o0 = new O.Prt();
+                o0 = new O.Prt();
                 o0.prtType = "plot";
+                o0.plotForEquationBrowser = true;
                 O.Prt.Element ope0 = new O.Prt.Element();
+                //List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
                 ope0.labelGiven = new List<string>() { "x|[@2,5:5='x',<883>,1:5]|[@2,5:5='x',<883>,1:5]" };
                 ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                 ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
                 ope0.variable[0] = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReportError) as Series;
-                o0.prtElements.Add(ope0);
-                o0.plotForEquationBrowser = true;
+                o0.prtElements.Add(ope0);                
                 o0.Exe();
 
                 //Plot.CallGnuplot(plotTable, o, containerExplode, freq, new PlotHelper(), false, new P());
                 //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
 
             }
-            Globals.browserPlotFiles = null;
 
-            int count = 0;
+            string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
+            string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
+            File.Delete(fileNameWithPath);
+            using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                foreach(string s in Globals.browserPlotFiles)
+                {
+                    sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
+                }
+            }
+            Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);
+            Globals.browserPlotFiles = null; Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+
+            count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
