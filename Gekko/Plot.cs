@@ -817,7 +817,7 @@ namespace Gekko
             }
             else
             {
-                plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData);
+                plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, 1);  //1 minute before abort
 
                 if (plotHelper.isDecompPlot)
                 {
@@ -953,7 +953,7 @@ namespace Gekko
             }
         }
 
-        public static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData)
+        public static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData, int maxMinutesBeforeAbort)
         {
             if (G.Equal(o.opt_dump, "yes"))
             {
@@ -997,7 +997,7 @@ namespace Gekko
             try
             {
                 process.Start();
-                exited = process.WaitForExit(1 * 60 * 1000);  //1 minute, has been > 5 sec at DORS
+                exited = process.WaitForExit(maxMinutesBeforeAbort * 60 * 1000);  //1 minute, has been > 5 sec at DORS
                 if (!exited)
                 {
                     MessageBox.Show("*** ERROR: The gnuplot call did not respond within 60 seconds, so the " + G.NL + "gnuplot call was aborted.");

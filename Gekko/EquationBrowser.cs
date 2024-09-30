@@ -17,6 +17,19 @@ namespace Gekko
         public bool show_source = false;
     }
 
+    public class BrowserHelper
+    {
+        //public StringBuilder html = null;
+        public int depthMax = -1;
+        public int counter = 0;
+        public int counterMax = -1;
+        public int pixels = 0;
+        public int pixelsAfterArrow = 30;
+        public int firstColWidth = 200;
+        public EFreq freq = EFreq.A;
+        public int plotTypes = 2;  //2 = n and p
+    }
+
     public class EquationNameAndNumber
     {
         public int i;
@@ -983,6 +996,7 @@ namespace Gekko
 
         public static void BrowserNew(bool limit)
         {
+            
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -1002,13 +1016,13 @@ namespace Gekko
                 restrict.Add("qX[xTot]", false);
             }
             
-            TraceHelper2 th = new TraceHelper2();
-            th.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
-            th.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
-            th.pixels = 20;
-            th.pixelsAfterArrow = 12;
-            th.freq = freq;
-            th.firstColWidth = 200;
+            BrowserHelper bh = new BrowserHelper();
+            bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
+            bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
+            bh.pixels = 20;
+            bh.pixelsAfterArrow = 12;
+            bh.freq = freq;
+            bh.firstColWidth = 200;
 
             bool adam = false;
             bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)                        
@@ -1053,14 +1067,32 @@ namespace Gekko
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar);
 
-            MessageBox.Show("!!! parallellize !!!");
-            BrowserNewPlots(combos, path, restrict);
-            BrowserNewHtml(t1, t2, th, path, restrict, combos, model, modelGamsScalar);
+            if (true)
+            {
+                BrowserNewPlots(combos, path, restrict);
+                BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
+            }
+            else
+            {
+                List<int> lists = new List<int>() { 0, 1 };
+                Parallel.ForEach(lists, (i) =>
+                {
+                    if (i == 0)
+                    {
+                        BrowserNewPlots(combos, path, restrict);
+                    }
+                    else if (i == 1)
+                    {
+                        BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
+                    }
+                    else throw new GekkoException();
+                });
+            }
             
             return;
         }
 
-        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, TraceHelper2 th, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, Model model, ModelGamsScalar modelGamsScalar)
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, BrowserHelper th, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
             DateTime dt1 = DateTime.UtcNow;
             int count = 0;
@@ -1113,9 +1145,8 @@ namespace Gekko
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                     html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
                     html1.AppendLine();
-                    html1.AppendLine("//NOTE: Gekko many more possibilities regarding decomposition, among other things");
-                    html1.AppendLine("//      the ability to link/merge decomp tables recursively, tracking effects through");
-                    html1.AppendLine("//      more than one equation.");
+                    html1.AppendLine("//NOTE: Gekko DECOMP has many more possibilities, among other things");
+                    html1.AppendLine("//      the ability to merge decomp tables recursively.");
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
                     html1.Append("<hr>");
                     EquationBrowser.WriteHtmlPreCode(html1, s5);
@@ -1150,13 +1181,14 @@ namespace Gekko
                     ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("plot " + variableName + ";");
+                    html1.AppendLine("plot " + variableName + "; //plot&lt;p> for growth");
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
                     try
                     {
                         //only plot the series from Work                        
                         //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
                         html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
+                        if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px;" + "` src = `" + variableName.ToLower() + "__p.svg" + "`>");                                                                        
                         html1.AppendLine("<p>");
                     }
                     catch
@@ -1330,59 +1362,85 @@ namespace Gekko
         private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict)
         {
             DateTime dt0 = DateTime.UtcNow;
-            Globals.browserPlotFiles = new List<string>(); //Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
-            string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
-
-            //Delete the master file
-            string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
-            try
+            List<string> m = new List<string>() { "n", "p" };
+            foreach (string op in m)
             {
-                File.Delete(fileNameWithPath);
-            }
-            catch { }
 
-            //Generate 1 file for gnuplot to chew on
-            O.Prt o0 = null;            
-            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
-            {                
-                if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
+                Globals.browserPlotFiles = new List<string>(); //Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+                string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
 
-                foreach (string s in new List<string>() { "gp", "dat" })
+                //Delete the master file
+                string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
+                try
                 {
-                    if (File.Exists(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s))
+                    File.Delete(fileNameWithPath);
+                }
+                catch { }
+
+                //Generate 1 file for gnuplot to chew on
+                O.Prt o0 = null;
+                foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+                {
+                    if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
+
+                    foreach (string s in new List<string>() { "gp", "dat" })
                     {
-                        try
+                        if (File.Exists(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s))
                         {
-                            File.Delete(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s);
+                            try
+                            {
+                                File.Delete(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s);
+                            }
+                            catch { }
                         }
-                        catch { }
+                    }
+
+                    o0 = new O.Prt();
+                    o0.operators = new List<OptString>();
+                    o0.operators.Add(new OptString(op, "yes"));
+
+                    if (op == "p")
+                    {
+                        //So we do not show too small or too large percentages
+                        o0.opt_yminhard = -100d;
+                        o0.opt_ymaxhard = 100d;
+                        o0.opt_yminsoft = -1d;
+                        o0.opt_ymaxsoft = 1d;
+                        //o0.opt_ytitle = "%"; Produces very large .svg files -- strange...!
+                    }
+
+                    o0.isBrowser = true;
+                    string extra = null;
+                    string extra2 = null;
+                    if (op != "n")
+                    {
+                        extra = "__" + op;
+                        extra2 = " (%)";
+                    }
+                    o0.browserPath = browserPath + "\\" + kvp.Key.ToLower() + extra + ".svg";
+                    o0.prtType = "plot";
+                    o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
+                    O.Prt.Element ope0 = new O.Prt.Element();
+                    ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
+                    ope0.labelRecordedPieces = new List<O.RecordedPieces>();
+                    ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
+                    ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
+                    o0.prtElements.Add(ope0);
+                    o0.Exe();
+                }
+
+                using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    foreach (string s in Globals.browserPlotFiles)
+                    {
+                        sw.WriteLine("reset session");
+                        sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
                     }
                 }
-
-                o0 = new O.Prt();
-                o0.isBrowser = true;
-                o0.browserPath = browserPath + "\\" + kvp.Key.ToLower() + ".svg";
-                o0.prtType = "plot";
-                o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
-                O.Prt.Element ope0 = new O.Prt.Element();                
-                ope0.labelGiven = new List<string>() { kvp.Key };
-                ope0.labelRecordedPieces = new List<O.RecordedPieces>();
-                ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
-                ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;                
-                o0.prtElements.Add(ope0);
-                o0.Exe();
-            }            
-            
-            using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-            {
-                foreach (string s in Globals.browserPlotFiles)
-                {
-                    sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
-                }
+                Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null, 10080);  //minutes corresponding to 1 week
+                Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
             }
-            Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null);            
-            Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
             if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }
 
@@ -1609,7 +1667,9 @@ namespace Gekko
 
         .toggle-content {
           padding: 5px;      
+          padding-left: 10 px;
           background-color: #fefce7;
+          color: #6b5840;
         }    
 
         .toggle-link:after {
@@ -1959,7 +2019,7 @@ namespace Gekko
         /// <param name="gtss"></param>
         /// <param name="th"></param>
         /// <param name="depth"></param>
-        public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, TraceHelper2 th, int depth, StringBuilder html)
+        public static void WalkTracesForHtml(Trace2 trace, GekkoTimeSpansSimple gtss, BrowserHelper th, int depth, StringBuilder html)
         {
             th.counter++;
             int childrenCount = trace.GetPrecedents_BewareOnlyInternalUse().Count();
@@ -2029,7 +2089,7 @@ namespace Gekko
             }
         }
 
-        private static bool WalkTracesForHtmlIsPruned(TraceHelper2 th, int depth)
+        private static bool WalkTracesForHtmlIsPruned(BrowserHelper th, int depth)
         {
             return depth >= th.depthMax || th.counter >= th.counterMax;
         }
