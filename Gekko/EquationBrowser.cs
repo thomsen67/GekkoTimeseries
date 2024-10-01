@@ -1300,10 +1300,10 @@ namespace Gekko
                         EquationBrowser.WriteHtml(html1, s);
                         html1.AppendLine("</div>");
                     }
-                }
+                }                
 
                 StringBuilder x; string js;
-                BrowserNewCssAndJs(variableName, th.firstColWidth, th.pixels, th.pixelsAfterArrow, out x, out js);
+                BrowserNewCssAndJs(variableName, th.firstColWidth, th.pixels, th.pixelsAfterArrow, equations, out x, out js);
 
                 x.AppendLine("  <body>");
                 string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere);
@@ -1483,12 +1483,14 @@ namespace Gekko
 
         private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, string variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
         {
+            string equationName = equationHelper.name;
+            string equationNameHash = ("#" + equationName).ToLower();
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = t1;
             decompOptions2.t2 = t2;
             decompOptions2.decompOperator = new DecompOperator("d");
             decompOptions2.new_select = new List<string>() { variableName };
-            decompOptions2.new_from = new List<string>() { equationHelper.name };
+            decompOptions2.new_from = new List<string>() { equationName };
             decompOptions2.new_endo = new List<string>() { variableName };            
 
             decompOptions2.rows = new List<string>() { "vars", "lags" };
@@ -1515,7 +1517,7 @@ namespace Gekko
                 {
                     foreach (string combo_errors in combos_errors)
                     {
-                        table += "<div id=`decomp_" + combo_op + "_" + combo_errors + "` class=`table-container`>" + G.NL;
+                        table += "<div id=`" + equationNameHash + "-decomp_" + combo_op + "_" + combo_errors + "` class=`table-container`>" + G.NL;
                         //active = null;  //only the first combination starts active
                         table += "<table>" + G.NL;
                         decompOptions2.decompOperator = new DecompOperator(combo_op);
@@ -1583,10 +1585,10 @@ namespace Gekko
                 }
                 table += "<div class=`checkboxes`> " + G.NL;
                 table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox_op`>Growth, &lt;p>" + G.NL;
+                table += "<input type=`checkbox` id =`" + equationNameHash + "-checkbox_op`>Growth, &lt;p>" + G.NL;
                 table += "</label>" + G.NL;
                 table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox_error`>Show errors" + G.NL;
+                table += "<input type=`checkbox` id =`" + equationNameHash + "-checkbox_error`>Show errors" + G.NL;
                 table += "</label>" + G.NL;
                 table += "</div>" + G.NL;
             }
@@ -2384,8 +2386,14 @@ namespace Gekko
             }
         }
 
-        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, out StringBuilder x, out string js)
+        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, List<EquationNameAndNumber> equations, out StringBuilder x, out string js)
         {
+            string s = null;
+            foreach (EquationNameAndNumber equation in equations)
+            {
+                s += "updateTable('#" + equation.name.ToLower() + "');" + G.NL;
+            }
+
             x = new StringBuilder();
             x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
             x.AppendLine("<html>");
@@ -2805,10 +2813,10 @@ namespace Gekko
 
         
         // Function to show the right div based on checkbox values
-        function updateTable(i) {
+        function updateTable(i) {            
             
-            const checkbox_op = document.getElementById('checkbox_op' + i);
-            const checkbox_error = document.getElementById('checkbox_error' + i);            
+            const checkbox_op = document.getElementById(i + '-' + 'checkbox_op');
+            const checkbox_error = document.getElementById(i + '-' + 'checkbox_error');
 
             // Add event listeners to checkboxes (needless to do every time, but makes more simple code)
             checkbox_op.addEventListener('change', function(){ updateTable(i); });
@@ -2816,10 +2824,10 @@ namespace Gekko
 
             // Get the decompDivs
             const decompDivs = {
-            div_d_yes: document.getElementById('decomp_d_yes' + i),
-            div_d_no: document.getElementById('decomp_d_no' + i),
-            div_p_yes: document.getElementById('decomp_p_yes' + i),
-            div_p_no: document.getElementById('decomp_p_no' + i),
+            div_d_yes: document.getElementById(i + '-' + 'decomp_d_yes'),
+            div_d_no: document.getElementById(i + '-' + 'decomp_d_no'),
+            div_p_yes: document.getElementById(i + '-' + 'decomp_p_yes'),
+            div_p_no: document.getElementById(i + '-' + 'decomp_p_no'),
             };
 
             // Get current checkbox states
@@ -2839,15 +2847,10 @@ namespace Gekko
             } else if (checkbox_op.checked && checkbox_error.checked) {
                 decompDivs.div_p_yes.style.display = 'block';
             }
-
-        }
-
-        
+        }        
 
         // Initialize the display (show the default table)
-        updateTable('');
-  
-
+        " + s + @"
 </script>";
             x.AppendLine("  </head>");
         }
