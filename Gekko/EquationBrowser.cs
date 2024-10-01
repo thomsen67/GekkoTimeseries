@@ -1509,16 +1509,14 @@ namespace Gekko
             string table = null;
             try
             {
-                List<string> combos_op = new List<string> {"d", "p" };
+                List<string> combos_op = new List<string> { "d", "p" };
                 List<string> combos_errors = new List<string> { "no", "yes" };
-                //string active = "active";
 
                 foreach (string combo_op in combos_op)
                 {
                     foreach (string combo_errors in combos_errors)
                     {
                         table += "<div id=`" + equationNameHash + "-decomp_" + combo_op + "_" + combo_errors + "` class=`table-container`>" + G.NL;
-                        //active = null;  //only the first combination starts active
                         table += "<table>" + G.NL;
                         decompOptions2.decompOperator = new DecompOperator(combo_op);
                         if (combo_errors == "yes") decompOptions2.showErrors = true;
@@ -1559,9 +1557,13 @@ namespace Gekko
 
                         for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
                         {
-                            string name = decompTable.Get(i2, 1).CellText.TextData[0];                            
+                            string name = decompTable.Get(i2, 1).CellText.TextData[0];
                             name = name.Replace(" | [0]", "");
                             name = name.Replace(" | ", "");
+                            name = name.Trim();
+                            string style = "style=`text-align: right`";
+                            if (name == "Error") style = "style=`text-align: right; background-color: #fff7ed`";  //like Gekko
+                            else if (name == "Residual") style = "style=`text-align: right; background-color: #fefdef`";  //like Gekko
                             table += "<tr>";
                             table += "<th>";
                             if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
@@ -1570,9 +1572,9 @@ namespace Gekko
                             for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                             {
                                 Cell c = decompTable.Get(i2, j2);
-                                table += "<td align = `right`>";
+                                table += "<td " + style + ">";
                                 double value = c.number;
-                                string valueFormatted = G.FormatNumber(value, "f15.4", true, false);
+                                string valueFormatted = G.FormatNumber(value, "f15.4", false, false).Trim();
                                 table += valueFormatted;
                                 table += "</td>";
                             }
@@ -1580,16 +1582,17 @@ namespace Gekko
                         }
                         table += "</tbody>" + G.NL;
                         table += "</table>" + G.NL;
-                        table += "</div>" + G.NL;                        
+                        table += "</div>" + G.NL;
                     }
                 }
-                table += "<div class=`checkboxes`> " + G.NL;
-                table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`" + equationNameHash + "-checkbox_op`>Growth, &lt;p>" + G.NL;
-                table += "</label>" + G.NL;
-                table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`" + equationNameHash + "-checkbox_error`>Show errors" + G.NL;
-                table += "</label>" + G.NL;
+                
+                table += "<div>" + G.NL;
+                table += "<label><input type=`radio` name=`page-selector` value=`page1` checked> Page 1</label>" + G.NL;
+                table += "<label><input type=`radio` name=`page-selector` value=`page1` checked> Page 2</label>" + G.NL;
+                table += "</div>" + G.NL;
+
+                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_op`>" + "Growth rate (<span style =`font-style: italic;`>p)</span>" + "</label>";                
+                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_error`>" + "Show errors" + "</label>";
                 table += "</div>" + G.NL;
             }
             catch
@@ -2391,7 +2394,7 @@ namespace Gekko
             string s = null;
             foreach (EquationNameAndNumber equation in equations)
             {
-                s += "updateTable('#" + equation.name.ToLower() + "');" + G.NL;
+                s += "updateTable('#" + equation.name.ToLower() + "');" + G.NL;  //activate checkbox listeners for each decomp table
             }
 
             x = new StringBuilder();
