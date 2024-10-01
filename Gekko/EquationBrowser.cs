@@ -1236,7 +1236,9 @@ namespace Gekko
                         html1.AppendLine("read &lt;gdx> forecast.gdx;");
                         html1.AppendLine("model &lt;gms> makro.zip;");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
+                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + "; // &lt;p> for growth");
+                        html1.AppendLine();
+                        html1.AppendLine("//NOTE: Gekko can merge decomp tables, and much more.");
                         html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()                            
                         html1.AppendLine(table);
                     }
@@ -1587,8 +1589,8 @@ namespace Gekko
                 }
                 
                 table += "<form id=`" + equationNameHash + "-checkbox_op`>" + G.NL;
-                table += "<input type=`radio` name=`myradio` value=`d` checked> Page 1" + G.NL;
-                table += "<input type=`radio` name=`myradio` value=`p`> Page 2" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`d` checked>Abs. time-change (d)" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`p`>Growth rate (p)" + G.NL;
                 table += "</form>" + G.NL;
 
                 //table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_op`>" + "Growth rate (<span style =`font-style: italic;`>p)</span>" + "</label>";                
@@ -2818,15 +2820,10 @@ namespace Gekko
         // Function to show the right div based on checkbox values
         function updateTable(i) {            
             
-            alert('Xxx: ' + i);
-
-            //const checkbox_op = document.getElementById(i + '-' + 'checkbox_op');
             const checkbox_error = document.getElementById(i + '-' + 'checkbox_error');
-            //const checkbox_op = document.querySelectorAll('input[name=`' +i + '-' + 'checkbox_op'+ '`]');
             
             const checkbox_op = document.getElementById(i + '-' + 'checkbox_op');
-            const selectedValue = checkbox_op.querySelector('input[name=`myradio`]:checked').value;
-            alert('Yyy: ' + selectedValue);
+            const op = checkbox_op.querySelector('input[name=`myradio`]:checked').value;
 
             // Add event listeners to checkboxes (needless to do every time, but makes more simple code)
             checkbox_op.addEventListener('change', function(){ updateTable(i); });
@@ -2840,21 +2837,17 @@ namespace Gekko
             div_p_no: document.getElementById(i + '-' + 'decomp_p_no'),
             };
 
-            // Get current checkbox states
-            const cb1Checked = checkbox_op.checked;
-            const cb2Checked = checkbox_error.checked;
-
             // Hide all divs
             Object.values(decompDivs).forEach(div => div.style.display = 'none');
 
             // Show the correct div based on checkbox states
-            if (!checkbox_op.checked && !checkbox_error.checked) {
+            if (!(op == `p`) && !checkbox_error.checked) {
                 decompDivs.div_d_no.style.display = 'block';
-            } else if (!checkbox_op.checked && checkbox_error.checked) {
+            } else if (!(op == `p`) && checkbox_error.checked) {
                 decompDivs.div_d_yes.style.display = 'block';
-            } else if (checkbox_op.checked && !checkbox_error.checked) {
+            } else if ((op == `p`) && !checkbox_error.checked) {
                 decompDivs.div_p_no.style.display = 'block';
-            } else if (checkbox_op.checked && checkbox_error.checked) {
+            } else if ((op == `p`) && checkbox_error.checked) {
                 decompDivs.div_p_yes.style.display = 'block';
             }
         }        
