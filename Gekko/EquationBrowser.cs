@@ -1574,18 +1574,17 @@ namespace Gekko
                         }
                         table += "</tbody>" + G.NL;
                         table += "</table>" + G.NL;
-                        table += "</div>" + G.NL;
-
-                        table += "<div class=`checkboxes`> " + G.NL;
-                        table += "<label>" + G.NL;
-                        table += "<input type=`checkbox` id =`checkbox1`> Checkbox 1" + G.NL;
-                        table += "</label>" + G.NL;
-                        table += "<label>" + G.NL;
-                        table += "<input type=`checkbox` id =`checkbox2`> Checkbox 2" + G.NL;
-                        table += "</label>" + G.NL;
-                        table += "</div>" + G.NL;
+                        table += "</div>" + G.NL;                        
                     }
                 }
+                table += "<div class=`checkboxes`> " + G.NL;
+                table += "<label>" + G.NL;
+                table += "<input type=`checkbox` id =`checkbox1`> Checkbox 1" + G.NL;
+                table += "</label>" + G.NL;
+                table += "<label>" + G.NL;
+                table += "<input type=`checkbox` id =`checkbox2`> Checkbox 2" + G.NL;
+                table += "</label>" + G.NL;
+                table += "</div>" + G.NL;
             }
             catch
             {
@@ -2799,7 +2798,7 @@ namespace Gekko
     window.onhashchange = showContent;
 
     // ------------ DECOMP selector -------------------------------
-/*
+
         const checkbox1 = document.getElementById('checkbox1');
         const checkbox2 = document.getElementById('checkbox2');
 
@@ -2807,7 +2806,7 @@ namespace Gekko
         const decompDivs = {
             falseFalse: document.getElementById('decomp_d_yes'),
             trueFalse: document.getElementById('decomp_d_no'),
-            falseTrue: document.getElementById('decomp_p_no'),
+            falseTrue: document.getElementById('decomp_p_yes'),
             trueTrue: document.getElementById('decomp_p_no'),
         };
 
@@ -2817,19 +2816,20 @@ namespace Gekko
             const cb1Checked = checkbox1.checked;
             const cb2Checked = checkbox2.checked;
 
-            // Hide all decompDivs
-            Object.values(decompDivs).forEach(div => div.classList.remove('active'));
+            // Hide all divs
+            Object.values(decompDivs).forEach(div => div.style.display = 'none');
 
-            // Show the correct div based on the combination of checkboxes
+            // Show the correct div based on checkbox states
             if (!cb1Checked && !cb2Checked) {
-                decompDivs.falseFalse.classList.add('active');  // Checkbox 1: false, Checkbox 2: false
+                decompDivs.falseFalse.style.display = 'block';
             } else if (cb1Checked && !cb2Checked) {
-                decompDivs.trueFalse.classList.add('active');   // Checkbox 1: true, Checkbox 2: false
+                decompDivs.trueFalse.style.display = 'block';
             } else if (!cb1Checked && cb2Checked) {
-                decompDivs.falseTrue.classList.add('active');   // Checkbox 1: false, Checkbox 2: true
+                decompDivs.falseTrue.style.display = 'block';
             } else if (cb1Checked && cb2Checked) {
-                decompDivs.trueTrue.classList.add('active');    // Checkbox 1: true, Checkbox 2: true
+                decompDivs.trueTrue.style.display = 'block';
             }
+
         }
 
         // Add event listeners to checkboxes
@@ -2838,7 +2838,7 @@ namespace Gekko
 
         // Initialize the display (show the default table)
         updateTable();
-  */  
+  
 
 </script>";
             x.AppendLine("  </head>");
