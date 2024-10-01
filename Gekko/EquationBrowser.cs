@@ -1119,7 +1119,7 @@ namespace Gekko
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
-                    html1.Append("<p style=`font-size: 2rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
+                    html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
                     EquationBrowser.SpanHtmlColor(html1, variableName);
                     html1.Append(" from equation ");
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
@@ -1144,7 +1144,7 @@ namespace Gekko
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                     html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
                     html1.AppendLine();
-                    html1.AppendLine("//NOTE: Gekko can merge decomp tables, and much more.");
+                    html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
                     html1.Append("<hr>");
                     EquationBrowser.WriteHtmlPreCode(html1, s5);
@@ -1233,13 +1233,13 @@ namespace Gekko
                     if (table != null)
                     {
                         html1.AppendLine("<br>");
-                        ToggleLink(html1, "Time-decomposition, absolute changes", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
+                        ToggleLink(html1, "Time-decomposition", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read &lt;gdx> forecast.gdx;");
                         html1.AppendLine("model &lt;gms> makro.zip;");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + "; // &lt;p> for growth");
+                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + "; //&lt;p> for growth, &lt;errors> for errors");
                         html1.AppendLine();
-                        html1.AppendLine("//NOTE: Gekko can merge decomp tables, and much more.");
+                        html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
                         html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()                            
                         html1.AppendLine(table);
                     }
@@ -1457,8 +1457,11 @@ namespace Gekko
         {
             List<EqHelper> eqsNew = GetRelatedEquations(variableName, t1, model, modelGamsScalar);
             StringBuilder html2 = new StringBuilder();
-            html2.AppendLine("<div id = `no-hash` class=`content`>");
-            EquationBrowser.WriteHtmlColor(html2, variableName);
+            html2.AppendLine("<div id = `no-hash` class=`content`>");            
+            html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
+            EquationBrowser.SpanHtmlColor(html2, variableName);
+            html2.Append("</p>");
+            //EquationBrowser.WriteHtmlColor(html2, variableName);
             EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
             html2.AppendLine("<br>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
@@ -1512,17 +1515,17 @@ namespace Gekko
             string table = null;
             try
             {
-                table += "<table>" + G.NL;
+                table += "<table style=`font-size:0.95rem`>" + G.NL;
                 table += "<tr>" + G.NL;
                 table += "<td style=`vertical-align:top;`>" + G.NL;
                 table += "<form id=`" + equationNameHash + "-checkbox_op`>" + G.NL;
-                table += "<input type=`radio` name=`myradio` value=`d` checked>Abs. time-change (d)" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`d` checked> Abs. time-change (d)" + G.NL;
                 table += "<br>" + G.NL;
-                table += "<input type=`radio` name=`myradio` value=`p`>Growth rate (p)" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`p`> Growth rate (p)" + G.NL;
                 table += "</form>" + G.NL;
                 table += "</td>" + G.NL;
                 table += "<td style=`padding-left: 40px; vertical-align:top;`>" + G.NL;
-                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_error`>" + "Show errors" + "</label>" + G.NL;
+                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_error`>" + " Show errors" + "</label>" + G.NL;
                 table += "</td>" + G.NL;
                 table += "</tr>" + G.NL;
                 table += "</table>" + G.NL;
@@ -1583,11 +1586,11 @@ namespace Gekko
                             if (cellFirstData != null)
                             {
                                 vars = cellFirstData.vars_hack;
-                                uniqueName = WindowDecomp.HiddenVariableHelper(cellFirstData, true);
+                                uniqueName = Decomp.HiddenVariableHelper(cellFirstData, true);
                             }
                             string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
                             string title = null;
-                            if (uniqueName != null) title += Program.SpecialXmlChars(uniqueName) + "\\n";
+                            if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE
                             if (!G.NullOrBlanks(sVarsInside)) title += sVarsInside;
                             string titleHtml = null;
                             if (!G.NullOrBlanks(title)) titleHtml = " title=`" + title.Trim() + "`";
@@ -1596,10 +1599,17 @@ namespace Gekko
                             name = name.Replace(" | ", "");
                             name = name.Trim();
                             string style = "style=`text-align: right`";
-                            if (name == "Error") style = "style=`text-align: right; background-color: #fff7ed`";  //like Gekko
-                            else if (name == "Residual") style = "style=`text-align: right; background-color: #fefdef`";  //like Gekko
-                            table += "<tr>";
-                        titleHtml = null;
+                            if (name == "Error")
+                            {
+                                style = "style=`text-align: right; background-color: #fff7ed`";  //like Gekko
+                                titleHtml = " title=`" + Globals.decompErrorText + "`";
+                            }
+                            else if (name == "Residual")
+                            {
+                                style = "style=`text-align: right; background-color: #fefdef`";  //like Gekko
+                                titleHtml = " title=`" + Globals.decompResidualText1 + Globals.decompResidualText2 + "`";
+                            }
+                            table += "<tr>";                           
                             table += "<th" + titleHtml + ">";
                             if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
                             else table += name;
@@ -1608,8 +1618,7 @@ namespace Gekko
                             {
                                 Cell cellData = decompTable.Get(i2, j2);
                                 double value = cellData.number;
-                                string dataHtml = " title=`" + value + "`";
-                            dataHtml = null;
+                                string dataHtml = " title=`" + value + "`";                            
                                 table += "<td " + style + dataHtml + ">";
                                 string valueFormatted = G.FormatNumber(value, "f15.4", false, false).Trim();
                                 table += valueFormatted;

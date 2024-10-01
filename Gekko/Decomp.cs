@@ -2886,6 +2886,32 @@ namespace Gekko
         }
 
         /// <summary>
+        /// For a data cell, it finds the list of variables inside (.vars_hack). Will return the first of these,
+        /// with any "¤[-1]" etc. stripped off, so "x¤[-1]" becomes "x". If onlyIfUnique==true and the list count
+        /// is not 1, null is returned. May retur null.
+        /// </summary>
+        /// <param name="c2"></param>
+        /// <param name="onlyIfUnique"></param>
+        /// <returns></returns>
+        public static string HiddenVariableHelper(Cell c2, bool onlyIfUnique)
+        {
+            if (c2 == null) return null;
+            List<string> vars = c2.vars_hack;
+            if (vars == null)
+            {
+                return null;
+            }
+            if (onlyIfUnique)
+            {
+                if (vars.Count != 1) return null;
+            }
+            string var = vars[0];  //#dskla8asjkdfa
+            int lag; string name;
+            Decomp.ConvertFromTurtleName(var, false, out name, out lag);
+            return name;
+        }
+
+        /// <summary>
         /// Setup filters.
         /// </summary>
         /// <param name="decompOptions2"></param>

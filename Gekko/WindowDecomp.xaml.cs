@@ -1611,7 +1611,7 @@ namespace Gekko
                 // FIND
                 // ---------------------------------------
 
-                string var = HiddenVariableHelper(c2, false);
+                string var = Decomp.HiddenVariableHelper(c2, false);
                 if (var == null)
                 {                    
                     new Error(Decomp.Text1(1));
@@ -1669,33 +1669,6 @@ namespace Gekko
                 //do nothing, return null
             }
         }
-
-        /// <summary>
-        /// For a data cell, it finds the list of variables inside (.vars_hack). Will return the first of these,
-        /// with any "¤[-1]" etc. stripped off, so "x¤[-1]" becomes "x". If onlyIfUnique==true and the list count
-        /// is not 1, null is returned. May retur null.
-        /// </summary>
-        /// <param name="c2"></param>
-        /// <param name="onlyIfUnique"></param>
-        /// <returns></returns>
-        public static string HiddenVariableHelper(Cell c2, bool onlyIfUnique)
-        {
-            if (c2 == null) return null;
-            List<string> vars = c2.vars_hack;
-            if (vars == null)
-            {
-                return null;
-            }
-            if (onlyIfUnique)
-            {
-                if (vars.Count != 1) return null;
-            }
-            string var = vars[0];  //#dskla8asjkdfa
-            int lag; string name;
-            Decomp.ConvertFromTurtleName(var, false, out name, out lag);
-            return name;
-        }
-
         
         private void Cell_Enter(object sender, MouseEventArgs e)
         {
@@ -1823,7 +1796,7 @@ namespace Gekko
                                 {
                                     this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gams;
                                 }
-                                string var7 = HiddenVariableHelper(c2, false);
+                                string var7 = Decomp.HiddenVariableHelper(c2, false);
 
                                 int number = -12345;
                                 try { number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch { };
@@ -1842,17 +1815,17 @@ namespace Gekko
                                 {
                                     if (var7 == Globals.decompErrorName)
                                     {
-                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
+                                        RichSetText(equation, Decomp.GetColoredEquations(Globals.decompErrorText));
                                     }
                                     else if (var7 == Globals.decompIgnoreName)
                                     {                                        
-                                        RichSetText(equation, Decomp.GetColoredEquations("Ignored contributions (" + this.textBlockIgnore.Text + "), cf. the 'Ignore' option."));
+                                        RichSetText(equation, Decomp.GetColoredEquations(Globals.decompIgnoreText1  + this.textBlockIgnore.Text + Globals.decompIgnoreText2));
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
                                         string more = "";
                                         if (number > 0) more = " #" + number;
-                                        RichSetText(equation, Decomp.GetColoredEquations("Data residual in equation" + more + " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values."));
+                                        RichSetText(equation, Decomp.GetColoredEquations(Globals.decompResidualText1 + more + Globals.decompResidualText2));
                                     }
                                     else
                                     {

@@ -98,6 +98,11 @@ namespace Gekko
 
         public static bool decompVar = false;  //default: false
         public static bool decompFixTimelessProblem = true;
+        public const string decompErrorText = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";
+        public const string decompIgnoreText1 = "Ignored contributions (";
+        public const string decompIgnoreText2 = "), cf. the 'Ignore' option.";
+        public const string decompResidualText1 = "Data residual in equation";
+        public const string decompResidualText2 = " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
 
         public const bool fixForGekko4_0 = false;
 
