@@ -2803,19 +2803,25 @@ namespace Gekko
 
     // ------------ DECOMP selector -------------------------------
 
-        const checkbox_op = document.getElementById('checkbox_op');
-        const checkbox_error = document.getElementById('checkbox_error');
+        
+        // Function to show the right div based on checkbox values
+        function updateTable() {
+            
+            const checkbox_op = document.getElementById('checkbox_op');
+            const checkbox_error = document.getElementById('checkbox_error');
 
-        // Get the decompDivs
-        const decompDivs = {
+            // Add event listeners to checkboxes
+            checkbox_op.addEventListener('change', updateTable);
+            checkbox_error.addEventListener('change', updateTable);
+
+            // Get the decompDivs
+            const decompDivs = {
             div_d_yes: document.getElementById('decomp_d_yes'),
             div_d_no: document.getElementById('decomp_d_no'),
             div_p_yes: document.getElementById('decomp_p_yes'),
             div_p_no: document.getElementById('decomp_p_no'),
-        };
+            };
 
-        // Function to show the right div based on checkbox values
-        function updateTable() {
             // Get current checkbox states
             const cb1Checked = checkbox_op.checked;
             const cb2Checked = checkbox_error.checked;
@@ -2836,9 +2842,7 @@ namespace Gekko
 
         }
 
-        // Add event listeners to checkboxes
-        checkbox_op.addEventListener('change', updateTable);
-        checkbox_error.addEventListener('change', updateTable);
+        
 
         // Initialize the display (show the default table)
         updateTable();
