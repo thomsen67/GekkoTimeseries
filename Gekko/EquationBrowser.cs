@@ -1511,13 +1511,29 @@ namespace Gekko
             string table = null;
             try
             {
+                table += "<table>" + G.NL;
+                table += "<tr>" + G.NL;
+                table += "<td style=`vertical-align:top;`>" + G.NL;
+                table += "<form id=`" + equationNameHash + "-checkbox_op`>" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`d` checked>Abs. time-change (d)" + G.NL;
+                table += "<br>" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`p`>Growth rate (p)" + G.NL;
+                table += "</form>" + G.NL;
+                table += "</td>" + G.NL;
+                table += "<td style=`padding-left: 40px; vertical-align:top;`>" + G.NL;
+                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_error`>" + "Show errors" + "</label>" + G.NL;
+                table += "</td>" + G.NL;
+                table += "</tr>" + G.NL;
+                table += "</table>" + G.NL;
+
                 List<string> combos_op = new List<string> { "d", "p" };
                 List<string> combos_errors = new List<string> { "no", "yes" };
 
                 foreach (string combo_op in combos_op)
                 {
                     foreach (string combo_errors in combos_errors)
-                    {
+                    {                       
+
                         table += "<div id=`" + equationNameHash + "-decomp_" + combo_op + "_" + combo_errors + "` class=`table-container`>" + G.NL;
                         table += "<table>" + G.NL;
                         decompOptions2.decompOperator = new DecompOperator(combo_op);
@@ -1586,16 +1602,7 @@ namespace Gekko
                         table += "</table>" + G.NL;
                         table += "</div>" + G.NL;
                     }
-                }
-                
-                table += "<form id=`" + equationNameHash + "-checkbox_op`>" + G.NL;
-                table += "<input type=`radio` name=`myradio` value=`d` checked>Abs. time-change (d)" + G.NL;
-                table += "<input type=`radio` name=`myradio` value=`p`>Growth rate (p)" + G.NL;
-                table += "</form>" + G.NL;
-
-                //table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_op`>" + "Growth rate (<span style =`font-style: italic;`>p)</span>" + "</label>";                
-                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_error`>" + "Show errors" + "</label>";
-                table += "</div>" + G.NL;
+                }                                              
             }
             catch
             {
