@@ -1479,427 +1479,7 @@ namespace Gekko
             html2.AppendLine(table);            
             html2.AppendLine("</div>");
             return html2.ToString();
-        }
-
-        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, out StringBuilder x, out string js)
-        {
-            x = new StringBuilder();
-            x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
-            x.AppendLine("<html>");
-            x.AppendLine("  <head>");
-            x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
-            x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-            x.AppendLine("    <title>" + variableName + "</title>");
-
-            string css = @"<style>        
-        
-        .content {
-            display: none;
-        }
-
-        .active {
-            display: block;
-        }
-
-        html {
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size:12px;
-        }
-    
-        ul {
-            list-style: none;
-            padding-left: 20px;
-        }
-        li {            
-            cursor: pointer;
         }        
-
-        table, th, td {
-            padding: 2px;
-        }
-    
-        .img-size {
-            height:1em;
-        }   
-
-        .redcircle {
-            display: inline-block;
-            width: 0.57em;
-            height: 0.57em;
-            border-radius: 50%;
-            background-color: #f01e3c;
-            border: 0.1em solid gray;
-            margin-right: 0.25em;
-            position: relative; top: 0.27em;
-        }
-
-        .orangecircle {
-            display: inline-block;
-            width: 0.57em;
-            height: 0.57em;
-            border-radius: 50%;
-            background-color: #ffc914;
-            border: 0.1em solid gray;
-            margin-right: 0.25em;
-            position: relative; top: 0.27em;
-        }
-
-        .yellowcircle {
-            display: inline-block;
-            width: 0.57em;
-            height: 0.57em;
-            border-radius: 50%;
-            background-color: #fafa0f;
-            border: 0.1em solid gray;
-            margin-right: 0.25em;
-            position: relative; top: 0.27em;
-        }
-    
-        .nested {
-            display: none;
-        }
-
-        .open > .nested {
-            display: block;
-        }
-    
-        .list-item-content {
-            display: flex;
-            justify-content: flex-start;
-            width: 100%;
-            font-size:12px;
-        }
-    
-        /* Set different widths for the columns */
-        .list-item-content > div:nth-child(1) {
-            width: " + firstColWidth + @"px;
-            padding: 5px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;            
-        }
-        
-        .list-item-content > div:nth-child(2) {
-            width: 400px;
-            padding: 5px;
-            padding-left: 8;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            border-left: 1px solid #ccc; 
-        }
-        
-        .list-item-content > div:nth-child(3) {
-            width: 90px;
-            padding: 5px;
-            padding-left: 8;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            border-left: 1px solid #ccc; 
-        }
-
-        .list-item-content > div:nth-child(4) {
-            width: 80px;
-            padding: 5px;
-            padding-left: 8;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            border-left: 1px solid #ccc; 
-        }
-
-        .list-item-content > div:nth-child(5) {
-            width: 200px;
-            padding: 5px;
-            padding-left: 8;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            border-left: 1px solid #ccc;             
-        }
-    
-        /* Textbox at the bottom */
-        textarea {
-            width: 1000px;
-            height: 150px;
-            margin-top: 5px;
-            margin-left: 20px;
-            padding: 10px;
-            font-family: Consolas;  
-            font-size:13px;
-            background-color: #fefce7;
-            overflow: auto;
-        }
-    
-        .extra-content {
-            display: none;
-        }
-    
-        .selected {
-            background-color: #0078d7;
-            color: white;
-        }                 
-
-        .table1 td {
-            padding-right: 20px;
-        }         
-
-        .table-container {
-            width: 100%;
-            max-width: 1000px; /* Optional: Adjust width of the container */
-            max-height: 500px; /* Optional: Adjust height of the container */
-            overflow: auto;    /* Enable scrolling */
-            position: relative;
-        }
-
-        .table-container table {
-            border-collapse: collapse;
-            width: 100%;
-            table-layout: fixed; /* Fixed size cells */
-            font-family: Consolas;  
-            font-size:13px;
-        }
-
-        .table-container th, .table-container td {
-            padding: 5px;
-            border: 1px solid #d0d7e5;
-            width: 100px;
-            height: 0px;
-            font-weight: normal;
-        }
-
-        .table-container td {            
-            text-align: right;
-        }
-
-        .table-container th {            
-            text-align: left;
-        }
-
-        /* Sticky First Row (Header) */
-        .table-container thead th {
-            position: sticky;
-            top: 0;
-            background-color: #f8f8f8;
-            z-index: 2; /* Ensures the header is above the body rows */            
-        }
-
-        /* Sticky First Column */
-        .table-container tbody th {
-            position: sticky;
-            left: 0;
-            background-color: #f8f8f8;
-            z-index: 1; /* Lower than the header row but above the body cells */
-        }
-
-        /* Empty Top-Left Cell */
-        .table-container thead th:first-child {
-            position: sticky;
-            top: 0;
-            left: 0;
-            z-index: 3; /* Prevent overlap and keep it at the top-left */
-            background-color: white; /* Set the upper-left cell to a different color (e.g., white) */            
-            border-left: 0 !important; /* Remove the left border */
-            border-top: 0 !important;  /* Remove the top border */
-        }
-
-        .table-container thead th:first-child, .table-container tbody th {
-            width: 150px; /* First col */
-        }
-
-        .toggle-content {
-          padding: 5px;      
-          padding-left: 10 px;
-          background-color: #fefce7;
-          color: #6b5840;
-        }    
-
-        .toggle-link:after {
-          content: `\25BC`; /* Down arrow */
-          display: inline-block;
-          margin-left: 2px;
-          transform: rotate(0deg);
-          transition: transform 0.3s ease-in-out;
-        }
-
-        .toggle-link.expanded:after {
-          transform: rotate(180deg); /* Up arrow */
-         }
-
-    </style>";
-
-            x.AppendLine(css);
-
-            js = @"<script>
-    let currentSelected = null;
-
-    // Function to calculate the deepest level of visible list items
-    function calculateMaxIndentation() {
-        let maxIndentationLevel = 0;
-
-        // Loop through all visible .list-item-content elements
-        document.querySelectorAll('.list-item-content').forEach(item => {
-            // Check visibility of current item
-            if (isElementVisible(item)) {
-                const level = calculateIndentationLevel(item);
-                if (level > maxIndentationLevel) {
-                    maxIndentationLevel = level;
-                }
-            }
-        });
-
-        // Adjust the width of the first column based on the maximum indentation level
-        const firstColumnWidth = " + firstColWidth + @" + maxIndentationLevel * " + pixels + @";
-        document.querySelectorAll('.list-item-content > div:nth-child(1)').forEach(div => {
-            div.style.width = `` + firstColumnWidth + `px`;
-        });
-    }
-
-    // Helper function to check if an element is visible
-    function isElementVisible(item) {
-        // An item is visible if all its parent folders are open
-        let parentFolder = item.closest('li.folder');
-        while (parentFolder) {
-            if (!parentFolder.classList.contains('open')) {
-                return false; // Not visible if a parent folder is closed
-            }
-            parentFolder = parentFolder.closest('ul').closest('li.folder');
-        }
-        return true;
-    }
-
-    // Function to calculate the indentation level of a given list item
-    function calculateIndentationLevel(item) {
-        let level = 0;
-        let currentElement = item.closest('li');
-
-        while (currentElement && currentElement.closest('ul')) {
-            level++;
-            currentElement = currentElement.closest('ul').closest('li');
-        }
-
-        return level;
-    }
-
-    // Handle folder icon click (expand/collapse)
-    document.querySelectorAll('.folder-icon').forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            const folder = this.closest('.folder');
-            folder.classList.toggle('open');
-            
-            // Change folder icon
-            if (folder.classList.contains('open')) {
-                this.innerHTML = '<img class=`img-size` src=`checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
-            } else
-                                {
-                                    this.innerHTML = '<img class=`img-size` src =`normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
-                                }
-
-                                // Recalculate the column width
-                                calculateMaxIndentation();
-
-                                e.stopPropagation();
-                            });
-            });
-
-            // Handle row selection
-            document.querySelectorAll('.list-item-content').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    if (e.target.closest('.folder-icon'))
-                    {
-                        return;
-                    }
-
-                    if (currentSelected)
-                    {
-                        currentSelected.classList.remove('selected');
-                    }
-
-                    currentSelected = this;
-                    currentSelected.classList.add('selected');
-
-                    let extraContent = this.parentElement.querySelector('.extra-content').textContent.trim();
-                    extraContent = extraContent.replace(/\\n/g, '\n');
-                    document.getElementById('output').value = extraContent;
-
-                    e.stopPropagation();
-                });
-        });
-
-    // Keyboard navigation
-    document.addEventListener('keydown', function(e)
-        {
-            if (!currentSelected) return;
-            let nextRow = null;
-            if (e.key === 'ArrowDown')
-            {
-                nextRow = currentSelected.parentElement.nextElementSibling?.querySelector('.list-item-content');
-            }
-            else if (e.key === 'ArrowUp')
-            {
-                nextRow = currentSelected.parentElement.previousElementSibling?.querySelector('.list-item-content');
-            }
-            if (nextRow)
-            {
-                currentSelected.classList.remove('selected');
-                currentSelected = nextRow;
-                currentSelected.classList.add('selected');
-
-                let extraContent = currentSelected.parentElement.querySelector('.extra-content').textContent.trim();
-                extraContent = extraContent.replace(/\\n/g, '\n');
-                document.getElementById('output').value = extraContent;
-            }
-        });
-
-    // Initial column width calculation on load
-    calculateMaxIndentation();
-
-    const toggleLinks = document.querySelectorAll(`.toggle-link`);
-    const toggleContents = document.querySelectorAll(`.toggle-content`);
-                            toggleLinks.forEach((link, index) => {
-                            link.addEventListener(`click`, (event) => {
-        event.preventDefault();
-        toggleContents[index].style.display = toggleContents[index].style.display === `block` ? `none` : `block`;
-        link.classList.toggle(`expanded`);
-      });
-    });
-
-    function showContent() {
-      // Hide all content initially
-      const contents = document.querySelectorAll('.content');
-      contents.forEach(content => content.classList.remove('active'));
-
-      // Get the hash from the URL
-      const hash = window.location.hash;
-
-      if (!hash) {
-          document.getElementById('no-hash').classList.add('active');
-      }
-      else {        
-        divs = 2;
-        hashes = 4;
-        // Show the corresponding content
-        for (let i = 1; i <= divs; i++) 
-        {
-          document.getElementById(hash + '-' + i).classList.add('active'); 
-        }
-        for (let i = 1; i <= hashes; i++) 
-        {
-          document.getElementById('hash' + '-' + i).classList.add('active'); 
-        }
-      }
-    }
-
-    // Call showContent when the page loads
-    window.onload = showContent;
-
-    // Listen for hash changes
-    window.onhashchange = showContent;
-
-</script>";
-            x.AppendLine("  </head>");
-        }
 
         private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, string variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
         {
@@ -1923,78 +1503,89 @@ namespace Gekko
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
             decompDatas.MAIN_data = null;
-            if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
-            string residualName = Program.GetDecompResidualName(0, 1);
+            if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);            
             string table = null;
             try
             {
-                table += "<div class=`table-container`>" + G.NL;
-                table += "<table>" + G.NL;
-                int funcCounter = 0;
-                DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-                Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
-                decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-                DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);                
-                
-                //if (G.Equal(variableName, "qbnp") && G.Equal(equationHelper.name, "e_qbnp"))
-                //{
-                //}
-                
-                Table decompTable = decompOutput.table;
+                List<string> combos_op = new List<string> {"d", "p" };
+                List<string> combos_errors = new List<string> { "no", "yes" };
+                //string active = "active";
 
-                table += "<thead>" + G.NL;
-                table += "<tr><th></th>" + G.NL;
-                for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
+                foreach (string combo_op in combos_op)
                 {
-                    double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
-                    string tooltip = WindowDecomp.RedLampText("row", "You may click the 'Show errors' link to see the errors.", decompOutput.red[j2 - 2]);
-                    string imageHtml = null;
-                    if (d <= Globals.redThresholds[0]) { /* do nothing */ }
-                    else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) imageHtml = "<div class=`yellowcircle` style=`float: right;` title=`" + tooltip + "`></div>";
-                    else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) imageHtml = "<div class=`orangecircle` style=`float: right` title=`" + tooltip + "`></div>";
-                    else if (d > Globals.redThresholds[2]) imageHtml = "<div class=`redcircle` style=`float: right` title=`" + tooltip + "`></div>";
-                    Cell c = decompTable.Get(1, j2);
-                    table += "<th>" + "<span style=`text-align: left`>" + c.CellText.TextData[0] + "</span>" + "" + imageHtml + "</th>";
-                }
-
-                table += "</tr>" + G.NL;
-                table += "</thead>" + G.NL;
-                table += "<tbody>" + G.NL;
-
-                for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
-                {
-                    string name = decompTable.Get(i2, 1).CellText.TextData[0];
-                    if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
-                    name = name.Replace(" | [0]", "");
-                    name = name.Replace(" | ", "");
-                    table += "<tr>";
-                    table += "<th>";
-                    if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
-                    else table += name;
-                    table += "</th>";
-                    for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
+                    foreach (string combo_errors in combos_errors)
                     {
-                        Cell c = decompTable.Get(i2, j2);
-                        table += "<td align = `right`>";
-                        double value = c.number;
-                        string valueFormatted = G.FormatNumber(value, "f15.4", true, false);
-                        table += valueFormatted;
-                        table += "</td>";
-                    }
-                    table += "</tr>" + G.NL;
-                }
-                table += "</tbody>" + G.NL;
-                table += "</table>" + G.NL;
-                table += "</div>" + G.NL;
+                        table += "<div id=`decomp_" + combo_op + "_" + combo_errors + "` class=`table-container`>" + G.NL;
+                        //active = null;  //only the first combination starts active
+                        table += "<table>" + G.NL;
+                        string residualName = Program.GetDecompResidualName(0, 1);
+                        int funcCounter = 0;
+                        DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                        Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
+                        decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
+                        DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
 
-                table += "<div class=`checkboxes`> " + G.NL;
-                table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox1`> Checkbox 1" + G.NL;
-                table += "</label>" + G.NL;
-                table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox2`> Checkbox 2" + G.NL;
-                table += "</label>" + G.NL;
-                table += "</div>" + G.NL;
+                        //if (G.Equal(variableName, "qbnp") && G.Equal(equationHelper.name, "e_qbnp"))
+                        //{
+                        //}
+
+                        Table decompTable = decompOutput.table;
+
+                        table += "<thead>" + G.NL;
+                        table += "<tr><th></th>" + G.NL;
+                        for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
+                        {
+                            double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
+                            string tooltip = WindowDecomp.RedLampText("row", "You may click the 'Show errors' link to see the errors.", decompOutput.red[j2 - 2]);
+                            string imageHtml = null;
+                            if (d <= Globals.redThresholds[0]) { /* do nothing */ }
+                            else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) imageHtml = "<div class=`yellowcircle` style=`float: right;` title=`" + tooltip + "`></div>";
+                            else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) imageHtml = "<div class=`orangecircle` style=`float: right` title=`" + tooltip + "`></div>";
+                            else if (d > Globals.redThresholds[2]) imageHtml = "<div class=`redcircle` style=`float: right` title=`" + tooltip + "`></div>";
+                            Cell c = decompTable.Get(1, j2);
+                            table += "<th>" + "<span style=`text-align: left`>" + c.CellText.TextData[0] + "</span>" + "" + imageHtml + "</th>";
+                        }
+
+                        table += "</tr>" + G.NL;
+                        table += "</thead>" + G.NL;
+                        table += "<tbody>" + G.NL;
+
+                        for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
+                        {
+                            string name = decompTable.Get(i2, 1).CellText.TextData[0];
+                            if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
+                            name = name.Replace(" | [0]", "");
+                            name = name.Replace(" | ", "");
+                            table += "<tr>";
+                            table += "<th>";
+                            if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
+                            else table += name;
+                            table += "</th>";
+                            for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
+                            {
+                                Cell c = decompTable.Get(i2, j2);
+                                table += "<td align = `right`>";
+                                double value = c.number;
+                                string valueFormatted = G.FormatNumber(value, "f15.4", true, false);
+                                table += valueFormatted;
+                                table += "</td>";
+                            }
+                            table += "</tr>" + G.NL;
+                        }
+                        table += "</tbody>" + G.NL;
+                        table += "</table>" + G.NL;
+                        table += "</div>" + G.NL;
+
+                        table += "<div class=`checkboxes`> " + G.NL;
+                        table += "<label>" + G.NL;
+                        table += "<input type=`checkbox` id =`checkbox1`> Checkbox 1" + G.NL;
+                        table += "</label>" + G.NL;
+                        table += "<label>" + G.NL;
+                        table += "<input type=`checkbox` id =`checkbox2`> Checkbox 2" + G.NL;
+                        table += "</label>" + G.NL;
+                        table += "</div>" + G.NL;
+                    }
+                }
             }
             catch
             {
@@ -2788,6 +2379,469 @@ namespace Gekko
                     Program.options.print_width = widthRemember;
                 }
             }
+        }
+
+        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, out StringBuilder x, out string js)
+        {
+            x = new StringBuilder();
+            x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+            x.AppendLine("<html>");
+            x.AppendLine("  <head>");
+            x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
+            x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+            x.AppendLine("    <title>" + variableName + "</title>");
+
+            string css = @"<style>        
+        
+        .content {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        html {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size:12px;
+        }
+    
+        ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        li {            
+            cursor: pointer;
+        }        
+
+        table, th, td {
+            padding: 2px;
+        }
+    
+        .img-size {
+            height:1em;
+        }   
+
+        .redcircle {
+            display: inline-block;
+            width: 0.57em;
+            height: 0.57em;
+            border-radius: 50%;
+            background-color: #f01e3c;
+            border: 0.1em solid gray;
+            margin-right: 0.25em;
+            position: relative; top: 0.27em;
+        }
+
+        .orangecircle {
+            display: inline-block;
+            width: 0.57em;
+            height: 0.57em;
+            border-radius: 50%;
+            background-color: #ffc914;
+            border: 0.1em solid gray;
+            margin-right: 0.25em;
+            position: relative; top: 0.27em;
+        }
+
+        .yellowcircle {
+            display: inline-block;
+            width: 0.57em;
+            height: 0.57em;
+            border-radius: 50%;
+            background-color: #fafa0f;
+            border: 0.1em solid gray;
+            margin-right: 0.25em;
+            position: relative; top: 0.27em;
+        }
+    
+        .nested {
+            display: none;
+        }
+
+        .open > .nested {
+            display: block;
+        }
+    
+        .list-item-content {
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+            font-size:12px;
+        }
+    
+        /* Set different widths for the columns */
+        .list-item-content > div:nth-child(1) {
+            width: " + firstColWidth + @"px;
+            padding: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;            
+        }
+        
+        .list-item-content > div:nth-child(2) {
+            width: 400px;
+            padding: 5px;
+            padding-left: 8;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+        
+        .list-item-content > div:nth-child(3) {
+            width: 90px;
+            padding: 5px;
+            padding-left: 8;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+
+        .list-item-content > div:nth-child(4) {
+            width: 80px;
+            padding: 5px;
+            padding-left: 8;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc; 
+        }
+
+        .list-item-content > div:nth-child(5) {
+            width: 200px;
+            padding: 5px;
+            padding-left: 8;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid #ccc;             
+        }
+    
+        /* Textbox at the bottom */
+        textarea {
+            width: 1000px;
+            height: 150px;
+            margin-top: 5px;
+            margin-left: 20px;
+            padding: 10px;
+            font-family: Consolas;  
+            font-size:13px;
+            background-color: #fefce7;
+            overflow: auto;
+        }
+    
+        .extra-content {
+            display: none;
+        }
+    
+        .selected {
+            background-color: #0078d7;
+            color: white;
+        }                 
+
+        .table1 td {  /* Variables */
+            padding-right: 20px;
+        }         
+        
+        .table-container { /* DECOMP table */
+            width: 100%;
+            max-width: 1000px; /* Optional: Adjust width of the container */
+            max-height: 500px; /* Optional: Adjust height of the container */
+            overflow: auto;    /* Enable scrolling */
+            position: relative;
+            display: none;
+        }
+
+        .table-container table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed; /* Fixed size cells */
+            font-family: Consolas;  
+            font-size:13px;
+        }
+
+        .table-container th, .table-container td {
+            padding: 5px;
+            border: 1px solid #d0d7e5;
+            width: 100px;
+            height: 0px;
+            font-weight: normal;
+        }
+
+        .table-container td {            
+            text-align: right;
+        }
+
+        .table-container th {            
+            text-align: left;
+        }
+
+        /* Sticky First Row (Header) */
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f8f8;
+            z-index: 2; /* Ensures the header is above the body rows */            
+        }
+
+        /* Sticky First Column */
+        .table-container tbody th {
+            position: sticky;
+            left: 0;
+            background-color: #f8f8f8;
+            z-index: 1; /* Lower than the header row but above the body cells */
+        }
+
+        /* Empty Top-Left Cell */
+        .table-container thead th:first-child {
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 3; /* Prevent overlap and keep it at the top-left */
+            background-color: white; /* Set the upper-left cell to a different color (e.g., white) */            
+            border-left: 0 !important; /* Remove the left border */
+            border-top: 0 !important;  /* Remove the top border */
+        }
+
+        .table-container thead th:first-child, .table-container tbody th {
+            width: 150px; /* First col */
+        }
+
+        .toggle-content {
+          padding: 5px;      
+          padding-left: 10 px;
+          background-color: #fefce7;
+          color: #6b5840;
+        }    
+
+        .toggle-link:after {
+          content: `\25BC`; /* Down arrow */
+          display: inline-block;
+          margin-left: 2px;
+          transform: rotate(0deg);
+          transition: transform 0.3s ease-in-out;
+        }
+
+        .toggle-link.expanded:after {
+          transform: rotate(180deg); /* Up arrow */
+         }
+
+    </style>";
+
+            x.AppendLine(css);
+
+            js = @"<script>
+    let currentSelected = null;
+
+    // Function to calculate the deepest level of visible list items
+    function calculateMaxIndentation() {
+        let maxIndentationLevel = 0;
+
+        // Loop through all visible .list-item-content elements
+        document.querySelectorAll('.list-item-content').forEach(item => {
+            // Check visibility of current item
+            if (isElementVisible(item)) {
+                const level = calculateIndentationLevel(item);
+                if (level > maxIndentationLevel) {
+                    maxIndentationLevel = level;
+                }
+            }
+        });
+
+        // Adjust the width of the first column based on the maximum indentation level
+        const firstColumnWidth = " + firstColWidth + @" + maxIndentationLevel * " + pixels + @";
+        document.querySelectorAll('.list-item-content > div:nth-child(1)').forEach(div => {
+            div.style.width = `` + firstColumnWidth + `px`;
+        });
+    }
+
+    // Helper function to check if an element is visible
+    function isElementVisible(item) {
+        // An item is visible if all its parent folders are open
+        let parentFolder = item.closest('li.folder');
+        while (parentFolder) {
+            if (!parentFolder.classList.contains('open')) {
+                return false; // Not visible if a parent folder is closed
+            }
+            parentFolder = parentFolder.closest('ul').closest('li.folder');
+        }
+        return true;
+    }
+
+    // Function to calculate the indentation level of a given list item
+    function calculateIndentationLevel(item) {
+        let level = 0;
+        let currentElement = item.closest('li');
+
+        while (currentElement && currentElement.closest('ul')) {
+            level++;
+            currentElement = currentElement.closest('ul').closest('li');
+        }
+
+        return level;
+    }
+
+    // Handle folder icon click (expand/collapse)
+    document.querySelectorAll('.folder-icon').forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            const folder = this.closest('.folder');
+            folder.classList.toggle('open');
+            
+            // Change folder icon
+            if (folder.classList.contains('open')) {
+                this.innerHTML = '<img class=`img-size` src=`checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
+            } else
+                                {
+                                    this.innerHTML = '<img class=`img-size` src =`normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
+                                }
+
+                                // Recalculate the column width
+                                calculateMaxIndentation();
+
+                                e.stopPropagation();
+                            });
+            });
+
+            // Handle row selection
+            document.querySelectorAll('.list-item-content').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.closest('.folder-icon'))
+                    {
+                        return;
+                    }
+
+                    if (currentSelected)
+                    {
+                        currentSelected.classList.remove('selected');
+                    }
+
+                    currentSelected = this;
+                    currentSelected.classList.add('selected');
+
+                    let extraContent = this.parentElement.querySelector('.extra-content').textContent.trim();
+                    extraContent = extraContent.replace(/\\n/g, '\n');
+                    document.getElementById('output').value = extraContent;
+
+                    e.stopPropagation();
+                });
+        });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e)
+        {
+            if (!currentSelected) return;
+            let nextRow = null;
+            if (e.key === 'ArrowDown')
+            {
+                nextRow = currentSelected.parentElement.nextElementSibling?.querySelector('.list-item-content');
+            }
+            else if (e.key === 'ArrowUp')
+            {
+                nextRow = currentSelected.parentElement.previousElementSibling?.querySelector('.list-item-content');
+            }
+            if (nextRow)
+            {
+                currentSelected.classList.remove('selected');
+                currentSelected = nextRow;
+                currentSelected.classList.add('selected');
+
+                let extraContent = currentSelected.parentElement.querySelector('.extra-content').textContent.trim();
+                extraContent = extraContent.replace(/\\n/g, '\n');
+                document.getElementById('output').value = extraContent;
+            }
+        });
+
+    // Initial column width calculation on load
+    calculateMaxIndentation();
+
+    const toggleLinks = document.querySelectorAll(`.toggle-link`);
+    const toggleContents = document.querySelectorAll(`.toggle-content`);
+                            toggleLinks.forEach((link, index) => {
+                            link.addEventListener(`click`, (event) => {
+        event.preventDefault();
+        toggleContents[index].style.display = toggleContents[index].style.display === `block` ? `none` : `block`;
+        link.classList.toggle(`expanded`);
+      });
+    });
+
+    function showContent() {
+      // Hide all content initially
+      const contents = document.querySelectorAll('.content');
+      contents.forEach(content => content.classList.remove('active'));
+
+      // Get the hash from the URL
+      const hash = window.location.hash;
+
+      if (!hash) {
+          document.getElementById('no-hash').classList.add('active');
+      }
+      else {        
+        divs = 2;
+        hashes = 4;
+        // Show the corresponding content
+        for (let i = 1; i <= divs; i++) 
+        {
+          document.getElementById(hash + '-' + i).classList.add('active'); 
+        }
+        for (let i = 1; i <= hashes; i++) 
+        {
+          document.getElementById('hash' + '-' + i).classList.add('active'); 
+        }
+      }
+    }
+
+    // Call showContent when the page loads
+    window.onload = showContent;
+
+    // Listen for hash changes
+    window.onhashchange = showContent;
+
+    // ------------ DECOMP selector -------------------------------
+/*
+        const checkbox1 = document.getElementById('checkbox1');
+        const checkbox2 = document.getElementById('checkbox2');
+
+        // Get the decompDivs
+        const decompDivs = {
+            falseFalse: document.getElementById('decomp_d_yes'),
+            trueFalse: document.getElementById('decomp_d_no'),
+            falseTrue: document.getElementById('decomp_p_no'),
+            trueTrue: document.getElementById('decomp_p_no'),
+        };
+
+        // Function to show the right div based on checkbox values
+        function updateTable() {
+            // Get current checkbox states
+            const cb1Checked = checkbox1.checked;
+            const cb2Checked = checkbox2.checked;
+
+            // Hide all decompDivs
+            Object.values(decompDivs).forEach(div => div.classList.remove('active'));
+
+            // Show the correct div based on the combination of checkboxes
+            if (!cb1Checked && !cb2Checked) {
+                decompDivs.falseFalse.classList.add('active');  // Checkbox 1: false, Checkbox 2: false
+            } else if (cb1Checked && !cb2Checked) {
+                decompDivs.trueFalse.classList.add('active');   // Checkbox 1: true, Checkbox 2: false
+            } else if (!cb1Checked && cb2Checked) {
+                decompDivs.falseTrue.classList.add('active');   // Checkbox 1: false, Checkbox 2: true
+            } else if (cb1Checked && cb2Checked) {
+                decompDivs.trueTrue.classList.add('active');    // Checkbox 1: true, Checkbox 2: true
+            }
+        }
+
+        // Add event listeners to checkboxes
+        checkbox1.addEventListener('change', updateTable);
+        checkbox2.addEventListener('change', updateTable);
+
+        // Initialize the display (show the default table)
+        updateTable();
+  */  
+
+</script>";
+            x.AppendLine("  </head>");
         }
     }
 }
