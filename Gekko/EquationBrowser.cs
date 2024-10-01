@@ -2833,8 +2833,10 @@ namespace Gekko
             const op = checkbox_op.querySelector('input[name=`myradio`]:checked').value;
 
             // Add event listeners to checkboxes (needless to do every time, but makes more simple code)
-            checkbox_op.addEventListener('change', function(){ updateTable(i); });
-            checkbox_error.addEventListener('change', function(){ updateTable(i); });
+            addEventListenerOnce(checkbox_op, 'change', function(){ updateTable(i); });
+            addEventListenerOnce(checkbox_error, 'change', function(){ updateTable(i); });
+            //checkbox_op.addEventListener('change', function(){ updateTable(i); });
+            //checkbox_error.addEventListener('change', function(){ updateTable(i); });
 
             // Get the decompDivs
             const decompDivs = {
@@ -2857,7 +2859,14 @@ namespace Gekko
             } else if ((op == `p`) && checkbox_error.checked) {
                 decompDivs.div_p_yes.style.display = 'block';
             }
-        }        
+        }   
+
+        function addEventListenerOnce(element, eventType, callback) {
+        if (!element.hasOwnProperty(`_${eventType}`)) {
+        element[`_${eventType}`] = true;
+        element.addEventListener(eventType, callback);
+        }
+        }
 
         // Initialize the display (show the default table)
         " + s + @"
