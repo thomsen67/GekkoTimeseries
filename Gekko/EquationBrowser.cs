@@ -2805,21 +2805,21 @@ namespace Gekko
 
         
         // Function to show the right div based on checkbox values
-        function updateTable() {
+        function updateTable(i) {
             
-            const checkbox_op = document.getElementById('checkbox_op');
-            const checkbox_error = document.getElementById('checkbox_error');
+            const checkbox_op = document.getElementById('checkbox_op' + i);
+            const checkbox_error = document.getElementById('checkbox_error' + i);            
 
-            // Add event listeners to checkboxes
-            checkbox_op.addEventListener('change', updateTable);
-            checkbox_error.addEventListener('change', updateTable);
+            // Add event listeners to checkboxes (needless to do every time, but makes more simple code)
+            checkbox_op.addEventListener('change', function(){ updateTable(i); });
+            checkbox_error.addEventListener('change', function(){ updateTable(i); });
 
             // Get the decompDivs
             const decompDivs = {
-            div_d_yes: document.getElementById('decomp_d_yes'),
-            div_d_no: document.getElementById('decomp_d_no'),
-            div_p_yes: document.getElementById('decomp_p_yes'),
-            div_p_no: document.getElementById('decomp_p_no'),
+            div_d_yes: document.getElementById('decomp_d_yes' + i),
+            div_d_no: document.getElementById('decomp_d_no' + i),
+            div_p_yes: document.getElementById('decomp_p_yes' + i),
+            div_p_no: document.getElementById('decomp_p_no' + i),
             };
 
             // Get current checkbox states
@@ -2845,7 +2845,7 @@ namespace Gekko
         
 
         // Initialize the display (show the default table)
-        updateTable();
+        updateTable('');
   
 
 </script>";
