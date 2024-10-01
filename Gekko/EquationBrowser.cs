@@ -1493,7 +1493,7 @@ namespace Gekko
 
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
-            decompOptions2.showErrors = false;                        
+            
             GekkoSmpl smpl = new GekkoSmpl(t1, t2);
             DecompDatas decompDatas = new DecompDatas();
             GekkoTime gt1, gt2;
@@ -1518,6 +1518,9 @@ namespace Gekko
                         table += "<div id=`decomp_" + combo_op + "_" + combo_errors + "` class=`table-container`>" + G.NL;
                         //active = null;  //only the first combination starts active
                         table += "<table>" + G.NL;
+                        decompOptions2.decompOperator = new DecompOperator(combo_op);
+                        if (combo_errors == "yes") decompOptions2.showErrors = true;
+                        else decompOptions2.showErrors = false;
                         string residualName = Program.GetDecompResidualName(0, 1);
                         int funcCounter = 0;
                         DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
@@ -1532,7 +1535,9 @@ namespace Gekko
                         Table decompTable = decompOutput.table;
 
                         table += "<thead>" + G.NL;
-                        table += "<tr><th></th>" + G.NL;
+                        string percent = null;
+                        if (combo_op == "p") percent = "%";
+                        table += "<tr><th>" + percent + "</th>" + G.NL;
                         for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                         {
                             double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
@@ -1552,8 +1557,7 @@ namespace Gekko
 
                         for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
                         {
-                            string name = decompTable.Get(i2, 1).CellText.TextData[0];
-                            if (G.Equal(name, "Error")) continue;  //it is phoney anyway, not near 0 as it really should
+                            string name = decompTable.Get(i2, 1).CellText.TextData[0];                            
                             name = name.Replace(" | [0]", "");
                             name = name.Replace(" | ", "");
                             table += "<tr>";
@@ -1579,10 +1583,10 @@ namespace Gekko
                 }
                 table += "<div class=`checkboxes`> " + G.NL;
                 table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox1`> Checkbox 1" + G.NL;
+                table += "<input type=`checkbox` id =`checkbox_op`>% growth" + G.NL;
                 table += "</label>" + G.NL;
                 table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox2`> Checkbox 2" + G.NL;
+                table += "<input type=`checkbox` id =`checkbox_error`>Show errors" + G.NL;
                 table += "</label>" + G.NL;
                 table += "</div>" + G.NL;
             }
@@ -2799,8 +2803,8 @@ namespace Gekko
 
     // ------------ DECOMP selector -------------------------------
 
-        const checkbox1 = document.getElementById('checkbox1');
-        const checkbox2 = document.getElementById('checkbox2');
+        const checkbox_op = document.getElementById('checkbox_op');
+        const checkbox_error = document.getElementById('checkbox_error');
 
         // Get the decompDivs
         const decompDivs = {
@@ -2813,8 +2817,8 @@ namespace Gekko
         // Function to show the right div based on checkbox values
         function updateTable() {
             // Get current checkbox states
-            const cb1Checked = checkbox1.checked;
-            const cb2Checked = checkbox2.checked;
+            const cb1Checked = checkbox_op.checked;
+            const cb2Checked = checkbox_error.checked;
 
             // Hide all divs
             Object.values(decompDivs).forEach(div => div.style.display = 'none');
@@ -2833,8 +2837,8 @@ namespace Gekko
         }
 
         // Add event listeners to checkboxes
-        checkbox1.addEventListener('change', updateTable);
-        checkbox2.addEventListener('change', updateTable);
+        checkbox_op.addEventListener('change', updateTable);
+        checkbox_error.addEventListener('change', updateTable);
 
         // Initialize the display (show the default table)
         updateTable();
