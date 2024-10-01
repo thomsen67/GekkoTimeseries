@@ -1611,7 +1611,7 @@ namespace Gekko
                 // FIND
                 // ---------------------------------------
 
-                string var = HiddenVariableHelper(c2);
+                string var = HiddenVariableHelper(c2, false);
                 if (var == null)
                 {                    
                     new Error(Decomp.Text1(1));
@@ -1670,13 +1670,25 @@ namespace Gekko
             }
         }
 
-        private static string HiddenVariableHelper(Cell c2)
+        /// <summary>
+        /// For a data cell, it finds the list of variables inside (.vars_hack). Will return the first of these,
+        /// with any "¤[-1]" etc. stripped off, so "x¤[-1]" becomes "x". If onlyIfUnique==true and the list count
+        /// is not 1, null is returned. May retur null.
+        /// </summary>
+        /// <param name="c2"></param>
+        /// <param name="onlyIfUnique"></param>
+        /// <returns></returns>
+        public static string HiddenVariableHelper(Cell c2, bool onlyIfUnique)
         {
             if (c2 == null) return null;
             List<string> vars = c2.vars_hack;
             if (vars == null)
             {
                 return null;
+            }
+            if (onlyIfUnique)
+            {
+                if (vars.Count != 1) return null;
             }
             string var = vars[0];  //#dskla8asjkdfa
             int lag; string name;
@@ -1811,7 +1823,7 @@ namespace Gekko
                                 {
                                     this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gams;
                                 }
-                                string var7 = HiddenVariableHelper(c2);
+                                string var7 = HiddenVariableHelper(c2, false);
 
                                 int number = -12345;
                                 try { number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch { };

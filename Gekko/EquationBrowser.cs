@@ -1119,7 +1119,7 @@ namespace Gekko
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
-                    html1.Append("<p>");
+                    html1.Append("<p style=`font-size: 2rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
                     EquationBrowser.SpanHtmlColor(html1, variableName);
                     html1.Append(" from equation ");
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
@@ -1136,7 +1136,8 @@ namespace Gekko
                     string s5 = helper22.s_gamsOrFrnSyntax;
                     string s6 = helper22.s_scalarModel;
                     int index = s6.IndexOf("..");
-                    if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();                    
+                    if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
+                    html1.AppendLine("<br>");
                     ToggleLink(html1, "Equation", "To see such equations in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     html1.AppendLine("model &lt;gms> makro.zip;");
@@ -1575,7 +1576,22 @@ namespace Gekko
 
                         for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
                         {
-                            string name = decompTable.Get(i2, 1).CellText.TextData[0];
+                            Cell cellVariableName = decompTable.Get(i2, 1);
+                            List<string> vars = new List<string>();
+                            Cell cellFirstData = decompTable.Get(i2, 2);
+                            string uniqueName = null;
+                            if (cellFirstData != null)
+                            {
+                                vars = cellFirstData.vars_hack;
+                                uniqueName = WindowDecomp.HiddenVariableHelper(cellFirstData, true);
+                            }
+                            string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
+                            string title = null;
+                            if (uniqueName != null) title += Program.SpecialXmlChars(uniqueName) + "\\n";
+                            if (!G.NullOrBlanks(sVarsInside)) title += sVarsInside;
+                            string titleHtml = null;
+                            if (!G.NullOrBlanks(title)) titleHtml = " title=`" + title.Trim() + "`";
+                            string name = cellVariableName.CellText.TextData[0];
                             name = name.Replace(" | [0]", "");
                             name = name.Replace(" | ", "");
                             name = name.Trim();
@@ -1583,15 +1599,18 @@ namespace Gekko
                             if (name == "Error") style = "style=`text-align: right; background-color: #fff7ed`";  //like Gekko
                             else if (name == "Residual") style = "style=`text-align: right; background-color: #fefdef`";  //like Gekko
                             table += "<tr>";
-                            table += "<th>";
+                        titleHtml = null;
+                            table += "<th" + titleHtml + ">";
                             if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
                             else table += name;
                             table += "</th>";
                             for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                             {
-                                Cell c = decompTable.Get(i2, j2);
-                                table += "<td " + style + ">";
-                                double value = c.number;
+                                Cell cellData = decompTable.Get(i2, j2);
+                                double value = cellData.number;
+                                string dataHtml = " title=`" + value + "`";
+                            dataHtml = null;
+                                table += "<td " + style + dataHtml + ">";
                                 string valueFormatted = G.FormatNumber(value, "f15.4", false, false).Trim();
                                 table += valueFormatted;
                                 table += "</td>";
