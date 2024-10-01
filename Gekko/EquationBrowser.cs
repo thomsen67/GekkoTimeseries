@@ -1536,8 +1536,8 @@ namespace Gekko
 
                         table += "<thead>" + G.NL;
                         string percent = null;
-                        if (combo_op == "p") percent = "%";
-                        table += "<tr><th>" + percent + "</th>" + G.NL;
+                        if (combo_op == "p") percent = "<span style=`margin-right: 0.75em`>%</span>";
+                        table += "<tr><th style=`text-align: right`>" + percent + "</th>" + G.NL;
                         for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                         {
                             double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
@@ -1583,7 +1583,7 @@ namespace Gekko
                 }
                 table += "<div class=`checkboxes`> " + G.NL;
                 table += "<label>" + G.NL;
-                table += "<input type=`checkbox` id =`checkbox_op`>% growth" + G.NL;
+                table += "<input type=`checkbox` id =`checkbox_op`>Growth, &lt;p>" + G.NL;
                 table += "</label>" + G.NL;
                 table += "<label>" + G.NL;
                 table += "<input type=`checkbox` id =`checkbox_error`>Show errors" + G.NL;
@@ -2808,10 +2808,10 @@ namespace Gekko
 
         // Get the decompDivs
         const decompDivs = {
-            falseFalse: document.getElementById('decomp_d_yes'),
-            trueFalse: document.getElementById('decomp_d_no'),
-            falseTrue: document.getElementById('decomp_p_yes'),
-            trueTrue: document.getElementById('decomp_p_no'),
+            div_d_yes: document.getElementById('decomp_d_yes'),
+            div_d_no: document.getElementById('decomp_d_no'),
+            div_p_yes: document.getElementById('decomp_p_yes'),
+            div_p_no: document.getElementById('decomp_p_no'),
         };
 
         // Function to show the right div based on checkbox values
@@ -2824,14 +2824,14 @@ namespace Gekko
             Object.values(decompDivs).forEach(div => div.style.display = 'none');
 
             // Show the correct div based on checkbox states
-            if (!cb1Checked && !cb2Checked) {
-                decompDivs.falseFalse.style.display = 'block';
-            } else if (cb1Checked && !cb2Checked) {
-                decompDivs.trueFalse.style.display = 'block';
-            } else if (!cb1Checked && cb2Checked) {
-                decompDivs.falseTrue.style.display = 'block';
-            } else if (cb1Checked && cb2Checked) {
-                decompDivs.trueTrue.style.display = 'block';
+            if (!checkbox_op.checked && !checkbox_error.checked) {
+                decompDivs.div_d_no.style.display = 'block';
+            } else if (!checkbox_op.checked && checkbox_error.checked) {
+                decompDivs.div_d_yes.style.display = 'block';
+            } else if (checkbox_op.checked && !checkbox_error.checked) {
+                decompDivs.div_p_no.style.display = 'block';
+            } else if (checkbox_op.checked && checkbox_error.checked) {
+                decompDivs.div_p_yes.style.display = 'block';
             }
 
         }
