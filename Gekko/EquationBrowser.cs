@@ -1000,7 +1000,7 @@ namespace Gekko
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            if (false)
+            if (true)
             {
                 restrict.Add("qbnp", false);
                 restrict.Add("pbnp", false);
@@ -1124,9 +1124,7 @@ namespace Gekko
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
                     html1.Append("</p>");
                     // ------------------------------------------------------
-
-                    EquationBrowser.WriteHtmlColorGray(html1, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
-
+                    
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
@@ -1137,16 +1135,14 @@ namespace Gekko
                     string s5 = helper22.s_gamsOrFrnSyntax;
                     string s6 = helper22.s_scalarModel;
                     int index = s6.IndexOf("..");
-                    if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
-                    html1.AppendLine("<br>");
-                    ToggleLink(html1, "Equations", "To see these equations in Gekko 3.x, you may use the following statements (or similar):");
+                    if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();                    
+                    ToggleLink(html1, "Equation", "To see such equations in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     html1.AppendLine("model &lt;gms> makro.zip;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                     html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
                     html1.AppendLine();
-                    html1.AppendLine("//NOTE: Gekko DECOMP has many more possibilities, among other things");
-                    html1.AppendLine("//      the ability to merge decomp tables recursively.");
+                    html1.AppendLine("//NOTE: Gekko can merge decomp tables, and much more.");
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
                     html1.Append("<hr>");
                     EquationBrowser.WriteHtmlPreCode(html1, s5);
@@ -1158,6 +1154,12 @@ namespace Gekko
                     EquationBrowser.WriteHtmlBold(html1, "Variables");
                     string vars2 = null;
                     html1.AppendLine("<table class = `table1`>");
+
+                    html1.AppendLine("<tr>");
+                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName, variableName.ToLower() + ".html") + "</td>");
+                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)) + "</td>");
+                    html1.AppendLine("</tr>");
+
                     EquationTextHelper helper2 = new EquationTextHelper();
                     helper2.showTime = false;
                     List<string> precedent2 = modelGamsScalar.GetPrecedentsNames(equationHelper.i, helper2, t1);
@@ -1165,6 +1167,7 @@ namespace Gekko
                     foreach (string variableName2 in precedent2)
                     {
                         string varnameWithoutLag = G.Chop_RemoveLagOrLead(variableName2);
+                        if (G.Equal(varnameWithoutLag, variableName)) continue;  //Shown at top
                         html1.AppendLine("<tr>");
                         html1.Append("<td>" + EquationBrowser.HtmlLink(variableName2, varnameWithoutLag.ToLower() + ".html") + "</td>");
                         html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
@@ -1177,7 +1180,27 @@ namespace Gekko
 
                 if (true)
                 {
+                    html1.AppendLine("<div id = `hash-2` class=`content`>");
+                    html1.Append("<br>");
+                    EquationBrowser.WriteHtmlBold(html1, "Related equations");
+                    bool first2 = true;
+                    string s8 = null;
+                    foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
+                    {
+                        string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                        string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
+                        if (!first2) s8 += ", ";
+                        s8 += link;
+                        first2 = false;
+                    }
+                    EquationBrowser.WriteHtml(html1, s8);
+                    html1.AppendLine("</div>");
+                }
+
+                if (true)
+                {
                     html1.AppendLine("<div id = `hash-1` class=`content`>");
+                    html1.Append("<br>");
                     ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
@@ -1195,25 +1218,7 @@ namespace Gekko
                     {
                     }
                     html1.AppendLine("</div>");
-                }
-
-                if (true)
-                {
-                    html1.AppendLine("<div id = `hash-2` class=`content`>");
-                    EquationBrowser.WriteHtmlBold(html1, "Related equations");
-                    bool first2 = true;
-                    string s8 = null;
-                    foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
-                    {
-                        string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                        string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
-                        if (!first2) s8 += ", ";
-                        s8 += link;
-                        first2 = false;
-                    }
-                    EquationBrowser.WriteHtml(html1, s8);
-                    html1.AppendLine("</div>");
-                }
+                }                
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
@@ -1507,14 +1512,52 @@ namespace Gekko
         li {            
             cursor: pointer;
         }        
+
+        table, th, td {
+            padding: 2px;
+        }
     
         .img-size {
             height:1em;
-        }        
+        }   
+
+        .redcircle {
+            display: inline-block;
+            width: 0.65em;
+            height: 0.65em;
+            border-radius: 50%;
+            background-color: red;
+            border: 0.1em solid #d0d7e5;
+            margin-right: 0.5em;
+            margin-left: 0.5em;
+        }
+
+        .orangecircle {
+            display: inline-block;
+            width: 0.65em;
+            height: 0.65em;
+            border-radius: 50%;
+            background-color: orange;
+            border: 0.1em solid #d0d7e5;
+            margin-right: 0.5em;
+            margin-left: 0.5em;
+        }
+
+        .yellowcircle {
+            display: inline-block;
+            width: 0.65em;
+            height: 0.65em;
+            border-radius: 50%;
+            background-color: yellow;
+            border: 0.1em solid #d0d7e5;
+            margin-right: 0.5em;
+            margin-left: 0.5em;
+        }
     
         .nested {
             display: none;
         }
+
         .open > .nested {
             display: block;
         }
@@ -1595,11 +1638,11 @@ namespace Gekko
         .selected {
             background-color: #0078d7;
             color: white;
-        }
+        }                 
 
-        .table1 th, .table1 td {
+        .table1 td {
             padding-right: 20px;
-        }        
+        }         
 
         .table-container {
             width: 100%;
@@ -1607,7 +1650,6 @@ namespace Gekko
             max-height: 500px; /* Optional: Adjust height of the container */
             overflow: auto;    /* Enable scrolling */
             position: relative;
-            /* border: 1px solid #ccc; */
         }
 
         .table-container table {
@@ -1875,10 +1917,7 @@ namespace Gekko
             GekkoTime gt1, gt2;
             Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);            
             Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;            
-            string lhsString = "Expression value";
-            int parentI = 0;
-            int funcCounter = 0;            
-            //Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
+            string lhsString = "Expression value";            
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
             decompDatas.MAIN_data = null;
@@ -1889,10 +1928,11 @@ namespace Gekko
             {                
                 table += "<div class=`table-container`>" + G.NL;
                 table += "<table>" + G.NL;
+                int funcCounter = 0;
                 DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                 Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
                 decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-                DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+                DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
                 //Remember red circles
                 Table decompTable = decompOutput.table;
 
@@ -1901,7 +1941,7 @@ namespace Gekko
                 for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                 {
                     Cell c = decompTable.Get(1, j2);
-                    table += "<th align = `right`>" + c.CellText.TextData[0] + "</th>";
+                    table += "<th align = `right`>" + c.CellText.TextData[0] + "<div class=`redcircle`></div>" + "<div class=`orangecircle`></div>" + "<div class=`yellowcircle`></div>" + "</th>";
                 }
 
                 table += "</tr>" + G.NL;

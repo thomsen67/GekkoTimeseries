@@ -4441,7 +4441,7 @@ namespace Gekko
             {
                 Series lhs2 = GetDecompDatas(decompDatasSupremeClone, operatorOneOf3Types)[d.lhs];
                 
-                Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, d.lhs);
+                Tuple<Series, Series> tsTuple = GetRealTimeseries(decompDatas, d.lhs);  //May contain null's, at least when doing html browser
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
@@ -4449,15 +4449,24 @@ namespace Gekko
                     double d2 = double.NaN;
                     if (operatorOneOf3Types == EContribType.D)
                     {
-                        d2 = ts.Item1.GetDataSimple(t) - ts.Item1.GetDataSimple(t.Add(-1));
+                        if (tsTuple.Item1 != null)
+                        {
+                            d2 = tsTuple.Item1.GetDataSimple(t) - tsTuple.Item1.GetDataSimple(t.Add(-1));
+                        }
                     }
                     else if (operatorOneOf3Types == EContribType.RD)
                     {
-                        d2 = ts.Item2.GetDataSimple(t) - ts.Item2.GetDataSimple(t.Add(-1));
+                        if (tsTuple.Item2 != null)
+                        {
+                            d2 = tsTuple.Item2.GetDataSimple(t) - tsTuple.Item2.GetDataSimple(t.Add(-1));
+                        }
                     }
                     else if (operatorOneOf3Types == EContribType.M)
                     {
-                        d2 = ts.Item1.GetDataSimple(t) - ts.Item2.GetDataSimple(t);
+                        if (tsTuple.Item1 != null && tsTuple.Item2 != null)
+                        {
+                            d2 = tsTuple.Item1.GetDataSimple(t) - tsTuple.Item2.GetDataSimple(t);
+                        }
                     }
                     double factor = d2 / d1;
                     bool found = false;
