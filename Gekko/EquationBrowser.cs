@@ -1586,12 +1586,12 @@ namespace Gekko
                     }
                 }
                 
-                table += "<div>" + G.NL;
-                table += "<label><input type=`radio` name=`page-selector` value=`page1` checked> Page 1</label>" + G.NL;
-                table += "<label><input type=`radio` name=`page-selector` value=`page1` checked> Page 2</label>" + G.NL;
-                table += "</div>" + G.NL;
+                table += "<form id=`" + equationNameHash + "-checkbox_op`>" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`d` checked> Page 1" + G.NL;
+                table += "<input type=`radio` name=`myradio` value=`p`> Page 2" + G.NL;
+                table += "</form>" + G.NL;
 
-                table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_op`>" + "Growth rate (<span style =`font-style: italic;`>p)</span>" + "</label>";                
+                //table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_op`>" + "Growth rate (<span style =`font-style: italic;`>p)</span>" + "</label>";                
                 table += "<label>" + "<input type =`checkbox` id =`" + equationNameHash + "-checkbox_error`>" + "Show errors" + "</label>";
                 table += "</div>" + G.NL;
             }
@@ -2818,8 +2818,15 @@ namespace Gekko
         // Function to show the right div based on checkbox values
         function updateTable(i) {            
             
-            const checkbox_op = document.getElementById(i + '-' + 'checkbox_op');
+            alert('Xxx: ' + i);
+
+            //const checkbox_op = document.getElementById(i + '-' + 'checkbox_op');
             const checkbox_error = document.getElementById(i + '-' + 'checkbox_error');
+            //const checkbox_op = document.querySelectorAll('input[name=`' +i + '-' + 'checkbox_op'+ '`]');
+            
+            const checkbox_op = document.getElementById(i + '-' + 'checkbox_op');
+            const selectedValue = checkbox_op.querySelector('input[name=`myradio`]:checked').value;
+            alert('Yyy: ' + selectedValue);
 
             // Add event listeners to checkboxes (needless to do every time, but makes more simple code)
             checkbox_op.addEventListener('change', function(){ updateTable(i); });
