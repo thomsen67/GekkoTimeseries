@@ -1235,24 +1235,7 @@ namespace Gekko
             double d = 0;
             if (errorValues != null)
             {
-                d = Math.Abs((double)errorValues[ij]);
-
-                if (Globals.runningOnTTComputer)
-                {
-                    //the method is probably never called with .isRaw==true, but never mind.
-                    if (!decompOptions2.decompOperator.isRaw && decompOptions2.showErrors)
-                    {
-                        if (d > 0.001d)
-                        {
-                            MessageBox.Show("TTH: Error regarding red circles: value = " + errorValues[ij]);
-                        }
-                    }
-                }
-
-                if (d > 1d) d = 1d;
-
-                //d = delete;                
-
+                d = RedLampValue(errorValues, ij, decompOptions2);
                 if (d <= Globals.redThresholds[0]) { /* do nothing */ }
                 else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) brush.Color = Globals.yellow;
                 else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) brush.Color = Globals.orange;
@@ -1280,10 +1263,51 @@ namespace Gekko
             dp.SetValue(Grid.RowProperty, i);
             dp.Children.Add(r);
             dp.HorizontalAlignment = HorizontalAlignment.Right;
-            string xx = "row";
-            if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "col";
-            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (errorValues[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox.\nThe colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%.";
+            string rowCol = "row";
+            if (isRowOrCol == Decomp.ERowsCols.Cols) rowCol = "col";            
+            dp.ToolTip = RedLampText(rowCol, "Try to click the 'Errors' checkbox.", errorValues[ij]);
             g.Children.Add(dp);
+        }
+
+        /// <summary>
+        /// Take the abs() of lamp values for decomp table.
+        /// </summary>
+        /// <param name="errorValues"></param>
+        /// <param name="i"></param>
+        /// <param name="decompOptions2"></param>
+        /// <returns></returns>
+        public static double RedLampValue(List<double> errorValues, int i, DecompOptions2 decompOptions2)
+        {
+            double d = Math.Abs((double)errorValues[i]);
+            if (Globals.runningOnTTComputer)
+            {
+                if (decompOptions2 != null)
+                {
+                    //the method is probably never called with .isRaw==true, but never mind.
+                    if (!decompOptions2.decompOperator.isRaw && decompOptions2.showErrors)
+                    {
+                        if (d > 0.001d)
+                        {
+                            MessageBox.Show("TTH: Error regarding red circles: value = " + errorValues[i]);
+                        }
+                    }
+                }
+            }
+
+            if (d > 1d) d = 1d;
+            return d;
+        }
+
+        /// <summary>
+        /// Text used for tooltips regarding "lamps" in decomp table
+        /// </summary>
+        /// <param name="rowCol"></param>
+        /// <param name="s"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static string RedLampText(string rowCol, string s, double v)
+        {
+            return "The relative difference between the value of " + rowCol + " #1 and the \n" + "sum of the rest of the " + rowCol + "s is = " + (v * 100d).ToString("0.00") + "%" + "\n" + s + "\n" + "The colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%.";
         }
 
         private void SetBorderThickness(Grid g, int i, int j, Border border)

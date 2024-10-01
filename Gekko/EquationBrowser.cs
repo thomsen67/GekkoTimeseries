@@ -1040,6 +1040,7 @@ namespace Gekko
                 {
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
                     Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;" + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    //Program.RunGekkoCommands("qbnp <2030 2035> *= 1.1, 1.2, 1.3, 1.4, 1.5, 1.6;", "", 0, new P());
                 }
             }
 
@@ -1526,8 +1527,8 @@ namespace Gekko
             width: 0.65em;
             height: 0.65em;
             border-radius: 50%;
-            background-color: red;
-            border: 0.1em solid #d0d7e5;
+            background-color: #f01e3c;
+            border: 0.1em solid gray;
             margin-right: 0.5em;
             margin-left: 0.5em;
         }
@@ -1537,8 +1538,8 @@ namespace Gekko
             width: 0.65em;
             height: 0.65em;
             border-radius: 50%;
-            background-color: orange;
-            border: 0.1em solid #d0d7e5;
+            background-color: #ffc914;
+            border: 0.1em solid gray;
             margin-right: 0.5em;
             margin-left: 0.5em;
         }
@@ -1548,8 +1549,8 @@ namespace Gekko
             width: 0.65em;
             height: 0.65em;
             border-radius: 50%;
-            background-color: yellow;
-            border: 0.1em solid #d0d7e5;
+            background-color: #fafa0f;
+            border: 0.1em solid gray;
             margin-right: 0.5em;
             margin-left: 0.5em;
         }
@@ -1908,10 +1909,11 @@ namespace Gekko
             decompOptions2.decompOperator = new DecompOperator("d");
             decompOptions2.new_select = new List<string>() { variableName };
             decompOptions2.new_from = new List<string>() { equationHelper.name };
-            decompOptions2.new_endo = new List<string>() { variableName };
+            decompOptions2.new_endo = new List<string>() { variableName };            
+
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
-            decompOptions2.showErrors = true;                        
+            decompOptions2.showErrors = false;                        
             GekkoSmpl smpl = new GekkoSmpl(t1, t2);
             DecompDatas decompDatas = new DecompDatas();
             GekkoTime gt1, gt2;
@@ -1934,14 +1936,24 @@ namespace Gekko
                 decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
                 DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
                 //Remember red circles
+                if (G.Equal(variableName, "qbnp") && G.Equal(equationHelper.name, "e_qbnp"))
+                {
+                }
                 Table decompTable = decompOutput.table;
 
                 table += "<thead>" + G.NL;
                 table += "<tr><th></th>" + G.NL;
                 for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
-                {
+                {                    
+                    double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
+                    string tooltip = WindowDecomp.RedLampText("row", "You may click the 'Errors' link to see the errors.", decompOutput.red[j2 - 2]);
+                    string imageHtml = null;
+                    if (d <= Globals.redThresholds[0]) { /* do nothing */ }
+                    else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) imageHtml = "<div class=`yellowcircle` style=`float: right;` title=`" + tooltip + "`></div>";
+                    else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) imageHtml = "<div class=`orangecircle` style=`float: right` title=`" + tooltip + "`></div>";
+                    else if (d > Globals.redThresholds[2]) imageHtml = "<div class=`redcircle` style=`float: right` title=`" + tooltip + "`></div>";                    
                     Cell c = decompTable.Get(1, j2);
-                    table += "<th align = `right`>" + c.CellText.TextData[0] + "<div class=`redcircle`></div>" + "<div class=`orangecircle`></div>" + "<div class=`yellowcircle`></div>" + "</th>";
+                    table += "<th>" + "<span style=`text-align: left`>" + c.CellText.TextData[0] + "</span>" + "" + imageHtml + "</th>";
                 }
 
                 table += "</tr>" + G.NL;
