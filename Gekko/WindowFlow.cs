@@ -50,15 +50,16 @@ namespace Gekko
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
                     Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;", "", 0, new P());
 
-                    string equationName = "E_qBNP";
-                    string variableName = "qBNP";
+
+                    GekkoDictionary<string, string> matches = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    matches.Add("vtKilde", "E_vtKilde");
+                    matches.Add("vtKommune[tot]", "E_vtkommune_tot");
+
                     GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
                     GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
 
                     FlowInfo flowInfo = Decomp.GetFlowInfoFromDecomp(t1, t2, equationName, variableName, "d", 2);
-
-                    flowInfo.children = null;
-
+                    
                     Edge e = null;
                     Node n = null;
 
@@ -66,64 +67,23 @@ namespace Gekko
 
                     //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();                    
 
-
-                    e = graph.AddEdge("vtAktie", "vtKilde");
-                    e.Attr.Color = Color(0.10);
-
-                    //e = graph.AddEdge("vtKilde", "vtAktie");
-                    //e.Attr.Color = Color(0.10);
-
-                    e = graph.AddEdge("vtKommune", "vtKilde");
-                    e.Attr.Color = Color(0.73);
-
-                    e = graph.AddEdge("vtBund", "vtKilde");
-                    e.Attr.Color = Color(0.35);
-
-                    e = graph.AddEdge("vSkatteplInd", "vtKommune");
-                    e.Attr.Color = Color(1.08);
-
-                    e = graph.AddEdge("vPersFradrag", "vtKommune");
-                    e.Attr.Color = Color(-0.09);
-
-                    e = graph.AddEdge("vPersInd", "vtBund");
-                    e.Attr.Color = Color(1.08);
-
-                    e = graph.AddEdge("vPersFradrag", "vtBund");
-                    e.Attr.Color = Color(-0.08);
-
-                    e = graph.AddEdge("vRealiseretAktieOmv", "vtAktie");
-                    e.Attr.Color = Color(0.40);
-
-                    e = graph.AddEdge("vHh[-1]", "vtAktie");
-                    e.Attr.Color = Color(0.60);
-
-                    e = graph.AddEdge("vWHh", "vPersInd");
-                    e.Attr.Color = Color(1.21);
-
-                    e = graph.AddEdge("vPensIndb", "vPersInd");
-                    e.Attr.Color = Color(-0.11);
-
-                    e = graph.AddEdge("vtHhAM", "vPersInd");
-                    e.Attr.Color = Color(-0.10);
-
-                    e = graph.AddEdge("vSatsIndeks", "vPersFradrag");
-                    e.Attr.Color = Color(1.00);
-
-                    e = graph.AddEdge("vPersInd", "vSkatteplInd");
-                    e.Attr.Color = Color(1.10);
-
-                    e = graph.AddEdge("vBeskFradrag", "vSkatteplInd");
-                    e.Attr.Color = Color(-0.07);
-
-                    e = graph.AddEdge("vWHh", "vBeskFradrag");
-                    e.Attr.Color = Color(1.00);
-
-                    foreach (string s in new string[] { "vtKilde", "vtAktie", "vtKommune", "vtBund", "vSkatteplInd", "vPersFradrag", "vRealiseretAktieOmv", "vHh[-1]", "vPersInd", "vWHh", "vPensIndb", "vtHhAM", "vSatsIndeks", "vBeskFradrag" })
+                    GekkoDictionary<string, bool> vars = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    FlowItem flowParent = flowInfo.children[0];
+                    for (int i = 1; i < flowInfo.children.Count; i++)  //skips first
+                    {                        
+                        FlowItem flowChild = flowInfo.children[i];
+                        e = graph.AddEdge(flowChild.box1, flowChild.box2);
+                        e.Attr.Color = Color(flowChild.thickness / flowParent.thickness);
+                        if (!vars.ContainsKey(flowChild.box1)) vars.Add(flowChild.box1, false);
+                        if (!vars.ContainsKey(flowChild.box2)) vars.Add(flowChild.box2, false);
+                    }
+                    
+                    foreach (string s in vars.Keys)
                     {
                         n = graph.FindNode(s);
                         n.Attr.LabelMargin = 4;
                         n.Attr.Color = Color(0.3);
-                        if (s == "vtKilde") n.Attr.FillColor = Color(0.3);
+                        if (G.Equal(s, variableName)) n.Attr.FillColor = Color(0.3);
                     }
 
                     if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;

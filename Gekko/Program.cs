@@ -191,6 +191,7 @@ namespace Gekko
         public GekkoTime period = GekkoTime.tNull;
         public string variableName = null;
         public string equationName = null;
+        public FlowItem own = null;
         public List<FlowItem> children =new List<FlowItem>();
     }
 

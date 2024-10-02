@@ -5277,7 +5277,7 @@ namespace Gekko
         /// <summary>
         /// A bit like the same engine as used for html browser, this code finds precedents
         /// to a given variable from a given equation. It returns a compact object which has 
-        /// a list of connections.
+        /// a list of connections. The first item in .children is always the variableName item itself (first row of decomp table)
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
@@ -5314,7 +5314,7 @@ namespace Gekko
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
             decompDatas.MAIN_data = null;
             if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
-            decompOptions2.decompOperator = new DecompOperator("d");
+            decompOptions2.decompOperator = new DecompOperator(op);
             decompOptions2.showErrors = true;
             string residualName = Program.GetDecompResidualName(0, 1);
             int funcCounter = 0;
@@ -5344,15 +5344,15 @@ namespace Gekko
                 name = name.Trim();
 
                 FlowItem flowItem = new FlowItem();
-                flowItem.box1 = flowInfo.variableName;
-                flowItem.box2 = name;
+                flowItem.box1 = name;
+                flowItem.box2 = flowInfo.variableName;                
 
                 for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                 {
                     Cell cellData = decompTable.Get(i2, j2);
                     double value = cellData.number;
                     if (j2 == 2 + offset) flowItem.thickness = value;
-                }
+                }                
                 flowInfo.children.Add(flowItem);
             }
 
