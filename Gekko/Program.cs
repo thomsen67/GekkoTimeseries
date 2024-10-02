@@ -183,6 +183,27 @@ namespace Gekko
         public bool zeros2 = false;
     }
 
+    /// <summary>
+    /// Stores info for flowgraph, like boxes and arrows, arrow thickness, etc.
+    /// </summary>
+    public class FlowInfo 
+    {
+        public GekkoTime period = GekkoTime.tNull;
+        public string variableName = null;
+        public string equationName = null;
+        public List<FlowItem> children =new List<FlowItem>();
+    }
+
+    /// <summary>
+    /// Connection betwee a box and another box
+    /// </summary>
+    public class FlowItem
+    {
+        public string box1 = null;
+        public string box2 = null;
+        public double thickness = 0d;
+    }
+
     public class EquationTextHelper
     {
         public bool showTime = false;

@@ -1060,7 +1060,6 @@ namespace Gekko
 
             Model model = Program.model;
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-
             //The following loads the databank values into the scalar model, for reuse for all the DECOMP
             //calculations later on.
             //BEWARE: should t1 have 2-3 periods subtraced for instance? But t1.Add(-3) does not seem to change anything.
@@ -1550,10 +1549,6 @@ namespace Gekko
                         decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
                         DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
 
-                        //if (G.Equal(variableName, "qbnp") && G.Equal(equationHelper.name, "e_qbnp"))
-                        //{
-                        //}
-
                         Table decompTable = decompOutput.table;
 
                         table += "<thead>" + G.NL;
@@ -1644,7 +1639,7 @@ namespace Gekko
         private static void ToggleLink(StringBuilder html1, string heading, string firstLine)
         {
             html1.AppendLine("<p><span style=`font-weight:bold`>" + heading + "</span>&nbsp;&nbsp;<span style=`font-size: 0.8em;`>");
-            html1.Append("<a href=`#` class=`toggle-link`>Gekko code</a></span></p><div class=`toggle-content` style=`display: none;`><p>" + firstLine + "</p><pre style=`background-color: #fefce7;`><code>");
+            html1.Append("<a href=`#` class=`toggle-link`>Gekko code</a></span></p><div class=`toggle-content` style=`display: none;`><p>" + firstLine + "</p><pre style=`background-color: #fff3cd;`><code>");
         }
 
         /// <summary>
@@ -2663,10 +2658,12 @@ namespace Gekko
         }
 
         .toggle-content {
-          padding: 5px;      
-          padding-left: 10 px;
-          background-color: #fefce7;
-          color: #6b5840;
+          padding: 10px;                
+          padding-left: 20px;
+          background-color: #fff3cd;
+          border:5px solid #ffe69c;
+          color: #664d03;
+          border-radius: 10px;
         }    
 
         .toggle-link:after {
