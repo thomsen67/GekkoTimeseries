@@ -1593,7 +1593,7 @@ namespace Gekko
                             if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE
                             if (!G.NullOrBlanks(sVarsInside)) title += sVarsInside;
                             string titleHtml = null;
-                            if (!G.NullOrBlanks(title)) titleHtml = " class=`more-info` title=`" + title.Trim() + "`";
+                            if (!G.NullOrBlanks(title)) titleHtml = " title=`" + title.Trim() + "`";
                             string name = cellVariableName.CellText.TextData[0];
                             name = name.Replace(" | [0]", "");
                             name = name.Replace(" | ", "");
@@ -2683,6 +2683,7 @@ namespace Gekko
    
         /* --------- tooltips ------------- */
         
+        /* not working
         .more-info {
           /* border-bottom: 1px dotted; */
           position: relative;
@@ -2695,8 +2696,9 @@ namespace Gekko
             padding: 4px;
             left: 0;
             white-space: nowrap;
+            z-index: 1000;
         }
-
+        */
 
     </style>";
 
@@ -2917,15 +2919,21 @@ namespace Gekko
 
         // -------------- tooltips click (for mobile)
 
-        $(`.more-info`).click(function () {
-          var $title = $(this).find(`.title`);
-          if (!$title.length) {
-            $(this).append('<span class=`title`> ' + $(this).attr(`title`) + '</span>');
-          } else
-          {
-            $title.remove();
-          }
+        /* DOES NOT WORK COMPLETELY, hidden by next row.
+        document.querySelectorAll('.more-info').forEach(function(element) {
+          element.addEventListener('click', function() {
+          const titleElement = element.querySelector('.title');
+          if (!titleElement) {
+          const newTitleElement = document.createElement('span');
+          newTitleElement.className = 'title';
+          newTitleElement.textContent = element.title;
+          element.appendChild(newTitleElement);
+        } else {
+          element.removeChild(titleElement);
+        }
         });
+        });
+        */
         
         // --------------- Initialize the display (show the default table)
         " + s + @"
