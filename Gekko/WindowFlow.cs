@@ -55,75 +55,9 @@ namespace Gekko
                     GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
                     GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
 
-                    FlowInfo flowInfo = new FlowInfo(); int two = 2;
+                    FlowInfo flowInfo = Decomp.GetFlowInfoFromDecomp(t1, t2, equationName, variableName, "d", 2);
 
-                    flowInfo.variableName = variableName;
-                    flowInfo.equationName = equationName;
-                    flowInfo.period = t1.Add(two);  //2030
-
-                    ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                    Model model = Program.model;                    
-                    modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);                    
-                    DecompOptions2 decompOptions2 = new DecompOptions2();
-                    decompOptions2.t1 = t1;
-                    decompOptions2.t2 = t2;
-                    decompOptions2.decompOperator = new DecompOperator("d");
-                    decompOptions2.new_select = new List<string>() { variableName };
-                    decompOptions2.new_from = new List<string>() { equationName };
-                    decompOptions2.new_endo = new List<string>() { variableName };
-                    decompOptions2.rows = new List<string>() { "vars", "lags" };
-                    decompOptions2.cols = new List<string>() { "time" };
-                    GekkoSmpl smpl = new GekkoSmpl(t1, t2);
-                    DecompDatas decompDatas = new DecompDatas();
-                    GekkoTime gt1, gt2;
-                    Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);
-                    Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
-                    string lhsString = "Expression value";
-                    Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
-                    if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
-                    decompDatas.MAIN_data = null;
-                    if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
-                    decompOptions2.decompOperator = new DecompOperator("d");
-                    decompOptions2.showErrors = true;
-                    string residualName = Program.GetDecompResidualName(0, 1);
-                    int funcCounter = 0;
-                    DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
-                    Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
-                    decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-                    DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
-                    Table decompTable = decompOutput.table;
-
-                    for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
-                    {
-                        Cell cellVariableName = decompTable.Get(i2, 1);
-                        List<string> vars = new List<string>();
-                        Cell cellFirstData = decompTable.Get(i2, 2);
-                        string uniqueName = null;
-                        if (cellFirstData != null)
-                        {
-                            vars = cellFirstData.vars_hack;
-                            uniqueName = Decomp.HiddenVariableHelper(cellFirstData, true);
-                        }
-                        string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
-                        string label = null;
-                        if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
-                        string name = cellVariableName.CellText.TextData[0];
-                        name = name.Replace(" | [0]", "");
-                        name = name.Replace(" | ", "");
-                        name = name.Trim();
-
-                        FlowItem flowItem = new FlowItem();
-                        flowItem.box1 = flowInfo.variableName;
-                        flowItem.box2 = name;
-
-                        for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
-                        {
-                            Cell cellData = decompTable.Get(i2, j2);
-                            double value = cellData.number;
-                            if (j2 == 2 + two) flowItem.thickness = value;
-                        }
-                        flowInfo.children.Add(flowItem);
-                    }
+                    flowInfo.children = null;
 
                     Edge e = null;
                     Node n = null;
@@ -449,7 +383,7 @@ namespace Gekko
             {
                 MessageBox.Show(e.ToString(), "Loading of Gekko flowgraph Failed", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
+        }        
 
         private static Color Color(double d2)
         {
