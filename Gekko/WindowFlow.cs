@@ -50,40 +50,59 @@ namespace Gekko
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
                     Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;", "", 0, new P());
 
-
                     GekkoDictionary<string, string> matches = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    
+                    string supreme = "vtKilde";
                     matches.Add("vtKilde", "E_vtKilde");
                     matches.Add("vtKommune[tot]", "E_vtkommune_tot");
+                    matches.Add("vtBund[tot]", "E_vtbund_tot");
+                    matches.Add("vtAktie[tot]", "E_vtaktie_tot");
 
-                    GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
-                    GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
-
-                    FlowInfo flowInfo = Decomp.GetFlowInfoFromDecomp(t1, t2, equationName, variableName, "d", 2);
-                    
                     Edge e = null;
                     Node n = null;
 
-                    double factor = 0.02;
-
-                    //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();                    
-
                     GekkoDictionary<string, bool> vars = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    FlowItem flowParent = flowInfo.children[0];
-                    for (int i = 1; i < flowInfo.children.Count; i++)  //skips first
-                    {                        
-                        FlowItem flowChild = flowInfo.children[i];
-                        e = graph.AddEdge(flowChild.box1, flowChild.box2);
-                        e.Attr.Color = Color(flowChild.thickness / flowParent.thickness);
-                        if (!vars.ContainsKey(flowChild.box1)) vars.Add(flowChild.box1, false);
-                        if (!vars.ContainsKey(flowChild.box2)) vars.Add(flowChild.box2, false);
-                    }
+                    foreach (KeyValuePair<string, string> match in matches)
+                    {
+
+                        GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
+                        GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+
+                        FlowInfo flowInfo = Decomp.GetFlowInfoFromDecomp(t1, t2, match.Key, match.Value, "d", 2);
+
+                        foreach (FlowItem xx in flowInfo.children)
+                        {
+                            if (G.Equal(xx.box1, "vtKommune[tot]")) xx.box1 = "vtKommune";
+                            if (G.Equal(xx.box2, "vtKommune[tot]")) xx.box2 = "vtKommune";
+                            if (G.Equal(xx.box1, "vtBunt[tot]")) xx.box1 = "vtBund";
+                            if (G.Equal(xx.box2, "vtBund[tot]")) xx.box2 = "vtBund";
+                            if (G.Equal(xx.box1, "vtAktie[tot]")) xx.box1 = "vtAktie";
+                            if (G.Equal(xx.box2, "vtAktie[tot]")) xx.box2 = "vtAktie";
+                        }
+                        
+                        double factor = 0.02;
+
+                        //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();                    
+                                                
+                        FlowItem flowParent = flowInfo.children[0];
+                        for (int i = 1; i < flowInfo.children.Count; i++)  //skips first
+                        {
+                            FlowItem flowChild = flowInfo.children[i];
+                            if (G.Equal(flowChild.box1, "Error")) continue;
+                            if (G.Equal(flowChild.box1, "Residual")) continue;
+                            e = graph.AddEdge(flowChild.box1, flowChild.box2);
+                            e.Attr.Color = Color(flowChild.thickness / flowParent.thickness);
+                            if (!vars.ContainsKey(flowChild.box1)) vars.Add(flowChild.box1, false);
+                            if (!vars.ContainsKey(flowChild.box2)) vars.Add(flowChild.box2, false);
+                        }
+                    }                    
                     
                     foreach (string s in vars.Keys)
                     {
                         n = graph.FindNode(s);
                         n.Attr.LabelMargin = 4;
                         n.Attr.Color = Color(0.3);
-                        if (G.Equal(s, variableName)) n.Attr.FillColor = Color(0.3);
+                        if (G.Equal(s, supreme)) n.Attr.FillColor = Color(0.3);
                     }
 
                     if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;

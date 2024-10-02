@@ -5284,7 +5284,7 @@ namespace Gekko
         /// <param name="equationName"></param>
         /// <param name="variableName"></param>
         /// <returns></returns>
-        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string equationName, string variableName, string op, int offset)
+        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, string op, int offset)
         {
             FlowInfo flowInfo = new FlowInfo();
 
