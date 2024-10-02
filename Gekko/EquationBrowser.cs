@@ -1137,7 +1137,7 @@ namespace Gekko
                     string s6 = helper22.s_scalarModel;
                     int index = s6.IndexOf("..");
                     if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
-                    html1.AppendLine("<br>");
+                    html1.AppendLine("<br style=`line-height: 0.2rem;`>");
                     ToggleLink(html1, "Equation", "To see such equations in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     html1.AppendLine("model &lt;gms> makro.zip;");
@@ -1462,8 +1462,8 @@ namespace Gekko
             EquationBrowser.SpanHtmlColor(html2, variableName);
             html2.Append("</p>");
             //EquationBrowser.WriteHtmlColor(html2, variableName);
-            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));
-            html2.AppendLine("<br>");
+            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));            
+            html2.AppendLine("<br style=`line-height: 0.35rem;`>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
             string table = "<table cellpadding=`5`>";
             foreach (EqHelper eqHelper in eqsNew)
@@ -1593,7 +1593,7 @@ namespace Gekko
                             if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE
                             if (!G.NullOrBlanks(sVarsInside)) title += sVarsInside;
                             string titleHtml = null;
-                            if (!G.NullOrBlanks(title)) titleHtml = " title=`" + title.Trim() + "`";
+                            if (!G.NullOrBlanks(title)) titleHtml = " class=`more-info` title=`" + title.Trim() + "`";
                             string name = cellVariableName.CellText.TextData[0];
                             name = name.Replace(" | [0]", "");
                             name = name.Replace(" | ", "");
@@ -1620,7 +1620,9 @@ namespace Gekko
                                 double value = cellData.number;
                                 string dataHtml = " title=`" + value + "`";                            
                                 table += "<td " + style + dataHtml + ">";
-                                string valueFormatted = G.FormatNumber(value, "f15.4", false, false).Trim();
+                                string valueFormatted = null;
+                                if (percent == null) valueFormatted = G.FormatNumber(value, "f15.4", false, false).Trim();
+                                else valueFormatted = G.FormatNumber(value, "f15.2", false, false).Trim();
                                 table += valueFormatted;
                                 table += "</td>";
                             }
@@ -2678,6 +2680,23 @@ namespace Gekko
         .toggle-link.expanded:after {
           transform: rotate(180deg); /* Up arrow */
          }
+   
+        /* --------- tooltips ------------- */
+        
+        .more-info {
+          /* border-bottom: 1px dotted; */
+          position: relative;
+        }
+
+        .more-info .title {
+            position: absolute;
+            top: 20px;
+            background: yellow;
+            padding: 4px;
+            left: 0;
+            white-space: nowrap;
+        }
+
 
     </style>";
 
@@ -2896,7 +2915,19 @@ namespace Gekko
         }
         }
 
-        // Initialize the display (show the default table)
+        // -------------- tooltips click (for mobile)
+
+        $(`.more-info`).click(function () {
+          var $title = $(this).find(`.title`);
+          if (!$title.length) {
+            $(this).append('<span class=`title`> ' + $(this).attr(`title`) + '</span>');
+          } else
+          {
+            $title.remove();
+          }
+        });
+        
+        // --------------- Initialize the display (show the default table)
         " + s + @"
 </script>";
             x.AppendLine("  </head>");
