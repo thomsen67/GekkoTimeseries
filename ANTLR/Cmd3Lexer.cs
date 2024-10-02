@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2024-09-24 14:40:23
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2024-10-02 13:52:45
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -106,7 +106,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int GROUP = 1239;
     public const int ASTINDEXERELEMENTPLUS = 83;
     public const int ASTOPT_STRING_FIRST = 549;
-    public const int LEFTANGLESPECIAL = 1416;
+    public const int LEFTANGLESPECIAL = 1417;
     public const int MDATEFORMAT = 885;
     public const int G_ = 1457;
     public const int ASTGENR = 363;
@@ -150,9 +150,9 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASBANK = 1085;
     public const int ASTOPT_STRING_PRINT = 102;
     public const int ASTOPT_STRING_SUBTITLE = 478;
-    public const int DOUBLEVERTICALBAR2 = 1423;
+    public const int DOUBLEVERTICALBAR2 = 1424;
     public const int ASTOPT_STRING_RESPECT = 595;
-    public const int DOUBLEVERTICALBAR1 = 1422;
+    public const int DOUBLEVERTICALBAR1 = 1423;
     public const int ASTFUNCTIONNAKED = 734;
     public const int ZERO = 1369;
     public const int RETURN2 = 804;
@@ -175,7 +175,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTBANKISSTARCHEATCODE = 243;
     public const int ASTOPT_VAL_Y2MINSOFT = 509;
     public const int ASTPRTTIMEFILTER = 662;
-    public const int GLUESTAR = 1425;
+    public const int GLUESTAR = 1405;
     public const int SPLICE = 1282;
     public const int STACK = 848;
     public const int ASTOPT_STRING_GEKKO20 = 557;
@@ -307,7 +307,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int HPFILTER = 1081;
     public const int MEM = 1129;
     public const int OR = 1182;
-    public const int DigitsEDigits = 1418;
+    public const int DigitsEDigits = 1419;
     public const int FILTER = 1032;
     public const int SPECIALMINUS = 1281;
     public const int ASTCOPYWILDCARD4 = 266;
@@ -325,7 +325,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTCLOSEALL = 255;
     public const int O_ = 1462;
     public const int ASTGENRINDEXER = 364;
-    public const int LEFTBRACKET = 1414;
+    public const int LEFTBRACKET = 1415;
     public const int ASTDATESTATEMENT = 281;
     public const int ASTNAMEDIGIT = 443;
     public const int ASTOPT_STRING_PARAM = 577;
@@ -393,7 +393,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTPRTITEMS = 655;
     public const int ASTDECOMPLINK = 11;
     public const int PUDVALG = 1211;
-    public const int QUESTION = 1410;
+    public const int QUESTION = 1411;
     public const int ASTOPT_STRING_Y2TITLE = 502;
     public const int GCM = 946;
     public const int ERRORS = 859;
@@ -407,7 +407,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTOPT_STRING_FLAT = 615;
     public const int ASTLISTITEMWILDRANGE = 408;
     public const int ASTTUPLE = 744;
-    public const int LEFTBRACKETGLUE = 1413;
+    public const int LEFTBRACKETGLUE = 1414;
     public const int NWIDTH = 1177;
     public const int POINTSIZE = 879;
     public const int CLONE = 932;
@@ -591,7 +591,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTLIBRARYQUESTION = 225;
     public const int ASTOPT_VAL_REPLACE = 627;
     public const int LEAD = 797;
-    public const int DIVEQUAL = 1406;
+    public const int DIVEQUAL = 1407;
     public const int ASTOPT_STRING_X2ZEROAXIS = 510;
     public const int ASTTABLEPRINT = 714;
     public const int ASTMATRIX = 424;
@@ -647,7 +647,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int PDEC = 1193;
     public const int ASTCLOSESTAR = 257;
     public const int ASTTABLEOUTPUTTYPE = 713;
-    public const int BACKSLASH = 1412;
+    public const int BACKSLASH = 1413;
     public const int ASTPRTELEMENTPDEC = 643;
     public const int Y_ = 1466;
     public const int ASTOPT_STRING_STOP = 476;
@@ -658,7 +658,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int UNSWAP = 1341;
     public const int OVERLAY = 1067;
     public const int DOC = 1000;
-    public const int DateDef = 1419;
+    public const int DateDef = 1420;
     public const int ASTOPT_STRING_SORT = 107;
     public const int ASTMAPITEM = 145;
     public const int UGDIF = 1335;
@@ -675,7 +675,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int GEKKO18 = 1063;
     public const int ASTRANGEGENERAL = 86;
     public const int COPY = 962;
-    public const int IdentStartingWithInt = 1420;
+    public const int IdentStartingWithInt = 1421;
     public const int ALL = 906;
     public const int ASTIFOPERATOR1 = 163;
     public const int ASTIFOPERATOR2 = 164;
@@ -905,8 +905,8 @@ public partial class Cmd3Lexer : Lexer {
     public const int FORMAT = 1053;
     public const int ASTMATRIXROW = 142;
     public const int X2ZEROAXIS = 873;
-    public const int STAREQUAL = 1405;
-    public const int GLUEBACKSLASH = 1411;
+    public const int STAREQUAL = 1406;
+    public const int GLUEBACKSLASH = 1412;
     public const int LAGFIX = 828;
     public const int TITLE = 1315;
     public const int FIT = 800;
@@ -947,7 +947,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTDATES2 = 123;
     public const int ASTOPT_STRING_BANK = 522;
     public const int ASTOPT_STRING_COLORS = 538;
-    public const int HAT = 1415;
+    public const int HAT = 1416;
     public const int RES = 1231;
     public const int VERTICALBAR = 1397;
     public const int ASTOPT_STRING_EXPAND = 548;
@@ -993,7 +993,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTOPT_STRING_RES = 594;
     public const int YMINSOFT = 865;
     public const int ERROR = 1015;
-    public const int HATEQUAL = 1407;
+    public const int HATEQUAL = 1408;
     public const int ASTFILENAMEPARTBACKSLASH = 328;
     public const int ASTRENAME = 674;
     public const int ASTGDIFF = 360;
@@ -1017,7 +1017,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int DUMPOPTIONS = 1007;
     public const int FALSE = 1025;
     public const int TABLE1 = 1299;
-    public const int PERCENTEQUAL = 1408;
+    public const int PERCENTEQUAL = 1409;
     public const int STARTFILE = 1287;
     public const int ASTWRITEOPTION = 786;
     public const int LAG = 1108;
@@ -1149,13 +1149,13 @@ public partial class Cmd3Lexer : Lexer {
     public const int EXCLAMATION = 1396;
     public const int ASTTRUNCATE = 743;
     public const int USING = 893;
-    public const int LEFTCURLY = 1421;
+    public const int LEFTCURLY = 1422;
     public const int SIM = 1269;
     public const int ASTEDIT = 310;
     public const int TIMESPAN = 1314;
     public const int ASTURL = 769;
     public const int ASTEXCLAMATION = 418;
-    public const int LEFTANGLESIMPLE = 1417;
+    public const int LEFTANGLESIMPLE = 1418;
     public const int IMPOSE = 888;
     public const int ASTOPT_STRING_LIST = 589;
     public const int ASTDOLLARCONDITIONAL = 147;
@@ -1166,7 +1166,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int ASTOPT_STRING_CAPS = 534;
     public const int ASTFREQ = 345;
     public const int ASTOPT_STRING_R = 201;
-    public const int Double = 1424;
+    public const int Double = 1425;
     public const int ASTPRTELEMENTDEC = 639;
     public const int ASTOPT_STRING_S = 597;
     public const int COLLAPSE = 940;
@@ -1262,7 +1262,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int XTREND = 941;
     public const int SEC = 1247;
     public const int ASTDECOMP2 = 284;
-    public const int HASHEQUAL = 1409;
+    public const int HASHEQUAL = 1410;
     public const int ASTDECOMP3 = 285;
     public const int ASTOPT_LIST_COLNAMES = 423;
     public const int OFFSET = 810;

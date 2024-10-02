@@ -2730,8 +2730,8 @@ assignment:                 assignmentTypeNotEmpty question -> ASTASSIGNMENTQUES
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2   
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2
-						  | assignmentType seriesOpt1? leftSide STAREQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2   
-						  | assignmentType seriesOpt1? leftSide STAREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2
+						  | assignmentType seriesOpt1? leftSide GLUESTAR? STAREQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2               //x*=2 becomes x½*=2, therefore GLUESTAR?
+						  | assignmentType seriesOpt1? leftSide GLUESTAR? STAREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2    //x*=2 becomes x½*=2, therefore GLUESTAR?
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2
 						  | assignmentType seriesOpt1? leftSide percentEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2
