@@ -200,9 +200,9 @@ namespace Gekko
     /// </summary>
     public class FlowItem
     {
-        public string box1 = null;
-        public string box2 = null;
-        public double thickness = 0d;
+        public string from = null;
+        public string to = null;
+        public double v = 0d;
     }
 
     public class EquationTextHelper
@@ -36914,7 +36914,7 @@ namespace Gekko
 
         public FrameLightRow(FrameLight frame)
         {
-            this.storage = new List<CellLight>(new CellLight[frame.colnames.Count]); //fills it with "null"-objects  t);            
+            this.storage = new List<CellLight>(new CellLight[frame.frameColNames.Count]); //fills it with "null"-objects  t);            
         }
 
         public void Set(FrameLight frame, string colname, CellLight cell)
@@ -36931,9 +36931,9 @@ namespace Gekko
 
         public static bool HasColumn(FrameLight frame, string colname)
         {
-            for (int i = 0; i < frame.colnames.Count; i++)
+            for (int i = 0; i < frame.frameColNames.Count; i++)
             {
-                if (G.Equal(frame.colnames[i], colname)) return true;
+                if (G.Equal(frame.frameColNames[i], colname)) return true;
             }
             return false;
         }
@@ -36941,9 +36941,9 @@ namespace Gekko
         public static int FindColumn(FrameLight frame, string colname)
         {
             int j = -12345;
-            for (int i = 0; i < frame.colnames.Count; i++)
+            for (int i = 0; i < frame.frameColNames.Count; i++)
             {
-                if (G.Equal(frame.colnames[i], colname)) j = i;
+                if (G.Equal(frame.frameColNames[i], colname)) j = i;
             }
             if (j == -12345)
             {
@@ -36962,17 +36962,17 @@ namespace Gekko
 
     public class FrameLight
     {
-        public List<FrameLightRow> rows = new List<FrameLightRow>();
-        public List<string> colnames = new List<string>(); //must be lowercase
+        public List<FrameLightRow> frameRows = new List<FrameLightRow>();
+        public List<string> frameColNames = new List<string>(); //must be lowercase
 
         public void AddColName(string colname)
         {
-            if (!this.colnames.Contains(colname, StringComparer.OrdinalIgnoreCase))
+            if (!this.frameColNames.Contains(colname, StringComparer.OrdinalIgnoreCase))
             {
-                this.colnames.Add(colname);
-                for (int i = 0; i < this.rows.Count; i++)
+                this.frameColNames.Add(colname);
+                for (int i = 0; i < this.frameRows.Count; i++)
                 {
-                    this.rows[i].storage.Add(new CellLight());
+                    this.frameRows[i].storage.Add(new CellLight());
                 }
             }
         }

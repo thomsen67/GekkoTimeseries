@@ -12361,7 +12361,7 @@ namespace UnitTests
             Gekko.Table table = null;
             int i = -12345;
 
-            //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
+            //NOTE: ShowDecompTable(); can be used to see tables in GUI
 
             I("flush();");
             I("reset;");
@@ -18633,6 +18633,39 @@ namespace UnitTests
             //Assert.AreEqual(output.known, 6);
             //Assert.AreEqual(output.unique, 2);
             //Assert.IsTrue(output.rss < 1e-14);
+        }
+
+        [TestMethod]
+        public void _Test_DecompPivot()
+        {
+            Program.Flush(); //wipes out existing cached models
+            Globals.unitTestScreenOutput.Clear();
+            I("reset; time 2001 2002;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
+            I("model <gms> pivot1.zip;");            
+            I("x1 = series(2);");
+            I("x2 = series(2);");
+            I("x1[a, a] = 1, 2;");
+            I("x1[a, b] = 2, 3;");
+            I("x1[b, a] = 3, 4;");
+            I("x1[b, b] = 4, 5;");
+            I("x2[a, a] = 100, 200;");
+            I("x2[a, b] = 200, 300;");
+            I("x2[b, a] = 300, 400;");
+            I("x2[b, b] = 400, 500;");
+            I("#i = a, b;");
+            I("#j = a, b;");                        
+            I("x1.setdomains(('#i','#j'));");
+            I("x2.setdomains(('#i','#j'));");
+            I("y = sum((#i, #j), x1[#i, #j] + x2[#i, #j]);");
+            I("prt y;");
+            I("time 2002 2002;");
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            ShowDecompTable();  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            I("decomp <d> y from e endo y;");            
         }
 
         [TestMethod]

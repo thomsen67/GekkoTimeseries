@@ -1958,12 +1958,20 @@ namespace Gekko
                     CrossThreadStuff.GetDecompSizes(parent);
                 }
 
-                Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
-                thread.Name = "Decomp";
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                thread.IsBackground = true;
-                thread.Start(decompFind);
+                if (G.IsUnitTesting() && Globals.showDecompTable == true)
+                {
+                    //Skip the "Decomp" thread stuff when unit testing -- will give TreadAbortedException for some reason not understood.
+                    CreateDecompWindow(decompFind);
+                }
+                else
+                {
+                    Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
+                    thread.Name = "Decomp";
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                    thread.IsBackground = true;
+                    thread.Start(decompFind);
+                }
 
                 //Also see #9237532567
                 //This stuff makes sure we wait for the window to open, before we move on with the code.
@@ -1998,7 +2006,8 @@ namespace Gekko
         private static void CreateDecompWindow(object o2)
         {
             DecompFind decompFind = o2 as DecompFind;
-            WindowDecomp windowDecomp = null;
+            WindowDecomp windowDecomp = null;            
+
             try
             {                
                 windowDecomp = new WindowDecomp(decompFind);
@@ -3317,44 +3326,32 @@ namespace Gekko
             // ==============================================================================
 
             decompOptions2.all.Clear();
-            foreach (string s in frame.colnames)
+            foreach (string s in frame.frameColNames)
             {
                 decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
             }
 
             GekkoDictionary<string, AggContainer> agg = new GekkoDictionary<string, AggContainer>(StringComparer.OrdinalIgnoreCase);
             int valueI = FrameLightRow.FindColumn(frame, G.HandleInternalIdentifyer2("value"));
-
-            //get the free values start
-            bool getFreeValues = false;
-            if (decompOptions2.freeValues == null)
-            {
-                decompOptions2.freeValues = new List<GekkoDictionary<string, string>>();
-                getFreeValues = true;
-            }
-
-            for (int i = 0; i < frame.colnames.Count; i++)
-            {
-                decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-            }
-            //get the free values end   
-
-            foreach (FrameLightRow row in frame.rows)
+                        
+            bool getFreeValues = DecompPivotAggregateGetFreeValues(frame, decompOptions2);
+            
+            foreach (FrameLightRow framerow in frame.frameRows)
             {
                 ENormalizerType normalizerType = ENormalizerType.None;
 
-                if (G.Equal(normalizerVariableWithIndex, row.Get(frame, Globals.col_fullVariableName).text))
+                if (G.Equal(normalizerVariableWithIndex, framerow.Get(frame, Globals.col_fullVariableName).text))
                 {
-                    if (row.Get(frame, Globals.col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
+                    if (framerow.Get(frame, Globals.col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
                     else normalizerType = ENormalizerType.NormalizerWithLagOrLead;
                 }
 
                 if (getFreeValues)
                 {
-                    for (int i = 0; i < frame.colnames.Count; i++)
+                    for (int i = 0; i < frame.frameColNames.Count; i++)
                     {
                         if (i == valueI) continue;
-                        string s = row.storage[i].text;
+                        string s = framerow.storage[i].text;
                         if (s == null) s = Globals.decompNull;  //hmmm used at all??
                         if (!decompOptions2.freeValues[i].ContainsKey(s)) decompOptions2.freeValues[i].Add(s, null);
                     }
@@ -3363,7 +3360,7 @@ namespace Gekko
                 bool skip = false;
                 foreach (FrameFilter filter in decompOptions2.filters)
                 {
-                    CellLight c = row.Get(frame, filter.name);
+                    CellLight c = framerow.Get(frame, filter.name);
                     if (c.type != ECellLightType.String && c.type != ECellLightType.None) throw new GekkoException();
                     string ss = c.text;
                     if (c.type == ECellLightType.None || !filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
@@ -3386,7 +3383,7 @@ namespace Gekko
                 string s1 = null;
                 foreach (string s in decompOptions2.rows)
                 {
-                    s1 = DecompAddText(frame, row, s1, s);
+                    s1 = DecompAddText(frame, framerow, s1, s);
                     if (s == Globals.col_variable) s1 += more;
                 }
                 if (s1 != null)
@@ -3397,7 +3394,7 @@ namespace Gekko
                 string s2 = null;
                 foreach (string s in decompOptions2.cols)
                 {
-                    s2 = DecompAddText(frame, row, s2, s);
+                    s2 = DecompAddText(frame, framerow, s2, s);
                     if (s == Globals.col_variable) s2 += more;
                 }
                 if (s2 != null)
@@ -3406,15 +3403,15 @@ namespace Gekko
                 }
                 string key = s1 + "¤" + s2;  //row ¤ col
 
-                double d = row.Get(frame, Globals.col_value).data;
-                double dAlternative = row.Get(frame, Globals.col_valueAlternative).data;
-                double dLevel = row.Get(frame, Globals.col_valueLevel).data;
-                double dLevelLag = row.Get(frame, Globals.col_valueLevelLag).data;
-                double dLevelLag2 = row.Get(frame, Globals.col_valueLevelLag2).data;
-                double dLevelRef = row.Get(frame, Globals.col_valueLevelRef).data;
-                double dLevelRefLag = row.Get(frame, Globals.col_valueLevelRefLag).data;
-                double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
-                string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;                
+                double d = framerow.Get(frame, Globals.col_value).data;
+                double dAlternative = framerow.Get(frame, Globals.col_valueAlternative).data;
+                double dLevel = framerow.Get(frame, Globals.col_valueLevel).data;
+                double dLevelLag = framerow.Get(frame, Globals.col_valueLevelLag).data;
+                double dLevelLag2 = framerow.Get(frame, Globals.col_valueLevelLag2).data;
+                double dLevelRef = framerow.Get(frame, Globals.col_valueLevelRef).data;
+                double dLevelRefLag = framerow.Get(frame, Globals.col_valueLevelRefLag).data;
+                double dLevelRefLag2 = framerow.Get(frame, Globals.col_valueLevelRefLag2).data;
+                string fullVariableName = framerow.Get(frame, Globals.col_fullVariableName).text;
 
                 string backgroundColor = "Transparent";
                 if (Program.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
@@ -3455,6 +3452,23 @@ namespace Gekko
                 }
             }
             return agg;
+        }
+
+        private static bool DecompPivotAggregateGetFreeValues(FrameLight frame, DecompOptions2 decompOptions2)
+        {
+            bool getFreeValues = false;
+            if (decompOptions2.freeValues == null)
+            {
+                decompOptions2.freeValues = new List<GekkoDictionary<string, string>>();
+                getFreeValues = true;
+            }
+
+            for (int i = 0; i < frame.frameColNames.Count; i++)
+            {
+                decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+            }
+
+            return getFreeValues;
         }
 
         public static string Text1(int i)
@@ -3738,14 +3752,14 @@ namespace Gekko
                         dr.Set(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                         dr.Set(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
 
-                        frame.rows.Add(dr);
+                        frame.frameRows.Add(dr);
                     }
                 }
             }
 
             if (decompOptions2.ageHierarchy && FrameLightRow.HasColumn(frame, Globals.internalSetIdentifyer + "a"))
             {
-                foreach (FrameLightRow row in frame.rows)
+                foreach (FrameLightRow row in frame.frameRows)
                 {
                     CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
                     string s = c.text;
@@ -4614,14 +4628,14 @@ namespace Gekko
         public static void WriteDatatableTocsv(FrameLight dt)
         {
             StringBuilder sb = new StringBuilder();
-            List<string> columnNames = new List<string>(dt.colnames);
+            List<string> columnNames = new List<string>(dt.frameColNames);
             for (int i = 0; i < columnNames.Count; i++)
             {
                 columnNames[i] = G.HandleInternalIdentifyer1(columnNames[i]);
                 if (columnNames[i] == "universe") columnNames[i] = "#universe";
             }
             sb.AppendLine(string.Join(";", columnNames));
-            foreach (FrameLightRow row in dt.rows)
+            foreach (FrameLightRow row in dt.frameRows)
             {
                 string s = null;
                 foreach (CellLight c in row.storage)
@@ -5286,6 +5300,8 @@ namespace Gekko
         /// <returns></returns>
         public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, string op, int offset)
         {
+            bool useRealNames = true;
+            
             FlowInfo flowInfo = new FlowInfo();
 
             flowInfo.variableName = variableName;
@@ -5344,14 +5360,21 @@ namespace Gekko
                 name = name.Trim();
 
                 FlowItem flowItem = new FlowItem();
-                flowItem.box1 = name;
-                flowItem.box2 = flowInfo.variableName;                
+                if (useRealNames)
+                {
+
+                }
+                else
+                {
+                    flowItem.from = name;
+                }
+                flowItem.to = flowInfo.variableName;                
 
                 for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                 {
                     Cell cellData = decompTable.Get(i2, j2);
                     double value = cellData.number;
-                    if (j2 == 2 + offset) flowItem.thickness = value;
+                    if (j2 == 2 + offset) flowItem.v = value;
                 }                
                 flowInfo.children.Add(flowItem);
             }

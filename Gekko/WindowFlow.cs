@@ -72,12 +72,12 @@ namespace Gekko
 
                         foreach (FlowItem xx in flowInfo.children)
                         {
-                            if (G.Equal(xx.box1, "vtKommune[tot]")) xx.box1 = "vtKommune";
-                            if (G.Equal(xx.box2, "vtKommune[tot]")) xx.box2 = "vtKommune";
-                            if (G.Equal(xx.box1, "vtBunt[tot]")) xx.box1 = "vtBund";
-                            if (G.Equal(xx.box2, "vtBund[tot]")) xx.box2 = "vtBund";
-                            if (G.Equal(xx.box1, "vtAktie[tot]")) xx.box1 = "vtAktie";
-                            if (G.Equal(xx.box2, "vtAktie[tot]")) xx.box2 = "vtAktie";
+                            if (G.Equal(xx.from, "vtKommune[tot]")) xx.from = "vtKommune";
+                            if (G.Equal(xx.to, "vtKommune[tot]")) xx.to = "vtKommune";
+                            if (G.Equal(xx.from, "vtBunt[tot]")) xx.from = "vtBund";
+                            if (G.Equal(xx.to, "vtBund[tot]")) xx.to = "vtBund";
+                            if (G.Equal(xx.from, "vtAktie[tot]")) xx.from = "vtAktie";
+                            if (G.Equal(xx.to, "vtAktie[tot]")) xx.to = "vtAktie";
                         }
                         
                         double factor = 0.02;
@@ -88,12 +88,12 @@ namespace Gekko
                         for (int i = 1; i < flowInfo.children.Count; i++)  //skips first
                         {
                             FlowItem flowChild = flowInfo.children[i];
-                            if (G.Equal(flowChild.box1, "Error")) continue;
-                            if (G.Equal(flowChild.box1, "Residual")) continue;
-                            e = graph.AddEdge(flowChild.box1, flowChild.box2);
-                            e.Attr.Color = Color(flowChild.thickness / flowParent.thickness);
-                            if (!vars.ContainsKey(flowChild.box1)) vars.Add(flowChild.box1, false);
-                            if (!vars.ContainsKey(flowChild.box2)) vars.Add(flowChild.box2, false);
+                            if (G.Equal(flowChild.from, "Error")) continue;
+                            if (G.Equal(flowChild.from, "Residual")) continue;
+                            e = graph.AddEdge(flowChild.from, flowChild.to);
+                            e.Attr.Color = Color(flowChild.v / flowParent.v);
+                            if (!vars.ContainsKey(flowChild.from)) vars.Add(flowChild.from, false);
+                            if (!vars.ContainsKey(flowChild.to)) vars.Add(flowChild.to, false);
                         }
                     }                    
                     

@@ -231,7 +231,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method for DECOMP
+        /// Helper method for decomp. Removes "gekkopivot__" and replaces "gekkoset__" with "#".
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
