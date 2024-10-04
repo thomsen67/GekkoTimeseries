@@ -2507,6 +2507,37 @@ namespace Gekko
                 return;
             }
 
+            if (Globals.runningOnTTComputer && (text == "pivot"))
+            {
+                var data = new List<PivotDataRow>
+        {
+            new PivotDataRow { RowField = "A", ColumnField = "X", ValueField = 5 },
+            new PivotDataRow { RowField = "A", ColumnField = "Y", ValueField = 10 },
+            new PivotDataRow { RowField = "B", ColumnField = "X", ValueField = 15 },
+            new PivotDataRow { RowField = "B", ColumnField = "Y", ValueField = 20 },
+            new PivotDataRow { RowField = "A", ColumnField = "X", ValueField = 5 }
+        };
+
+                // Create pivot table (row: RowField, column: ColumnField, value: sum(ValueField))
+                var pivotTable = PivotTable.CreatePivotTable(
+                    data,
+                     row => row.RowField,           // Correct row selector
+                     row => row.ColumnField,        // Correct column selector
+                     row => row.ValueField,         // Correct value selector
+                     values => values.Sum()         // Aggregation function (sum)
+                );
+
+                // Display the result
+                foreach (var row in pivotTable)
+                {
+                    G.Writeln(row.Key + ":");
+                    foreach (var column in row.Value)
+                    {
+                        G.Writeln("  " + column.Key + ": " + column.Value);
+                    }
+                }
+            }
+        
 
             if (text == "flowgraph1" || text == "flowgraph2")
             {

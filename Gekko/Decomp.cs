@@ -13,6 +13,66 @@ using System.Threading;
 
 namespace Gekko
 {
+
+
+    public class PivotDataRow
+    {
+        public string RowField { get; set; }
+        public string ColumnField { get; set; }
+        public int ValueField { get; set; }
+    }
+
+    public class PivotTable
+    {
+        public static Dictionary<string, Dictionary<string, int>> CreatePivotTable(
+            List<PivotDataRow> data,
+            Func<PivotDataRow, string> rowSelector,
+            Func<PivotDataRow, string> columnSelector,
+            Func<PivotDataRow, int> valueSelector,
+            Func<IEnumerable<int>, int> aggFunction
+        )
+        {
+            // Step 1: Initialize an empty dictionary for the pivot table
+            var pivotTable = new Dictionary<string, Dictionary<string, List<int>>>();
+
+            // Step 2: Iterate through each row in the data
+            foreach (var row in data)
+            {
+                var rowKey = rowSelector(row); // Group by row field
+                var columnKey = columnSelector(row); // Group by column field
+
+                // Step 3: Initialize row in the pivot table if it doesn't exist
+                if (!pivotTable.ContainsKey(rowKey))
+                {
+                    pivotTable[rowKey] = new Dictionary<string, List<int>>();
+                }
+
+                // Step 4: Initialize column in the row if it doesn't exist
+                if (!pivotTable[rowKey].ContainsKey(columnKey))
+                {
+                    pivotTable[rowKey][columnKey] = new List<int>();
+                }
+
+                // Step 5: Add the value to the appropriate cell
+                pivotTable[rowKey][columnKey].Add(valueSelector(row));
+            }
+
+            // Step 6: Apply the aggregation function to each cell
+            var resultTable = new Dictionary<string, Dictionary<string, int>>();
+            foreach (var rowEntry in pivotTable)
+            {
+                resultTable[rowEntry.Key] = new Dictionary<string, int>();
+                foreach (var columnEntry in rowEntry.Value)
+                {
+                    resultTable[rowEntry.Key][columnEntry.Key] = aggFunction(columnEntry.Value);
+                }
+            }
+
+            return resultTable;
+        }
+    }
+
+
     public class DecompOutput
     {
         public Table table = null;
@@ -2848,7 +2908,7 @@ namespace Gekko
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
-            if (true && (Globals.runningOnTTComputer || G.IsUnitTesting()))
+            if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
                 //For testing purposes (Excel or Google sheets)
                 WriteDatatableTocsv(frame);
@@ -3484,12 +3544,13 @@ namespace Gekko
             int superN = 1;
 
             //The DataTable dt will get the following colums:
-            //<t>:         time
-            //<variable>:  variable name, like fy or pop
-            //<lag>:       lag or lead
-            //<#universe>: universal set for elements without domain info
-            //#i:          set names, like #age, #sector, etc.
-            //<value>:     data value
+            //time         time
+            //vars         variable name, like x or npop
+            //lags:        lag or lead, [0] for none
+            //<#universe>  universal set for elements without domain info (corresponds to x[*] in contrast to x[#i])
+            //#i           set names, like #age, #sector, etc.
+            //x#1, x#2:    dimension of x           
+            //value        data value
 
             FrameLight frame = new FrameLight();
             frame.AddColName(Globals.col_t);
@@ -3511,9 +3572,12 @@ namespace Gekko
                 frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
             }
 
-            //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
+            //adding frame rows, while also getting sets defined as frame columns
 
-            for (int super = 0; super < superN; super++)  //Normally super = 0. Equations like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
+            for (int super = 0; super < superN; super++)  //Gekko 4.0: remove stuff with > 1 variable explained. Also equationnumber.
+                                                          //It was a misconception to make it possible to analyze y[#a] = f(x[#i]) as LSH. If that needs to be done,
+                                                          //analyze sum(#a, f(x[#i]) instead. Much more logical.
+                                                          //Normally super = 0. Equations like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
             {
                 int j = 0;
                 foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
@@ -3597,7 +3661,7 @@ namespace Gekko
                                 if (domain != null)
                                 {
                                     string setname = domain.ToLower();
-                                    if (setname == null) setname = Globals.col_universe;
+                                    if (setname == null) setname = Globals.col_universe; //corresonds to x[*]
                                     frame.AddColName(setname);  //will .tolower() and ignore dublets
                                 }
                             }
@@ -3777,6 +3841,8 @@ namespace Gekko
 
             return frame;
         }
+
+
 
         /// <summary>
         /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
