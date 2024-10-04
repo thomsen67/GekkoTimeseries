@@ -180,8 +180,6 @@ namespace Gekko
 
         //public static int decompWindowCounter = 0;
 
-        public static bool decompUnitCsvPivot = false;  //can activate xlsx pivot writing   
-
         public const string internalColumnIdentifyer = "gekkopivot__";
         public const string internalSetIdentifyer = "gekkoset__";
         public static string internalPivotRows = "Rows";

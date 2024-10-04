@@ -2848,8 +2848,9 @@ namespace Gekko
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
-            if (false && Globals.decompUnitCsvPivot)
+            if (true && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
+                //For testing purposes (Excel or Google sheets)
                 WriteDatatableTocsv(frame);
             }
 
@@ -3319,7 +3320,7 @@ namespace Gekko
             //Aggregation
             //Aggregation
             //
-            // decompOptions2.all gets sets at the end, for instance "#i"
+            // decompOptions2.all receives sets at the end, for instance "#i"
             // decompOptions2.freeValues has a Dict for each frame.colnames.Count (for instance 15)
             //
             //
@@ -4645,8 +4646,7 @@ namespace Gekko
                 if (s != null) s = s.Substring(0, s.Length - "; ".Length);
                 sb.AppendLine(s);
             }
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString(), G.GetEncoding());
-            //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString(), G.GetEncoding());            
         }
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel, bool missingAsZero)

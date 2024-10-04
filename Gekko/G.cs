@@ -5340,8 +5340,9 @@ namespace Gekko
 
         /// <summary>
         /// For developer use/debugging. Will also be true if ExcelDna or hiding GUI is active.
+        /// Beware: It seems the when running unit tests, Globals.runningOnTTComputer is false.
         /// </summary>
-        public static bool IsUnitTesting()  
+        public static bool IsUnitTesting()
         {
             if (Globals.hideGui) return true;
             if (Globals.excelDna) return true;            
