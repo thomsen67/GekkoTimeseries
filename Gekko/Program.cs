@@ -2509,22 +2509,27 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer && (text == "pivot"))
             {
-                var data = new List<PivotDataRow>
+                // Example data with arbitrary number of elements in each row
+                var data = new List<List<object>>
         {
-            new PivotDataRow { RowField = "A", ColumnField = "X", ValueField = 5 },
-            new PivotDataRow { RowField = "A", ColumnField = "Y", ValueField = 10 },
-            new PivotDataRow { RowField = "B", ColumnField = "X", ValueField = 15 },
-            new PivotDataRow { RowField = "B", ColumnField = "Y", ValueField = 20 },
-            new PivotDataRow { RowField = "A", ColumnField = "X", ValueField = 5 }
+            new List<object> { "A", "X", "C", 1 },
+            new List<object> { "A", "Y", "C", 20 },
+            new List<object> { "B", "X", "D", 300 },
+            new List<object> { "B", "Y", "D", 4000 },
+            new List<object> { "A", "X", "C", 50000 },
+            new List<object> { "A", "X", "C", 600000 },
         };
 
-                // Create pivot table (row: RowField, column: ColumnField, value: sum(ValueField))
-                var pivotTable = PivotTable.CreatePivotTable(
+                // Indices for row and column dimensions
+                var rowIndices = new List<int> { 0 };   // "A", "B" (row dimension)
+                var columnIndices = new List<int> { 1, 2 }; // "X", "Y" (column dimension)
+
+                // Create the pivot table (sum of the last element)
+                var pivotTable = GenericPivotTable.CreatePivotTable(
                     data,
-                     row => row.RowField,           // Correct row selector
-                     row => row.ColumnField,        // Correct column selector
-                     row => row.ValueField,         // Correct value selector
-                     values => values.Sum()         // Aggregation function (sum)
+                    rowIndices,
+                    columnIndices,
+                    values => values.Sum()  // Sum aggregation
                 );
 
                 // Display the result

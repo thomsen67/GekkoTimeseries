@@ -15,31 +15,25 @@ namespace Gekko
 {
 
 
-    public class PivotDataRow
+    public class GenericPivotTable
     {
-        public string RowField { get; set; }
-        public string ColumnField { get; set; }
-        public int ValueField { get; set; }
-    }
-
-    public class PivotTable
-    {
+        // Function to create a pivot table
         public static Dictionary<string, Dictionary<string, int>> CreatePivotTable(
-            List<PivotDataRow> data,
-            Func<PivotDataRow, string> rowSelector,
-            Func<PivotDataRow, string> columnSelector,
-            Func<PivotDataRow, int> valueSelector,
-            Func<IEnumerable<int>, int> aggFunction
+            List<List<object>> data,                     // The generic data rows
+            List<int> rowIndices,                        // Indices of the elements to use for row dimensions
+            List<int> columnIndices,                     // Indices of the elements to use for column dimensions
+            Func<IEnumerable<int>, int> aggFunction      // Aggregation function (e.g., sum)
         )
         {
-            // Step 1: Initialize an empty dictionary for the pivot table
+            // Initialize the pivot table as a nested dictionary
             var pivotTable = new Dictionary<string, Dictionary<string, List<int>>>();
 
-            // Step 2: Iterate through each row in the data
+            // Step 1: Iterate over each row in the data
             foreach (var row in data)
             {
-                var rowKey = rowSelector(row); // Group by row field
-                var columnKey = columnSelector(row); // Group by column field
+                // Step 2: Construct row and column keys based on selected dimensions
+                string rowKey = string.Join("-", rowIndices.Select(i => row[i]?.ToString() ?? "null"));
+                string columnKey = string.Join("-", columnIndices.Select(i => row[i]?.ToString() ?? "null"));
 
                 // Step 3: Initialize row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey))
@@ -53,8 +47,9 @@ namespace Gekko
                     pivotTable[rowKey][columnKey] = new List<int>();
                 }
 
-                // Step 5: Add the value to the appropriate cell
-                pivotTable[rowKey][columnKey].Add(valueSelector(row));
+                // Step 5: Add the value (last element of the row) to the appropriate cell
+                var value = Convert.ToInt32(row.Last());
+                pivotTable[rowKey][columnKey].Add(value);
             }
 
             // Step 6: Apply the aggregation function to each cell
