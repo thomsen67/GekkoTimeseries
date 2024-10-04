@@ -17,12 +17,13 @@ namespace Gekko
 
     public class GenericPivotTable
     {
-        // Function to create a pivot table
+        // Function to create a pivot table with filtering
         public static Dictionary<string, Dictionary<string, int>> CreatePivotTable(
             List<List<object>> data,                     // The generic data rows
             List<int> rowIndices,                        // Indices of the elements to use for row dimensions
             List<int> columnIndices,                     // Indices of the elements to use for column dimensions
-            Func<IEnumerable<int>, int> aggFunction      // Aggregation function (e.g., sum)
+            Func<IEnumerable<int>, int> aggFunction,     // Aggregation function (e.g., sum)
+            Func<List<object>, bool> filter = null       // Optional filter function
         )
         {
             // Initialize the pivot table as a nested dictionary
@@ -31,6 +32,12 @@ namespace Gekko
             // Step 1: Iterate over each row in the data
             foreach (var row in data)
             {
+                // Apply the filter if one is provided
+                if (filter != null && !filter(row))
+                {
+                    continue;  // Skip this row if it doesn't match the filter
+                }
+
                 // Step 2: Construct row and column keys based on selected dimensions
                 string rowKey = string.Join("-", rowIndices.Select(i => row[i]?.ToString() ?? "null"));
                 string columnKey = string.Join("-", columnIndices.Select(i => row[i]?.ToString() ?? "null"));
