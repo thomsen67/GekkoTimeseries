@@ -18,77 +18,83 @@ namespace Gekko
     public class GekkoPivotTable
     {
         // Function to create a pivot table with filtering
-        public static Dictionary<string, Dictionary<string, double>> CreatePivotTable(
-            List<FrameLightRow> data,                      // The generic data rows (first part)
-            List<int> rowIndices,                          // Indices of the elements to use for row dimensions
-            List<int> columnIndices,                       // Indices of the elements to use for column dimensions            
-            Func<IEnumerable<double>, double> aggFunction, // Aggregation function (e.g., sum)
+        public static Dictionary<string, Dictionary<string, double>> Compute(
+            List<FrameLightRow> dataframe,                 // The generic data rows (first part)
+            List<int> pivotRowIndexes,                     // Indices of the elements to use for row dimensions
+            List<int> pivotColIndexes,                     // Indices of the elements to use for column dimensions            
+            Func<IEnumerable<double>, double> agg,         // Aggregation function (e.g., sum)
             Func<FrameLightRow, bool> filter = null,       // Optional filter function
-            Func<FrameLightRow, int, string> group = null       // Optional grouping function            
+            Func<FrameLightRow, int, string> group = null  // Optional grouping function            
         )
         {
             // Initialize the pivot table as a nested dictionary
-            var pivotTable = new Dictionary<string, Dictionary<string, List<double>>>();
+            Dictionary<string, Dictionary<string, List<double>>> pivotTable = new Dictionary<string, Dictionary<string, List<double>>>();
 
             // Step 1: Iterate over each row in the data
-            foreach (FrameLightRow row in data)
+            foreach (FrameLightRow dataframeRow in dataframe)
             {
                 // Apply the filter if one is provided
-                if (filter != null && !filter(row))
+                if (filter != null && !filter(dataframeRow))
                 {
-                    continue;  // Skip this row if it doesn't match the filter
+                    continue;  // Skip this dataframe row if it doesn't match the filter
                 }
 
-                // Step 2: Construct row and column keys based on selected dimensions
+                // Construct row and column keys, and optionally group them
+                string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow);
+                string columnKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow);
 
-                string rowKey = null;
-                if (group == null)
-                {
-                    rowKey = string.Join("-", rowIndices.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
-                }
-                else
-                {
-                    string s = null;
-                    foreach (int ii in rowIndices)
-                    {
-                        s += group(row, ii) + "-";
-                    }
-                    rowKey = G.Substring(s, 0, s.Length - 2);
-                }
+                // Initialize a row in the pivot table if it doesn't exist
+                if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<double>>();
 
-                string columnKey = string.Join("-", columnIndices.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
-
-                // Step 3: Initialize row in the pivot table if it doesn't exist
-                if (!pivotTable.ContainsKey(rowKey))
-                {
-                    pivotTable[rowKey] = new Dictionary<string, List<double>>();
-                }
-
-                // Step 4: Initialize column in the row if it doesn't exist
-                if (!pivotTable[rowKey].ContainsKey(columnKey))
-                {
-                    pivotTable[rowKey][columnKey] = new List<double>();
-                }
+                // Initialize a column in the row if it doesn't exist
+                if (!pivotTable[rowKey].ContainsKey(columnKey)) pivotTable[rowKey][columnKey] = new List<double>();
 
                 // Step 5: Add the value (from the values part of the data row)
-                double v = Convert.ToDouble(row.storageValues[0].data);
-                pivotTable[rowKey][columnKey].Add(v);
+                double v = Convert.ToDouble(dataframeRow.storageValues[0].data);
+                pivotTable[rowKey][columnKey].Add(v);  //These values will be aggregated later on
             }
-
-            // Step 6: Apply the aggregation function to each cell
+            
+            // Apply the aggregation function to each cell
             var resultTable = new Dictionary<string, Dictionary<string, double>>();
             foreach (var rowEntry in pivotTable)
             {
                 resultTable[rowEntry.Key] = new Dictionary<string, double>();
                 foreach (var columnEntry in rowEntry.Value)
                 {
-                    resultTable[rowEntry.Key][columnEntry.Key] = aggFunction(columnEntry.Value);
+                    resultTable[rowEntry.Key][columnEntry.Key] = agg(columnEntry.Value);
                 }
             }
 
             return resultTable;
         }
 
+        /// <summary>
+        /// This basically renames elements, for instance "30", "31", "32" ... could each become "30..39", for this interval.
+        /// Can also be used to rename stuff like "99-" into "99" or "99..".
+        /// </summary>
+        /// <param name="selectedIndexes"></param>
+        /// <param name="group"></param>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row)
+        {
+            string rowKey = null;
+            if (group == null)
+            {
+                rowKey = string.Join("-", selectedIndexes.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
+            }
+            else
+            {
+                string s = null;
+                foreach (int ii in selectedIndexes)
+                {
+                    s += group(row, ii) + "-";
+                }
+                rowKey = G.Substring(s, 0, s.Length - 2);
+            }
+
+            return rowKey;
+        }
 
         public static void CreatePivotTable2()
         {
@@ -96,8 +102,8 @@ namespace Gekko
 
             Program.RunGekkoCommands(@"reset; time 1970 2024; import <all px array> c:\Thomas\Gekko\regres\Models\Decomp\befolk1.px;", "", 0, new P());
             Series ts = O.GetIVariableFromString("befolk1!a", O.ECreatePossibilities.NoneReportError) as Series;
-            GekkoTime t1 = new GekkoTime(EFreq.A, 1971, 1, 1);
-            GekkoTime t2 = new GekkoTime(EFreq.A, 1924, 1, 1);
+            GekkoTime t1 = new GekkoTime(EFreq.A, 2024, 1, 1);
+            GekkoTime t2 = new GekkoTime(EFreq.A, 2024, 1, 1);
 
             List<FrameLightRow> data = new List<FrameLightRow>();
             List<MultidimItem> keys1 = ts.dimensionsStorage.storage.Keys.ToList();
@@ -120,8 +126,8 @@ namespace Gekko
             }
 
             // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
-            var rowIndices = new List<int> { 0, 2 };   // "A", "B" (row dimension)
-            var columnIndices = new List<int> { 1 }; // "X", "Y" (column dimension)
+            var rowIndices = new List<int> { 1 };   // "A", "B" (row dimension)
+            var columnIndices = new List<int> { 0 }; // "X", "Y" (column dimension)
 
             // Define a filter to only include rows where the second element is "X"
             Func<FrameLightRow, bool> filter = row =>
@@ -144,10 +150,11 @@ namespace Gekko
                     }
                 }
                 return s;
-            };            
+            };
+            group = null;
 
             // Create the pivot table (sum of the last element) with filtering applied
-            var pivotTable = GekkoPivotTable.CreatePivotTable(
+            var pivotTable = GekkoPivotTable.Compute(
                 data,
                 rowIndices,
                 columnIndices,
