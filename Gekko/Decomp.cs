@@ -126,8 +126,8 @@ namespace Gekko
             }
 
             // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
-            var rowIndices = new List<int> { 1 };   // "A", "B" (row dimension)
-            var columnIndices = new List<int> { 0 }; // "X", "Y" (column dimension)
+            var rowIndices = new List<int> { 1 };
+            var columnIndices = new List<int> { 0 };
 
             // Define a filter to only include rows where the second element is "X"
             Func<FrameLightRow, bool> filter = dataframeRow =>
@@ -985,13 +985,15 @@ namespace Gekko
             //We are cloning decompDataMAINClone this, because normalization may take place when doing the table
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
-            DecompOutput decompOutput = Decomp.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
-
-            if (false)
+            DecompOutput decompOutput = null;
+            if (Globals.decompPivotNew)
             {
-                DecompOutput decompOutput2 = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+                decompOutput = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             }
-
+            else
+            {
+                decompOutput = Decomp.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+            }            
 
             if (false)
             {
@@ -3064,6 +3066,7 @@ namespace Gekko
         {
             if (model.DecompType() != EModelType.GAMSScalar) new Error("DecompPivotToTable() presupposes scalar model");
 
+            string format2 = GetNumberFormat(decompOptions2);
             int parentI = 0;
             //string format2 = GetNumberFormat(decompOptions2);
                         
@@ -3082,32 +3085,83 @@ namespace Gekko
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
+            // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
+            var rowIndices = new List<int> { 1 };
+            var columnIndices = new List<int> { 0 };
+
+            Func<FrameLightRow, bool> filter = dataframeRow =>
+            {
+                //false if it must be filtered
+                bool b = true;
+                //if (G.Equal(dataframeRow.storageDimensions[0].text, "tot") || G.Equal(dataframeRow.storageDimensions[1].text, "tot") || G.Equal(dataframeRow.storageDimensions[2].text, "tot")) b = false;
+                //if (dataframeRow.storageDimensions[1].text == "20" || dataframeRow.storageDimensions[1].text == "21" || dataframeRow.storageDimensions[1].text == "22") b = false;
+                return b;
+            };
+
+            // Group
+            Func<FrameLightRow, int, string> group = (dataframeRow, i) =>
+            {
+                string s = dataframeRow.storageDimensions[i].text;
+                //if (i == 1)
+                //{
+                //    if (s == "99-") s = "99";
+                //    int ii = -12345;
+                //    if (int.TryParse(s, out ii))
+                //    {
+                //        int ten = ii / 10;
+                //        s = ten + "0" + ".." + ten + "9";
+                //    }
+                //}
+                return s;
+            };
+            
+            Dictionary<string, Dictionary<string, double>> pivot = GekkoPivotTable.Compute(frame.data, rowIndices, columnIndices, values => values.Sum(), filter, group);
+
             if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
                 //For testing purposes (Excel or Google sheets)
                 //WriteDatatableTocsv(frame);
             }
 
-            int xlag = 0; string temp = null;
-            ConvertFromTurtleName(decompDataMAINClone.lhs, true, out temp, out xlag);
-            string normalizerVariableWithIndex = null;
-            if (temp != null)
+            if (false)
             {
-                normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
+                int xlag = 0; string temp = null;
+                ConvertFromTurtleName(decompDataMAINClone.lhs, true, out temp, out xlag);
+                string normalizerVariableWithIndex = null;
+                if (temp != null)
+                {
+                    normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
+                }
             }
 
             DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
             DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
             DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
 
-            List<string> tempRowNames = new List<string>();
-            List<string> tempColNames = new List<string>();
+            //List<string> tempRowNames = new List<string>();
+            //List<string> tempColNames = new List<string>();
             //GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
 
-            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
-            DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
+            //List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
+            //DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
 
-            //Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
+            // Display the result
+
+            GekkoDictionary<string, bool> rownames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, bool> colnames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (KeyValuePair<string, Dictionary<string, double>> row in pivot)
+            {
+                if (!rownames2.ContainsKey(row.Key)) rownames2.Add(row.Key, false);
+                foreach (KeyValuePair<string, double> column in row.Value)
+                {
+                    if (!colnames2.ContainsKey(column.Key)) colnames2.Add(column.Key, false);                    
+                }
+            }
+            List<string> rownames = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            List<string> colnames = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+
+            Table table = DecompGetTableFromPivot(pivot, op, decompOptions2, format2, rownames, colnames);
 
             //DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
 
@@ -3358,6 +3412,187 @@ namespace Gekko
             }
             return table;
         }
+
+        private static Table DecompGetTableFromPivot(Dictionary<string, Dictionary<string, double>> pivot, DecompOperator op, DecompOptions2 decompOptions2, string format2, List<string> rownames, List<string> colnames)
+        {
+            Table table = new Table();
+            table.writeOnce = true;
+
+            //for (int i = 0; i < rownames.Count; i++)
+            //{
+            //    for (int j = 0; j < colnames.Count; j++)
+            //    {
+            //        string key = rownames[i] + "¤" + colnames[j];
+
+            //        AggContainer td = null;
+            //        agg.TryGetValue(key, out td);
+            //        double d = 0d;
+            //        double dAlternative = 0d;
+            //        double dLevel = 0d;
+            //        double dLevelLag = 0d;
+            //        double dLevelLag2 = 0d;
+            //        double dLevelRef = 0d;
+            //        double dLevelRefLag = 0d;
+            //        double dLevelRefLag2 = 0d;
+            //        int n = 0;
+            //        List<string> fullVariableNames = null;
+            //        string backgroundColor = "Transparent";
+
+            //        if (td != null)
+            //        {
+            //            dLevel = td.level;
+            //            dLevelLag = td.levelLag;
+            //            dLevelLag2 = td.levelLag2;
+            //            dLevelRef = td.levelRef;
+            //            dLevelRefLag = td.levelRefLag;
+            //            dLevelRefLag2 = td.levelRefLag2;
+            //            n = td.n;
+            //            fullVariableNames = td.fullVariableNames;
+            //            backgroundColor = td.backgroundColor;
+
+            //            // ----- first start -----------------------------------------------
+            //            double dFirstLevel = double.NaN;
+            //            double dFirstLevelLag = double.NaN;
+            //            double dFirstLevelLag2 = double.NaN;
+            //            double dFirstLevelRef = double.NaN;
+            //            double dFirstLevelRefLag = double.NaN;
+            //            double dFirstLevelRefLag2 = double.NaN;
+            //            int dFirstN = 0;
+            //            List<string> dFirstFullVariableNames = null;
+            //            string keyFirst = null;
+            //            if (rownamesFirst != null) keyFirst = rownamesFirst + "¤" + colnames[j];
+            //            else if (colnamesFirst != null) keyFirst = rownames[i] + "¤" + colnamesFirst;
+            //            AggContainer tdFirst = null;
+            //            agg.TryGetValue(keyFirst, out tdFirst);
+            //            if (tdFirst != null)
+            //            {
+            //                dFirstLevel = tdFirst.level;
+            //                dFirstLevelLag = tdFirst.levelLag;
+            //                dFirstLevelLag2 = tdFirst.levelLag2;
+            //                dFirstLevelRef = tdFirst.levelRef;
+            //                dFirstLevelRefLag = tdFirst.levelRefLag;
+            //                dFirstLevelRefLag2 = tdFirst.levelRefLag2;
+            //                dFirstN = tdFirst.n;
+            //                dFirstFullVariableNames = tdFirst.fullVariableNames;
+            //            }
+            //            // ----- first end --------------------------------------------------
+
+            //            if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
+            //            {
+            //                d = dLevel;
+            //            }
+            //            else if (op.OperatorLower() == "rn" || op.OperatorLower() == "r" || op.OperatorLower() == "xrn" || op.OperatorLower() == "xr")
+            //            {
+            //                d = dLevelRef;
+            //            }
+            //            else if (op.OperatorLower() == "d" || op.OperatorLower() == "sd")
+            //            {
+            //                d = td.change;
+            //            }
+            //            else if (op.OperatorLower() == "p" || op.OperatorLower() == "sp")
+            //            {
+            //                d = td.change / dFirstLevelLag * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "dp" || op.OperatorLower() == "sdp")
+            //            {
+            //                d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "m" || op.OperatorLower() == "sm")
+            //            {
+            //                d = td.change;
+            //            }
+            //            else if (op.OperatorLower() == "q" || op.OperatorLower() == "sq")
+            //            {
+            //                d = td.change / dFirstLevelRef * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "mp" || op.OperatorLower() == "smp")
+            //            {
+            //                d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "xd")
+            //            {
+            //                d = dLevel - dLevelLag;
+            //            }
+            //            else if (op.OperatorLower() == "xp")
+            //            {
+            //                d = (dLevel - dLevelLag) / dLevelLag * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "xdp")
+            //            {
+            //                d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelLag - dLevelLag2) / dLevelLag2 * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "xm")
+            //            {
+            //                d = dLevel - dLevelRef;
+            //            }
+            //            else if (op.OperatorLower() == "xq")
+            //            {
+            //                d = (dLevel - dLevelRef) / dLevelRef * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "xmp")
+            //            {
+            //                d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+            //            }
+            //            // -----------------
+            //            else if (op.OperatorLower() == "rd" || op.OperatorLower() == "srd")
+            //            {
+            //                d = td.change;
+            //            }
+            //            else if (op.OperatorLower() == "rp" || op.OperatorLower() == "srp")
+            //            {
+            //                d = td.change / dFirstLevelRefLag * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "rdp" || op.OperatorLower() == "srdp")
+            //            {
+            //                d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "xrd")
+            //            {
+            //                d = dLevelRef - dLevelRefLag;
+            //            }
+            //            else if (op.OperatorLower() == "xrp")
+            //            {
+            //                d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+            //            }
+            //            else if (op.OperatorLower() == "xrdp")
+            //            {
+            //                d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
+            //            }
+            //        }
+
+            //        if (decompOptions2.count == ECountType.N)
+            //        {
+            //            table.SetNumber(i + 2, j + 2, n, "f16.0");
+            //        }
+            //        else if (decompOptions2.count == ECountType.Names)
+            //        {
+            //            string tmp2 = null;
+            //            if (fullVariableNames != null)
+            //            {
+            //                List<string> tmp = new List<string>();
+            //                foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
+            //                tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+            //            }
+            //            else
+            //            {
+            //                tmp2 = Text1(0);
+            //            }
+            //            table.Set(i + 2, j + 2, tmp2);
+            //        }
+            //        else
+            //        {
+            //            table.SetNumber(i + 2, j + 2, d, format2);
+            //        }
+
+            //        Cell c = table.Get(i + 2, j + 2);
+            //        c.vars_hack = fullVariableNames;
+            //        c.value_hack = d;  //stored for sort and ignore later on
+            //        c.backgroundColor = backgroundColor;
+            //    }
+            //}
+            return table;
+        }
+
 
         /// <summary>
         /// In order for some name bits like &lt;null> to show up first, some tricks were applied when sorting in a previous method. These tricks are resolved here.
