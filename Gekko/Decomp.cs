@@ -130,15 +130,19 @@ namespace Gekko
             var columnIndices = new List<int> { 0 }; // "X", "Y" (column dimension)
 
             // Define a filter to only include rows where the second element is "X"
-            Func<FrameLightRow, bool> filter = row =>
+            Func<FrameLightRow, bool> filter = dataframeRow =>
             {
-                return !(G.Equal(row.storageDimensions[0].text, "tot") || G.Equal(row.storageDimensions[1].text, "tot") || G.Equal(row.storageDimensions[2].text, "tot"));
+                //false if it must be filtered
+                bool b = true;
+                if (G.Equal(dataframeRow.storageDimensions[0].text, "tot") || G.Equal(dataframeRow.storageDimensions[1].text, "tot") || G.Equal(dataframeRow.storageDimensions[2].text, "tot")) b = false;
+                //if (dataframeRow.storageDimensions[1].text == "20" || dataframeRow.storageDimensions[1].text == "21" || dataframeRow.storageDimensions[1].text == "22") b = false;
+                return b;
             };
             
             // Group
-            Func<FrameLightRow, int, string> group = (row, i) =>
+            Func<FrameLightRow, int, string> group = (dataframeRow, i) =>
             {
-                string s = row.storageDimensions[i].text;
+                string s = dataframeRow.storageDimensions[i].text;
                 if (i == 1)
                 {
                     if (s == "99-") s = "99";
@@ -151,7 +155,7 @@ namespace Gekko
                 }
                 return s;
             };
-            group = null;
+            //group = null;
 
             // Create the pivot table (sum of the last element) with filtering applied
             var pivotTable = GekkoPivotTable.Compute(
