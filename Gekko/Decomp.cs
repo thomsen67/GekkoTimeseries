@@ -986,7 +986,12 @@ namespace Gekko
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
             DecompOutput decompOutput = Decomp.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
-            DecompOutput decompOutput2 = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+
+            if (false)
+            {
+                DecompOutput decompOutput2 = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+            }
+
 
             if (false)
             {
