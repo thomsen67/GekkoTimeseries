@@ -1554,7 +1554,7 @@ namespace Gekko
                         DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
                         decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-                        DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
+                        DecompOutput decompOutput = Decomp.DecompPivotToTable_OLD(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
 
                         Table decompTable = decompOutput.table;
 
@@ -1647,70 +1647,7 @@ namespace Gekko
         {
             html1.AppendLine("<p><span style=`font-weight:bold`>" + heading + "</span>&nbsp;&nbsp;<span style=`font-size: 0.8em;`>");
             html1.Append("<a href=`#` class=`toggle-link`>Gekko code</a></span></p><div class=`toggle-content` style=`display: none;`><p>" + firstLine + "</p><pre style=`background-color: #fff3cd;`><code>");
-        }
-
-        /// <summary>
-        /// Helper for html browser, calling the DECOMP methods.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="decompOptions2"></param>
-        /// <param name="per1"></param>
-        /// <param name="per2"></param>
-        /// <param name="smpl"></param>
-        /// <param name="decompDatas"></param>
-        /// <param name="operatorOneOf3Types"></param>
-        /// <param name="lhsString"></param>
-        /// <param name="parentI"></param>
-        /// <returns></returns>
-        private static DecompOutput MakePivot_DeleteMeAtSomePoint(Model model, DecompOptions2 decompOptions2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDatas decompDatas, Decomp.EContribType operatorOneOf3Types, string lhsString, int parentI)
-        {
-            if (operatorOneOf3Types == Gekko.Decomp.EContribType.D) decompDatas.hasD = true;
-            else if (operatorOneOf3Types == Gekko.Decomp.EContribType.RD) decompDatas.hasRD = true;
-            else if (operatorOneOf3Types == Gekko.Decomp.EContribType.M) decompDatas.hasM = true;
-
-            if (decompOptions2.link[parentI].varnames == null)
-            {
-                //does this ever happen?
-                decompOptions2.link[parentI].varnames = Globals.decompResidualName;
-            }
-
-            bool[] used = new bool[decompDatas.storage.Count];
-            used[0] = true;  //primary equation
-
-            GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-            //decomp period by period, showing lags/leads.
-
-            if (decompOptions2.decompOperator.lowLevel == Gekko.Decomp.ELowLevel.BothQuoAndRef)  //<mp>
-            {
-                bool refreshObjects = true;
-                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                {
-                    Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
-                    refreshObjects = false;
-                }
-                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                {
-                    Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, Gekko.Decomp.EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
-                }
-            }
-            else
-            {
-                int deduct = 0;
-                //why deduct not enough??
-                if (decompOptions2.decompOperator.isDoubleDifQuo || decompOptions2.decompOperator.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
-                bool refreshObjects = true;
-                foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
-                {
-                    Gekko.Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
-                    refreshObjects = false;
-                }
-            }
-
-            DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
-
-            return Gekko.Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
-        }
+        }        
 
         /// <summary>
         /// Walks through nested data traces, producing html while doing so. This is similar to what is done regarding

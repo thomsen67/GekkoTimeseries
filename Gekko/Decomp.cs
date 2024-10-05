@@ -985,7 +985,7 @@ namespace Gekko
             //We are cloning decompDataMAINClone this, because normalization may take place when doing the table
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
-            DecompOutput decompOutput = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+            DecompOutput decompOutput = Decomp.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
 
             if (false)
             {
@@ -2981,7 +2981,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static DecompOutput DecompPivotToTable(GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, EContribType operatorOneOf3Types, Model model)
+        public static DecompOutput DecompPivotToTable_OLD(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, string lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
             int parentI = 0;
             string format2 = GetNumberFormat(decompOptions2);
@@ -3051,6 +3051,67 @@ namespace Gekko
 
             DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
             
+            return decompOutput2;
+        }
+
+        public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, string lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
+        {
+            if (model.DecompType() != EModelType.GAMSScalar) new Error("DecompPivotToTable() presupposes scalar model");
+
+            int parentI = 0;
+            string format2 = GetNumberFormat(decompOptions2);
+                        
+            ENormalizeType normalize = ENormalizeType.Lags;
+            if (op.lowLevel == ELowLevel.BothQuoAndRef)
+            {
+                DecompAdjust(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.D, normalize, op);
+                DecompAdjust(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.RD, normalize, op);
+            }
+            else
+            {
+                int deduct = 0;
+                if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;
+                DecompAdjust(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
+            }            
+
+            FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
+
+            if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
+            {
+                //For testing purposes (Excel or Google sheets)
+                WriteDatatableTocsv(frame);
+            }
+
+            int xlag = 0; string temp = null;
+            ConvertFromTurtleName(decompDataMAINClone.lhs, true, out temp, out xlag);
+            string normalizerVariableWithIndex = null;
+            if (temp != null)
+            {
+                normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
+            }
+
+            DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+
+            List<string> tempRowNames = new List<string>();
+            List<string> tempColNames = new List<string>();
+            GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
+
+            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
+            DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
+
+            Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
+
+            DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
+
+            if (model.DecompType() == EModelType.GAMSScalar)
+            {
+                DecompTableHandleSignAndShares(table, decompOptions2);
+            }
+
+            DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
+
             return decompOutput2;
         }
 
@@ -5510,7 +5571,7 @@ namespace Gekko
             DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
             Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
             decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-            DecompOutput decompOutput = Decomp.DecompPivotToTable(t1, t2, dd, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[0].expressionText, decompOptions2, operatorOneOf3Types, model);
+            DecompOutput decompOutput = Decomp.DecompPivotToTable_OLD(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             Table decompTable = decompOutput.table;
 
             for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
