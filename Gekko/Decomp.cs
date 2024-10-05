@@ -3418,178 +3418,164 @@ namespace Gekko
             Table table = new Table();
             table.writeOnce = true;
 
-            //for (int i = 0; i < rownames.Count; i++)
-            //{
-            //    for (int j = 0; j < colnames.Count; j++)
-            //    {
-            //        string key = rownames[i] + "¤" + colnames[j];
+            for (int i = 0; i < rownames.Count; i++)
+            {
+                Dictionary<string, double> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
 
-            //        AggContainer td = null;
-            //        agg.TryGetValue(key, out td);
-            //        double d = 0d;
-            //        double dAlternative = 0d;
-            //        double dLevel = 0d;
-            //        double dLevelLag = 0d;
-            //        double dLevelLag2 = 0d;
-            //        double dLevelRef = 0d;
-            //        double dLevelRefLag = 0d;
-            //        double dLevelRefLag2 = 0d;
-            //        int n = 0;
-            //        List<string> fullVariableNames = null;
-            //        string backgroundColor = "Transparent";
+                for (int j = 0; j < colnames.Count; j++)
+                {
+                    double d = 0;
+                    double dAlternative = 0d;
+                    double dLevel = 0d;
+                    double dLevelLag = 0d;
+                    double dLevelLag2 = 0d;
+                    double dLevelRef = 0d;
+                    double dLevelRefLag = 0d;
+                    double dLevelRefLag2 = 0d;
+                    int n = 0;
+                    List<string> fullVariableNames = null;
+                    string backgroundColor = "Transparent";
 
-            //        if (td != null)
-            //        {
-            //            dLevel = td.level;
-            //            dLevelLag = td.levelLag;
-            //            dLevelLag2 = td.levelLag2;
-            //            dLevelRef = td.levelRef;
-            //            dLevelRefLag = td.levelRefLag;
-            //            dLevelRefLag2 = td.levelRefLag2;
-            //            n = td.n;
-            //            fullVariableNames = td.fullVariableNames;
-            //            backgroundColor = td.backgroundColor;
+                    double change = double.NaN; if (rowDict != null) rowDict.TryGetValue(colnames[j], out change);
+                    AggContainer td = new AggContainer(change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
 
-            //            // ----- first start -----------------------------------------------
-            //            double dFirstLevel = double.NaN;
-            //            double dFirstLevelLag = double.NaN;
-            //            double dFirstLevelLag2 = double.NaN;
-            //            double dFirstLevelRef = double.NaN;
-            //            double dFirstLevelRefLag = double.NaN;
-            //            double dFirstLevelRefLag2 = double.NaN;
-            //            int dFirstN = 0;
-            //            List<string> dFirstFullVariableNames = null;
-            //            string keyFirst = null;
-            //            if (rownamesFirst != null) keyFirst = rownamesFirst + "¤" + colnames[j];
-            //            else if (colnamesFirst != null) keyFirst = rownames[i] + "¤" + colnamesFirst;
-            //            AggContainer tdFirst = null;
-            //            agg.TryGetValue(keyFirst, out tdFirst);
-            //            if (tdFirst != null)
-            //            {
-            //                dFirstLevel = tdFirst.level;
-            //                dFirstLevelLag = tdFirst.levelLag;
-            //                dFirstLevelLag2 = tdFirst.levelLag2;
-            //                dFirstLevelRef = tdFirst.levelRef;
-            //                dFirstLevelRefLag = tdFirst.levelRefLag;
-            //                dFirstLevelRefLag2 = tdFirst.levelRefLag2;
-            //                dFirstN = tdFirst.n;
-            //                dFirstFullVariableNames = tdFirst.fullVariableNames;
-            //            }
-            //            // ----- first end --------------------------------------------------
+                    if (td != null)
+                    {
+                        dLevel = td.level;
+                        dLevelLag = td.levelLag;
+                        dLevelLag2 = td.levelLag2;
+                        dLevelRef = td.levelRef;
+                        dLevelRefLag = td.levelRefLag;
+                        dLevelRefLag2 = td.levelRefLag2;
+                        n = td.n;
+                        fullVariableNames = td.fullVariableNames;
+                        backgroundColor = td.backgroundColor;
 
-            //            if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
-            //            {
-            //                d = dLevel;
-            //            }
-            //            else if (op.OperatorLower() == "rn" || op.OperatorLower() == "r" || op.OperatorLower() == "xrn" || op.OperatorLower() == "xr")
-            //            {
-            //                d = dLevelRef;
-            //            }
-            //            else if (op.OperatorLower() == "d" || op.OperatorLower() == "sd")
-            //            {
-            //                d = td.change;
-            //            }
-            //            else if (op.OperatorLower() == "p" || op.OperatorLower() == "sp")
-            //            {
-            //                d = td.change / dFirstLevelLag * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "dp" || op.OperatorLower() == "sdp")
-            //            {
-            //                d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "m" || op.OperatorLower() == "sm")
-            //            {
-            //                d = td.change;
-            //            }
-            //            else if (op.OperatorLower() == "q" || op.OperatorLower() == "sq")
-            //            {
-            //                d = td.change / dFirstLevelRef * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "mp" || op.OperatorLower() == "smp")
-            //            {
-            //                d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "xd")
-            //            {
-            //                d = dLevel - dLevelLag;
-            //            }
-            //            else if (op.OperatorLower() == "xp")
-            //            {
-            //                d = (dLevel - dLevelLag) / dLevelLag * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "xdp")
-            //            {
-            //                d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelLag - dLevelLag2) / dLevelLag2 * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "xm")
-            //            {
-            //                d = dLevel - dLevelRef;
-            //            }
-            //            else if (op.OperatorLower() == "xq")
-            //            {
-            //                d = (dLevel - dLevelRef) / dLevelRef * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "xmp")
-            //            {
-            //                d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
-            //            }
-            //            // -----------------
-            //            else if (op.OperatorLower() == "rd" || op.OperatorLower() == "srd")
-            //            {
-            //                d = td.change;
-            //            }
-            //            else if (op.OperatorLower() == "rp" || op.OperatorLower() == "srp")
-            //            {
-            //                d = td.change / dFirstLevelRefLag * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "rdp" || op.OperatorLower() == "srdp")
-            //            {
-            //                d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "xrd")
-            //            {
-            //                d = dLevelRef - dLevelRefLag;
-            //            }
-            //            else if (op.OperatorLower() == "xrp")
-            //            {
-            //                d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
-            //            }
-            //            else if (op.OperatorLower() == "xrdp")
-            //            {
-            //                d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
-            //            }
-            //        }
+                        // ----- first start -----------------------------------------------
+                        double dFirstLevel = double.NaN;
+                        double dFirstLevelLag = double.NaN;
+                        double dFirstLevelLag2 = double.NaN;
+                        double dFirstLevelRef = double.NaN;
+                        double dFirstLevelRefLag = double.NaN;
+                        double dFirstLevelRefLag2 = double.NaN;
+                        int dFirstN = 0;
+                        List<string> dFirstFullVariableNames = null;
+                        string keyFirst = null;
+                        AggContainer tdFirst = null;                        
 
-            //        if (decompOptions2.count == ECountType.N)
-            //        {
-            //            table.SetNumber(i + 2, j + 2, n, "f16.0");
-            //        }
-            //        else if (decompOptions2.count == ECountType.Names)
-            //        {
-            //            string tmp2 = null;
-            //            if (fullVariableNames != null)
-            //            {
-            //                List<string> tmp = new List<string>();
-            //                foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
-            //                tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
-            //            }
-            //            else
-            //            {
-            //                tmp2 = Text1(0);
-            //            }
-            //            table.Set(i + 2, j + 2, tmp2);
-            //        }
-            //        else
-            //        {
-            //            table.SetNumber(i + 2, j + 2, d, format2);
-            //        }
+                        if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
+                        {
+                            d = dLevel;
+                        }
+                        else if (op.OperatorLower() == "rn" || op.OperatorLower() == "r" || op.OperatorLower() == "xrn" || op.OperatorLower() == "xr")
+                        {
+                            d = dLevelRef;
+                        }
+                        else if (op.OperatorLower() == "d" || op.OperatorLower() == "sd")
+                        {
+                            d = td.change;
+                        }
+                        else if (op.OperatorLower() == "p" || op.OperatorLower() == "sp")
+                        {
+                            d = td.change / dFirstLevelLag * 100d;
+                        }
+                        else if (op.OperatorLower() == "dp" || op.OperatorLower() == "sdp")
+                        {
+                            d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
+                        }
+                        else if (op.OperatorLower() == "m" || op.OperatorLower() == "sm")
+                        {
+                            d = td.change;
+                        }
+                        else if (op.OperatorLower() == "q" || op.OperatorLower() == "sq")
+                        {
+                            d = td.change / dFirstLevelRef * 100d;
+                        }
+                        else if (op.OperatorLower() == "mp" || op.OperatorLower() == "smp")
+                        {
+                            d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
+                        }
+                        else if (op.OperatorLower() == "xd")
+                        {
+                            d = dLevel - dLevelLag;
+                        }
+                        else if (op.OperatorLower() == "xp")
+                        {
+                            d = (dLevel - dLevelLag) / dLevelLag * 100d;
+                        }
+                        else if (op.OperatorLower() == "xdp")
+                        {
+                            d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelLag - dLevelLag2) / dLevelLag2 * 100d;
+                        }
+                        else if (op.OperatorLower() == "xm")
+                        {
+                            d = dLevel - dLevelRef;
+                        }
+                        else if (op.OperatorLower() == "xq")
+                        {
+                            d = (dLevel - dLevelRef) / dLevelRef * 100d;
+                        }
+                        else if (op.OperatorLower() == "xmp")
+                        {
+                            d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+                        }
+                        // -----------------
+                        else if (op.OperatorLower() == "rd" || op.OperatorLower() == "srd")
+                        {
+                            d = td.change;
+                        }
+                        else if (op.OperatorLower() == "rp" || op.OperatorLower() == "srp")
+                        {
+                            d = td.change / dFirstLevelRefLag * 100d;
+                        }
+                        else if (op.OperatorLower() == "rdp" || op.OperatorLower() == "srdp")
+                        {
+                            d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
+                        }
+                        else if (op.OperatorLower() == "xrd")
+                        {
+                            d = dLevelRef - dLevelRefLag;
+                        }
+                        else if (op.OperatorLower() == "xrp")
+                        {
+                            d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+                        }
+                        else if (op.OperatorLower() == "xrdp")
+                        {
+                            d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
+                        }
+                    }
 
-            //        Cell c = table.Get(i + 2, j + 2);
-            //        c.vars_hack = fullVariableNames;
-            //        c.value_hack = d;  //stored for sort and ignore later on
-            //        c.backgroundColor = backgroundColor;
-            //    }
-            //}
+                    if (decompOptions2.count == ECountType.N)
+                    {
+                        table.SetNumber(i + 2, j + 2, n, "f16.0");
+                    }
+                    else if (decompOptions2.count == ECountType.Names)
+                    {
+                        string tmp2 = null;
+                        if (fullVariableNames != null)
+                        {
+                            List<string> tmp = new List<string>();
+                            foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
+                            tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                        }
+                        else
+                        {
+                            tmp2 = Text1(0);
+                        }
+                        table.Set(i + 2, j + 2, tmp2);
+                    }
+                    else
+                    {
+                        table.SetNumber(i + 2, j + 2, d, format2);
+                    }
+
+                    Cell c = table.Get(i + 2, j + 2);
+                    c.vars_hack = fullVariableNames;
+                    c.value_hack = d;  //stored for sort and ignore later on
+                    c.backgroundColor = backgroundColor;
+                }
+            }
             return table;
         }
 
