@@ -3050,7 +3050,7 @@ namespace Gekko
 
             Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
             
-            DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
+            DecompTablePostProcessing_OLD(table, rownames, colnames, decompOptions2, model);
 
             if (model.DecompType() == EModelType.GAMSScalar)
             {
@@ -3163,7 +3163,7 @@ namespace Gekko
 
             Table table = DecompGetTableFromPivot(pivot, op, decompOptions2, format2, rownames, colnames);
 
-            //DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
+            DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
 
             //DecompTableHandleSignAndShares(table, decompOptions2);            
 
@@ -3588,7 +3588,7 @@ namespace Gekko
         /// <param name="rownames"></param>
         /// <param name="colnames"></param>
         /// <param name="decompOptions2"></param>
-        private static void DecompTablePostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2, Model model)
+        private static void DecompTablePostProcessing_OLD(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2, Model model)
         {
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
             if (!Decomp.VarsAndTimeDimensionsAreSeparate(decompOptions2)) rowsCols = ERowsCols.None;
@@ -3620,6 +3620,37 @@ namespace Gekko
                 {
                     if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;
                 }
+                tab.Set(1, j + 2, s);
+                if (rowsCols == ERowsCols.Rows) tab.Get(1, j + 2).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
+            }
+        }
+
+        private static void DecompTablePostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2, Model model)
+        {
+            ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
+            if (!Decomp.VarsAndTimeDimensionsAreSeparate(decompOptions2)) rowsCols = ERowsCols.None;
+
+            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
+            {
+                tab.Set(1, 1, "%" + "  ");
+            }
+            else
+            {
+                tab.Set(1, 1, "");
+            }
+
+            for (int i = 0; i < rownames.Count; i++)
+            {
+                string s = rownames[i];                
+                if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2);                
+                tab.Set(i + 2, 1, s);
+                if (rowsCols == ERowsCols.Cols) tab.Get(i + 2, 1).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
+            }
+
+            for (int j = 0; j < colnames.Count; j++)
+            {
+                string s = colnames[j];                
+                if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;                
                 tab.Set(1, j + 2, s);
                 if (rowsCols == ERowsCols.Rows) tab.Get(1, j + 2).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
             }
