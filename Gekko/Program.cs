@@ -36916,10 +36916,12 @@ namespace Gekko
     public class FrameLightRow
     {
         public List<CellLight> storage = null;
+        public List<CellLight> storage2 = null;  //for instance for values, to keep them separate
 
         public FrameLightRow()
         {
             this.storage = new List<CellLight>();
+            this.storage2 = new List<CellLight>();
         }
 
         public FrameLightRow(FrameLight frame)

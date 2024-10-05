@@ -19,7 +19,7 @@ namespace Gekko
     {
         // Function to create a pivot table with filtering
         public static Dictionary<string, Dictionary<string, double>> CreatePivotTable(
-            List<FrameLightRow> data,                      // The generic data rows
+            List<FrameLightRow> data,                      // The generic data rows (first part)
             List<int> rowIndices,                          // Indices of the elements to use for row dimensions
             List<int> columnIndices,                       // Indices of the elements to use for column dimensions            
             Func<IEnumerable<double>, double> aggFunction, // Aggregation function (e.g., sum)
@@ -70,9 +70,9 @@ namespace Gekko
                     pivotTable[rowKey][columnKey] = new List<double>();
                 }
 
-                // Step 5: Add the value (last element of the row) to the appropriate cell
-                double value = Convert.ToDouble(row.storage.Last().data);
-                pivotTable[rowKey][columnKey].Add(value);
+                // Step 5: Add the value (from the values part of the data row)
+                double v = Convert.ToDouble(row.storage2[0].data);
+                pivotTable[rowKey][columnKey].Add(v);
             }
 
             // Step 6: Apply the aggregation function to each cell
@@ -96,37 +96,30 @@ namespace Gekko
 
             FrameLightRow r1 = new FrameLightRow();
             r1.storage.Add(new CellLight("A"));
-            r1.storage.Add(new CellLight("X"));
-            r1.storage.Add(new CellLight(5.1));
+            r1.storage.Add(new CellLight("X"));            
+            r1.storage2.Add(new CellLight(5.1));
 
             FrameLightRow r2 = new FrameLightRow();
             r2.storage.Add(new CellLight("A"));
             r2.storage.Add(new CellLight("Y"));
-            r2.storage.Add(new CellLight(10.2));
+            r2.storage2.Add(new CellLight(10.2));
 
             FrameLightRow r3 = new FrameLightRow();
             r3.storage.Add(new CellLight("B"));
-            r3.storage.Add(new CellLight("X"));
-            r3.storage.Add(new CellLight(15.3));
+            r3.storage.Add(new CellLight("X"));                        
+            r3.storage2.Add(new CellLight(15.3));
 
             FrameLightRow r4 = new FrameLightRow();
             r4.storage.Add(new CellLight("B"));
-            r4.storage.Add(new CellLight("Y"));
-            r4.storage.Add(new CellLight(20.4));
+            r4.storage.Add(new CellLight("Y"));                        
+            r4.storage2.Add(new CellLight(20.4));
 
             FrameLightRow r5 = new FrameLightRow();
             r5.storage.Add(new CellLight("A"));
-            r5.storage.Add(new CellLight("X"));
-            r5.storage.Add(new CellLight(5.5));
+            r5.storage.Add(new CellLight("X"));            
+            r5.storage2.Add(new CellLight(5.5));
 
-            var data = new List<FrameLightRow>
-        {
-            r1,
-            r2,
-            r3,
-            r4,
-            r5
-        };
+            List<FrameLightRow> data = new List<FrameLightRow> { r1, r2, r3, r4, r5 };
 
             // Indices for row and column dimensions
             var rowIndices = new List<int> { 0 };   // "A", "B" (row dimension)
