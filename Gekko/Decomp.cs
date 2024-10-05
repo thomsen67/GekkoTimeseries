@@ -3165,15 +3165,16 @@ namespace Gekko
 
             //DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
 
-            if (model.DecompType() == EModelType.GAMSScalar)
-            {
-                //DecompTableHandleSignAndShares(table, decompOptions2);
-            }
+            //DecompTableHandleSignAndShares(table, decompOptions2);            
+
+            List<double> red = new List<double>();
+            for (int i = 0; i < 1000; i++) red.Add(0d);
+            DecompOutput decompOutput = new DecompOutput(table, null, red);
 
             //DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
 
             //return decompOutput2;
-            return null;
+            return decompOutput;
         }
 
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
