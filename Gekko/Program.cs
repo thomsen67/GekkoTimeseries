@@ -36915,30 +36915,30 @@ namespace Gekko
 
     public class FrameLightRow
     {
-        public List<CellLight> storage = null;
-        public List<CellLight> storage2 = null;  //for instance for values, to keep them separate
+        public List<CellLight> storageDimensions = null;
+        public List<CellLight> storageValues = null;  //for instance for values, to keep them separate
 
         public FrameLightRow()
         {
-            this.storage = new List<CellLight>();
-            this.storage2 = new List<CellLight>();
+            this.storageDimensions = new List<CellLight>();
+            this.storageValues = new List<CellLight>();
         }
 
         public FrameLightRow(FrameLight frame)
         {
-            this.storage = new List<CellLight>(new CellLight[frame.frameColNames.Count]); //fills it with "null"-objects  t);            
+            this.storageDimensions = new List<CellLight>(new CellLight[frame.frameColNames.Count]); //fills it with "null"-objects  t);            
         }
 
         public void Set(FrameLight frame, string colname, CellLight cell)
         {
             int i = FindColumn(frame, colname);
-            this.storage[i] = cell;
+            this.storageDimensions[i] = cell;
         }
 
         public CellLight Get(FrameLight frame, string colname)
         {
             int i = FindColumn(frame, colname);
-            return this.storage[i];
+            return this.storageDimensions[i];
         }
 
         public static bool HasColumn(FrameLight frame, string colname)
@@ -36984,7 +36984,7 @@ namespace Gekko
                 this.frameColNames.Add(colname);
                 for (int i = 0; i < this.frameRows.Count; i++)
                 {
-                    this.frameRows[i].storage.Add(new CellLight());
+                    this.frameRows[i].storageDimensions.Add(new CellLight());
                 }
             }
         }

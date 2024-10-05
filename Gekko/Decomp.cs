@@ -44,7 +44,7 @@ namespace Gekko
                 string rowKey = null;
                 if (group == null)
                 {
-                    rowKey = string.Join("-", rowIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
+                    rowKey = string.Join("-", rowIndices.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
                 }
                 else
                 {
@@ -56,7 +56,7 @@ namespace Gekko
                     rowKey = G.Substring(s, 0, s.Length - 2);
                 }
 
-                string columnKey = string.Join("-", columnIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
+                string columnKey = string.Join("-", columnIndices.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
 
                 // Step 3: Initialize row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey))
@@ -71,7 +71,7 @@ namespace Gekko
                 }
 
                 // Step 5: Add the value (from the values part of the data row)
-                double v = Convert.ToDouble(row.storage2[0].data);
+                double v = Convert.ToDouble(row.storageValues[0].data);
                 pivotTable[rowKey][columnKey].Add(v);
             }
 
@@ -94,42 +94,57 @@ namespace Gekko
         {
             // Example data with arbitrary number of elements in each row
 
-            FrameLightRow r1 = new FrameLightRow();
-            r1.storage.Add(new CellLight("A"));
-            r1.storage.Add(new CellLight("X"));            
-            r1.storage2.Add(new CellLight(5.1));
+            Program.RunGekkoCommands(@"reset; time 1970 2024; import <all px array> c:\Thomas\Gekko\regres\Models\Decomp\befolk1.px;", "", 0, new P());
+            Series ts = O.GetIVariableFromString("befolk1!a", O.ECreatePossibilities.NoneReportError) as Series;
+            GekkoTime t1 = new GekkoTime(EFreq.A, 1971, 1, 1);
+            GekkoTime t2 = new GekkoTime(EFreq.A, 1924, 1, 1);
 
-            FrameLightRow r2 = new FrameLightRow();
-            r2.storage.Add(new CellLight("A"));
-            r2.storage.Add(new CellLight("Y"));
-            r2.storage2.Add(new CellLight(10.2));
+            List<FrameLightRow> data = new List<FrameLightRow>();
+            List<MultidimItem> keys1 = ts.dimensionsStorage.storage.Keys.ToList();
+            keys1.Sort(Multidim.CompareMultidimItems);
+            for (int i = 0; i < keys1.Count; i++)
+            {
+                MultidimItem mm1 = keys1[i];
+                Series sub1 = ts.dimensionsStorage.storage[mm1] as Series;
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    FrameLightRow r = new FrameLightRow();
+                    foreach (string s in mm1.storage)
+                    {
+                        r.storageDimensions.Add(new CellLight(s));
+                    }
+                    double v = sub1.GetDataSimple(t);
+                    r.storageValues.Add(new CellLight(v));
+                    data.Add(r);
+                }
+            }
 
-            FrameLightRow r3 = new FrameLightRow();
-            r3.storage.Add(new CellLight("B"));
-            r3.storage.Add(new CellLight("X"));                        
-            r3.storage2.Add(new CellLight(15.3));
-
-            FrameLightRow r4 = new FrameLightRow();
-            r4.storage.Add(new CellLight("B"));
-            r4.storage.Add(new CellLight("Y"));                        
-            r4.storage2.Add(new CellLight(20.4));
-
-            FrameLightRow r5 = new FrameLightRow();
-            r5.storage.Add(new CellLight("A"));
-            r5.storage.Add(new CellLight("X"));            
-            r5.storage2.Add(new CellLight(5.5));
-
-            List<FrameLightRow> data = new List<FrameLightRow> { r1, r2, r3, r4, r5 };
-
-            // Indices for row and column dimensions
-            var rowIndices = new List<int> { 0 };   // "A", "B" (row dimension)
+            // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
+            var rowIndices = new List<int> { 0, 2 };   // "A", "B" (row dimension)
             var columnIndices = new List<int> { 1 }; // "X", "Y" (column dimension)
 
             // Define a filter to only include rows where the second element is "X"
-            Func<FrameLightRow, bool> filter = row => row.storage[1].ToString() != "W";
-
-            // Group second element
-            Func<FrameLightRow, int, string> group = (row, i) => { string s = row.storage[i].ToString(); if (i == 0) s = "A..B"; return s; };
+            Func<FrameLightRow, bool> filter = row =>
+            {
+                return !(G.Equal(row.storageDimensions[0].text, "tot") || G.Equal(row.storageDimensions[1].text, "tot") || G.Equal(row.storageDimensions[2].text, "tot"));
+            };
+            
+            // Group
+            Func<FrameLightRow, int, string> group = (row, i) =>
+            {
+                string s = row.storageDimensions[i].text;
+                if (i == 1)
+                {
+                    if (s == "99-") s = "99";
+                    int ii = -12345;
+                    if (int.TryParse(s, out ii))
+                    {
+                        int ten = ii / 10;
+                        s = ten + "0" + ".." + ten + "9";
+                    }
+                }
+                return s;
+            };            
 
             // Create the pivot table (sum of the last element) with filtering applied
             var pivotTable = GekkoPivotTable.CreatePivotTable(
@@ -3493,7 +3508,7 @@ namespace Gekko
                     for (int i = 0; i < frame.frameColNames.Count; i++)
                     {
                         if (i == valueI) continue;
-                        string s = framerow.storage[i].text;
+                        string s = framerow.storageDimensions[i].text;
                         if (s == null) s = Globals.decompNull;  //hmmm used at all??
                         if (!decompOptions2.freeValues[i].ContainsKey(s)) decompOptions2.freeValues[i].Add(s, null);
                     }
@@ -4786,7 +4801,7 @@ namespace Gekko
             foreach (FrameLightRow row in dt.frameRows)
             {
                 string s = null;
-                foreach (CellLight c in row.storage)
+                foreach (CellLight c in row.storageDimensions)
                 {
                     s += c.ToString() + "; ";
                 }

@@ -510,7 +510,7 @@ namespace Gekko
             if (type == EPrintTypes.Plot)
             {                
                 string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, new PlotHelper(), smpl.p);
-                Globals.browserPlotFiles.Add(fileName);
+                if (Globals.browserPlotFiles != null) Globals.browserPlotFiles.Add(fileName);
             }
             else if (type == EPrintTypes.Sheet)
             {

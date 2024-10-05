@@ -1375,79 +1375,86 @@ namespace Gekko
             {
 
                 Globals.browserPlotFiles = new List<string>(); //Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
-                string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
-
-                //Delete the master file
-                string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
                 try
                 {
-                    File.Delete(fileNameWithPath);
-                }
-                catch { }
+                    string gnuplotPath = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
 
-                //Generate 1 file for gnuplot to chew on
-                O.Prt o0 = null;
-                foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
-                {
-                    if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
-
-                    foreach (string s in new List<string>() { "gp", "dat" })
+                    //Delete the master file
+                    string fileNameWithPath = gnuplotPath + "\\" + "browser.gp";
+                    try
                     {
-                        if (File.Exists(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s))
+                        File.Delete(fileNameWithPath);
+                    }
+                    catch { }
+
+                    //Generate 1 file for gnuplot to chew on
+                    O.Prt o0 = null;
+                    foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+                    {
+                        if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
+
+                        foreach (string s in new List<string>() { "gp", "dat" })
                         {
-                            try
+                            if (File.Exists(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s))
                             {
-                                File.Delete(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s);
+                                try
+                                {
+                                    File.Delete(gnuplotPath + "\\" + "temp" + (Globals.browserPlotFiles.Count + 1) + "." + s);
+                                }
+                                catch { }
                             }
-                            catch { }
+                        }
+
+                        o0 = new O.Prt();
+                        o0.operators = new List<OptString>();
+                        o0.operators.Add(new OptString(op, "yes"));
+
+                        if (op == "p")
+                        {
+                            //So we do not show too small or too large percentages
+                            o0.opt_yminhard = -100d;
+                            o0.opt_ymaxhard = 100d;
+                            o0.opt_yminsoft = -1d;
+                            o0.opt_ymaxsoft = 1d;
+                            //o0.opt_ytitle = "%"; Produces very large .svg files -- strange...!
+                        }
+
+                        o0.isBrowser = true;
+                        string extra = null;
+                        string extra2 = null;
+                        if (op != "n")
+                        {
+                            extra = "__" + op;
+                            extra2 = " (%)";
+                        }
+                        o0.browserPath = browserPath + "\\" + kvp.Key.ToLower() + extra + ".svg";
+                        o0.prtType = "plot";
+                        o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
+                        O.Prt.Element ope0 = new O.Prt.Element();
+                        ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
+                        ope0.labelRecordedPieces = new List<O.RecordedPieces>();
+                        ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
+                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
+                        o0.prtElements.Add(ope0);
+                        o0.Exe();
+                    }
+
+                    using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string s in Globals.browserPlotFiles)
+                        {
+                            sw.WriteLine("reset session");
+                            sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
                         }
                     }
-
-                    o0 = new O.Prt();
-                    o0.operators = new List<OptString>();
-                    o0.operators.Add(new OptString(op, "yes"));
-
-                    if (op == "p")
-                    {
-                        //So we do not show too small or too large percentages
-                        o0.opt_yminhard = -100d;
-                        o0.opt_ymaxhard = 100d;
-                        o0.opt_yminsoft = -1d;
-                        o0.opt_ymaxsoft = 1d;
-                        //o0.opt_ytitle = "%"; Produces very large .svg files -- strange...!
-                    }
-
-                    o0.isBrowser = true;
-                    string extra = null;
-                    string extra2 = null;
-                    if (op != "n")
-                    {
-                        extra = "__" + op;
-                        extra2 = " (%)";
-                    }
-                    o0.browserPath = browserPath + "\\" + kvp.Key.ToLower() + extra + ".svg";
-                    o0.prtType = "plot";
-                    o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
-                    O.Prt.Element ope0 = new O.Prt.Element();
-                    ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
-                    ope0.labelRecordedPieces = new List<O.RecordedPieces>();
-                    ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
-                    ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
-                    o0.prtElements.Add(ope0);
-                    o0.Exe();
+                    Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null, 10080);  //minutes corresponding to 1 week
                 }
-
-                using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                finally
                 {
-                    foreach (string s in Globals.browserPlotFiles)
-                    {
-                        sw.WriteLine("reset session");
-                        sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
-                    }
+                    //Important: switches this off for normal PLOT use
+                    Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
                 }
-                Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null, 10080);  //minutes corresponding to 1 week
-                Globals.browserPlotFiles = null; // Directory.Delete(Globals.localTempFilesLocationGnuplot, true); --> often fails because gnuplot sits on the folder            
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }
