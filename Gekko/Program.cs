@@ -36915,8 +36915,36 @@ namespace Gekko
 
     public class FrameLightRow
     {
-        public List<CellLight> storageDimensions = null;
-        public List<CellLight> storageValues = null;  //for instance for values, to keep them separate
+        public List<CellLight> storageDimensions = new List<CellLight>();
+        public List<CellLight> storageValues = new List<CellLight>();
+
+        public void AddDimension(FrameLight frame, string s, CellLight c)
+        {
+            int i = -12345;
+            if (frame.frameDimensionNames.TryGetValue(s, out i))
+            {
+                this.storageDimensions[i] = c;
+            }
+            else
+            {
+                this.storageDimensions.Add(c);
+                frame.frameDimensionNames.Add(s, this.storageDimensions.Count - 1);
+            }            
+        }
+
+        public void AddValue(FrameLight frame, string s, CellLight c)
+        {
+            int i = -12345;
+            if (frame.frameValueNames.TryGetValue(s, out i))
+            {
+                this.storageValues[i] = c;
+            }
+            else
+            {
+                this.storageValues.Add(c);
+                frame.frameValueNames.Add(s, this.storageValues.Count - 1);
+            }
+        }
 
         public FrameLightRow()
         {
@@ -36925,23 +36953,31 @@ namespace Gekko
         }
 
         public FrameLightRow(FrameLight frame)
+        {            
+            this.storageDimensions = new List<CellLight>();
+            this.storageValues = new List<CellLight>();
+            for (int i = 0; i < frame.frameDimensionNames.Count; i++) storageDimensions.Add(new CellLight()); //null cell placeholder
+            for (int i = 0; i < frame.frameValueNames.Count; i++) storageValues.Add(new CellLight()); //null cell placeholder
+        }
+
+        public FrameLightRow(FrameLight_OLD frame)
         {
             this.storageDimensions = new List<CellLight>(new CellLight[frame.frameColNames.Count]); //fills it with "null"-objects  t);            
         }
 
-        public void Set(FrameLight frame, string colname, CellLight cell)
+        public void Set(FrameLight_OLD frame, string colname, CellLight cell)
         {
             int i = FindColumn(frame, colname);
             this.storageDimensions[i] = cell;
         }
 
-        public CellLight Get(FrameLight frame, string colname)
+        public CellLight Get(FrameLight_OLD frame, string colname)
         {
             int i = FindColumn(frame, colname);
             return this.storageDimensions[i];
         }
 
-        public static bool HasColumn(FrameLight frame, string colname)
+        public static bool HasColumn(FrameLight_OLD frame, string colname)
         {
             for (int i = 0; i < frame.frameColNames.Count; i++)
             {
@@ -36950,7 +36986,7 @@ namespace Gekko
             return false;
         }
 
-        public static int FindColumn(FrameLight frame, string colname)
+        public static int FindColumn(FrameLight_OLD frame, string colname)
         {
             int j = -12345;
             for (int i = 0; i < frame.frameColNames.Count; i++)
@@ -36972,7 +37008,14 @@ namespace Gekko
         public bool active = false;
     }
 
-    public class FrameLight
+    public class FrameLight 
+    {
+        public List<FrameLightRow> data = new List<FrameLightRow>();
+        public GekkoDictionary<string, int> frameDimensionNames = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, int> frameValueNames = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    public class FrameLight_OLD
     {
         public List<FrameLightRow> frameRows = new List<FrameLightRow>();
         public List<string> frameColNames = new List<string>(); //must be lowercase
