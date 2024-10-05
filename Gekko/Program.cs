@@ -2507,45 +2507,11 @@ namespace Gekko
                 return;
             }
 
-            if (Globals.runningOnTTComputer && (text == "pivot"))
+            if (Globals.runningOnTTComputer && (text == "p"))
             {
-                // Example data with arbitrary number of elements in each row
-                var data = new List<List<object>>
-        {
-            new List<object> { "A", "X", 5 },
-            new List<object> { "A", "Y", 10 },
-            new List<object> { "B", "X", 15 },
-            new List<object> { "B", "Y", 20 },
-            new List<object> { "A", "X", 5 }
-        };
-
-                // Indices for row and column dimensions
-                var rowIndices = new List<int> { 0 };   // "A", "B" (row dimension)
-                var columnIndices = new List<int> { 1 }; // "X", "Y" (column dimension)
-
-                // Define a filter to only include rows where the second element is "X"
-                Func<List<object>, bool> filter = row => row[1].ToString() != "W";
-
-                // Create the pivot table (sum of the last element) with filtering applied
-                var pivotTable = GenericPivotTable.CreatePivotTable(
-                    data,
-                    rowIndices,
-                    columnIndices,
-                    values => values.Sum(),  // Sum aggregation
-                    filter                   // Apply filter for column 1 == "X"
-                );
-
-                // Display the result
-                foreach (var row in pivotTable)
-                {
-                    G.Writeln(row.Key + ":");
-                    foreach (var column in row.Value)
-                    {
-                        G.Writeln("  " + column.Key + ": " + column.Value);
-                    }
-                }
+                GekkoPivotTable.CreatePivotTable2();
+                return;
             }
-        
 
             if (text == "flowgraph1" || text == "flowgraph2")
             {

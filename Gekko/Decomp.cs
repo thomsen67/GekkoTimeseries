@@ -15,7 +15,7 @@ namespace Gekko
 {
 
 
-    public class GenericPivotTable
+    public class GekkoPivotTable
     {
         // Function to create a pivot table with filtering
         public static Dictionary<string, Dictionary<string, int>> CreatePivotTable(
@@ -30,7 +30,7 @@ namespace Gekko
             var pivotTable = new Dictionary<string, Dictionary<string, List<int>>>();
 
             // Step 1: Iterate over each row in the data
-            foreach (var row in data)
+            foreach (List<object> row in data)
             {
                 // Apply the filter if one is provided
                 if (filter != null && !filter(row))
@@ -55,7 +55,7 @@ namespace Gekko
                 }
 
                 // Step 5: Add the value (last element of the row) to the appropriate cell
-                var value = Convert.ToInt32(row.Last());
+                int value = Convert.ToInt32(row.Last());
                 pivotTable[rowKey][columnKey].Add(value);
             }
 
@@ -71,6 +71,46 @@ namespace Gekko
             }
 
             return resultTable;
+        }
+
+
+        public static void CreatePivotTable2()
+        {
+            // Example data with arbitrary number of elements in each row
+            var data = new List<List<object>>
+        {
+            new List<object> { "A", "X", 5 },
+            new List<object> { "A", "Y", 10 },
+            new List<object> { "B", "X", 15 },
+            new List<object> { "B", "Y", 20 },
+            new List<object> { "A", "X", 5 }
+        };
+
+            // Indices for row and column dimensions
+            var rowIndices = new List<int> { 0 };   // "A", "B" (row dimension)
+            var columnIndices = new List<int> { 1 }; // "X", "Y" (column dimension)
+
+            // Define a filter to only include rows where the second element is "X"
+            Func<List<object>, bool> filter = row => row[1].ToString() != "W";
+
+            // Create the pivot table (sum of the last element) with filtering applied
+            var pivotTable = GekkoPivotTable.CreatePivotTable(
+                data,
+                rowIndices,
+                columnIndices,
+                values => values.Sum(),  // Sum aggregation
+                filter                   // Apply filter for column 1 == "X"
+            );
+
+            // Display the result
+            foreach (KeyValuePair<string, Dictionary<string, int>> row in pivotTable)
+            {
+                G.Writeln(row.Key + ":");
+                foreach (KeyValuePair<string, int> column in row.Value)
+                {
+                    G.Writeln("  " + column.Key + ": " + column.Value);
+                }
+            }
         }
     }
 
