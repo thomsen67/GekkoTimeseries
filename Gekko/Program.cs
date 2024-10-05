@@ -36917,6 +36917,11 @@ namespace Gekko
     {
         public List<CellLight> storage = null;
 
+        public FrameLightRow()
+        {
+            this.storage = new List<CellLight>();
+        }
+
         public FrameLightRow(FrameLight frame)
         {
             this.storage = new List<CellLight>(new CellLight[frame.frameColNames.Count]); //fills it with "null"-objects  t);            

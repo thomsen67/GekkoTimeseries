@@ -19,18 +19,18 @@ namespace Gekko
     {
         // Function to create a pivot table with filtering
         public static Dictionary<string, Dictionary<string, double>> CreatePivotTable(
-            List<List<object>> data,                       // The generic data rows
+            List<FrameLightRow> data,                      // The generic data rows
             List<int> rowIndices,                          // Indices of the elements to use for row dimensions
             List<int> columnIndices,                       // Indices of the elements to use for column dimensions
             Func<IEnumerable<double>, double> aggFunction, // Aggregation function (e.g., sum)
-            Func<List<object>, bool> filter = null         // Optional filter function
+            Func<FrameLightRow, bool> filter = null        // Optional filter function
         )
         {
             // Initialize the pivot table as a nested dictionary
             var pivotTable = new Dictionary<string, Dictionary<string, List<double>>>();
 
             // Step 1: Iterate over each row in the data
-            foreach (List<object> row in data)
+            foreach (FrameLightRow row in data)
             {
                 // Apply the filter if one is provided
                 if (filter != null && !filter(row))
@@ -39,8 +39,8 @@ namespace Gekko
                 }
 
                 // Step 2: Construct row and column keys based on selected dimensions
-                string rowKey = string.Join("-", rowIndices.Select(i => row[i]?.ToString() ?? "null"));
-                string columnKey = string.Join("-", columnIndices.Select(i => row[i]?.ToString() ?? "null"));
+                string rowKey = string.Join("-", rowIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
+                string columnKey = string.Join("-", columnIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
 
                 // Step 3: Initialize row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey))
@@ -55,7 +55,7 @@ namespace Gekko
                 }
 
                 // Step 5: Add the value (last element of the row) to the appropriate cell
-                double value = Convert.ToDouble(row.Last());
+                double value = Convert.ToDouble(row.storage.Last().data);
                 pivotTable[rowKey][columnKey].Add(value);
             }
 
@@ -77,13 +77,39 @@ namespace Gekko
         public static void CreatePivotTable2()
         {
             // Example data with arbitrary number of elements in each row
-            var data = new List<List<object>>
+
+            FrameLightRow r1 = new FrameLightRow();
+            r1.storage.Add(new CellLight("A"));
+            r1.storage.Add(new CellLight("X"));
+            r1.storage.Add(new CellLight(5.1));
+
+            FrameLightRow r2 = new FrameLightRow();
+            r2.storage.Add(new CellLight("A"));
+            r2.storage.Add(new CellLight("Y"));
+            r2.storage.Add(new CellLight(10.2));
+
+            FrameLightRow r3 = new FrameLightRow();
+            r3.storage.Add(new CellLight("B"));
+            r3.storage.Add(new CellLight("X"));
+            r3.storage.Add(new CellLight(15.3));
+
+            FrameLightRow r4 = new FrameLightRow();
+            r4.storage.Add(new CellLight("B"));
+            r4.storage.Add(new CellLight("Y"));
+            r4.storage.Add(new CellLight(20.4));
+
+            FrameLightRow r5 = new FrameLightRow();
+            r5.storage.Add(new CellLight("A"));
+            r5.storage.Add(new CellLight("X"));
+            r5.storage.Add(new CellLight(5.5));
+
+            var data = new List<FrameLightRow>
         {
-            new List<object> { "A", "X", 5.1 },
-            new List<object> { "A", "Y", 10.2 },
-            new List<object> { "B", "X", 15.3 },
-            new List<object> { "B", "Y", 20.4 },
-            new List<object> { "A", "X", 5.5 }
+            r1,
+            r2,
+            r3,
+            r4,
+            r5
         };
 
             // Indices for row and column dimensions
@@ -91,7 +117,7 @@ namespace Gekko
             var columnIndices = new List<int> { 1 }; // "X", "Y" (column dimension)
 
             // Define a filter to only include rows where the second element is "X"
-            Func<List<object>, bool> filter = row => row[1].ToString() != "W";
+            Func<FrameLightRow, bool> filter = row => row.storage[1].ToString() != "W";            
 
             // Create the pivot table (sum of the last element) with filtering applied
             var pivotTable = GekkoPivotTable.CreatePivotTable(
