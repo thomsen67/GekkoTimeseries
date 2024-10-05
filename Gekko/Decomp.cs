@@ -21,9 +21,10 @@ namespace Gekko
         public static Dictionary<string, Dictionary<string, double>> CreatePivotTable(
             List<FrameLightRow> data,                      // The generic data rows
             List<int> rowIndices,                          // Indices of the elements to use for row dimensions
-            List<int> columnIndices,                       // Indices of the elements to use for column dimensions
+            List<int> columnIndices,                       // Indices of the elements to use for column dimensions            
             Func<IEnumerable<double>, double> aggFunction, // Aggregation function (e.g., sum)
-            Func<FrameLightRow, bool> filter = null        // Optional filter function
+            Func<FrameLightRow, bool> filter = null,       // Optional filter function
+            Func<FrameLightRow, int, string> group = null       // Optional grouping function            
         )
         {
             // Initialize the pivot table as a nested dictionary
@@ -39,7 +40,22 @@ namespace Gekko
                 }
 
                 // Step 2: Construct row and column keys based on selected dimensions
-                string rowKey = string.Join("-", rowIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
+
+                string rowKey = null;
+                if (group == null)
+                {
+                    rowKey = string.Join("-", rowIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
+                }
+                else
+                {
+                    string s = null;
+                    foreach (int ii in rowIndices)
+                    {
+                        s += group(row, ii) + "-";
+                    }
+                    rowKey = G.Substring(s, 0, s.Length - 2);
+                }
+
                 string columnKey = string.Join("-", columnIndices.Select(i => row.storage[i].text?.ToString() ?? "null"));
 
                 // Step 3: Initialize row in the pivot table if it doesn't exist
@@ -117,7 +133,10 @@ namespace Gekko
             var columnIndices = new List<int> { 1 }; // "X", "Y" (column dimension)
 
             // Define a filter to only include rows where the second element is "X"
-            Func<FrameLightRow, bool> filter = row => row.storage[1].ToString() != "W";            
+            Func<FrameLightRow, bool> filter = row => row.storage[1].ToString() != "W";
+
+            // Group second element
+            Func<FrameLightRow, int, string> group = (row, i) => { string s = row.storage[i].ToString(); if (i == 0) s = "A..B"; return s; };
 
             // Create the pivot table (sum of the last element) with filtering applied
             var pivotTable = GekkoPivotTable.CreatePivotTable(
@@ -125,7 +144,8 @@ namespace Gekko
                 rowIndices,
                 columnIndices,
                 values => values.Sum(),  // Sum aggregation
-                filter                   // Apply filter for column 1 == "X"
+                filter,                   // Apply filter for column 1 == "X"
+                group
             );
 
             // Display the result
