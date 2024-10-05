@@ -18,16 +18,16 @@ namespace Gekko
     public class GekkoPivotTable
     {
         // Function to create a pivot table with filtering
-        public static Dictionary<string, Dictionary<string, int>> CreatePivotTable(
-            List<List<object>> data,                     // The generic data rows
-            List<int> rowIndices,                        // Indices of the elements to use for row dimensions
-            List<int> columnIndices,                     // Indices of the elements to use for column dimensions
-            Func<IEnumerable<int>, int> aggFunction,     // Aggregation function (e.g., sum)
-            Func<List<object>, bool> filter = null       // Optional filter function
+        public static Dictionary<string, Dictionary<string, double>> CreatePivotTable(
+            List<List<object>> data,                       // The generic data rows
+            List<int> rowIndices,                          // Indices of the elements to use for row dimensions
+            List<int> columnIndices,                       // Indices of the elements to use for column dimensions
+            Func<IEnumerable<double>, double> aggFunction, // Aggregation function (e.g., sum)
+            Func<List<object>, bool> filter = null         // Optional filter function
         )
         {
             // Initialize the pivot table as a nested dictionary
-            var pivotTable = new Dictionary<string, Dictionary<string, List<int>>>();
+            var pivotTable = new Dictionary<string, Dictionary<string, List<double>>>();
 
             // Step 1: Iterate over each row in the data
             foreach (List<object> row in data)
@@ -45,25 +45,25 @@ namespace Gekko
                 // Step 3: Initialize row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey))
                 {
-                    pivotTable[rowKey] = new Dictionary<string, List<int>>();
+                    pivotTable[rowKey] = new Dictionary<string, List<double>>();
                 }
 
                 // Step 4: Initialize column in the row if it doesn't exist
                 if (!pivotTable[rowKey].ContainsKey(columnKey))
                 {
-                    pivotTable[rowKey][columnKey] = new List<int>();
+                    pivotTable[rowKey][columnKey] = new List<double>();
                 }
 
                 // Step 5: Add the value (last element of the row) to the appropriate cell
-                int value = Convert.ToInt32(row.Last());
+                double value = Convert.ToDouble(row.Last());
                 pivotTable[rowKey][columnKey].Add(value);
             }
 
             // Step 6: Apply the aggregation function to each cell
-            var resultTable = new Dictionary<string, Dictionary<string, int>>();
+            var resultTable = new Dictionary<string, Dictionary<string, double>>();
             foreach (var rowEntry in pivotTable)
             {
-                resultTable[rowEntry.Key] = new Dictionary<string, int>();
+                resultTable[rowEntry.Key] = new Dictionary<string, double>();
                 foreach (var columnEntry in rowEntry.Value)
                 {
                     resultTable[rowEntry.Key][columnEntry.Key] = aggFunction(columnEntry.Value);
@@ -79,11 +79,11 @@ namespace Gekko
             // Example data with arbitrary number of elements in each row
             var data = new List<List<object>>
         {
-            new List<object> { "A", "X", 5 },
-            new List<object> { "A", "Y", 10 },
-            new List<object> { "B", "X", 15 },
-            new List<object> { "B", "Y", 20 },
-            new List<object> { "A", "X", 5 }
+            new List<object> { "A", "X", 5.1 },
+            new List<object> { "A", "Y", 10.2 },
+            new List<object> { "B", "X", 15.3 },
+            new List<object> { "B", "Y", 20.4 },
+            new List<object> { "A", "X", 5.5 }
         };
 
             // Indices for row and column dimensions
@@ -103,10 +103,10 @@ namespace Gekko
             );
 
             // Display the result
-            foreach (KeyValuePair<string, Dictionary<string, int>> row in pivotTable)
+            foreach (KeyValuePair<string, Dictionary<string, double>> row in pivotTable)
             {
                 G.Writeln(row.Key + ":");
-                foreach (KeyValuePair<string, int> column in row.Value)
+                foreach (KeyValuePair<string, double> column in row.Value)
                 {
                     G.Writeln("  " + column.Key + ": " + column.Value);
                 }
