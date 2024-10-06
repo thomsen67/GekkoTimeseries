@@ -51,7 +51,7 @@ namespace Gekko
 
                 // Step 5: Add the value (from the values part of the data row)
 
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, null);
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, null, dataframeRow.storageValues[Globals.dPrimeShare].data);
                 pivotTable[rowKey][columnKey].Add(ac);  //The list of these values will be aggregated later on
             }
             
@@ -414,8 +414,9 @@ namespace Gekko
         public int n;
         public List<string> fullVariableNames;
         public string backgroundColor;
+        public double primeShare; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
 
-        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, string backgroundColor)
+        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, string backgroundColor, double primeShare)
         {
             this.change = change;
             this.changeAlternative = changeAlternative;
@@ -428,6 +429,7 @@ namespace Gekko
             this.n = n;
             this.fullVariableNames = fullVariableNames;
             this.backgroundColor = backgroundColor;
+            this.primeShare = primeShare;
         }
     }
 
@@ -3066,7 +3068,7 @@ namespace Gekko
 
             Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
             {
-                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null, 0d);
                 foreach (AggContainer x in m)
                 {
                     aggregate.change += x.change;
@@ -3080,6 +3082,7 @@ namespace Gekko
                     aggregate.n += x.n;
                     aggregate.fullVariableNames.AddRange(x.fullVariableNames);
                     aggregate.backgroundColor = null;
+                    aggregate.primeShare += x.primeShare;
                 }
 
                 return aggregate;
@@ -3407,7 +3410,7 @@ namespace Gekko
                     List<string> fullVariableNames = new List<string>();
                     string backgroundColor = "Transparent";
 
-                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null, 0d);
                     if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
                     
                     //new AggContainer(change.change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
@@ -3873,6 +3876,7 @@ namespace Gekko
                 double dLevelRefLag = framerow.Get(frame, Globals.col_valueLevelRefLag).data;
                 double dLevelRefLag2 = framerow.Get(frame, Globals.col_valueLevelRefLag2).data;
                 string fullVariableName = framerow.Get(frame, Globals.col_fullVariableName).text;
+                double dPrimeShare = framerow.Get(frame, Globals.col_primeShare).data;
 
                 string backgroundColor = "Transparent";
                 if (Program.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
@@ -3889,7 +3893,7 @@ namespace Gekko
                     agg.TryGetValue(key, out td);
                     if (td == null)
                     {
-                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, backgroundColor));
+                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, backgroundColor, dPrimeShare));
                     }
                     else
                     {
@@ -3967,15 +3971,18 @@ namespace Gekko
             //frame.AddColName(Globals.col_valueLevelRefLag);
             //frame.AddColName(Globals.col_valueLevelRefLag2);
             //adding frame rows, while also getting sets defined as frame columns
-            //prime 101, 103, 107, 109, ... the contributions should add up --> one per period            
+            //prime 101, 103, 107, 109, ... the contributions should add up --> one per period
+            //
+
+            int prime = 101;
+
+            // ------------------------------------------------------------------------------
+            // PERIODS
+            // ------------------------------------------------------------------------------
 
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
-                int i = 0;
-                double lhsSum = 0d;
-                double rhsSum = 0d;
-
-                //second time, no loop..........
+                prime = G.NextPrime(prime);                
 
                 DecompDict dd = null;
                 if (op.isRaw)
@@ -3998,8 +4005,14 @@ namespace Gekko
                     }
                 }
 
+                // ------------------------------------------------------------------------------
+                // VARIABLE: these variables sum to 0 for the "d" and "dAlternative" types
+                // ------------------------------------------------------------------------------
+
                 foreach (string dictName in dd.storage.Keys)
                 {
+                    double primeShare = (double)prime / (double)dd.storage.Count;
+
                     FrameLightRow frameRow = new FrameLightRow(frame);
                     
                     string dbName = null; string varName = null; string freq = null; string[] indexes = null;                    
@@ -4149,6 +4162,7 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
+                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight(primeShare));
 
                     frame.data.Add(frameRow);
                 }

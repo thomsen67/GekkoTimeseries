@@ -113,6 +113,7 @@ namespace Gekko
         public const int dLevelRefLag = 6;
         public const int dLevelRefLag2 = 7;
         public const int dNames = 8;
+        public const int dPrimeShare = 9;
 
         public const bool fixForGekko4_0 = false;
 
@@ -218,6 +219,7 @@ namespace Gekko
         public const string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
         public const string col_equ = Globals.internalColumnIdentifyer + "equ";
         public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
+        public const string col_primeShare = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
 
         // ----------------------------------------------------------------
         // GRADIENT

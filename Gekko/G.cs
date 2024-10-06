@@ -5358,13 +5358,13 @@ namespace Gekko
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
-        public static bool NextPrime(int num)
+        public static int NextPrime(int num)
         {
             for (int i = num + 1; i < int.MaxValue; i++)
             {
-                if (G.IsPrime(i)) return true;
+                if (G.IsPrime(i)) return i;
             }
-            return false;  //hmm, probably never arrives here...!
+            return -12345;  //hmm, probably never arrives here...!
         }
 
 
