@@ -18647,6 +18647,7 @@ namespace UnitTests
             I("x2 = series(2);");
             I("x3 = series(1);");
             I("x4 = series(1);");
+
             I("x1[a, c] = 1, 2;");
             I("x1[a, d] = 2, 3;");
             I("x1[b, c] = 3, 4;");
@@ -18655,12 +18656,25 @@ namespace UnitTests
             I("x2[a, d] = 200, 300;");
             I("x2[b, c] = 300, 400;");
             I("x2[b, d] = 400, 500;");
-
             I("x3[a] = 10000, 20000;");
             I("x3[b] = 20000, 30000;");
-
             I("x4[c] = 1000000, 2000000;");
             I("x4[d] = 2000000, 3000000;");
+
+            I("clone;");
+
+            I("ref:x1[a, c] += -1;");
+            I("ref:x1[a, d] += -1;");
+            I("ref:x1[b, c] += -1;");
+            I("ref:x1[b, d] += -1;");
+            I("ref:x2[a, c] += -100;");
+            I("ref:x2[a, d] += -100;");
+            I("ref:x2[b, c] += -100;");
+            I("ref:x2[b, d] += -100;");
+            I("ref:x3[a] += -10000;");
+            I("ref:x3[b] += -10000;");
+            I("ref:x4[c] += -10000;");
+            I("ref:x4[d] += -10000;");
 
             I("#i = a, b;");
             I("#j = c, d;");                        
@@ -18669,6 +18683,7 @@ namespace UnitTests
             I("x3.setdomains(('#i',));");
             //I("x4.setdomains(('#j',));");
             I("y = sum((#i, #j), x1[#i, #j] + x2[#i, #j]) + sum(#i, x3[#i]) + sum(#j, x4[#j]);");
+            
             _AssertSeries(First(), "y!a", 2001, 3031010, sharedDelta);
             _AssertSeries(First(), "y!a", 2002, 5051414, sharedDelta);
             I("time 2002 2002;");

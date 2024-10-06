@@ -50,7 +50,8 @@ namespace Gekko
                 if (!pivotTable[rowKey].ContainsKey(columnKey)) pivotTable[rowKey][columnKey] = new List<AggContainer>();
 
                 // Step 5: Add the value (from the values part of the data row)
-                AggContainer ac = new AggContainer(Convert.ToDouble(dataframeRow.storageValues[0].data), 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>() { "55555" }, null);
+
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 0, new List<string>() { "55555" }, null);
                 pivotTable[rowKey][columnKey].Add(ac);  //These values will be aggregated later on
             }
             
@@ -3085,7 +3086,7 @@ namespace Gekko
 
             };
 
-            Dictionary<string, Dictionary<string, AggContainer>> pivot = GekkoPivotTable.Compute(frame.data, rowIndices, columnIndices, agg, filter, group);
+            Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame.data, rowIndices, columnIndices, agg, filter, group);
 
             if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
@@ -3119,7 +3120,7 @@ namespace Gekko
 
             GekkoDictionary<string, bool> rownames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> colnames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, Dictionary<string, AggContainer>> row in pivot)
+            foreach (KeyValuePair<string, Dictionary<string, AggContainer>> row in pivotTable)
             {
                 if (!rownames2.ContainsKey(row.Key)) rownames2.Add(row.Key, false);
                 foreach (KeyValuePair<string, AggContainer> column in row.Value)
@@ -3130,7 +3131,7 @@ namespace Gekko
             List<string> rownames = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             List<string> colnames = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
-            Table table = DecompGetTableFromPivot(pivot, op, decompOptions2, format2, rownames, colnames);
+            Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
 
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
 
