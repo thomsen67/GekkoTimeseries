@@ -191,6 +191,7 @@ namespace Gekko
 
         public const string internalColumnIdentifyer = "gekkopivot__";
         public const string internalSetIdentifyer = "gekkoset__";
+        public const string internalDimIdentifyer = "gekkodim__";
         public static string internalPivotRows = "Rows";
         public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";

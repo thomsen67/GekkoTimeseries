@@ -3035,12 +3035,18 @@ namespace Gekko
             }            
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
+                                    
+            List<int> rowIndices = new List<int>();
+            rowIndices.Add(frame.frameDimensionNames[Globals.col_variable]);
+            //rowIndices.Add(frame.frameDimensionNames["gekkoset__i"]);
+            //rowIndices.Add(frame.frameDimensionNames["gekkoset__j"]);
+            //rowIndices.Add(frame.frameDimensionNames[Globals.col_universe]);
+            rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
+            rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
+            rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
 
-            // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
-            //
-            //List<int> rowIndices = new List<int> { frame.frameDimensionNames[Globals.col_variable], frame.frameDimensionNames["gekkoset__i"], frame.frameDimensionNames["gekkoset__j"], frame.frameDimensionNames[Globals.col_lag] };
-            List<int> rowIndices = new List<int> { frame.frameDimensionNames[Globals.col_variable], frame.frameDimensionNames["gekkoset__i"], frame.frameDimensionNames["gekkoset__j"], frame.frameDimensionNames[Globals.col_universe], frame.frameDimensionNames[Globals.col_lag] };
-            List<int> columnIndices = new List<int> { frame.frameDimensionNames[Globals.col_t] };
+            List<int> columnIndices = new List<int>();
+            columnIndices.Add(frame.frameDimensionNames[Globals.col_t]);
                         
             Func<FrameLightRow, bool> filter = dataframeRow =>
             {
@@ -3979,7 +3985,7 @@ namespace Gekko
             int prime = 101;
 
             // ------------------------------------------------------------------------------
-            // PERIODS
+            // Loop over PERIODS
             // ------------------------------------------------------------------------------
 
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
@@ -4008,7 +4014,7 @@ namespace Gekko
                 }
 
                 // ------------------------------------------------------------------------------
-                // VARIABLE: these variables sum to 0 for the "d" and "dAlternative" types
+                // Loop over VARIABLES: these variables sum to 0 for the "d" and "dAlternative" types
                 // ------------------------------------------------------------------------------
 
                 foreach (string dictName in dd.storage.Keys)
@@ -4138,19 +4144,14 @@ namespace Gekko
                     {
                         for (int ii = 0; ii < indexes.Length; ii++)
                         {
+                            string index = indexes[ii];
+                            frameRow.AddDimension(frame, Globals.internalDimIdentifyer + varName + "¤" + (ii + 1), new CellLight(index));
+
                             if (domains != null)
                             {
                                 string domain = domains[ii];
-                                string index = indexes[ii];
-
-                                if (domain != null)
-                                {
-                                    frameRow.AddDimension(frame, domain, new CellLight(index));
-                                }
-                                else
-                                {
-                                    frameRow.AddDimension(frame, Globals.col_universe, new CellLight(index));
-                                }
+                                if (domain != null) frameRow.AddDimension(frame, domain, new CellLight(index));
+                                else frameRow.AddDimension(frame, Globals.col_universe, new CellLight(index));
                             }
                         }
                     }
