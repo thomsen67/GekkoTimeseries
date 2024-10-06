@@ -926,7 +926,6 @@ namespace Gekko
                 }
             }
 
-
             //decompDatas[parentI] is the main equation, the other ones are in-substituted. This decompDatas[parentI] has a member
             //for each uncontrolled set like #a. The main variables (MAIN_varnames) are normalized to 1.
             //decompData.cellsContribD contains keys like "Work:y[19]¤[+1]" with values as timeseries.
@@ -3017,6 +3016,8 @@ namespace Gekko
         {
             if (model.DecompType() != EModelType.GAMSScalar) new Error("DecompPivotToTable() presupposes scalar model");
 
+            string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
+
             string format2 = GetNumberFormat(decompOptions2);
             int parentI = 0;
             //string format2 = GetNumberFormat(decompOptions2);
@@ -3034,7 +3035,7 @@ namespace Gekko
                 DecompAdjust(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
             }            
 
-            FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
+            FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, lhs2, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
                                     
             List<int> rowIndices = new List<int>();
             rowIndices.Add(frame.frameDimensionNames[Globals.col_variable]);
@@ -3044,6 +3045,7 @@ namespace Gekko
             rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
             rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
             rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
+            rowIndices.Add(frame.frameDimensionNames[Globals.col_lhs]);
 
             List<int> columnIndices = new List<int>();
             columnIndices.Add(frame.frameDimensionNames[Globals.col_t]);
@@ -3951,7 +3953,7 @@ namespace Gekko
             else return "";
         }
 
-        private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
+        private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, string lhs2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
             FrameLight frame = new FrameLight();
 
@@ -4030,6 +4032,9 @@ namespace Gekko
                     int iLag = int.Parse(G.Substring(lag, 1, lag.Length - 2));
                     O.Chop(fullName, out dbName, out varName, out freq, out indexes);
                     string[] domains = DecompPivotGetDomains(fullName, indexes);
+
+                    bool isLhs = false;
+                    if (iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(fullName)), lhs2)) isLhs = true;
                     
                     double dLevel = double.NaN;
                     double dLevelLag = double.NaN;
@@ -4155,6 +4160,7 @@ namespace Gekko
                             }
                         }
                     }
+                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight("variable_is_lhs"));
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));

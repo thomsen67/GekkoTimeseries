@@ -208,6 +208,7 @@ namespace Gekko
         public const string col_lag = Globals.internalColumnIdentifyer + "lags";
         public const string col_t = internalColumnIdentifyer + "time";
         public const string col_universe = Globals.internalColumnIdentifyer + "universe";
+        public const string col_lhs = Globals.internalColumnIdentifyer + "lhs";
         public const string col_value = Globals.internalColumnIdentifyer + "value";
         public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
         public const string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
