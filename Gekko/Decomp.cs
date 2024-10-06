@@ -51,7 +51,7 @@ namespace Gekko
 
                 // Step 5: Add the value (from the values part of the data row)
 
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, dataframeRow.storageValues[Globals.dNames].data, null);
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, null);
                 pivotTable[rowKey][columnKey].Add(ac);  //The list of these values will be aggregated later on
             }
             
@@ -3066,7 +3066,7 @@ namespace Gekko
 
             Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
             {
-                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>() { "55555" }, null);
+                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
                 foreach (AggContainer x in m)
                 {
                     aggregate.change += x.change;
@@ -3404,10 +3404,10 @@ namespace Gekko
                     double dLevelRefLag = 0d;
                     double dLevelRefLag2 = 0d;
                     int n = 0;
-                    List<string> fullVariableNames = new List<string>() { "55555" };
+                    List<string> fullVariableNames = new List<string>();
                     string backgroundColor = "Transparent";
 
-                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>() { "55555" }, null);
+                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
                     if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
                     
                     //new AggContainer(change.change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
