@@ -51,8 +51,8 @@ namespace Gekko
 
                 // Step 5: Add the value (from the values part of the data row)
 
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 0, new List<string>() { "55555" }, null);
-                pivotTable[rowKey][columnKey].Add(ac);  //These values will be aggregated later on
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, dataframeRow.storageValues[Globals.dNames].data, null);
+                pivotTable[rowKey][columnKey].Add(ac);  //The list of these values will be aggregated later on
             }
             
             // Apply the aggregation function to each cell
@@ -2992,7 +2992,7 @@ namespace Gekko
 
             List<string> tempRowNames = new List<string>();
             List<string> tempColNames = new List<string>();
-            GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
+            GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate_OLD(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
 
             List<string> rownames, colnames; string rownamesFirst, colnamesFirst;            
             DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
@@ -3771,7 +3771,7 @@ namespace Gekko
         /// <param name="tempRowNames"></param>
         /// <param name="tempColNames"></param>
         /// <returns></returns>
-        private static GekkoDictionary<string, AggContainer> DecompPivotAggregate(FrameLight_OLD frame, DecompOptions2 decompOptions2, string normalizerVariableWithIndex, List<string> tempRowNames, List<string> tempColNames, Model model)
+        private static GekkoDictionary<string, AggContainer> DecompPivotAggregate_OLD(FrameLight_OLD frame, DecompOptions2 decompOptions2, string normalizerVariableWithIndex, List<string> tempRowNames, List<string> tempColNames, Model model)
         {
             // ==============================================================================
             //Aggregation

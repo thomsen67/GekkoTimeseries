@@ -112,6 +112,7 @@ namespace Gekko
         public const int dLevelRef = 5;
         public const int dLevelRefLag = 6;
         public const int dLevelRefLag2 = 7;
+        public const int dNames = 8;
 
         public const bool fixForGekko4_0 = false;
 
