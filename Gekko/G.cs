@@ -5337,6 +5337,36 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Not particularly fast. Used for pivot tables. Reasonably fast check regarding even numbers not being prime,
+        /// and that divisors only run up to sqrt(num).
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public static bool IsPrime(int num)
+        {
+            if (num <= 1) return false; // Not prime if less than or equal to 1
+            if (num == 2) return true; // 2 is prime            
+            for (int i = 2; i * i <= num; i++) // Start checking from 2
+                if (num % i == 0) return false; // Not prime if divisible by any i
+            return true; // Return true if it is prime
+        }
+
+        /// <summary>
+        /// Not particularly fast. Used for pivot tables.
+        /// Will not check num itself, so will not return num, even if num is prime.
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public static bool NextPrime(int num)
+        {
+            for (int i = num + 1; i < int.MaxValue; i++)
+            {
+                if (G.IsPrime(i)) return true;
+            }
+            return false;  //hmm, probably never arrives here...!
+        }
+
 
         /// <summary>
         /// For developer use/debugging. Will also be true if ExcelDna or hiding GUI is active.

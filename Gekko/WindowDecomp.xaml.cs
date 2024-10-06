@@ -2274,7 +2274,7 @@ namespace Gekko
             this.gridUpperLeft.ColumnDefinitions.Clear();
             this.gridUpperLeft.Children.Clear();
         }
-
+        
         private void MakeGuiTable2(DecompOutput decompOutput, DecompOptions2 decompOptions)
         {
             CreateGridRowsAndColumns(this.gridUpperLeft, decompOutput, GekkoTableTypes.UpperLeft);

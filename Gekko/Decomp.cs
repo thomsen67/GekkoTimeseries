@@ -4001,71 +4001,15 @@ namespace Gekko
                 foreach (string dictName in dd.storage.Keys)
                 {
                     FrameLightRow frameRow = new FrameLightRow(frame);
-
-                    string dbName = null; string varName = null; string freq = null; string[] indexes = null;
-                    string[] domains = null;
-
-                    //See #876435924365
-
-                    string lag = null;
-
-                    //there is some repeated work done here, but not really bad
-                    //problem is we prefer to do one period at a time, to sum up, adjust etc.
-
+                    
+                    string dbName = null; string varName = null; string freq = null; string[] indexes = null;                    
                     string[] ss = dictName.Split('¤');
                     string fullName = ss[0];
-                    lag = ss[1];
-                    string lag2 = lag;  //lag2 keeps [0], lag has null for this.
-                    if (lag == "[0]")
-                    {
-                        lag = null;
-                    }
-                    int iLag = int.Parse(lag2.Substring(1, lag2.Length - 2));
-
-                    char firstChar;
+                    string lag = ss[1];
+                    int iLag = int.Parse(G.Substring(lag, 1, lag.Length - 2));
                     O.Chop(fullName, out dbName, out varName, out freq, out indexes);
-
-                    if (true)
-                    {
-                        if (indexes != null) domains = new string[indexes.Length];
-
-                        if (domains != null)
-                        {
-                            //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
-                            //So in this case, #a and #sector would be added as columns
-                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways);
-                            if (iv != null)
-                            {
-                                Series ts = iv as Series;
-                                if (ts?.mmi?.parent?.meta?.domains != null)
-                                {
-                                    for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
-                                    {
-                                        domains[ii] = ConvertSetname(ts.mmi.parent.meta.domains[ii], Globals.internalSetIdentifyer, Globals.col_universe);
-                                    }
-                                }
-                            }
-
-                            if (false)
-                            {
-                                foreach (string domain in domains)
-                                {
-                                    if (domain != null)
-                                    {
-                                        string setname = domain.ToLower();
-                                        if (setname == null) setname = Globals.col_universe; //corresonds to x[*]                                
-                                        frameRow.AddDimension(frame, setname, new CellLight(1d));
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    //See #876435924365              
-                    //string bank2 = dbName;
-                    //if (G.Equal(DecompFirst(), dbName)) bank2 = null;
-                    //string name2 = O.UnChop(null, varName, null, indexes);
-
+                    string[] domains = DecompPivotGetDomains(fullName, indexes);
+                    
                     double dLevel = double.NaN;
                     double dLevelLag = double.NaN;
                     double dLevelLag2 = double.NaN;
@@ -4167,13 +4111,13 @@ namespace Gekko
                     {
                         d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.OperatorLower(), smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         dAlternative = double.NaN;
-                    }                                                       
+                    }
 
                     string dictName2 = dictName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
-                                                        
+
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
                     frameRow.AddDimension(frame, Globals.col_variable, new CellLight(varName));
-                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(lag2));
+                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(lag));
 
                     if (indexes != null)
                     {
@@ -4203,14 +4147,40 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelLag2, new CellLight(dLevelLag2));
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
-                    frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));                    
+                    frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
 
                     frame.data.Add(frameRow);
                 }
-            }           
+            }      
 
             return frame;
+        }
+
+        private static string[] DecompPivotGetDomains(string fullName, string[] indexes)
+        {
+            string[] domains = null;
+            if (indexes != null) domains = new string[indexes.Length];
+            if (domains != null)
+            {
+                //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
+                //So in this case, #a and #sector would be added as columns
+                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways);
+                if (iv != null)
+                {
+                    Series ts = iv as Series;
+                    if (ts?.mmi?.parent?.meta?.domains != null)
+                    {
+                        for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
+                        {
+                            domains[ii] = ConvertSetname(ts.mmi.parent.meta.domains[ii], Globals.internalSetIdentifyer, Globals.col_universe);
+                        }
+                    }
+                }
+
+            }
+
+            return domains;
         }
 
         private static FrameLight_OLD DecompPivotCreateDataframe_OLD(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
