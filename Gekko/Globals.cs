@@ -93,9 +93,7 @@ namespace Gekko
 
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
-
-        public const bool gams2cs = false;
-
+                
         public static bool decompPivotNew = true;
         public static bool decompVar = false;  //default: false        
         public static bool decompFixTimelessProblem = true;

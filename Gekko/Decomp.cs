@@ -82,16 +82,16 @@ namespace Gekko
             string rowKey = null;
             if (group == null)
             {
-                rowKey = string.Join("-", selectedIndexes.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
+                rowKey = string.Join(Globals.pivotTableDelimiter, selectedIndexes.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
             }
             else
             {
                 string s = null;
                 foreach (int ii in selectedIndexes)
                 {
-                    s += group(row, ii) + "-";
+                    s += group(row, ii) + Globals.pivotTableDelimiter;
                 }
-                rowKey = G.Substring(s, 0, s.Length - 2);
+                rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
             }
 
             return rowKey;
@@ -3037,9 +3037,11 @@ namespace Gekko
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
             // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
-            var rowIndices = new List<int> { 1 };
-            var columnIndices = new List<int> { 0 };
-
+            //
+            //List<int> rowIndices = new List<int> { frame.frameDimensionNames[Globals.col_variable], frame.frameDimensionNames["gekkoset__i"], frame.frameDimensionNames["gekkoset__j"], frame.frameDimensionNames[Globals.col_lag] };
+            List<int> rowIndices = new List<int> { frame.frameDimensionNames[Globals.col_variable], frame.frameDimensionNames["gekkoset__i"], frame.frameDimensionNames["gekkoset__j"], frame.frameDimensionNames[Globals.col_universe], frame.frameDimensionNames[Globals.col_lag] };
+            List<int> columnIndices = new List<int> { frame.frameDimensionNames[Globals.col_t] };
+                        
             Func<FrameLightRow, bool> filter = dataframeRow =>
             {
                 //false if it must be filtered
@@ -4166,7 +4168,20 @@ namespace Gekko
 
                     frame.data.Add(frameRow);
                 }
-            }      
+            }
+
+            int maxDimension = 0;
+            int maxValue = 0;
+            foreach (FrameLightRow frameRow in frame.data)
+            {
+                maxDimension = Math.Max(maxDimension, frameRow.storageDimensions.Count);
+                maxValue = Math.Max(maxDimension, frameRow.storageValues.Count);  //probably never a problem with these, mostly for dimensions
+            }
+            foreach (FrameLightRow frameRow in frame.data)
+            {
+                for (int i = 0; i < maxDimension - frameRow.storageDimensions.Count; i++) frameRow.storageDimensions.Add(new CellLight());
+                for (int i = 0; i < maxValue - frameRow.storageValues.Count; i++) frameRow.storageValues.Add(new CellLight());
+            }
 
             return frame;
         }

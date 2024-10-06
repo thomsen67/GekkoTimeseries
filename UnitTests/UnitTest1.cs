@@ -18640,7 +18640,7 @@ namespace UnitTests
         {
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
-            I("reset; time 2001 2002;");
+            I("reset; time 2001 2003;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
             I("model <gms> pivot1.zip;");            
             I("x1 = series(2);");
@@ -18648,18 +18648,18 @@ namespace UnitTests
             I("x3 = series(1);");
             I("x4 = series(1);");
 
-            I("x1[a, c] = 1, 2;");
-            I("x1[a, d] = 2, 3;");
-            I("x1[b, c] = 3, 4;");
-            I("x1[b, d] = 4, 5;");
-            I("x2[a, c] = 100, 200;");
-            I("x2[a, d] = 200, 300;");
-            I("x2[b, c] = 300, 400;");
-            I("x2[b, d] = 400, 500;");
-            I("x3[a] = 10000, 20000;");
-            I("x3[b] = 20000, 30000;");
-            I("x4[c] = 1000000, 2000000;");
-            I("x4[d] = 2000000, 3000000;");
+            I("x1[a, c] = 1, 2, 3;");
+            I("x1[a, d] = 2, 3, 4;");
+            I("x1[b, c] = 3, 4, 5;");
+            I("x1[b, d] = 4, 5, 6;");
+            I("x2[a, c] = 100, 200, 300;");
+            I("x2[a, d] = 200, 300, 400;");
+            I("x2[b, c] = 300, 400, 500;");
+            I("x2[b, d] = 400, 500, 600;");
+            I("x3[a] = 10000, 20000, 30000;");
+            I("x3[b] = 20000, 30000, 40000;");
+            I("x4[c] = 1000000, 2000000, 3000000;");
+            I("x4[d] = 2000000, 3000000, 4000000;");
 
             I("#i = a, b;");
             I("#j = c, d;");
@@ -18687,13 +18687,15 @@ namespace UnitTests
 
             _AssertSeries(First(), "y!a", 2001, 3031010, sharedDelta);
             _AssertSeries(First(), "y!a", 2002, 5051414, sharedDelta);
-            I("time 2002 2002;");
+            I("time 2003 2003;");
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             ShowDecompTable();  //will show the following decomp table and then abort
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            I("decomp <d> y from e endo y;");            
+                                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            I("decomp <d> y from e endo y rows time cols vars, lags;"); 
+            //I("decomp <d> y from e endo y rows vars, lags cols time;");            
         }
 
         [TestMethod]
