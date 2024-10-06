@@ -50,7 +50,7 @@ namespace Gekko
                 if (!pivotTable[rowKey].ContainsKey(columnKey)) pivotTable[rowKey][columnKey] = new List<AggContainer>();
 
                 // Step 5: Add the value (from the values part of the data row)
-                AggContainer ac = new AggContainer(Convert.ToDouble(dataframeRow.storageValues[0].data), 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                AggContainer ac = new AggContainer(Convert.ToDouble(dataframeRow.storageValues[0].data), 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>() { "55555" }, null);
                 pivotTable[rowKey][columnKey].Add(ac);  //These values will be aggregated later on
             }
             
@@ -3065,7 +3065,7 @@ namespace Gekko
 
             Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
             {
-                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>() { "55555" }, null);
                 foreach (AggContainer x in m)
                 {
                     aggregate.change += x.change;
@@ -3137,7 +3137,7 @@ namespace Gekko
             //DecompTableHandleSignAndShares(table, decompOptions2);            
 
             List<double> red = new List<double>();
-            for (int i = 0; i < 1000; i++) red.Add(0d);
+            for (int i = 0; i < 55555; i++) red.Add(0d);
             DecompOutput decompOutput = new DecompOutput(table, null, red);
 
             //DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
@@ -3403,11 +3403,12 @@ namespace Gekko
                     double dLevelRefLag = 0d;
                     double dLevelRefLag2 = 0d;
                     int n = 0;
-                    List<string> fullVariableNames = null;
+                    List<string> fullVariableNames = new List<string>() { "55555" };
                     string backgroundColor = "Transparent";
 
-                    AggContainer change = null; if (rowDict != null) rowDict.TryGetValue(colnames[j], out change);
-                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>() { "55555" }, null);
+                    if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
+                    
                     //new AggContainer(change.change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
 
                     if (td != null)
@@ -3544,7 +3545,7 @@ namespace Gekko
                     Cell c = table.Get(i + 2, j + 2);
                     c.vars_hack = fullVariableNames;
                     c.value_hack = d;  //stored for sort and ignore later on
-                    c.backgroundColor = backgroundColor;
+                    c.backgroundColor = "Transparent";
                 }
             }
             return table;
