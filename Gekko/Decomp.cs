@@ -18,17 +18,17 @@ namespace Gekko
     public class GekkoPivotTable
     {
         // Function to create a pivot table with filtering
-        public static Dictionary<string, Dictionary<string, double>> Compute(
+        public static Dictionary<string, Dictionary<string, AggContainer>> Compute(
             List<FrameLightRow> dataframe,                 // The generic data rows (first part)
             List<int> pivotRowIndexes,                     // Indices of the elements to use for row dimensions
             List<int> pivotColIndexes,                     // Indices of the elements to use for column dimensions            
-            Func<IEnumerable<double>, double> agg,         // Aggregation function (e.g., sum)
+            Func<IEnumerable<AggContainer>, AggContainer> agg,         // Aggregation function (e.g., sum)
             Func<FrameLightRow, bool> filter = null,       // Optional filter function
             Func<FrameLightRow, int, string> group = null  // Optional grouping function            
         )
         {
             // Initialize the pivot table as a nested dictionary
-            Dictionary<string, Dictionary<string, List<double>>> pivotTable = new Dictionary<string, Dictionary<string, List<double>>>();
+            Dictionary<string, Dictionary<string, List<AggContainer>>> pivotTable = new Dictionary<string, Dictionary<string, List<AggContainer>>>();
 
             // Step 1: Iterate over each row in the data
             foreach (FrameLightRow dataframeRow in dataframe)
@@ -44,21 +44,21 @@ namespace Gekko
                 string columnKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow);
 
                 // Initialize a row in the pivot table if it doesn't exist
-                if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<double>>();
+                if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<AggContainer>>();
 
                 // Initialize a column in the row if it doesn't exist
-                if (!pivotTable[rowKey].ContainsKey(columnKey)) pivotTable[rowKey][columnKey] = new List<double>();
+                if (!pivotTable[rowKey].ContainsKey(columnKey)) pivotTable[rowKey][columnKey] = new List<AggContainer>();
 
                 // Step 5: Add the value (from the values part of the data row)
-                double v = Convert.ToDouble(dataframeRow.storageValues[0].data);
-                pivotTable[rowKey][columnKey].Add(v);  //These values will be aggregated later on
+                AggContainer ac = new AggContainer(Convert.ToDouble(dataframeRow.storageValues[0].data), 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                pivotTable[rowKey][columnKey].Add(ac);  //These values will be aggregated later on
             }
             
             // Apply the aggregation function to each cell
-            var resultTable = new Dictionary<string, Dictionary<string, double>>();
+            var resultTable = new Dictionary<string, Dictionary<string, AggContainer>>();
             foreach (var rowEntry in pivotTable)
             {
-                resultTable[rowEntry.Key] = new Dictionary<string, double>();
+                resultTable[rowEntry.Key] = new Dictionary<string, AggContainer>();
                 foreach (var columnEntry in rowEntry.Value)
                 {
                     resultTable[rowEntry.Key][columnEntry.Key] = agg(columnEntry.Value);
@@ -122,58 +122,6 @@ namespace Gekko
                     double v = sub1.GetDataSimple(t);
                     r.storageValues.Add(new CellLight(v));
                     data.Add(r);
-                }
-            }
-
-            // Indices for row and column dimensions (0: sex, 1: age, 2:civilstatus)
-            var rowIndices = new List<int> { 1 };
-            var columnIndices = new List<int> { 0 };
-
-            // Define a filter to only include rows where the second element is "X"
-            Func<FrameLightRow, bool> filter = dataframeRow =>
-            {
-                //false if it must be filtered
-                bool b = true;
-                if (G.Equal(dataframeRow.storageDimensions[0].text, "tot") || G.Equal(dataframeRow.storageDimensions[1].text, "tot") || G.Equal(dataframeRow.storageDimensions[2].text, "tot")) b = false;
-                //if (dataframeRow.storageDimensions[1].text == "20" || dataframeRow.storageDimensions[1].text == "21" || dataframeRow.storageDimensions[1].text == "22") b = false;
-                return b;
-            };
-            
-            // Group
-            Func<FrameLightRow, int, string> group = (dataframeRow, i) =>
-            {
-                string s = dataframeRow.storageDimensions[i].text;
-                if (i == 1)
-                {
-                    if (s == "99-") s = "99";
-                    int ii = -12345;
-                    if (int.TryParse(s, out ii))
-                    {
-                        int ten = ii / 10;
-                        s = ten + "0" + ".." + ten + "9";
-                    }
-                }
-                return s;
-            };
-            //group = null;
-
-            // Create the pivot table (sum of the last element) with filtering applied
-            var pivotTable = GekkoPivotTable.Compute(
-                data,
-                rowIndices,
-                columnIndices,
-                values => values.Sum(),  // Sum aggregation
-                filter,                   // Apply filter for column 1 == "X"
-                group
-            );
-
-            // Display the result
-            foreach (KeyValuePair<string, Dictionary<string, double>> row in pivotTable)
-            {
-                G.Writeln(row.Key + ":");
-                foreach (KeyValuePair<string, double> column in row.Value)
-                {
-                    G.Writeln("  " + column.Key + ": " + column.Value);
                 }
             }
         }
@@ -452,7 +400,7 @@ namespace Gekko
         }
     }
 
-    class AggContainer
+    public class AggContainer
     {
         public double change;
         public double changeAlternative;
@@ -3114,8 +3062,30 @@ namespace Gekko
                 //}
                 return s;
             };
-            
-            Dictionary<string, Dictionary<string, double>> pivot = GekkoPivotTable.Compute(frame.data, rowIndices, columnIndices, values => values.Sum(), filter, group);
+
+            Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
+            {
+                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                foreach (AggContainer x in m)
+                {
+                    aggregate.change += x.change;
+                    aggregate.changeAlternative += x.changeAlternative;
+                    aggregate.level += x.level;
+                    aggregate.levelLag += x.levelLag;
+                    aggregate.levelLag2 += x.levelLag2;
+                    aggregate.levelRef += x.levelRef;
+                    aggregate.levelRefLag += x.levelRefLag;
+                    aggregate.levelRefLag2 += x.levelRefLag2;
+                    aggregate.n += x.n;
+                    aggregate.fullVariableNames.AddRange(x.fullVariableNames);
+                    aggregate.backgroundColor = null;
+                }
+
+                return aggregate;
+
+            };
+
+            Dictionary<string, Dictionary<string, AggContainer>> pivot = GekkoPivotTable.Compute(frame.data, rowIndices, columnIndices, agg, filter, group);
 
             if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
@@ -3149,11 +3119,10 @@ namespace Gekko
 
             GekkoDictionary<string, bool> rownames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> colnames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (KeyValuePair<string, Dictionary<string, double>> row in pivot)
+            foreach (KeyValuePair<string, Dictionary<string, AggContainer>> row in pivot)
             {
                 if (!rownames2.ContainsKey(row.Key)) rownames2.Add(row.Key, false);
-                foreach (KeyValuePair<string, double> column in row.Value)
+                foreach (KeyValuePair<string, AggContainer> column in row.Value)
                 {
                     if (!colnames2.ContainsKey(column.Key)) colnames2.Add(column.Key, false);                    
                 }
@@ -3414,14 +3383,14 @@ namespace Gekko
             return table;
         }
 
-        private static Table DecompGetTableFromPivot(Dictionary<string, Dictionary<string, double>> pivot, DecompOperator op, DecompOptions2 decompOptions2, string format2, List<string> rownames, List<string> colnames)
+        private static Table DecompGetTableFromPivot(Dictionary<string, Dictionary<string, AggContainer>> pivot, DecompOperator op, DecompOptions2 decompOptions2, string format2, List<string> rownames, List<string> colnames)
         {
             Table table = new Table();
             table.writeOnce = true;
 
             for (int i = 0; i < rownames.Count; i++)
             {
-                Dictionary<string, double> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
+                Dictionary<string, AggContainer> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
 
                 for (int j = 0; j < colnames.Count; j++)
                 {
@@ -3437,8 +3406,9 @@ namespace Gekko
                     List<string> fullVariableNames = null;
                     string backgroundColor = "Transparent";
 
-                    double change = double.NaN; if (rowDict != null) rowDict.TryGetValue(colnames[j], out change);
-                    AggContainer td = new AggContainer(change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
+                    AggContainer change = null; if (rowDict != null) rowDict.TryGetValue(colnames[j], out change);
+                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null);
+                    //new AggContainer(change.change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
 
                     if (td != null)
                     {
