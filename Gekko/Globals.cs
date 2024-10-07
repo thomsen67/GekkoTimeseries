@@ -220,7 +220,7 @@ namespace Gekko
         public const string col_equ = Globals.internalColumnIdentifyer + "equ";
         public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
         public const string col_primeShare = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
-        public const string decompLhsIndicator = "[is_the_lhs_variable]";
+        public const string decompLhsIndicator = "{===>}";
 
         // ----------------------------------------------------------------
         // GRADIENT

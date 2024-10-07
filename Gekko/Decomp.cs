@@ -19,7 +19,7 @@ namespace Gekko
     {
         // Function to create a pivot table with filtering
         public static Dictionary<string, Dictionary<string, AggContainer>> Compute(
-            List<FrameLightRow> dataframe,                 // The generic data rows (first part)
+            FrameLight dataframe,                          // The generic data rows
             List<int> pivotRowIndexes,                     // Indices of the elements to use for row dimensions
             List<int> pivotColIndexes,                     // Indices of the elements to use for column dimensions            
             Func<IEnumerable<AggContainer>, AggContainer> agg,         // Aggregation function (e.g., sum)
@@ -29,11 +29,9 @@ namespace Gekko
         {
             // Initialize the pivot table as a nested dictionary
             Dictionary<string, Dictionary<string, List<AggContainer>>> pivotTable = new Dictionary<string, Dictionary<string, List<AggContainer>>>();
-
-            //int frameLhsCol = frame.frameDimensionNames[Globals.col_lhs];
-
+                        
             // Step 1: Iterate over each row in the data
-            foreach (FrameLightRow dataframeRow in dataframe)
+            foreach (FrameLightRow dataframeRow in dataframe.data)
             {
                 // Apply the filter if one is provided
                 if (filter != null && !filter(dataframeRow))
@@ -42,19 +40,20 @@ namespace Gekko
                 }
 
                 // Construct row and column keys, and optionally group them
-                string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow);
-                string columnKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow);
+                int frameLhsCol = dataframe.frameDimensionNames[Globals.col_lhs];
+                string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow, frameLhsCol);
+                string colKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow, frameLhsCol);
 
                 // Initialize a row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<AggContainer>>();
 
                 // Initialize a column in the row if it doesn't exist
-                if (!pivotTable[rowKey].ContainsKey(columnKey)) pivotTable[rowKey][columnKey] = new List<AggContainer>();
+                if (!pivotTable[rowKey].ContainsKey(colKey)) pivotTable[rowKey][colKey] = new List<AggContainer>();
 
                 // Step 5: Add the value (from the values part of the data row)
 
                 AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, null, dataframeRow.storageValues[Globals.dPrimeShare].data);
-                pivotTable[rowKey][columnKey].Add(ac);  //The list of these values will be aggregated later on
+                pivotTable[rowKey][colKey].Add(ac);  //The list of these values will be aggregated later on
             }
             
             // Apply the aggregation function to each cell
@@ -62,9 +61,9 @@ namespace Gekko
             foreach (var rowEntry in pivotTable)
             {
                 resultTable[rowEntry.Key] = new Dictionary<string, AggContainer>();
-                foreach (var columnEntry in rowEntry.Value)
+                foreach (var colEntry in rowEntry.Value)
                 {
-                    resultTable[rowEntry.Key][columnEntry.Key] = agg(columnEntry.Value);
+                    resultTable[rowEntry.Key][colEntry.Key] = agg(colEntry.Value);
                 }
             }
 
@@ -79,16 +78,28 @@ namespace Gekko
         /// <param name="group"></param>
         /// <param name="row"></param>
         /// <returns></returns>
-        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameColumn)
+        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol)
         {        
             string rowKey = null;
             string s = null;
             foreach (int ii in selectedIndexes)
             {
-                if (ii == lhsFrameColumn)
+                string groupName = group(row, ii);
+                if (ii == lhsFrameCol)
                 {
+                    if (groupName == Globals.decompLhsIndicator)
+                    {
+                        s = groupName + s;  //from "x | a" to "{===>}x | a".
+                    }
+                    else
+                    {
+                        //ignore that groupName
+                    }
                 }
-                s += group(row, ii) + Globals.pivotTableDelimiter;
+                else 
+                {
+                    s += groupName + Globals.pivotTableDelimiter;
+                }
             }
             rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
             return rowKey;
@@ -3034,26 +3045,26 @@ namespace Gekko
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, lhs2, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
-            List<int> rowIndices = new List<int>();
-            rowIndices.Add(frame.frameDimensionNames[Globals.col_variable]);
+            List<int> rowIndexes = new List<int>();
+            rowIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
             //rowIndices.Add(frame.frameDimensionNames["gekkoset__i"]);
             //rowIndices.Add(frame.frameDimensionNames["gekkoset__j"]);
             //rowIndices.Add(frame.frameDimensionNames[Globals.col_universe]);
             //rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
             //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
             //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
-            rowIndices.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
+            rowIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
 
-            List<int> columnIndices = new List<int>();
-            columnIndices.Add(frame.frameDimensionNames[Globals.col_t]);
+            List<int> colIndexes = new List<int>();
+            colIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
 
-            if (true)
+            if (false)
             {
-                rowIndices = new List<int>();
-                rowIndices.Add(frame.frameDimensionNames[Globals.col_t]);
-                columnIndices = new List<int>();
-                columnIndices.Add(frame.frameDimensionNames[Globals.col_variable]);
-                columnIndices.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
+                rowIndexes = new List<int>();
+                rowIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
+                colIndexes = new List<int>();
+                colIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
+                colIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
             }
 
             Func<FrameLightRow, bool> filter = dataframeRow =>
@@ -3068,7 +3079,7 @@ namespace Gekko
             // Group
             Func<FrameLightRow, int, string> group = (dataframeRow, i) =>
             {
-                string s = dataframeRow.storageDimensions[i].text;
+                string s = dataframeRow.storageDimensions[i].text;                
                 //if (i == 1)
                 //{
                 //    if (s == "99-") s = "99";
@@ -3105,7 +3116,7 @@ namespace Gekko
 
             };
 
-            Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame.data, rowIndices, columnIndices, agg, filter, group);
+            Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame, rowIndexes, colIndexes, agg, filter, group);
 
             if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
