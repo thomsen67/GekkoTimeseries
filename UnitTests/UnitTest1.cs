@@ -18688,6 +18688,9 @@ namespace UnitTests
 
             _AssertSeries(First(), "y!a", 2001, 3031010, sharedDelta);
             _AssertSeries(First(), "y!a", 2002, 5051414, sharedDelta);
+
+            I("write pivot1;");
+
             I("time 2003 2003;");
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -18695,7 +18698,8 @@ namespace UnitTests
                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            I("decomp <d> y from e endo y rows time cols vars, lags;"); 
+            //I("decomp <d> y from e endo y rows time cols vars, lags;");
+            I("decomp <d> x1[a, c] from e endo x1[a, c] rows time cols vars, lags;");
             //I("decomp <d> y from e endo y rows vars, lags cols time;");            
         }
 

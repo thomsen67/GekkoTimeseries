@@ -30,6 +30,8 @@ namespace Gekko
             // Initialize the pivot table as a nested dictionary
             Dictionary<string, Dictionary<string, List<AggContainer>>> pivotTable = new Dictionary<string, Dictionary<string, List<AggContainer>>>();
 
+            //int frameLhsCol = frame.frameDimensionNames[Globals.col_lhs];
+
             // Step 1: Iterate over each row in the data
             foreach (FrameLightRow dataframeRow in dataframe)
             {
@@ -77,23 +79,18 @@ namespace Gekko
         /// <param name="group"></param>
         /// <param name="row"></param>
         /// <returns></returns>
-        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row)
-        {
+        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameColumn)
+        {        
             string rowKey = null;
-            if (group == null)
+            string s = null;
+            foreach (int ii in selectedIndexes)
             {
-                rowKey = string.Join(Globals.pivotTableDelimiter, selectedIndexes.Select(i => row.storageDimensions[i].text?.ToString() ?? "null"));
-            }
-            else
-            {
-                string s = null;
-                foreach (int ii in selectedIndexes)
+                if (ii == lhsFrameColumn)
                 {
-                    s += group(row, ii) + Globals.pivotTableDelimiter;
                 }
-                rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
+                s += group(row, ii) + Globals.pivotTableDelimiter;
             }
-
+            rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
             return rowKey;
         }
 
@@ -3021,7 +3018,7 @@ namespace Gekko
             string format2 = GetNumberFormat(decompOptions2);
             int parentI = 0;
             //string format2 = GetNumberFormat(decompOptions2);
-                        
+
             ENormalizeType normalize = ENormalizeType.Lags;
             if (op.lowLevel == ELowLevel.BothQuoAndRef)
             {
@@ -3033,23 +3030,32 @@ namespace Gekko
                 int deduct = 0;
                 if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;
                 DecompAdjust(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
-            }            
+            }
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, lhs2, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
-                                    
+
             List<int> rowIndices = new List<int>();
             rowIndices.Add(frame.frameDimensionNames[Globals.col_variable]);
             //rowIndices.Add(frame.frameDimensionNames["gekkoset__i"]);
             //rowIndices.Add(frame.frameDimensionNames["gekkoset__j"]);
             //rowIndices.Add(frame.frameDimensionNames[Globals.col_universe]);
-            rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
-            rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
-            rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
-            rowIndices.Add(frame.frameDimensionNames[Globals.col_lhs]);
+            //rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
+            //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
+            //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
+            rowIndices.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
 
             List<int> columnIndices = new List<int>();
             columnIndices.Add(frame.frameDimensionNames[Globals.col_t]);
-                        
+
+            if (true)
+            {
+                rowIndices = new List<int>();
+                rowIndices.Add(frame.frameDimensionNames[Globals.col_t]);
+                columnIndices = new List<int>();
+                columnIndices.Add(frame.frameDimensionNames[Globals.col_variable]);
+                columnIndices.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
+            }
+
             Func<FrameLightRow, bool> filter = dataframeRow =>
             {
                 //false if it must be filtered
@@ -3138,11 +3144,12 @@ namespace Gekko
                 if (!rownames2.ContainsKey(row.Key)) rownames2.Add(row.Key, false);
                 foreach (KeyValuePair<string, AggContainer> column in row.Value)
                 {
-                    if (!colnames2.ContainsKey(column.Key)) colnames2.Add(column.Key, false);                    
+                    if (!colnames2.ContainsKey(column.Key)) colnames2.Add(column.Key, false);
                 }
             }
-            List<string> rownames = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-            List<string> colnames = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+
+            List<string> rownames, colnames;
+            DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames);
 
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
 
@@ -3158,6 +3165,31 @@ namespace Gekko
 
             //return decompOutput2;
             return decompOutput;
+        }
+
+        private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, out List<string> rownames, out List<string> colnames)
+        {
+            List<string> rownames3 = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            List<string> colnames3 = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            rownames = new List<string>();
+            colnames = new List<string>();
+            string lhsRow = null;
+            foreach (string rowname in rownames3)
+            {
+                if (rowname.Contains(Globals.decompLhsIndicator)) lhsRow = rowname;
+                else rownames.Add(rowname);
+            }
+            if (lhsRow != null) rownames.Insert(0, lhsRow);
+            string lhsCol = null;
+            foreach (string colname in colnames3)
+            {
+                if (colname.Contains(Globals.decompLhsIndicator)) lhsCol = colname;
+                else colnames.Add(colname);
+            }
+            if (lhsCol != null) colnames.Insert(0, lhsCol);
+            if (lhsRow != null && lhsCol != null) new Error("Decomp pivot: lhs variable present on both rows and cols of pivot table");
+            if (rownames3.Count != rownames.Count) new Error("Decomp pivot: rownames count problem (lhs variable)");
+            if (colnames3.Count != colnames.Count) new Error("Decomp pivot: rownames count problem (lhs variable)");
         }
 
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
@@ -4159,7 +4191,7 @@ namespace Gekko
                             }
                         }
                     }
-                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight("variable_is_lhs"));
+                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.decompLhsIndicator));
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
