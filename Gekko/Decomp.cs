@@ -3079,17 +3079,28 @@ namespace Gekko
             // Group
             Func<FrameLightRow, int, string> group = (dataframeRow, i) =>
             {
-                string s = dataframeRow.storageDimensions[i].text;                
-                //if (i == 1)
-                //{
-                //    if (s == "99-") s = "99";
-                //    int ii = -12345;
-                //    if (int.TryParse(s, out ii))
-                //    {
-                //        int ten = ii / 10;
-                //        s = ten + "0" + ".." + ten + "9";
-                //    }
-                //}
+                string s = dataframeRow.storageDimensions[i].text;
+
+                if (true)
+                {
+                    //SLACK SLACK SLACK
+                    //SLACK SLACK SLACK
+                    //SLACK SLACK SLACK Should do this lookup before calling .Compute(). But never mind: not speed critical code.
+                    //SLACK SLACK SLACK
+                    //SLACK SLACK SLACK
+                    int iAge = -12345; dataframeRow.parent.frameDimensionNames.TryGetValue(Globals.internalSetIdentifyer + "a", out iAge);
+                    if (iAge != -12345)
+                    {
+                        MessageBox.Show("Age aggregation...?");
+                        if (s == "99-") s = "99";
+                        int ii = -12345;
+                        if (int.TryParse(s, out ii))
+                        {
+                            int ten = ii / 10;
+                            s = ten + "0" + ".." + ten + "9";
+                        }
+                    }
+                }
                 return s;
             };
 

@@ -36926,6 +36926,7 @@ namespace Gekko
     {
         public List<CellLight> storageDimensions = new List<CellLight>();
         public List<CellLight> storageValues = new List<CellLight>();
+        public FrameLight parent = null;
 
         public void AddDimension(FrameLight frame, string s, CellLight c)
         {
@@ -36967,6 +36968,7 @@ namespace Gekko
             this.storageValues = new List<CellLight>();
             for (int i = 0; i < frame.frameDimensionNames.Count; i++) storageDimensions.Add(new CellLight()); //null cell placeholder
             for (int i = 0; i < frame.frameValueNames.Count; i++) storageValues.Add(new CellLight()); //null cell placeholder
+            this.parent = frame;
         }
 
         public FrameLightRow(FrameLight_OLD frame)
