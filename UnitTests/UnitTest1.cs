@@ -18603,9 +18603,10 @@ namespace UnitTests
         {
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
-            I("MODEL <gms> small.zip;");
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
+            I("option model gams scalar data = yes;");
+            I("model <gms> small.zip;");
 
             //A good test of reading and writing from GAMS scalar model a array.
             Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
@@ -28470,7 +28471,7 @@ print(df2)
             Setup_Exceptions_Test();
             Globals.unitTestScreenOutput.Clear();
             I("EXPORT temp:x* file=slet;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Wrote 1 variables to"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Wrote 1 variable and 2 traces to"));
             Globals.unitTestScreenOutput.Clear();
             FAIL("EXPORT x* file=slet;");  //fails with 'no variables to write'
 
@@ -28478,7 +28479,7 @@ print(df2)
             Setup_Exceptions_Test();
             Globals.unitTestScreenOutput.Clear();
             I("WRITE temp:x* file=slet;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Wrote 1 variables to"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Wrote 1 variable and 2 traces to"));
             Globals.unitTestScreenOutput.Clear();
             FAIL("WRITE x* file=slet;");  //fails with 'no variables to write'
 

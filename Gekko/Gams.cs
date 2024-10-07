@@ -798,7 +798,7 @@ namespace Gekko
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
             if (helper.count != semis) new Error("Not summing up");
 
-            if (false)
+            if (Program.options.model_gams_scalar_data)
             {
                 //We don't read the endo values from gams.gms anymore: reading data from a databank is mandatory now.
                 //Do not delete this: is may be resurrected sometime, but for now we do not like data to be stored

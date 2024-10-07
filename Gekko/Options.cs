@@ -97,7 +97,7 @@ namespace Gekko
         public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public string gams_time_set = "t";  //name of the time set in GAMS
-        public int gams_trim = 0;  //trim vars/params from gdx with few elements  
+        public int gams_trim = 0;  //trim vars/params from gdx with few elements          
 
         // --- ----------------------------------------------------------------------------
         // --- the following can only be called from gekko.ini next to gekko.exe
@@ -152,7 +152,7 @@ namespace Gekko
         public bool interface_table_operators = true;        
         public int interface_zoom = 100;
         // ---
-        public string interpolate_method = "avg"; //total|avg ... (rorate/repeat are obsolete). Gekko 4.0: set this as "total" to mirror collapse.
+        public string interpolate_method = "avg"; //total|avg ... (prorate/repeat are obsolete). Gekko 4.0: set this as "total" to mirror collapse.
         // ---
         public bool library_cache = true;  //if using cache on file or not        
         // ---
@@ -162,6 +162,7 @@ namespace Gekko
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "lhs";  //lhs|eqname
+        public bool model_gams_scalar_data = false;  //set yes to read data from a scalar model gams.gms file
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //default | gams
         // ---
@@ -461,6 +462,7 @@ namespace Gekko
             Add("MODEL CACHE MAX", Globals.xint);            
             Add("MODEL GAMS DEP CURRENT", Globals.xbool);
             Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname");
+            Add("MODEL GAMS SCALAR DATA", Globals.xbool);
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
             Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");
             Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj

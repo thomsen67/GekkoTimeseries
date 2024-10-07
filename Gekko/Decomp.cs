@@ -3886,8 +3886,7 @@ namespace Gekko
                 double dLevelRefLag = framerow.Get(frame, Globals.col_valueLevelRefLag).data;
                 double dLevelRefLag2 = framerow.Get(frame, Globals.col_valueLevelRefLag2).data;
                 string fullVariableName = framerow.Get(frame, Globals.col_fullVariableName).text;
-                double dPrimeShare = framerow.Get(frame, Globals.col_primeShare).data;
-
+                
                 string backgroundColor = "Transparent";
                 if (Program.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
 
@@ -3903,7 +3902,7 @@ namespace Gekko
                     agg.TryGetValue(key, out td);
                     if (td == null)
                     {
-                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, backgroundColor, dPrimeShare));
+                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, backgroundColor, 0d));
                     }
                     else
                     {
