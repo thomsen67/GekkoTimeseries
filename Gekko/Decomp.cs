@@ -3175,17 +3175,13 @@ namespace Gekko
 
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
 
-            DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
+            DecompTableHandleSignAndShares(table, decompOptions2);
+            DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);            
 
-            //DecompTableHandleSignAndShares(table, decompOptions2);
-            //
-
-
-            List<double> red = new List<double>();
-            for (int i = 0; i < 55555; i++) red.Add(0d);
-            DecompOutput decompOutput = new DecompOutput(table, null, red);
+            //List<double> red = new List<double>();
+            //for (int i = 0; i < 55555; i++) red.Add(0d);
+            //DecompOutput decompOutput = new DecompOutput(table, null, red);
 
             //DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
 
@@ -4589,7 +4585,421 @@ namespace Gekko
             return frame;
         }
 
+        /// <summary>
+        /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
+        /// </summary>
+        /// <param name="table1"></param>
+        /// <param name="decompOptions2"></param>
+        private static DecompOutput DecompTableHandleSortAndIgnoreAndErrors(Table table1, DecompOptions2 decompOptions2, Model model)
+        {
+            string numberFormat = GetNumberFormat(decompOptions2);
 
+            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
+            if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
+
+            string ignore = null;
+            List<double> red = new List<double>();
+
+            // --------------------------------
+            // SORT AND IGNORE START
+            // --------------------------------
+
+            List<SortHelper> sortHelperStart = new List<SortHelper>();
+
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+                for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
+                {
+                    Cell c5 = table1.Get(i, 2);
+                    string name2 = c5?.vars_hack?[0];
+                    double max = 0d;
+                    for (int j = 2; j <= table1.GetColMaxNumber(); j++)
+                    {
+                        Cell c1 = table1.Get(i, j);
+                        Cell c2 = table1.Get(2, j);
+                        double d = 0d;
+                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
+                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                    }
+                    sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
+                }
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
+                {
+                    Cell c5 = table1.Get(2, j);
+                    string name2 = c5?.vars_hack?[0];
+                    double max = 0d;
+                    for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        Cell c1 = table1.Get(i, j);
+                        Cell c2 = table1.Get(i, 2);
+                        double d = 0d;
+                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
+                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                    }
+                    sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
+                }
+            }
+
+            // ------------------- the following is common for rows vs cols START ------------------------
+
+            //maybe ignore
+            double ignoreSum = 0d;
+            List<SortHelper> sortHelperNotIgnored = new List<SortHelper>();
+            List<SortHelper> sortHelperIgnored = new List<SortHelper>();
+            if (!(double.IsNaN(decompOptions2.ignore) || decompOptions2.ignore == 0d || decompOptions2.decompOperator.isRaw))
+            {
+                foreach (SortHelper sh in sortHelperStart)
+                {
+                    if (sh.value < decompOptions2.ignore)
+                    {
+                        sortHelperIgnored.Add(sh);
+                    }
+                    else
+                    {
+                        sortHelperNotIgnored.Add(sh);
+                    }
+                }
+            }
+            else
+            {
+                sortHelperNotIgnored.AddRange(sortHelperStart);
+            }
+            int ignoreCount = sortHelperStart.Count - sortHelperNotIgnored.Count;
+            if (ignoreCount > 0)
+            {
+                string x = "row" + G.S(ignoreCount);
+                if (rowsOrCols == ERowsCols.Cols) x = "col" + G.S(ignoreCount);
+                ignore = ignoreCount + " " + x + " ignored";
+            }
+
+            //Maybe sort
+            List<SortHelper> sortHelperFinal = new List<SortHelper>();
+            if (decompOptions2.sort)
+            {
+                sortHelperFinal.AddRange(sortHelperNotIgnored.OrderByDescending(x => x.value));
+            }
+            else
+            {
+                sortHelperFinal.AddRange(sortHelperNotIgnored);
+            }
+
+            // ------------------- the preceding is common for rows vs cols END ------------------------
+
+            Table table2 = new Table();
+            table2.writeOnce = true;
+            table2.Set(new Coord(1, 1), table1.Get(1, 1));
+
+            //fill in sorted rows/columns
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+                //copy the first two rows 
+                int two = 2;
+                for (int i = 1; i <= two; i++)
+                {
+                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                    {
+                        table2.Set(new Coord(i, j), table1.Get(i, j));
+                    }
+                }
+                int i1 = 2;
+                foreach (SortHelper sh in sortHelperFinal)
+                {
+                    i1++;
+                    int i2 = sh.position;
+                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                    {
+                        table2.Set(new Coord(i1, j), table1.Get(i2, j));
+                    }
+                }
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                //copy the first two cols
+                int two = 2;
+                for (int j = 1; j <= two; j++)
+                {
+                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        table2.Set(new Coord(i, j), table1.Get(i, j));
+                    }
+                }
+                int j1 = 2;
+                foreach (SortHelper sh in sortHelperFinal)
+                {
+                    j1++;
+                    int j2 = sh.position;
+                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        table2.Set(new Coord(i, j1), table1.Get(i, j2));
+                    }
+                }
+            }
+
+            // --- insert ignores aggregate
+
+            if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw && sortHelperIgnored.Count > 0)
+            {
+                int rowmax = table2.GetRowMaxNumber();  //because it changes dynamically later on
+                int colmax = table2.GetColMaxNumber();  //because it changes dynamically later on
+
+                if (rowsOrCols == ERowsCols.Rows)
+                {
+                    table2.Set(rowmax + 1, 1, Globals.decompIgnoreName2);
+                    for (int j = 2; j <= colmax; j++)
+                    {
+                        double sum_hack = 0d;
+                        double sum = 0d;
+                        foreach (SortHelper x in sortHelperIgnored)
+                        {
+                            sum += table1.Get(x.position, j).number;
+                            sum_hack += table1.Get(x.position, j).value_hack;
+                        }
+
+                        if (decompOptions2.count == ECountType.Names)
+                        {
+                            table2.Set(rowmax + 1, j, Globals.decompIgnoreName2);
+                        }
+                        else if (decompOptions2.count == ECountType.N)
+                        {
+                            table2.SetNumber(rowmax + 1, j, 1d, "f16.0");
+                        }
+                        else
+                        {
+                            table2.SetNumber(rowmax + 1, j, sum, numberFormat);
+                        }
+
+                        Cell c = table2.Get(rowmax + 1, j);
+                        c.backgroundColor = Globals.decompIgnoredColor;
+                        c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                        c.value_hack = sum_hack;
+                    }
+                }
+                else if (rowsOrCols == ERowsCols.Cols)
+                {
+                    table2.Set(1, colmax + 1, Globals.decompIgnoreName2);
+                    for (int i = 2; i <= rowmax; i++)
+                    {
+                        double sum_hack = 0d;
+                        double sum = 0d;
+                        foreach (SortHelper x in sortHelperIgnored)
+                        {
+                            sum += table1.Get(i, x.position).number;
+                            sum_hack += table1.Get(i, x.position).value_hack;
+                        }
+
+                        if (decompOptions2.count == ECountType.Names)
+                        {
+                            table2.Set(i, colmax + 1, Globals.decompIgnoreName2);
+                        }
+                        else if (decompOptions2.count == ECountType.N)
+                        {
+                            table2.SetNumber(i, colmax + 1, 1d, "f16.0");
+                        }
+                        else
+                        {
+                            table2.SetNumber(i, colmax + 1, sum, numberFormat);
+                        }
+
+                        Cell c = table2.Get(i, colmax + 1);
+                        c.backgroundColor = Globals.decompIgnoredColor;
+                        c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                        c.value_hack = sum_hack;
+                    }
+                }
+            }
+
+            // ----------------------------------------------
+            // Show non-existing variables as N, not M
+            // ----------------------------------------------
+
+            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+            {
+                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                {
+                    try
+                    {
+                        Cell c = table2.Get(i, j);
+                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
+                        double d = c.number;
+                        if (double.IsNaN(d))
+                        {
+                            bool hit = false;
+                            List<string> xx = c.vars_hack;
+                            foreach (string s in xx)
+                            {
+                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
+                                if (a == -12345) continue;
+
+                                bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                if (b1) //first-position databank checked
+                                {
+                                    if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                    {
+                                        hit = true;
+                                        goto Lbl1;
+                                    }
+                                }
+
+                                if (b2) //ref databank checked
+                                {
+                                    if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                    {
+                                        hit = true;
+                                        goto Lbl1;
+                                    }
+                                }
+                            }
+                        Lbl1:;
+                            if (hit)
+                            {
+                                //c.number = Globals.missingVariableArtificialNumber;
+                                c.numberShouldShowAsN = true;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        //if this fails, never mind, just a M instead of a N.
+                    }
+                }
+            }
+
+            // ------------------------------------------
+            // ERRORS
+            // ------------------------------------------
+
+            //Set error row/column, as a sum of rows 2 and on. Also sets count/names on that row/col.
+            if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
+            {
+                int rowmax = table2.GetRowMaxNumber();  //because it changes dynamically later on
+                int colmax = table2.GetColMaxNumber();  //because it changes dynamically later on
+                if (rowsOrCols == ERowsCols.Rows)
+                {
+                    for (int j = 2; j <= colmax; j++)
+                    {
+                        double target = table2.Get(2, j).number;
+                        double sum = 0d;
+                        double sum_hack = 0d;
+                        for (int i = 3; i <= rowmax; i++)
+                        {
+                            sum += table2.Get(i, j).number;
+                            sum_hack += table2.Get(i, j).value_hack;
+                        }
+
+                        if (decompOptions2.count == ECountType.N)
+                        {
+                            table2.SetNumber(rowmax + 1, j, 1, "f16.0");
+                        }
+                        else if (decompOptions2.count == ECountType.Names)
+                        {
+                            table2.Set(rowmax + 1, j, Globals.decompErrorName2);
+                        }
+                        else
+                        {
+                            table2.SetNumber(rowmax + 1, j, target - sum, numberFormat);
+                        }
+
+                        table2.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
+                        table2.Get(rowmax + 1, j).value_hack = -sum_hack;  //probably not used?
+                        table2.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
+                    }
+                    table2.Set(rowmax + 1, 1, Globals.decompErrorName2);
+
+                }
+                else if (rowsOrCols == ERowsCols.Cols)
+                {
+
+                    for (int i = 2; i <= rowmax; i++)
+                    {
+                        double target = table2.Get(i, 2).number;
+                        double sum = 0d;
+                        double sum_hack = 0d;
+                        for (int j = 3; j <= colmax; j++)
+                        {
+                            sum += table2.Get(i, j).number;
+                            sum_hack += table2.Get(i, j).value_hack;
+                        }
+
+                        if (decompOptions2.count == ECountType.N)
+                        {
+                            table2.SetNumber(i, colmax + 1, 1, "f16.0");
+                        }
+                        else if (decompOptions2.count == ECountType.Names)
+                        {
+                            table2.Set(i, colmax + 1, Globals.decompErrorName2);
+                        }
+                        else
+                        {
+                            table2.SetNumber(i, colmax + 1, target - sum, numberFormat);
+                        }
+
+                        table2.Get(i, colmax + 1).vars_hack = new List<string>() { Globals.decompErrorName };
+                        table2.Get(i, colmax + 1).value_hack = -sum_hack;  //probably not used?
+                        table2.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
+                    }
+                    table2.Set(1, colmax + 1, Globals.decompErrorName2);
+                }
+                else
+                {
+                    //do nothing, no errors shown
+                }
+            }
+
+            // --------------------------------------------------------------------
+            // Calculate yellow/orange/red lamps as the very last step
+            // --------------------------------------------------------------------
+
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                {
+                    double target = table2.Get(2, j).number;
+                    double sum = 0d;
+                    for (int i = 3; i <= table2.GetRowMaxNumber(); i++)  //ignore first 2 rows
+                    {
+                        double x = table2.Get(i, j).number;
+                        if (double.IsNaN(x)) x = 0d; //hmmmmmm?
+                        sum += x;
+                    }
+                    double error = 1 - sum / target;  //value 0 for same number.
+                    if (sum == 0d && target == 0d) error = 0d;
+                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
+                    red.Add(error);  //one for each period
+                }
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+                {
+                    double target = table2.Get(i, 2).number;
+                    double sum = 0d;
+                    for (int j = 3; j <= table2.GetColMaxNumber(); j++)  //ignore first 2 cols
+                    {
+                        double x = table2.Get(i, j).number;
+                        if (double.IsNaN(x)) x = 0d; //hmmmmmm?
+                        sum += x;
+                    }
+                    double error = 1 - sum / target;  //value 0 for same number.
+                    if (sum == 0d && target == 0d) error = 0d;
+                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
+                    red.Add(error);  //one for each period
+                }
+            }
+            else
+            {
+                //lamps not shown
+            }
+
+            DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
+            return decompOutput;
+        }
 
         /// <summary>
         /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
@@ -5005,422 +5415,7 @@ namespace Gekko
 
             DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
             return decompOutput;
-        }
-
-        /// <summary>
-        /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
-        /// </summary>
-        /// <param name="table1"></param>
-        /// <param name="decompOptions2"></param>
-        private static void DecompTableHandleSortAndIgnoreAndErrors(Table table1, DecompOptions2 decompOptions2, Model model)
-        {
-            string numberFormat = GetNumberFormat(decompOptions2);
-            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
-            if (rowsOrCols == ERowsCols.None) return;
-
-            string ignore = null;
-            List<double> red = new List<double>();
-
-            // --------------------------------
-            // SORT AND IGNORE START
-            // --------------------------------
-
-            List<SortHelper> sortHelperStart = new List<SortHelper>();
-
-            if (rowsOrCols == ERowsCols.Rows)
-            {
-                for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
-                {
-                    Cell c5 = table1.Get(i, 2);
-                    string name2 = c5?.vars_hack?[0];
-                    double max = 0d;
-                    for (int j = 2; j <= table1.GetColMaxNumber(); j++)
-                    {
-                        Cell c1 = table1.Get(i, j);
-                        Cell c2 = table1.Get(2, j);
-                        double d = 0d;
-                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
-                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
-                    }
-                    sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
-                }
-            }
-            else if (rowsOrCols == ERowsCols.Cols)
-            {
-                for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
-                {
-                    Cell c5 = table1.Get(2, j);
-                    string name2 = c5?.vars_hack?[0];
-                    double max = 0d;
-                    for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
-                    {
-                        Cell c1 = table1.Get(i, j);
-                        Cell c2 = table1.Get(i, 2);
-                        double d = 0d;
-                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
-                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
-                    }
-                    sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
-                }
-            }
-
-            // ------------------- the following is common for rows vs cols START ------------------------
-
-            //maybe ignore
-            double ignoreSum = 0d;
-            List<SortHelper> sortHelperNotIgnored = new List<SortHelper>();
-            List<SortHelper> sortHelperIgnored = new List<SortHelper>();
-            if (!(double.IsNaN(decompOptions2.ignore) || decompOptions2.ignore == 0d || decompOptions2.decompOperator.isRaw))
-            {
-                foreach (SortHelper sh in sortHelperStart)
-                {
-                    if (sh.value < decompOptions2.ignore)
-                    {
-                        sortHelperIgnored.Add(sh);
-                    }
-                    else
-                    {
-                        sortHelperNotIgnored.Add(sh);
-                    }
-                }
-            }
-            else
-            {
-                sortHelperNotIgnored.AddRange(sortHelperStart);
-            }
-            int ignoreCount = sortHelperStart.Count - sortHelperNotIgnored.Count;
-            if (ignoreCount > 0)
-            {
-                string x = "row" + G.S(ignoreCount);
-                if (rowsOrCols == ERowsCols.Cols) x = "col" + G.S(ignoreCount);
-                ignore = ignoreCount + " " + x + " ignored";
-            }
-
-            //Maybe sort
-            List<SortHelper> sortHelperFinal = new List<SortHelper>();
-            if (decompOptions2.sort)
-            {
-                sortHelperFinal.AddRange(sortHelperNotIgnored.OrderByDescending(x => x.value));
-            }
-            else
-            {
-                sortHelperFinal.AddRange(sortHelperNotIgnored);
-            }
-
-            // ------------------- the preceding is common for rows vs cols END ------------------------
-
-            Table table2 = new Table();
-            table2.writeOnce = true;
-            table2.Set(new Coord(1, 1), table1.Get(1, 1));
-
-            //fill in sorted rows/columns
-            if (rowsOrCols == ERowsCols.Rows)
-            {
-                //copy the first two rows 
-                int two = 2;
-                for (int i = 1; i <= two; i++)
-                {
-                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
-                    {
-                        table2.Set(new Coord(i, j), table1.Get(i, j));
-                    }
-                }
-                int i1 = 2;
-                foreach (SortHelper sh in sortHelperFinal)
-                {
-                    i1++;
-                    int i2 = sh.position;
-                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
-                    {
-                        table2.Set(new Coord(i1, j), table1.Get(i2, j));
-                    }
-                }
-            }
-            else if (rowsOrCols == ERowsCols.Cols)
-            {
-                //copy the first two cols
-                int two = 2;
-                for (int j = 1; j <= two; j++)
-                {
-                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
-                    {
-                        table2.Set(new Coord(i, j), table1.Get(i, j));
-                    }
-                }
-                int j1 = 2;
-                foreach (SortHelper sh in sortHelperFinal)
-                {
-                    j1++;
-                    int j2 = sh.position;
-                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
-                    {
-                        table2.Set(new Coord(i, j1), table1.Get(i, j2));
-                    }
-                }
-            }
-
-            // --- insert ignores aggregate
-
-            if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw && sortHelperIgnored.Count > 0)
-            {
-                int rowmax = table2.GetRowMaxNumber();  //because it changes dynamically later on
-                int colmax = table2.GetColMaxNumber();  //because it changes dynamically later on
-
-                if (rowsOrCols == ERowsCols.Rows)
-                {
-                    table2.Set(rowmax + 1, 1, Globals.decompIgnoreName2);
-                    for (int j = 2; j <= colmax; j++)
-                    {
-                        double sum_hack = 0d;
-                        double sum = 0d;
-                        foreach (SortHelper x in sortHelperIgnored)
-                        {
-                            sum += table1.Get(x.position, j).number;
-                            sum_hack += table1.Get(x.position, j).value_hack;
-                        }
-
-                        if (decompOptions2.count == ECountType.Names)
-                        {
-                            table2.Set(rowmax + 1, j, Globals.decompIgnoreName2);
-                        }
-                        else if (decompOptions2.count == ECountType.N)
-                        {
-                            table2.SetNumber(rowmax + 1, j, 1d, "f16.0");
-                        }
-                        else
-                        {
-                            table2.SetNumber(rowmax + 1, j, sum, numberFormat);
-                        }
-
-                        Cell c = table2.Get(rowmax + 1, j);
-                        c.backgroundColor = Globals.decompIgnoredColor;
-                        c.vars_hack = new List<string>() { Globals.decompIgnoreName };
-                        c.value_hack = sum_hack;
-                    }
-                }
-                else if (rowsOrCols == ERowsCols.Cols)
-                {
-                    table2.Set(1, colmax + 1, Globals.decompIgnoreName2);
-                    for (int i = 2; i <= rowmax; i++)
-                    {
-                        double sum_hack = 0d;
-                        double sum = 0d;
-                        foreach (SortHelper x in sortHelperIgnored)
-                        {
-                            sum += table1.Get(i, x.position).number;
-                            sum_hack += table1.Get(i, x.position).value_hack;
-                        }
-
-                        if (decompOptions2.count == ECountType.Names)
-                        {
-                            table2.Set(i, colmax + 1, Globals.decompIgnoreName2);
-                        }
-                        else if (decompOptions2.count == ECountType.N)
-                        {
-                            table2.SetNumber(i, colmax + 1, 1d, "f16.0");
-                        }
-                        else
-                        {
-                            table2.SetNumber(i, colmax + 1, sum, numberFormat);
-                        }
-
-                        Cell c = table2.Get(i, colmax + 1);
-                        c.backgroundColor = Globals.decompIgnoredColor;
-                        c.vars_hack = new List<string>() { Globals.decompIgnoreName };
-                        c.value_hack = sum_hack;
-                    }
-                }
-            }
-
-            // ----------------------------------------------
-            // Show non-existing variables as N, not M
-            // ----------------------------------------------
-
-            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
-            {
-                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
-                {
-                    try
-                    {
-                        Cell c = table2.Get(i, j);
-                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
-                        double d = c.number;
-                        if (double.IsNaN(d))
-                        {
-                            bool hit = false;
-                            List<string> xx = c.vars_hack;
-                            foreach (string s in xx)
-                            {
-                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
-                                if (a == -12345) continue;
-
-                                bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-                                bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-
-                                if (b1) //first-position databank checked
-                                {
-                                    if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
-                                    {
-                                        hit = true;
-                                        goto Lbl1;
-                                    }
-                                }
-
-                                if (b2) //ref databank checked
-                                {
-                                    if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
-                                    {
-                                        hit = true;
-                                        goto Lbl1;
-                                    }
-                                }
-                            }
-                        Lbl1:;
-                            if (hit)
-                            {
-                                //c.number = Globals.missingVariableArtificialNumber;
-                                c.numberShouldShowAsN = true;
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        //if this fails, never mind, just a M instead of a N.
-                    }
-                }
-            }
-
-            // ------------------------------------------
-            // ERRORS
-            // ------------------------------------------
-
-            //Set error row/column, as a sum of rows 2 and on. Also sets count/names on that row/col.
-            if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
-            {
-                int rowmax = table2.GetRowMaxNumber();  //because it changes dynamically later on
-                int colmax = table2.GetColMaxNumber();  //because it changes dynamically later on
-                if (rowsOrCols == ERowsCols.Rows)
-                {
-                    for (int j = 2; j <= colmax; j++)
-                    {
-                        double target = table2.Get(2, j).number;
-                        double sum = 0d;
-                        double sum_hack = 0d;
-                        for (int i = 3; i <= rowmax; i++)
-                        {
-                            sum += table2.Get(i, j).number;
-                            sum_hack += table2.Get(i, j).value_hack;
-                        }
-
-                        if (decompOptions2.count == ECountType.N)
-                        {
-                            table2.SetNumber(rowmax + 1, j, 1, "f16.0");
-                        }
-                        else if (decompOptions2.count == ECountType.Names)
-                        {
-                            table2.Set(rowmax + 1, j, Globals.decompErrorName2);
-                        }
-                        else
-                        {
-                            table2.SetNumber(rowmax + 1, j, target - sum, numberFormat);
-                        }
-
-                        table2.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
-                        table2.Get(rowmax + 1, j).value_hack = -sum_hack;  //probably not used?
-                        table2.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
-                    }
-                    table2.Set(rowmax + 1, 1, Globals.decompErrorName2);
-
-                }
-                else if (rowsOrCols == ERowsCols.Cols)
-                {
-
-                    for (int i = 2; i <= rowmax; i++)
-                    {
-                        double target = table2.Get(i, 2).number;
-                        double sum = 0d;
-                        double sum_hack = 0d;
-                        for (int j = 3; j <= colmax; j++)
-                        {
-                            sum += table2.Get(i, j).number;
-                            sum_hack += table2.Get(i, j).value_hack;
-                        }
-
-                        if (decompOptions2.count == ECountType.N)
-                        {
-                            table2.SetNumber(i, colmax + 1, 1, "f16.0");
-                        }
-                        else if (decompOptions2.count == ECountType.Names)
-                        {
-                            table2.Set(i, colmax + 1, Globals.decompErrorName2);
-                        }
-                        else
-                        {
-                            table2.SetNumber(i, colmax + 1, target - sum, numberFormat);
-                        }
-
-                        table2.Get(i, colmax + 1).vars_hack = new List<string>() { Globals.decompErrorName };
-                        table2.Get(i, colmax + 1).value_hack = -sum_hack;  //probably not used?
-                        table2.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
-                    }
-                    table2.Set(1, colmax + 1, Globals.decompErrorName2);
-                }
-                else
-                {
-                    //do nothing, no errors shown
-                }
-            }
-
-            // --------------------------------------------------------------------
-            // Calculate yellow/orange/red lamps as the very last step
-            // --------------------------------------------------------------------
-
-            if (rowsOrCols == ERowsCols.Rows)
-            {
-                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
-                {
-                    double target = table2.Get(2, j).number;
-                    double sum = 0d;
-                    for (int i = 3; i <= table2.GetRowMaxNumber(); i++)  //ignore first 2 rows
-                    {
-                        double x = table2.Get(i, j).number;
-                        if (double.IsNaN(x)) x = 0d; //hmmmmmm?
-                        sum += x;
-                    }
-                    double error = 1 - sum / target;  //value 0 for same number.
-                    if (sum == 0d && target == 0d) error = 0d;
-                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
-                    red.Add(error);  //one for each period
-                }
-            }
-            else if (rowsOrCols == ERowsCols.Cols)
-            {
-                for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
-                {
-                    double target = table2.Get(i, 2).number;
-                    double sum = 0d;
-                    for (int j = 3; j <= table2.GetColMaxNumber(); j++)  //ignore first 2 cols
-                    {
-                        double x = table2.Get(i, j).number;
-                        if (double.IsNaN(x)) x = 0d; //hmmmmmm?
-                        sum += x;
-                    }
-                    double error = 1 - sum / target;  //value 0 for same number.
-                    if (sum == 0d && target == 0d) error = 0d;
-                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
-                    red.Add(error);  //one for each period
-                }
-            }
-            else
-            {
-                //lamps not shown
-            }
-
-            DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
-            return;
-        }
+        }        
 
 
         /// <summary>
@@ -5432,6 +5427,77 @@ namespace Gekko
         private static void DecompTableHandleSignAndShares_OLD(Table tab, DecompOptions2 decompOptions2)
         {            
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);                                                
+
+            //
+            // SIGN AND SHARES
+            //
+            //change sign on row/col 2 (dependent var), and calcuate share values for rows/cols 2 and on.
+            //no adding of rows/columns.
+            if (!decompOptions2.decompOperator.isRaw)
+            {
+                string formatSShares = "f16." + decompOptions2.decimalsPch;
+                if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
+                if (rowsOrCols == ERowsCols.Rows)
+                {
+                    for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                    {
+                        double value = tab.Get(2, j).number;
+                        for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                        {
+                            if (i == 2)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = -value;
+                            }
+                            if (decompOptions2.isShares)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = tab.Get(i, j).number / (-value) * 100d;
+                                c.numberFormat = formatSShares;
+                            }
+                        }
+                    }
+                }
+                else if (rowsOrCols == ERowsCols.Cols)
+                {
+                    for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                    {
+                        double value = tab.Get(i, 2).number;
+                        for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                        {
+                            if (j == 2)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = -value;
+                            }
+                            if (decompOptions2.isShares)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = tab.Get(i, j).number / (-value) * 100d;
+                                c.numberFormat = formatSShares;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    //Do nothing: no special handling of the first row/col, and no 
+                    //shares calculation.
+                    //Should the values change sign? Sign is probably pretty arbitray, and
+                    //the cells sum up to zero (?)
+                }
+            }
+        }
+
+        /// <summary>
+        /// At this point, decomp rows sum to 0, so we change the sign of the first row, so the rest sum
+        /// to the first. Also, percentages can be set, so first row is 100%. Also works for columns.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="decompOptions2"></param>
+        private static void DecompTableHandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
+        {
+            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
 
             //
             // SIGN AND SHARES
