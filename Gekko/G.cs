@@ -5338,8 +5338,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Not particularly fast. Used for pivot tables. Reasonably fast check regarding even numbers not being prime,
-        /// and that divisors only run up to sqrt(num).
+        /// Reasonably fast check regarding even numbers not being prime, and that divisors only run up to sqrt(num).
+        /// See comments to NextPrimt().
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
@@ -5355,6 +5355,7 @@ namespace Gekko
         /// <summary>
         /// Not particularly fast. Used for pivot tables.
         /// Will not check num itself, so will not return num, even if num is prime.
+        /// Even if num = 1 000 000 000, generating 1000 of these takes &lt; 0.05 seconds.
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>

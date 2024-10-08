@@ -2494,7 +2494,6 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-
             if (Globals.runningOnTTComputer && (text == "d"))
             {
                 EquationBrowser.BrowserNew(false);
