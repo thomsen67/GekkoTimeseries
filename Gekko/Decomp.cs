@@ -3272,7 +3272,7 @@ namespace Gekko
             }
 
             List<string> rownames, colnames;
-            DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames);
+            DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames, decompOptions2.showErrors);
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             table.PrintCellsForDebug();
@@ -3282,29 +3282,41 @@ namespace Gekko
             return decompOutput;
         }
 
-        private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, out List<string> rownames, out List<string> colnames)
+        private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, out List<string> rownames, out List<string> colnames, bool showErrors)
         {
             List<string> rownames3 = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             List<string> colnames3 = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             rownames = new List<string>();
             colnames = new List<string>();
             string lhsRow = null;
+            int rowResiduals = 0;
             foreach (string rowname in rownames3)
             {
+                if (!showErrors && rowname.Contains(Globals.decompResidualName))
+                {
+                    rowResiduals++;
+                    continue;
+                }
                 if (rowname.Contains(Globals.pivotHelper2)) lhsRow = rowname;
                 else rownames.Add(rowname);
             }
             if (lhsRow != null) rownames.Insert(0, lhsRow);
             string lhsCol = null;
+            int colResiduals = 0;
             foreach (string colname in colnames3)
             {
+                if (!showErrors && colname.Contains(Globals.decompResidualName))
+                {
+                    colResiduals++;
+                    continue;
+                }
                 if (colname.Contains(Globals.pivotHelper2)) lhsCol = colname;
                 else colnames.Add(colname);
             }
             if (lhsCol != null) colnames.Insert(0, lhsCol);
             if (lhsRow != null && lhsCol != null) new Error("Decomp pivot: lhs variable present on both rows and cols of pivot table");
-            if (rownames3.Count != rownames.Count) new Error("Decomp pivot: rownames count problem (lhs variable)");
-            if (colnames3.Count != colnames.Count) new Error("Decomp pivot: rownames count problem (lhs variable)");
+            if (rownames3.Count != rownames.Count + rowResiduals) new Error("Decomp pivot: rownames count problem (lhs variable)");
+            if (colnames3.Count != colnames.Count + colResiduals) new Error("Decomp pivot: rownames count problem (lhs variable)");
         }
 
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
