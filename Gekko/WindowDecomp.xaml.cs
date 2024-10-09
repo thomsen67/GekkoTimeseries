@@ -2974,9 +2974,9 @@ namespace Gekko
         public double ignore = double.NaN;  //between 0 and 100.
         public bool plot = false;
         public bool expand = false;
-        public List<string> new_select = null;
-        public List<string> new_from = null;
-        public List<string> new_endo = null;
+        public List<string> new_select = new List<string>();
+        public List<string> new_from = new List<string>();
+        public List<string> new_endo = new List<string>();
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 

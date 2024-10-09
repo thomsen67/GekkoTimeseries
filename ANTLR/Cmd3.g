@@ -2994,9 +2994,8 @@ decompExpression:           expression;
 // --------------
 
 //new decomp
-decomp:                    	DECOMP decompOpt1? decompVar1Simple decompFrom decompEndo decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom) ^(ASTDECOMPENDO decompEndo)  ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
-                          | DECOMP decompOpt1? decompVar1Simple                                                                           -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    )
-                          ;
+decomp:                    	DECOMP decompOpt1? decompVar1Simple decompFrom? decompEndo? decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom?) ^(ASTDECOMPENDO decompEndo?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
+                            ;
 
 seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
 seqOfBankvarnamesAlias:     seqOfBankvarnames;

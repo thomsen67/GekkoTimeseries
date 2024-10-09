@@ -487,6 +487,9 @@ namespace Gekko
         public static void DecompStart(O.Decomp2 o)
         {
             Model model = Program.model;
+
+            if (model.modelCommon.GetModelSourceType() == EModelType.Unknown) new Error("DECOMP: It seems no model is loaded, cf. the MODEL statement");
+
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
             bool isGekko = false;
@@ -606,24 +609,50 @@ namespace Gekko
                 //       e1[a][2001a1], e1[a][2002a1], etc.
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
 
-                decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
+                if (o.select.Count > 0) decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
+                if (o.from.Count > 0) decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);
+                if (o.endo.Count > 0) decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);                
+                                
+                bool handleAsGekko = isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp);
+                HandleFromAndEndo(decompOptions2, handleAsGekko);
 
-                //bool isPreviousWindowAFindWindow = o.decompFind.parent != null && o.decompFind.parent.type == EDecompFindNavigation.Find;
-                if (isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp))
+                if (false)
                 {
-                    decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
-                    decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                    if (handleAsGekko)
+                    {
+                        if (o.from.Count == 0)
+                        {
+                            decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
+                            if (decompOptions2.new_endo == null || decompOptions2.new_endo.Count == 0)
+                            {
+                                decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                            }
+                        }
+                        else
+                        {
+                            decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);
+                            decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                        }
+                    }
+                    else
+                    {
+                        decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.                                    
+                        if (decompOptions2.new_from != null && decompOptions2.new_from.Count == 1 && o.endo.Count == 0)
+                        {
+                            //For something like "decomp y from e_y ..." we do not need to write "decomp y from e_y endo y ..."
+                            decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                        }
+                        else
+                        {
+                            decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+                        }
+                    }
                 }
-                else
-                {
-                    decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.                
-                    decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
-                }
-                
+
                 for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
                 for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
                 for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
-                               
+
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2, false);
@@ -665,7 +694,72 @@ namespace Gekko
             }
 
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
-        }        
+        }
+
+        /// <summary>
+        /// Handles the FROM and ENDO arguments, filling them out if needed, and issuing errors.
+        /// </summary>
+        /// <param name="decompOptions2"></param>
+        /// <param name="handleAsGekko"></param>
+        private static void HandleFromAndEndo(DecompOptions2 decompOptions2, bool handleAsGekko)
+        {
+            //Now we have equation(s) and endo(s). Beware: o.selectnew_select always has 1 element.
+            //We then have o.from and o.endo.                
+            // 
+            //A. decomp y;            
+            //B. decomp y            endo y;
+            //C. decomp y from e_y;   
+            //E. decomp y from e_y   endo y;
+
+            if (decompOptions2.new_select.Count != 1) new Error("DECOMP: Expected 1 variable to be selected, not a list");
+            if (decompOptions2.new_from.Count > 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_from.Count != decompOptions2.new_endo.Count) new Error("DECOMP: The number of elements in FROM and ENDO must match");
+            if (decompOptions2.new_from.Count == 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_endo.Count != 1) new Error("DECOMP: You must provide 1 ENDO variable");
+            if (decompOptions2.new_endo.Count > 0 && !G.EqualHandleBlanks(decompOptions2.new_select[0], decompOptions2.new_endo)) new Error("DECOMP: The decomp variable must be one of the ENDO variables");
+
+            if (decompOptions2.new_from.Count == 0)
+            {
+                if (decompOptions2.new_endo.Count == 0)
+                {
+                    //A. decomp y;            
+                    if (handleAsGekko)
+                    {
+                        //Becomes: decomp y from e_y endo y
+                        decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
+                        decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                    }
+                    else
+                    {
+                        //Do nothing (calls find window)
+                    }
+                }
+                else
+                {
+                    //B. decomp y endo y;
+                    new Error("DECOMP: ENDO is only used together with FROM");
+                }
+            }
+            else
+            {
+                if (decompOptions2.new_endo.Count == 0)
+                {
+                    //C. decomp y from e_y;                        
+                    if (decompOptions2.new_from.Count == 1)
+                    {
+                        //Becomes: decomp y from e_y endo y
+                        decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                    }
+                    else
+                    {
+                        new Error("DECOMP: When stating several FROM equations, you must provide ENDO variables");
+                    }
+                }
+                else
+                {
+                    //D. decomp y from e_y endo y;
+                    //Do nothing                    
+                }
+            }
+        }
 
         /// <summary>
         /// Hooks up to GAMS scalar model
@@ -3003,20 +3097,23 @@ namespace Gekko
             List<string> tempColNames = new List<string>();
             GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate_OLD(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
 
-            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;            
+            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
             DecompPivotOrderRowsAndColumns_OLD(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
 
             Table table = DecompGetTableFromAggObject_OLD(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
-            
+
+            DecompOutput decompOutput2 = null;
+
             DecompTablePostProcessing_OLD(table, rownames, colnames, decompOptions2, model);
 
             if (model.DecompType() == EModelType.GAMSScalar)
             {
                 DecompTableHandleSignAndShares_OLD(table, decompOptions2);
-            }            
+            }
 
-            DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors_OLD(table, decompOptions2, model);
-            
+            decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors_OLD(table, decompOptions2, model);
+
+
             return decompOutput2;
         }
 

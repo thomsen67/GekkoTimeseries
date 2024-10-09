@@ -18699,9 +18699,10 @@ namespace UnitTests
                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             
-            I("decomp <d ignore = 70> y from e endo y rows time cols vars, lags;");
+            //I("decomp <d ignore = 70> y from e endo y rows time cols vars, lags;");
             //I("decomp <d> x1[a, c] from e endo x1[a, c] rows time cols vars, lags;");
-            //I("decomp <d> y from e endo y rows vars, lags cols time;");            
+            //I("decomp <d> y from e endo y rows vars, lags cols time;");
+            I("decomp <d> y from e rows vars, lags cols time;");
         }
 
         [TestMethod]

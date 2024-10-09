@@ -75,6 +75,46 @@ namespace Gekko
             //return (string.Compare(s1, s2, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
+        /// <summary>
+        /// /// Compares two strings, ignoring case (so "aBc" == "Abc"). If one but not the other
+        /// is null, it returns false. If both are null, it returns true. Blanks are ignored,
+        /// so for instance "x[a, b]" will match "x[a,b]" ... and "X[A,B]".
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
+        public static bool EqualHandleBlanks(string s1, string s2)
+        {
+            //s1 or s2 may be null
+            return (string.Compare(G.HandleBlanksRemove(s1), G.HandleBlanksRemove(s2), true) == 0);  //true for ignoreCase            
+        }
+
+        /// <summary>
+        /// True if at least one element is EqualHandleBlanks(). Practical to see if "x[a, b]" is 
+        /// contained in the list ("x[a,b]", ...).
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s3"></param>
+        /// <returns></returns>
+        public static bool EqualHandleBlanks(string s1, List<string> s3)
+        {
+            string rv = null;
+            foreach (string s2 in s3)
+            {                
+                if (G.EqualHandleBlanks(s1, s2))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Could just as well return a boolean.
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s3"></param>
+        /// <returns></returns>
         public static string Equal(string s1, List<string> s3)
         {
             string rv = null;
