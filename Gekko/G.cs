@@ -279,6 +279,7 @@ namespace Gekko
         {
             s = s.Replace(Globals.internalColumnIdentifyer, "");
             s = s.Replace(Globals.internalSetIdentifyer, "#");
+            s = s.Replace(Globals.internalDimIdentifyer, "DIM ");
             return s;
         }
 
@@ -303,6 +304,7 @@ namespace Gekko
         public static string HandleInternalIdentifyer2(string s)
         {
             if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
+            else if (s.StartsWith("DIM ")) s = Globals.internalDimIdentifyer + s.Substring("DIM ".Length);
             else s = Globals.internalColumnIdentifyer + s;
             return s;
         }

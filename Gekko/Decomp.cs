@@ -3350,20 +3350,31 @@ namespace Gekko
             List<int> indexes = new List<int>();
             foreach (string name in names)
             {
-                if (name == Globals.col_variable)
+                int i = -12345;
+                if (frameDimensionNames.TryGetValue(name, out i))
                 {
-                    indexes.Add(frameDimensionNames[Globals.col_variable]);
-                    indexes.Add(frameDimensionNames[Globals.col_lhs]);  //so lhs will separate it from other vars
+                    indexes.Add(i);
+                    if (name == Globals.col_variable) indexes.Add(frameDimensionNames[Globals.col_lhs]); //so lhs will separate it from other vars
                 }
-                else if (name == Globals.col_lag)
+                else
                 {
-                    indexes.Add(frameDimensionNames[Globals.col_lag]);
+                    new Error("Unrecognized name '" + name + "' selected in ROW or COL");
                 }
-                else if (name == Globals.col_t)
-                {
-                    indexes.Add(frameDimensionNames[Globals.col_t]);
-                }
-                else new Error("Unrecognized name '" + name + "' selected in ROW or COL");
+                
+                //if (name == Globals.col_variable)
+                //{
+                //    indexes.Add(frameDimensionNames[Globals.col_variable]);
+                //    indexes.Add(frameDimensionNames[Globals.col_lhs]);  //so lhs will separate it from other vars
+                //}
+                //else if (name == Globals.col_lag)
+                //{
+                //    indexes.Add(frameDimensionNames[Globals.col_lag]);
+                //}
+                //else if (name == Globals.col_t)
+                //{
+                //    indexes.Add(frameDimensionNames[Globals.col_t]);
+                //}
+                //else new Error("Unrecognized name '" + name + "' selected in ROW or COL");
             }
             return indexes;
         }
