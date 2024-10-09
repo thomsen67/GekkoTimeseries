@@ -101,7 +101,7 @@ namespace Gekko
                     s += groupName + Globals.pivotTableDelimiter;
                 }
             }
-            rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
+            if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
             return rowKey;
         }
 
@@ -3281,12 +3281,17 @@ namespace Gekko
                 }
             }
 
-            List<string> rownames, colnames;
-            DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames, decompOptions2.showErrors);
-            Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
+            List<string> rownames, colnames, rownamesWithResiduals, colnamesWithResiduals;
+            DecompOrderRowAndColNames(rownames2, colnames2, decompOptions2.showErrors, out rownames, out colnames, out rownamesWithResiduals, out colnamesWithResiduals);
+            Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);                        
+            Tuple<bool, bool> rowsOrColsSumUp = DoRowsOrColsAddUp(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);
 
-            bool rowsSumUp, colsSumUp;
-            PrimeRowsOrColsSumUp(table, out rowsSumUp, out colsSumUp);
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO Only show lamps (for "Show errors" no) when the row/col is summable
+            //TODO TODO TODO Only show Error (for "Show errors" yes) when the row/col is summable
+            //TODO TODO TODO
+            //TODO TODO TODO
 
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             //table.PrintCellsForDebug();
@@ -3294,6 +3299,38 @@ namespace Gekko
             DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
 
             return decompOutput;
+        }
+
+        /// <summary>
+        /// Checks if the rows or columns of the generated table conceptually add up or not.
+        /// Uses prime number fractions, so aggregation over periods
+        /// may still be summable. Unless "Show errors" is active, a new Table object is generated.
+        /// If not, the already generated table is reused for the calculations.
+        /// </summary>
+        /// <param name="rownamesWithResiduals"></param>
+        /// <param name="colnamesWithResiduals"></param>
+        /// <param name="pivotTable"></param>
+        /// <param name="table"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="op"></param>
+        /// <param name="format2"></param>
+        /// <returns></returns>
+        private static Tuple<bool, bool> DoRowsOrColsAddUp(List<string> rownamesWithResiduals, List<string> colnamesWithResiduals, Dictionary<string, Dictionary<string, AggContainer>> pivotTable, Table table, DecompOptions2 decompOptions2, DecompOperator op, string format2)
+        {
+            bool rowsSumUp = false;
+            bool colsSumUp = false;
+            Table tableWithErrors = null;
+            if (decompOptions2.showErrors)
+            {
+                tableWithErrors = table;  //no need to recalculate it: residuals are already present
+            }
+            else
+            {
+                //We have to calc it again, but that should be pretty fast
+                tableWithErrors = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownamesWithResiduals, colnamesWithResiduals);
+            }
+            PrimeRowsOrColsAddUp(tableWithErrors, out rowsSumUp, out colsSumUp);
+            return new Tuple<bool, bool>(rowsSumUp, colsSumUp);
         }
 
         /// <summary>
@@ -3325,43 +3362,42 @@ namespace Gekko
             return indexes;
         }
 
-        private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, out List<string> rownames, out List<string> colnames, bool showErrors)
+        private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, bool showErrors, out List<string> rownames, out List<string> colnames, out List<string> rownamesWithResiduals, out List<string> colnamesWithResiduals)
         {
             List<string> rownames3 = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             List<string> colnames3 = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             rownames = new List<string>();
             colnames = new List<string>();
-            string lhsRow = null;
+            rownamesWithResiduals = new List<string>();
+            colnamesWithResiduals = new List<string>();
             int rowResiduals = 0;
             foreach (string rowname in rownames3)
             {
                 if (!showErrors && rowname.Contains(Globals.decompResidualName))
                 {
                     rowResiduals++;
+                    rownamesWithResiduals.Add(rowname);
                     continue;
-                }
-                //if (rowname.Contains(Globals.pivotHelper2)) lhsRow = rowname;
-                //else rownames.Add(rowname);
+                }                
                 rownames.Add(rowname);
-            }
-            //if (lhsRow != null) rownames.Insert(0, lhsRow);
-            string lhsCol = null;
+                rownamesWithResiduals.Add(rowname);
+            }                        
             int colResiduals = 0;
             foreach (string colname in colnames3)
             {
                 if (!showErrors && colname.Contains(Globals.decompResidualName))
                 {
                     colResiduals++;
+                    colnamesWithResiduals.Add(colname);
                     continue;
-                }
-                //if (colname.Contains(Globals.pivotHelper2)) lhsCol = colname;
-                //else colnames.Add(colname);
+                }                
                 colnames.Add(colname);
-            }
-            //if (lhsCol != null) colnames.Insert(0, lhsCol);
-            if (lhsRow != null && lhsCol != null) new Error("Decomp pivot: lhs variable present on both rows and cols of pivot table");
-            if (rownames3.Count != rownames.Count + rowResiduals) new Error("Decomp pivot: rownames count problem (lhs variable)");
-            if (colnames3.Count != colnames.Count + colResiduals) new Error("Decomp pivot: rownames count problem (lhs variable)");
+                colnamesWithResiduals.Add(colname);
+            }                        
+            if (rownames3.Count != rownames.Count + rowResiduals) new Error("Decomp pivot: count problem (lhs variable)");
+            if (colnames3.Count != colnames.Count + colResiduals) new Error("Decomp pivot: count problem (lhs variable)");
+            if (rownames3.Count != rownamesWithResiduals.Count) new Error("Decomp pivot: count problem (lhs variable)");
+            if (colnames3.Count != colnamesWithResiduals.Count) new Error("Decomp pivot: count problem (lhs variable)");
         }
 
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
@@ -3603,6 +3639,16 @@ namespace Gekko
             return table;
         }
 
+        /// <summary>
+        /// Create table object from pivot (which is dictionary-based)
+        /// </summary>
+        /// <param name="pivot"></param>
+        /// <param name="op"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="format2"></param>
+        /// <param name="rownames"></param>
+        /// <param name="colnames"></param>
+        /// <returns></returns>
         private static Table DecompGetTableFromPivot(Dictionary<string, Dictionary<string, AggContainer>> pivot, DecompOperator op, DecompOptions2 decompOptions2, string format2, List<string> rownames, List<string> colnames)
         {
             Table table = new Table();
@@ -5739,7 +5785,7 @@ namespace Gekko
         /// <param name="tab"></param>
         /// <param name="rowsSumUp"></param>
         /// <param name="colsSumUp"></param>
-        private static void PrimeRowsOrColsSumUp(Table tab, out bool rowsSumUp, out bool colsSumUp)
+        private static void PrimeRowsOrColsAddUp(Table tab, out bool rowsSumUp, out bool colsSumUp)
         {
             rowsSumUp = true;
             for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
@@ -5757,7 +5803,7 @@ namespace Gekko
                 }
             }
 
-            colsSumUp = false;
+            colsSumUp = true;
             for (int j = 2; j <= tab.GetColMaxNumber(); j++)
             {
                 double colPrimeSum = 0d;
