@@ -3178,14 +3178,7 @@ namespace Gekko
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             DecompTableHandleSignAndShares(table, decompOptions2);
             DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);            
-
-            //List<double> red = new List<double>();
-            //for (int i = 0; i < 55555; i++) red.Add(0d);
-            //DecompOutput decompOutput = new DecompOutput(table, null, red);
-
-            //DecompOutput decompOutput2 = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-
-            //return decompOutput2;
+            
             return decompOutput;
         }
 
