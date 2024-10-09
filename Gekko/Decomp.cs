@@ -4717,6 +4717,7 @@ namespace Gekko
                 {
                     Cell c5 = table1.Get(i, 2);
                     string name2 = c5?.vars_hack?[0];
+                    if (Program.IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -4736,6 +4737,7 @@ namespace Gekko
                 {
                     Cell c5 = table1.Get(2, j);
                     string name2 = c5?.vars_hack?[0];
+                    if (Program.IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
                     {
