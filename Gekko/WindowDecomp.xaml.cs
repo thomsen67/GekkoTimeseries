@@ -417,6 +417,10 @@ namespace Gekko
             }            
         }
 
+        /// <summary>
+        /// In DECOMP window, in the Rows/Cols selector, this is where the elements in the drop down are added (.all collection).
+        /// </summary>
+        /// <param name="taskType"></param>
         private void RefreshList2(TaskType taskType)
         {   
             this.decompFind.decompOptions2.freeFilter.Clear();

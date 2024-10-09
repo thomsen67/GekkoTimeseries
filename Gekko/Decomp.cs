@@ -3239,6 +3239,12 @@ namespace Gekko
 
             Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame, rowIndexes, colIndexes, agg, filter, group);
 
+            decompOptions2.all.Clear();
+            foreach (string s in frame.frameDimensionNames.Keys)
+            {
+                decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
+            }
+
             if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
             {
                 //For testing purposes (Excel or Google sheets)

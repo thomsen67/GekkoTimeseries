@@ -96,6 +96,7 @@ namespace Gekko
         public const string pivotHelper2New = "00000000 ";  //first when sorted
 
         public const int startPrime = 1012;  //next is 1013.
+
         public static bool decompPivotNew = true;
         public static bool decompVar = false;  //default: false        
         public static bool decompFixTimelessProblem = true;
