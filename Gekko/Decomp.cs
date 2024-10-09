@@ -87,9 +87,9 @@ namespace Gekko
                 string groupName = group(row, ii);
                 if (ii == lhsFrameCol)
                 {
-                    if (groupName == Globals.decompLhsIndicator)
+                    if (groupName == Globals.pivotHelper2)
                     {
-                        s = groupName + s;  //from "x | a" to "{===>}x | a".
+                        s = groupName + s;  //from "x | a" to "{normalize}x | a".
                     }
                     else
                     {
@@ -3104,10 +3104,11 @@ namespace Gekko
             DecompPivotOrderRowsAndColumns_OLD(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
 
             Table table = DecompGetTableFromAggObject_OLD(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
-
+            
             DecompOutput decompOutput2 = null;
 
             DecompTablePostProcessing_OLD(table, rownames, colnames, decompOptions2, model);
+            table.PrintCellsForDebug();
 
             if (model.DecompType() == EModelType.GAMSScalar)
             {
@@ -3265,17 +3266,16 @@ namespace Gekko
             {
                 if (!rownames2.ContainsKey(row.Key)) rownames2.Add(row.Key, false);
                 foreach (KeyValuePair<string, AggContainer> column in row.Value)
-                {
+                {                    
                     if (!colnames2.ContainsKey(column.Key)) colnames2.Add(column.Key, false);
                 }
             }
 
             List<string> rownames, colnames;
             DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames);
-
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
-
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
+            table.PrintCellsForDebug();
             DecompTableHandleSignAndShares(table, decompOptions2);
             DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);            
             
@@ -3291,14 +3291,14 @@ namespace Gekko
             string lhsRow = null;
             foreach (string rowname in rownames3)
             {
-                if (rowname.Contains(Globals.decompLhsIndicator)) lhsRow = rowname;
+                if (rowname.Contains(Globals.pivotHelper2)) lhsRow = rowname;
                 else rownames.Add(rowname);
             }
             if (lhsRow != null) rownames.Insert(0, lhsRow);
             string lhsCol = null;
             foreach (string colname in colnames3)
             {
-                if (colname.Contains(Globals.decompLhsIndicator)) lhsCol = colname;
+                if (colname.Contains(Globals.pivotHelper2)) lhsCol = colname;
                 else colnames.Add(colname);
             }
             if (lhsCol != null) colnames.Insert(0, lhsCol);
@@ -4316,7 +4316,7 @@ namespace Gekko
                             }
                         }
                     }
-                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.decompLhsIndicator));
+                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2));
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));

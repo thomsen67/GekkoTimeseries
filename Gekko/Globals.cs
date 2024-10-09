@@ -94,7 +94,7 @@ namespace Gekko
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
                 
-        public static bool decompPivotNew = false;
+        public static bool decompPivotNew = true;
         public static bool decompVar = false;  //default: false        
         public static bool decompFixTimelessProblem = true;
         public const string decompErrorText = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";
@@ -220,8 +220,7 @@ namespace Gekko
         public const string col_equ = Globals.internalColumnIdentifyer + "equ";
         public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
         public const string col_primeShare = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
-        public const string decompLhsIndicator = "{===>}";
-
+        
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------
@@ -1027,7 +1026,7 @@ namespace Gekko
         public static bool showDecompTable = false;  //only used for unit tests
         public const string decompNull = "<null>";
         public static string decompNullName = "________a";        
-        public static string decompResidualName = "zzzzzzzzy";        
+        public static string decompResidualName = "zzzzzzzz_residal";        
         public const string decompResidualName2 = "Residual";
         public static string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";
