@@ -957,7 +957,7 @@ namespace Gekko
                     }
                     else if (c.cellType == CellType.Date) s = c.date;
                                         
-                    string v = c.vars_hack?[0];
+                    string v = Decomp.GetVarsHack(c);
                     if (v == Globals.decompErrorName) v = null;
                     if (v == Globals.decompIgnoreName) v = null;
                     if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
@@ -1182,7 +1182,7 @@ namespace Gekko
             int extra = 2;
             Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + extra, j + extra);
             if (c == null) return false;
-            string v = c.vars_hack?[0];
+            string v = Decomp.GetVarsHack(c);
             if (v == Globals.decompErrorName) v = null;
             if (v == Globals.decompIgnoreName) v = null;
 

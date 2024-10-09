@@ -93,7 +93,8 @@ namespace Gekko
 
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
-                
+        public const string pivotHelper2New = "00000000 ";  //first when sorted
+
         public static bool decompPivotNew = true;
         public static bool decompVar = false;  //default: false        
         public static bool decompFixTimelessProblem = true;
@@ -1026,7 +1027,7 @@ namespace Gekko
         public static bool showDecompTable = false;  //only used for unit tests
         public const string decompNull = "<null>";
         public static string decompNullName = "________a";        
-        public static string decompResidualName = "zzzzzzzz_residal";        
+        public static string decompResidualName = "ZZZZZZZZ_residal";        
         public const string decompResidualName2 = "Residual";
         public static string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";

@@ -30911,6 +30911,7 @@ namespace Gekko
 
         public static bool IsDecompResidualName(string name)
         {
+            if (name == null) return false;
             return name.Contains(Globals.decompResidualName);
         }
 

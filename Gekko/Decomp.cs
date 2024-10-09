@@ -87,9 +87,9 @@ namespace Gekko
                 string groupName = group(row, ii);
                 if (ii == lhsFrameCol)
                 {
-                    if (groupName == Globals.pivotHelper2)
+                    if (groupName == Globals.pivotHelper2New)
                     {
-                        s = groupName + s;  //from "x | a" to "{normalize}x | a".
+                        s = groupName + s;  //from "x | a" to "!!x | a".
                     }
                     else
                     {
@@ -3108,7 +3108,7 @@ namespace Gekko
             DecompOutput decompOutput2 = null;
 
             DecompTablePostProcessing_OLD(table, rownames, colnames, decompOptions2, model);
-            table.PrintCellsForDebug();
+            //table.PrintCellsForDebug();
 
             if (model.DecompType() == EModelType.GAMSScalar)
             {
@@ -3126,10 +3126,10 @@ namespace Gekko
             if (model.DecompType() != EModelType.GAMSScalar) new Error("DecompPivotToTable() presupposes scalar model");
 
             string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
+            ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
 
             string format2 = GetNumberFormat(decompOptions2);
             int parentI = 0;
-            //string format2 = GetNumberFormat(decompOptions2);
 
             ENormalizeType normalize = ENormalizeType.Lags;
             if (op.lowLevel == ELowLevel.BothQuoAndRef)
@@ -3146,27 +3146,36 @@ namespace Gekko
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, lhs2, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
-            List<int> rowIndexes = new List<int>();
-            rowIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
-            //rowIndices.Add(frame.frameDimensionNames["gekkoset__i"]);
-            //rowIndices.Add(frame.frameDimensionNames["gekkoset__j"]);
-            //rowIndices.Add(frame.frameDimensionNames[Globals.col_universe]);
-            //rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
-            //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
-            //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
-            rowIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
 
-            List<int> colIndexes = new List<int>();
-            colIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
+            //if (false)
+            //{
+            //    rowIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
+            //    //rowIndices.Add(frame.frameDimensionNames["gekkoset__i"]);
+            //    //rowIndices.Add(frame.frameDimensionNames["gekkoset__j"]);
+            //    //rowIndices.Add(frame.frameDimensionNames[Globals.col_universe]);
+            //    //rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
+            //    //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
+            //    //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
+            //    rowIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.                
+            //    colIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
+            //}
 
-            if (false)
-            {
-                rowIndexes = new List<int>();
-                rowIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
-                colIndexes = new List<int>();
-                colIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
-                colIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
-            }
+            //if (false)
+            //{
+            //    rowIndexes = new List<int>();
+            //    rowIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
+            //    colIndexes = new List<int>();
+            //    colIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
+            //    colIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
+            //}
+
+            //if(rowsCols==ERowsCols.Rows
+
+            DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+
+            List<int> rowIndexes = ChooseVarsLagsTimeSetsEtc(decompOptions2.rows, frame.frameDimensionNames);
+            List<int> colIndexes = ChooseVarsLagsTimeSetsEtc(decompOptions2.cols, frame.frameDimensionNames);
 
             Func<FrameLightRow, bool> filter = dataframeRow =>
             {
@@ -3189,7 +3198,7 @@ namespace Gekko
                     //SLACK SLACK SLACK Should do this lookup before calling .Compute(). But never mind: not speed critical code.
                     //SLACK SLACK SLACK
                     //SLACK SLACK SLACK
-                    int iAge = -12345;                     
+                    int iAge = -12345;
                     if (dataframeRow.parent.frameDimensionNames.TryGetValue(Globals.internalSetIdentifyer + "a", out iAge))
                     {
                         MessageBox.Show("Age aggregation...?");
@@ -3247,9 +3256,10 @@ namespace Gekko
                 }
             }
 
-            DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            //DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            //DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            //DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            //??? is .filters used ???
 
             //List<string> tempRowNames = new List<string>();
             //List<string> tempColNames = new List<string>();
@@ -3266,7 +3276,7 @@ namespace Gekko
             {
                 if (!rownames2.ContainsKey(row.Key)) rownames2.Add(row.Key, false);
                 foreach (KeyValuePair<string, AggContainer> column in row.Value)
-                {                    
+                {
                     if (!colnames2.ContainsKey(column.Key)) colnames2.Add(column.Key, false);
                 }
             }
@@ -3275,11 +3285,40 @@ namespace Gekko
             DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames, decompOptions2.showErrors);
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
-            table.PrintCellsForDebug();
+            //table.PrintCellsForDebug();
             DecompTableHandleSignAndShares(table, decompOptions2);
-            DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);            
-            
+            DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
+
             return decompOutput;
+        }
+
+        /// <summary>
+        /// Transforms a list like ("vars", "lags") into a list like (0, 2), where these integers correspond to the dataframe column.
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="frameDimensionNames"></param>
+        /// <returns></returns>
+        private static List<int> ChooseVarsLagsTimeSetsEtc(List<string> names, GekkoDictionary<string, int> frameDimensionNames)
+        {
+            List<int> indexes = new List<int>();
+            foreach (string name in names)
+            {
+                if (name == Globals.col_variable)
+                {
+                    indexes.Add(frameDimensionNames[Globals.col_variable]);
+                    indexes.Add(frameDimensionNames[Globals.col_lhs]);  //so lhs will separate it from other vars
+                }
+                else if (name == Globals.col_lag)
+                {
+                    indexes.Add(frameDimensionNames[Globals.col_lag]);
+                }
+                else if (name == Globals.col_t)
+                {
+                    indexes.Add(frameDimensionNames[Globals.col_t]);
+                }
+                else new Error("Unrecognized name '" + name + "' selected in ROW or COL");
+            }
+            return indexes;
         }
 
         private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, out List<string> rownames, out List<string> colnames, bool showErrors)
@@ -3297,10 +3336,11 @@ namespace Gekko
                     rowResiduals++;
                     continue;
                 }
-                if (rowname.Contains(Globals.pivotHelper2)) lhsRow = rowname;
-                else rownames.Add(rowname);
+                //if (rowname.Contains(Globals.pivotHelper2)) lhsRow = rowname;
+                //else rownames.Add(rowname);
+                rownames.Add(rowname);
             }
-            if (lhsRow != null) rownames.Insert(0, lhsRow);
+            //if (lhsRow != null) rownames.Insert(0, lhsRow);
             string lhsCol = null;
             int colResiduals = 0;
             foreach (string colname in colnames3)
@@ -3310,10 +3350,11 @@ namespace Gekko
                     colResiduals++;
                     continue;
                 }
-                if (colname.Contains(Globals.pivotHelper2)) lhsCol = colname;
-                else colnames.Add(colname);
+                //if (colname.Contains(Globals.pivotHelper2)) lhsCol = colname;
+                //else colnames.Add(colname);
+                colnames.Add(colname);
             }
-            if (lhsCol != null) colnames.Insert(0, lhsCol);
+            //if (lhsCol != null) colnames.Insert(0, lhsCol);
             if (lhsRow != null && lhsCol != null) new Error("Decomp pivot: lhs variable present on both rows and cols of pivot table");
             if (rownames3.Count != rownames.Count + rowResiduals) new Error("Decomp pivot: rownames count problem (lhs variable)");
             if (colnames3.Count != colnames.Count + colResiduals) new Error("Decomp pivot: rownames count problem (lhs variable)");
@@ -3338,8 +3379,9 @@ namespace Gekko
         public static string HiddenVariableHelper(Cell c2, bool onlyIfUnique)
         {
             if (c2 == null) return null;
-            List<string> vars = c2.vars_hack;
-            if (vars == null)
+            List<string> vars = c2.vars_hack;  //See also GetVarsHack().
+
+            if (vars == null || vars.Count == 0)
             {
                 return null;
             }
@@ -3347,7 +3389,8 @@ namespace Gekko
             {
                 if (vars.Count != 1) return null;
             }
-            string var = vars[0];  //#dskla8asjkdfa
+            string var = null;
+            if (vars.Count > 0) var = vars[0];  //#dskla8asjkdfa
             int lag; string name;
             Decomp.ConvertFromTurtleName(var, false, out name, out lag);
             return name;
@@ -3786,7 +3829,7 @@ namespace Gekko
             for (int i = 0; i < rownames.Count; i++)
             {
                 string s = rownames[i];                
-                if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2);                
+                if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2New, "").Replace(Globals.decompResidualName, Globals.decompResidualName2);                
                 tab.Set(i + 2, 1, s);
                 if (rowsCols == ERowsCols.Cols) tab.Get(i + 2, 1).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
             }
@@ -3794,7 +3837,7 @@ namespace Gekko
             for (int j = 0; j < colnames.Count; j++)
             {
                 string s = colnames[j];                
-                if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;                
+                if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2New, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;                
                 tab.Set(1, j + 2, s);
                 if (rowsCols == ERowsCols.Rows) tab.Get(1, j + 2).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
             }
@@ -4328,7 +4371,7 @@ namespace Gekko
                             }
                         }
                     }
-                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2));
+                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
@@ -4716,8 +4759,8 @@ namespace Gekko
                 for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
                 {
                     Cell c5 = table1.Get(i, 2);
-                    string name2 = c5?.vars_hack?[0];
-                    if (Program.IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
+                    //string name2 = c5?.vars_hack?[0];
+                    string name2 = GetVarsHack(c5);
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -4727,6 +4770,7 @@ namespace Gekko
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                         if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                        if (Program.IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
                     }
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
@@ -4735,8 +4779,9 @@ namespace Gekko
             {
                 for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
                 {
-                    Cell c5 = table1.Get(2, j);
-                    string name2 = c5?.vars_hack?[0];
+                    Cell c5 = table1.Get(2, j);                    
+                    //string name2 = c5?.vars_hack?[0];
+                    string name2 = GetVarsHack(c5);
                     if (Program.IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
@@ -4747,6 +4792,7 @@ namespace Gekko
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                         if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                        if (Program.IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
                     }
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }
@@ -5109,6 +5155,17 @@ namespace Gekko
         }
 
         /// <summary>
+        /// May return null!
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static string GetVarsHack(Cell c)
+        {
+            string name2 = null; if (c != null && c.vars_hack != null && c.vars_hack.Count > 0) name2 = c.vars_hack[0];
+            return name2;
+        }
+
+        /// <summary>
         /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
         /// </summary>
         /// <param name="table1"></param>
@@ -5134,7 +5191,7 @@ namespace Gekko
                 for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
                 {
                     Cell c5 = table1.Get(i, 2);
-                    string name2 = c5?.vars_hack?[0];
+                    string name2 = GetVarsHack(c5);
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -5153,7 +5210,7 @@ namespace Gekko
                 for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
                 {
                     Cell c5 = table1.Get(2, j);
-                    string name2 = c5?.vars_hack?[0];
+                    string name2 = GetVarsHack(c5);
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
                     {
@@ -5968,7 +6025,15 @@ namespace Gekko
             return G.ContainsWord(colnames3, G.Chop_GetName(varnames));
         }
 
-        
+        /// <summary>
+        /// Translate from for instance "time" to "gekkopivot__time". The inverse method exists.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="col_t"></param>
+        /// <param name="col_variable"></param>
+        /// <param name="col_lag"></param>
+        /// <param name="col_universe"></param>
+        /// <param name="col_equ"></param>
         private static void DecomposeReplaceVars(List<string> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
             for (int i = 0; i < vars.Count; i++)
@@ -5982,6 +6047,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Translate from for instance "gekkopivot__time" to "time". The inverse method exists.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="col_t"></param>
+        /// <param name="col_variable"></param>
+        /// <param name="col_lag"></param>
+        /// <param name="col_universe"></param>
+        /// <param name="col_equ"></param>
         public static void DecomposeReplaceVars(List<FrameFilter> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
             for (int i = 0; i < vars.Count; i++)
