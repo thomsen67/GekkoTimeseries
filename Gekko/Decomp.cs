@@ -3284,6 +3284,10 @@ namespace Gekko
             List<string> rownames, colnames;
             DecompOrderRowAndColNames(rownames2, colnames2, out rownames, out colnames, decompOptions2.showErrors);
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
+
+            bool rowsSumUp, colsSumUp;
+            PrimeRowsOrColsSumUp(table, out rowsSumUp, out colsSumUp);
+
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             //table.PrintCellsForDebug();
             DecompTableHandleSignAndShares(table, decompOptions2);
@@ -3621,6 +3625,7 @@ namespace Gekko
                     int n = 0;
                     List<string> fullVariableNames = new List<string>();
                     string backgroundColor = "Transparent";
+                    double primeShare = double.NaN;
 
                     AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null, 0d);
                     if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
@@ -3638,6 +3643,7 @@ namespace Gekko
                         n = td.n;
                         fullVariableNames = td.fullVariableNames;
                         backgroundColor = td.backgroundColor;
+                        primeShare = td.primeShare;
 
                         // ----- first start -----------------------------------------------
                         double dFirstLevel = double.NaN;
@@ -3762,6 +3768,7 @@ namespace Gekko
                     c.vars_hack = fullVariableNames;
                     c.value_hack = d;  //stored for sort and ignore later on
                     c.backgroundColor = "Transparent";
+                    c.prime_hack = primeShare;
                 }
             }
             return table;
@@ -4185,7 +4192,7 @@ namespace Gekko
             //prime 101, 103, 107, 109, ... the contributions should add up --> one per period
             //
 
-            int prime = 1012;  //next one, 1013, is a prime.
+            int prime = Globals.startPrime;  //1012: next one, 1013, is a prime.
 
             // ------------------------------------------------------------------------------
             // Loop over PERIODS
@@ -5660,7 +5667,7 @@ namespace Gekko
         /// <param name="tab"></param>
         /// <param name="decompOptions2"></param>
         private static void DecompTableHandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
-        {
+        {            
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
 
             //
@@ -5720,6 +5727,49 @@ namespace Gekko
                     //shares calculation.
                     //Should the values change sign? Sign is probably pretty arbitray, and
                     //the cells sum up to zero (?)
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if rows or cols (or in principle both, even if this is maybe not possible) may sum up
+        /// in the decomp/differentiation sense. Uses prime number fractions, so aggregation over periods
+        /// may still be summable.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="rowsSumUp"></param>
+        /// <param name="colsSumUp"></param>
+        private static void PrimeRowsOrColsSumUp(Table tab, out bool rowsSumUp, out bool colsSumUp)
+        {
+            rowsSumUp = true;
+            for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+            {
+                double rowPrimeSum = 0d;
+                for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                {
+                    rowPrimeSum += tab.Get(i, j).prime_hack;
+                }
+                double dif = Math.Abs(rowPrimeSum - Math.Round(rowPrimeSum)) / (double)Globals.startPrime;
+                if (dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
+                {
+                    rowsSumUp = false;
+                    break;
+                }
+            }
+
+            colsSumUp = false;
+            for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+            {
+                double colPrimeSum = 0d;
+                for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                {
+                    colPrimeSum += tab.Get(i, j).prime_hack;
+                }
+                double dif = Math.Abs(colPrimeSum - Math.Round(colPrimeSum)) / (double)Globals.startPrime;
+                if (dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
+                {
+                    colsSumUp = false;
+                    break;
                 }
             }
         }

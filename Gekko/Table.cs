@@ -1538,6 +1538,7 @@ namespace Gekko
         public GekkoTime date_hack = GekkoTime.tNull;  //used to smuggle in dates, until above issue is fixed 
         public List<string> vars_hack = null;          //used to smuggle in "atomic" variables contained in a cell in a DECOMP table
         public double value_hack = double.NaN;         //used in decomp when sorting etc., so that the real background value is always known, even if something else is showing (for instance count or names or ...). Note that for the first row, this value has another sign! (Maybe fix the sign for Gekko 4.0)
+        public double prime_hack = double.NaN;         //used in decomp to test if a group of cells should add up (close to integer if so)
 
         public double number;
         public bool numberShouldShowAsN = false;

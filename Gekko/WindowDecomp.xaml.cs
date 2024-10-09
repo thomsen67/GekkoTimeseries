@@ -1799,7 +1799,7 @@ namespace Gekko
                                 string var7 = Decomp.HiddenVariableHelper(c2, false);
 
                                 int number = -12345;
-                                try { number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch { };
+                                try { if (var7 != null) number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch { };
                                 if (var7 == Globals.decompResidualName) number = 0;
                                 //"Residual" --> number = 0
                                 //"Residual1" --> number = 1
