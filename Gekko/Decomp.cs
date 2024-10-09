@@ -489,11 +489,10 @@ namespace Gekko
             Model model = Program.model;
 
             if (model.modelCommon.GetModelSourceType() == EModelType.Unknown) new Error("DECOMP: It seems no model is loaded, cf. the MODEL statement");
+            bool isGekko = false; if (model.modelCommon.GetModelSourceType() == EModelType.Gekko) isGekko = true;
+            bool isGamsRaw = false; if (model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw) isGamsRaw = true;
 
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
-
-            bool isGekko = false;
-            if (model.modelCommon.GetModelSourceType() == EModelType.Gekko) isGekko = true;
 
             if (!isGekko && o.from.Count == 0)
             {
@@ -614,7 +613,7 @@ namespace Gekko
                 if (o.endo.Count > 0) decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);                
                                 
                 bool handleAsGekko = isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp);
-                HandleFromAndEndo(decompOptions2, handleAsGekko);
+                HandleFromAndEndo(decompOptions2, handleAsGekko, isGamsRaw);
 
                 if (false)
                 {
@@ -701,7 +700,7 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions2"></param>
         /// <param name="handleAsGekko"></param>
-        private static void HandleFromAndEndo(DecompOptions2 decompOptions2, bool handleAsGekko)
+        private static void HandleFromAndEndo(DecompOptions2 decompOptions2, bool handleAsGekko, bool isGamsRaw)
         {
             //Now we have equation(s) and endo(s). Beware: o.selectnew_select always has 1 element.
             //We then have o.from and o.endo.                
@@ -711,8 +710,12 @@ namespace Gekko
             //C. decomp y from e_y;   
             //E. decomp y from e_y   endo y;
 
-            if (decompOptions2.new_select.Count != 1) new Error("DECOMP: Expected 1 variable to be selected, not a list");
-            if (decompOptions2.new_from.Count > 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_from.Count != decompOptions2.new_endo.Count) new Error("DECOMP: The number of elements in FROM and ENDO must match");
+            if (!isGamsRaw)
+            {
+                //GamsRaw is weird anyway!! Probably obsolete sooner or later.                
+                if (decompOptions2.new_select.Count != 1) new Error("DECOMP: Expected 1 variable to be selected, not a list");            
+                if (decompOptions2.new_from.Count > 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_from.Count != decompOptions2.new_endo.Count) new Error("DECOMP: The number of elements in FROM and ENDO must match");
+            }            
             if (decompOptions2.new_from.Count == 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_endo.Count != 1) new Error("DECOMP: You must provide 1 ENDO variable");
             if (decompOptions2.new_endo.Count > 0 && !G.EqualHandleBlanks(decompOptions2.new_select[0], decompOptions2.new_endo)) new Error("DECOMP: The decomp variable must be one of the ENDO variables");
 

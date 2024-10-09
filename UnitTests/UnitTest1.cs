@@ -12526,6 +12526,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompBig()
         {
+            // NOTE: not scalar model! Obsolete sooner or later
+            //            
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("option model type = gams;");
@@ -16731,7 +16733,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompAgeLead()
         {
-            // NOTE: not scalar model!
+            // NOTE: not scalar model! Obsolete sooner or later
             //
             // Consider this model, run over t = 2021, 2022
             // over the ages #a = 18, 19
