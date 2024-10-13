@@ -313,6 +313,7 @@ namespace Gekko
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(type);
             RecalcCellsWithNewType(decompFind.model);
+            RefreshRowsColsFiltersList();
         }        
 
         public static List<string> GetAllPossibleValuesForListFilter(string name, DecompOptions2 decompOptions2)
@@ -427,8 +428,8 @@ namespace Gekko
         /// <param name="taskType"></param>
         private void RefreshList2(TaskType taskType)
         {
-            List<string> x_freeFilter1 = new List<string>();            
-            List<string> x_free1 = new List<string>();            
+            List<string> x_freeFilter = new List<string>();            
+            List<string> x_free = new List<string>();            
 
             foreach (string s in this.decompFind.decompOptions2.all)
             {
@@ -453,24 +454,27 @@ namespace Gekko
 
                 if (!isFilter)
                 {                    
-                    x_freeFilter1.Add(G.HandleInternalIdentifyer1(s2));
+                    x_freeFilter.Add(G.HandleInternalIdentifyer1(s2));
                 }
 
                 if (!(this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s))))                
                 {
-                    x_free1.Add(G.HandleInternalIdentifyer1(s2));
+                    x_free.Add(G.HandleInternalIdentifyer1(s2));
                 }
             }
 
-            x_freeFilter1 = x_freeFilter1.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-            x_free1 = x_free1.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-            x_freeFilter1 = x_freeFilter1.Select(x => x.Split('?')[1]).ToList();
-            x_free1 = x_free1.Select(x => x.Split('?')[1]).ToList();
+            x_freeFilter = x_freeFilter.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            x_free = x_free.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            x_freeFilter = x_freeFilter.Select(x => x.Split('?')[1]).ToList();
+            x_free = x_free.Select(x => x.Split('?')[1]).ToList();
 
-            this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>();
-            foreach (string s in x_freeFilter1) this.decompFind.decompOptions2.freeFilter.Add(s);
-            this.decompFind.decompOptions2.free = new ObservableCollection<string>();
-            foreach (string s in x_free1) this.decompFind.decompOptions2.free.Add(s);
+            //this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>();
+            //foreach (string s in x_freeFilter1) this.decompFind.decompOptions2.freeFilter.Add(s);
+            //this.decompFind.decompOptions2.free = new ObservableCollection<string>();
+            //foreach (string s in x_free1) this.decompFind.decompOptions2.free.Add(s);
+
+            this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>(x_freeFilter);
+            this.decompFind.decompOptions2.free = new ObservableCollection<string>(x_free);
 
             //foreach (string s in this.decompFind.decompOptions2.all)
             //{
@@ -500,7 +504,7 @@ namespace Gekko
             //}
             //this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>(this.decompFind.decompOptions2.freeFilter.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)));
             //this.decompFind.decompOptions2.free = new ObservableCollection<string>(this.decompFind.decompOptions2.free.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)));
-                        
+
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
@@ -2650,11 +2654,12 @@ namespace Gekko
             else
             {                
                 RemoveFromObservableCollection(task);
-            }
+            }            
+            
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(task.Pivot_TaskType);
             RecalcCellsWithNewType(decompFind.model);
-            this.RefreshRowsColsFiltersList();
+            RefreshRowsColsFiltersList();
         }
 
         private void RemoveFromObservableCollection(GekkoTask task)
