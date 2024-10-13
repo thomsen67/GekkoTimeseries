@@ -382,6 +382,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// In DECOMP window, in the Rows/Cols selector, this is where the elements in the drop down are added (including dropdown-menus). Note that
+        /// each row in the selector is a GekkoTask.
+        /// </summary>
         private void RefreshRowsColsFiltersList()
         {
             RefreshList2(TaskType.None);
@@ -422,21 +426,13 @@ namespace Gekko
         /// </summary>
         /// <param name="taskType"></param>
         private void RefreshList2(TaskType taskType)
-        {   
-            this.decompFind.decompOptions2.freeFilter.Clear();
-            this.decompFind.decompOptions2.free.Clear();
+        {
+            List<string> x_freeFilter1 = new List<string>();            
+            List<string> x_free1 = new List<string>();            
+
             foreach (string s in this.decompFind.decompOptions2.all)
             {
-                if (s == "value") continue;
-                if (s == "valueAlternative") continue;
-                if (s == "valueLevel") continue;
-                if (s == "valueLevelLag") continue;
-                if (s == "valueLevelLag2") continue;
-                if (s == "valueLevelRef") continue;
-                if (s == "valueLevelRefLag") continue;
-                if (s == "valueLevelRefLag2") continue;
-                if (s == "fullVariableName") continue;
-                if (s == "equ") continue;
+                if (s == "lhs") continue;
                 bool isFilter = false;
                 foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
                 {
@@ -446,20 +442,65 @@ namespace Gekko
                         break;
                     }
                 }
+
+                string s2 = s;
+                if (s == "vars") s2 = "1?" + s;
+                else if (s == "lags") s2 = "2?" + s;
+                else if (s == "time") s2 = "3?" + s;
+                else if (s.StartsWith("#")) s2 = "4?" + s;
+                else if (s.Contains(" dim ")) s2 = "5?" + s;
+                else s2 = "6?" + s;
+
                 if (!isFilter)
-                {
-                    this.decompFind.decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
+                {                    
+                    x_freeFilter1.Add(G.HandleInternalIdentifyer1(s2));
                 }
 
-                if (this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
+                if (!(this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s))))                
                 {
+                    x_free1.Add(G.HandleInternalIdentifyer1(s2));
+                }
+            }
 
-                }
-                else
-                {
-                    this.decompFind.decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
-                }
-            }            
+            x_freeFilter1 = x_freeFilter1.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            x_free1 = x_free1.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            x_freeFilter1 = x_freeFilter1.Select(x => x.Split('?')[1]).ToList();
+            x_free1 = x_free1.Select(x => x.Split('?')[1]).ToList();
+
+            this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>();
+            foreach (string s in x_freeFilter1) this.decompFind.decompOptions2.freeFilter.Add(s);
+            this.decompFind.decompOptions2.free = new ObservableCollection<string>();
+            foreach (string s in x_free1) this.decompFind.decompOptions2.free.Add(s);
+
+            //foreach (string s in this.decompFind.decompOptions2.all)
+            //{
+            //    if (s == "lhs") continue;
+            //    bool isFilter = false;
+            //    foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
+            //    {
+            //        if (G.Equal(ff.name, G.HandleInternalIdentifyer2(s)))
+            //        {
+            //            isFilter = true;
+            //            break;
+            //        }
+            //    }
+            //    if (!isFilter)
+            //    {
+            //        this.decompFind.decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
+            //    }
+
+            //    if (this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
+            //    {
+            //        //do nothing
+            //    }
+            //    else
+            //    {
+            //        this.decompFind.decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
+            //    }                
+            //}
+            //this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>(this.decompFind.decompOptions2.freeFilter.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)));
+            //this.decompFind.decompOptions2.free = new ObservableCollection<string>(this.decompFind.decompOptions2.free.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)));
+                        
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
@@ -573,6 +614,11 @@ namespace Gekko
             RecalcCellsWithNewType(decompFind.model);            
         }
 
+        /// <summary>
+        /// Updates decompOptions2.rows, .cols and .filters, takes them from what is visible in the GUI (taskList).
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <exception cref="GekkoException"></exception>
         private void PutGuiPivotSelectionIntoDecompOptions(ObservableCollection<GekkoTask> collection)
         {
             this.decompFind.decompOptions2.rows.Clear();
@@ -2607,7 +2653,8 @@ namespace Gekko
             }
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(task.Pivot_TaskType);
-            RecalcCellsWithNewType(decompFind.model);            
+            RecalcCellsWithNewType(decompFind.model);
+            this.RefreshRowsColsFiltersList();
         }
 
         private void RemoveFromObservableCollection(GekkoTask task)
@@ -2621,7 +2668,7 @@ namespace Gekko
                 t.I = i++;
             }
             taskList.Clear();
-            foreach (GekkoTask t in m) taskList.Add(t);
+            foreach (GekkoTask t in m) taskList.Add(t);            
         }
 
         //private void checkBoxErrors2_Checked(object sender, RoutedEventArgs e)

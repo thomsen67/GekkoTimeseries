@@ -279,7 +279,30 @@ namespace Gekko
         {
             s = s.Replace(Globals.internalColumnIdentifyer, "");
             s = s.Replace(Globals.internalSetIdentifyer, "#");
-            s = s.Replace(Globals.internalDimIdentifyer, "DIM ");
+            if (s.Contains(Globals.internalDimIdentifyer))
+            {
+                //gekkokdim_x¤1 --> x dim 1
+                string s2 = s.Replace(Globals.internalDimIdentifyer, "");
+                string[] ss = s2.Split('¤');
+                s = ss[0] + " dim " + ss[1];
+            }            
+            return s;
+        }
+
+        /// <summary>
+        /// Helper method for DECOMP
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string HandleInternalIdentifyer2(string s)
+        {
+            if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
+            else if (s.Contains(" dim "))
+            {
+                string[] ss = s.Split(new string[] { " dim " }, StringSplitOptions.None);
+                s = Globals.internalDimIdentifyer + ss[0] + "¤" + ss[1];
+            }
+            else s = Globals.internalColumnIdentifyer + s;
             return s;
         }
 
@@ -294,19 +317,6 @@ namespace Gekko
             int i1 = i / 10;
             s2 = (i1 * 10) + Globals.ageHierarchyDivider + ((i1 + 1) * 10 - 1);
             return s2;
-        }
-
-        /// <summary>
-        /// Helper method for DECOMP
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string HandleInternalIdentifyer2(string s)
-        {
-            if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
-            else if (s.StartsWith("DIM ")) s = Globals.internalDimIdentifyer + s.Substring("DIM ".Length);
-            else s = Globals.internalColumnIdentifyer + s;
-            return s;
         }
 
 
