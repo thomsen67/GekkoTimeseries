@@ -3199,15 +3199,18 @@ namespace Gekko
                     //SLACK SLACK SLACK
                     //SLACK SLACK SLACK
                     int iAge = -12345;
-                    if (dataframeRow.parent.frameDimensionNames.TryGetValue(Globals.internalSetIdentifyer + "a", out iAge))
+                    if (dataframeRow.parent.frameDimensionNames.TryGetValue(Globals.internalSetIdentifyer + "a_", out iAge)) //#a_
                     {
-                        MessageBox.Show("Age aggregation...?");
-                        if (s == "99-") s = "99";
-                        int ii = -12345;
-                        if (int.TryParse(s, out ii))
+                        if (i == iAge)
                         {
-                            int ten = ii / 10;
-                            s = ten + "0" + ".." + ten + "9";
+                            //MessageBox.Show("Age aggregation...?");
+                            if (s == "99-") s = "99";
+                            int ii = -12345;
+                            if (int.TryParse(s, out ii))
+                            {
+                                int ten = ii / 10;
+                                s = ten + "0" + ".." + ten + "9";
+                            }
                         }
                     }
                 }
@@ -4467,8 +4470,10 @@ namespace Gekko
             }
             foreach (FrameLightRow frameRow in frame.data)
             {
-                for (int i = 0; i < maxDimension - frameRow.storageDimensions.Count; i++) frameRow.storageDimensions.Add(new CellLight());
-                for (int i = 0; i < maxValue - frameRow.storageValues.Count; i++) frameRow.storageValues.Add(new CellLight());
+                int i1 = frameRow.storageDimensions.Count;
+                int i2 = frameRow.storageValues.Count;
+                for (int i = 0; i < maxDimension - i1; i++) frameRow.storageDimensions.Add(new CellLight());
+                for (int i = 0; i < maxValue - i2; i++) frameRow.storageValues.Add(new CellLight());
             }
 
             return frame;
