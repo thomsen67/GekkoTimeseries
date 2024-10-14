@@ -1045,7 +1045,7 @@ namespace Gekko
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
             DecompOutput decompOutput = null;
-            if (Globals.decompPivotNew)
+            if (Globals.decompPivotNew && model.DecompType() == EModelType.GAMSScalar)
             {
                 decompOutput = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             }
@@ -3126,9 +3126,7 @@ namespace Gekko
         }
 
         public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, string lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
-        {
-            if (model.DecompType() != EModelType.GAMSScalar) new Error("DecompPivotToTable() presupposes scalar model");
-
+        {            
             string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
 
@@ -3727,16 +3725,6 @@ namespace Gekko
             int firstI = -12345;
             int firstJ = -12345;
 
-            //for (int i = 0; i < rownames.Count; i++)
-            //{
-            //    Dictionary<string, AggContainer> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
-            //    for (int j = 0; j < colnames.Count; j++)
-            //    {
-            //        AggContainer td = null;
-            //        if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
-            //    }
-            //}
-
             for (int i = 0; i < rownames.Count; i++)
             {
                 if (rownames[i].Contains(Globals.pivotHelper2New)) { firstI = i; break; }
@@ -3746,8 +3734,6 @@ namespace Gekko
                 if (colnames[j].Contains(Globals.pivotHelper2New)) { firstJ = j; break; }
             }
             if (firstI != -12345 && firstJ != -12345 && Globals.runningOnTTComputer) MessageBox.Show("First identification problem");
-
-
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -3765,14 +3751,11 @@ namespace Gekko
                     double dLevelRefLag2 = 0d;
                     int n = 0;
                     List<string> fullVariableNames = new List<string>();
-                    string backgroundColor = "Transparent";
                     double primeShare = double.NaN;
 
                     AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null, 0d);
                     if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
                     
-                    //new AggContainer(change.change, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN, 0, null, null);                                       
-
                     if (td != null)
                     {
                         dLevel = td.level;
@@ -3783,30 +3766,37 @@ namespace Gekko
                         dLevelRefLag2 = td.levelRefLag2;
                         n = td.n;
                         fullVariableNames = td.fullVariableNames;
-                        backgroundColor = td.backgroundColor;
                         primeShare = td.primeShare;
 
-                        // ----- first start -----------------------------------------------
-                        double dFirstLevel = double.NaN;
+                        // ----- first start -----------------------------------------------                        
                         double dFirstLevelLag = double.NaN;
                         double dFirstLevelLag2 = double.NaN;
                         double dFirstLevelRef = double.NaN;
                         double dFirstLevelRefLag = double.NaN;
-                        double dFirstLevelRefLag2 = double.NaN;                        
-                        string keyFirst = null;
+                        double dFirstLevelRefLag2 = double.NaN;
                         AggContainer tdFirst = null;
 
                         if (firstJ != -12345)
                         {
                             if (rowDict != null) rowDict.TryGetValue(colnames[firstJ], out tdFirst);
                             if (tdFirst != null)
-                            {                                
+                            {
                                 dFirstLevelLag = tdFirst.levelLag;
                                 dFirstLevelLag2 = tdFirst.levelLag2;
                                 dFirstLevelRef = tdFirst.levelRef;
                                 dFirstLevelRefLag = tdFirst.levelRefLag;
-                                dFirstLevelRefLag2 = tdFirst.levelRefLag2;                                
+                                dFirstLevelRefLag2 = tdFirst.levelRefLag2;
                             }
+                        }
+                        else if (firstI != -12345)
+                        {
+                            Dictionary<string, AggContainer> rowDictFirst = null; pivot.TryGetValue(rownames[firstI], out rowDictFirst);
+                            if (rowDictFirst != null) rowDictFirst.TryGetValue(colnames[j], out tdFirst);
+                            dFirstLevelLag = tdFirst.levelLag;
+                            dFirstLevelLag2 = tdFirst.levelLag2;
+                            dFirstLevelRef = tdFirst.levelRef;
+                            dFirstLevelRefLag = tdFirst.levelRefLag;
+                            dFirstLevelRefLag2 = tdFirst.levelRefLag2;
                         }
 
                         if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
