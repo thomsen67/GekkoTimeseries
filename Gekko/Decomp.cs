@@ -85,7 +85,7 @@ namespace Gekko
             foreach (int ii in selectedIndexes)
             {
                 string groupName = group(row, ii);
-                if (groupName == null) groupName = "[null]";
+                if (groupName == null) groupName = "<null>";
                 if (ii == lhsFrameCol)
                 {
                     if (groupName == Globals.pivotHelper2New)
@@ -103,7 +103,7 @@ namespace Gekko
                 }
             }
             if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
-            else rowKey = "[null]";
+            else rowKey = "<null>";
             return rowKey;
         }
 
