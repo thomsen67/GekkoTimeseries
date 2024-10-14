@@ -476,7 +476,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <DockPanel>
-                            <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" ToolTip="Besides selecting, you may drag-and-drop fields between Rows/Columns." />
+                            <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" ToolTip="Besides selecting, you may drag-and-drop fields between Rows/Columns.&#x0a;For a dimensional variable x, the field x#1 unfolds dimension 1, etc." />
                             <TextBlock Text="   " HorizontalAlignment="Left" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <StackPanel Width="25" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding Pivot_ButtonVisible3}" >

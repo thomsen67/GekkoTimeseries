@@ -44,6 +44,10 @@ namespace Gekko
                 string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow, frameLhsCol);
                 string colKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow, frameLhsCol);
 
+                if (rowKey == null || colKey == null)
+                {
+                }
+
                 // Initialize a row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<AggContainer>>();
 
@@ -85,6 +89,7 @@ namespace Gekko
             foreach (int ii in selectedIndexes)
             {
                 string groupName = group(row, ii);
+                if (groupName == null) groupName = "[null]";
                 if (ii == lhsFrameCol)
                 {
                     if (groupName == Globals.pivotHelper2New)
@@ -102,6 +107,7 @@ namespace Gekko
                 }
             }
             if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
+            else rowKey = "[null]";
             return rowKey;
         }
 
@@ -3193,7 +3199,7 @@ namespace Gekko
             {
                 string s = dataframeRow.storageDimensions[i].text;
 
-                if (true)
+                if (false)
                 {
                     //SLACK SLACK SLACK
                     //SLACK SLACK SLACK

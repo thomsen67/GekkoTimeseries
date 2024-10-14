@@ -55,6 +55,7 @@ namespace Gekko
 
         public static string NL = "\r\n";  //official Windows, cf. https://stackoverflow.com/questions/3986093/in-c-whats-the-difference-between-n-and-r-n
         public static char NL2 = '\n';     //best for counting number of newlines, since Windows accepts both \r\n and \n as newline. Mac uses \r, hmm, never mind.
+        public static string NL_ToolTip = "&#x0a;";  //not used in xaml, just put here for remembrance
 
         // ------------------------------------------------------------------------------------------------
         // Compare strings start
