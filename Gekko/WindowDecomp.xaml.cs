@@ -1367,7 +1367,7 @@ namespace Gekko
             string vv = null;
             if (v == Globals.redNaN) vv = "[missing value]";
             else vv = (v * 100d).ToString("0.00");
-            return "The relative difference between the value of " + rowCol + " #1 and the \n" + "sum of the rest of the " + rowCol + "s is = " + vv + "%." + "\n" + s + "\n" + "The colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%.";
+            return "The relative difference between the value of " + rowCol + " #1 and the \n" + "sum of the rest of the " + rowCol + "s is = " + vv + "%." + "\n" + s + "\n" + "The colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%. \nA circle (coloured or not) indicates that a row/col is decomposeable.";
         }
 
         private void SetBorderThickness(Grid g, int i, int j, Border border)

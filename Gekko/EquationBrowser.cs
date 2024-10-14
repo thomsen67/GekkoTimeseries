@@ -1565,7 +1565,7 @@ namespace Gekko
                         for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                         {
                             double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
-                            string tooltip = WindowDecomp.RedLampText("row", "You may click the 'Show errors' link to see the errors.", decompOutput.red[j2 - 2]);
+                            string tooltip = WindowDecomp.RedLampText("row", "Try to click the 'Show errors' checkbox.", decompOutput.red[j2 - 2]);
                             string imageHtml = null;
                             if (d <= Globals.redThresholds[0]) imageHtml = "<div class=`transparentcircle` style=`float: right;` title=`" + tooltip + "`></div>";
                             else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) imageHtml = "<div class=`yellowcircle` style=`float: right;` title=`" + tooltip + "`></div>";
