@@ -3068,7 +3068,7 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = new List<FrameFilter>();
         public List<string> mergeNewVariables = null;  //do clone for this
-        public List<double> primes = new List<double>();
+        //public List<double> primes = new List<double>();
 
         //-------- No clone for this ----------------
         public int guiDecompLastClickedRow = 0;

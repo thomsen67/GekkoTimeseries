@@ -424,7 +424,7 @@ namespace Gekko
         public int n;
         public List<string> fullVariableNames;
         public string backgroundColor;
-        public double primeShare; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
+        public double primeShare; //used to see if elements should sum up
 
         public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, string backgroundColor, double primeShare)
         {
@@ -3341,7 +3341,7 @@ namespace Gekko
                 //We have to calc it again, but that should be pretty fast
                 tableWithErrors = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownamesWithResiduals, colnamesWithResiduals);
             }
-            PrimeRowsOrColsAddUp(tableWithErrors, decompOptions2.primes, out rowsSumUp, out colsSumUp);
+            PrimeRowsOrColsAddUp(tableWithErrors, out rowsSumUp, out colsSumUp);
             return new Tuple<bool, bool>(rowsSumUp, colsSumUp);
         }
 
@@ -4266,8 +4266,7 @@ namespace Gekko
             // ------------------------------------------------------------------------------
 
             int prime = Globals.startPrime;  //1013: next one is 1019
-            decompOptions2.primes = new List<double>(); //resetting this
-
+            
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
                 DecompDict dd = null;
@@ -4291,28 +4290,18 @@ namespace Gekko
                     }
                 }
 
-                double primeSum = 0d;
+                double primeSumWithoutLhs = 0d;
 
                 // ------------------------------------------------------------------------------
                 // Loop over VARIABLES: these variables sum to 0 for the "d" and "dAlternative" types
                 // ------------------------------------------------------------------------------
 
+                int lhsFrameRow = -12345;
+                                
                 foreach (string dictName in dd.storage.Keys)
                 {
-                    //The thing about using primes is that a new prime is used for each period. Say prime = 1013 for the
-                    //first period, with n contributions. Then each contribution (like y, x1, x2 in y = x1+x2) gets
-                    //1013/3, so when aggregating over these 3 contributions, the sum is a whole number (here 1013).
-                    //If a part is missing, or a part from another year is used, we will not get a whole number. Let us say
-                    //that we are using three parts 1013/3, 1013/3 and 1019/3, where the last is errorenously taken from
-                    //the next year. Then we do not get a whole number. And because we are using primes, this scheme will
-                    //only fail (with low probability) if we are operating on contributions with >= 1013 elements. So when
-                    //using two elements from the first year, we cannot just get a whole number by taking for instance 2 or 3
-                    //numbers from the next year: 2/1019 or 3/1019 just does not fit with 1/1013. (Maybe the only issue would be
-                    //with 1013*1019 = 1032247 elements?). In any case: extremely unlikely not to work.
-
                     prime = G.NextPrime(prime);  //first time: 1019
-                    primeSum += prime;
-
+                    
                     FrameLightRow frameRow = new FrameLightRow(frame);
                     
                     string dbName = null; string varName = null; string freq = null; string[] indexes = null;                    
@@ -4325,7 +4314,9 @@ namespace Gekko
 
                     bool isLhs = false;
                     if (iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(fullName)), lhs2)) isLhs = true;
-                    
+
+                    if(!isLhs) primeSumWithoutLhs += prime;
+
                     double dLevel = double.NaN;
                     double dLevelLag = double.NaN;
                     double dLevelLag2 = double.NaN;
@@ -4450,8 +4441,11 @@ namespace Gekko
                             }
                         }
                     }
-                    if (isLhs) frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));
-
+                    if (isLhs)
+                    {
+                        frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));
+                        lhsFrameRow = frame.data.Count;  //framerow is added just below
+                    }
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
                     frameRow.AddValue(frame, Globals.col_valueLevel, new CellLight(dLevel));
@@ -4460,11 +4454,17 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
-                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
-                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight((double)prime));
+                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));                                        
+                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight(prime));
                     frame.data.Add(frameRow);
                 }
-                decompOptions2.primes.Add(primeSum);
+
+                if (lhsFrameRow != -12345)
+                {
+                    FrameLightRow frameRow = frame.data[lhsFrameRow];
+                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight(-primeSumWithoutLhs));
+                }               
+
             }
 
             int maxDimension = 0;
@@ -5813,7 +5813,7 @@ namespace Gekko
         /// <param name="tab"></param>
         /// <param name="rowsSumUp"></param>
         /// <param name="colsSumUp"></param>
-        private static void PrimeRowsOrColsAddUp(Table tab, List<double>primes, out bool rowsSumUp, out bool colsSumUp)
+        private static void PrimeRowsOrColsAddUp(Table tab, out bool rowsSumUp, out bool colsSumUp)
         {
             colsSumUp = true;
             for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
@@ -5827,7 +5827,7 @@ namespace Gekko
                     primeSum += prime;
                 }
 
-                bool match = IsPrimeMatch(primes, primeSum);
+                bool match = IsPrimeMatch(primeSum);
                 if (!match)
                 {
                     colsSumUp = false;
@@ -5846,7 +5846,7 @@ namespace Gekko
                     double prime = tab.Get(i, j).prime_hack;
                     primeSum += prime;
                 }
-                bool match = IsPrimeMatch(primes, primeSum);
+                bool match = IsPrimeMatch(primeSum);
                 if (!match)
                 {
                     rowsSumUp = false;
@@ -5854,19 +5854,10 @@ namespace Gekko
                 }
             }
 
-            bool IsPrimeMatch(List<double> primes, double rowPrimeSum)
+            bool IsPrimeMatch(double rowPrimeSum)
             {
-                bool match = false;
-                foreach (double prime in primes)
-                {
-                    double dif = Math.Abs(rowPrimeSum - prime);
-                    if (dif < 0.01d)  //the two values are in reality integers, so this criterion is solid (and the values do not get too large)
-                    {
-                        match = true;
-                        break;
-                    }
-                }
-                return match;
+                if (Math.Abs(rowPrimeSum) < 0.01d) return true;
+                return false;                
             }
         }        
 
