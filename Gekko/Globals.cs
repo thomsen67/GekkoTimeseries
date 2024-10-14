@@ -95,7 +95,7 @@ namespace Gekko
         public const string pivotHelper2 = "{normalize}";
         public const string pivotHelper2New = "00000000 ";  //first when sorted
 
-        public const int startPrime = 1012;  //next is 1013.
+        public const int startPrime = 1013;  //next is 1019.
 
         public static bool decompPivotNew = true;
         public static bool decompVar = false;  //default: false        
@@ -115,6 +115,7 @@ namespace Gekko
         public const int dLevelRefLag2 = 7;
         public const int dNames = 8;
         public const int dPrimeShare = 9;
+        public const double redNaN = 1000000d;
 
         public const bool fixForGekko4_0 = false;
 

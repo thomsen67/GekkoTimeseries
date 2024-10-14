@@ -142,6 +142,8 @@ namespace Gekko
         public Table table = null;
         public string ignore = null;
         public List<double> red = null;
+        public Tuple<bool, bool> rowsOrColsSumUp = null;
+
         public DecompOutput(Table table, string ignore, List<double> red)
         {
             this.table = table;
@@ -3306,7 +3308,7 @@ namespace Gekko
             //table.PrintCellsForDebug();
             DecompTableHandleSignAndShares(table, decompOptions2);
             DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-
+            decompOutput.rowsOrColsSumUp = rowsOrColsSumUp;
             return decompOutput;
         }
 
@@ -3315,6 +3317,7 @@ namespace Gekko
         /// Uses prime number fractions, so aggregation over periods
         /// may still be summable. Unless "Show errors" is active, a new Table object is generated.
         /// If not, the already generated table is reused for the calculations.
+        /// NOTE: Normal decomp table will return {true, false}, because the rows sum up (for each column).
         /// </summary>
         /// <param name="rownamesWithResiduals"></param>
         /// <param name="colnamesWithResiduals"></param>
@@ -3338,7 +3341,7 @@ namespace Gekko
                 //We have to calc it again, but that should be pretty fast
                 tableWithErrors = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownamesWithResiduals, colnamesWithResiduals);
             }
-            PrimeRowsOrColsAddUp(tableWithErrors, out rowsSumUp, out colsSumUp);
+            PrimeRowsOrColsAddUp(tableWithErrors, decompOptions2.primes, out rowsSumUp, out colsSumUp);
             return new Tuple<bool, bool>(rowsSumUp, colsSumUp);
         }
 
@@ -4256,18 +4259,17 @@ namespace Gekko
             //frame.AddColName(Globals.col_valueLevelRefLag2);
             //adding frame rows, while also getting sets defined as frame columns
             //prime 101, 103, 107, 109, ... the contributions should add up --> one per period
-            //
-
-            int prime = Globals.startPrime;  //1012: next one, 1013, is a prime.
+            //            
 
             // ------------------------------------------------------------------------------
             // Loop over PERIODS
             // ------------------------------------------------------------------------------
 
+            int prime = Globals.startPrime;  //1013: next one is 1019
+            decompOptions2.primes = new List<double>(); //resetting this
+
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
-                prime = G.NextPrime(prime);  //take an extremely small amount of time to generate, say, 1000 of these.
-
                 DecompDict dd = null;
                 if (op.isRaw)
                 {
@@ -4289,6 +4291,8 @@ namespace Gekko
                     }
                 }
 
+                double primeSum = 0d;
+
                 // ------------------------------------------------------------------------------
                 // Loop over VARIABLES: these variables sum to 0 for the "d" and "dAlternative" types
                 // ------------------------------------------------------------------------------
@@ -4305,7 +4309,9 @@ namespace Gekko
                     //using two elements from the first year, we cannot just get a whole number by taking for instance 2 or 3
                     //numbers from the next year: 2/1019 or 3/1019 just does not fit with 1/1013. (Maybe the only issue would be
                     //with 1013*1019 = 1032247 elements?). In any case: extremely unlikely not to work.
-                    double primeShare = (double)prime / (double)dd.storage.Count;
+
+                    prime = G.NextPrime(prime);  //first time: 1019
+                    primeSum += prime;
 
                     FrameLightRow frameRow = new FrameLightRow(frame);
                     
@@ -4455,10 +4461,10 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
-                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight(primeShare));
-
+                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight((double)prime));
                     frame.data.Add(frameRow);
                 }
+                decompOptions2.primes.Add(primeSum);
             }
 
             int maxDimension = 0;
@@ -5198,7 +5204,7 @@ namespace Gekko
                     }
                     double error = 1 - sum / target;  //value 0 for same number.
                     if (sum == 0d && target == 0d) error = 0d;
-                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
+                    else if (target == 0d || double.IsNaN(target)) error = Globals.redNaN; //just some large number
                     red.Add(error);  //one for each period
                 }
             }
@@ -5807,46 +5813,62 @@ namespace Gekko
         /// <param name="tab"></param>
         /// <param name="rowsSumUp"></param>
         /// <param name="colsSumUp"></param>
-        private static void PrimeRowsOrColsAddUp(Table tab, out bool rowsSumUp, out bool colsSumUp)
+        private static void PrimeRowsOrColsAddUp(Table tab, List<double>primes, out bool rowsSumUp, out bool colsSumUp)
         {
-            rowsSumUp = true;
+            colsSumUp = true;
             for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
             {
-                double rowPrimeSum = 0d;
+                double primeSum = 0d;
                 int count = 0;
                 for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                 {
                     count++;
                     double prime = tab.Get(i, j).prime_hack;
-                    rowPrimeSum += prime;
+                    primeSum += prime;
                 }
-                double dif = Math.Abs(rowPrimeSum - Math.Round(rowPrimeSum)) / (double)Globals.startPrime;
-                if (count == 0 || dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
+
+                bool match = IsPrimeMatch(primes, primeSum);
+                if (!match)
+                {
+                    colsSumUp = false;
+                    break;
+                }
+            }
+
+            rowsSumUp = true;
+            for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+            {
+                double primeSum = 0d;
+                int count = 0;
+                for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                {
+                    count++;
+                    double prime = tab.Get(i, j).prime_hack;
+                    primeSum += prime;
+                }
+                bool match = IsPrimeMatch(primes, primeSum);
+                if (!match)
                 {
                     rowsSumUp = false;
                     break;
                 }
             }
 
-            colsSumUp = true;
-            for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+            bool IsPrimeMatch(List<double> primes, double rowPrimeSum)
             {
-                double colPrimeSum = 0d;
-                int count = 0;
-                for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                bool match = false;
+                foreach (double prime in primes)
                 {
-                    count++;
-                    double prime = tab.Get(i, j).prime_hack;
-                    colPrimeSum += prime;
+                    double dif = Math.Abs(rowPrimeSum - prime);
+                    if (dif < 0.01d)  //the two values are in reality integers, so this criterion is solid (and the values do not get too large)
+                    {
+                        match = true;
+                        break;
+                    }
                 }
-                double dif = Math.Abs(colPrimeSum - Math.Round(colPrimeSum)) / (double)Globals.startPrime;
-                if (count == 0 || dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
-                {
-                    colsSumUp = false;
-                    break;
-                }
+                return match;
             }
-        }
+        }        
 
 
         /// <summary>

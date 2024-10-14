@@ -1038,8 +1038,8 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
-                    Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;" + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
+                    Program.RunGekkoCommands("reset; time 2025 2030; model<gms>makro_exo.zip; read makro_exo; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
                     //Program.RunGekkoCommands("qbnp <2030 2035> *= 1.1, 1.2, 1.3, 1.4, 1.5, 1.6;", "", 0, new P());
                 }
             }
@@ -1567,7 +1567,7 @@ namespace Gekko
                             double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
                             string tooltip = WindowDecomp.RedLampText("row", "You may click the 'Show errors' link to see the errors.", decompOutput.red[j2 - 2]);
                             string imageHtml = null;
-                            if (d <= Globals.redThresholds[0]) { /* do nothing */ }
+                            if (d <= Globals.redThresholds[0]) imageHtml = "<div class=`transparentcircle` style=`float: right;` title=`" + tooltip + "`></div>";
                             else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) imageHtml = "<div class=`yellowcircle` style=`float: right;` title=`" + tooltip + "`></div>";
                             else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) imageHtml = "<div class=`orangecircle` style=`float: right` title=`" + tooltip + "`></div>";
                             else if (d > Globals.redThresholds[2]) imageHtml = "<div class=`redcircle` style=`float: right` title=`" + tooltip + "`></div>";
@@ -2420,7 +2420,7 @@ namespace Gekko
             height: 0.57em;
             border-radius: 50%;
             background-color: #f01e3c;
-            border: 0.1em solid gray;
+            border: 0.10em solid gray;
             margin-right: 0.25em;
             position: relative; top: 0.27em;
         }
@@ -2431,7 +2431,7 @@ namespace Gekko
             height: 0.57em;
             border-radius: 50%;
             background-color: #ffc914;
-            border: 0.1em solid gray;
+            border: 0.10em solid gray;
             margin-right: 0.25em;
             position: relative; top: 0.27em;
         }
@@ -2442,7 +2442,18 @@ namespace Gekko
             height: 0.57em;
             border-radius: 50%;
             background-color: #fafa0f;
-            border: 0.1em solid gray;
+            border: 0.10em solid gray;
+            margin-right: 0.25em;
+            position: relative; top: 0.27em;
+        }
+
+        .transparentcircle {
+            display: inline-block;
+            width: 0.57em;
+            height: 0.57em;
+            border-radius: 50%;
+            background-color: #ffffff00;
+            border: 0.15em solid #d7d7d7;
             margin-right: 0.25em;
             position: relative; top: 0.27em;
         }

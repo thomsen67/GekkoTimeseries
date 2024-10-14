@@ -988,7 +988,7 @@ namespace Gekko
                     Cell c = decompOutput.table.Get(i, j);
                     if (c == null)
                     {
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOptions.decompOperator);  //transparent
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator);  //transparent
                         continue;
                     }
                     string s = "";
@@ -1019,7 +1019,7 @@ namespace Gekko
                         c.backgroundColor = Globals.decompBlueColor;
                     }
 
-                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOptions.decompOperator);
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator);
                 }
             }
         }        
@@ -1106,9 +1106,8 @@ namespace Gekko
             Clipboard.SetText(s, TextDataFormat.Text);            
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, DecompOperator decompOperator)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator)
         {
-
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
@@ -1225,7 +1224,7 @@ namespace Gekko
             if (b1 && b2 && b3 && Decomp.VarsAndTimeDimensionsAreSeparate(decompFind.decompOptions2))
             {
                 //to do red lamp, there must be both vars and time, and they must be on separate row/col.
-                SetRedCircle(g, i, j, type, isRowOrCol, red, decompFind.decompOptions2);
+                SetRedCircle(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);
             }
         }
 
@@ -1279,7 +1278,7 @@ namespace Gekko
 
         //public static double delete = 0.15;
 
-        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues, DecompOptions2 decompOptions2)
+        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
         {
             int ij = 0;
             if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
@@ -1287,14 +1286,19 @@ namespace Gekko
 
             SolidColorBrush brush = new SolidColorBrush();
             double d = 0;
-            if (errorValues != null)
+
+            bool ok = false;
+            if (isRowOrCol == Decomp.ERowsCols.Rows && rowsOrColsSumUp.Item1) ok = true;
+            if (isRowOrCol == Decomp.ERowsCols.Cols && rowsOrColsSumUp.Item2) ok = true;
+            if (!ok) return;
+
+            if (red != null)
             {
-                d = RedLampValue(errorValues, ij, decompOptions2);
-                if (d <= Globals.redThresholds[0]) { /* do nothing */ }
+                d = RedLampValue(red, ij, decompOptions2);
+                if (d <= Globals.redThresholds[0]) brush.Color = Colors.Transparent;
                 else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) brush.Color = Globals.yellow;
                 else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) brush.Color = Globals.orange;
                 else if (d > Globals.redThresholds[2]) brush.Color = Globals.red;
-
                 //delete += 0.20;
             }
 
@@ -1303,12 +1307,11 @@ namespace Gekko
             r.Height = 9;
             r.Fill = brush;
             r.HorizontalAlignment = HorizontalAlignment.Right;
-            if (d > Globals.redThresholds[0])
-            {
-                //border
-                r.Stroke = new SolidColorBrush(Colors.Gray);
-                r.StrokeThickness = 1;
-            }
+
+            //border
+            if (d <= Globals.redThresholds[0]) r.Stroke = new SolidColorBrush(Colors.LightGray);
+            else r.Stroke = new SolidColorBrush(Colors.Gray);
+            r.StrokeThickness = 1;
 
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;
@@ -1318,8 +1321,8 @@ namespace Gekko
             dp.Children.Add(r);
             dp.HorizontalAlignment = HorizontalAlignment.Right;
             string rowCol = "row";
-            if (isRowOrCol == Decomp.ERowsCols.Cols) rowCol = "col";            
-            dp.ToolTip = RedLampText(rowCol, "Try to click the 'Errors' checkbox.", errorValues[ij]);
+            if (isRowOrCol == Decomp.ERowsCols.Cols) rowCol = "col";
+            dp.ToolTip = RedLampText(rowCol, "Try to click the 'Errors' checkbox.", red[ij]);
             g.Children.Add(dp);
         }
 
@@ -1361,7 +1364,10 @@ namespace Gekko
         /// <returns></returns>
         public static string RedLampText(string rowCol, string s, double v)
         {
-            return "The relative difference between the value of " + rowCol + " #1 and the \n" + "sum of the rest of the " + rowCol + "s is = " + (v * 100d).ToString("0.00") + "%" + "\n" + s + "\n" + "The colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%.";
+            string vv = null;
+            if (v == Globals.redNaN) vv = "[missing value]";
+            else vv = (v * 100d).ToString("0.00");
+            return "The relative difference between the value of " + rowCol + " #1 and the \n" + "sum of the rest of the " + rowCol + "s is = " + vv + "%." + "\n" + s + "\n" + "The colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%.";
         }
 
         private void SetBorderThickness(Grid g, int i, int j, Border border)
@@ -3062,6 +3068,7 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = new List<FrameFilter>();
         public List<string> mergeNewVariables = null;  //do clone for this
+        public List<double> primes = new List<double>();
 
         //-------- No clone for this ----------------
         public int guiDecompLastClickedRow = 0;
