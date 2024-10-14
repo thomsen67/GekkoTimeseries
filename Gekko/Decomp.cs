@@ -44,10 +44,6 @@ namespace Gekko
                 string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow, frameLhsCol);
                 string colKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow, frameLhsCol);
 
-                if (rowKey == null || colKey == null)
-                {
-                }
-
                 // Initialize a row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<AggContainer>>();
 
@@ -3426,6 +3422,16 @@ namespace Gekko
             return indexes;
         }
 
+        /// <summary>
+        /// Order alphabetically.
+        /// </summary>
+        /// <param name="rownames2"></param>
+        /// <param name="colnames2"></param>
+        /// <param name="showErrors"></param>
+        /// <param name="rownames"></param>
+        /// <param name="colnames"></param>
+        /// <param name="rownamesWithResiduals"></param>
+        /// <param name="colnamesWithResiduals"></param>
         private static void DecompOrderRowAndColNames(GekkoDictionary<string, bool> rownames2, GekkoDictionary<string, bool> colnames2, bool showErrors, out List<string> rownames, out List<string> colnames, out List<string> rownamesWithResiduals, out List<string> colnamesWithResiduals)
         {
             List<string> rownames3 = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
@@ -3718,6 +3724,31 @@ namespace Gekko
             Table table = new Table();
             table.writeOnce = true;
 
+            int firstI = -12345;
+            int firstJ = -12345;
+
+            //for (int i = 0; i < rownames.Count; i++)
+            //{
+            //    Dictionary<string, AggContainer> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
+            //    for (int j = 0; j < colnames.Count; j++)
+            //    {
+            //        AggContainer td = null;
+            //        if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
+            //    }
+            //}
+
+            for (int i = 0; i < rownames.Count; i++)
+            {
+                if (rownames[i].Contains(Globals.pivotHelper2New)) { firstI = i; break; }
+            }
+            for (int j = 0; j < colnames.Count; j++)
+            {
+                if (colnames[j].Contains(Globals.pivotHelper2New)) { firstJ = j; break; }
+            }
+            if (firstI != -12345 && firstJ != -12345 && Globals.runningOnTTComputer) MessageBox.Show("First identification problem");
+
+
+
             for (int i = 0; i < rownames.Count; i++)
             {
                 Dictionary<string, AggContainer> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
@@ -3761,11 +3792,22 @@ namespace Gekko
                         double dFirstLevelLag2 = double.NaN;
                         double dFirstLevelRef = double.NaN;
                         double dFirstLevelRefLag = double.NaN;
-                        double dFirstLevelRefLag2 = double.NaN;
-                        int dFirstN = 0;
-                        List<string> dFirstFullVariableNames = null;
+                        double dFirstLevelRefLag2 = double.NaN;                        
                         string keyFirst = null;
-                        AggContainer tdFirst = null;                        
+                        AggContainer tdFirst = null;
+
+                        if (firstJ != -12345)
+                        {
+                            if (rowDict != null) rowDict.TryGetValue(colnames[firstJ], out tdFirst);
+                            if (tdFirst != null)
+                            {                                
+                                dFirstLevelLag = tdFirst.levelLag;
+                                dFirstLevelLag2 = tdFirst.levelLag2;
+                                dFirstLevelRef = tdFirst.levelRef;
+                                dFirstLevelRefLag = tdFirst.levelRefLag;
+                                dFirstLevelRefLag2 = tdFirst.levelRefLag2;                                
+                            }
+                        }
 
                         if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
                         {
