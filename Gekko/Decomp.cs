@@ -5813,12 +5813,15 @@ namespace Gekko
             for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
             {
                 double rowPrimeSum = 0d;
+                int count = 0;
                 for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                 {
-                    rowPrimeSum += tab.Get(i, j).prime_hack;
+                    count++;
+                    double prime = tab.Get(i, j).prime_hack;
+                    rowPrimeSum += prime;
                 }
                 double dif = Math.Abs(rowPrimeSum - Math.Round(rowPrimeSum)) / (double)Globals.startPrime;
-                if (dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
+                if (count == 0 || dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
                 {
                     rowsSumUp = false;
                     break;
@@ -5829,12 +5832,15 @@ namespace Gekko
             for (int j = 2; j <= tab.GetColMaxNumber(); j++)
             {
                 double colPrimeSum = 0d;
+                int count = 0;
                 for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
                 {
-                    colPrimeSum += tab.Get(i, j).prime_hack;
+                    count++;
+                    double prime = tab.Get(i, j).prime_hack;
+                    colPrimeSum += prime;
                 }
                 double dif = Math.Abs(colPrimeSum - Math.Round(colPrimeSum)) / (double)Globals.startPrime;
-                if (dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
+                if (count == 0 || dif > 1e-11d) //is < 1e-15 when it aligns, so a bit of a margin
                 {
                     colsSumUp = false;
                     break;

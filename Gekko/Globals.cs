@@ -199,6 +199,7 @@ namespace Gekko
         public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
+        public const string decompDimension = "#";
 
         public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
         public static string windowDecompStatusBarText_gekko = "Click to decompose variable, Ctrl+click to find equation(s)."; //Gekko model

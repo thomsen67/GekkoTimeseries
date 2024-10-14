@@ -449,7 +449,7 @@ namespace Gekko
                 else if (s == "lags") s2 = "2?" + s;
                 else if (s == "time") s2 = "3?" + s;
                 else if (s.StartsWith("#")) s2 = "4?" + s;
-                else if (s.Contains(" dim ")) s2 = "5?" + s;
+                else if (s.Contains(Globals.decompDimension)) s2 = "5?" + s;
                 else s2 = "6?" + s;
 
                 if (!isFilter)
