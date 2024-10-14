@@ -1219,9 +1219,10 @@ namespace Gekko
 
             bool b1 = !decompOperator.isRaw;
             bool b2 = decompFind.decompOptions2.count == ECountType.None;
-            bool b3 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left);            
-            
-            if (b1 && b2 && b3 && Decomp.VarsAndTimeDimensionsAreSeparate(decompFind.decompOptions2))
+            bool b3 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left);
+            bool b4 = (isRowOrCol == Decomp.ERowsCols.Rows && rowsOrColsSumUp.Item1) || (isRowOrCol == Decomp.ERowsCols.Cols && rowsOrColsSumUp.Item2);
+
+            if (b1 && b2 && b3 && b4)
             {
                 //to do red lamp, there must be both vars and time, and they must be on separate row/col.
                 SetRedCircle(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);
@@ -3068,7 +3069,7 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = new List<FrameFilter>();
         public List<string> mergeNewVariables = null;  //do clone for this
-        //public List<double> primes = new List<double>();
+        //public Tuple<bool, bool> rowsOrColsPrimes = new Tuple<bool, bool>(false, false);
 
         //-------- No clone for this ----------------
         public int guiDecompLastClickedRow = 0;

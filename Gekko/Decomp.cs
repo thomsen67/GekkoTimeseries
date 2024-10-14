@@ -1117,7 +1117,7 @@ namespace Gekko
         }
 
         public static ERowsCols VariablesOnRowsOrCols(DecompOptions2 decompOptions)
-        {
+        {            
             ERowsCols rv = ERowsCols.None;
             if (decompOptions.rows.Contains(Globals.col_variable)) rv = ERowsCols.Rows;
             else if (decompOptions.cols.Contains(Globals.col_variable)) rv = ERowsCols.Cols;
@@ -3295,28 +3295,20 @@ namespace Gekko
             List<string> rownames, colnames, rownamesWithResiduals, colnamesWithResiduals;
             DecompOrderRowAndColNames(rownames2, colnames2, decompOptions2.showErrors, out rownames, out colnames, out rownamesWithResiduals, out colnamesWithResiduals);
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);                        
-            Tuple<bool, bool> rowsOrColsSumUp = DoRowsOrColsAddUp(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);
-
-            //TODO TODO TODO
-            //TODO TODO TODO
-            //TODO TODO TODO Only show lamps (for "Show errors" no) when the row/col is summable
-            //TODO TODO TODO Only show Error (for "Show errors" yes) when the row/col is summable
-            //TODO TODO TODO
-            //TODO TODO TODO
-
+            Tuple<bool, bool> decompRowsOrColsPrimeBased = DecompRowsOrColsPrimeBased(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);
+            //decompOptions2.rowsOrColsPrimes = decompRowsOrColsPrimeBased;
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             //table.PrintCellsForDebug();
             DecompTableHandleSignAndShares(table, decompOptions2);
             DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-            decompOutput.rowsOrColsSumUp = rowsOrColsSumUp;
+            decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
             return decompOutput;
         }
 
         /// <summary>
-        /// Checks if the rows or columns of the generated table conceptually add up or not.
-        /// Uses prime number fractions, so aggregation over periods
-        /// may still be summable. Unless "Show errors" is active, a new Table object is generated.
-        /// If not, the already generated table is reused for the calculations.
+        /// Checks if the rows or columns of the generated table conceptually add up or not, so
+        /// that the sum of elements #2 and on is equal to element #1, in either the row or
+        /// col orientation (or both, in principle). Uses prime numbers internally for that.
         /// NOTE: Normal decomp table will return {true, false}, because the rows sum up (for each column).
         /// </summary>
         /// <param name="rownamesWithResiduals"></param>
@@ -3327,11 +3319,9 @@ namespace Gekko
         /// <param name="op"></param>
         /// <param name="format2"></param>
         /// <returns></returns>
-        private static Tuple<bool, bool> DoRowsOrColsAddUp(List<string> rownamesWithResiduals, List<string> colnamesWithResiduals, Dictionary<string, Dictionary<string, AggContainer>> pivotTable, Table table, DecompOptions2 decompOptions2, DecompOperator op, string format2)
+        private static Tuple<bool, bool> DecompRowsOrColsPrimeBased(List<string> rownamesWithResiduals, List<string> colnamesWithResiduals, Dictionary<string, Dictionary<string, AggContainer>> pivotTable, Table table, DecompOptions2 decompOptions2, DecompOperator op, string format2)
         {
-            bool rowsSumUp = false;
-            bool colsSumUp = false;
-            Table tableWithErrors = null;
+            Table tableWithErrors;
             if (decompOptions2.showErrors)
             {
                 tableWithErrors = table;  //no need to recalculate it: residuals are already present
@@ -3341,8 +3331,53 @@ namespace Gekko
                 //We have to calc it again, but that should be pretty fast
                 tableWithErrors = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownamesWithResiduals, colnamesWithResiduals);
             }
-            PrimeRowsOrColsAddUp(tableWithErrors, out rowsSumUp, out colsSumUp);
+
+            bool rowsSumUp = true;
+            for (int j = 2; j <= tableWithErrors.GetColMaxNumber(); j++)
+            {
+                double primeSum = 0d;
+                int count = 0;
+                for (int i = 2; i <= tableWithErrors.GetRowMaxNumber(); i++)
+                {
+                    count++;
+                    double prime = tableWithErrors.Get(i, j).prime_hack;
+                    primeSum += prime;
+                }
+                bool match = IsPrimeMatch(primeSum);
+                if (!match)
+                {
+                    rowsSumUp = false;
+                    break;
+                }
+            }
+
+            bool colsSumUp = true;
+            for (int i = 2; i <= tableWithErrors.GetRowMaxNumber(); i++)
+            {
+                double primeSum = 0d;
+                int count = 0;
+                for (int j = 2; j <= tableWithErrors.GetColMaxNumber(); j++)
+                {
+                    count++;
+                    double prime = tableWithErrors.Get(i, j).prime_hack;
+                    primeSum += prime;
+                }
+
+                bool match = IsPrimeMatch(primeSum);
+                if (!match)
+                {
+                    colsSumUp = false;
+                    break;
+                }
+            }
+
             return new Tuple<bool, bool>(rowsSumUp, colsSumUp);
+
+            bool IsPrimeMatch(double rowPrimeSum)
+            {
+                if (Math.Abs(rowPrimeSum) < 0.01d) return true;
+                return false;
+            }            
         }
 
         /// <summary>
@@ -3888,6 +3923,14 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// This method does not do much.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="rownames"></param>
+        /// <param name="colnames"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="model"></param>
         private static void DecompTablePostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2, Model model)
         {
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
@@ -5813,29 +5856,9 @@ namespace Gekko
         /// <param name="tab"></param>
         /// <param name="rowsSumUp"></param>
         /// <param name="colsSumUp"></param>
-        private static void PrimeRowsOrColsAddUp(Table tab, out bool rowsSumUp, out bool colsSumUp)
+        private static Tuple<bool, bool> PrimeRowsOrColsAddUp(Table tab)
         {
-            colsSumUp = true;
-            for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
-            {
-                double primeSum = 0d;
-                int count = 0;
-                for (int j = 2; j <= tab.GetColMaxNumber(); j++)
-                {
-                    count++;
-                    double prime = tab.Get(i, j).prime_hack;
-                    primeSum += prime;
-                }
-
-                bool match = IsPrimeMatch(primeSum);
-                if (!match)
-                {
-                    colsSumUp = false;
-                    break;
-                }
-            }
-
-            rowsSumUp = true;
+            bool rowsSumUp = true;
             for (int j = 2; j <= tab.GetColMaxNumber(); j++)
             {
                 double primeSum = 0d;
@@ -5854,11 +5877,33 @@ namespace Gekko
                 }
             }
 
+            bool colsSumUp = true;
+            for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+            {
+                double primeSum = 0d;
+                int count = 0;
+                for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                {
+                    count++;
+                    double prime = tab.Get(i, j).prime_hack;
+                    primeSum += prime;
+                }
+
+                bool match = IsPrimeMatch(primeSum);
+                if (!match)
+                {
+                    colsSumUp = false;
+                    break;
+                }
+            }            
+
+            return new Tuple<bool, bool>(rowsSumUp, colsSumUp);
+
             bool IsPrimeMatch(double rowPrimeSum)
             {
                 if (Math.Abs(rowPrimeSum) < 0.01d) return true;
                 return false;                
-            }
+            }            
         }        
 
 

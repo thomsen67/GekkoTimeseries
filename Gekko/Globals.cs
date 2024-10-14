@@ -98,6 +98,7 @@ namespace Gekko
         public const int startPrime = 1013;  //next is 1019.
 
         public static bool decompPivotNew = true;
+        public static bool decompPivotNew2 = true;  //using primes to find out if vars are on rows or cols
         public static bool decompVar = false;  //default: false        
         public static bool decompFixTimelessProblem = true;
         public const string decompErrorText = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";
