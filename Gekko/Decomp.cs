@@ -52,7 +52,7 @@ namespace Gekko
 
                 // Step 5: Add the value (from the values part of the data row)
 
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, null, dataframeRow.storageValues[Globals.dPrimeShare].data);
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, dataframeRow.storageValues[Globals.dPrimeShare].data, 0d, 0d, 0d, 0d, 0d);
                 pivotTable[rowKey][colKey].Add(ac);  //The list of these values will be aggregated later on
             }
             
@@ -425,10 +425,16 @@ namespace Gekko
         public double levelRefLag2;
         public int n;
         public List<string> fullVariableNames;
-        public string backgroundColor;
+        //public string backgroundColor;
         public double prime; //used to see if elements should sum up
+        //Values from lhs/endo variable
+        public double dFirstLevelLag;
+        public double dFirstLevelLag2;
+        public double dFirstLevelRef;
+        public double dFirstLevelRefLag;
+        public double dFirstLevelRefLag2;
 
-        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, string backgroundColor, double primeShare)
+        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, double primeShare, double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2)
         {
             this.change = change;
             this.changeAlternative = changeAlternative;
@@ -440,8 +446,14 @@ namespace Gekko
             this.levelRefLag2 = levelRefLag2;
             this.n = n;
             this.fullVariableNames = fullVariableNames;
-            this.backgroundColor = backgroundColor;
+            //this.backgroundColor = backgroundColor;
             this.prime = primeShare;
+            // -----
+            this.dFirstLevelLag = dFirstLevelLag;
+            this.dFirstLevelLag2 = dFirstLevelLag2;
+            this.dFirstLevelRef = dFirstLevelRef;
+            this.dFirstLevelRefLag = dFirstLevelRefLag;
+            this.dFirstLevelRefLag2 = dFirstLevelRefLag2;
         }
     }
 
@@ -3221,7 +3233,7 @@ namespace Gekko
 
             Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
             {
-                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null, 0d);
+                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), 0d, 0d, 0d, 0d, 0d, 0d);
                 foreach (AggContainer x in m)
                 {
                     aggregate.change += x.change;
@@ -3234,8 +3246,13 @@ namespace Gekko
                     aggregate.levelRefLag2 += x.levelRefLag2;
                     aggregate.n += x.n;
                     aggregate.fullVariableNames.AddRange(x.fullVariableNames);
-                    aggregate.backgroundColor = null;
                     aggregate.prime += x.prime;
+                    // -----
+                    aggregate.dFirstLevelLag += x.dFirstLevelLag;
+                    aggregate.dFirstLevelLag2 += x.dFirstLevelLag2;
+                    aggregate.dFirstLevelRef += x.dFirstLevelRef;
+                    aggregate.dFirstLevelRefLag += x.dFirstLevelRefLag;
+                    aggregate.dFirstLevelRefLag2 += x.dFirstLevelRefLag2;
                 }
 
                 return aggregate;
@@ -3562,7 +3579,7 @@ namespace Gekko
                         dLevelRefLag2 = td.levelRefLag2;
                         n = td.n;
                         fullVariableNames = td.fullVariableNames;
-                        backgroundColor = td.backgroundColor;
+                        //backgroundColor = td.backgroundColor;
 
                         // ----- first start -----------------------------------------------
                         double dFirstLevel = double.NaN;
@@ -4239,7 +4256,7 @@ namespace Gekko
                     agg.TryGetValue(key, out td);
                     if (td == null)
                     {
-                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, backgroundColor, 0d));
+                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, 0d, double.NaN, double.NaN, double.NaN, double.NaN, double.NaN));
                     }
                     else
                     {
@@ -4258,7 +4275,7 @@ namespace Gekko
                         //BEWARE
                         //BEWARE
                         td.fullVariableNames.Add(fullVariableName);
-                        if (backgroundColor != "Transparent") td.backgroundColor = backgroundColor;
+                        //if (backgroundColor != "Transparent") td.backgroundColor = backgroundColor;
                     }
                 }
             }
