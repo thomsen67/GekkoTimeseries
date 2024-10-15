@@ -36956,6 +36956,20 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// No test that it exists, may create exception.
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public CellLight GetValue(FrameLight frame, string s)
+        {
+            int i = -12345;
+            frame.frameValueNames.TryGetValue(s, out i);
+            CellLight c = this.storageValues[i];
+            return c;
+        }
+
         public FrameLightRow()
         {
             this.storageDimensions = new List<CellLight>();
