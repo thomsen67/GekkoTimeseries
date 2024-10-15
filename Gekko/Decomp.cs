@@ -4538,8 +4538,12 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));                                        
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
-
-
+                    // -----
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(double.NaN));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelLag2, new CellLight(double.NaN));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelRef, new CellLight(double.NaN));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelRefLag, new CellLight(double.NaN));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelRefLag2, new CellLight(double.NaN));
 
                     frame.data.Add(frameRow);
                 }
