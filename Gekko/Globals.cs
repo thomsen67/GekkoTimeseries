@@ -105,7 +105,8 @@ namespace Gekko
         public const string decompIgnoreText2 = "), cf. the 'Ignore' option.";
         public const string decompResidualText1 = "Data residual in equation";
         public const string decompResidualText2 = " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
-        public const int d = 0;
+        // -----
+        public const int d = 0;        
         public const int dAlternative = 1;
         public const int dLevel = 2;
         public const int dLevelLag = 3;
@@ -115,6 +116,12 @@ namespace Gekko
         public const int dLevelRefLag2 = 7;
         public const int dNames = 8;
         public const int dPrimeShare = 9;
+        public const int dFirstLevelLag = 10;
+        public const int dFirstLevelLag2 = 11;
+        public const int dFirstLevelRef = 12;
+        public const int dFirstLevelRefLag = 13;
+        public const int dFirstLevelRefLag2 = 14;
+        // -----
         public const double redNaN = 1000000d;
         public const string decompFirst = "00000000";
 
@@ -225,8 +232,14 @@ namespace Gekko
         public const string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
         public const string col_equ = Globals.internalColumnIdentifyer + "equ";
         public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
-        public const string col_primeShare = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
-        
+        public const string col_prime = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
+        // -----        
+        public const string col_firstValueLevelLag = Globals.internalColumnIdentifyer + "firstValueLevelLag";
+        public const string col_firstValueLevelLag2 = Globals.internalColumnIdentifyer + "firstValueLevelLag2";
+        public const string col_firstValueLevelRef = Globals.internalColumnIdentifyer + "firstValueLevelRef";
+        public const string col_firstValueLevelRefLag = Globals.internalColumnIdentifyer + "firstValueLevelRefLag";
+        public const string col_firstValueLevelRefLag2 = Globals.internalColumnIdentifyer + "firstValueLevelRefLag2";
+
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------

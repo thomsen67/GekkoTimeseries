@@ -52,7 +52,13 @@ namespace Gekko
 
                 // Step 5: Add the value (from the values part of the data row)
 
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, dataframeRow.storageValues[Globals.dPrimeShare].data, 0d, 0d, 0d, 0d, 0d);
+                //double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, dataframeRow.storageValues[Globals.dPrimeShare].data,      
+                    dataframeRow.storageValues[Globals.dFirstLevelLag].data,
+                    dataframeRow.storageValues[Globals.dFirstLevelLag2].data,
+                    dataframeRow.storageValues[Globals.dFirstLevelRef].data, 
+                    dataframeRow.storageValues[Globals.dFirstLevelRefLag].data, 
+                    dataframeRow.storageValues[Globals.dFirstLevelRefLag2].data);
                 pivotTable[rowKey][colKey].Add(ac);  //The list of these values will be aggregated later on
             }
             
@@ -4385,13 +4391,13 @@ namespace Gekko
                     string fullName = ss[0];
                     string lag = ss[1];
                     int iLag = int.Parse(G.Substring(lag, 1, lag.Length - 2));
-                    O.Chop(fullName, out dbName, out varName, out freq, out indexes);
-                    string[] domains = DecompPivotGetDomains(fullName, indexes);
-
+                    O.Chop(fullName, out dbName, out varName, out freq, out indexes);                    
                     bool isLhs = false;
                     if (iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(fullName)), lhs2)) isLhs = true;
 
-                    if(!isLhs) primeSumWithoutLhs += prime;
+                    string[] domains = DecompPivotGetDomains(fullName, indexes);
+
+                    if (!isLhs) primeSumWithoutLhs += prime;
 
                     double dLevel = double.NaN;
                     double dLevelLag = double.NaN;
@@ -4531,14 +4537,17 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));                                        
-                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight(prime));
+                    frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
+
+
+
                     frame.data.Add(frameRow);
                 }
 
                 if (lhsFrameRow != -12345)
                 {
                     FrameLightRow frameRow = frame.data[lhsFrameRow];
-                    frameRow.AddValue(frame, Globals.col_primeShare, new CellLight(-primeSumWithoutLhs));
+                    frameRow.AddValue(frame, Globals.col_prime, new CellLight(-primeSumWithoutLhs));
                 }               
 
             }
