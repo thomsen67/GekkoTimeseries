@@ -3351,8 +3351,8 @@ namespace Gekko
                 for (int i = 2; i <= tableWithErrors.GetRowMaxNumber(); i++)
                 {
                     count++;
-                    double prime = tableWithErrors.Get(i, j).prime_hack;
-                    primeSum += prime;
+                    Cell c = tableWithErrors.Get(i, j);
+                    if (c != null) primeSum += c.prime_hack;
                 }
                 bool match = IsPrimeMatch(primeSum);
                 if (!match)
@@ -3370,8 +3370,8 @@ namespace Gekko
                 for (int j = 2; j <= tableWithErrors.GetColMaxNumber(); j++)
                 {
                     count++;
-                    double prime = tableWithErrors.Get(i, j).prime_hack;
-                    primeSum += prime;
+                    Cell c = tableWithErrors.Get(i, j);
+                    if (c != null) primeSum += c.prime_hack;
                 }
 
                 bool match = IsPrimeMatch(primeSum);
@@ -4320,7 +4320,7 @@ namespace Gekko
             {
                 if (!ChopFullVariableName(lhs2, fullVariableName).isLhs) orderedNames.Add(fullVariableName);
             }
-            if (hit != 0 && Globals.runningOnTTComputer) MessageBox.Show("LHS problem: " + hit);
+            if (hit != 1 && Globals.runningOnTTComputer) MessageBox.Show("LHS problem: " + hit);
 
             // ------------------------------------------------------------------------------
             // Loop over PERIODS
@@ -4328,7 +4328,7 @@ namespace Gekko
 
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
-                
+
                 double primeSumWithoutLhs = 0d;
                 int lhsFrameRow = -12345;
 
@@ -4336,8 +4336,10 @@ namespace Gekko
                 // Loop over VARIABLES: these variables sum to 0 for the "d" and "dAlternative" types
                 // ------------------------------------------------------------------------------
 
+                FrameLightRow frameRowLhs = null;
+
                 foreach (string fullVariableName in orderedNames)
-                {                    
+                {
                     ChopFullVariableName chop = ChopFullVariableName(lhs2, fullVariableName);
 
                     double dLevel = double.NaN;
@@ -4348,6 +4350,7 @@ namespace Gekko
                     double dLevelRefLag2 = double.NaN;
 
                     FrameLightRow frameRow = new FrameLightRow(frame);
+                    if (frameRowLhs == null) frameRowLhs = frameRow;  //The first row for this period (the row is a LHS variable).
                     prime = G.NextPrime(prime);  //first time: 1019
                     if (!chop.isLhs) primeSumWithoutLhs += prime;
 
@@ -4471,7 +4474,6 @@ namespace Gekko
                     if (chop.isLhs)
                     {
                         frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));
-                        lhsFrameRow = frame.data.Count;  //framerow is added just below
                     }
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
@@ -4493,15 +4495,7 @@ namespace Gekko
                     frame.data.Add(frameRow);
                 }
 
-                if (lhsFrameRow != -12345)
-                {
-                    //
-                    // TODO TODO: do this above
-                    //
-                    FrameLightRow frameRow = frame.data[0];  //Sorted list has it first
-                    frameRow.AddValue(frame, Globals.col_prime, new CellLight(-primeSumWithoutLhs));
-                }
-
+                if (frameRowLhs != null) frameRowLhs.AddValue(frame, Globals.col_prime, new CellLight(-primeSumWithoutLhs)); //For each period, the LHS row gets the sum of all the other row's primes.
             }
 
             //Fill out any "holes" in the dataframe columns
