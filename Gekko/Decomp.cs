@@ -4306,6 +4306,22 @@ namespace Gekko
             int prime = Globals.startPrime;  //1013: next one is 1019
             DecompDict dd = DecompPivotCreateDataframeGetDict(decompDataMAINClone, op, operatorOneOf3Types);
 
+            //We start ordring the list, so that the LHS is in position 1.
+            int hit = 0;
+            List<string> orderedNames = new List<string>();
+            foreach (string fullVariableName in dd.storage.Keys)
+            {
+                if (ChopFullVariableName(lhs2, fullVariableName).isLhs)
+                {
+                    orderedNames.Add(fullVariableName); hit++;
+                }
+            }
+            foreach (string fullVariableName in dd.storage.Keys)
+            {
+                if (!ChopFullVariableName(lhs2, fullVariableName).isLhs) orderedNames.Add(fullVariableName);
+            }
+            if (hit != 0 && Globals.runningOnTTComputer) MessageBox.Show("LHS problem: " + hit);
+
             // ------------------------------------------------------------------------------
             // Loop over PERIODS
             // ------------------------------------------------------------------------------
@@ -4320,7 +4336,7 @@ namespace Gekko
                 // Loop over VARIABLES: these variables sum to 0 for the "d" and "dAlternative" types
                 // ------------------------------------------------------------------------------
 
-                foreach (string fullVariableName in dd.storage.Keys)
+                foreach (string fullVariableName in orderedNames)
                 {                    
                     ChopFullVariableName chop = ChopFullVariableName(lhs2, fullVariableName);
 
@@ -4479,12 +4495,16 @@ namespace Gekko
 
                 if (lhsFrameRow != -12345)
                 {
-                    FrameLightRow frameRow = frame.data[lhsFrameRow];
+                    //
+                    // TODO TODO: do this above
+                    //
+                    FrameLightRow frameRow = frame.data[0];  //Sorted list has it first
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(-primeSumWithoutLhs));
                 }
 
             }
 
+            //Fill out any "holes" in the dataframe columns
             int maxDimension = 0;
             int maxValue = 0;
             foreach (FrameLightRow frameRow in frame.data)
