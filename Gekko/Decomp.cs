@@ -13,7 +13,20 @@ using System.Threading;
 
 namespace Gekko
 {
-
+ 
+    /// <summary>
+    /// Helper class to chop up the key from the DecompDict (containing decomp results)
+    /// </summary>
+    public class ChopFullVariableName
+    {
+        public string varName;
+        public string fullName;
+        public string lag;
+        public string[] indexes;
+        public string[] domains;
+        public int iLag;
+        public bool isLhs;
+    }
 
     public class GekkoPivotTable
     {
@@ -3166,31 +3179,6 @@ namespace Gekko
 
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, lhs2, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
-
-            //if (false)
-            //{
-            //    rowIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
-            //    //rowIndices.Add(frame.frameDimensionNames["gekkoset__i"]);
-            //    //rowIndices.Add(frame.frameDimensionNames["gekkoset__j"]);
-            //    //rowIndices.Add(frame.frameDimensionNames[Globals.col_universe]);
-            //    //rowIndices.Add(frame.frameDimensionNames[Globals.col_lag]);
-            //    //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "1"]);
-            //    //rowIndices.Add(frame.frameDimensionNames[Globals.internalDimIdentifyer + "x1" + "¤" + "2"]);
-            //    rowIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.                
-            //    colIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
-            //}
-
-            //if (false)
-            //{
-            //    rowIndexes = new List<int>();
-            //    rowIndexes.Add(frame.frameDimensionNames[Globals.col_t]);
-            //    colIndexes = new List<int>();
-            //    colIndexes.Add(frame.frameDimensionNames[Globals.col_variable]);
-            //    colIndexes.Add(frame.frameDimensionNames[Globals.col_lhs]);  //will put [lhsVariable] on 1 row or col.
-            //}
-
-            //if(rowsCols==ERowsCols.Rows
-
             DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
             DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
 
@@ -4315,89 +4303,26 @@ namespace Gekko
         private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, string lhs2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
             FrameLight frame = new FrameLight();
-
-            // --- KEYS ---
-            //frame.AddColName(Globals.col_variable);
-            //frame.AddColName(Globals.col_lag);
-            //frame.AddColName(Globals.col_t);
-            //frame.AddColName(Globals.col_universe);                        
-            //#i
-            //#j
-            //x1#1
-            //x1#2
-            //x2#1
-            //x2#2
-            //#is_lhs
-
-            // --- VALUES ---
-            //frame.AddColName(Globals.col_fullVariableName);   
-            //frame.AddColName(Globals.col_value);
-            //frame.AddColName(Globals.col_valueAlternative);
-            //frame.AddColName(Globals.col_valueLevel);
-            //frame.AddColName(Globals.col_valueLevelLag);
-            //frame.AddColName(Globals.col_valueLevelLag2);
-            //frame.AddColName(Globals.col_valueLevelRef);
-            //frame.AddColName(Globals.col_valueLevelRefLag);
-            //frame.AddColName(Globals.col_valueLevelRefLag2);
-            //adding frame rows, while also getting sets defined as frame columns
-            //prime 101, 103, 107, 109, ... the contributions should add up --> one per period
-            //            
+            int prime = Globals.startPrime;  //1013: next one is 1019
+            DecompDict dd = DecompPivotCreateDataframeGetDict(decompDataMAINClone, op, operatorOneOf3Types);
 
             // ------------------------------------------------------------------------------
             // Loop over PERIODS
             // ------------------------------------------------------------------------------
 
-            int prime = Globals.startPrime;  //1013: next one is 1019
-            
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
-                DecompDict dd = null;
-                if (op.isRaw)
-                {
-                    //data is not used from here, it is just to get the list of
-                    //relevant variables. For multiplier type, both if's are true,
-                    //and in that case we just use the first.
-                    dd = decompDataMAINClone.cellsQuo;
-                    if (op.lowLevel == ELowLevel.OnlyRef) dd = decompDataMAINClone.cellsRef;
-                }
-                else
-                {
-                    if (op.lowLevel == ELowLevel.BothQuoAndRef)
-                    {
-                        dd = GetDecompDatas(decompDataMAINClone, EContribType.D);  //could just as well be .RD, we are only using the keys
-                    }
-                    else
-                    {
-                        dd = GetDecompDatas(decompDataMAINClone, operatorOneOf3Types);
-                    }
-                }
-
+                
                 double primeSumWithoutLhs = 0d;
+                int lhsFrameRow = -12345;
 
                 // ------------------------------------------------------------------------------
                 // Loop over VARIABLES: these variables sum to 0 for the "d" and "dAlternative" types
                 // ------------------------------------------------------------------------------
 
-                int lhsFrameRow = -12345;
-                                
-                foreach (string dictName in dd.storage.Keys)
-                {
-                    prime = G.NextPrime(prime);  //first time: 1019
-                    
-                    FrameLightRow frameRow = new FrameLightRow(frame);
-                    
-                    string dbName = null; string varName = null; string freq = null; string[] indexes = null;                    
-                    string[] ss = dictName.Split('¤');
-                    string fullName = ss[0];
-                    string lag = ss[1];
-                    int iLag = int.Parse(G.Substring(lag, 1, lag.Length - 2));
-                    O.Chop(fullName, out dbName, out varName, out freq, out indexes);                    
-                    bool isLhs = false;
-                    if (iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(fullName)), lhs2)) isLhs = true;
-
-                    string[] domains = DecompPivotGetDomains(fullName, indexes);
-
-                    if (!isLhs) primeSumWithoutLhs += prime;
+                foreach (string fullVariableName in dd.storage.Keys)
+                {                    
+                    ChopFullVariableName chop = ChopFullVariableName(lhs2, fullVariableName);
 
                     double dLevel = double.NaN;
                     double dLevelLag = double.NaN;
@@ -4406,9 +4331,13 @@ namespace Gekko
                     double dLevelRefLag = double.NaN;
                     double dLevelRefLag2 = double.NaN;
 
-                    if (Program.IsDecompResidualName(dictName))
+                    FrameLightRow frameRow = new FrameLightRow(frame);
+                    prime = G.NextPrime(prime);  //first time: 1019
+                    if (!chop.isLhs) primeSumWithoutLhs += prime;
+
+                    if (Program.IsDecompResidualName(fullVariableName))
                     {
-                        Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
+                        Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, fullVariableName);
                         if (tup.Item1 != null)
                         {
                             dLevel = tup.Item1.GetDataSimple(t2);
@@ -4428,23 +4357,23 @@ namespace Gekko
                         //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
                         //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
 
-                        string fullNameRef = G.Chop_SetBank(fullName, "Ref");
+                        string fullNameRef = G.Chop_SetBank(chop.fullName, "Ref");
 
                         if (op.isRaw)
                         {
-                            Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            Series tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsFirst != null)
                             {
-                                dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
-                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
-                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + iLag));
+                                dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
+                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
+                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
                             }
                             Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsRef != null)
                             {
-                                dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
-                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + iLag));
-                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + iLag));
+                                dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
+                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
+                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
                             }
                         }
                         else
@@ -4452,15 +4381,15 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                             {
                                 Series tsFirst = null;
-                                tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 if (tsFirst == null)
                                 {
-                                    string s2 = fullName.Replace("¤", "");
+                                    string s2 = chop.fullName.Replace("¤", "");
                                     new Error("Could not find variable " + s2 + "");
                                 }
-                                dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
-                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
-                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + iLag));
+                                dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
+                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
+                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
                             }
 
                             if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
@@ -4472,9 +4401,9 @@ namespace Gekko
                                     string s2 = fullNameRef.Replace("¤", "");
                                     new Error("Could not find variable " + s2 + "");
                                 }
-                                dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
-                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + iLag));
-                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + iLag));
+                                dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
+                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
+                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
                             }
                         }
                     }
@@ -4483,47 +4412,47 @@ namespace Gekko
                     double dAlternative = double.NaN;
                     if (op.isDoubleDifQuo)  //dp
                     {
-                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                        dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2.Add(-1), dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2.Add(-1), fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                     }
                     else if (op.isDoubleDifRef) //rdp
                     {
-                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                        dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2.Add(-1), dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2.Add(-1), fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                     }
                     else if (op.lowLevel == ELowLevel.BothQuoAndRef) //mp
                     {
-                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                        dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                     }
                     else
                     {
-                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.OperatorLower(), smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.OperatorLower(), smpl, lhs, t2, fullVariableName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         dAlternative = double.NaN;
                     }
 
-                    string dictName2 = dictName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
+                    string dictName2 = fullVariableName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
 
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
-                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(varName));
-                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(lag));
+                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.varName));
+                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.lag));
 
-                    if (indexes != null)
+                    if (chop.indexes != null)
                     {
-                        for (int ii = 0; ii < indexes.Length; ii++)
+                        for (int ii = 0; ii < chop.indexes.Length; ii++)
                         {
-                            string index = indexes[ii];
-                            frameRow.AddDimension(frame, Globals.internalDimIdentifyer + varName + "¤" + (ii + 1), new CellLight(index));
+                            string index = chop.indexes[ii];
+                            frameRow.AddDimension(frame, Globals.internalDimIdentifyer + chop.varName + "¤" + (ii + 1), new CellLight(index));
 
-                            if (domains != null)
+                            if (chop.domains != null)
                             {
-                                string domain = domains[ii];
+                                string domain = chop.domains[ii];
                                 if (domain != null) frameRow.AddDimension(frame, domain, new CellLight(index));
                                 else frameRow.AddDimension(frame, Globals.col_universe, new CellLight(index));
                             }
                         }
                     }
-                    if (isLhs)
+                    if (chop.isLhs)
                     {
                         frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));
                         lhsFrameRow = frame.data.Count;  //framerow is added just below
@@ -4536,7 +4465,7 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
-                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));                                        
+                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
                     // -----
                     frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(double.NaN));
@@ -4552,7 +4481,7 @@ namespace Gekko
                 {
                     FrameLightRow frameRow = frame.data[lhsFrameRow];
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(-primeSumWithoutLhs));
-                }               
+                }
 
             }
 
@@ -4572,6 +4501,59 @@ namespace Gekko
             }
 
             return frame;
+        }
+
+        /// <summary>
+        /// Helper method chop up the key from the DecompDict (containing decomp results)
+        /// </summary>
+        /// <param name="lhs2"></param>
+        /// <param name="dictName"></param>
+        /// <param name="varName"></param>
+        /// <param name="indexes"></param>
+        /// <param name="fullName"></param>
+        /// <param name="lag"></param>
+        /// <param name="iLag"></param>
+        /// <param name="isLhs"></param>
+        /// <param name="domains"></param>
+        public static ChopFullVariableName ChopFullVariableName(string lhs2, string dictName)
+        {
+            ChopFullVariableName chop = new ChopFullVariableName();            
+            string[] ss = dictName.Split('¤');
+            chop.fullName = ss[0];
+            chop.lag = ss[1];
+            chop.iLag = int.Parse(G.Substring(chop.lag, 1, chop.lag.Length - 2));
+            string dbName, freq;
+            O.Chop(chop.fullName, out dbName, out chop.varName, out freq, out chop.indexes);
+            chop.isLhs = false;
+            if (chop.iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(chop.fullName)), lhs2)) chop.isLhs = true;
+            chop.domains = DecompPivotGetDomains(chop.fullName, chop.indexes);
+            return chop;
+        }
+
+        private static DecompDict DecompPivotCreateDataframeGetDict(DecompData decompDataMAINClone, DecompOperator op, EContribType operatorOneOf3Types)
+        {
+            DecompDict dd = null;
+            if (op.isRaw)
+            {
+                //data is not used from here, it is just to get the list of
+                //relevant variables. For multiplier type, both if's are true,
+                //and in that case we just use the first.
+                dd = decompDataMAINClone.cellsQuo;
+                if (op.lowLevel == ELowLevel.OnlyRef) dd = decompDataMAINClone.cellsRef;
+            }
+            else
+            {
+                if (op.lowLevel == ELowLevel.BothQuoAndRef)
+                {
+                    dd = GetDecompDatas(decompDataMAINClone, EContribType.D);  //could just as well be .RD, we are only using the keys
+                }
+                else
+                {
+                    dd = GetDecompDatas(decompDataMAINClone, operatorOneOf3Types);
+                }
+            }
+
+            return dd;
         }
 
         private static string[] DecompPivotGetDomains(string fullName, string[] indexes)

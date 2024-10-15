@@ -106,6 +106,7 @@ namespace Gekko
         public const string decompResidualText1 = "Data residual in equation";
         public const string decompResidualText2 = " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
         // -----
+        // The following are hardcoded because it is known how many of them there is.
         public const int d = 0;        
         public const int dAlternative = 1;
         public const int dLevel = 2;
