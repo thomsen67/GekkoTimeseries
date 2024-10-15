@@ -90,7 +90,7 @@ namespace Gekko
                 {
                     if (groupName == Globals.pivotHelper2New)
                     {
-                        s = groupName + s;  //from "x | a" to "!!x | a".
+                        s = groupName + s;  //from "x | a" to "00000000 x | a".
                     }
                     else
                     {
@@ -426,7 +426,7 @@ namespace Gekko
         public int n;
         public List<string> fullVariableNames;
         public string backgroundColor;
-        public double primeShare; //used to see if elements should sum up
+        public double prime; //used to see if elements should sum up
 
         public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, string backgroundColor, double primeShare)
         {
@@ -441,7 +441,7 @@ namespace Gekko
             this.n = n;
             this.fullVariableNames = fullVariableNames;
             this.backgroundColor = backgroundColor;
-            this.primeShare = primeShare;
+            this.prime = primeShare;
         }
     }
 
@@ -1045,7 +1045,7 @@ namespace Gekko
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
             DecompOutput decompOutput = null;
-            if (Globals.decompPivotNew && model.DecompType() == EModelType.GAMSScalar)
+            if (Globals.decompPivotNew && model.DecompType() == EModelType.GAMSScalar)  //will also include "perpetual" Gekko models, but not GAMS-raw-code models.
             {
                 decompOutput = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             }
@@ -3235,7 +3235,7 @@ namespace Gekko
                     aggregate.n += x.n;
                     aggregate.fullVariableNames.AddRange(x.fullVariableNames);
                     aggregate.backgroundColor = null;
-                    aggregate.primeShare += x.primeShare;
+                    aggregate.prime += x.prime;
                 }
 
                 return aggregate;
@@ -3740,33 +3740,11 @@ namespace Gekko
                 Dictionary<string, AggContainer> rowDict = null; pivot.TryGetValue(rownames[i], out rowDict);
 
                 for (int j = 0; j < colnames.Count; j++)
-                {
-                    double d = 0;
-                    double dAlternative = 0d;
-                    double dLevel = 0d;
-                    double dLevelLag = 0d;
-                    double dLevelLag2 = 0d;
-                    double dLevelRef = 0d;
-                    double dLevelRefLag = 0d;
-                    double dLevelRefLag2 = 0d;
-                    int n = 0;
-                    List<string> fullVariableNames = new List<string>();
-                    double primeShare = double.NaN;
-
-                    AggContainer td = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), null, 0d);
-                    if (rowDict != null) rowDict.TryGetValue(colnames[j], out td);
-                    
-                    if (td != null)
+                {                    
+                    AggContainer agg = null; if (rowDict != null) rowDict.TryGetValue(colnames[j], out agg);                    
+                    if (agg != null)
                     {
-                        dLevel = td.level;
-                        dLevelLag = td.levelLag;
-                        dLevelLag2 = td.levelLag2;
-                        dLevelRef = td.levelRef;
-                        dLevelRefLag = td.levelRefLag;
-                        dLevelRefLag2 = td.levelRefLag2;
-                        n = td.n;
-                        fullVariableNames = td.fullVariableNames;
-                        primeShare = td.primeShare;
+                        double value = double.NaN;
 
                         // ----- first start -----------------------------------------------                        
                         double dFirstLevelLag = double.NaN;
@@ -3801,116 +3779,116 @@ namespace Gekko
 
                         if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
                         {
-                            d = dLevel;
+                            value = agg.level;
                         }
                         else if (op.OperatorLower() == "rn" || op.OperatorLower() == "r" || op.OperatorLower() == "xrn" || op.OperatorLower() == "xr")
                         {
-                            d = dLevelRef;
+                            value = agg.levelRef;
                         }
                         else if (op.OperatorLower() == "d" || op.OperatorLower() == "sd")
                         {
-                            d = td.change;
+                            value = agg.change;
                         }
                         else if (op.OperatorLower() == "p" || op.OperatorLower() == "sp")
                         {
-                            d = td.change / dFirstLevelLag * 100d;
+                            value = agg.change / dFirstLevelLag * 100d;
                         }
                         else if (op.OperatorLower() == "dp" || op.OperatorLower() == "sdp")
                         {
-                            d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
+                            value = agg.change / dFirstLevelLag * 100d - agg.changeAlternative / dFirstLevelLag2 * 100d;
                         }
                         else if (op.OperatorLower() == "m" || op.OperatorLower() == "sm")
                         {
-                            d = td.change;
+                            value = agg.change;
                         }
                         else if (op.OperatorLower() == "q" || op.OperatorLower() == "sq")
                         {
-                            d = td.change / dFirstLevelRef * 100d;
+                            value = agg.change / dFirstLevelRef * 100d;
                         }
                         else if (op.OperatorLower() == "mp" || op.OperatorLower() == "smp")
                         {
-                            d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
+                            value = agg.change / dFirstLevelLag * 100d - agg.changeAlternative / dFirstLevelRefLag * 100d;
                         }
                         else if (op.OperatorLower() == "xd")
                         {
-                            d = dLevel - dLevelLag;
+                            value = agg.level - agg.levelLag;
                         }
                         else if (op.OperatorLower() == "xp")
                         {
-                            d = (dLevel - dLevelLag) / dLevelLag * 100d;
+                            value = (agg.level - agg.levelLag) / agg.levelLag * 100d;
                         }
                         else if (op.OperatorLower() == "xdp")
                         {
-                            d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelLag - dLevelLag2) / dLevelLag2 * 100d;
+                            value = (agg.level - agg.levelLag) / agg.levelLag * 100d - (agg.levelLag - agg.levelLag2) / agg.levelLag2 * 100d;
                         }
                         else if (op.OperatorLower() == "xm")
                         {
-                            d = dLevel - dLevelRef;
+                            value = agg.level - agg.levelRef;
                         }
                         else if (op.OperatorLower() == "xq")
                         {
-                            d = (dLevel - dLevelRef) / dLevelRef * 100d;
+                            value = (agg.level - agg.levelRef) / agg.levelRef * 100d;
                         }
                         else if (op.OperatorLower() == "xmp")
                         {
-                            d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+                            value = (agg.level - agg.levelLag) / agg.levelLag * 100d - (agg.levelRef - agg.levelRefLag) / agg.levelRefLag * 100d;
                         }
                         // -----------------
                         else if (op.OperatorLower() == "rd" || op.OperatorLower() == "srd")
                         {
-                            d = td.change;
+                            value = agg.change;
                         }
                         else if (op.OperatorLower() == "rp" || op.OperatorLower() == "srp")
                         {
-                            d = td.change / dFirstLevelRefLag * 100d;
+                            value = agg.change / dFirstLevelRefLag * 100d;
                         }
                         else if (op.OperatorLower() == "rdp" || op.OperatorLower() == "srdp")
                         {
-                            d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
+                            value = agg.change / dFirstLevelRefLag * 100d - agg.changeAlternative / dFirstLevelRefLag2 * 100d;
                         }
                         else if (op.OperatorLower() == "xrd")
                         {
-                            d = dLevelRef - dLevelRefLag;
+                            value = agg.levelRef - agg.levelRefLag;
                         }
                         else if (op.OperatorLower() == "xrp")
                         {
-                            d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+                            value = (agg.levelRef - agg.levelRefLag) / agg.levelRefLag * 100d;
                         }
                         else if (op.OperatorLower() == "xrdp")
                         {
-                            d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
+                            value = (agg.levelRef - agg.levelRefLag) / agg.levelRefLag * 100d - (agg.levelRefLag - agg.levelRefLag2) / agg.levelRefLag2 * 100d;
                         }
-                    }
 
-                    if (decompOptions2.count == ECountType.N)
-                    {
-                        table.SetNumber(i + 2, j + 2, n, "f16.0");
-                    }
-                    else if (decompOptions2.count == ECountType.Names)
-                    {
-                        string tmp2 = null;
-                        if (fullVariableNames != null)
+                        if (decompOptions2.count == ECountType.N)
                         {
-                            List<string> tmp = new List<string>();
-                            foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
-                            tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                            table.SetNumber(i + 2, j + 2, agg.n, "f16.0");
+                        }
+                        else if (decompOptions2.count == ECountType.Names)
+                        {
+                            string tmp2 = null;
+                            if (agg.fullVariableNames != null)
+                            {
+                                List<string> tmp = new List<string>();
+                                foreach (string s in agg.fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
+                                tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                            }
+                            else
+                            {
+                                tmp2 = Text1(0);
+                            }
+                            table.Set(i + 2, j + 2, tmp2);
                         }
                         else
                         {
-                            tmp2 = Text1(0);
+                            table.SetNumber(i + 2, j + 2, value, format2);
                         }
-                        table.Set(i + 2, j + 2, tmp2);
-                    }
-                    else
-                    {
-                        table.SetNumber(i + 2, j + 2, d, format2);
-                    }
 
-                    Cell c = table.Get(i + 2, j + 2);
-                    c.vars_hack = fullVariableNames;
-                    c.value_hack = d;  //stored for sort and ignore later on
-                    c.backgroundColor = "Transparent";
-                    c.prime_hack = primeShare;
+                        Cell c = table.Get(i + 2, j + 2);
+                        c.vars_hack = agg.fullVariableNames;
+                        c.value_hack = value;  //stored for sort and ignore later on
+                        c.backgroundColor = "Transparent";
+                        c.prime_hack = agg.prime;
+                    }                    
                 }
             }
             return table;
