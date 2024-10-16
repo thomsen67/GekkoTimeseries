@@ -207,7 +207,7 @@ namespace Gekko
         public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
-        public const string decompDimension = "#";
+        public const string decompDimension = " dim ";
 
         public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
         public static string windowDecompStatusBarText_gekko = "Click to decompose variable, Ctrl+click to find equation(s)."; //Gekko model
@@ -219,7 +219,7 @@ namespace Gekko
         public const string col_variable = Globals.internalColumnIdentifyer + "vars";
         public const string col_lag = Globals.internalColumnIdentifyer + "lags";
         public const string col_t = internalColumnIdentifyer + "time";
-        public const string col_universe = Globals.internalColumnIdentifyer + "universe";
+        public const string col_universe = Globals.internalColumnIdentifyer + "universal";
         public const string col_lhs = Globals.internalColumnIdentifyer + "lhs";
         public const string col_value = Globals.internalColumnIdentifyer + "value";
         public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
