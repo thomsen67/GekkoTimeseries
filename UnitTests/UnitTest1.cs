@@ -12945,7 +12945,7 @@ namespace UnitTests
         {
             //Note: This also tests transposed tables.
             //      Only the "skeleton" is tested, not values inside tables.
-            //      A good sanity test if something is redsigned.
+            //      A good sanity test if something is redesigned.
 
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
