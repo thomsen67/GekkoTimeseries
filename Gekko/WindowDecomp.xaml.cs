@@ -1243,7 +1243,7 @@ namespace Gekko
             bool isEndogenous = false;
             if (v != null)
             {
-                if (!Program.IsDecompResidualName(v))
+                if (!Decomp.IsDecompResidualName(v))
                 {
                     if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
                     {
@@ -1424,33 +1424,7 @@ namespace Gekko
             }
 
             if (!(rightClick || dockPanel.type == GekkoTableTypes.TableContent)) return; //a pure click and shift-click (and ctrl-click that has no special meaning...) on a cells on the frozen borders does not get selected, making a mess of further selections 
-
-            bool flowChart = false;
-            if (flowChart)
-            {                
-                DecompOptions2 decompOptions = this.decompFind.decompOptions2;
-                string code = "sp";                
-                TextBlock textBlock = (TextBlock)border.Child;
-                string s2 = textBlock.Text.Trim();
-                string variable = "y";
-                if (MessageBox.Show("Flowchart?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                {
-                    try
-                    {
-                        Program.FlowChart(variable, code, GekkoTime.FromStringToGekkoTime(s2));
-                    }
-                    catch (Exception err)
-                    {
-                        new Error("Flowchart failed");
-                    }
-                }
-                else
-                {
-                    // Do not close the window
-                }
-                return;
-            }  
-
+                        
             Grid g = (Grid)dockPanel.Parent;
             int col = (int)dockPanel.GetValue(Grid.ColumnProperty);
             int row = (int)dockPanel.GetValue(Grid.RowProperty);
@@ -2346,20 +2320,6 @@ namespace Gekko
             PutTableIntoGrid2(this.grid1Left, decompOutput, GekkoTableTypes.Left, decompOptions);
             CreateGridRowsAndColumns(this.grid1, decompOutput, GekkoTableTypes.TableContent);
             PutTableIntoGrid2(this.grid1, decompOutput, GekkoTableTypes.TableContent, decompOptions);
-        }
-
-        private string FindEquationText(DecompOptions decompOptions)
-        {
-            if (decompOptions.expressionOld != null)
-            {
-                return decompOptions.expressionOld;
-            }
-            else
-            {
-                EquationHelper eh = Program.FindEquationByMeansOfVariableName(this.decompFind.decompOptions2.variable);
-                if (eh == null) return ""; //probably only when model is changed while UDVALG window is open (this is illegal anyway, and a popup will appear)
-                else return ((EquationHelper)eh).equationText;
-            }
         }        
 
         private void radioButton1_Checked(object sender, RoutedEventArgs e)

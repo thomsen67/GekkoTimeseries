@@ -2926,7 +2926,6 @@ namespace Gekko
             {
                 //close all PLOT+DECOMP
                 Program.CutPlot();
-                Program.CutDecomp1();
                 Program.CutDecomp2();
                 Program.CutTrace();
                 Program.CutPrint(print);
@@ -2949,8 +2948,7 @@ namespace Gekko
         {
             try
             {
-                //Close all decomp
-                Program.CutDecomp1();
+                //Close all decomp                
                 Program.CutDecomp2();
                 Program.CutPrint(true);
             }

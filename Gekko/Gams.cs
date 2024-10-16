@@ -2461,7 +2461,7 @@ namespace Gekko
             string rhs = found.rhs.Trim();
             string lhs = found.lhs.Trim();
 
-            string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";  //this is a generic method, not just a GAMS method
+            string s1 = Decomp.EquationLhsRhs(lhs, rhs, true) + ";";  //this is a generic method, not just a GAMS method
 
             if (found.expressions == null || found.expressions.Count == 0)
             {
@@ -2503,7 +2503,7 @@ namespace Gekko
 
                 string rhs = eq.rhs.Trim();
                 string lhs = eq.lhs.Trim();
-                string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";
+                string s1 = Decomp.EquationLhsRhs(lhs, rhs, true) + ";";
 
                 if (eq.expressions == null || eq.expressions.Count == 0)
                 {
@@ -2604,7 +2604,7 @@ namespace Gekko
 
                 string rhs = eq.rhs.Trim();
                 string lhs = eq.lhs.Trim();
-                string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";
+                string s1 = Decomp.EquationLhsRhs(lhs, rhs, true) + ";";
                 string sets = null;
                 bool hasDim = false;
                 

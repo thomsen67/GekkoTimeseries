@@ -12323,38 +12323,10 @@ namespace UnitTests
             I("#j1 = x1.getdomains();");
             _AssertListString(First(), "#i1", 1, "#a1");
             _AssertListString(First(), "#j1", 1, "#a1");
-        }
+        }        
 
         [TestMethod]
-        public void _Test_Decomp_OldGekkoStyle()
-        {
-            Gekko.Table table = null;
-
-            //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
-
-            if (true)
-            {
-                // ===============================================
-                // ===============================================
-                // Test of old style ADAM
-                // ===============================================
-                // ===============================================
-
-                I("RESET; TIME 2006 2006;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                I("READ <tsd> jul05;");
-                I("MODEL jul05;");
-                I("DECOMP2 <d> fy;");
-                table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 2).date, "2006");
-                Assert.AreEqual(table.Get(2, 2).number, 15465.4976, 0.0001);
-                Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
-                Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
-            }
-        }
-
-        [TestMethod]
-        public void _Test_Decomp_DELETEATSOMEPOINT_FrmToScalar1()
+        public void _Test_Decomp_Frm_Lags()
         {
             //testing of lags etc, but delete it at some point.
 
@@ -12425,23 +12397,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 3.0000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
-            Assert.AreEqual(table.Get(i, 2).number, 2.0000d, 0.0001);
-
-            // --------------- y<d> ----------------------------------
-
-            //I("decomp <2002 2002 d> y from e_y endo y;");
-            //table = Globals.lastDecompTable;
-            //i = 1;
-            //Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
-            //i++;
-            //Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
-            //Assert.AreEqual(table.Get(i, 2).number, 33.0000d, 0.0001);
-            //i++;
-            //Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
-            //Assert.AreEqual(table.Get(i, 2).number, 12.0000d, 0.0001);
-            //i++;
-            //Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
-            //Assert.AreEqual(table.Get(i, 2).number, 20.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 2).number, 2.0000d, 0.0001);           
 
 
             //// --------------- c<m> ----------------------------------
@@ -12524,7 +12480,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test_DecompBig()
+        public void _Test_Decomp_GAMSRaw_Big()
         {
             // NOTE: not scalar model! Obsolete sooner or later
             //            
@@ -12581,7 +12537,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSetTypes()
+        public void _Test_Decomp_GAMSRaw_SetTypes()
         {
             //    var   set1   set2    time            
             //    x     a#i            2001
@@ -12621,7 +12577,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Decomp_MONA()
+        public void _Test_Decomp_Frm_MONA()
         {
             I("RESET;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
@@ -12700,7 +12656,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompQuarterly()
+        public void _Test_Decomp_Frm_Quarterly()
         {
             //-----------------------------------------------------------
             //----------------- testing quarterly model -----------------            
@@ -12740,7 +12696,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test_DecompSimul1()
+        public void _Test_Decomp_Scalar_Simul1()
         {
             //Tests both scalar model and raw gams model
             //Also test cache
@@ -12839,7 +12795,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul2()
+        public void _Test_Decomp_Scalar_Simul2()
         {
 
             // -------------------------
@@ -12941,7 +12897,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul2_combis()
+        public void _Test_Decomp_Scalar_Simul2_combis()
         {
             //Note: This also tests transposed tables.
             //      Only the "skeleton" is tested, not values inside tables.
@@ -13393,7 +13349,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul3()
+        public void _Test_Decomp_Scalar_Simul3()
         {
 
             // -------------------------
@@ -13790,7 +13746,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul5()
+        public void _Test_Decomp_Scalar_Simul5()
         {
             for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
             {
@@ -16267,7 +16223,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul4()
+        public void _Test_Decomp_Scalar_Simul4()
         {
             // See _Test_DecompSimul4()
             // Here, we use sets
@@ -16731,7 +16687,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompAgeLead()
+        public void _Test_Decomp_GAMSRaw_AgeLead()
         {
             // NOTE: not scalar model! Obsolete sooner or later
             //
@@ -16864,7 +16820,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompOperator1()
+        public void _Test_Decomp_Scalar_Operator1()
         {
             //Good sanity test of operators. But _Test_DecompOperator2() is a little bit more rigorous.
             //This test also tests pivot aggretation though, and that is important!            
@@ -17561,7 +17517,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompOperators2()
+        public void _Test_Decomp_Scalar_Operators2()
         {
             //Really good and comprehensive test of scalar model and .frm model (compiled into scalar).
 
@@ -18639,8 +18595,11 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompPivot()
+        public void _Test_Decomp_Scalar_Pivot()
         {
+            //Not really testing much... mostly for seeing a GUI decomp table easily.
+            //Could be useful for testing hiding of dimensions etc.
+
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
             I("reset; time 2001 2003;");
@@ -18696,7 +18655,7 @@ namespace UnitTests
             I("time 2003 2003;");
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            ShowDecompTable();  //will show the following decomp table and then abort
+            //ShowDecompTable();  //will show the following decomp table and then abort
                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

@@ -2984,16 +2984,6 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 // DECOMP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//old stuff
-decomp2:						
-                            DECOMP2 decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
-                          | DECOMP2 decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
-                            ;
-decompExpression:           expression;
-
-// --------------
-
-//new decomp
 decomp:                    	DECOMP decompOpt1? decompVar1Simple decompFrom? decompEndo? decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom?) ^(ASTDECOMPENDO decompEndo?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
                             ;
 

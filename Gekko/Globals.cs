@@ -749,7 +749,6 @@ namespace Gekko
         public const int systemTthreadsExtra = 3;
 
         public static List<Graph> windowsGraph = new List<Graph>();
-        public static List<Window1> windowsDecomp = new List<Window1>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
         public static List<WindowTreeViewWithTable> windowsTrace = new List<WindowTreeViewWithTable>();
         public static CounterHelper ch = new CounterHelper();

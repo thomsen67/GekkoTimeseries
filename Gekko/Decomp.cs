@@ -28,6 +28,51 @@ namespace Gekko
         public bool isLhs;
     }
 
+    /// <summary>
+    /// Stores all equations (non-unrolled)
+    /// </summary>
+    public class DecompDatas
+    {
+        public List<List<DecompData>> storage = null; //decomps of equations
+        public DecompData MAIN_data = null;  //combined results
+        public bool hasD = false;
+        public bool hasM = false;
+        public bool hasRD = false;
+    }
+
+    /// <summary>
+    /// Decomp of 1 unrolled equation
+    /// </summary>
+    public class DecompData
+    {
+        public DecompDict cellsQuo = null;
+        public DecompDict cellsGradQuo = null;
+        public DecompDict cellsContribD = null;
+        // -------------------------------------
+        public DecompDict cellsRef = null;
+        public DecompDict cellsGradRef = null;
+        public DecompDict cellsContribDRef = null;
+        // -------------------------------------
+        public DecompDict cellsContribM = null;
+        // -------------------------------------
+
+        public string lhs = null;  //name of the LHS variable, for instance "Work:y2¤[0]
+
+        public DecompData DeepClone()
+        {
+            DecompData dd = new DecompData();
+            dd.cellsQuo = this.cellsQuo.DeepClone();
+            dd.cellsGradQuo = this.cellsGradQuo.DeepClone();
+            dd.cellsContribD = this.cellsContribD.DeepClone();
+            dd.cellsRef = this.cellsRef.DeepClone();
+            dd.cellsGradRef = this.cellsGradRef.DeepClone();
+            dd.cellsContribDRef = this.cellsContribDRef.DeepClone();
+            dd.cellsContribM = this.cellsContribM.DeepClone();
+            dd.lhs = this.lhs;
+            return dd;
+        }
+    }
+
     public class GekkoPivotTable
     {
         // Function to create a pivot table with filtering
@@ -1826,7 +1871,7 @@ namespace Gekko
             ConvertFromTurtleName(name, true, out name2, out lag2);
 
             Tuple<Series, Series> tup = null;
-            if (Program.IsDecompResidualName(name))
+            if (IsDecompResidualName(name))
             {
                 tup = GetRealTimeseries(decompDatas, name);
                 if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(name)) decompDatas.MAIN_data.cellsQuo.Add(name, tup.Item1);
@@ -1910,6 +1955,36 @@ namespace Gekko
             MergeDecompDict(dd.cellsRef, decompDatas.storage[ii][jj].cellsRef);
         }
 
+        public static bool IsDecompResidualName(string name)
+        {
+            if (name == null) return false;
+            return name.Contains(Globals.decompResidualName);
+        }
+
+        /// <summary>
+        /// Helper method.
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="simple"></param>
+        /// <returns></returns>
+        public static string EquationLhsRhs(string lhs, string rhs, bool simple)
+        {
+            //This method is just so that we keep the two ways of decomposing together,
+            //that is, calling an equation like DECOMP eq1, or DECOMP y = x1 + x2.
+            //The former has simple = true, the latter simple = false.
+            //if (simple) return "-(" + lhs + ") + " + rhs;
+            //else return "O.Add(" + Globals.smpl + ", O.Negate(" + Globals.smpl + ", " + lhs + "), " + rhs + ")";
+            if (simple)
+            {
+                return lhs + " - (" + rhs + ")";
+            }
+            else
+            {
+                return "O.Add(" + Globals.smpl + ", " + lhs + ", O.Negate(" + Globals.smpl + ", (" + rhs + ")))";
+            }
+        }
+
         private static void MergeDecompDict(DecompDict d, DecompDict dStorage)
         {
             foreach (KeyValuePair<string, Series> kvp in d.storage)
@@ -1965,7 +2040,7 @@ namespace Gekko
                 string s = kvp.Key;
                 string[] ss = s.Split('¤');
                 string s2 = G.Chop_RemoveBank(ss[0], DecompFirst());
-                if (Program.IsDecompResidualName(s2))
+                if (IsDecompResidualName(s2))
                 {
                     //TODO TODO TODO
                     //TODO TODO TODO
@@ -3811,7 +3886,7 @@ namespace Gekko
                     prime = G.NextPrime(prime);  //first time: 1019
                     if (!chop.isLhs) primeSumWithoutLhs += prime;
 
-                    if (Program.IsDecompResidualName(fullVariableName))
+                    if (IsDecompResidualName(fullVariableName))
                     {
                         Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, fullVariableName);
                         if (tup.Item1 != null)
@@ -4092,7 +4167,7 @@ namespace Gekko
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                         if (!G.isNumericalError(d)) max = Math.Max(max, d);
-                        if (Program.IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+                        if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
                     }
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
@@ -4104,7 +4179,7 @@ namespace Gekko
                     Cell c5 = table1.Get(2, j);                    
                     //string name2 = c5?.vars_hack?[0];
                     string name2 = GetVarsHack(c5);
-                    if (Program.IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
+                    if (IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
                     {
@@ -4114,7 +4189,7 @@ namespace Gekko
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                         if (!G.isNumericalError(d)) max = Math.Max(max, d);
-                        if (Program.IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+                        if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
                     }
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }

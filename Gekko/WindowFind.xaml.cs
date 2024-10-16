@@ -362,7 +362,7 @@ namespace Gekko
                         string residualName = "residual___";
                         int funcCounter = 0;
 
-                        string s1 = Program.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
+                        string s1 = Decomp.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
                         if (equation.expressions == null || equation.expressions.Count == 0)
                         {
                             Globals.expressions = null;  //maybe not necessary
@@ -410,7 +410,7 @@ namespace Gekko
             {
                 //if (Globals.runningOnTTComputer) new Writeln("TTH: Button color problem...");
             }
-        }
+        }        
 
         public void FindSetButtons1(string eqName, List<string> firstList)
         {

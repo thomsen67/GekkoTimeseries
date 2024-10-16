@@ -4677,18 +4677,7 @@ ASTPLACEHOLDER [0]
                         //node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
 
                     }
-                    break;
-                case "ASTDECOMP":
-                    {
-                        //
-                        // Old DECOMP, will be obsolete
-                        //
-                        node.Code.A("O.Decomp1 o" + Num(node) + " = new O.Decomp1();" + G.NL);
-                        node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
-                        GetCodeFromAllChildren(node);
-                        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                    }
-                    break;
+                    break;                
                 case "ASTDECOMPITEMS":
                     {
                         string methodName = "Evalcode" + ++Globals.counter;
@@ -4717,7 +4706,7 @@ ASTPLACEHOLDER [0]
                         else
                         {
                             //DECOMP y = x1 + x2                                
-                            code = Program.EquationLhsRhs(node[1][0].Code.ToString(), node[1][1].Code.ToString(), false);
+                            code = Decomp.EquationLhsRhs(node[1][0].Code.ToString(), node[1][1].Code.ToString(), false);
                         }
 
                         StashIntoLocalFuncs(w, methodName, code, false);

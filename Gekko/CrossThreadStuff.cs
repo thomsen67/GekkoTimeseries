@@ -815,29 +815,6 @@ namespace Gekko
             } 
         }
 
-
-        //weird delegate pattern, but it works!
-        delegate void CloseDecompCallback(Window1 w);
-        public static void CloseDecomp(Window1 w)
-        {
-            //Soon obsolete
-            try
-            {
-                if (!w.Dispatcher.CheckAccess())
-                {
-                    // It's on a different thread, so use Invoke.
-                    w.Dispatcher.Invoke(new CloseDecompCallback(CloseDecomp), new object[] { w });
-                }
-                else
-                {
-                    //w.Close();
-                    Globals.ch.windowsDecompCloseCounter++;
-                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
-                }
-            }
-            catch { };  //fail silently
-        }
-
         //weird delegate pattern, but it works!
         delegate void CloseDecompCallback2(WindowDecomp w);
         public static void CloseDecomp2(WindowDecomp w)

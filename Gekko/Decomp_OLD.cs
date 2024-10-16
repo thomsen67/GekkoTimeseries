@@ -527,9 +527,9 @@ namespace Gekko
                 string fullVariableName = framerow.Get(frame, Globals.col_fullVariableName).text;
 
                 string backgroundColor = "Transparent";
-                if (Program.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
+                if (Decomp.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
 
-                if (!decompOptions2.showErrors && Program.IsDecompResidualName(fullVariableName))
+                if (!decompOptions2.showErrors && Decomp.IsDecompResidualName(fullVariableName))
                 {
                     //skip residuals if errors are not shown
                 }
@@ -707,7 +707,7 @@ namespace Gekko
                         double dLevelRefLag = double.NaN;
                         double dLevelRefLag2 = double.NaN;
 
-                        if (Program.IsDecompResidualName(dictName))
+                        if (Decomp.IsDecompResidualName(dictName))
                         {
                             Tuple<Series, Series> tup = Decomp.GetRealTimeseries(decompDatas, dictName);
                             if (tup.Item1 != null)
