@@ -3228,8 +3228,10 @@ namespace Gekko
             Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
             {
                 AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), 0d, 0d, 0d, 0d, 0d, 0d);
+                int n = 0;
                 foreach (AggContainer x in m)
                 {
+                    n++;
                     aggregate.change += x.change;
                     aggregate.changeAlternative += x.changeAlternative;
                     aggregate.level += x.level;
@@ -3248,6 +3250,17 @@ namespace Gekko
                     aggregate.dFirstLevelRefLag += x.dFirstLevelRefLag;
                     aggregate.dFirstLevelRefLag2 += x.dFirstLevelRefLag2;
                 }
+                //For the LHS values we take averages.
+                //Think percentages like 17/50 = 10/50 + 3/50 + 4/50. If we sum 3+4 = 7, we would like
+                //to see it as (3+4)/50, not (3+4)/(50+50). This is obvious intra a period, summing
+                //variables. When for instance removing time dimension, this average rule is perhaps less
+                //obvious. Or is it? We are generally *summing*, so shouldn't percentages sum up when
+                //removing time dimension (which they do when doing averages).
+                aggregate.dFirstLevelLag /= n;
+                aggregate.dFirstLevelLag2 /= n;
+                aggregate.dFirstLevelRef /= n;
+                aggregate.dFirstLevelRefLag /= n;
+                aggregate.dFirstLevelRefLag2 /= n;
 
                 return aggregate;
 
@@ -3758,35 +3771,36 @@ namespace Gekko
                         double value = double.NaN;
 
                         // ----- first start -----------------------------------------------                        
-                        double dFirstLevelLag = double.NaN;
-                        double dFirstLevelLag2 = double.NaN;
-                        double dFirstLevelRef = double.NaN;
-                        double dFirstLevelRefLag = double.NaN;
-                        double dFirstLevelRefLag2 = double.NaN;
-                        AggContainer tdFirst = null;
+                        //double dFirstLevelLag = double.NaN;
+                        //double dFirstLevelLag2 = double.NaN;
+                        //double dFirstLevelRef = double.NaN;
+                        //double dFirstLevelRefLag = double.NaN;
+                        //double dFirstLevelRefLag2 = double.NaN;
+                        
+                        //AggContainer tdFirst = null;
 
-                        if (firstJ != -12345)
-                        {
-                            if (rowDict != null) rowDict.TryGetValue(colnames[firstJ], out tdFirst);
-                            if (tdFirst != null)
-                            {
-                                dFirstLevelLag = tdFirst.levelLag;
-                                dFirstLevelLag2 = tdFirst.levelLag2;
-                                dFirstLevelRef = tdFirst.levelRef;
-                                dFirstLevelRefLag = tdFirst.levelRefLag;
-                                dFirstLevelRefLag2 = tdFirst.levelRefLag2;
-                            }
-                        }
-                        else if (firstI != -12345)
-                        {
-                            Dictionary<string, AggContainer> rowDictFirst = null; pivot.TryGetValue(rownames[firstI], out rowDictFirst);
-                            if (rowDictFirst != null) rowDictFirst.TryGetValue(colnames[j], out tdFirst);
-                            dFirstLevelLag = tdFirst.levelLag;
-                            dFirstLevelLag2 = tdFirst.levelLag2;
-                            dFirstLevelRef = tdFirst.levelRef;
-                            dFirstLevelRefLag = tdFirst.levelRefLag;
-                            dFirstLevelRefLag2 = tdFirst.levelRefLag2;
-                        }
+                        //if (firstJ != -12345)
+                        //{
+                        //    if (rowDict != null) rowDict.TryGetValue(colnames[firstJ], out tdFirst);
+                        //    if (tdFirst != null)
+                        //    {
+                        //        dFirstLevelLag = tdFirst.levelLag;
+                        //        dFirstLevelLag2 = tdFirst.levelLag2;
+                        //        dFirstLevelRef = tdFirst.levelRef;
+                        //        dFirstLevelRefLag = tdFirst.levelRefLag;
+                        //        dFirstLevelRefLag2 = tdFirst.levelRefLag2;
+                        //    }
+                        //}
+                        //else if (firstI != -12345)
+                        //{
+                        //    Dictionary<string, AggContainer> rowDictFirst = null; pivot.TryGetValue(rownames[firstI], out rowDictFirst);
+                        //    if (rowDictFirst != null) rowDictFirst.TryGetValue(colnames[j], out tdFirst);
+                        //    dFirstLevelLag = tdFirst.levelLag;
+                        //    dFirstLevelLag2 = tdFirst.levelLag2;
+                        //    dFirstLevelRef = tdFirst.levelRef;
+                        //    dFirstLevelRefLag = tdFirst.levelRefLag;
+                        //    dFirstLevelRefLag2 = tdFirst.levelRefLag2;
+                        //}
 
                         if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
                         {
@@ -3802,11 +3816,11 @@ namespace Gekko
                         }
                         else if (op.OperatorLower() == "p" || op.OperatorLower() == "sp")
                         {
-                            value = agg.change / dFirstLevelLag * 100d;
+                            value = agg.change / agg.dFirstLevelLag * 100d;
                         }
                         else if (op.OperatorLower() == "dp" || op.OperatorLower() == "sdp")
                         {
-                            value = agg.change / dFirstLevelLag * 100d - agg.changeAlternative / dFirstLevelLag2 * 100d;
+                            value = agg.change / agg.dFirstLevelLag * 100d - agg.changeAlternative / agg.dFirstLevelLag2 * 100d;
                         }
                         else if (op.OperatorLower() == "m" || op.OperatorLower() == "sm")
                         {
@@ -3814,11 +3828,11 @@ namespace Gekko
                         }
                         else if (op.OperatorLower() == "q" || op.OperatorLower() == "sq")
                         {
-                            value = agg.change / dFirstLevelRef * 100d;
+                            value = agg.change / agg.dFirstLevelRef * 100d;
                         }
                         else if (op.OperatorLower() == "mp" || op.OperatorLower() == "smp")
                         {
-                            value = agg.change / dFirstLevelLag * 100d - agg.changeAlternative / dFirstLevelRefLag * 100d;
+                            value = agg.change / agg.dFirstLevelLag * 100d - agg.changeAlternative / agg.dFirstLevelRefLag * 100d;
                         }
                         else if (op.OperatorLower() == "xd")
                         {
@@ -3851,11 +3865,11 @@ namespace Gekko
                         }
                         else if (op.OperatorLower() == "rp" || op.OperatorLower() == "srp")
                         {
-                            value = agg.change / dFirstLevelRefLag * 100d;
+                            value = agg.change / agg.dFirstLevelRefLag * 100d;
                         }
                         else if (op.OperatorLower() == "rdp" || op.OperatorLower() == "srdp")
                         {
-                            value = agg.change / dFirstLevelRefLag * 100d - agg.changeAlternative / dFirstLevelRefLag2 * 100d;
+                            value = agg.change / agg.dFirstLevelRefLag * 100d - agg.changeAlternative / agg.dFirstLevelRefLag2 * 100d;
                         }
                         else if (op.OperatorLower() == "xrd")
                         {
@@ -4486,11 +4500,11 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
                     // -----                    
-                    frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_firstValueLevelLag).data));
-                    frameRow.AddValue(frame, Globals.col_firstValueLevelLag2, new CellLight(frameRowLhs.GetValue(frame, Globals.col_firstValueLevelLag2).data));
-                    frameRow.AddValue(frame, Globals.col_firstValueLevelRef, new CellLight(frameRowLhs.GetValue(frame, Globals.col_firstValueLevelRef).data));
-                    frameRow.AddValue(frame, Globals.col_firstValueLevelRefLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_firstValueLevelRefLag).data));
-                    frameRow.AddValue(frame, Globals.col_firstValueLevelRefLag2, new CellLight(frameRowLhs.GetValue(frame, Globals.col_firstValueLevelRefLag2).data));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelLag).data));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelLag2, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelLag2).data));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelRef, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelRef).data));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelRefLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelRefLag).data));
+                    frameRow.AddValue(frame, Globals.col_firstValueLevelRefLag2, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelRefLag2).data));
                     // -----
                     frame.data.Add(frameRow);
                 }

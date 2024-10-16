@@ -16866,7 +16866,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompOperator1()
         {
-            //Good sanity test of operators. But _Test_DecompOperator1() is a little bit more rigorous.
+            //Good sanity test of operators. But _Test_DecompOperator2() is a little bit more rigorous.
             //This test also tests pivot aggretation though, and that is important!            
 
             I("RESET;");
