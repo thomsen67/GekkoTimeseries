@@ -3375,21 +3375,7 @@ namespace Gekko
 
             DecompOutput decompOutput = null;
             if (true)
-            {
-                for (int i = 2; i <= table.GetRowMaxNumber(); i++)
-                {
-                    for (int j = 2; j <= table.GetColMaxNumber(); j++)
-                    {
-                        if (table.Get(i, j) == null)
-                        {
-                            Cell c = new Cell();
-                            c.cellType = CellType.Number;
-                            c.number = 0d;
-                            c.value_hack = 0d;
-                            table.Set(new Coord(i, j), c);
-                        }
-                    }
-                }
+            {                
                 DecompTableHandleSignAndShares(table, decompOptions2);
                 decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
                 decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
@@ -3840,6 +3826,19 @@ namespace Gekko
                     }                    
                 }
             }
+
+            //Replace null-cells with 0-cells.
+            for (int i = 2; i <= table.GetRowMaxNumber(); i++)
+            {
+                for (int j = 2; j <= table.GetColMaxNumber(); j++)
+                {
+                    if (table.Get(i, j) == null)
+                    {
+                        table.SetNumber(i, j, 0d, format2);
+                    }
+                }
+            }
+
             return table;
         }        
 
