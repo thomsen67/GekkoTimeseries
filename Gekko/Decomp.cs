@@ -3204,10 +3204,10 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        
+
 
         public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, string lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
-        {            
+        {
             string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
 
@@ -3368,13 +3368,44 @@ namespace Gekko
 
             List<string> rownames, colnames, rownamesWithResiduals, colnamesWithResiduals;
             DecompOrderRowAndColNames(rownames2, colnames2, decompOptions2.showErrors, out rownames, out colnames, out rownamesWithResiduals, out colnamesWithResiduals);
-            Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);                        
-            Tuple<bool, bool> decompRowsOrColsPrimeBased = DecompRowsOrColsPrimeBased(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);            
+            Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);
+            Tuple<bool, bool> decompRowsOrColsPrimeBased = DecompRowsOrColsPrimeBased(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             //table.PrintCellsForDebug();
-            DecompTableHandleSignAndShares(table, decompOptions2);
-            DecompOutput decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-            decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
+
+            DecompOutput decompOutput = null;
+
+            bool ok = true;
+
+            if (rowsCols == ERowsCols.Rows)
+            {
+                for (int j = 2; j <= table.GetColMaxNumber(); j++)
+                {
+                    if (table.Get(2, j) == null) { ok = false; break; }
+                }
+            }
+
+            if (rowsCols == ERowsCols.Cols)
+            {
+                for (int i = 2; i <= table.GetRowMaxNumber(); i++)
+                {
+                    if (table.Get(i, 2) == null) { ok = false; break; }
+                }
+            }
+
+            if (ok)
+            {
+                DecompTableHandleSignAndShares(table, decompOptions2);
+                decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
+                decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
+            }
+            else
+            {
+                //In case something goes wrong in GUI. Delete after some time.
+                MessageBox.Show("Cannot normalize (change sign from negative to positive) the selected variable");
+                decompOutput = new DecompOutput(table, null, null);
+                decompOutput.rowsOrColsSumUp = new Tuple<bool, bool>(false, false);
+            }
             return decompOutput;
         }
 
@@ -4053,7 +4084,7 @@ namespace Gekko
                     int dims = 0;
                     if (chop.indexes != null) dims = chop.indexes.Length;
                     //gekkodims = 2
-                    frameRow.AddDimension(frame, "dims", new CellLight(dims));
+                    frameRow.AddDimension(frame, Globals.decompDimension2, new CellLight(dims));
                     if (dims > 0)
                     {                        
                         for (int ii = 0; ii < chop.indexes.Length; ii++)
@@ -4070,7 +4101,7 @@ namespace Gekko
                                 string domain = chop.domains[ii];  //has corresponding dimensions                              
                                 if (domain == null || domain == "*")
                                 {
-                                    frameRow.AddDimension(frame, "#*", new CellLight(index));
+                                    frameRow.AddDimension(frame, Globals.decompUniversal, new CellLight(index));
                                     //frameRow.AddDimension(frame, Globals.internalDim3Identifyer, new CellLight(ii + 1));
                                 }
                                 else 
@@ -4202,7 +4233,7 @@ namespace Gekko
             if (indexes != null)
             {
                 domains = new string[indexes.Length];
-                for (int i = 0; i < domains.Length; i++) domains[i] = "#*";                
+                for (int i = 0; i < domains.Length; i++) domains[i] = Globals.decompUniversal;                
             }
             if (domains != null)
             {
@@ -4225,7 +4256,7 @@ namespace Gekko
             return domains;
         }
 
-        
+
 
         /// <summary>
         /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
@@ -4240,7 +4271,7 @@ namespace Gekko
             if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
 
             string ignore = null;
-            List<double> red = new List<double>();
+            List<double> red = new List<double>();            
 
             // --------------------------------
             // SORT AND IGNORE START
@@ -4680,23 +4711,34 @@ namespace Gekko
             {
                 string formatSShares = "f16." + decompOptions2.decimalsPch;
                 if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
+                                
+                //int w = 0;
+
                 if (rowsOrCols == ERowsCols.Rows)
                 {
                     for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                     {
-                        double value = tab.Get(2, j).number;
-                        for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                        Cell cFirst = tab.Get(2, j);
+                        if (cFirst == null)
                         {
-                            if (i == 2)
+                            //Cannot be
+                        }
+                        else
+                        {
+                            double value = cFirst.number;
+                            for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
                             {
-                                Cell c = tab.Get(i, j);
-                                c.number = -value;
-                            }
-                            if (decompOptions2.isShares)
-                            {
-                                Cell c = tab.Get(i, j);
-                                c.number = tab.Get(i, j).number / (-value) * 100d;
-                                c.numberFormat = formatSShares;
+                                if (i == 2)
+                                {
+                                    Cell c = tab.Get(i, j);
+                                    c.number = -value;
+                                }
+                                if (decompOptions2.isShares)
+                                {
+                                    Cell c = tab.Get(i, j);
+                                    c.number = tab.Get(i, j).number / (-value) * 100d;
+                                    c.numberFormat = formatSShares;
+                                }
                             }
                         }
                     }
@@ -4705,19 +4747,27 @@ namespace Gekko
                 {
                     for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
                     {
-                        double value = tab.Get(i, 2).number;
-                        for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                        Cell cFirst = tab.Get(i, 2);
+                        if (cFirst == null)
                         {
-                            if (j == 2)
+                            //Cannot be
+                        }
+                        else
+                        {
+                            double value = cFirst.number;
+                            for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                             {
-                                Cell c = tab.Get(i, j);
-                                c.number = -value;
-                            }
-                            if (decompOptions2.isShares)
-                            {
-                                Cell c = tab.Get(i, j);
-                                c.number = tab.Get(i, j).number / (-value) * 100d;
-                                c.numberFormat = formatSShares;
+                                if (j == 2)
+                                {
+                                    Cell c = tab.Get(i, j);
+                                    c.number = -value;
+                                }
+                                if (decompOptions2.isShares)
+                                {
+                                    Cell c = tab.Get(i, j);
+                                    c.number = tab.Get(i, j).number / (-value) * 100d;
+                                    c.numberFormat = formatSShares;
+                                }
                             }
                         }
                     }
@@ -4728,7 +4778,7 @@ namespace Gekko
                     //shares calculation.
                     //Should the values change sign? Sign is probably pretty arbitray, and
                     //the cells sum up to zero (?)
-                }
+                }                
             }
         }
 
@@ -4985,7 +5035,7 @@ namespace Gekko
             string rv = null;
             if (domain == null || domain == "*")
             {
-                rv = "#*";
+                rv = Globals.decompUniversal;
             }
             else
             {

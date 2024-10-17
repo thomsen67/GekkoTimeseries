@@ -56,6 +56,8 @@ namespace Gekko
         //public const string internalDim2Identifyer = "gekkodim2__";
         //public const string internalDim3Identifyer = "gekkodim3__";
         public const string decompDimension = " dim ";
+        public const string decompDimension2 = "dims";
+        public const string decompUniversal = "#universal";
         public const string decompFirst = "00000000";  //special name that always ends up first in a pivot row or col label (chosen because it ends up at top when sorted)
         //
         public const string col_variable = "vars";

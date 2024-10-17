@@ -433,7 +433,10 @@ namespace Gekko
 
             foreach (string s in this.decompFind.decompOptions2.all)
             {
-                if (s == "lhs") continue;
+                if (s == Globals.col_lhs) continue;
+                if (s.StartsWith(Globals.decompDimension)) continue;
+                if (s.StartsWith(Globals.decompDimension2)) continue;
+
                 bool isFilter = false;
                 foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
                 {
@@ -444,10 +447,12 @@ namespace Gekko
                     }
                 }
 
+                //Sorting from 1-7
                 string s2 = s;
-                if (s == "vars") s2 = "1?" + s;
-                else if (s == "lags") s2 = "2?" + s;
-                else if (s == "time") s2 = "3?" + s;
+                if (s == Globals.col_variable) s2 = "1?" + s;
+                else if (s == Globals.col_lag) s2 = "2?" + s;
+                else if (s == Globals.col_t) s2 = "3?" + s;
+                else if (s == Globals.decompUniversal) s2 = "7?" + s;
                 else if (s.StartsWith("#")) s2 = "4?" + s;
                 else if (s.Contains(Globals.decompDimension)) s2 = "5?" + s;
                 else s2 = "6?" + s;
