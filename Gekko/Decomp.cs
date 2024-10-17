@@ -3374,37 +3374,60 @@ namespace Gekko
             //table.PrintCellsForDebug();
 
             DecompOutput decompOutput = null;
-
-            bool ok = true;
-
-            if (rowsCols == ERowsCols.Rows)
-            {
-                for (int j = 2; j <= table.GetColMaxNumber(); j++)
-                {
-                    if (table.Get(2, j) == null) { ok = false; break; }
-                }
-            }
-
-            if (rowsCols == ERowsCols.Cols)
+            if (true)
             {
                 for (int i = 2; i <= table.GetRowMaxNumber(); i++)
                 {
-                    if (table.Get(i, 2) == null) { ok = false; break; }
+                    for (int j = 2; j <= table.GetColMaxNumber(); j++)
+                    {
+                        if (table.Get(i, j) == null)
+                        {
+                            Cell c = new Cell();
+                            c.cellType = CellType.Number;
+                            c.number = 0d;
+                            c.value_hack = 0d;
+                            table.Set(new Coord(i, j), c);
+                        }
+                    }
                 }
-            }
-
-            if (ok)
-            {
                 DecompTableHandleSignAndShares(table, decompOptions2);
                 decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
                 decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
             }
             else
             {
-                //In case something goes wrong in GUI. Delete after some time.
-                MessageBox.Show("Cannot normalize (change sign from negative to positive) the selected variable");
-                decompOutput = new DecompOutput(table, null, null);
-                decompOutput.rowsOrColsSumUp = new Tuple<bool, bool>(false, false);
+
+                bool ok = true;
+
+                if (rowsCols == ERowsCols.Rows)
+                {
+                    for (int j = 2; j <= table.GetColMaxNumber(); j++)
+                    {
+                        if (table.Get(2, j) == null) { ok = false; break; }
+                    }
+                }
+
+                if (rowsCols == ERowsCols.Cols)
+                {
+                    for (int i = 2; i <= table.GetRowMaxNumber(); i++)
+                    {
+                        if (table.Get(i, 2) == null) { ok = false; break; }
+                    }
+                }
+
+                if (ok)
+                {
+                    DecompTableHandleSignAndShares(table, decompOptions2);
+                    decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
+                    decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
+                }
+                else
+                {
+                    //In case something goes wrong in GUI. Delete after some time.
+                    MessageBox.Show("Cannot normalize (change sign from negative to positive) the selected variable");
+                    decompOutput = new DecompOutput(table, null, null);
+                    decompOutput.rowsOrColsSumUp = new Tuple<bool, bool>(false, false);
+                }
             }
             return decompOutput;
         }
