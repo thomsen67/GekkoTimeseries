@@ -368,7 +368,7 @@ namespace Gekko
         private static gdxOpenWrite_t dll_gdxOpenWrite;
         private static int d_gdxOpenWrite(IntPtr pgdx, string FileName, string Producer, ref int ErrNr)
         {
-            if (Globals.graneFix)
+            if (Globals.gdxReaderDebug)
             {
                 new Writeln("Grane9 --> gdxOpenWrite could not be loaded");
             }
@@ -2575,7 +2575,7 @@ namespace Gekko
 
         public int gdxOpenWrite(string FileName, string Producer, ref int ErrNr)
         {
-            if (Globals.graneFix)
+            if (Globals.gdxReaderDebug)
             {
                 new Writeln("Grane2 --> FileName = " + FileName);
                 new Writeln("Grane3 --> Producer = " + Producer);

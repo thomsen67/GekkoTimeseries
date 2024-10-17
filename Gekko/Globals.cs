@@ -38,17 +38,63 @@ namespace Gekko
 
     public class Globals
     {
-        public static bool graneFix = false;
-        
-        public static bool stars = true; //#8ujklasdfas        
-
         public const string smpl = "§¤£";  //this line must be at top
-        public const string libraryDriveCheatString = "library___name___";
-        public static bool HANDLE_LIBRARY = false;
+        
+        public static bool gdxReaderDebug = false;        
+        public const string libraryDriveCheatString = "library___name___";        
         public const string tempFileStart = "tempfile";
         public const string tempFileEnd = ".tmp";
         public const string zip = ".zip";
 
+        // =======================================================
+        // ============ DATAFRAME STUFF START ====================
+        // =======================================================
+        public const string decompFirst = "00000000";  //special name that always ends up first in a pivot row or col label (chosen because it ends up at top when sorted)
+        //
+        public const string col_variable = Globals.internalColumnIdentifyer + "vars";
+        public const string col_lag = Globals.internalColumnIdentifyer + "lags";
+        public const string col_t = internalColumnIdentifyer + "time";
+        public const string col_universe = Globals.internalColumnIdentifyer + "universal";
+        public const string col_lhs = Globals.internalColumnIdentifyer + "lhs";
+        public const string col_expand = Globals.internalColumnIdentifyer + "expand";
+        public const string col_value = Globals.internalColumnIdentifyer + "value";
+        public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
+        public const string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
+        public const string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
+        public const string col_valueLevelLag2 = Globals.internalColumnIdentifyer + "valueLevelLag2";
+        public const string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
+        public const string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
+        public const string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
+        public const string col_equ = Globals.internalColumnIdentifyer + "equ";
+        public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
+        public const string col_prime = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.         
+        public const string col_firstValueLevelLag = Globals.internalColumnIdentifyer + "firstValueLevelLag";
+        public const string col_firstValueLevelLag2 = Globals.internalColumnIdentifyer + "firstValueLevelLag2";
+        public const string col_firstValueLevelRef = Globals.internalColumnIdentifyer + "firstValueLevelRef";
+        public const string col_firstValueLevelRefLag = Globals.internalColumnIdentifyer + "firstValueLevelRefLag";
+        public const string col_firstValueLevelRefLag2 = Globals.internalColumnIdentifyer + "firstValueLevelRefLag2";
+        // The following are hardcoded because it is known how many of them there is.
+        public const int d = 0;
+        public const int dAlternative = 1;
+        public const int dLevel = 2;
+        public const int dLevelLag = 3;
+        public const int dLevelLag2 = 4;
+        public const int dLevelRef = 5;
+        public const int dLevelRefLag = 6;
+        public const int dLevelRefLag2 = 7;
+        public const int dNames = 8;
+        public const int dPrimeShare = 9;
+        public const int dFirstLevelLag = 10;
+        public const int dFirstLevelLag2 = 11;
+        public const int dFirstLevelRef = 12;
+        public const int dFirstLevelRefLag = 13;
+        public const int dFirstLevelRefLag2 = 14;
+
+        // =======================================================
+        // ============ DATAFRAME STUFF END ======================
+        // =======================================================
+
+        //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;
         public static bool traceWalkAllCombinations = false;  //only activated for unit testing, counting all combinations.
         public static double traceTime = double.NaN;
@@ -104,27 +150,8 @@ namespace Gekko
         public const string decompIgnoreText2 = "), cf. the 'Ignore' option.";
         public const string decompResidualText1 = "Data residual in equation";
         public const string decompResidualText2 = " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
-        // -----
-        // The following are hardcoded because it is known how many of them there is.
-        public const int d = 0;        
-        public const int dAlternative = 1;
-        public const int dLevel = 2;
-        public const int dLevelLag = 3;
-        public const int dLevelLag2 = 4;
-        public const int dLevelRef = 5;
-        public const int dLevelRefLag = 6;
-        public const int dLevelRefLag2 = 7;
-        public const int dNames = 8;
-        public const int dPrimeShare = 9;
-        public const int dFirstLevelLag = 10;
-        public const int dFirstLevelLag2 = 11;
-        public const int dFirstLevelRef = 12;
-        public const int dFirstLevelRefLag = 13;
-        public const int dFirstLevelRefLag2 = 14;
-        // -----
         public const double redNaN = 1000000d;
-        public const string decompFirst = "00000000";
-
+                
         public const bool fixForGekko4_0 = false;
 
         public const string cacheExtension = ".cache";  //used for libraries and databanks (models have .mdl)
@@ -215,31 +242,7 @@ namespace Gekko
         public static string windowDecompStatusBarText_gekko2 = "Ctrl+click to find equation(s)."; //Gekko model
         public static string windowDecompStatusBarText_gams = "Click to find equation(s)."; //Gams model
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel.";
-        public const string decompGekkoEquationPrefix = "e_";
-
-        public const string col_variable = Globals.internalColumnIdentifyer + "vars";
-        public const string col_lag = Globals.internalColumnIdentifyer + "lags";
-        public const string col_t = internalColumnIdentifyer + "time";
-        public const string col_universe = Globals.internalColumnIdentifyer + "universal";
-        public const string col_lhs = Globals.internalColumnIdentifyer + "lhs";
-        public const string col_expand = Globals.internalColumnIdentifyer + "expand";
-        public const string col_value = Globals.internalColumnIdentifyer + "value";
-        public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
-        public const string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
-        public const string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
-        public const string col_valueLevelLag2 = Globals.internalColumnIdentifyer + "valueLevelLag2";
-        public const string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
-        public const string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
-        public const string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
-        public const string col_equ = Globals.internalColumnIdentifyer + "equ";
-        public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
-        public const string col_prime = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.
-        // -----        
-        public const string col_firstValueLevelLag = Globals.internalColumnIdentifyer + "firstValueLevelLag";
-        public const string col_firstValueLevelLag2 = Globals.internalColumnIdentifyer + "firstValueLevelLag2";
-        public const string col_firstValueLevelRef = Globals.internalColumnIdentifyer + "firstValueLevelRef";
-        public const string col_firstValueLevelRefLag = Globals.internalColumnIdentifyer + "firstValueLevelRefLag";
-        public const string col_firstValueLevelRefLag2 = Globals.internalColumnIdentifyer + "firstValueLevelRefLag2";
+        public const string decompGekkoEquationPrefix = "e_";        
 
         // ----------------------------------------------------------------
         // GRADIENT

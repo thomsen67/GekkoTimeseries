@@ -3925,7 +3925,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    if (Globals.graneFix)
+                    if (Globals.gdxReaderDebug)
                     {
                         new Writeln("Grane1 --> pathAndFilename = " + pathAndFilename);
                     }
