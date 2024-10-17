@@ -277,16 +277,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <returns></returns>
         public static string HandleInternalIdentifyer1(string s)
-        {
-            s = s.Replace(Globals.internalColumnIdentifyer, "");
-            s = s.Replace(Globals.internalSetIdentifyer, "#");
-            if (s.Contains(Globals.internalDimIdentifyer))
-            {
-                //gekkokdim_x¤1 --> x dim 1
-                string s2 = s.Replace(Globals.internalDimIdentifyer, "");
-                string[] ss = s2.Split('¤');
-                s = ss[0] + Globals.decompDimension + ss[1];
-            }            
+        {            
             return s;
         }
 
@@ -296,14 +287,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <returns></returns>
         public static string HandleInternalIdentifyer2(string s)
-        {
-            if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
-            else if (s.Contains(Globals.decompDimension))
-            {
-                string[] ss = s.Split(new string[] { Globals.decompDimension }, StringSplitOptions.None);
-                s = Globals.internalDimIdentifyer + ss[0] + "¤" + ss[1];
-            }
-            else s = Globals.internalColumnIdentifyer + s;
+        {            
             return s;
         }
 

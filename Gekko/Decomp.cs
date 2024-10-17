@@ -3257,7 +3257,7 @@ namespace Gekko
                     //SLACK SLACK SLACK
                     //SLACK SLACK SLACK
                     int iAge = -12345;
-                    if (dataframeRow.parent.frameDimensionNames.TryGetValue(Globals.internalSetIdentifyer + "a_", out iAge)) //#a_
+                    if (dataframeRow.parent.frameDimensionNames.TryGetValue("a_", out iAge)) //#a_
                     {
                         if (i == iAge)
                         {
@@ -4053,16 +4053,16 @@ namespace Gekko
                     int dims = 0;
                     if (chop.indexes != null) dims = chop.indexes.Length;
                     //gekkodims = 2
-                    frameRow.AddDimension(frame, Globals.internalDimsIdentifyer, new CellLight(dims));
+                    frameRow.AddDimension(frame, "dims", new CellLight(dims));
                     if (dims > 0)
                     {                        
                         for (int ii = 0; ii < chop.indexes.Length; ii++)
                         {
                             string index = chop.indexes[ii];
                             //gekkodim__x1¤1 = "a", variable specific
-                            frameRow.AddDimension(frame, Globals.internalDimIdentifyer + chop.varName + "¤" + (ii + 1), new CellLight(index));
+                            frameRow.AddDimension(frame, chop.varName + Globals.decompDimension + (ii + 1), new CellLight(index));
                             //gekkodim2__1 = "a", common for all variables
-                            frameRow.AddDimension(frame, Globals.internalDim2Identifyer +  (ii + 1), new CellLight(index));
+                            frameRow.AddDimension(frame, Globals.decompDimension + (ii + 1), new CellLight(index));
 
                             if (chop.domains != null)
                             {
@@ -4070,7 +4070,7 @@ namespace Gekko
                                 string domain = chop.domains[ii];  //has corresponding dimensions                              
                                 if (domain == null || domain == "*")
                                 {
-                                    frameRow.AddDimension(frame, Globals.col_universe, new CellLight(index));
+                                    frameRow.AddDimension(frame, "#*", new CellLight(index));
                                     //frameRow.AddDimension(frame, Globals.internalDim3Identifyer, new CellLight(ii + 1));
                                 }
                                 else 
@@ -4202,7 +4202,7 @@ namespace Gekko
             if (indexes != null)
             {
                 domains = new string[indexes.Length];
-                for (int i = 0; i < domains.Length; i++) domains[i] = "*";                
+                for (int i = 0; i < domains.Length; i++) domains[i] = "#*";                
             }
             if (domains != null)
             {
@@ -4216,7 +4216,7 @@ namespace Gekko
                     {
                         for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
                         {
-                            domains[ii] = ConvertSetname(ts.mmi.parent.meta.domains[ii], Globals.internalSetIdentifyer, Globals.col_universe);
+                            domains[ii] = ConvertSetname(ts.mmi.parent.meta.domains[ii]);
                         }
                     }
                 }
@@ -4963,15 +4963,7 @@ namespace Gekko
         /// <param name="col_equ"></param>
         public static void DecomposeReplaceVars(List<string> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
-            for (int i = 0; i < vars.Count; i++)
-            {
-                if (G.Equal(vars[i], "time")) vars[i] = col_t;
-                if (G.Equal(vars[i], "vars")) vars[i] = col_variable;
-                if (G.Equal(vars[i], "lags")) vars[i] = col_lag;
-                if (G.Equal(vars[i], "#universe")) vars[i] = col_universe;
-                if (G.Equal(vars[i], "equ")) vars[i] = col_equ;
-                if (vars[i].StartsWith("#")) vars[i] = Globals.internalSetIdentifyer + vars[i].Substring(1);
-            }
+            //Do nothing
         }
 
         /// <summary>
@@ -4985,27 +4977,19 @@ namespace Gekko
         /// <param name="col_equ"></param>
         public static void DecomposeReplaceVars(List<FrameFilter> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
-            for (int i = 0; i < vars.Count; i++)
-            {
-                if (G.Equal(vars[i].name, "time")) vars[i].name = col_t;
-                if (G.Equal(vars[i].name, "vars")) vars[i].name = col_variable;
-                if (G.Equal(vars[i].name, "lags")) vars[i].name = col_lag;
-                if (G.Equal(vars[i].name, "#universe")) vars[i].name = col_universe;
-                if (G.Equal(vars[i].name, "equ")) vars[i].name = col_equ;
-                if (vars[i].name.StartsWith("#")) vars[i].name = Globals.internalSetIdentifyer + vars[i].name.Substring(1);
-            }
+            //Do nothing
         }
 
-        public static string ConvertSetname(string domain, string internalSetIdentifyer, string col_universe)
+        public static string ConvertSetname(string domain)
         {
             string rv = null;
             if (domain == null || domain == "*")
             {
-                rv = col_universe;
+                rv = "#*";
             }
             else
             {
-                rv = internalSetIdentifyer + domain.Replace("#", "");
+                rv = domain;
             }
             return rv;
         }

@@ -49,37 +49,37 @@ namespace Gekko
         // =======================================================
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
-        public const string internalColumnIdentifyer = "gekkopivot__";
-        public const string internalSetIdentifyer = "gekkoset__";
-        public const string internalDimIdentifyer = "gekkodim__";
-        public const string internalDimsIdentifyer = "gekkodims__";
-        public const string internalDim2Identifyer = "gekkodim2__";
-        public const string internalDim3Identifyer = "gekkodim3__";
+        //public const string internalColumnIdentifyer = "gekkopivot__";
+        //public const string internalSetIdentifyer = "gekkoset__";
+        //public const string internalDimIdentifyer = "gekkodim__";
+        //public const string internalDimsIdentifyer = "gekkodims__";
+        //public const string internalDim2Identifyer = "gekkodim2__";
+        //public const string internalDim3Identifyer = "gekkodim3__";
         public const string decompDimension = " dim ";
         public const string decompFirst = "00000000";  //special name that always ends up first in a pivot row or col label (chosen because it ends up at top when sorted)
         //
-        public const string col_variable = Globals.internalColumnIdentifyer + "vars";
-        public const string col_lag = Globals.internalColumnIdentifyer + "lags";
-        public const string col_t = internalColumnIdentifyer + "time";
-        public const string col_universe = Globals.internalColumnIdentifyer + "universal";
-        public const string col_lhs = Globals.internalColumnIdentifyer + "lhs";
-        public const string col_expand = Globals.internalColumnIdentifyer + "expand";
-        public const string col_value = Globals.internalColumnIdentifyer + "value";
-        public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
-        public const string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
-        public const string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
-        public const string col_valueLevelLag2 = Globals.internalColumnIdentifyer + "valueLevelLag2";
-        public const string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
-        public const string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
-        public const string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
-        public const string col_equ = Globals.internalColumnIdentifyer + "equ";
-        public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
-        public const string col_prime = Globals.internalColumnIdentifyer + "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.         
-        public const string col_firstValueLevelLag = Globals.internalColumnIdentifyer + "firstValueLevelLag";
-        public const string col_firstValueLevelLag2 = Globals.internalColumnIdentifyer + "firstValueLevelLag2";
-        public const string col_firstValueLevelRef = Globals.internalColumnIdentifyer + "firstValueLevelRef";
-        public const string col_firstValueLevelRefLag = Globals.internalColumnIdentifyer + "firstValueLevelRefLag";
-        public const string col_firstValueLevelRefLag2 = Globals.internalColumnIdentifyer + "firstValueLevelRefLag2";
+        public const string col_variable = "vars";
+        public const string col_lag = "lags";
+        public const string col_t = "time";
+        public const string col_universe = "universal";
+        public const string col_lhs = "lhs";
+        public const string col_expand = "expand";
+        public const string col_value = "value";
+        public const string col_valueAlternative = "valueAlternative";
+        public const string col_valueLevel = "valueLevel";
+        public const string col_valueLevelLag = "valueLevelLag";
+        public const string col_valueLevelLag2 = "valueLevelLag2";
+        public const string col_valueLevelRef = "valueLevelRef";
+        public const string col_valueLevelRefLag = "valueLevelRefLag";
+        public const string col_valueLevelRefLag2 = "valueLevelRefLag2";
+        public const string col_equ = "equ";
+        public const string col_fullVariableName = "fullVariableName";
+        public const string col_prime = "primes"; //used to see if elements should sum up --> will sum up to a prime like 103 if yes, else is not integer.         
+        public const string col_firstValueLevelLag = "firstValueLevelLag";
+        public const string col_firstValueLevelLag2 = "firstValueLevelLag2";
+        public const string col_firstValueLevelRef = "firstValueLevelRef";
+        public const string col_firstValueLevelRefLag = "firstValueLevelRefLag";
+        public const string col_firstValueLevelRefLag2 = "firstValueLevelRefLag2";
         // The following are hardcoded because it is known how many of them there is.
         public const int d = 0;
         public const int dAlternative = 1;

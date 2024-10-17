@@ -594,11 +594,7 @@ namespace Gekko
             frame.AddColName(Globals.col_lag);
             frame.AddColName(Globals.col_universe);
             frame.AddColName(Globals.col_equ);
-            frame.AddColName(Globals.col_fullVariableName);
-            if (decompOptions2.ageHierarchy)
-            {
-                frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
-            }
+            frame.AddColName(Globals.col_fullVariableName);            
 
             //adding frame rows, while also getting sets defined as frame columns
 
@@ -679,7 +675,7 @@ namespace Gekko
                                 {
                                     for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
                                     {
-                                        domains[ii] = Decomp.ConvertSetname(ts.mmi.parent.meta.domains[ii], Globals.internalSetIdentifyer, Globals.col_universe);
+                                        domains[ii] = Decomp.ConvertSetname(ts.mmi.parent.meta.domains[ii]);
                                     }
                                 }
                             }
@@ -848,24 +844,7 @@ namespace Gekko
                         frame.frameRows.Add(dr);
                     }
                 }
-            }
-
-            if (decompOptions2.ageHierarchy && FrameLightRow.HasColumn(frame, Globals.internalSetIdentifyer + "a"))
-            {
-                foreach (FrameLightRow row in frame.frameRows)
-                {
-                    CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
-                    string s = c.text;
-                    int i = -12345;
-                    string s2 = Globals.decompNull;  //hmmm used at all?
-                    if (int.TryParse(s, out i))
-                    {
-                        s2 = G.GroupBy10(i);
-                    }
-                    //set a new column with aggregated ages
-                    row.Set(frame, Globals.internalSetIdentifyer + Globals.ageHierarchyName, new CellLight(s2));
-                }
-            }
+            }            
 
             return frame;
         }
