@@ -146,29 +146,79 @@ namespace Gekko
         {        
             string rowKey = null;
             string s = null;
-            foreach (int ii in selectedIndexes)
+            string nameWithStars = null;
+
+            if (false)
             {
-                string groupName = group(row, ii);
-                if (groupName == null) groupName = "<null>";
-                if (ii == lhsFrameCol)
+                //TODO: try-catch etc. What if variable is not selected?
+                //What about group()??
+                string variableName = row.GetDimension(row.parent, Globals.col_variable).text;
+                //TODO: have cols that share dimensions.
+                List<int> shownDimensions = GetShownDimensions(row, variableName, selectedIndexes);
+                int dims = 2;  //TODO: This must be a col in dataframe keys
+                string prettyName = variableName;
+                if (dims > 0) prettyName += "[";
+                for (int dim = 1; dim <= dims; dim++)
                 {
-                    if (groupName == Globals.pivotHelper2New)
+                    if (dim > 1) prettyName += ", ";
+                    string dimensionValue = "a"; //TODO: make this, 
+
+                }
+                if (dims > 0) prettyName += "]";
+            }
+            else
+            {
+                foreach (int i in selectedIndexes)
+                {
+                    string groupName = group(row, i);
+                    if (groupName == null) groupName = "<null>";
+                    if (i == lhsFrameCol)
                     {
-                        s = groupName + s;  //from "x | a" to "00000000 x | a".
+                        if (groupName == Globals.pivotHelper2New)
+                        {
+                            s = groupName + s;  //from "x | a" to "00000000 x | a".
+                        }
+                        else
+                        {
+                            //ignore that groupName
+                        }
                     }
                     else
                     {
-                        //ignore that groupName
+                        s += groupName + Globals.pivotTableDelimiter;
                     }
-                }
-                else 
-                {
-                    s += groupName + Globals.pivotTableDelimiter;
                 }
             }
             if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
             else rowKey = "<null>";
             return rowKey;
+        }
+
+        /// <summary>
+        /// For a dataframe row, a variable name and the selected columns, the method returns the dimensions of the variable 
+        /// that are selected ("active"), so the others can be shown as "*". Note: the returned list is 1-based.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="variableName"></param>
+        /// <param name="selectedIndexes"></param>
+        /// <returns></returns>
+        private static List<int> GetShownDimensions(FrameLightRow row, string variableName, List<int> selectedIndexes)
+        {
+            List<int> chosenDim = new List<int>();            
+            foreach (KeyValuePair<string, int> kvp in row.parent.frameDimensionNames)
+            {
+                string colName = kvp.Key;
+                int colI = kvp.Value;
+                if (G.StartsWith(colName, variableName))  //x¤1 for x dim 1
+                {
+                    if (selectedIndexes.Contains(colI))
+                    {
+                        int variableDim = int.Parse(colName.Split('¤')[1]);
+                        chosenDim.Add(variableDim);
+                    }
+                }
+            }
+            return chosenDim;
         }
 
         public static void CreatePivotTable2()
@@ -3319,8 +3369,7 @@ namespace Gekko
             List<string> rownames, colnames, rownamesWithResiduals, colnamesWithResiduals;
             DecompOrderRowAndColNames(rownames2, colnames2, decompOptions2.showErrors, out rownames, out colnames, out rownamesWithResiduals, out colnamesWithResiduals);
             Table table = DecompGetTableFromPivot(pivotTable, op, decompOptions2, format2, rownames, colnames);                        
-            Tuple<bool, bool> decompRowsOrColsPrimeBased = DecompRowsOrColsPrimeBased(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);
-            //decompOptions2.rowsOrColsPrimes = decompRowsOrColsPrimeBased;
+            Tuple<bool, bool> decompRowsOrColsPrimeBased = DecompRowsOrColsPrimeBased(rownamesWithResiduals, colnamesWithResiduals, pivotTable, table, decompOptions2, op, format2);            
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
             //table.PrintCellsForDebug();
             DecompTableHandleSignAndShares(table, decompOptions2);
@@ -3904,10 +3953,9 @@ namespace Gekko
                     }
                     else
                     {
-                        //MAybe turn this off for x-type...
+                        //Maybe turn this off for x-type...
                         //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
-                        //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
-
+                        
                         string fullNameRef = G.Chop_SetBank(chop.fullName, "Ref");
 
                         if (op.isRaw)
@@ -4003,10 +4051,17 @@ namespace Gekko
                             }
                         }
                     }
+                    
                     if (chop.isLhs)
                     {
-                        frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));
+                        frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper2New));                        
                     }
+                    
+                    if (decompOptions2.expand)
+                    {
+                        frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper3New));
+                    }
+
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
                     frameRow.AddValue(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
                     frameRow.AddValue(frame, Globals.col_valueLevel, new CellLight(dLevel));

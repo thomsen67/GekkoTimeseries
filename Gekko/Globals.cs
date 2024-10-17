@@ -94,6 +94,7 @@ namespace Gekko
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
         public const string pivotHelper2New = "00000000 ";  //first when sorted
+        public const string pivotHelper3New = "{expand} ";
 
         public const int startPrime = 1013;  //next is 1019.
                     
@@ -221,6 +222,7 @@ namespace Gekko
         public const string col_t = internalColumnIdentifyer + "time";
         public const string col_universe = Globals.internalColumnIdentifyer + "universal";
         public const string col_lhs = Globals.internalColumnIdentifyer + "lhs";
+        public const string col_expand = Globals.internalColumnIdentifyer + "expand";
         public const string col_value = Globals.internalColumnIdentifyer + "value";
         public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
         public const string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
