@@ -3230,7 +3230,7 @@ namespace Gekko
         //[ProtoMember(14)] reserved for .traceId when it arrives!!!
 
         [ProtoMember(7)]
-        public string[] domains = null;
+        public string[] domains = null;  //has same dimensions as indexes, unspecified is set to "*", so for instance ["#i", "*", "#j"] for a 3d variable.
 
         [ProtoMember(8)]
         public EFixedType fix = EFixedType.None; //for an array-superseries, if this type is .Parameter, the corresponding GDX variable is "parameter". If not, the corresponding GDX variable is "variable". So this field is also used to store information on GAMS/GDX types.

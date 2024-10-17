@@ -4036,21 +4036,54 @@ namespace Gekko
                     frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.varName));
                     frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.lag));
 
-                    if (chop.indexes != null)
-                    {
+                    //Clean this up sometime, so we do not have gekkodim_x1&1 for a dimension, but just gekkodim_1, and
+                    //all the vars share this gekkodim_1. Problem is the pivot selector, etc.
+                    //Maybe have fixed positions for variable, lags, time, lhs, etc., and then a integer column with n "dims",
+                    //follwed by the n dimension values, then a integer column withm  "sets", followed by the m set values, 
+                    //then followed m integers showing which dimension number the set is for.
+                    //All these could have almost-fixed positions, given then "dims" and "sets" integers.
+                    //For now we use names (dictionary lookup), and gekkodim_x1&1 is essentially superfluous because
+                    //it could be calculated from the cols following "dims".
+                    //
+
+                    //     dims     x1-dim-1     x1-dim-2     dim-1     dim-2      #i     #j     #i     #j
+                    //     3        a            m            a         m          a      m      1      2
+                    //
+
+                    int dims = 0;
+                    if (chop.indexes != null) dims = chop.indexes.Length;
+                    //gekkodims = 2
+                    frameRow.AddDimension(frame, Globals.internalDimsIdentifyer, new CellLight(dims));
+                    if (dims > 0)
+                    {                        
                         for (int ii = 0; ii < chop.indexes.Length; ii++)
                         {
                             string index = chop.indexes[ii];
+                            //gekkodim__x1¤1 = "a", variable specific
                             frameRow.AddDimension(frame, Globals.internalDimIdentifyer + chop.varName + "¤" + (ii + 1), new CellLight(index));
+                            //gekkodim2__1 = "a", common for all variables
+                            frameRow.AddDimension(frame, Globals.internalDim2Identifyer +  (ii + 1), new CellLight(index));
 
                             if (chop.domains != null)
                             {
-                                string domain = chop.domains[ii];
-                                if (domain != null) frameRow.AddDimension(frame, domain, new CellLight(index));
-                                else frameRow.AddDimension(frame, Globals.col_universe, new CellLight(index));
+                                //gekkoset__i = "a"
+                                string domain = chop.domains[ii];  //has corresponding dimensions                              
+                                if (domain == null || domain == "*")
+                                {
+                                    frameRow.AddDimension(frame, Globals.col_universe, new CellLight(index));
+                                    //frameRow.AddDimension(frame, Globals.internalDim3Identifyer, new CellLight(ii + 1));
+                                }
+                                else 
+                                {
+                                    frameRow.AddDimension(frame, domain, new CellLight(index));
+                                }
+
+                                //gekkodim3__ = 1
+                                
+
                             }
-                        }
-                    }
+                        }                        
+                    }                    
                     
                     if (chop.isLhs)
                     {
@@ -4157,10 +4190,20 @@ namespace Gekko
             return dd;
         }
 
+        /// <summary>
+        /// Gets domain names like ["#i", "*", "#j]
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <param name="indexes"></param>
+        /// <returns></returns>
         private static string[] DecompPivotGetDomains(string fullName, string[] indexes)
         {
             string[] domains = null;
-            if (indexes != null) domains = new string[indexes.Length];
+            if (indexes != null)
+            {
+                domains = new string[indexes.Length];
+                for (int i = 0; i < domains.Length; i++) domains[i] = "*";                
+            }
             if (domains != null)
             {
                 //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
@@ -4177,7 +4220,6 @@ namespace Gekko
                         }
                     }
                 }
-
             }
 
             return domains;

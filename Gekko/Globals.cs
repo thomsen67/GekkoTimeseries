@@ -49,6 +49,13 @@ namespace Gekko
         // =======================================================
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
+        public const string internalColumnIdentifyer = "gekkopivot__";
+        public const string internalSetIdentifyer = "gekkoset__";
+        public const string internalDimIdentifyer = "gekkodim__";
+        public const string internalDimsIdentifyer = "gekkodims__";
+        public const string internalDim2Identifyer = "gekkodim2__";
+        public const string internalDim3Identifyer = "gekkodim3__";
+        public const string decompDimension = " dim ";
         public const string decompFirst = "00000000";  //special name that always ends up first in a pivot row or col label (chosen because it ends up at top when sorted)
         //
         public const string col_variable = Globals.internalColumnIdentifyer + "vars";
@@ -89,6 +96,13 @@ namespace Gekko
         public const int dFirstLevelRef = 12;
         public const int dFirstLevelRefLag = 13;
         public const int dFirstLevelRefLag2 = 14;
+
+        // Less important
+
+        public static string internalPivotRows = "Rows";
+        public static string internalPivotCols = "Cols";
+        public static string internalPivotFilters = "Filters";
+        public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
 
         // =======================================================
         // ============ DATAFRAME STUFF END ======================
@@ -227,16 +241,7 @@ namespace Gekko
         public static string excelDnaName = "Gekcel"; //probably unwise to delete this...
 
         //public static int decompWindowCounter = 0;
-
-        public const string internalColumnIdentifyer = "gekkopivot__";
-        public const string internalSetIdentifyer = "gekkoset__";
-        public const string internalDimIdentifyer = "gekkodim__";
-        public static string internalPivotRows = "Rows";
-        public static string internalPivotCols = "Cols";
-        public static string internalPivotFilters = "Filters";
-        public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
-        public const string decompDimension = " dim ";
-
+                
         public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
         public static string windowDecompStatusBarText_gekko = "Click to decompose variable, Ctrl+click to find equation(s)."; //Gekko model
         public static string windowDecompStatusBarText_gekko2 = "Ctrl+click to find equation(s)."; //Gekko model
