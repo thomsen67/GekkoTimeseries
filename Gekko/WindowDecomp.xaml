@@ -382,13 +382,21 @@
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
                 <CheckBox Name="checkBoxExpand" Margin="0,3,0,0" Content="Expand" ToolTip="Expand all elements (all data cells will get 'Count' = 1)" Checked="checkBoxExpand_Checked" Unchecked="checkBoxExpand_Unchecked" />
+                <Button Name ="buttonStyle"  Margin="8,-4,0,0" Width="50" Height="22" Opacity="0.7" Click="Style_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
                 <Button Content="Refresh" Margin="8,-4,0,0" Width="50" Height="22" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                </Button>                
+                </Button>
+                
             </StackPanel>
         </Grid>
 

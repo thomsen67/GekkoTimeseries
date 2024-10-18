@@ -49,12 +49,10 @@ namespace Gekko
         // =======================================================
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
-        //public const string internalColumnIdentifyer = "gekkopivot__";
-        //public const string internalSetIdentifyer = "gekkoset__";
-        //public const string internalDimIdentifyer = "gekkodim__";
-        //public const string internalDimsIdentifyer = "gekkodims__";
-        //public const string internalDim2Identifyer = "gekkodim2__";
-        //public const string internalDim3Identifyer = "gekkodim3__";
+
+        public static bool useGamsStyleNames = true;
+        public const string decompNull = "...";  //used to be "<null>"
+        public const char decompSetDimNumberChar = '¤';        
         public const string decompDimension = " dim ";
         public const string decompDimension2 = "dims";
         public const string decompUniversal = "#universal";
@@ -105,10 +103,26 @@ namespace Gekko
         public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
+                
+        public static string decompNullName = "________a";
+        public static string decompResidualName = "ZZZZZZZZ_residal";
+        public const string decompResidualName2 = "Residual";
+        public static string decompErrorName = "Error_78hsgds98dsfus";
+        public const string decompErrorName2 = "Error";
+        public static string decompIgnoreName = "Ignored_78hsgds98dsfus";
+        public const string decompIgnoreName2 = "Ignored";
+        public const bool decompFix = true;
+        public const bool decompFix2 = true;
+        public static List<double> redThresholds = new List<double>() { 0.05, 0.20, 0.35 }; //must be 3 of them
 
         // =======================================================
         // ============ DATAFRAME STUFF END ======================
         // =======================================================
+
+        public const string decompStyleA1 = "x | a | b";
+        public const string decompStyleB1 = "x[a, b]";        
+        public const string decompStyleA2 = "Change variable style from 'x[a, b, *][-1]' " + G.NL_ToolTip + " to 'x | a | b | --- | [-1]'.";
+        public const string decompStyleB2 = "Change variable style from 'x | a | b | --- | [-1]' " + G.NL_ToolTip + " to 'x[a, b, *][-1]'.";
 
         //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;
@@ -1053,18 +1067,7 @@ namespace Gekko
         public static Table lastPrtOrMulprtTable = null; 
         public static Table lastDecompTable = null;  //only used for unit tests
         public static bool showDecompTable = false;  //only used for unit tests
-        public const string decompNull = "<null>";
-        public static string decompNullName = "________a";        
-        public static string decompResidualName = "ZZZZZZZZ_residal";        
-        public const string decompResidualName2 = "Residual";
-        public static string decompErrorName = "Error_78hsgds98dsfus";
-        public const string decompErrorName2 = "Error";
-        public static string decompIgnoreName = "Ignored_78hsgds98dsfus";
-        public const string decompIgnoreName2 = "Ignored";
-        public const bool decompFix = true;
-        public const bool decompFix2 = true;
-        public static List<double> redThresholds = new List<double>() { 0.05, 0.20, 0.35 }; //must be 3 of them
-        
+                
         public static CommandMemory commandMemory = new CommandMemory();
 
         public const string number1 = "1";

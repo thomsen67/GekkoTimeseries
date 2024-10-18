@@ -144,7 +144,7 @@ namespace Gekko
         /// <returns></returns>
         private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol)
         {
-            bool useGamsStyleNames = false;
+            bool useGamsStyleNames = true;
 
             string rowKey = null;
             string s = null;
@@ -154,12 +154,13 @@ namespace Gekko
             int iVars = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_variable, out iVars);
             if (selectedIndexes.Contains(iVars)) hasVarsSelected = true;
 
-            if (useGamsStyleNames && hasVarsSelected)
+            if (Globals.useGamsStyleNames && hasVarsSelected)
             {
                 //TODO: try-catch etc. What if variable is not selected?
                 //What about group()??
                 //What about lags???
                 string variableName = row.GetDimension(row.parent, Globals.col_variable).text;
+                string lag = row.GetDimension(row.parent, Globals.col_lag).text;
                 //TODO: have cols that share dimensions.
                 List<int> shownDimensions = GetShownDimensions(row, variableName, selectedIndexes);
                 int dims = (int)row.GetDimension(row.parent, Globals.decompDimension2).data;
@@ -172,6 +173,7 @@ namespace Gekko
                     else prettyName += "*";
                 }
                 if (dims > 0) prettyName += "]";
+                if (lag != "[0]") prettyName += lag;
                 rowKey = prettyName;
             }
             else
@@ -179,7 +181,7 @@ namespace Gekko
                 foreach (int i in selectedIndexes)
                 {
                     string groupName = group(row, i);
-                    if (groupName == null) groupName = "<null>";
+                    if (groupName == null) groupName = Globals.decompNull;
                     if (i == lhsFrameCol)
                     {
                         if (groupName == Globals.pivotHelper2New)
@@ -197,7 +199,7 @@ namespace Gekko
                     }
                 }
                 if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
-                else rowKey = "<null>";
+                else rowKey = Globals.decompNull;
             }            
             return rowKey;
         }
@@ -226,7 +228,7 @@ namespace Gekko
                     }
                     else if (G.StartsWith(colName, "#"))
                     {
-                        int dimNumber = (int)row.GetDimension(row.parent, colName.Replace('#', '¤')).data;
+                        int dimNumber = (int)row.GetDimension(row.parent, colName.Replace('#', Globals.decompSetDimNumberChar)).data;
                         if (!chosenDims.Contains(dimNumber)) chosenDims.Add(dimNumber);                        
                     }
                 }
@@ -4132,12 +4134,12 @@ namespace Gekko
                                 if (domain == null || domain == "*")
                                 {
                                     frameRow.AddDimension(frame, Globals.decompUniversal, new CellLight(index));
-                                    frameRow.AddDimension(frame, Globals.decompUniversal.Replace('#', '¤'), new CellLight(ii + 1));
+                                    frameRow.AddDimension(frame, Globals.decompUniversal.Replace('#', Globals.decompSetDimNumberChar), new CellLight(ii + 1));
                                 }
                                 else 
                                 {
                                     frameRow.AddDimension(frame, domain, new CellLight(index));
-                                    frameRow.AddDimension(frame, domain.Replace('#', '¤'), new CellLight(ii + 1));
+                                    frameRow.AddDimension(frame, domain.Replace('#', Globals.decompSetDimNumberChar), new CellLight(ii + 1));
                                 }
                             }
                         }                        

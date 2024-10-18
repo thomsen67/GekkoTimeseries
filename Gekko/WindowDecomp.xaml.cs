@@ -436,6 +436,8 @@ namespace Gekko
                 if (s == Globals.col_lhs) continue;
                 if (s.StartsWith(Globals.decompDimension)) continue;
                 if (s.StartsWith(Globals.decompDimension2)) continue;
+                if (s.StartsWith(Globals.decompDimension2)) continue;
+                if (s.StartsWith(Globals.decompSetDimNumberChar.ToString())) continue;
 
                 bool isFilter = false;
                 foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
@@ -806,30 +808,19 @@ namespace Gekko
 
         public WindowDecomp(DecompFind df)
         {
-            //if (this.decompFind == null)
-            //{
-            //    this.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, this);
-            //}
-            //else
-            //{
-            //    this.decompFind.CreateChild(decompOptions2, EDecompFindNavigation.Decomp, this);
-            //}            
-
             this.decompFind = df;
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
 
             InitializeComponent();            
 
             this.textMerge.Visibility = Visibility.Collapsed;
-            //this.buttonMergeHide.Visibility = Visibility.Collapsed;
 
             txtNum.Text = _numValue.ToString();
             this.scrollViewerDecomp1.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
             this.scrollViewerDecomp2.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
 
             this.isInitializing = false;  //ready for clicking
-
-            //this.buttonMerge.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
+                        
             this.buttonMerge.Background = new SolidColorBrush(Globals.GekkoModeBlue);
                         
             if (this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp) == null) this.buttonMerge.Visibility = Visibility.Collapsed;
@@ -851,6 +842,9 @@ namespace Gekko
             this.splitterHorizontal.Width = new GridLength(Globals.guiDecompWindowSplitterHorizontal);
             this.splitterVertical.Height = new GridLength(Globals.guiDecompWindowSplitterVertical);
 
+            this.buttonStyle.Content = Globals.decompStyleA1;
+            this.buttonStyle.ToolTip = Globals.decompStyleA2;
+
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
 
             //this.KeyDown += new KeyEventHandler(Window_KeyDown); //new System.Windows.Forms.KeyEventHandler(this.radioButton1_KeyDown);
@@ -858,7 +852,7 @@ namespace Gekko
             this.decompFind.decompOptions2.guiDecompChangedCells.Clear();
             this.decompFind.decompOptions2.guiDecompIsSelecting = false;
             this.decompFind.decompOptions2.guiDecompIsSelectingAll = false;
-
+            
             if (true)
             {
                 var fd = new FlowDocument();
@@ -2964,6 +2958,31 @@ namespace Gekko
             {                
                 decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
                 RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
+        private void Style_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                Globals.useGamsStyleNames = !Globals.useGamsStyleNames;
+                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
+                RecalcCellsWithNewType(decompFind.model);
+
+                Button b = sender as Button;
+                if (b != null)
+                {
+                    if (Globals.useGamsStyleNames)
+                    {
+                        b.Content = Globals.decompStyleA1;
+                        b.ToolTip = Globals.decompStyleA2;
+                    }
+                    else
+                    {
+                        b.Content = Globals.decompStyleB1;
+                        b.ToolTip = Globals.decompStyleB2;
+                    }
+                }
             }
         }
     }
