@@ -143,28 +143,36 @@ namespace Gekko
         /// <param name="row"></param>
         /// <returns></returns>
         private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol)
-        {        
+        {
+            bool useGamsStyleNames = false;
+
             string rowKey = null;
             string s = null;
             string nameWithStars = null;
 
-            if (false)
+            bool hasVarsSelected = false;
+            int iVars = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_variable, out iVars);
+            if (selectedIndexes.Contains(iVars)) hasVarsSelected = true;
+
+            if (useGamsStyleNames && hasVarsSelected)
             {
                 //TODO: try-catch etc. What if variable is not selected?
                 //What about group()??
+                //What about lags???
                 string variableName = row.GetDimension(row.parent, Globals.col_variable).text;
                 //TODO: have cols that share dimensions.
                 List<int> shownDimensions = GetShownDimensions(row, variableName, selectedIndexes);
-                int dims = 2;  //TODO: This must be a col in dataframe keys
+                int dims = (int)row.GetDimension(row.parent, Globals.decompDimension2).data;
                 string prettyName = variableName;
                 if (dims > 0) prettyName += "[";
                 for (int dim = 1; dim <= dims; dim++)
                 {
                     if (dim > 1) prettyName += ", ";
-                    string dimensionValue = "a"; //TODO: make this, 
-
+                    if (shownDimensions.Contains(dim)) prettyName += row.GetDimension(row.parent, variableName + Globals.decompDimension + dim).text;
+                    else prettyName += "*";
                 }
                 if (dims > 0) prettyName += "]";
+                rowKey = prettyName;
             }
             else
             {
@@ -188,9 +196,9 @@ namespace Gekko
                         s += groupName + Globals.pivotTableDelimiter;
                     }
                 }
-            }
-            if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
-            else rowKey = "<null>";
+                if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
+                else rowKey = "<null>";
+            }            
             return rowKey;
         }
 
@@ -204,21 +212,26 @@ namespace Gekko
         /// <returns></returns>
         private static List<int> GetShownDimensions(FrameLightRow row, string variableName, List<int> selectedIndexes)
         {
-            List<int> chosenDim = new List<int>();            
+            List<int> chosenDims = new List<int>();            
             foreach (KeyValuePair<string, int> kvp in row.parent.frameDimensionNames)
             {
                 string colName = kvp.Key;
                 int colI = kvp.Value;
-                if (G.StartsWith(colName, variableName))  //x¤1 for x dim 1
+                if (selectedIndexes.Contains(colI))
                 {
-                    if (selectedIndexes.Contains(colI))
+                    if (G.StartsWith(colName, variableName))  //"x1 dim 1" starts with x1
                     {
-                        int variableDim = int.Parse(colName.Split('¤')[1]);
-                        chosenDim.Add(variableDim);
+                        int variableDim = int.Parse(colName.Split(new string[] { Globals.decompDimension }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                        if (!chosenDims.Contains(variableDim)) chosenDims.Add(variableDim);
+                    }
+                    else if (G.StartsWith(colName, "#"))
+                    {
+                        int dimNumber = (int)row.GetDimension(row.parent, colName.Replace('#', '¤')).data;
+                        if (!chosenDims.Contains(dimNumber)) chosenDims.Add(dimNumber);                        
                     }
                 }
-            }
-            return chosenDim;
+            }            
+            return chosenDims;
         }
 
         public static void CreatePivotTable2()
@@ -3321,13 +3334,7 @@ namespace Gekko
             decompOptions2.all.Clear();
             foreach (string s in frame.frameDimensionNames.Keys)
             {
-                decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
-            }
-
-            if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
-            {
-                //For testing purposes (Excel or Google sheets)
-                //WriteDatatableTocsv(frame);
+                decompOptions2.all.Add(s);
             }
 
             if (false)
@@ -4105,35 +4112,33 @@ namespace Gekko
 
                     int dims = 0;
                     if (chop.indexes != null) dims = chop.indexes.Length;
-                    //gekkodims = 2
+                    //dims = 2
                     frameRow.AddDimension(frame, Globals.decompDimension2, new CellLight(dims));
                     if (dims > 0)
                     {                        
                         for (int ii = 0; ii < chop.indexes.Length; ii++)
                         {
                             string index = chop.indexes[ii];
-                            //gekkodim__x1¤1 = "a", variable specific
+                            //x1 dim 1 = "a", variable specific
                             frameRow.AddDimension(frame, chop.varName + Globals.decompDimension + (ii + 1), new CellLight(index));
-                            //gekkodim2__1 = "a", common for all variables
+                            // dim 1 = "a", common for all variables
                             frameRow.AddDimension(frame, Globals.decompDimension + (ii + 1), new CellLight(index));
 
                             if (chop.domains != null)
                             {
-                                //gekkoset__i = "a"
+                                //#i = "a"
+                                //¤i = 1, what dimension number does #i have?
                                 string domain = chop.domains[ii];  //has corresponding dimensions                              
                                 if (domain == null || domain == "*")
                                 {
                                     frameRow.AddDimension(frame, Globals.decompUniversal, new CellLight(index));
-                                    //frameRow.AddDimension(frame, Globals.internalDim3Identifyer, new CellLight(ii + 1));
+                                    frameRow.AddDimension(frame, Globals.decompUniversal.Replace('#', '¤'), new CellLight(ii + 1));
                                 }
                                 else 
                                 {
                                     frameRow.AddDimension(frame, domain, new CellLight(index));
+                                    frameRow.AddDimension(frame, domain.Replace('#', '¤'), new CellLight(ii + 1));
                                 }
-
-                                //gekkodim3__ = 1
-                                
-
                             }
                         }                        
                     }                    
@@ -5082,30 +5087,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             return s1;
-        }
-
-        public static void WriteDatatableTocsv(FrameLight_OLD dt)
-        {
-            StringBuilder sb = new StringBuilder();
-            List<string> columnNames = new List<string>(dt.frameColNames);
-            for (int i = 0; i < columnNames.Count; i++)
-            {
-                columnNames[i] = G.HandleInternalIdentifyer1(columnNames[i]);
-                if (columnNames[i] == "universe") columnNames[i] = "#universe";
-            }
-            sb.AppendLine(string.Join(";", columnNames));
-            foreach (FrameLightRow row in dt.frameRows)
-            {
-                string s = null;
-                foreach (CellLight c in row.storageDimensions)
-                {
-                    s += c.ToString() + "; ";
-                }
-                if (s != null) s = s.Substring(0, s.Length - "; ".Length);
-                sb.AppendLine(s);
-            }
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString(), G.GetEncoding());            
-        }
+        }        
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel, bool missingAsZero)
         {

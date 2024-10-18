@@ -338,7 +338,7 @@ namespace Gekko
                 GekkoDictionary<string, string> selected2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (FrameFilter task in Globals.uglyHack_decompOptions2.filters)
                 {
-                    if (G.HandleInternalIdentifyer1(task.name) != name) continue;
+                    if (task.name != name) continue;
                     foreach (string s in task.selected)
                     {
                         selected2.Add(s, null);

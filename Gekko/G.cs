@@ -269,27 +269,7 @@ namespace Gekko
                 ok = false;
                 return double.NaN;
             }
-        }
-
-        /// <summary>
-        /// Helper method for decomp. Removes "gekkopivot__" and replaces "gekkoset__" with "#".
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string HandleInternalIdentifyer1(string s)
-        {            
-            return s;
-        }
-
-        /// <summary>
-        /// Helper method for DECOMP
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string HandleInternalIdentifyer2(string s)
-        {            
-            return s;
-        }
+        }                
 
         /// <summary>
         /// For instance, 5 --> 0..9, 12 --> 10..19

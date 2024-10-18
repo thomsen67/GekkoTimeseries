@@ -42,12 +42,6 @@ namespace Gekko
 
             FrameLight_OLD frame = DecompPivotCreateDataframe_OLD(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2, model);
 
-            if (false && (Globals.runningOnTTComputer || G.IsUnitTesting()))
-            {
-                //For testing purposes (Excel or Google sheets)
-                Decomp.WriteDatatableTocsv(frame);
-            }
-
             int xlag = 0; string temp = null;
             Decomp.ConvertFromTurtleName(decompDataMAINClone.lhs, true, out temp, out xlag);
             string normalizerVariableWithIndex = null;
@@ -441,11 +435,11 @@ namespace Gekko
             decompOptions2.all.Clear();
             foreach (string s in frame.frameColNames)
             {
-                decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
+                decompOptions2.all.Add(s);
             }
 
             GekkoDictionary<string, AggContainer> agg = new GekkoDictionary<string, AggContainer>(StringComparer.OrdinalIgnoreCase);
-            int valueI = FrameLightRow.FindColumn(frame, G.HandleInternalIdentifyer2("value"));
+            int valueI = FrameLightRow.FindColumn(frame, "value");
 
             bool getFreeValues = Decomp.DecompPivotAggregateGetFreeValues(frame, decompOptions2);
 

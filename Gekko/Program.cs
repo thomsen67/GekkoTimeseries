@@ -35097,7 +35097,7 @@ namespace Gekko
         {
             int i = -12345;
             frame.frameDimensionNames.TryGetValue(s, out i);
-            CellLight c = this.storageValues[i];
+            CellLight c = this.storageDimensions[i];
             return c;
         }
 
@@ -35165,7 +35165,7 @@ namespace Gekko
             }
             if (j == -12345)
             {
-                new Error("Could not find name '" + G.HandleInternalIdentifyer1(colname) + "'");
+                new Error("Could not find name '" + colname + "'");
             }
             return j;
         }

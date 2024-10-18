@@ -409,7 +409,7 @@ namespace Gekko
             taskList.Add(new GekkoTask(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, this.decompFind.decompOptions2.freeFilter, null, this.decompFind.decompOptions2));
             foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
             {
-                taskList.Add(new GekkoTask(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, ff.selected, this.decompFind.decompOptions2));
+                taskList.Add(new GekkoTask(ff.name, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, ff.selected, this.decompFind.decompOptions2));
             }
             //taskList[taskList.Count - 1].LineColor = "Black";
 
@@ -418,7 +418,7 @@ namespace Gekko
 
             for (int i2 = 0; i2 < taskList.Count; i2++)
             {
-                taskList[i2].Pivot_Text = G.HandleInternalIdentifyer1(taskList[i2].Pivot_Text);
+                taskList[i2].Pivot_Text = taskList[i2].Pivot_Text;
             }            
         }
 
@@ -440,7 +440,7 @@ namespace Gekko
                 bool isFilter = false;
                 foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
                 {
-                    if (G.Equal(ff.name, G.HandleInternalIdentifyer2(s)))
+                    if (G.Equal(ff.name, s))
                     {
                         isFilter = true;
                         break;
@@ -459,12 +459,12 @@ namespace Gekko
 
                 if (!isFilter)
                 {                    
-                    x_freeFilter.Add(G.HandleInternalIdentifyer1(s2));
+                    x_freeFilter.Add(s2);
                 }
 
-                if (!(this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s))))                
+                if (!(this.decompFind.decompOptions2.rows.Contains(s) || this.decompFind.decompOptions2.cols.Contains(s)))                
                 {
-                    x_free.Add(G.HandleInternalIdentifyer1(s2));
+                    x_free.Add(s2);
                 }
             }
 
@@ -659,14 +659,14 @@ namespace Gekko
                 {
                     //this is the last invisible member of type .Invisible
                 }
-                if (state == 1 && task.Pivot_TaskType == TaskType.Rows) this.decompFind.decompOptions2.rows.Add(G.HandleInternalIdentifyer2(task.Pivot_Text));
-                else if (state == 2 && task.Pivot_TaskType == TaskType.Cols) this.decompFind.decompOptions2.cols.Add(G.HandleInternalIdentifyer2(task.Pivot_Text));
+                if (state == 1 && task.Pivot_TaskType == TaskType.Rows) this.decompFind.decompOptions2.rows.Add(task.Pivot_Text);
+                else if (state == 2 && task.Pivot_TaskType == TaskType.Cols) this.decompFind.decompOptions2.cols.Add(task.Pivot_Text);
                 else if (state == 3 && task.Pivot_TaskType == TaskType.Filters)
                 {
                     if (true)
                     {
                         FrameFilter ff = new FrameFilter();
-                        ff.name = G.HandleInternalIdentifyer2(task.Pivot_Text);
+                        ff.name = task.Pivot_Text;
                         ff.selected = new List<string>(); foreach (string s in task.pivot_filterSelected) ff.selected.Add(s);
                         this.decompFind.decompOptions2.filters.Add(ff);
                     }
@@ -2612,7 +2612,7 @@ namespace Gekko
             //this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
             ToggleButton button = sender as ToggleButton;
             GekkoTask task = button.DataContext as GekkoTask;
-            string s = G.HandleInternalIdentifyer2(task.Pivot_Text);            
+            string s = task.Pivot_Text;
             if (task.Pivot_TaskType == TaskType.Rows)
             {
                 //decompOptions2.rows.Remove(s);
@@ -3085,7 +3085,7 @@ namespace Gekko
                 List<string> temp = new List<string>();
                 foreach (string x in this.rows)
                 {
-                    temp.Add(G.HandleInternalIdentifyer1(x));
+                    temp.Add(x);
                 }
                 s.Add(" rows", color);
                 s.Add(" " + Stringlist.GetListWithCommas(temp));
@@ -3095,7 +3095,7 @@ namespace Gekko
                 List<string> temp = new List<string>();
                 foreach (string x in this.cols)
                 {
-                    temp.Add(G.HandleInternalIdentifyer1(x));
+                    temp.Add(x);
                 }
                 s.Add(" cols", color);
                 s.Add(" " + Stringlist.GetListWithCommas(temp));
