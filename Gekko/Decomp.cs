@@ -81,6 +81,7 @@ namespace Gekko
             List<int> pivotRowIndexes,                     // Indices of the elements to use for row dimensions
             List<int> pivotColIndexes,                     // Indices of the elements to use for column dimensions            
             Func<IEnumerable<AggContainer>, AggContainer> agg,         // Aggregation function (e.g., sum)
+            DecompOptions2 decompOptions2,
             Func<FrameLightRow, bool> filter = null,       // Optional filter function
             Func<FrameLightRow, int, string> group = null  // Optional grouping function            
         )
@@ -99,8 +100,8 @@ namespace Gekko
 
                 // Construct row and column keys, and optionally group them
                 int frameLhsCol = dataframe.frameDimensionNames[Globals.col_lhs];
-                string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow, frameLhsCol);
-                string colKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow, frameLhsCol);
+                string rowKey = GekkoPivotGroup(pivotRowIndexes, group, dataframeRow, frameLhsCol, decompOptions2);
+                string colKey = GekkoPivotGroup(pivotColIndexes, group, dataframeRow, frameLhsCol, decompOptions2);
 
                 // Initialize a row in the pivot table if it doesn't exist
                 if (!pivotTable.ContainsKey(rowKey)) pivotTable[rowKey] = new Dictionary<string, List<AggContainer>>();
@@ -142,7 +143,7 @@ namespace Gekko
         /// <param name="group"></param>
         /// <param name="row"></param>
         /// <returns></returns>
-        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol)
+        private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol, DecompOptions2 decompOptions2)
         {
             string rowKey = null;
 
@@ -154,7 +155,7 @@ namespace Gekko
             int iTime = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_t, out iVars);
             if (selectedIndexes.Contains(iTime)) hasTimeSelected = true;
 
-            if (Globals.decompUseBracketNames && hasVarsSelected && !hasTimeSelected)
+            if (decompOptions2.useBracketNames && hasVarsSelected && !hasTimeSelected)
             {
                 //What about group()??
 
@@ -3345,7 +3346,7 @@ namespace Gekko
 
             };
 
-            Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame, rowIndexes, colIndexes, agg, filter, group);
+            Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame, rowIndexes, colIndexes, agg, decompOptions2, filter, group);
 
             decompOptions2.all.Clear();
             foreach (string s in frame.frameDimensionNames.Keys)

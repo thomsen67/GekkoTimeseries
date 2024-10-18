@@ -842,8 +842,16 @@ namespace Gekko
             this.splitterHorizontal.Width = new GridLength(Globals.guiDecompWindowSplitterHorizontal);
             this.splitterVertical.Height = new GridLength(Globals.guiDecompWindowSplitterVertical);
 
-            this.buttonStyle.Content = Globals.decompStyleA1;
-            this.buttonStyle.ToolTip = Globals.decompStyleA2;
+            if (df.decompOptions2.useBracketNames)
+            {
+                this.buttonStyle.Content = Globals.decompStyleA1;
+                this.buttonStyle.ToolTip = Globals.decompStyleA2;
+            }
+            else
+            {
+                this.buttonStyle.Content = Globals.decompStyleB1;
+                this.buttonStyle.ToolTip = Globals.decompStyleB2;
+            }
 
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
 
@@ -2965,14 +2973,14 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                Globals.decompUseBracketNames = !Globals.decompUseBracketNames;
+                decompFind.decompOptions2.useBracketNames = !decompFind.decompOptions2.useBracketNames;                
                 decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
                 RecalcCellsWithNewType(decompFind.model);
 
                 Button b = sender as Button;
                 if (b != null)
                 {
-                    if (Globals.decompUseBracketNames)
+                    if (decompFind.decompOptions2.useBracketNames)
                     {
                         b.Content = Globals.decompStyleA1;
                         b.ToolTip = Globals.decompStyleA2;
@@ -3027,7 +3035,8 @@ namespace Gekko
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 
-                
+
+        public bool useBracketNames = Globals.decompUseBracketNames;
         public List iv = null;
         public GekkoTime tSelected = GekkoTime.tNull;
         public bool showTime = false;
@@ -3170,7 +3179,9 @@ namespace Gekko
             d.ignore = this.ignore;
             
             d.modelHash = this.modelHash;
-            d.type = this.type;
+            d.type = this.type;            
+
+            d.useBracketNames = this.useBracketNames;
 
             //d.decimalsLevel = this.decimalsLevel;
 
