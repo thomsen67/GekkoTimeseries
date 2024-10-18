@@ -50,7 +50,7 @@ namespace Gekko
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
 
-        public static bool useGamsStyleNames = true;
+        public static bool useGamsStyleNames = false;
         public const string decompNull = "...";  //used to be "<null>"
         public const char decompSetDimNumberChar = '¤';        
         public const string decompDimension = " dim ";
