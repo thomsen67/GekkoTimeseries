@@ -144,17 +144,14 @@ namespace Gekko
         /// <returns></returns>
         private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol)
         {
-            bool useGamsStyleNames = true;
-
-            string rowKey = null;
-            string s = null;
+            string rowKey = null;            
             string nameWithStars = null;
 
             bool hasVarsSelected = false;
             int iVars = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_variable, out iVars);
             if (selectedIndexes.Contains(iVars)) hasVarsSelected = true;
 
-            if (Globals.useGamsStyleNames && hasVarsSelected)
+            if (Globals.decompUseBracketNames && hasVarsSelected)
             {
                 //TODO: try-catch etc. What if variable is not selected?
                 //What about group()??
@@ -174,29 +171,39 @@ namespace Gekko
                 }
                 if (dims > 0) prettyName += "]";
                 if (lag != "[0]") prettyName += lag;
+
+                if (row.GetDimension(row.parent, Globals.col_lhs).text == Globals.pivotHelper2New)
+                {
+                    prettyName = Globals.pivotHelper2New + prettyName;
+                }
+                //if (i == lhsFrameCol && groupName == Globals.pivotHelper2New)
+                //{
+                //    s = groupName + s;  //from "x | a" to "00000000 x | a".                    
+                //}
+                //else
+                //{
+                //    s += groupName + Globals.pivotTableDelimiter;
+                //}
+
                 rowKey = prettyName;
             }
             else
             {
+                string s = null;
                 foreach (int i in selectedIndexes)
                 {
                     string groupName = group(row, i);
                     if (groupName == null) groupName = Globals.decompNull;
-                    if (i == lhsFrameCol)
+                    //string lhs = row.GetDimension(row.parent, Globals.col_lhs).text;
+                    if (groupName == Globals.pivotHelper2New)
                     {
-                        if (groupName == Globals.pivotHelper2New)
-                        {
-                            s = groupName + s;  //from "x | a" to "00000000 x | a".
-                        }
-                        else
-                        {
-                            //ignore that groupName
-                        }
+                        s = groupName + s;
+                        //s = lhs + s;  //from "x | a" to "00000000 x | a".                    
                     }
                     else
                     {
-                        s += groupName + Globals.pivotTableDelimiter;
-                    }
+                        if(i != lhsFrameCol)s += groupName + Globals.pivotTableDelimiter;
+                    }                    
                 }
                 if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
                 else rowKey = Globals.decompNull;

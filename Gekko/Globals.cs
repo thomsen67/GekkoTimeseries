@@ -50,13 +50,12 @@ namespace Gekko
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
 
-        public static bool useGamsStyleNames = false;
+        public static bool decompUseBracketNames = false;
         public const string decompNull = "...";  //used to be "<null>"
         public const char decompSetDimNumberChar = '¤';        
         public const string decompDimension = " dim ";
         public const string decompDimension2 = "dims";
-        public const string decompUniversal = "#universal";
-        public const string decompFirst = "00000000";  //special name that always ends up first in a pivot row or col label (chosen because it ends up at top when sorted)
+        public const string decompUniversal = "#universal";        
         //
         public const string col_variable = "vars";
         public const string col_lag = "lags";
@@ -120,9 +119,9 @@ namespace Gekko
         // =======================================================
 
         public const string decompStyleA1 = "x | a | b";
-        public const string decompStyleB1 = "x[a, b]";        
-        public const string decompStyleA2 = "Change variable style from 'x[a, b, *][-1]' " + G.NL_ToolTip + " to 'x | a | b | --- | [-1]'.";
-        public const string decompStyleB2 = "Change variable style from 'x | a | b | --- | [-1]' " + G.NL_ToolTip + " to 'x[a, b, *][-1]'.";
+        public const string decompStyleB1 = "x[a, b]";
+        public const string decompStyleA2 = "Set variable style 'x | a | b' " + G.NL_ToolTip + " instead of 'x[a, b]'.";
+        public const string decompStyleB2 = "Set variable style 'x[a, b]' " + G.NL_ToolTip + " instead of 'x | a | b'.";
 
         //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;

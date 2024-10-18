@@ -2965,14 +2965,14 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                Globals.useGamsStyleNames = !Globals.useGamsStyleNames;
+                Globals.decompUseBracketNames = !Globals.decompUseBracketNames;
                 decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
                 RecalcCellsWithNewType(decompFind.model);
 
                 Button b = sender as Button;
                 if (b != null)
                 {
-                    if (Globals.useGamsStyleNames)
+                    if (Globals.decompUseBracketNames)
                     {
                         b.Content = Globals.decompStyleA1;
                         b.ToolTip = Globals.decompStyleA2;
