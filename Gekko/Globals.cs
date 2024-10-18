@@ -55,7 +55,8 @@ namespace Gekko
         public const char decompSetDimNumberChar = '¤';        
         public const string decompDimension = " dim ";
         public const string decompDimension2 = "dims";
-        public const string decompUniversal = "#universal";        
+        public const string decompUniversal = "#universal";
+        public const string decompNoLag = "[0]";
         //
         public const string col_variable = "vars";
         public const string col_lag = "lags";

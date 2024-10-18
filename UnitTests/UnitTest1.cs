@@ -16381,7 +16381,7 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2001");
                     Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2002");
                     i++;
-                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[y][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[y]");
                     else Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [0]");
                     Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
@@ -16391,7 +16391,7 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, 1.5000d, 0.0001);
                     i++;
-                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[g][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[g]");
                     else Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [0]");
                     Assert.AreEqual(table.Get(i, 2).number, 3.5000d, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, 3.5000d, 0.0001);
@@ -16433,11 +16433,11 @@ namespace UnitTests
                     i++;
                     Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2001");
                     i++;
-                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[y][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[y]");
                     else Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [0]");
                     Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
                     i++;
-                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[g][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[g]");
                     else Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [0]");
                     Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
                     i++;
@@ -16460,11 +16460,11 @@ namespace UnitTests
                     i++;
                     Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
                     i++;
-                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[y][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[y]");
                     else Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [0]");
                     Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
                     i++;
-                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[g][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x[g]");
                     else Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [0]");
                     Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
                     i++;
@@ -16484,10 +16484,10 @@ namespace UnitTests
                     I("decomp <2002 2002 d> x[y] from e1, e2 endo x[y], x[c] rows vars, #i, lags cols time;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
-                    if (ii == 0) Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x[y][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x[y]");
                     else Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x | y | [0]");
                     Assert.AreEqual(table.Get(2, 2).number, 32d, 0.0001);
-                    if (ii == 0) Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x[g][0]");
+                    if (ii == 0) Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x[g]");
                     else Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x | g | [0]");
                     Assert.AreEqual(table.Get(3, 2).number, 1d / 0.7d * 20d, 0.0001);
                     if (ii == 0) Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "x[y][-1]");

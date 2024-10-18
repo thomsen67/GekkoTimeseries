@@ -3363,21 +3363,7 @@ namespace Gekko
                 {
                     normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
                 }
-            }
-
-            //DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            //DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            //DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            //??? is .filters used ???
-
-            //List<string> tempRowNames = new List<string>();
-            //List<string> tempColNames = new List<string>();
-            //GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
-
-            //List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
-            //DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
-
-            // Display the result
+            }            
 
             GekkoDictionary<string, bool> rownames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> colnames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -4304,12 +4290,13 @@ namespace Gekko
 
         /// <summary>
         /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
+        /// At the end, if decompOptions2.useBracketNames == true, any "[0]" is also removed.
         /// </summary>
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
         private static DecompOutput DecompTableHandleSortAndIgnoreAndErrors(Table table1, DecompOptions2 decompOptions2, Model model)
         {
-            string numberFormat = GetNumberFormat(decompOptions2);
+            string numberFormat = GetNumberFormat(decompOptions2);            
 
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
             if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
@@ -4717,6 +4704,38 @@ namespace Gekko
             else
             {
                 //lamps not shown
+            }
+
+            if (decompOptions2.useBracketNames)
+            {
+                if (rowsOrCols == ERowsCols.Rows)  //will never be null, if so it will have been returned above
+                {
+                    for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+                    {
+                        string s = table2.Get(i, 1).CellText.TextData[0];
+                        if (s.Contains(Globals.decompNoLag))
+                        {
+                            s = s.Replace(Globals.decompNoLag, "");
+                            table2.writeOnce = false;
+                            table2.Set(new Coord(i, 1), s);
+                            table2.writeOnce = true;
+                        }
+                    }
+                }
+                else if (rowsOrCols == ERowsCols.Cols)  //will never be null, if so it will have been returned above
+                {
+                    for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                    {
+                        string s = table2.Get(1, j).CellText.TextData[0];
+                        if (s.Contains(Globals.decompNoLag))
+                        {
+                            s = s.Replace(Globals.decompNoLag, "");
+                            table2.writeOnce = false;
+                            table2.Set(new Coord(1, j), s);
+                            table2.writeOnce = true;
+                        }
+                    }
+                }
             }
 
             DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
