@@ -144,20 +144,28 @@ namespace Gekko
         /// <returns></returns>
         private static string GekkoPivotGroup(List<int> selectedIndexes, Func<FrameLightRow, int, string> group, FrameLightRow row, int lhsFrameCol)
         {
-            string rowKey = null;            
-            string nameWithStars = null;
+            string rowKey = null;
 
             bool hasVarsSelected = false;
             int iVars = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_variable, out iVars);
             if (selectedIndexes.Contains(iVars)) hasVarsSelected = true;
 
-            if (Globals.decompUseBracketNames && hasVarsSelected)
+            bool hasTimeSelected = false;
+            int iTime = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_t, out iVars);
+            if (selectedIndexes.Contains(iTime)) hasTimeSelected = true;
+
+            if (Globals.decompUseBracketNames && hasVarsSelected && !hasTimeSelected)
             {
-                //TODO: try-catch etc. What if variable is not selected?
                 //What about group()??
-                //What about lags???
+
                 string variableName = row.GetDimension(row.parent, Globals.col_variable).text;
-                string lag = row.GetDimension(row.parent, Globals.col_lag).text;
+
+                bool hasLagsSelected = false;
+                int iLags = -12345; row.parent.frameDimensionNames.TryGetValue(Globals.col_lag, out iLags);
+                if (selectedIndexes.Contains(iLags)) hasLagsSelected = true;
+                string lag = null;
+                if (hasLagsSelected) lag = row.GetDimension(row.parent, Globals.col_lag).text;                
+                
                 //TODO: have cols that share dimensions.
                 List<int> shownDimensions = GetShownDimensions(row, variableName, selectedIndexes);
                 int dims = (int)row.GetDimension(row.parent, Globals.decompDimension2).data;
@@ -170,7 +178,8 @@ namespace Gekko
                     else prettyName += "*";
                 }
                 if (dims > 0) prettyName += "]";
-                if (lag != "[0]") prettyName += lag;
+                //if (lag != "[0]") prettyName += lag;
+                prettyName += lag;
 
                 if (row.GetDimension(row.parent, Globals.col_lhs).text == Globals.pivotHelper2New)
                 {
@@ -193,16 +202,14 @@ namespace Gekko
                 foreach (int i in selectedIndexes)
                 {
                     string groupName = group(row, i);
-                    if (groupName == null) groupName = Globals.decompNull;
-                    //string lhs = row.GetDimension(row.parent, Globals.col_lhs).text;
+                    if (groupName == null) groupName = Globals.decompNull;                    
                     if (groupName == Globals.pivotHelper2New)
                     {
-                        s = groupName + s;
-                        //s = lhs + s;  //from "x | a" to "00000000 x | a".                    
+                        s = groupName + s;  //Just put "00000000 " on the left
                     }
                     else
                     {
-                        if(i != lhsFrameCol)s += groupName + Globals.pivotTableDelimiter;
+                        if(i != lhsFrameCol)s += groupName + Globals.pivotTableDelimiter;  //skip lhs dimension
                     }                    
                 }
                 if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);

@@ -50,7 +50,7 @@ namespace Gekko
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
 
-        public static bool decompUseBracketNames = false;
+        public static bool decompUseBracketNames = true;
         public const string decompNull = "...";  //used to be "<null>"
         public const char decompSetDimNumberChar = '¤';        
         public const string decompDimension = " dim ";
@@ -120,8 +120,8 @@ namespace Gekko
 
         public const string decompStyleA1 = "x | a | b";
         public const string decompStyleB1 = "x[a, b]";
-        public const string decompStyleA2 = "Set variable style 'x | a | b' " + G.NL_ToolTip + " instead of 'x[a, b]'.";
-        public const string decompStyleB2 = "Set variable style 'x[a, b]' " + G.NL_ToolTip + " instead of 'x | a | b'.";
+        public const string decompStyleA2 = "Use pivot style 'x | a | b' " + G.NL + "instead of bracket style 'x[a, b]'.";
+        public const string decompStyleB2 = "Use bracket style 'x[a, b]' " + G.NL + "instead of pivot style 'x | a | b'.";
 
         //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;
