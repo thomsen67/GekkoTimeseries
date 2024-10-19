@@ -53,7 +53,7 @@ namespace Gekko
         public static bool decompUseBracketNames = true;
         public const string decompNull = "...";  //used to be "<null>"
         public const char decompSetDimNumberChar = '¤';        
-        public const string decompDimension = "#";  //like x#1 for x dim 1.
+        public const char decompDimension = '#';  //like x#1 for x dim 1.
         public const string decompDimension2 = "dims";
         public const string decompUniversal = "#universal";
         public const string decompNoLag = "[0]";

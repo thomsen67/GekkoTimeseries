@@ -229,7 +229,7 @@ namespace Gekko
                 {
                     if (G.StartsWith(colName, variableName))  //"x1 dim 1" starts with x1
                     {
-                        int variableDim = int.Parse(colName.Split(new string[] { Globals.decompDimension }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                        int variableDim = int.Parse(colName.Split(Globals.decompDimension)[1]);
                         if (!chosenDims.Contains(variableDim)) chosenDims.Add(variableDim);
                     }
                     else if (G.StartsWith(colName, "#"))
@@ -4147,7 +4147,7 @@ namespace Gekko
                             //x1 dim 1 = "a", variable specific
                             frameRow.AddDimension(frame, chop.varName + Globals.decompDimension + (ii + 1), new CellLight(index));
                             // dim 1 = "a", common for all variables
-                            frameRow.AddDimension(frame, Globals.decompDimension + (ii + 1), new CellLight(index));
+                            frameRow.AddDimension(frame, "" + Globals.decompDimension + (ii + 1), new CellLight(index));  //Note: keep "" !!
 
                             if (chop.domains != null)
                             {

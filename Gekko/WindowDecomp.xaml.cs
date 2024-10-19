@@ -432,11 +432,12 @@ namespace Gekko
 
             foreach (string s in this.decompFind.decompOptions2.all)
             {
+                if (s == null) continue;
                 if (s == Globals.col_lhs) continue;
-                if (s.StartsWith(Globals.decompDimension)) continue;
+                if (s == Globals.col_expand) continue;
                 if (s.StartsWith(Globals.decompDimension2)) continue;
-                if (s.StartsWith(Globals.decompDimension2)) continue;
-                if (s.StartsWith(Globals.decompSetDimNumberChar.ToString())) continue;
+                if (s.Length > 1 && s[0] == Globals.decompDimension && char.IsDigit(s[1])) continue; //Stuff like #1 (dimension 1)                
+                if (s[0] == Globals.decompSetDimNumberChar) continue;
 
                 bool isFilter = false;
                 foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
