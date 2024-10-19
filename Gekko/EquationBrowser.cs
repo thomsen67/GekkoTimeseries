@@ -1129,7 +1129,7 @@ namespace Gekko
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
-                    string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), false);
+                    string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
                     EquationTextHelper helper = new EquationTextHelper();
                     GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
                     string s5 = helper22.s_gamsOrFrnSyntax;

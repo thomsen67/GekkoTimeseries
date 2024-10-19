@@ -199,7 +199,7 @@ namespace Gekko
             List<string> eqNames = new List<string>();
             foreach (Link link in links)
             {
-                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), false));
+                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), null));
             }
             s = model.GetEquationText(eqNames, helper, t0).resultingText;
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.

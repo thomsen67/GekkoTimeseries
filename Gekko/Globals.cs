@@ -53,7 +53,7 @@ namespace Gekko
         public static bool decompUseBracketNames = true;
         public const string decompNull = "...";  //used to be "<null>"
         public const char decompSetDimNumberChar = '¤';        
-        public const string decompDimension = " dim ";
+        public const string decompDimension = "#";  //like x#1 for x dim 1.
         public const string decompDimension2 = "dims";
         public const string decompUniversal = "#universal";
         public const string decompNoLag = "[0]";
@@ -104,8 +104,8 @@ namespace Gekko
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
                 
-        public static string decompNullName = "________a";
-        public static string decompResidualName = "ZZZZZZZZ_residal";
+        public const string decompNullName = "________a";
+        public const string decompResidualName = "ZZZZZZZZ_residal";
         public const string decompResidualName2 = "Residual";
         public static string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";
@@ -262,6 +262,7 @@ namespace Gekko
         public static string windowDecompStatusBarText_gekko2 = "Ctrl+click to find equation(s)."; //Gekko model
         public static string windowDecompStatusBarText_gams = "Click to find equation(s)."; //Gams model
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel.";
+        public static string windowDecompStatusBarText3 = "BEWARE: percentages may be miscalculated, when time is not shown on a row or column."; //Gekko model
         public const string decompGekkoEquationPrefix = "e_";        
 
         // ----------------------------------------------------------------

@@ -955,7 +955,7 @@ namespace Gekko
 
                 //string s2 = AddTimeToIndexes(s, time);
 
-                string s2 = G.Chop_DimensionAddLast(s, time.ToString(), false);
+                string s2 = G.Chop_DimensionAddLast(s, time.ToString(), null);
 
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s2);
                 if (eqNumber == -12345)
@@ -992,7 +992,7 @@ namespace Gekko
         private static string AddTimeToIndexes(string name2, List<string> indexes2, GekkoTime time)
         {
             indexes2.Add(time.ToString());
-            string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), false);
+            string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), null);
             return s2;
         }
 
@@ -1210,20 +1210,7 @@ namespace Gekko
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter, System.Drawing.Color.Gray);  //using writeln2 to avoid popup
 
             return decompOutput;
-        }
-
-        /// <summary>
-        /// Make sure the table is suitable for red lamps, or for plotting.
-        /// </summary>
-        /// <param name="decompOptions2"></param>
-        /// <returns></returns>
-        public static bool VarsAndTimeDimensionsAreSeparate(DecompOptions2 decompOptions2)
-        {
-            bool b4 = false;
-            if (decompOptions2.rows.Contains(Globals.col_variable) && decompOptions2.cols.Contains(Globals.col_t)) b4 = true;
-            if (decompOptions2.rows.Contains(Globals.col_t) && decompOptions2.cols.Contains(Globals.col_variable)) b4 = true;
-            return b4;
-        }
+        }        
 
         public static void DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, DecompOperator op)
         {
@@ -1265,12 +1252,27 @@ namespace Gekko
             PrintDecompDict(y.cellsContribM);
         }
 
-        public static ERowsCols VariablesOnRowsOrCols(DecompOptions2 decompOptions)
+        public static ERowsCols VariablesOnRowsOrCols(DecompOptions2 decompOptions2)
         {            
             ERowsCols rv = ERowsCols.None;
-            if (decompOptions.rows.Contains(Globals.col_variable)) rv = ERowsCols.Rows;
-            else if (decompOptions.cols.Contains(Globals.col_variable)) rv = ERowsCols.Cols;
+            if (decompOptions2.rows.Contains(Globals.col_variable, StringComparer.OrdinalIgnoreCase)) rv = ERowsCols.Rows;
+            else if (decompOptions2.cols.Contains(Globals.col_variable, StringComparer.OrdinalIgnoreCase)) rv = ERowsCols.Cols;
+            if (decompOptions2.expand) rv = ERowsCols.Rows;
             return rv;
+        }
+
+        /// <summary>
+        /// Make sure the table is suitable for red lamps, or for plotting.
+        /// </summary>
+        /// <param name="decompOptions2"></param>
+        /// <returns></returns>
+        public static bool VarsAndTimeDimensionsAreSeparate(DecompOptions2 decompOptions2)
+        {
+            bool b4 = false;
+            if (decompOptions2.rows.Contains(Globals.col_variable, StringComparer.OrdinalIgnoreCase) && decompOptions2.cols.Contains(Globals.col_t, StringComparer.OrdinalIgnoreCase)) b4 = true;
+            if (decompOptions2.rows.Contains(Globals.col_t, StringComparer.OrdinalIgnoreCase) && decompOptions2.cols.Contains(Globals.col_variable, StringComparer.OrdinalIgnoreCase)) b4 = true;
+            if (decompOptions2.expand) b4 = true;
+            return b4;
         }
 
         public static void InitDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas, Model model)
@@ -3337,6 +3339,17 @@ namespace Gekko
 
             };
 
+            if (decompOptions2.expand)
+            {
+                //TODO: What if we want it on cols? Maybe decomp <expandcols> ? 
+                //      So that <expand> and <expandrows> is for rows, and <expandcols> is for cols.
+                rowIndexes = new List<int>();
+                colIndexes = new List<int>();
+                rowIndexes.Add(frame.frameDimensionNames["expand"]);
+                rowIndexes.Add(frame.frameDimensionNames["lhs"]);
+                colIndexes.Add(frame.frameDimensionNames["time"]);
+            }
+
             Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame, rowIndexes, colIndexes, agg, decompOptions2, filter, group);
 
             decompOptions2.all.Clear();
@@ -3805,8 +3818,11 @@ namespace Gekko
                             if (agg.fullVariableNames != null)
                             {
                                 List<string> tmp = new List<string>();
-                                foreach (string s in agg.fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
-                                tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                                foreach (string s in agg.fullVariableNames)
+                                {                                    
+                                    tmp.Add(FullVariableNamePretty(s, true)); 
+                                }
+                                tmp2 = Stringlist.GetListWithCommas(tmp, "  ");  //x[i, j], x[i, k] --> x[i, j],  x[i, k]
                             }
                             else
                             {
@@ -3841,7 +3857,20 @@ namespace Gekko
             }
 
             return table;
-        }        
+        }
+
+        /// <summary>
+        /// Converts something like "x[a,b]¤[-1]" --> "x[a, b][-1]". Also converts "ZZZZZZZZ_residal" to "Residual".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static string FullVariableNamePretty(string s, bool replaceResidualName)
+        {
+            if (s == null) return s;
+            s = s.Replace("¤", "").Replace(",", ", ");
+            if (replaceResidualName) s = s.Replace(Globals.decompResidualName, Globals.decompResidualName2);
+            return s;
+        }
 
         /// <summary>
         /// This method does not do much.
@@ -4144,7 +4173,7 @@ namespace Gekko
                     
                     if (decompOptions2.expand)
                     {
-                        frameRow.AddDimension(frame, Globals.col_expand, new CellLight(Globals.pivotHelper3New));
+                        frameRow.AddDimension(frame, Globals.col_expand, new CellLight(FullVariableNamePretty(fullVariableName, false).Replace("Work:", "")));
                     }
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
@@ -5413,7 +5442,7 @@ namespace Gekko
                     string textColor = "Black";
                     if (o.decompFind.decompOptions2.new_from != null)
                     {
-                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3, StringComparer.OrdinalIgnoreCase))
                         {
                             textColor = "Gray";
                         }
@@ -5421,7 +5450,7 @@ namespace Gekko
 
                     //This is where the contents of each GUI line is set
                     //Hack that it is a global variable...
-                    Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
+                    Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
                 }
 
                 if (G.IsUnitTesting())

@@ -463,7 +463,7 @@ namespace Gekko
                     x_freeFilter.Add(s2);
                 }
 
-                if (!(this.decompFind.decompOptions2.rows.Contains(s) || this.decompFind.decompOptions2.cols.Contains(s)))                
+                if (!(this.decompFind.decompOptions2.rows.Contains(s, StringComparer.OrdinalIgnoreCase) || this.decompFind.decompOptions2.cols.Contains(s, StringComparer.OrdinalIgnoreCase)))
                 {
                     x_free.Add(s2);
                 }
@@ -2003,7 +2003,7 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
 
             DecompOutput decompOutput = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, ref this.decompDatas, model);
-            textBlockIgnore.Text = decompOutput.ignore;
+            textBlockIgnore.Text = decompOutput.ignore;            
 
             string s = null;            
             if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
@@ -2318,6 +2318,10 @@ namespace Gekko
             PutTableIntoGrid2(this.grid1Left, decompOutput, GekkoTableTypes.Left, decompOptions);
             CreateGridRowsAndColumns(this.grid1, decompOutput, GekkoTableTypes.TableContent);
             PutTableIntoGrid2(this.grid1, decompOutput, GekkoTableTypes.TableContent, decompOptions);
+            if (this.decompFind.decompOptions2.decompOperator.isPercentageType && !this.decompFind.decompOptions2.rows.Contains("time", StringComparer.OrdinalIgnoreCase) && !this.decompFind.decompOptions2.cols.Contains("time", StringComparer.OrdinalIgnoreCase))
+            {
+                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText3;
+            }
         }        
 
         private void radioButton1_Checked(object sender, RoutedEventArgs e)
@@ -2935,8 +2939,7 @@ namespace Gekko
         private void checkBoxExpand_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
-                MessageBox.Show("Expand is intended to expand all cells with Count > 1. Work in progress, not implemented yet...");
+            {                
                 this.decompFind.decompOptions2.expand = true;
                 RecalcCellsWithNewType(decompFind.model);
             }

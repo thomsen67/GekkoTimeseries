@@ -15858,7 +15858,7 @@ namespace Gekko
                         string s = O.ConvertToString(iv);
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
-                        string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), false);
+                        string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), null);
                         GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
                         string eq = temp.resultingText;
                         if (temp.hasHit)

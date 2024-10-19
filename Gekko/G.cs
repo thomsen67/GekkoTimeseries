@@ -885,7 +885,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (true) or [a,b,c] (false)
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (" ") or [a,b,c] (null)
         /// </summary>
         /// <param name="bank"></param>
         /// <param name="name"></param>
@@ -893,7 +893,7 @@ namespace Gekko
         /// <param name="index"></param>
         /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_GetFullName(string bank, string name, string freq, string[] index, bool listBlanks)
+        public static string Chop_GetFullName(string bank, string name, string freq, string[] index, string listBlanks)
         {
             string s = O.UnChop(bank, name, freq, index, listBlanks);
             return s;
@@ -910,7 +910,7 @@ namespace Gekko
         /// <returns></returns>
         public static string Chop_GetFullName(string bank, string name, string freq, string[] index)
         {
-            string s = O.UnChop(bank, name, freq, index, true);
+            string s = O.UnChop(bank, name, freq, index, " ");
             return s;
         }
 
@@ -1307,14 +1307,14 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (true) or [a,b,c] (false)
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (" ") or [a,b,c] (null)
         /// </summary>
         /// <param name="bank"></param>
         /// <param name="name"></param>
         /// <param name="freq"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static string Chop_Unchop(string bank, string name, string freq, string[] index, bool listBlanks)
+        public static string Chop_Unchop(string bank, string name, string freq, string[] index, string listBlanks)
         {
             return O.UnChop(bank, name, freq, index, listBlanks);
         }
@@ -1323,13 +1323,13 @@ namespace Gekko
         /// Adds a dimension to a name. If inputName = "x" and inputIndex = "40", the result
         /// will be x[40]. If inputName is "x[a, b]", the result will be "x[a, b, 40]".
         /// If inputname is "x[]", it will be treated as if it was "x".
-        /// Last argument true means between commas (normal).
+        /// Last argument " " means blanks between commas (normal).
         /// Dimension is always added last.
         /// </summary>
         /// <param name="inputName"></param>
         /// <param name="inputIndex"></param>
         /// <returns></returns>
-        public static string Chop_DimensionAddLast(string inputName, string inputIndex, bool listBlanks)
+        public static string Chop_DimensionAddLast(string inputName, string inputIndex, string listBlanks)
         {
             string bank = null; string name = null; string freq = null; string[] indexes = null;
             G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
@@ -1350,7 +1350,7 @@ namespace Gekko
 
         public static string Chop_DimensionAddLast(string inputName, string inputIndex)
         {
-            return Chop_DimensionAddLast(inputName, inputIndex, true);
+            return Chop_DimensionAddLast(inputName, inputIndex, " ");
         }
 
         /// <summary>
@@ -1374,7 +1374,7 @@ namespace Gekko
                 indexes2 = new string[indexes.Length - 1];
                 Array.Copy(indexes, indexes2, indexes2.Length);
             }
-            return G.Chop_Unchop(bank, name, freq, indexes2, true);
+            return G.Chop_Unchop(bank, name, freq, indexes2, " ");
         }
 
         /// <summary>

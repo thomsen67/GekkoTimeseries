@@ -4127,7 +4127,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (true) or [a,b,c] (false)
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (" ") or [a,b,c] (null)
         /// </summary>
         /// <param name="bank"></param>
         /// <param name="name"></param>
@@ -4135,7 +4135,7 @@ namespace Gekko
         /// <param name="index"></param>
         /// <returns></returns>
         //See also Chop()
-        public static string UnChop(string bank, string name, string freq, string[] index, bool listBlanks)
+        public static string UnChop(string bank, string name, string freq, string[] index, string listBlanks)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -4164,7 +4164,7 @@ namespace Gekko
         /// <returns></returns>
         public static string UnChop(string bank, string name, string freq, string[] index)
         {
-            return UnChop(bank, name, freq, index, true);
+            return UnChop(bank, name, freq, index, " ");
         }
 
         /// <summary>

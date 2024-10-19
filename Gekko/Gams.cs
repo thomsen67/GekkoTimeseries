@@ -607,7 +607,7 @@ namespace Gekko
                     //    }
                     //}                    
                     if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
-                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, false) + "]";                    
+                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, null) + "]";                    
                 }
                 else
                 {
