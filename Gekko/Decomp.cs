@@ -178,22 +178,13 @@ namespace Gekko
                     if (shownDimensions.Contains(dim)) prettyName += row.GetDimension(row.parent, variableName + Globals.decompDimension + dim).text;
                     else prettyName += "*";
                 }
-                if (dims > 0) prettyName += "]";
-                //if (lag != "[0]") prettyName += lag;
+                if (dims > 0) prettyName += "]";  //For bracket-style, "[0]" are removed late in the table processing, so that [-1] gets sorted before [0] and [+1] etc.                
                 prettyName += lag;
 
                 if (row.GetDimension(row.parent, Globals.col_lhs).text == Globals.pivotHelper2New)
                 {
                     prettyName = Globals.pivotHelper2New + prettyName;
-                }
-                //if (i == lhsFrameCol && groupName == Globals.pivotHelper2New)
-                //{
-                //    s = groupName + s;  //from "x | a" to "00000000 x | a".                    
-                //}
-                //else
-                //{
-                //    s += groupName + Globals.pivotTableDelimiter;
-                //}
+                }               
 
                 rowKey = prettyName;
             }
@@ -4153,7 +4144,7 @@ namespace Gekko
                     
                     if (decompOptions2.expand)
                     {
-                        frameRow.AddDimension(frame, Globals.col_lhs, new CellLight(Globals.pivotHelper3New));
+                        frameRow.AddDimension(frame, Globals.col_expand, new CellLight(Globals.pivotHelper3New));
                     }
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));

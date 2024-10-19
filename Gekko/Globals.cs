@@ -97,7 +97,7 @@ namespace Gekko
         public const int dFirstLevelRefLag = 13;
         public const int dFirstLevelRefLag2 = 14;
 
-        // Less important
+        // ------------- Less important --------------------------
 
         public static string internalPivotRows = "Rows";
         public static string internalPivotCols = "Cols";
@@ -115,14 +115,18 @@ namespace Gekko
         public const bool decompFix2 = true;
         public static List<double> redThresholds = new List<double>() { 0.05, 0.20, 0.35 }; //must be 3 of them
 
-        // =======================================================
-        // ============ DATAFRAME STUFF END ======================
-        // =======================================================
-
+        public const string pivotHelper1 = "{extra}";
+        public const string pivotHelper2 = "{normalize}";
+        public const string pivotHelper3New = "{expand} ";
+        public const string pivotHelper2New = "00000000 ";  //first when sorted        
         public const string decompStyleA1 = "x | a | b";
         public const string decompStyleB1 = "x[a, b]";
         public const string decompStyleA2 = "Use pivot style 'x | a | b' " + G.NL + "instead of bracket style 'x[a, b]'.";
         public const string decompStyleB2 = "Use bracket style 'x[a, b]' " + G.NL + "instead of pivot style 'x | a | b'.";
+
+        // =======================================================
+        // ============ DATAFRAME STUFF END ======================
+        // =======================================================
 
         //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;
@@ -165,12 +169,7 @@ namespace Gekko
         public const string scalarModelLstFolder = "LST";
 
         public static bool bugfixDollarOperator = true;        
-        public static bool bugfixLhsIsFunctionParameter = true;
-
-        public const string pivotHelper1 = "{extra}";
-        public const string pivotHelper2 = "{normalize}";
-        public const string pivotHelper2New = "00000000 ";  //first when sorted
-        public const string pivotHelper3New = "{expand} ";
+        public static bool bugfixLhsIsFunctionParameter = true;        
 
         public const int startPrime = 1013;  //next is 1019.
                     
