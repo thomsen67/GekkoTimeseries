@@ -4734,7 +4734,7 @@ namespace Gekko
                         Cell c1 = table2.Get(i, 1);
                         Cell c2 = table2.Get(i, 2);
                         string s = c1.CellText.TextData[0];
-                        if (Globals.decompShowSingletonSet && c2.vars_hack != null && c2.vars_hack.Count == 1) s = c2.vars_hack[0];
+                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
                         s = s.Replace(Globals.decompNoLag, "");
                         c1.CellText.TextData = new List<string> { s };
                     }
@@ -4746,7 +4746,7 @@ namespace Gekko
                         Cell c1 = table2.Get(1, j);
                         Cell c2 = table2.Get(2, j);
                         string s = c1.CellText.TextData[0];
-                        if (Globals.decompShowSingletonSet && c2.vars_hack != null && c2.vars_hack.Count == 1) s = c2.vars_hack[0];
+                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
                         s = s.Replace(Globals.decompNoLag, "");                        
                         c1.CellText.TextData = new List<string> { s };
                     }
