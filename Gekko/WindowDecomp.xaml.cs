@@ -47,8 +47,7 @@ namespace Gekko
     /// </summary>
     public partial class WindowDecomp : Window
     {
-        DateTime lastClick = DateTime.Now;
-
+        
         public enum GekkoTableTypes
         {
             TableContent, Left, Top, UpperLeft, Unknown
@@ -1627,14 +1626,6 @@ namespace Gekko
         {
             //#98732498724
             //Click in FIND: #8fdskfesdfw
-
-            double ms = (DateTime.Now - lastClick).TotalMilliseconds;
-            lastClick= DateTime.Now;
-            if (ms < 500)  //Windows standard is 500
-            {
-                MessageBox.Show("The DECOMP and FIND windows no longer use double-clicks. Use single-click or Ctrl+click (forces a FIND window).");
-                return;
-            }
 
             bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 

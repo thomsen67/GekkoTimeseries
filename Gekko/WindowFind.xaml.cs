@@ -136,26 +136,24 @@ namespace Gekko
 
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
             //Click in DECOMP: #8fdskfesdfw            
 
-            double ms = (DateTime.Now - lastClick).TotalMilliseconds;
-            lastClick = DateTime.Now;
-            if (ms < 500)  //Windows standard is 500. But this never seems to be activated...
+            EquationListItem item = null;
+            try
             {
-                MessageBox.Show(ms + " The DECOMP and FIND windows no longer use double-clicks. Use single-click or Ctrl+click (selects/retains the equation).");
-                return;
+                FrameworkElement fe = e.OriginalSource as FrameworkElement;
+                item = fe.DataContext as EquationListItem;
             }
-
+            catch { }
+            if (item == null) return; //A scroll button click can trigger this method, but should be ignored
+                                    
             bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
             if (isCtrl)
             {
                 //do nothing here, will "select" the equation elsewhere.
             }
             else
-            {
-                FrameworkElement fe = e.OriginalSource as FrameworkElement;
-                EquationListItem item = fe.DataContext as EquationListItem;
+            {                
                 CallDecomp(item.fullName, decompFind.model);
             }
         }
