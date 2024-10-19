@@ -278,14 +278,16 @@ namespace Gekko
     {
         public Table table = null;
         public string ignore = null;
-        public List<double> red = null;
+        public List<double> red = null; //lamps
+        public List<List<string>> black = null;  //expand/collapse arrows
         public Tuple<bool, bool> rowsOrColsSumUp = null;
 
-        public DecompOutput(Table table, string ignore, List<double> red)
+        public DecompOutput(Table table, string ignore, List<double> red, List<List<string>> black)
         {
             this.table = table;
             this.ignore = ignore;
             this.red = red;
+            this.black = black;
         }
     }
 
@@ -3425,7 +3427,7 @@ namespace Gekko
                 {
                     //In case something goes wrong in GUI. Delete after some time.
                     MessageBox.Show("Cannot normalize (change sign from negative to positive) the selected variable");
-                    decompOutput = new DecompOutput(table, null, null);
+                    decompOutput = new DecompOutput(table, null, null, null);
                     decompOutput.rowsOrColsSumUp = new Tuple<bool, bool>(false, false);
                 }
             }
@@ -4319,10 +4321,11 @@ namespace Gekko
             string numberFormat = GetNumberFormat(decompOptions2);            
 
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
-            if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
+            if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null, null); //fast return 
 
-            string ignore = null;
-            List<double> red = new List<double>();            
+            string ignoredText = null;
+            List<double> red = new List<double>();
+            List<List<string>> black = new List<List<string>>();
 
             // --------------------------------
             // SORT AND IGNORE START
@@ -4403,7 +4406,7 @@ namespace Gekko
             {
                 string x = "row" + G.S(ignoreCount);
                 if (rowsOrCols == ERowsCols.Cols) x = "col" + G.S(ignoreCount);
-                ignore = ignoreCount + " " + x + " ignored";
+                ignoredText = ignoreCount + " " + x + " ignored";
             }
 
             //Maybe sort
@@ -4603,7 +4606,7 @@ namespace Gekko
             // ------------------------------------------
             // ERRORS
             // ------------------------------------------
-
+            
             //Set error row/column, as a sum of rows 2 and on. Also sets count/names on that row/col.
             if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
             {
@@ -4681,15 +4684,15 @@ namespace Gekko
                 }
             }
 
-            // --------------------------------------------------------------------
-            // Calculate yellow/orange/red lamps as the very last step
-            // --------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------
+            // Calculate yellow/orange/red lamps + black arrows as the very last step before rewriting with bracket names
+            // --------------------------------------------------------------------------------------------
 
             if (rowsOrCols == ERowsCols.Rows)
             {
                 for (int j = 2; j <= table2.GetColMaxNumber(); j++)
                 {
-                    double target = table2.Get(2, j).number;
+                    double target = table2.Get(2, j).number;                    
                     double sum = 0d;
                     for (int i = 3; i <= table2.GetRowMaxNumber(); i++)  //ignore first 2 rows
                     {
@@ -4726,7 +4729,37 @@ namespace Gekko
                 //lamps not shown
             }
 
-            if (decompOptions2.useBracketNames)
+            // ---------------- black, collapse arrows -----------------------
+
+            
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+                for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+                {
+                    Cell c = table2.Get(i, 2);
+                    if (c == null) black.Add(new List<string>());
+                    else
+                    {
+                        black.Add(c.vars_hack);  //We mostly use the count though
+                    }
+                }
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                {
+                    Cell c = table2.Get(2, j);
+                    if (c == null) black.Add(new List<string>());
+                    else
+                    {
+                        black.Add(c.vars_hack);  //We mostly use the count though
+                    }
+                }
+            }
+
+            // ==================================================================================
+
+            if (decompOptions2.useBracketNames || decompOptions2.expand)
             {
                 if (rowsOrCols == ERowsCols.Rows)  //will never be null, if so it will have been returned above
                 {
@@ -4758,7 +4791,7 @@ namespace Gekko
                 }
             }
 
-            DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
+            DecompOutput decompOutput = new DecompOutput(table2, ignoredText, red, black);
             return decompOutput;
         }
 

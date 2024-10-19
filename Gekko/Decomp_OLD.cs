@@ -853,7 +853,7 @@ namespace Gekko
             string numberFormat = Decomp.GetNumberFormat(decompOptions2);
 
             Decomp.ERowsCols rowsOrCols = Decomp.VariablesOnRowsOrCols(decompOptions2);
-            if (rowsOrCols == Decomp.ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
+            if (rowsOrCols == Decomp.ERowsCols.None) return new DecompOutput(table1, null, null, null); //fast return 
 
             string ignore = null;
             List<double> red = new List<double>();
@@ -1255,7 +1255,7 @@ namespace Gekko
                 //lamps not shown
             }
 
-            DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
+            DecompOutput decompOutput = new DecompOutput(table2, ignore, red, null);
             return decompOutput;
         }
 

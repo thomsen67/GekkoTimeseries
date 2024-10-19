@@ -952,6 +952,21 @@ namespace Gekko
 
             Decomp.ERowsCols variablesAreOnRows = Decomp.VariablesOnRowsOrCols(decompOptions);
 
+            bool canExpand = false;
+            if (decompOutput.black != null)            
+            {
+                foreach (List<string> names in decompOutput.black)
+                {
+                    if (names != null && names.Count > 1)
+                    {
+                        canExpand = true;
+                        break;
+                    }
+                }
+            }
+
+            //bool visible = false; try { visible = ShowBlackArrow(decompOutput.black, ij); } catch { };  //should not fail, but for safety
+
             if (type == GekkoTableTypes.TableContent)
             {
                 startRow = this.frozenRows + 1;
@@ -994,7 +1009,7 @@ namespace Gekko
                     Cell c = decompOutput.table.Get(i, j);
                     if (c == null)
                     {
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator);  //transparent
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, false);  //transparent
                         continue;
                     }
                     string s = "";
@@ -1025,7 +1040,7 @@ namespace Gekko
                         c.backgroundColor = Globals.decompBlueColor;
                     }
 
-                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator);
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, canExpand);
                 }
             }
         }        
@@ -1112,7 +1127,7 @@ namespace Gekko
             Clipboard.SetText(s, TextDataFormat.Text);            
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, List<List<string>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator, bool canExpand)
         {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
@@ -1174,8 +1189,10 @@ namespace Gekko
                 textBlock.VerticalAlignment = VerticalAlignment.Center;
                 textBlock.FontFamily = Globals.decompFontFamily;
                 textBlock.FontSize = Globals.decompFontSize;
-                textBlock.Padding = new Thickness(2, 2, 4, 3);
 
+                int padding = 2;
+                if (canExpand) padding = 15;
+                textBlock.Padding = new Thickness(padding, 2, 4, 3);
                 dockPanel.type = type;
                 dockPanel.MouseDown += Cell_MouseDown;
                 dockPanel.MouseUp += Cell_MouseUp;
@@ -1227,20 +1244,18 @@ namespace Gekko
             bool b2 = decompFind.decompOptions2.count == ECountType.None;
             bool b3 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left);
             bool b4 = (isRowOrCol == Decomp.ERowsCols.Rows && rowsOrColsSumUp.Item1) || (isRowOrCol == Decomp.ERowsCols.Cols && rowsOrColsSumUp.Item2);
-
             if (b1 && b2 && b3 && b4)
             {
                 //to do red lamp, there must be both vars and time, and they must be on separate row/col.
                 SetRedCircle(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);                
             }
-                        
-            bool bb1 = decompFind.decompOptions2.count == ECountType.None;
-            bool bb2 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top);
-           
-            if (bb1 && bb2)
+
+            //bool bb1 = decompFind.decompOptions2.count != ECountType.Names;  //Names have different width, but is that a problem?
+            bool bb1 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top);           
+            if (bb1)
             {
                 //                
-                this.SetExpandCollapse(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);
+                this.SetExpandCollapse(g, i, j, type, isRowOrCol, black, rowsOrColsSumUp, decompFind.decompOptions2);
             }
         }
 
@@ -1307,9 +1322,8 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
         {
-            int ij = 0;
-            if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
-            else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
+            int ij = GetIJ(i, j, type, isRowOrCol, true);
+            if (ij == -12345) return;
 
             SolidColorBrush brush = new SolidColorBrush();
             double d = 0;
@@ -1354,6 +1368,31 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Get the 0-based number of the element, depending on whether it is using rows or columns. Picks either i or j, or returns -12345 (fail).
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="type"></param>
+        /// <param name="isRowOrCol"></param>
+        /// <param name="isRedLamps"></param>
+        /// <returns></returns>
+        private static int GetIJ(int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, bool isRedLamps)
+        {                        
+            int ij = -12345;
+            if (isRedLamps)
+            {
+                if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
+                else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
+            }
+            else
+            {
+                if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) ij = i;
+                else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top) ij = j;
+            }
+            return ij;
+        }
+
+        /// <summary>
         /// Symbol to indicate that a row/col can be unfolded.
         /// </summary>
         /// <param name="g"></param>
@@ -1364,22 +1403,20 @@ namespace Gekko
         /// <param name="red"></param>
         /// <param name="rowsOrColsSumUp"></param>
         /// <param name="decompOptions2"></param>
-        private void SetExpandCollapse(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
-        {
-            int ij = 0;
-            if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
-            else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
-            
-            //bool ok = false;
-            //if (isRowOrCol == Decomp.ERowsCols.Rows && rowsOrColsSumUp.Item1) ok = true;
-            //if (isRowOrCol == Decomp.ERowsCols.Cols && rowsOrColsSumUp.Item2) ok = true;
-            //if (!ok) return;
+        private void SetExpandCollapse(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<List<string>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
+        {            
+            int ij = GetIJ(i, j, type, isRowOrCol, false);
+            if (ij == -12345) return;         
             
             CheckBox checkBox = new CheckBox();
             checkBox.Style = (Style)FindResource("myCheckboxStyle");
             Grid.SetColumn(checkBox, 1);
             checkBox.Height = 10;
             checkBox.Width = 10;
+            bool visible = false; try { visible = ShowBlackArrow(black, ij); } catch { };  //should not fail, but for safety
+            if (visible) checkBox.Visibility = Visibility.Visible;
+            else checkBox.Visibility = Visibility.Hidden;
+
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;
             dp.Margin = new Thickness(0, 0, 6, 0);
@@ -1388,6 +1425,19 @@ namespace Gekko
             dp.Children.Add(checkBox);
             dp.HorizontalAlignment = HorizontalAlignment.Left;
             g.Children.Add(dp);
+        }
+
+        /// <summary>
+        /// Should black arrow with 0-based number ij be shown
+        /// </summary>
+        /// <param name="black"></param>
+        /// <param name="ij"></param>
+        /// <returns></returns>
+        private static bool ShowBlackArrow(List<List<string>> black, int ij)
+        {
+            bool visible = false;
+            if (black != null) visible = black[ij].Count > 1;
+            return visible;
         }
 
         /// <summary>
@@ -2297,6 +2347,9 @@ namespace Gekko
                 cmdUp.Opacity = 1.0;
                 cmdDown.IsEnabled = true;
                 cmdDown.Opacity = 1.0;
+
+                buttonStyle.IsEnabled = true;
+                buttonStyle.Opacity = 1.0;
             }
 
             if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
@@ -2346,7 +2399,13 @@ namespace Gekko
             {
                 checkRef.IsEnabled = false;  //baseline, not meaningful for multiplier types
                 checkRef.Opacity = 0.5;
-            }            
+            }
+
+            if (this.decompFind.decompOptions2.expand == true)
+            {
+                buttonStyle.IsEnabled = false;
+                buttonStyle.Opacity = 0.5;
+            }
         }        
 
         private void ClearGrid()
@@ -2998,7 +3057,7 @@ namespace Gekko
             if (!isInitializing)
             {                
                 this.decompFind.decompOptions2.expand = true;
-                RecalcCellsWithNewType(decompFind.model);
+                RecalcCellsWithNewType(decompFind.model);                
             }
         }
 
@@ -3007,7 +3066,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2.expand = false;
-                RecalcCellsWithNewType(decompFind.model);
+                RecalcCellsWithNewType(decompFind.model);                
             }
         }
 
