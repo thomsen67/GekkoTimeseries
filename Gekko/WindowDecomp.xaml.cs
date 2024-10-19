@@ -1231,7 +1231,16 @@ namespace Gekko
             if (b1 && b2 && b3 && b4)
             {
                 //to do red lamp, there must be both vars and time, and they must be on separate row/col.
-                SetRedCircle(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);
+                SetRedCircle(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);                
+            }
+                        
+            bool bb1 = decompFind.decompOptions2.count == ECountType.None;
+            bool bb2 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top);
+           
+            if (bb1 && bb2)
+            {
+                //                
+                this.SetExpandCollapse(g, i, j, type, isRowOrCol, red, rowsOrColsSumUp, decompFind.decompOptions2);
             }
         }
 
@@ -1285,6 +1294,17 @@ namespace Gekko
 
         //public static double delete = 0.15;
 
+        /// <summary>
+        /// Yellow/Orange/Red "lamps" in decomp GUI
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="type"></param>
+        /// <param name="isRowOrCol"></param>
+        /// <param name="red"></param>
+        /// <param name="rowsOrColsSumUp"></param>
+        /// <param name="decompOptions2"></param>
         private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
         {
             int ij = 0;
@@ -1330,6 +1350,43 @@ namespace Gekko
             string rowCol = "row";
             if (isRowOrCol == Decomp.ERowsCols.Cols) rowCol = "col";
             dp.ToolTip = RedLampText(rowCol, "Try to click the 'Errors' checkbox.", red[ij]);
+            g.Children.Add(dp);
+        }
+
+        /// <summary>
+        /// Symbol to indicate that a row/col can be unfolded.
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="type"></param>
+        /// <param name="isRowOrCol"></param>
+        /// <param name="red"></param>
+        /// <param name="rowsOrColsSumUp"></param>
+        /// <param name="decompOptions2"></param>
+        private void SetExpandCollapse(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
+        {
+            int ij = 0;
+            if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
+            else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
+            
+            //bool ok = false;
+            //if (isRowOrCol == Decomp.ERowsCols.Rows && rowsOrColsSumUp.Item1) ok = true;
+            //if (isRowOrCol == Decomp.ERowsCols.Cols && rowsOrColsSumUp.Item2) ok = true;
+            //if (!ok) return;
+            
+            CheckBox checkBox = new CheckBox();
+            checkBox.Style = (Style)FindResource("myCheckboxStyle");
+            Grid.SetColumn(checkBox, 1);
+            checkBox.Height = 10;
+            checkBox.Width = 10;
+            DockPanel dp = new DockPanel();
+            dp.Width = 15; dp.Height = 15;
+            dp.Margin = new Thickness(0, 0, 6, 0);
+            dp.SetValue(Grid.ColumnProperty, j);
+            dp.SetValue(Grid.RowProperty, i);
+            dp.Children.Add(checkBox);
+            dp.HorizontalAlignment = HorizontalAlignment.Left;
             g.Children.Add(dp);
         }
 
