@@ -3370,7 +3370,7 @@ namespace Gekko
                 {
                     normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
                 }
-            }            
+            }
 
             GekkoDictionary<string, bool> rownames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> colnames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -3391,47 +3391,9 @@ namespace Gekko
             //table.PrintCellsForDebug();
 
             DecompOutput decompOutput = null;
-            if (true)
-            {                
-                DecompTableHandleSignAndShares(table, decompOptions2);
-                decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-                decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
-            }
-            else
-            {
-
-                bool ok = true;
-
-                if (rowsCols == ERowsCols.Rows)
-                {
-                    for (int j = 2; j <= table.GetColMaxNumber(); j++)
-                    {
-                        if (table.Get(2, j) == null) { ok = false; break; }
-                    }
-                }
-
-                if (rowsCols == ERowsCols.Cols)
-                {
-                    for (int i = 2; i <= table.GetRowMaxNumber(); i++)
-                    {
-                        if (table.Get(i, 2) == null) { ok = false; break; }
-                    }
-                }
-
-                if (ok)
-                {
-                    DecompTableHandleSignAndShares(table, decompOptions2);
-                    decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
-                    decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
-                }
-                else
-                {
-                    //In case something goes wrong in GUI. Delete after some time.
-                    MessageBox.Show("Cannot normalize (change sign from negative to positive) the selected variable");
-                    decompOutput = new DecompOutput(table, null, null, null);
-                    decompOutput.rowsOrColsSumUp = new Tuple<bool, bool>(false, false);
-                }
-            }
+            DecompTableHandleSignAndShares(table, decompOptions2);
+            decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
+            decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
             return decompOutput;
         }
 
@@ -4313,7 +4275,8 @@ namespace Gekko
 
         /// <summary>
         /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
-        /// At the end, if decompOptions2.useBracketNames == true, any "[0]" is also removed.
+        /// At the end, if decompOptions2.useBracketNames == true, any "[0]" is also removed, and for bracket-names
+        /// singleton sets x[*] are shown with their real varname x[tot].
         /// </summary>
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
@@ -4731,8 +4694,7 @@ namespace Gekko
             }
 
             // ---------------- black, collapse arrows -----------------------
-
-            
+                        
             if (rowsOrCols == ERowsCols.Rows)
             {
                 for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
@@ -4759,6 +4721,9 @@ namespace Gekko
             }
 
             // ==================================================================================
+            // For bracket names, remove "[0]". Also, for singleton sets #a_ = ['tot'] we take
+            // the real variable, for instance x[tot].
+            // ==================================================================================
 
             if (decompOptions2.useBracketNames || decompOptions2.expand)
             {
@@ -4766,28 +4731,24 @@ namespace Gekko
                 {
                     for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
                     {
-                        string s = table2.Get(i, 1).CellText.TextData[0];
-                        if (s.Contains(Globals.decompNoLag))
-                        {
-                            s = s.Replace(Globals.decompNoLag, "");
-                            table2.writeOnce = false;
-                            table2.Set(new Coord(i, 1), s);
-                            table2.writeOnce = true;
-                        }
+                        Cell c1 = table2.Get(i, 1);
+                        Cell c2 = table2.Get(i, 2);
+                        string s = c1.CellText.TextData[0];
+                        if (Globals.decompShowSingletonSet && c2.vars_hack != null && c2.vars_hack.Count == 1) s = c2.vars_hack[0];
+                        s = s.Replace(Globals.decompNoLag, "");
+                        c1.CellText.TextData = new List<string> { s };
                     }
                 }
                 else if (rowsOrCols == ERowsCols.Cols)  //will never be null, if so it will have been returned above
                 {
                     for (int j = 2; j <= table2.GetColMaxNumber(); j++)
                     {
-                        string s = table2.Get(1, j).CellText.TextData[0];
-                        if (s.Contains(Globals.decompNoLag))
-                        {
-                            s = s.Replace(Globals.decompNoLag, "");
-                            table2.writeOnce = false;
-                            table2.Set(new Coord(1, j), s);
-                            table2.writeOnce = true;
-                        }
+                        Cell c1 = table2.Get(1, j);
+                        Cell c2 = table2.Get(2, j);
+                        string s = c1.CellText.TextData[0];
+                        if (Globals.decompShowSingletonSet && c2.vars_hack != null && c2.vars_hack.Count == 1) s = c2.vars_hack[0];
+                        s = s.Replace(Globals.decompNoLag, "");                        
+                        c1.CellText.TextData = new List<string> { s };
                     }
                 }
             }
