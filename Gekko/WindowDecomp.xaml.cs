@@ -1414,10 +1414,19 @@ namespace Gekko
             Grid.SetColumn(checkBox, 1);
             checkBox.Height = 10;
             checkBox.Width = 10;
-            checkBox.Opacity = 0.35;
+            checkBox.Opacity = 0.30;
             bool visible = false; try { visible = ShowBlackArrow(black, ij); } catch { };  //should not fail, but for safety
+            int hidden = 0; if (black != null) hidden = black[ij].Count;
             if (visible) checkBox.Visibility = Visibility.Visible;
             else checkBox.Visibility = Visibility.Hidden;
+            string text = "Contains " + hidden +" aggregated variables: expand/collapse clicking will be improved in a later Gekko version.\nFor now, click the 'Expand' checkbox to see all variables, \nor expand more selectively from the Rows/Cols selector to the right.\n";
+            checkBox.ToolTip = text;
+            //checkBox.Checked += Clicked;
+            checkBox.Checked += (sender, e) =>
+            {
+                // Your inline click event handling code here
+                MessageBox.Show(text);
+            };
 
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;

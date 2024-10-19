@@ -11959,7 +11959,23 @@ namespace Gekko
             if (iv != null) ts = iv as Series;
             if (printName)
             {
-                rv.Add("Series: " + varnameMaybeWithFreq);
+                string sDomains = null;
+                if (ts.mmi != null)
+                {
+                    //then it is a sub-series
+                    Series parent = ts.mmi.parent;
+                    double dimCount2 = 1d;
+                    string dimCount = null;
+                    List<List<string>> elements = new List<List<string>>();
+                    List<string> domains = new List<string>();
+                    List<MultidimItem> keys = parent.GetSortedDimensionKeys();
+                    DispHelperArraySeries2(parent, keys, ref dimCount2, ref dimCount, elements, domains);
+                    if (domains.Count > 0)
+                    {
+                        sDomains = ", domains: [" + Stringlist.GetListWithCommas(domains) + "]";
+                    }
+                }
+                rv.Add("Series: " + varnameMaybeWithFreq + sDomains);
             }
 
             List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(varnameWithoutFreq);
@@ -15765,9 +15781,7 @@ namespace Gekko
 
                 if (ts.type == ESeriesType.ArraySuper)
                 {
-                    List<MultidimItem> keys = null;
-                    keys = ts.dimensionsStorage.storage.Keys.ToList();
-                    keys.Sort(Multidim.CompareMultidimItems);
+                    List<MultidimItem> keys = ts.GetSortedDimensionKeys();
                     G.Writeln2("------------------------------------------------------------------------------------------");
                     DispHelperArraySeries(ts, keys, false);
                     G.Writeln("------------------------------------------------------------------------------------------");
@@ -15790,7 +15804,7 @@ namespace Gekko
                     Trace2.CallTraceViewer(trace, int.MaxValue);
                 }
             }
-        }
+        }        
 
         private static void DispHelper(GekkoTime tStart, GekkoTime tEnd, List<IVariable> m, List<string> list, List<string> names, List originalList, bool showDetailed, bool showAllPeriods, bool clickedLink, ref int nonSeries, ref int seriesCounter)
         {
@@ -16023,8 +16037,7 @@ namespace Gekko
                 GekkoDictionary<string, string>[] temp = null;
                 if (ts.type == ESeriesType.ArraySuper)
                 {
-                    keys = ts.dimensionsStorage.storage.Keys.ToList();
-                    keys.Sort(Multidim.CompareMultidimItems);
+                    keys = ts.GetSortedDimensionKeys();
                     temp = new GekkoDictionary<string, string>[ts.dimensions];
                 }
 
@@ -16455,7 +16468,7 @@ namespace Gekko
             {
                 if (elements[i].Count > 0)
                 {
-                    G.Writeln("Dimension " + (i + 1) + " (" + domains[i] + elements[i].Count + " elements): " + Stringlist.GetListWithCommas(elements[i]));
+                    G.Writeln("Dimension " + (i + 1) + " (" + domains[i] + ", " + elements[i].Count + " elements): " + Stringlist.GetListWithCommas(elements[i]));
                 }
             }
 
@@ -16502,7 +16515,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for DISP, and also used in Functions.getelements()
+        /// Helper for DISP, and also used in Functions.getelements(). For domains list, no-domain is "*".
         /// </summary>
         /// <param name="ts"></param>
         /// <param name="keys"></param>
@@ -16515,13 +16528,13 @@ namespace Gekko
             GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
             for (int i = 0; i < ts.dimensions; i++)
             {
-                string domain = null;
+                string domain = "*";
                 if (ts?.meta?.domains != null)
                 {
-                    if (i >= 0 && i < domains.Count) domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
+                    if (i >= 0 && i < ts.meta.domains.Length) domain = ts.meta.domains[i];
                 }
-                if (domain == "*") domain = null;
-                if (domain != null) domain = domain + ", ";
+                //if (domain == "*") domain = null;
+                //if (domain != null) domain = domain + ", ";
                 temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 int ii = 0;
                 foreach (MultidimItem key in keys)

@@ -1878,6 +1878,22 @@ namespace Gekko
             return temp;
         }
 
+        /// <summary>
+        /// Gets dimension keys from timeseries. Returns empty list if none found (for instance: if series is non-array-series).
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns></returns>
+        public List<MultidimItem> GetSortedDimensionKeys()
+        {
+            List<MultidimItem> keys = new List<MultidimItem>();
+            if (this.type == ESeriesType.ArraySuper)
+            {
+                keys = this.dimensionsStorage.storage.Keys.ToList();
+                keys.Sort(Multidim.CompareMultidimItems);
+            }
+            return keys;
+        }
+
         private static Series ArithmeticsArraySeriesArraySeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
             //SOMETHING FISHY HERE, when domains do not match

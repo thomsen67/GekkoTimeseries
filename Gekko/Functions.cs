@@ -2821,7 +2821,6 @@ namespace Gekko
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
                 new Error("setdomains(): Expected array-series");
-                //throw new GekkoException();
             }
             List<string> ss = new List<string>();
             for (int i = 0; i < x_series.meta.domains.Length; i++) ss.Add(x_series.meta.domains[i]);  //cloning for safety
