@@ -1414,6 +1414,7 @@ namespace Gekko
             Grid.SetColumn(checkBox, 1);
             checkBox.Height = 10;
             checkBox.Width = 10;
+            checkBox.Opacity = 0.35;
             bool visible = false; try { visible = ShowBlackArrow(black, ij); } catch { };  //should not fail, but for safety
             if (visible) checkBox.Visibility = Visibility.Visible;
             else checkBox.Visibility = Visibility.Hidden;

@@ -948,7 +948,8 @@ namespace Gekko
                 if (modelGamsScalar.isPerpetualModel) i = 0;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
-                    if (showErrors) new Error("Period " + time.ToString() + " outside GAMS scalar model period. " + modelGamsScalar.GamsModelDefinedString() + ".");
+                    if (showErrors) new Error("Period " + time.ToString() + " outside GAMS scalar model period. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                    return;
                 }
                 if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                 DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
@@ -5447,7 +5448,7 @@ namespace Gekko
                 List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
                 if (eqNumbers == null)
                 {
-                    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
+                    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
                     return;
                 }
                 List<EqHelper> eqsNew = FindEquationsThatContainGivenVariableSorted(variableName, o.tSelected, eqNumbers, model);
