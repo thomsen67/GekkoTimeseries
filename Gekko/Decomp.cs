@@ -3792,8 +3792,10 @@ namespace Gekko
                             {
                                 List<string> tmp = new List<string>();
                                 foreach (string s in agg.fullVariableNames)
-                                {                                    
-                                    tmp.Add(FullVariableNamePretty(s, true)); 
+                                {
+                                    string s2 = FullVariableNamePretty(s, true);
+                                    string s3 = TrimAndRemoveLag0(s2);
+                                    tmp.Add(s3); 
                                 }
                                 tmp2 = Stringlist.GetListWithCommas(tmp, "  ");  //x[i, j], x[i, k] --> x[i, j],  x[i, k]
                             }
@@ -4893,7 +4895,7 @@ namespace Gekko
                         Cell c2 = table2.Get(i, 2);
                         string s = c1.CellText.TextData[0];
                         if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
-                        //s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
+                        s = TrimAndRemoveLag0(s);
                         c1.CellText.TextData = new List<string> { s };
                     }
                 }
@@ -4904,8 +4906,8 @@ namespace Gekko
                         Cell c1 = table2.Get(1, j);
                         Cell c2 = table2.Get(2, j);
                         string s = c1.CellText.TextData[0];
-                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);                        
-                        //s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
+                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
+                        s = TrimAndRemoveLag0(s);
                         c1.CellText.TextData = new List<string> { s };
                     }
                 }
@@ -4913,6 +4915,20 @@ namespace Gekko
 
             DecompOutput decompOutput = new DecompOutput(table2, ignoredText, red, black);
             return decompOutput;
+        }
+
+        /// <summary>
+        /// Converts something like "npop[0][0]" into "npop[0]", only removing [0] if it is last (after trimming).
+        /// If lags are known to be always last, this is safe. Beware that "npop[0]¤[0]" becomes "npop[0]¤".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static string TrimAndRemoveLag0(string s)
+        {
+            if (s == null) return s;
+            s = s.Trim();
+            if (s.EndsWith(Globals.decompNoLag)) s = G.Substring(s, 0, s.Length - 1 - Globals.decompNoLag.Length).Trim();
+            return s;
         }
 
         /// <summary>
