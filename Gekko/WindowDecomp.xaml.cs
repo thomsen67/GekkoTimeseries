@@ -941,7 +941,7 @@ namespace Gekko
                 g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });
             }
         }
-        
+
         private void PutTableIntoGrid2(Grid g, DecompOutput decompOutput, GekkoTableTypes type, DecompOptions2 decompOptions)
         {
             int offsetRow = 0;
@@ -954,7 +954,7 @@ namespace Gekko
             Decomp.ERowsCols variablesAreOnRows = Decomp.VariablesOnRowsOrCols(decompOptions);
 
             bool canExpand = false;
-            if (decompOutput.black != null)            
+            if (decompOutput.black != null)
             {
                 foreach (List<string> names in decompOutput.black)
                 {
@@ -1032,13 +1032,25 @@ namespace Gekko
                         if (c.numberShouldShowAsN) s = "N";
                     }
                     else if (c.cellType == CellType.Date) s = c.date;
-                                        
+
                     string v = Decomp.GetVarsHack(c);
                     if (v == Globals.decompErrorName) v = null;
                     if (v == Globals.decompIgnoreName) v = null;
-                    if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
+                    if (v != null)
                     {
-                        c.backgroundColor = Globals.decompBlueColor;
+                        if (this.decompFind.decompOptions2.mergeNewVariables != null)
+                        {                            
+                            bool ok = false;
+                            foreach (string mergeVar in this.decompFind.decompOptions2.mergeNewVariables)
+                            {
+                                if (G.Equal(mergeVar.Replace(" ", ""), v.Replace(" ", ""))) //Unsure of blank situation inside []...
+                                {
+                                    ok = true;
+                                    break;
+                                }                                
+                            }
+                            if (ok) c.backgroundColor = Globals.decompBlueColor;
+                        }
                     }
 
                     AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, canExpand);
@@ -1419,7 +1431,7 @@ namespace Gekko
             int hidden = 0; if (black != null) hidden = black[ij].Count;
             if (visible) checkBox.Visibility = Visibility.Visible;
             else checkBox.Visibility = Visibility.Hidden;
-            string text = "Contains " + hidden +" aggregated variables: interactive expand/collapse will be improved in a later Gekko version.\nFor now, use the 'Expand' checkbox to expand all aggregated variables, or inspect count/names with the 'Count' or 'Names' checkboxes.\nYou may expand dimensions more selectively from the Rows/Cols selector to the right.";
+            string text = "Contains " + hidden +" aggregated variables: interactive expand/collapse will be improved in a later Gekko version.\nFor now, use the 'Expand' checkbox to expand all aggregated variables, or inspect count/names with the 'Count' or 'Names' checkboxes.\nYou may expand dimensions more selectively from the Rows/Cols selector to the right.\n(Aggregated variables may also be the result of selecting the 'Group age' checkbox).";
             checkBox.ToolTip = text;
             //checkBox.Checked += Clicked;
             checkBox.Checked += (sender, e) =>

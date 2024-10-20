@@ -3839,8 +3839,9 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private static string FullVariableNamePretty(string s, bool replaceResidualName)
+        public static string FullVariableNamePretty(string s, bool replaceResidualName)
         {
+            //!!!!!!!!! do not feed with "x[a, b]" will become "x[a,  b]".
             if (s == null) return s;
             s = s.Replace("¤", "").Replace(",", ", ");
             if (replaceResidualName) s = s.Replace(Globals.decompResidualName, Globals.decompResidualName2);
@@ -4923,7 +4924,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private static string TrimAndRemoveLag0(string s)
+        public static string TrimAndRemoveLag0(string s)
         {
             if (s == null) return s;
             s = s.Trim();
