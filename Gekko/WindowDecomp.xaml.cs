@@ -1043,11 +1043,14 @@ namespace Gekko
                             bool ok = false;
                             foreach (string mergeVar in this.decompFind.decompOptions2.mergeNewVariables)
                             {
-                                if (G.Equal(mergeVar.Replace(" ", ""), v.Replace(" ", ""))) //Unsure of blank situation inside []...
+                                // HACK HACK HACK
+                                // HACK HACK HACK
+                                // HACK HACK HACK
+                                if (G.Equal(mergeVar.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""), v.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""))) //Unsure of blank situation inside []...
                                 {
                                     ok = true;
                                     break;
-                                }                                
+                                }
                             }
                             if (ok) c.backgroundColor = Globals.decompBlueColor;
                         }
