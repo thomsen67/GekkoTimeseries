@@ -3395,7 +3395,7 @@ namespace Gekko
         private static string AgeIntervals(string s)
         {
             int span = 20;
-            int ii = -12345;
+            int ii = -12345;            
             if (int.TryParse(s, out ii))
             {                
                 int intervalStart = (ii / span) * span;
@@ -4190,41 +4190,119 @@ namespace Gekko
 
             if (decompOptions2.groupAge)
             {
-                foreach (KeyValuePair<string, int> kvp in frame.frameDimensionNames)
+                int a1 = 20; int a2 = 67; int aMax = 102;
+                if (decompOptions2.expand)
                 {
-                    bool isAge = false;
-                    if (kvp.Key.Contains("#") && !kvp.Key.Contains(Globals.decompSetDimNumberChar))
+                    //uses "expand" column
+                    int ie = frame.frameDimensionNames[Globals.col_expand];
+
+                    bool isAge1 = false;
+                    bool isAge2 = false;
+                    bool isAge3 = false;
+                    int[] hits1 = new int[aMax];
+                    int[] hits2 = new int[aMax];
+                    int[] hits3 = new int[aMax];
+                    foreach (FrameLightRow frameRow in frame.data)
                     {                        
-                        int[] hits = new int[102];
+                        string varname = frameRow.storageDimensions[ie].text;
+                        //we do not use O.Chop(), Unchop() because it is just a hack
+                        int i1 = varname.IndexOf('[');
+                        int i2 = varname.IndexOf(']');
+                        string x = G.Substring(varname, i1 + 1, i2 - 1);
+                        string[] ss = x.Split(',');
+                        int cnt = 0;
+                        foreach (string s in ss)
+                        {
+                            cnt++;
+                            if (cnt == 1) AgeHelper1(s, a1, a2, aMax, hits1);
+                            else if (cnt == 2) AgeHelper1(s, a1, a2, aMax, hits2);
+                            else if (cnt == 3) AgeHelper1(s, a1, a2, aMax, hits3);
+                        }
+                    }
+
+                    isAge1 = AgeHelper2(a1, a2, hits1);
+                    isAge2 = AgeHelper2(a1, a2, hits2);
+                    isAge3 = AgeHelper2(a1, a2, hits3);
+
+                    if (isAge1 || isAge2 || isAge3)
+                    {
                         foreach (FrameLightRow frameRow in frame.data)
                         {
-                            string s = frameRow.storageDimensions[kvp.Value].text;
-                            bool ok = false;
-                            int i = -12345;
-                            if (int.TryParse(s, out i))
+                            string varname = frameRow.storageDimensions[ie].text;
+                            int i1 = varname.IndexOf('[');
+                            int i2 = varname.IndexOf(']');
+                            string x = G.Substring(varname, i1 + 1, i2 - 1);
+                            string[] ss = x.Split(',');
+                            string sIndex = null;
+                            int cnt = 0;
+                            foreach (string s in ss)
                             {
-                                if (i >= 0 && i <= 101)
+                                cnt++;
+                                if ((cnt == 1 && isAge1) || (cnt == 2 && isAge2) || (cnt == 3 && isAge3))
                                 {
-                                    ok = true;
-                                    if (i >= 20) hits[i]++;
+                                    sIndex += AgeIntervals(s) + ", ";
                                 }
-                            }                            
-                        }                                                
-                        int span = 0;
-                        foreach (int i in hits) span += Math.Min(i, 1);
-                        double ratioSpan = (double)span / (102 - 20);
-                        if (ratioSpan > 0.90) isAge = true;  //over 90% of ages 20-101 are represented
+                                else
+                                {
+                                    sIndex += s + ", ";
+                                }
+                            }
+                            sIndex = G.Substring(sIndex, 0, sIndex.Length - 1 - ", ".Length);
+                            string s2 = G.Substring(varname, 0, i1) + sIndex + G.Substring(varname, i2, varname.Length - 1);
+                            frameRow.storageDimensions[ie] = new CellLight(s2);
+                        }
+                    }
 
-                        if (isAge)
-                        {
+                    foreach (KeyValuePair<string, int> kvp in frame.frameDimensionNames)
+                    {
+                        bool isAge = false;
+                        if ((kvp.Key.Contains("#") && !kvp.Key.Contains(Globals.decompSetDimNumberChar)))
+                        {                            
+                            int[] hits = new int[aMax];
                             foreach (FrameLightRow frameRow in frame.data)
                             {
                                 string s = frameRow.storageDimensions[kvp.Value].text;
-                                int i = -12345;
-                                if (int.TryParse(s, out i))
-                                {
+                                AgeHelper1(s, a1, a2, aMax, hits);
+                            }
+                            isAge = AgeHelper2(a1, a2, hits);
+
+                            if (isAge)
+                            {
+                                foreach (FrameLightRow frameRow in frame.data)
+                                {                                    
                                     CellLight c = frameRow.storageDimensions[kvp.Value];
                                     frameRow.storageDimensions[kvp.Value] = new CellLight(AgeIntervals(c.text));
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, int> kvp in frame.frameDimensionNames)
+                    {
+                        bool isAge = false;
+                        if ((kvp.Key.Contains("#") && !kvp.Key.Contains(Globals.decompSetDimNumberChar)) || (decompOptions2.expand && kvp.Key == "expand"))
+                        {                            
+                            int[] hits = new int[aMax];
+                            foreach (FrameLightRow frameRow in frame.data)
+                            {
+                                string s = frameRow.storageDimensions[kvp.Value].text;
+                                AgeHelper1(s, a1, a2, aMax, hits);
+                            }
+                            isAge = AgeHelper2(a1, a2, hits);
+
+                            if (isAge)
+                            {
+                                foreach (FrameLightRow frameRow in frame.data)
+                                {
+                                    string s = frameRow.storageDimensions[kvp.Value].text;
+                                    int i = -12345;
+                                    if (int.TryParse(s, out i))
+                                    {
+                                        CellLight c = frameRow.storageDimensions[kvp.Value];
+                                        frameRow.storageDimensions[kvp.Value] = new CellLight(AgeIntervals(c.text));
+                                    }
                                 }
                             }
                         }
@@ -4233,6 +4311,30 @@ namespace Gekko
             }
 
             return frame;
+        }
+
+        private static bool AgeHelper2(int a1, int a2, int[] hits)
+        {
+            bool isAge = false;
+            int span = 0;
+            foreach (int i in hits) span += Math.Min(i, 1);
+            double ratio = (double)span / (a2 - a1 + 1);
+            if (ratio > 0.80) isAge = true;  //over 80% of ages 20-67 are represented
+            return isAge;
+        }
+
+        private static void AgeHelper1(string s, int a1, int a2, int aMax, int[] hits)
+        {
+            bool ok = false;
+            int i = -12345;
+            if (int.TryParse(s, out i))
+            {
+                if (i >= 0 && i <= aMax - 1)
+                {
+                    ok = true;
+                    if (i >= a1 && i <= a2) hits[i]++;
+                }
+            }
         }
 
         /// <summary>
@@ -4578,29 +4680,32 @@ namespace Gekko
                         {
                             bool hit = false;
                             List<string> xx = c.vars_hack;
-                            foreach (string s in xx)
+                            if (xx != null)
                             {
-                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
-                                if (a == -12345) continue;
-
-                                bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-                                bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-
-                                if (b1) //first-position databank checked
+                                foreach (string s in xx)
                                 {
-                                    if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                    int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
+                                    if (a == -12345) continue;
+
+                                    bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                    bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                    if (b1) //first-position databank checked
                                     {
-                                        hit = true;
-                                        goto Lbl1;
+                                        if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                        {
+                                            hit = true;
+                                            goto Lbl1;
+                                        }
                                     }
-                                }
 
-                                if (b2) //ref databank checked
-                                {
-                                    if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                    if (b2) //ref databank checked
                                     {
-                                        hit = true;
-                                        goto Lbl1;
+                                        if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                        {
+                                            hit = true;
+                                            goto Lbl1;
+                                        }
                                     }
                                 }
                             }
@@ -4787,7 +4892,7 @@ namespace Gekko
                         Cell c2 = table2.Get(i, 2);
                         string s = c1.CellText.TextData[0];
                         if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
-                        s = s.Replace(Globals.decompNoLag, "");
+                        s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
                         c1.CellText.TextData = new List<string> { s };
                     }
                 }
@@ -4798,8 +4903,8 @@ namespace Gekko
                         Cell c1 = table2.Get(1, j);
                         Cell c2 = table2.Get(2, j);
                         string s = c1.CellText.TextData[0];
-                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
-                        s = s.Replace(Globals.decompNoLag, "");                        
+                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);                        
+                        s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
                         c1.CellText.TextData = new List<string> { s };
                     }
                 }

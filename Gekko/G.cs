@@ -2852,7 +2852,7 @@ namespace Gekko
             if (G.IsEnglishLetter(c) || char.IsDigit(c))
                 return true;
             else return false;
-        }
+        }        
 
         /// <summary>
         /// letters, digits, _ or !
@@ -4310,6 +4310,7 @@ namespace Gekko
         /// <returns></returns>
         public static string ReplaceLastOccurrence(string s, string find, string replace)
         {
+            if (s == null) return s;
             int place = s.LastIndexOf(find);
             if (place == -1)
                 return s;

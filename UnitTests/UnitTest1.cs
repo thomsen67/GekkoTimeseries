@@ -22129,6 +22129,28 @@ print(df2)
         public void _Test_FunctionsInBuilt()
         {
             I("reset; time 2001 2003;");
+            I("x1 = series(1);");
+            I("x1[a] = 2;");
+            I("x1.setdomains(('#a1',));");
+            I("#i1 = x1[a].getparent().getdomains();");
+            I("#j1 = x1.getdomains();");
+            _AssertListString(First(), "#i1", 1, "#a1");
+            _AssertListString(First(), "#j1", 1, "#a1");
+            I("x2 = series(2);");
+            I("x2[a,b] = 2;");
+            I("x2.setdomains(('*', '#a1',));");
+            I("#i1 = x2[a,b].getparent().getdomains();");
+            I("#j1 = x2.getdomains();");
+            _AssertListString(First(), "#i1", new StringOrList("*", "#a1"));
+            _AssertListString(First(), "#j1", new StringOrList("*", "#a1"));
+            I("x3 = series(3);");
+            I("x3[a,b,c] = 2;");            
+            I("#i1 = x3[a,b,c].getparent().getdomains();");
+            I("#j1 = x3.getdomains();");
+            _AssertListString(First(), "#i1", new StringOrList("*", "*", "*"));
+            _AssertListString(First(), "#j1", new StringOrList("*", "*", "*"));
+
+            I("reset; time 2001 2003;");
             I("x1 = 1;");
             I("x2 = timeless(1);");
             I("x3 = series(1);");
