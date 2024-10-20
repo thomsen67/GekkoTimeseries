@@ -11959,8 +11959,9 @@ namespace Gekko
             if (iv != null) ts = iv as Series;
             if (printName)
             {
+                
                 string sDomains = null;
-                if (ts.mmi != null)
+                if (ts?.mmi != null)
                 {
                     //then it is a sub-series
                     Series parent = ts.mmi.parent;

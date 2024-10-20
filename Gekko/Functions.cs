@@ -2761,7 +2761,7 @@ namespace Gekko
             }
             if (x_series.dimensions != ss.Length)
             {
-                new Error("setdomains(): The array-timeseries has " + x_series.dimensions + ", whereas the provided list of domain names has " + ss.Length + " dimensions.");
+                new Error("setdomains(): The array-timeseries has " + x_series.dimensions + " dimensions, whereas the provided list of domain names has " + ss.Length + " elements.");
             }
             foreach (string s in ss)
             {
@@ -2816,11 +2816,16 @@ namespace Gekko
         /// <returns></returns>
         public static List getdomains(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            Series x_series = x as Series;
-            if (x_series.meta.domains == null) return new List(new List<string>());  //empty
+            Series x_series = x as Series;            
+            if (x_series.meta.domains == null)
+            {
+                List<string> ss2 = new List<string>();
+                for (int i = 0; i < x_series.dimensions; i++) ss2.Add(Globals.dimensionWithoutDomain);
+                return new List(ss2);
+            }
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
-                new Error("setdomains(): Expected array-series");
+                new Error("getdomains(): Expected array-series");
             }
             List<string> ss = new List<string>();
             for (int i = 0; i < x_series.meta.domains.Length; i++) ss.Add(x_series.meta.domains[i]);  //cloning for safety

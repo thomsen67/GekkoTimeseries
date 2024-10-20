@@ -176,7 +176,7 @@ namespace Gekko
                 {
                     if (dim > 1) prettyName += ", ";
                     if (shownDimensions.Contains(dim)) prettyName += row.GetDimension(row.parent, variableName + Globals.decompDimension + dim).text;
-                    else prettyName += "*";
+                    else prettyName += "*";  //This is not conceptually the same as a domainless dimension
                 }
                 if (dims > 0) prettyName += "]";  //For bracket-style, "[0]" are removed late in the table processing, so that [-1] gets sorted before [0] and [+1] etc.                
                 prettyName += lag;
@@ -4125,7 +4125,7 @@ namespace Gekko
                                 //#i = "a"
                                 //¤i = 1, what dimension number does #i have?
                                 string domain = chop.domains[ii];  //has corresponding dimensions                              
-                                if (domain == null || domain == "*")
+                                if (domain == null || domain == Globals.dimensionWithoutDomain)
                                 {
                                     frameRow.AddDimension(frame, Globals.decompUniversal, new CellLight(index));
                                     frameRow.AddDimension(frame, Globals.decompUniversal.Replace('#', Globals.decompSetDimNumberChar), new CellLight(ii + 1));
@@ -5163,7 +5163,7 @@ namespace Gekko
         public static string ConvertSetname(string domain)
         {
             string rv = null;
-            if (domain == null || domain == "*")
+            if (domain == null || domain == Globals.dimensionWithoutDomain)
             {
                 rv = Globals.decompUniversal;
             }

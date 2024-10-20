@@ -8693,7 +8693,7 @@ namespace UnitTests
         {
             //% deviation
             double temp = 100d * (cps - target) / target;
-            new Writeln("Measured = " + cps + ", Target = " + target + ", %diff = " + temp + ", positive %diff is good");
+            new Writeln("Measured = " + cps + ", Target = " + target + ", %diff = " + temp + ", positive %diff is good, +/- " + p + "% is expected ");
             Assert.AreEqual(temp, 0d, p);
         }
 
