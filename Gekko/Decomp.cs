@@ -3289,12 +3289,7 @@ namespace Gekko
                         {
                             //MessageBox.Show("Age aggregation...?");
                             if (s == "99-") s = "99";
-                            int ii = -12345;
-                            if (int.TryParse(s, out ii))
-                            {
-                                int ten = ii / 10;
-                                s = ten + "0" + ".." + ten + "9";
-                            }
+                            s = AgeIntervals(s);
                         }
                     }
                 }
@@ -3395,6 +3390,19 @@ namespace Gekko
             decompOutput = DecompTableHandleSortAndIgnoreAndErrors(table, decompOptions2, model);
             decompOutput.rowsOrColsSumUp = decompRowsOrColsPrimeBased;
             return decompOutput;
+        }
+
+        private static string AgeIntervals(string s)
+        {
+            int span = 20;
+            int ii = -12345;
+            if (int.TryParse(s, out ii))
+            {                
+                int intervalStart = (ii / span) * span;
+                int intervalEnd = intervalStart + span - 1;
+                s = intervalStart + ".." + intervalEnd;
+            }
+            return s;
         }
 
         /// <summary>
@@ -4178,6 +4186,50 @@ namespace Gekko
                 int i2 = frameRow.storageValues.Count;
                 for (int i = 0; i < maxDimension - i1; i++) frameRow.storageDimensions.Add(new CellLight());
                 for (int i = 0; i < maxValue - i2; i++) frameRow.storageValues.Add(new CellLight());
+            }
+
+            if (decompOptions2.groupAge)
+            {
+                foreach (KeyValuePair<string, int> kvp in frame.frameDimensionNames)
+                {
+                    bool isAge = false;
+                    if (kvp.Key.Contains("#") && !kvp.Key.Contains(Globals.decompSetDimNumberChar))
+                    {                        
+                        int[] hits = new int[102];
+                        foreach (FrameLightRow frameRow in frame.data)
+                        {
+                            string s = frameRow.storageDimensions[kvp.Value].text;
+                            bool ok = false;
+                            int i = -12345;
+                            if (int.TryParse(s, out i))
+                            {
+                                if (i >= 0 && i <= 101)
+                                {
+                                    ok = true;
+                                    if (i >= 20) hits[i]++;
+                                }
+                            }                            
+                        }                                                
+                        int span = 0;
+                        foreach (int i in hits) span += Math.Min(i, 1);
+                        double ratioSpan = (double)span / (102 - 20);
+                        if (ratioSpan > 0.90) isAge = true;  //over 90% of ages 20-101 are represented
+
+                        if (isAge)
+                        {
+                            foreach (FrameLightRow frameRow in frame.data)
+                            {
+                                string s = frameRow.storageDimensions[kvp.Value].text;
+                                int i = -12345;
+                                if (int.TryParse(s, out i))
+                                {
+                                    CellLight c = frameRow.storageDimensions[kvp.Value];
+                                    frameRow.storageDimensions[kvp.Value] = new CellLight(AgeIntervals(c.text));
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             return frame;

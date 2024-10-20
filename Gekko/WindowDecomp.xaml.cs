@@ -1419,7 +1419,7 @@ namespace Gekko
             int hidden = 0; if (black != null) hidden = black[ij].Count;
             if (visible) checkBox.Visibility = Visibility.Visible;
             else checkBox.Visibility = Visibility.Hidden;
-            string text = "Contains " + hidden +" aggregated variables: interactive expand/collapse will be improved in a later Gekko version.\nFor now, use the 'Expand' checkbox to expand all aggregated variables, or inspect count/names them with the 'Count' or 'Names' checkboxes.\nYou may expand dimensions more selectively from the Rows/Cols selector to the right.";
+            string text = "Contains " + hidden +" aggregated variables: interactive expand/collapse will be improved in a later Gekko version.\nFor now, use the 'Expand' checkbox to expand all aggregated variables, or inspect count/names with the 'Count' or 'Names' checkboxes.\nYou may expand dimensions more selectively from the Rows/Cols selector to the right.";
             checkBox.ToolTip = text;
             //checkBox.Checked += Clicked;
             checkBox.Checked += (sender, e) =>
@@ -3008,6 +3008,24 @@ namespace Gekko
             }
         }
 
+        private void CheckBoxGroupAge_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.groupAge = true;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
+        private void CheckBoxGroupAge_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.groupAge = false;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
         private void CheckBoxErrors_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
@@ -3157,6 +3175,7 @@ namespace Gekko
         public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 
 
+        public bool groupAge = false;
         public bool useBracketNames = Globals.decompUseBracketNames;
         public List iv = null;
         public GekkoTime tSelected = GekkoTime.tNull;
