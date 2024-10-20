@@ -559,7 +559,7 @@ namespace Gekko
 
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
-        public static int guiTableCellWidthFirst = 135;
+        public static int guiTableCellWidthFirst = 150;
         public static int guiTableCellWidth = 100;
         public static int guiTableCellHeight = 20;
         public static double guiDecompPlotFontSize = 1.85d;  //1.7

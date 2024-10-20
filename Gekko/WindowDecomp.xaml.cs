@@ -1419,7 +1419,7 @@ namespace Gekko
             int hidden = 0; if (black != null) hidden = black[ij].Count;
             if (visible) checkBox.Visibility = Visibility.Visible;
             else checkBox.Visibility = Visibility.Hidden;
-            string text = "Contains " + hidden +" aggregated variables: expand/collapse clicking will be improved in a later Gekko version.\nFor now, click the 'Expand' checkbox to see all variables, \nor expand more selectively from the Rows/Cols selector to the right.\n";
+            string text = "Contains " + hidden +" aggregated variables: interactive expand/collapse will be improved in a later Gekko version.\nFor now, use the 'Expand' checkbox to expand all aggregated variables, or inspect count/names them with the 'Count' or 'Names' checkboxes.\nYou may expand dimensions more selectively from the Rows/Cols selector to the right.";
             checkBox.ToolTip = text;
             //checkBox.Checked += Clicked;
             checkBox.Checked += (sender, e) =>
