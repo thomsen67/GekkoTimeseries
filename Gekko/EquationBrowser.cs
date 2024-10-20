@@ -1571,8 +1571,9 @@ namespace Gekko
                             else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) imageHtml = "<div class=`yellowcircle` style=`float: right;` title=`" + tooltip + "`></div>";
                             else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) imageHtml = "<div class=`orangecircle` style=`float: right` title=`" + tooltip + "`></div>";
                             else if (d > Globals.redThresholds[2]) imageHtml = "<div class=`redcircle` style=`float: right` title=`" + tooltip + "`></div>";
+                            
                             Cell c = decompTable.Get(1, j2);
-                            table += "<th>" + "<span style=`text-align: left`>" + c.CellText.TextData[0] + "</span>" + "" + imageHtml + "</th>";
+                            table += "<th>" + "" + "<span style=`text-align: left`>" + c.CellText.TextData[0] + "</span>" + "" + imageHtml + "</th>";
                         }
 
                         table += "</tr>" + G.NL;
@@ -1613,8 +1614,54 @@ namespace Gekko
                             }
                             table += "<tr>";                           
                             table += "<th" + titleHtml + ">";
-                            if (i2 == 2) table += "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
-                            else table += name;
+
+
+
+
+
+
+
+
+
+
+
+                            List<List<string>> black = decompOutput.black;
+                            bool view = false;
+                            foreach (List<string> b5 in black)
+                            {
+                                if (b5.Count > 1)
+                                {
+                                    view = true; break;
+                                }
+                            }
+                            List<string> black2 = black[i2 - 2];
+                            int n = black2.Count;
+                            string imgBlack = "";
+                            if (view)
+                            {
+                                if (n > 1)
+                                {
+                                    imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.3; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
+                                }
+                                else
+                                {
+                                    imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.0; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
+                                }
+                            }
+
+
+
+
+
+
+
+
+
+
+
+
+                            if (i2 == 2) table += imgBlack + "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
+                            else table += imgBlack + name;
                             table += "</th>";
                             for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                             {
