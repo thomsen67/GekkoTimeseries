@@ -4086,7 +4086,8 @@ namespace Gekko
                         dAlternative = double.NaN;
                     }
 
-                    string dictName2 = fullVariableName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
+                    //string dictName2 = fullVariableName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
+                    string dictName2 = fullVariableName.Replace(DecompFirst() + ":", "");
 
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
                     frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.varName));
@@ -4892,7 +4893,7 @@ namespace Gekko
                         Cell c2 = table2.Get(i, 2);
                         string s = c1.CellText.TextData[0];
                         if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
-                        s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
+                        //s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
                         c1.CellText.TextData = new List<string> { s };
                     }
                 }
@@ -4904,7 +4905,7 @@ namespace Gekko
                         Cell c2 = table2.Get(2, j);
                         string s = c1.CellText.TextData[0];
                         if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);                        
-                        s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
+                        //s = G.ReplaceLastOccurrence(s, Globals.decompNoLag, "");  //can have [0] for age too
                         c1.CellText.TextData = new List<string> { s };
                     }
                 }
