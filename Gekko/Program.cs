@@ -2496,13 +2496,19 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && (text == "d"))
             {
-                EquationBrowser.BrowserNew(false);
+                EquationBrowser.BrowserNew(false, false);
+                return;
+            }
+
+            if (Globals.runningOnTTComputer && (text == "d2"))
+            {
+                EquationBrowser.BrowserNew(false, true);
                 return;
             }
 
             if (Globals.runningOnTTComputer && (text == "dd"))
             {
-                EquationBrowser.BrowserNew(true);
+                EquationBrowser.BrowserNew(true, false);
                 return;
             }
 

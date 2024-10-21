@@ -240,7 +240,10 @@ namespace Gekko
                 if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
                 {
-                    rv.s_scalarModel += this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0) + G.NL;
+                    string unfolded = this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0);
+                    int idx = unfolded.IndexOf("..");
+                    if (idx > -1) unfolded = unfolded.Substring(idx + "..".Length).Trim();
+                    rv.s_scalarModel += unfolded + G.NL;                    
                     if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else

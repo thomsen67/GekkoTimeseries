@@ -994,13 +994,13 @@ namespace Gekko
 
         }
 
-        public static void BrowserNew(bool limit)
+        public static void BrowserNew(bool limit, bool onlyHtml)
         {
             
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            if (true)
+            if (false)
             {
                 restrict.Add("qbnp", false);
                 restrict.Add("pbnp", false);
@@ -1047,11 +1047,14 @@ namespace Gekko
             if (limit) return;
 
             string path = @"c:\Thomas\Desktop\gekko\testing\Browser";
-            G.DeleteFolder(path, "css", false);
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\" + "checked.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\" + "normal.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\" + "checked_red.png");
-            File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\" + "normal_red.png");
+            if (!onlyHtml)
+            {
+                G.DeleteFolder(path, "css", false);
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\" + "checked.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\" + "normal.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\" + "checked_red.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\" + "normal_red.png");
+            }
 
             GekkoTime t1 = GekkoTime.tNull;
             GekkoTime t2 = GekkoTime.tNull;
@@ -1069,7 +1072,7 @@ namespace Gekko
 
             if (true)
             {
-                BrowserNewPlots(combos, path, restrict);
+                if(!onlyHtml) BrowserNewPlots(combos, path, restrict);
                 BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
             }
             else
@@ -1795,7 +1798,11 @@ namespace Gekko
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
             List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-            if (eqNumbers == null) new Error("Hov");
+            if (eqNumbers == null)
+            {
+                G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
+                eqNumbers = new List<int>();
+            }
             List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
             return eqsNew;
         }
