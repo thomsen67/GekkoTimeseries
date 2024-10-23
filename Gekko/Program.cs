@@ -3281,6 +3281,8 @@ namespace Gekko
                 m[0].dict_FromEqNameToEqNumber = null;
                 m[2].aTemp = m[0].aTemp;
                 m[0].aTemp = null;
+                m[2].fixTemp = m[0].fixTemp;
+                m[0].fixTemp = null;
                 m[2].csCodeLines = m[0].csCodeLines;
                 m[0].csCodeLines = null;
                 m[3] = new ModelGamsScalar(null);
@@ -3332,6 +3334,7 @@ namespace Gekko
                 m[0].ee = m[1].ee;
                 m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
                 m[0].aTemp = m[2].aTemp;
+                m[0].fixTemp = m[2].fixTemp;
                 m[0].csCodeLines = m[2].csCodeLines;
                 m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
                 m[0].ddTemp = m[3].ddTemp;
@@ -11970,8 +11973,7 @@ namespace Gekko
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
-            {
-                
+            {                
                 string sDomains = null;
                 if (ts?.mmi != null)
                 {
@@ -11988,7 +11990,30 @@ namespace Gekko
                         sDomains = ", domains: [" + Stringlist.GetListWithCommas(domains) + "]";
                     }
                 }
-                rv.Add("Series: " + varnameMaybeWithFreq + sDomains);
+                GekkoTimeSpans fixList = null;
+                try
+                {                    
+                    if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+                    {
+                        int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(varnameWithoutFreq);
+                        List<Tuple<GekkoTime, bool>> list = new List<Tuple<GekkoTime, bool>>();
+                        foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                        {
+                            int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(Program.model.modelGamsScalar.Maybe2000GekkoTime(t));
+                            byte fix = Program.model.modelGamsScalar.fix[timeIndex][aNumber];
+                            list.Add(new Tuple<GekkoTime, bool>(t, fix == 1));
+                            if (false)
+                            {
+                                list.Add(new Tuple<GekkoTime, bool>(t, false));
+                            }
+                        }
+                        fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(list);
+                    }
+                }
+                catch { } //No need to crash on this, the try-catch can be removed in Gekko 4.0
+                string fixes = null;
+                if (fixList != null && fixList.data.Count != 0) fixes = ", modelfix: " + fixList.ToString()";
+                rv.Add("Series: " + varnameMaybeWithFreq + sDomains + fixes);
             }
 
             List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(varnameWithoutFreq);
@@ -12057,7 +12082,7 @@ namespace Gekko
                 //no need to fail on this
             }
             return rv;
-        }
+        }        
 
         /// <summary>
         /// Helper method.

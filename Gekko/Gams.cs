@@ -798,13 +798,71 @@ namespace Gekko
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
             if (helper.count != semis) new Error("Not summing up");
 
-            if (Program.options.model_gams_scalar_data)
+            if (true)
             {
+                //Get fixed variables
+                
+                helper.fix = new byte[periods][];
+                for (int i = 0; i < helper.fix.Length; i++)
+                {
+                    helper.fix[i] = new byte[helper.dict_FromVarNameToANumber.Count()]; //beware: 0-based
+                }
+
+                foreach (string line in values)
+                {
+                    if (line.Trim() == "" || line.StartsWith("*")) continue;
+                    bool isFix = false;
+                    int iFix = line.IndexOf(".fx");
+                    if (iFix > -1)
+                    {
+                        string sFix = G.Substring(line, 0, iFix - 1);
+                        sFix = sFix.Trim();
+                        int id = -12345;
+                        try
+                        {
+                            id = int.Parse(sFix.Substring(1)) - 1;  //0-based
+                        }
+                        catch
+                        {
+                            new Error("Could not parse integer part of the string '" + sFix + "'");
+                        }
+
+                        string inputName = helper.dict_FromVarNumberToVarName[id];
+                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
+                        int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+                        if (aNumber == -12345)
+                        {
+                            new Error("When reading fixed variable, could not find name '" + helper2.resultingFullName + "' in dictionary");
+                        }
+                        int i1 = -12345;
+                        int i2 = aNumber;
+                        if (Globals.decompFixTimelessProblem && helper2.time.IsNull())
+                        {
+                            i1 = 0;
+                        }
+                        else
+                        {
+                            i1 = helper2.time.Subtract(helper.tBasis);
+                        }
+                        try
+                        {
+                            helper.fix[i1][i2] = 1;  //Is 0 or 1
+                        }
+                        catch
+                        {
+                            new Error("Index out of range when finding fixed GAMS variable");
+                        }
+                    }                    
+                }
+            }
+
+            if (false)
+            {                
                 //We don't read the endo values from gams.gms anymore: reading data from a databank is mandatory now.
                 //Do not delete this: is may be resurrected sometime, but for now we do not like data to be stored
                 //in a model.zip file inside gams.gms.
                 foreach (string line in values)
-                {
+                {                    
                     if (line.Trim() == "" || line.StartsWith("*")) continue;
                     string[] ss = line.Split(split, StringSplitOptions.None);
                     int id = -12345;
@@ -816,6 +874,7 @@ namespace Gekko
                     {
                         new Error("Could not parse integer part of the string '" + ss[0] + "'");
                     }
+                    
                     string inputName = helper.dict_FromVarNumberToVarName[id];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
                     int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
@@ -868,9 +927,11 @@ namespace Gekko
                     {
                         new Error("Index out of range when reading GAMS scalar equation");
                     }
-                }
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
+                }                
             }
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS data .fx reading: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
 
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
             //if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
@@ -880,6 +941,7 @@ namespace Gekko
             double[] r = G.CreateNaN(eqCounts2);
             Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], int, double>[helper.unique];
             double[][] a = helper.a;
+            byte[][] fix = helper.fix;
             int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
             double[] cc = helper.c.ToArray();
             int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
@@ -915,6 +977,7 @@ namespace Gekko
             // -------------- these can evaluate an equation --------
             modelGamsScalar.functions = functions;
             modelGamsScalar.a = a;
+            modelGamsScalar.fix = fix;
 
             modelGamsScalar.a_ref = new double[modelGamsScalar.a.Length][];
             for (int i = 0; i < modelGamsScalar.a.Length; i++)
@@ -1844,6 +1907,13 @@ namespace Gekko
                 }
                 modelGamsScalar.aTemp = null;
 
+                modelGamsScalar.fix = new byte[modelGamsScalar.fixTemp.Length][];
+                for (int i = 0; i < modelGamsScalar.fixTemp.Length; i++)
+                {
+                    modelGamsScalar.fix[i] = modelGamsScalar.fixTemp[i].storage;
+                }
+                modelGamsScalar.fixTemp = null;
+
                 // -----
 
                 modelGamsScalar.r_ref = G.CreateNaN(modelGamsScalar.CountEqs(1));
@@ -1877,6 +1947,13 @@ namespace Gekko
                 {
                     modelGamsScalar.aTemp[i] = new DoubleArray();
                     modelGamsScalar.aTemp[i].storage = modelGamsScalar.a[i];
+                }
+
+                modelGamsScalar.fixTemp = new ByteArray[modelGamsScalar.fix.Length];
+                for (int i = 0; i < modelGamsScalar.fix.Length; i++)
+                {
+                    modelGamsScalar.fixTemp[i] = new ByteArray();
+                    modelGamsScalar.fixTemp[i].storage = modelGamsScalar.fix[i];
                 }
             }
         }
@@ -4643,6 +4720,7 @@ namespace Gekko
 
         public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
+        public byte[][] fix = null;  //fixed varibles, around 2.5 MB for 85 years and 30.000 variables. Not too much.
         public List<List<int>> b = new List<List<int>>();
         public List<double> c = new List<double>();
         public List<List<int>> d = new List<List<int>>();

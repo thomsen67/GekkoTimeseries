@@ -2666,7 +2666,6 @@ namespace Gekko
                 if (y0a == null)
                 {
                     new Error("DECOMP expects the expression to be of series type");
-                    //throw new GekkoException();
                 }
                 Series y0_series = y0a_series;
                 if (y0a_series.type != ESeriesType.Light)

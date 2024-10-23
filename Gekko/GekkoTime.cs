@@ -2076,6 +2076,10 @@ namespace Gekko
         [ProtoMember(1)]
         public List<GekkoTimeSpan> data = new List<GekkoTimeSpan>();
 
+        /// <summary>
+        /// Pretty string.
+        /// </summary>
+        /// <returns></returns>
         public string ToString()
         {
             string s = null;
@@ -2092,6 +2096,49 @@ namespace Gekko
             }
             s = s.Substring(0, s.Length - ", ".Length);
             return s;
+        }
+
+        /// <summary>
+        /// For a list of pairs (GekkoTime, boolean), this constructs a GekkoTimeSpans. For instance:
+        /// (2000, false), (2001, true), (2002, true), (2003, false), (2004, true), (2005, false)
+        /// will become 2001-2002, 2004-2004.
+        /// </summary>
+        public static GekkoTimeSpans GetTimeSpansFromGekkoTimeArray(List<Tuple<GekkoTime, bool>> list)
+        {
+            GekkoTimeSpans gtss = new GekkoTimeSpans();
+            bool active = false;
+            GekkoTime t1 = GekkoTime.tNull;
+            GekkoTime t2 = GekkoTime.tNull;
+            foreach (Tuple<GekkoTime, bool> tuple in list)
+            {
+                t2 = tuple.Item1;
+                if (tuple.Item2)
+                {
+                    if (!active)
+                    {
+                        t1 = tuple.Item1;
+                        active = true;
+                    }
+                }
+                else
+                {
+                    if (active)
+                    {
+                        gtss.data.Add(new GekkoTimeSpan(t1, tuple.Item1.Add(-1)));
+                        active = false;
+                    }
+                }
+            }
+            if (active)
+            {
+                gtss.data.Add(new GekkoTimeSpan(t1, t2));
+            }
+            foreach (GekkoTimeSpan gts in gtss.data)
+            {
+                //Remove this test in Gekko 4.0
+                if (gts.tStart.IsNull() || gts.tEnd.IsNull()) new Error("Null-period in time spans");
+            }
+            return gtss;
         }
     }
 

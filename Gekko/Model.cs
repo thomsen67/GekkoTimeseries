@@ -837,7 +837,10 @@ namespace Gekko
         //the values from the scalar model.
         [ProtoMember(6)]
         public DoubleArray[] aTemp = null; //because protobuf does not support jagged arrays
+        [ProtoMember(32)]
+        public ByteArray[] fixTemp = null; //because protobuf does not support jagged arrays
         public double[][] a = null;
+        public byte[][] fix = null;
 
         public Dictionary<int, int> nonExisting = null;  //value not used
         public Dictionary<int, int> nonExisting_ref = null; //value not used
@@ -1934,6 +1937,14 @@ namespace Gekko
     [ProtoContract]
     public class ModelGamsScalarEquation
     {
+    }
+
+
+    [ProtoContract]
+    public class ByteArray
+    {
+        [ProtoMember(1)]
+        public byte[] storage = null;
     }
 
     [ProtoContract]
