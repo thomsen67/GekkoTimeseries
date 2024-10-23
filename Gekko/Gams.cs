@@ -886,9 +886,7 @@ namespace Gekko
             int[] ee = helper.eqPointers.ToArray();
                         
             Compile5(csCodeLines, functions);
-
-            dt1 = DateTime.Now;
-
+            
             if (Globals.runningOnTTComputer) new Writeln("TTH: Data preparation finished: " + G.Seconds(dt1));
 
             dt1 = DateTime.Now;
@@ -2347,24 +2345,20 @@ namespace Gekko
             else if (G.Equal(Program.options.model_gams_dep_method, "eqname"))
             {
                 if (eqnameGams.Contains("__"))
-                {
-                    //new Error("Eqname '" + eqnameGams + "': did not expect '__' substring in name");
+                {                    
                     G.Warning("w1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");                    
                 }
                 string[] ss = eqnameGams.Split('_');
                 if (ss.Length <= 1)
-                {
-                    //new Error("Eqname '" + eqnameGams + "': did not find any '_' separators");
+                {                    
                     G.Warning("w1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");                    
                 }
                 if (!G.Equal(ss[0], "e"))
-                {
-                    //new Error("Eqname '" + eqnameGams + "': expected it to start with 'e_'");
+                {                 
                     G.Warning("w1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");                    
                 }
                 if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
-                {
-                    //new Error("Eqname '" + eqnameGams + "': could not resolve variable name");
+                {                 
                     G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");                    
                 }
                 lhs = ss[1];

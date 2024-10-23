@@ -382,7 +382,7 @@
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
                 <CheckBox x:Name="checkBoxErrors"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Errors" Checked="CheckBoxErrors_Checked" Unchecked="CheckBoxErrors_Unchecked"/>
                 <CheckBox x:Name="checkBoxSort"  Width="57" Margin="7.7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Sort contributions by size (&lt;sort> option)"  Content="Sort" Checked="CheckBoxSort_Checked" Unchecked="CheckBoxSort_Unchecked"/>
-                <CheckBox x:Name="checkBoxAge"  Width="79" Margin="10.7,0,0,0" VerticalAlignment="Center" ToolTip="Group age dimension by 10 years intervals: 0..9, 10..19, etc.&#x0a;Note: will not work in combination with the 'Expand' checkbox." Content="Group age" Checked="CheckBoxGroupAge_Checked" Unchecked="CheckBoxGroupAge_Unchecked"/>
+                <CheckBox x:Name="checkBoxAge"  Width="79" Margin="10.7,0,0,0" VerticalAlignment="Center" ToolTip="Group age dimension by 10 years intervals: 0..9, 10..19, etc.&#x0a;Only has effect when an age dimension is expanded, and will in that case reduce the number of variable rows/cols shown." Content="Group age" Checked="CheckBoxGroupAge_Checked" Unchecked="CheckBoxGroupAge_Unchecked"/>
             </StackPanel>
 
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">Options</TextBlock>
