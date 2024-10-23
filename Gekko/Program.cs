@@ -16002,8 +16002,7 @@ namespace Gekko
                             //then it is a sub-series
                             Series parent = ts.mmi.parent;
                             if (parent != null)
-                            {
-                                //if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
+                            {                                
                                 if (parent.meta.fix == EFixedType.Parameter)
                                 {
                                     G.Writeln("Fixed (parameter)");
@@ -16206,119 +16205,6 @@ namespace Gekko
         {
             return eh.codeLhsHumanVersion.Trim().Replace("[0]", "") + " = " + eh.codeRhsHumanVersion.Trim().Replace("[0]", "");
         }
-
-        ///// <summary>
-        ///// DISP for GAMS equations.
-        ///// </summary>
-        ///// <param name="tStart"></param>
-        ///// <param name="tEnd"></param>
-        ///// <param name="showDetailed"></param>
-        ///// <param name="showAllPeriods"></param>
-        ///// <param name="clickedLink"></param>
-        ///// <param name="gamsToGekko"></param>
-        ///// <param name="ts"></param>
-        ///// <param name="variableMaybeWithFreq"></param>
-        ///// <param name="bank"></param>
-        ///// <param name="varnameWithoutFreq"></param>
-        //private static void DispGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, bool gamsToGekko, Series ts, string variableMaybeWithFreq, string bank)
-        //{
-        //    string varnameWithoutFreq = G.Chop_RemoveFreq(variableMaybeWithFreq);
-
-        //    string note = null;
-
-        //    string s2 = "[" + Stringlist.GetListWithCommas(ts.meta.domains) + "]";
-        //    if (s2 == "[]") s2 = null;
-
-        //    bool isTimeless = ts.type == ESeriesType.Timeless;
-
-        //    string ss = "SERIES";
-        //    if (ts.type == ESeriesType.ArraySuper) ss = "ARRAY-SERIES";
-        //    G.Writeln2("==========================================================================================");
-        //    G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
-
-        //    List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
-        //    foreach (string expl in expls) G.Writeln(expl);
-
-        //    if (ts.type == ESeriesType.ArraySuper)
-        //    {
-
-        //    }
-        //    else
-        //    {
-        //        if (ts.mmi != null)
-        //        {
-        //            //then it is a sub-series
-        //            Series parent = ts.mmi.parent;
-        //            if (parent != null)
-        //            {
-        //                //if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
-        //                if (parent.meta.fix == EFixedType.Parameter)
-        //                {
-        //                    G.Writeln("Fixed (parameter)");
-        //                }
-        //            }
-        //        }
-
-        //        if (isTimeless)
-        //        {
-        //            if (ts.meta.fix == EFixedType.Timeless)
-        //            {
-        //                G.Writeln("Fixed: " + Globals.fixedTimelessText);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (ts.meta.fix == EFixedType.Normal)
-        //            {
-        //                string s = ts.meta.fixedNormal.ToString();  //fixedNormal does exist if EFixedType.Normal
-        //                G.Writeln("Fixed: " + s);
-        //            }
-        //        }
-        //    }
-
-        //    List<MultidimItem> keys = null;
-
-        //    if (ts.type == ESeriesType.ArraySuper)
-        //    {
-        //        keys = ts.dimensionsStorage.storage.Keys.ToList();
-        //        keys.Sort(Multidim.CompareMultidimItems);
-        //    }
-
-        //    bool eqsPrinted = false;
-
-        //    if (Program.model.modelGams != null)
-        //    {
-        //        if (Program.model.modelGams.equationsByVarname != null)
-        //        {
-        //            eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, variableMaybeWithFreq, varnameWithoutFreq, eqsPrinted);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (Program.model?.modelGekko?.equations != null)
-        //        {
-        //            note = "+++ NOTE: There is a normal model loaded, perhaps you should use 'OPTION model type = default;'?";
-        //        }
-        //    }
-
-        //    if (ts.dimensions > 0)
-        //    {
-        //        DispHelperArraySeries(ts, keys, eqsPrinted);
-        //    }
-        //    else
-        //    {
-        //        DispHelperNormalSeries(tStart, tEnd, showAllPeriods, ts, varnameWithoutFreq, isTimeless);
-        //    }
-
-        //    if (G.GetModelSourceType() == EModelType.GAMSScalar)
-        //    {
-        //        //we try to fetch equation names
-        //    }
-
-        //    G.Writeln("==========================================================================================");
-
-        //    if (note != null) G.Writeln(note);
-        //}
 
         /// <summary>
         /// Check whether a variable is part of a GAMS model
