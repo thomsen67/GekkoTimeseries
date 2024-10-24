@@ -1153,6 +1153,26 @@ namespace Gekko
             return this.tBasis.Add(t);
         }
 
+
+        /// <summary>
+        /// Input a varname without freq (possibly with indexes) for a GAMS scalar model, and it returns the periods that are fixed.
+        /// Returns null if no scalar model is loaded. May crash if the name is wrong.
+        /// </summary>
+        /// <param name="varnameWithoutFreq"></param>
+        /// <returns></returns>
+        public List<Tuple<GekkoTime, bool>> GetFixedPeriods(string varnameWithoutFreq)
+        {            
+            int aNumber = this.dict_FromVarNameToANumber.GetInt(varnameWithoutFreq);
+            List<Tuple<GekkoTime, bool>> list = new List<Tuple<GekkoTime, bool>>();
+            for (int timeIndex = 0; timeIndex < this.fix.Length; timeIndex++)
+            {
+                byte fix = this.fix[timeIndex][aNumber];
+                GekkoTime t = this.FromTimeIntegerToGekkoTime(timeIndex);
+                list.Add(new Tuple<GekkoTime, bool>(t, fix == 1));
+            }
+            return list;
+        }
+
         /// <summary>
         /// Sets all elements in a, a_ref, r and r_ref to NaN (unless they are already == null).
         /// </summary>

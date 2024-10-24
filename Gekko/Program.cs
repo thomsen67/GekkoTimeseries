@@ -11994,25 +11994,13 @@ namespace Gekko
                 try
                 {                    
                     if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
-                    {
-                        int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(varnameWithoutFreq);
-                        List<Tuple<GekkoTime, bool>> list = new List<Tuple<GekkoTime, bool>>();
-                        foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                        {
-                            int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(Program.model.modelGamsScalar.Maybe2000GekkoTime(t));
-                            byte fix = Program.model.modelGamsScalar.fix[timeIndex][aNumber];
-                            list.Add(new Tuple<GekkoTime, bool>(t, fix == 1));
-                            if (false)
-                            {
-                                list.Add(new Tuple<GekkoTime, bool>(t, false));
-                            }
-                        }
-                        fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(list);
+                    {                        
+                        fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(varnameWithoutFreq));
                     }
                 }
                 catch { } //No need to crash on this, the try-catch can be removed in Gekko 4.0
                 string fixes = null;
-                if (fixList != null && fixList.data.Count != 0) fixes = ", modelfix: " + fixList.ToString()";
+                if (fixList != null && fixList.data.Count != 0) fixes = ", modelfix: " + fixList.ToString();
                 rv.Add("Series: " + varnameMaybeWithFreq + sDomains + fixes);
             }
 
@@ -12082,7 +12070,7 @@ namespace Gekko
                 //no need to fail on this
             }
             return rv;
-        }        
+        }
 
         /// <summary>
         /// Helper method.

@@ -1282,39 +1282,58 @@ namespace Gekko
             int extra = 2;
             Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + extra, j + extra);
             if (c == null) return false;
-            string v = Decomp.GetVarsHack(c);
-            if (v == Globals.decompErrorName) v = null;
-            if (v == Globals.decompIgnoreName) v = null;
 
             bool isEndogenous = false;
-            if (v != null)
+
+            if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
             {
-                if (!Decomp.IsDecompResidualName(v))
+                isEndogenous = false;                
+                if (c != null && c.vars_hack != null && c.vars_hack.Count > 0)
                 {
-                    if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+                    foreach (string varname in c.vars_hack)
                     {
-                        isEndogenous = true;
-                    }
-                    else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
-                    {
-                        if (Program.HasGamsEquation(v)) isEndogenous = true;
-                    }
-                    else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
-                    {
-                        isEndogenous = true;
-                        try
+                        string name; int lag;
+                        Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
+                        GekkoTimeSpans fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(name));
+                        if (fixList.data.Count == 0)
                         {
-                            int lag2;
-                            string name2 = v;
-                            if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
-                            EEndoOrExo e = Program.VariableTypeEndoExo(name2);
-                            isEndogenous = e == EEndoOrExo.Endo;
+                            isEndogenous = true;
+                            break;
                         }
-                        catch { }
                     }
-                    else
+                }                
+            }
+            else
+            {
+                string v = Decomp.GetVarsHack(c);
+                if (v == Globals.decompErrorName) v = null;
+                if (v == Globals.decompIgnoreName) v = null;
+                
+                if (v != null)
+                {
+                    if (!Decomp.IsDecompResidualName(v))
                     {
-                        //strange...
+                        if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
+                        {
+                            if (Program.HasGamsEquation(v)) isEndogenous = true;
+                        }
+                        else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                        {
+                            isEndogenous = true;
+                            try
+                            {
+                                int lag2;
+                                string name2 = v;
+                                if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
+                                EEndoOrExo e = Program.VariableTypeEndoExo(name2);
+                                isEndogenous = e == EEndoOrExo.Endo;
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            //strange...
+                        }
                     }
                 }
             }
