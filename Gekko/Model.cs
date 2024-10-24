@@ -1160,15 +1160,15 @@ namespace Gekko
         /// </summary>
         /// <param name="varnameWithoutFreq"></param>
         /// <returns></returns>
-        public List<Tuple<GekkoTime, bool>> GetFixedPeriods(string varnameWithoutFreq)
+        public List<GekkoTime> GetFixedPeriods(string varnameWithoutFreq)
         {            
             int aNumber = this.dict_FromVarNameToANumber.GetInt(varnameWithoutFreq);
-            List<Tuple<GekkoTime, bool>> list = new List<Tuple<GekkoTime, bool>>();
+            List<GekkoTime> list = new List<GekkoTime>();
             for (int timeIndex = 0; timeIndex < this.fix.Length; timeIndex++)
             {
                 byte fix = this.fix[timeIndex][aNumber];
                 GekkoTime t = this.FromTimeIntegerToGekkoTime(timeIndex);
-                list.Add(new Tuple<GekkoTime, bool>(t, fix == 1));
+                if (fix == 1) list.Add(t);
             }
             return list;
         }

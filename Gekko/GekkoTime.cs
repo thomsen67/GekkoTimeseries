@@ -2094,50 +2094,41 @@ namespace Gekko
                     s += gts.tStart.ToString() + "-" + gts.tEnd.ToString() + ", ";
                 }
             }
-            s = s.Substring(0, s.Length - ", ".Length);
+            if (s != null) s = s.Substring(0, s.Length - ", ".Length);
             return s;
         }
 
         /// <summary>
-        /// For a list of pairs (GekkoTime, boolean), this constructs a GekkoTimeSpans. For instance:
-        /// (2000, false), (2001, true), (2002, true), (2003, false), (2004, true), (2005, false)
-        /// will become 2001-2002, 2004-2004. It is expected that the GekkoTime dates are consecutive.
+        /// For a list of GekkoTimes, this constructs GekkoTimeSpans. For instance:
+        /// 2001, 2002, 2004 --> 2001-2002, 2004. It is expected that the GekkoTime dates are ascending and same freq.
+        /// Tested and seems ok. Returns empty list if input is null or has 0 elements.
         /// </summary>
-        public static GekkoTimeSpans GetTimeSpansFromGekkoTimeArray(List<Tuple<GekkoTime, bool>> list)
+        public static GekkoTimeSpans GetTimeSpansFromGekkoTimeArray(List<GekkoTime> list)
         {
             GekkoTimeSpans gtss = new GekkoTimeSpans();
-            bool active = false;
-            GekkoTime t1 = GekkoTime.tNull;
-            GekkoTime t2 = GekkoTime.tNull;
-            foreach (Tuple<GekkoTime, bool> tuple in list)
+            if (list == null || list.Count == 0) return gtss;
+            GekkoTime start = list[0];
+            GekkoTime end = start;
+            bool first = true;
+            foreach (GekkoTime t in list)
             {
-                t2 = tuple.Item1;
-                if (tuple.Item2)
+                if (first) { first = false; continue; }
+                if (t.Subtract(end) < 1)
                 {
-                    if (!active)
-                    {
-                        t1 = tuple.Item1;
-                        active = true;
-                    }
+                    new Error("Expected consecutive dates in dates list");
+                }
+                else if (t.Subtract(end) == 1)
+                {
+                    end = t;
                 }
                 else
                 {
-                    if (active)
-                    {
-                        gtss.data.Add(new GekkoTimeSpan(t1, tuple.Item1.Add(-1)));
-                        active = false;
-                    }
+                    gtss.data.Add(new GekkoTimeSpan(start, end));
+                    start = t;
+                    end = start;
                 }
             }
-            if (active)
-            {
-                gtss.data.Add(new GekkoTimeSpan(t1, t2));
-            }
-            foreach (GekkoTimeSpan gts in gtss.data)
-            {
-                //Remove this test in Gekko 4.0
-                if (gts.tStart.IsNull() || gts.tEnd.IsNull()) new Error("Null-period in time spans");
-            }
+            gtss.data.Add(new GekkoTimeSpan(start, end));
             return gtss;
         }
     }

@@ -108,9 +108,9 @@ namespace Gekko
         public const string decompNullName = "________a";
         public const string decompResidualName = "ZZZZZZZZ_residal";
         public const string decompResidualName2 = "Residual";
-        public static string decompErrorName = "Error_78hsgds98dsfus";
+        public const string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";
-        public static string decompIgnoreName = "Ignored_78hsgds98dsfus";
+        public const string decompIgnoreName = "Ignored_78hsgds98dsfus";
         public const string decompIgnoreName2 = "Ignored";
         public const bool decompFix = true;
         public const bool decompFix2 = true;

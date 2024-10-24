@@ -2496,7 +2496,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && (text == "d"))
             {
-                new Writeln("Distanace: " + EditDistance(new List<string>() { "c", "a", "b" }, new List<string>() { "c", "b" }));
+                //new Writeln("Distanace: " + EditDistance(new List<string>() { "c", "a", "b" }, new List<string>() { "c", "b" }));
                 return;
             }
 
@@ -20831,6 +20831,7 @@ namespace Gekko
                             //explicit check.
                             //For instance, if gtLag = 2000 and gt=2001, we will iterate between 2001 and 2000 to get
                             //the filtered periods, which should not include 2001. The dif check handles this case.
+                            //Fix in Gekko 4.0
                             foreach (GekkoTime gt2 in new GekkoTimeIterator(gtLag.Add(1), gt.Add(-1)))
                             {
                                 negativeFilter.Add(gt2);

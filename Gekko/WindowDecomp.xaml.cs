@@ -1168,14 +1168,7 @@ namespace Gekko
             else
             {
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
-                {
-                    //
-                    // LINKS etc.
-                    // TODO: This is hacky. Better to look at adjacent cell content (like what happens when link is actually clicked)
-                    //       
-                    //
-                    //                    
-
+                {                    
                     bool isEndogenous = IsEndogenous(i, j);
                     
                     textBlock.MouseDown += Mouse_Down;
@@ -1276,64 +1269,61 @@ namespace Gekko
         }
 
         private bool IsEndogenous(int i, int j)
-        {
+        {            
             //TODO: offsets...
             //2 below because the row or col labels all start in coord (0, 0), and guiDecompValues is 1-based. So first coord will be (2, 2).
             int extra = 2;
             Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + extra, j + extra);
             if (c == null) return false;
+            if (c.vars_hack == null) return false;
+            if (c.vars_hack.Count == 0) return false;
+            string v = Decomp.GetVarsHack(c);  //Only looks at the first element if aggregated. If error/ignore/residual, there is only 1, no?
+            if (v == Globals.decompErrorName) return false;
+            if (v == Globals.decompIgnoreName) return false;
+            if (Decomp.IsDecompResidualName(v)) return false;
 
             bool isEndogenous = false;
 
             if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
             {
-                isEndogenous = false;                
-                if (c != null && c.vars_hack != null && c.vars_hack.Count > 0)
+                foreach (string varname in c.vars_hack)
                 {
-                    foreach (string varname in c.vars_hack)
+                    //All of these must be exogenous for the return value to be false (so any one endogenous among a list of otherwise exogenous will make the name blue)
+                    string name; int lag;
+                    Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
+                    GekkoTimeSpans fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(name));
+                    if (fixList.data.Count == 0)
                     {
-                        string name; int lag;
-                        Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
-                        GekkoTimeSpans fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(name));
-                        if (fixList.data.Count == 0)
-                        {
-                            isEndogenous = true;
-                            break;
-                        }
+                        isEndogenous = true;
+                        break;
                     }
-                }                
+                }
             }
             else
             {
-                string v = Decomp.GetVarsHack(c);
-                if (v == Globals.decompErrorName) v = null;
-                if (v == Globals.decompIgnoreName) v = null;
-                
                 if (v != null)
                 {
-                    if (!Decomp.IsDecompResidualName(v))
+
+                    if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
                     {
-                        if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
+                        if (Program.HasGamsEquation(v)) isEndogenous = true;
+                    }
+                    else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                    {
+                        isEndogenous = true;
+                        try
                         {
-                            if (Program.HasGamsEquation(v)) isEndogenous = true;
+                            int lag2;
+                            string name2 = v;
+                            if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
+                            EEndoOrExo e = Program.VariableTypeEndoExo(name2);
+                            isEndogenous = e == EEndoOrExo.Endo;
                         }
-                        else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
-                        {
-                            isEndogenous = true;
-                            try
-                            {
-                                int lag2;
-                                string name2 = v;
-                                if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
-                                EEndoOrExo e = Program.VariableTypeEndoExo(name2);
-                                isEndogenous = e == EEndoOrExo.Endo;
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            //strange...
-                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        //strange...
                     }
                 }
             }
