@@ -1023,10 +1023,10 @@ namespace Gekko
             // Example: DECOMP x[#a] from e1, e2 endo x[#a], y[#a];
             // 1. dimension corresponds to main chosen decomp variables (x[#a], could be stated like x[18], x[19]).
             //    This dimension corresponds to super = 0, 1 here.
-            // 2. dimension is the folded raw link equations (including main equation with number 0). The folded link
+            // 2. dimension is the raw link equations (including main equation with number 0). The raw link
             //    equations are e1 and e2.
             // 3. dimension corresponds to uncontrolled lists like x[#a] or x[#a, #i] in each link equation (including the main equation)
-            //    So 3. dimension unfolds the folded equations, for instance x[#a] in e1 and y[#a] in e2.
+            //    So 3. dimension unfolds the raw equations, for instance x[#a] in e1 and y[#a] in e2.
             // The 1. dimension (super) is kind of like link variables, but where the x[#a] variables have no "mother" equation
             // to be put into. Each super element is adjusted on its own, and stuff sums to 0. In reporting, this is
             // shown as "equ" to choose/pivot from
@@ -2477,7 +2477,7 @@ namespace Gekko
 
         /// <summary>
         /// Called by DecompMain() and performs the low-level math, obtaining and preparing data and
-        /// calculating gradients. Used for "normal" Gekko models, possibly with folded equations.
+        /// calculating gradients. Used for "normal" Gekko models, possibly with raw equations.
         /// </summary>
         /// <param name="tt1"></param>
         /// <param name="tt2"></param>

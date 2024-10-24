@@ -136,11 +136,11 @@ namespace Gekko
         }
 
         /// <summary>
-        /// This gets folded equations from GAMS code scalar model.
+        /// This gets raw equations from GAMS code scalar model.
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public TwoStrings GetEquationTextFoldedScalar(List<string>eqNames)
+        public TwoStrings GetEquationTextRawScalar(List<string>eqNames)
         {
             //See also how to get unfolded equations: #jseds78hsd33.
             string rv = "";
@@ -207,7 +207,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The central equation text method. Gets equation text from both folded and unfolded equations.
+        /// The central equation text method. Gets equation text from both raw and unfolded equations.
         /// Returns the resulting text, but also the three parts of it (fields s_...).
         /// </summary>
         /// <param name="eq"></param>
@@ -224,7 +224,7 @@ namespace Gekko
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            TwoStrings two = this.GetEquationTextFoldedScalar(eqs2);
+            TwoStrings two = this.GetEquationTextRawScalar(eqs2);
 
             if (!G.NullOrBlanks(two.s1) || !G.NullOrBlanks(two.s2)) hit = true;                        
 
@@ -272,13 +272,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// This gets folded equations from GAMS code nonscalar model.
+        /// This gets raw equations from GAMS code nonscalar .gms file.
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static string GetEquationTextFoldedNonScalar(EModelType modelType, List<Link> links)
+        public static string GetEquationTextRawNonScalar(EModelType modelType, List<Link> links)
         {
-            //See also how to get unfolded equations: #jseds78hsd33.
+            //See also how to get raw equations: #jseds78hsd33.
             string rv = "";
             List<string> eqNames = new List<string>();
             foreach (Link link in links)
@@ -898,7 +898,7 @@ namespace Gekko
         [ProtoMember(15)]
         public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
 
-        //eq numbers in folded model, corresponds to i/ii dimension
+        //eq numbers in raw model, corresponds to i/ii dimension
         [ProtoMember(16)]
         public string[] dict_FromEqChunkNumberToEqName = null;
 

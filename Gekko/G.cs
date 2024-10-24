@@ -4075,6 +4075,17 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Checks if x is between 1500 and 3000
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static bool IsYear(int x) 
+        {
+            if (x >= Globals.possibleYearStart && x <= Globals.possibleYearEnd) return true;
+            return false;
+        }
+
+        /// <summary>
         /// 1950 --> 1950.
         /// 50   --> 1950.
         /// 2010 --> 2010.
@@ -4085,7 +4096,7 @@ namespace Gekko
         public static int FindYear(int x, bool allowTwoDigits)
         {
             
-            if (x >= Globals.possibleYearStart && x <= Globals.possibleYearEnd)
+            if (G.IsYear(x))
             {
                 return x;
             }
@@ -4444,7 +4455,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Check if a string is an integer, with special options. 
+        /// Check if a string is an integer, with special options.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="canHaveMinus"></param>
@@ -4482,7 +4493,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload. Can have minus = false, can be 0 = true.
+        /// Overload. Can have minus = false, can be 0 = true. This is the fastest of the argument possibilities of the called method.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>

@@ -7551,7 +7551,7 @@ namespace Gekko
                     if (iv.Type() == EVariableType.Val)
                     {
                         int date = O.ConvertToInt(iv, false);
-                        if (date != int.MaxValue && date >= Globals.possibleYearStart && date <= Globals.possibleYearEnd)
+                        if (date != int.MaxValue &&  G.IsYear(date))
                         {
                             //integer between 1500 and 3000, seems like a year, else it will be considered a constant value like a timeless series
                             period = new GekkoTime(EFreq.A, date, 1);

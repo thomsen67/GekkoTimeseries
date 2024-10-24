@@ -1746,7 +1746,7 @@ namespace Gekko
                 }
                 else
                 {
-                    s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
+                    s = Model.GetEquationTextRawNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
                 }
                 RichSetText(equation, Decomp.GetColoredEquations(s));
             }
@@ -2024,7 +2024,7 @@ namespace Gekko
                     }
                     else
                     {
-                        s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
+                        s = Model.GetEquationTextRawNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
                     }
                     RichSetText(equation, Decomp.GetColoredEquations(s));
                 }
@@ -2156,7 +2156,7 @@ namespace Gekko
             }
             else
             {
-                s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
+                s = Model.GetEquationTextRawNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
             }            
             RichSetText(equation, Decomp.GetColoredEquations(s));
             RichSetText(this.code, this.decompFind.decompOptions2.code.AddTemporarily(Program.SetBlanks()));

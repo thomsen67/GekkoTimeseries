@@ -14900,7 +14900,7 @@ namespace Gekko
                         new Error("Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
                     }
 
-                    if (temp.Year < Globals.possibleYearStart || temp.Year > Globals.possibleYearEnd)
+                    if (!G.IsYear(temp.Year))
                     {
                         new Error("Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
                     }

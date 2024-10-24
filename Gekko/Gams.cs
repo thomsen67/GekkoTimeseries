@@ -705,7 +705,7 @@ namespace Gekko
 
             string[] split = new string[] { ".fx", ".l", "=", ";" };
             string[] split2 = new string[] { " " };
-                        
+                                    
             int status2 = 0;
             int substatus2 = 0;
             int eqCounts2 = -12345;
@@ -713,7 +713,7 @@ namespace Gekko
             int fakeEqCounts2 = 0;
             int fakeVarCounts2 = 0;
             Dictionary<int, int> timeless = new Dictionary<int, int>();  //records timeless vars for later use in .isTimeless array.
-            
+
             //read dictionary                        
             if (settings.scalarMemoryModelProducedByGekko)
             {
@@ -953,7 +953,7 @@ namespace Gekko
 
             dt1 = DateTime.Now;
 
-            //The method below handles ANSI, but labels are not fetched here yet.   
+            //The method below handles ANSI, but labels are not fetched here yet.        
 
             ModelGams modelGams = null;
             if (!settings.scalarMemoryModelProducedByGekko)
@@ -2178,7 +2178,7 @@ namespace Gekko
                 string dollar = null;
 
                 eqnameGams = tok.Offset(i)?.s;
-
+                
                 i++;
 
                 //this may be parentheses
@@ -2829,7 +2829,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Actual transformation of GAMS equations into Gekko statements.
+        /// Actual translation of GAMS equations into Gekko statements.
         /// </summary>
         /// <param name="node"></param>
         /// <param name="th"></param>
@@ -2954,14 +2954,26 @@ namespace Gekko
                                     {
                                         //a single token in the slot , .... , so this is not an expression like t+1 etc.
 
-                                        if (helper.list[0].type == ETokenType.Word)
+                                        bool looksLikeFixedYear = false;  //we have to do this analysis here, to get it treated together with ETokenType.Word
+                                        if (helper.list[0].type == ETokenType.QuotedString)
+                                        {
+                                            string stripped = G.StripQuotes(helper.list[0].s);
+                                            if (G.IsInteger(stripped))
+                                            {
+                                                if (G.IsYear(int.Parse(stripped)))
+                                                {
+                                                    looksLikeFixedYear = true;
+                                                }
+                                            }
+                                        }
+
+                                        if (helper.list[0].type == ETokenType.Word || looksLikeFixedYear)
                                         {
                                             //helper.list[0] is the single token
 
-                                            if (iSplit == split.Count - 1 && (G.Equal(helper.list[0].s, th.t) || G.Equal(helper.list[0].s, th.tBase)))
+                                            if (iSplit == split.Count - 1 && (G.Equal(helper.list[0].s, th.t) || G.Equal(helper.list[0].s, th.tBase) || looksLikeFixedYear))
                                             {
-                                                //t or tBase at last position
-
+                                                //t or tBase or '2018' (or other hardcoded year) at last position
                                                 if (G.Equal(helper.list[0].s, th.t))
                                                 {
                                                     //normal t
@@ -2976,17 +2988,27 @@ namespace Gekko
                                                         helper.comma.Clear();
                                                     }
                                                 }
-                                                else
+                                                else if (G.Equal(helper.list[0].s, th.tBase) || looksLikeFixedYear)
                                                 {
-                                                    //tBase
+                                                    //tBase or '2018'
                                                     //x(i, tBase) --> x[#i][%tBase]
+                                                    //x(i, '2018') --> x[#i][2018]
                                                     //we need to transform one []-subnode into two consequtive
                                                     //see also #89075203489
 
                                                     TokenHelper nextNode2 = new TokenHelper(); nextNode2.subnodes = new TokenList();
                                                     //[%tBase]
                                                     nextNode2.subnodes.storage.Add(new TokenHelper("["));
-                                                    nextNode2.subnodes.storage.Add(new TokenHelper(Globals.symbolScalar + helper.list[0].s));
+                                                    if (looksLikeFixedYear)
+                                                    {
+                                                        //x(i, '2018') --> x[#i][2018]
+                                                        nextNode2.subnodes.storage.Add(new TokenHelper(G.StripQuotes(helper.list[0].s)));
+                                                    }
+                                                    else
+                                                    {
+                                                        //x(i, tBase) --> x[#i][%tBase]
+                                                        nextNode2.subnodes.storage.Add(new TokenHelper(Globals.symbolScalar + helper.list[0].s));
+                                                    }
                                                     nextNode2.subnodes.storage.Add(new TokenHelper("]"));
 
                                                     TokenHelper nextNode1 = new TokenHelper(); nextNode1.subnodes = new TokenList();
@@ -3003,6 +3025,7 @@ namespace Gekko
                                                     else
                                                     {
                                                         //x(i, tBase) --> x[#i][%tBase], but x(tBase) --> x[%tBase]
+                                                        //x(i, '2018') --> x[#i][2018], but x('2018') --> x[2018]
                                                     }
 
                                                     int id = nextNode.id;
@@ -3014,6 +3037,7 @@ namespace Gekko
                                                     parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
 
                                                 }
+                                                else throw new GekkoException("Hov");
                                             }
                                             else
                                             {
@@ -3023,7 +3047,7 @@ namespace Gekko
                                         }
                                         else if (helper.list[0].type == ETokenType.QuotedString)
                                         {
-                                            //remove the quotes
+                                            //remove the quotes                                            
                                             helper.list[0].s = G.StripQuotes(helper.list[0].s);
                                         }
                                     }
