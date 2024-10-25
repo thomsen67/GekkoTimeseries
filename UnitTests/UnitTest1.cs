@@ -23387,8 +23387,8 @@ print(df2)
                 G.Writeln("edit " + i + " = " + Globals.gamsLhsCount[i]);
             }
 
-            Assert.AreEqual(1027, Globals.gamsLhsCount[0]);
-            Assert.AreEqual(206, Globals.gamsLhsCount[1]);
+            Assert.AreEqual(1028, Globals.gamsLhsCount[0]);
+            Assert.AreEqual(205, Globals.gamsLhsCount[1]);
             Assert.AreEqual(35, Globals.gamsLhsCount[2]);
             Assert.AreEqual(8, Globals.gamsLhsCount[3]);
             Assert.AreEqual(0, Globals.gamsLhsCount[4]);

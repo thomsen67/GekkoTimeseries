@@ -2437,15 +2437,11 @@ namespace Gekko
             }
             else if (G.Equal(Program.options.model_gams_dep_method, "both"))
             {
-                //Removes plings in x['a']
-                //Removes e_x_t1End so it becomes e_x, also for tEnd, End, aEnd.
+                //In var: Removes plings in x['a']
+                //In ex: Removes e_x_t1End so it becomes e_x, also for tEnd, End, aEnd.
+                //In eq: Replaces 'born' with 'boern'
                 
                 string[] ss = SplitEqName(eqnameGams);
-
-                //if (ss.Length >= 3 && G.Equal(ss[1], "vHhInvestx") && G.Equal(ss[2], "tot"))
-                //{
-
-                //}
 
                 List<string> eqChunks2 = new List<string>();
                 for (int i = 1; i < ss.Length; i++)
@@ -2455,6 +2451,8 @@ namespace Gekko
                     else if (G.Equal(s, "tEnd")) continue;  //ignore it
                     else if (G.Equal(s, "End")) continue;  //ignore it
                     else if (G.Equal(s, "aEnd")) continue;  //ignore it
+                    s = s.Replace("Born", "Boern");
+                    //s = s.Replace("a18", "a");
                     eqChunks2.Add(s);  //for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel"]
                 }
                 for (int i = 0; i < equation.setsGamsList.Count; i++)  //for E_vUdlAkt_andel[portf,t] we get ["portf"]
@@ -2465,30 +2463,41 @@ namespace Gekko
                 }
                                 
                 List<string> xx = new List<string>();                
-                int min = int.MaxValue;
+                int minLhs = int.MaxValue;
+                string bestFirstChunkLhs = null;
                 xx.Add(eqnameGams + equation.setsGams + " --> " + Stringlist.GetListWithCommas(eqChunks2));
                 for (int i = 0; i < lhsVars2.Count; i++)
                 {
                     List<string> lhsList = lhsVars2[i].Select(x => x.Replace("'", "")).ToList();
                     int edit1 = Program.EditDistance(eqChunks2, lhsList);
                     int edit2 = Program.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
-                    min = Math.Min(min, edit1);
-                    min = Math.Min(min, edit2);
-                    xx.Add(edit1 + " LHS: " + lhsVars[i] + " " + Stringlist.GetListWithCommas(lhsList));
+                    if (edit1 < minLhs || edit2 < minLhs)
+                    {
+                        bestFirstChunkLhs = lhsVars2[i][0];
+                        minLhs = Math.Min(edit1, edit2);
+                    }                    
+                    xx.Add(Math.Min(edit1, edit2) + " LHS: " + lhsVars[i] + " " + Stringlist.GetListWithCommas(lhsList));
                 }
+
+                int minRhs = int.MaxValue;
+                string bestFirstChunkRhs = null;
                 for (int i = 0; i < rhsVars2.Count; i++)
                 {
                     List<string> rhsList = rhsVars2[i].Select(x => x.Replace("'", "")).ToList();
                     int edit1 = Program.EditDistance(eqChunks2, rhsList);
                     int edit2 = Program.EditDistance(eqChunks2, rhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
-                    min = Math.Min(min, edit1);
-                    min = Math.Min(min, edit2);
-                    xx.Add(edit1 + " RHS: " + rhsVars[i] + " " + Stringlist.GetListWithCommas(rhsList));
+                    if (edit1 < minRhs || edit2 < minRhs)
+                    {
+                        bestFirstChunkRhs = rhsVars2[i][0];
+                        minRhs = Math.Min(edit1, edit2);
+                    }
+                    xx.Add(Math.Min(edit1, edit2) + " RHS: " + rhsVars[i] + " " + Stringlist.GetListWithCommas(rhsList));
                 }
                 xx.Add("");
-                Globals.gamsLhsCount[min]++;                
+                int min = Math.Min(minLhs, minRhs);
+                Globals.gamsLhsCount[min]++;         
 
-                if (Globals.gamsLhsCount != null)
+                if (Globals.gamsLhsCount != null && min > 0)
                 {
                     G.Writeln("MIN = " + min);
                     foreach (string s in xx)
