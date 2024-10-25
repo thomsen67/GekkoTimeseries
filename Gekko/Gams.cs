@@ -2438,9 +2438,14 @@ namespace Gekko
             else if (G.Equal(Program.options.model_gams_dep_method, "both"))
             {
                 //Removes plings in x['a']
-                //Removes e_x_t1End so it becomes e_x
+                //Removes e_x_t1End so it becomes e_x, also for tEnd, End, aEnd.
                 
                 string[] ss = SplitEqName(eqnameGams);
+
+                //if (ss.Length >= 3 && G.Equal(ss[1], "vHhInvestx") && G.Equal(ss[2], "tot"))
+                //{
+
+                //}
 
                 List<string> eqChunks2 = new List<string>();
                 for (int i = 1; i < ss.Length; i++)
@@ -2465,16 +2470,20 @@ namespace Gekko
                 for (int i = 0; i < lhsVars2.Count; i++)
                 {
                     List<string> lhsList = lhsVars2[i].Select(x => x.Replace("'", "")).ToList();
-                    int edit = Program.EditDistance(eqChunks2, lhsList);
-                    min = Math.Min(min, edit);
-                    xx.Add(edit + " LHS: " + lhsVars[i] + " " + Stringlist.GetListWithCommas(lhsList));
+                    int edit1 = Program.EditDistance(eqChunks2, lhsList);
+                    int edit2 = Program.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
+                    min = Math.Min(min, edit1);
+                    min = Math.Min(min, edit2);
+                    xx.Add(edit1 + " LHS: " + lhsVars[i] + " " + Stringlist.GetListWithCommas(lhsList));
                 }
                 for (int i = 0; i < rhsVars2.Count; i++)
                 {
                     List<string> rhsList = rhsVars2[i].Select(x => x.Replace("'", "")).ToList();
-                    int edit = Program.EditDistance(eqChunks2, rhsList);
-                    min = Math.Min(min, edit);
-                    xx.Add(edit + " RHS: " + rhsVars[i] + " " + Stringlist.GetListWithCommas(rhsList));
+                    int edit1 = Program.EditDistance(eqChunks2, rhsList);
+                    int edit2 = Program.EditDistance(eqChunks2, rhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
+                    min = Math.Min(min, edit1);
+                    min = Math.Min(min, edit2);
+                    xx.Add(edit1 + " RHS: " + rhsVars[i] + " " + Stringlist.GetListWithCommas(rhsList));
                 }
                 xx.Add("");
                 Globals.gamsLhsCount[min]++;                
@@ -3014,7 +3023,12 @@ namespace Gekko
 
                             vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
                             List<string> vars2a = new List<string>();
-                            vars2a.Add(node.ToString().Replace(" ", ""));
+                            string name = node.ToString();
+                            string[] ss = name.Split('_');                            
+                            foreach (string s in ss)
+                            {
+                                vars2a.Add(s.Replace(" ", "")); //no need to remove blanks
+                            }
 
                             bool removeParenthesis = false;
 
