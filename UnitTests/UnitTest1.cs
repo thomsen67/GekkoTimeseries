@@ -23376,12 +23376,14 @@ print(df2)
         }
 
         [TestMethod]
-        public void _Test_GamsLhs()
+        public void _Test_Decomp_GamsLhs()
         {
             //Tests LHS variable finder for raw GAMS models.
             Globals.gamsLhsCount = new int[10]; //Existence also used as a signal for printing this stuff out
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
-            I("flush(); reset; model<gms> raw1.gms;");  //flush() to avoid cache setting in
+            I("flush(); reset;");  //flush() to avoid cache setting in
+            I("option model gams dep method = both;");
+            I("model<gms> raw1.gms;");
             for (int i = 0; i < Globals.gamsLhsCount.Length; i++)
             {
                 G.Writeln("edit " + i + " = " + Globals.gamsLhsCount[i]);

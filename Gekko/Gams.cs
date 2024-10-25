@@ -2451,7 +2451,7 @@ namespace Gekko
                     else if (G.Equal(s, "tEnd")) continue;  //ignore it
                     else if (G.Equal(s, "End")) continue;  //ignore it
                     else if (G.Equal(s, "aEnd")) continue;  //ignore it
-                    s = s.Replace("Born", "Boern");
+                    s = s.Replace("Born", "Boern");  //do something about a18 --> a?, but does not improve it
                     //s = s.Replace("a18", "a");
                     eqChunks2.Add(s);  //for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel"]
                 }
@@ -2495,9 +2495,20 @@ namespace Gekko
                 }
                 xx.Add("");
                 int min = Math.Min(minLhs, minRhs);
+
+                int point = min;
+                //Point system: we now deduct 1
+                if (point > 0)
+                {
+                    if (G.Equal(bestFirstChunkLhs, eqChunks2[0]))
+                    {
+                        point--;
+                    }
+                }
+
                 Globals.gamsLhsCount[min]++;         
 
-                if (Globals.gamsLhsCount != null && min > 0)
+                if (Globals.gamsLhsCount != null && point > 0)
                 {
                     G.Writeln("MIN = " + min);
                     foreach (string s in xx)
