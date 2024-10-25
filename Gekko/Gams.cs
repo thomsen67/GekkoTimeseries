@@ -2448,6 +2448,8 @@ namespace Gekko
                     string s = ss[i];
                     if (G.Equal(s, "t1End")) continue;  //ignore it
                     else if (G.Equal(s, "tEnd")) continue;  //ignore it
+                    else if (G.Equal(s, "End")) continue;  //ignore it
+                    else if (G.Equal(s, "aEnd")) continue;  //ignore it
                     eqChunks2.Add(s);  //for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel"]
                 }
                 for (int i = 0; i < equation.setsGamsList.Count; i++)  //for E_vUdlAkt_andel[portf,t] we get ["portf"]
