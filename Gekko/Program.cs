@@ -19011,9 +19011,11 @@ namespace Gekko
                 }
             }
         }
+        
 
         /// <summary>
-        /// Damerau–Levenshtein distance. Can delete a word, add a new word, change a word to another word, or swap two words.
+        /// Damerau–Levenshtein distance. Can delete a word, add a new word, change a word to another word, or swap two words. Immune
+        /// to blanks or casing.
         /// https://gist.github.com/wickedshimmy/449595/a17ab0d689623f5e6730eeb1c8606ab771149819
         /// </summary>
         /// <param name="original"></param>

@@ -161,7 +161,7 @@ namespace Gekko
         public bool model_cache = true;  //if using cache on file or not        
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
         public bool model_gams_dep_current = false;
-        public string model_gams_dep_method = "lhs";  //lhs|eqname
+        public string model_gams_dep_method = "both";  //lhs|eqname|both
         //public bool model_gams_scalar_data = false;  //set yes to read data from a scalar model gams.gms file. But does not work...
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //default | gams
@@ -461,7 +461,7 @@ namespace Gekko
             Add("MODEL CACHE", Globals.xbool);
             Add("MODEL CACHE MAX", Globals.xint);            
             Add("MODEL GAMS DEP CURRENT", Globals.xbool);
-            Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname");
+            Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname", "both");
             //Add("MODEL GAMS SCALAR DATA", Globals.xbool);
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
             Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");

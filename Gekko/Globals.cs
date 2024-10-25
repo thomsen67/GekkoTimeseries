@@ -129,6 +129,8 @@ namespace Gekko
         // ============ DATAFRAME STUFF END ======================
         // =======================================================
 
+        public static int[] gamsLhsCount = null;
+
         //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;
         public static bool traceWalkAllCombinations = false;  //only activated for unit testing, counting all combinations.

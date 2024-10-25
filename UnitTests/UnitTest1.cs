@@ -23376,6 +23376,28 @@ print(df2)
         }
 
         [TestMethod]
+        public void _Test_GamsLhs()
+        {
+            //Tests LHS variable finder for raw GAMS models.
+            Globals.gamsLhsCount = new int[10]; //Existence also used as a signal for printing this stuff out
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
+            I("flush(); reset; model<gms> raw1.gms;");  //flush() to avoid cache setting in
+            for (int i = 0; i < Globals.gamsLhsCount.Length; i++)
+            {
+                G.Writeln("edit " + i + " = " + Globals.gamsLhsCount[i]);
+            }
+
+            Assert.AreEqual(887, Globals.gamsLhsCount[0]);
+            Assert.AreEqual(265, Globals.gamsLhsCount[1]);
+            Assert.AreEqual(92, Globals.gamsLhsCount[2]);
+            Assert.AreEqual(29, Globals.gamsLhsCount[3]);
+            Assert.AreEqual(3, Globals.gamsLhsCount[4]);
+            Assert.AreEqual(2, Globals.gamsLhsCount[5]);
+            Assert.AreEqual(0, Globals.gamsLhsCount[6]);
+            Globals.gamsLhsCount = null; //important 
+        }
+
+        [TestMethod]
         public void _Test_GotoTarget()
         {
             I("RESET;");

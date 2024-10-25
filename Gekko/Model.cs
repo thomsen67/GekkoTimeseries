@@ -1934,7 +1934,10 @@ namespace Gekko
 
         [ProtoMember(10)]
         public List<EquationVariablesGams> expressionVariablesWithSets = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
-        
+
+        //[ProtoMember(11)]
+        //public VariableChops variableChops = null;
+
         // ===========================================
         // ===========================================
         // ===========================================
