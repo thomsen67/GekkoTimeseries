@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Gekko
 {
@@ -459,15 +450,15 @@ namespace Gekko
         public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, string textColor, bool isSelected, string fullName2)
         {
             Name = name;
-            Sub = sub;
-            Dep = dep;
-            Lhs = lhs;
-            Per = per;
-            Vars = vars;
-            LineColor = lineColor;
-            TextColor = textColor;
-            IsSelected = isSelected;
-            fullName = fullName2;
+            Sub = sub; //empty
+            Dep = dep; //"<flueben>"
+            Lhs = lhs; //empty
+            Per = per; //"tx0"
+            Vars = vars; //"nPop[0], nPop[1], ..."
+            LineColor = lineColor; //"Black"
+            TextColor = textColor; //"Black"
+            IsSelected = isSelected; //true
+            fullName = fullName2; //"E_ftAktie[2025]"
         }
 
         public string Name { get; set; }

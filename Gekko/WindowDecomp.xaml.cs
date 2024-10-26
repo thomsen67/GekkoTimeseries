@@ -473,45 +473,10 @@ namespace Gekko
             x_freeFilter = x_freeFilter.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             x_free = x_free.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             x_freeFilter = x_freeFilter.Select(x => x.Split('?')[1]).ToList();
-            x_free = x_free.Select(x => x.Split('?')[1]).ToList();
-
-            //this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>();
-            //foreach (string s in x_freeFilter1) this.decompFind.decompOptions2.freeFilter.Add(s);
-            //this.decompFind.decompOptions2.free = new ObservableCollection<string>();
-            //foreach (string s in x_free1) this.decompFind.decompOptions2.free.Add(s);
+            x_free = x_free.Select(x => x.Split('?')[1]).ToList();            
 
             this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>(x_freeFilter);
             this.decompFind.decompOptions2.free = new ObservableCollection<string>(x_free);
-
-            //foreach (string s in this.decompFind.decompOptions2.all)
-            //{
-            //    if (s == "lhs") continue;
-            //    bool isFilter = false;
-            //    foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
-            //    {
-            //        if (G.Equal(ff.name, G.HandleInternalIdentifyer2(s)))
-            //        {
-            //            isFilter = true;
-            //            break;
-            //        }
-            //    }
-            //    if (!isFilter)
-            //    {
-            //        this.decompFind.decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
-            //    }
-
-            //    if (this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
-            //    {
-            //        //do nothing
-            //    }
-            //    else
-            //    {
-            //        this.decompFind.decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
-            //    }                
-            //}
-            //this.decompFind.decompOptions2.freeFilter = new ObservableCollection<string>(this.decompFind.decompOptions2.freeFilter.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)));
-            //this.decompFind.decompOptions2.free = new ObservableCollection<string>(this.decompFind.decompOptions2.free.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)));
-
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
