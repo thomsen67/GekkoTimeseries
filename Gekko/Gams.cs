@@ -1,27 +1,16 @@
 using System;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System;
-using System.Text;
 using System.IO;
-using System.Drawing;
-using ProtoBuf;
-using ProtoBuf.Meta;
 using Antlr.Runtime;
 using Antlr.Runtime.Tree;
-using Antlr.Runtime.Debug;
 using System.Collections;
-using System.Windows.Forms;
 using GAMS;
 using System.Xml;
 using System.Threading.Tasks;
-using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Reflection;
-using System.Security.Cryptography;
-using static Gekko.O;
 
 namespace Gekko
 {
@@ -38,6 +27,12 @@ namespace Gekko
         public GekkoTime time = GekkoTime.tNull;
         public string resultingFullName = null;
         public List<string> indexes = null;
+    }
+
+    public class EquationLhsPoints
+    {
+        public string eqname = null;
+        public double points = double.NaN;
     }
 
     public static class GamsModel  //The rest of this class is in GamsWrappers.cs
@@ -2106,9 +2101,9 @@ namespace Gekko
             string eqnameGams = null;
             int i = -12345;
             List<string> lhsVars = new List<string>();
-            List<List<string>> lhsVars2 = new List<List<string>>();
+            List<EquationNameChunks> lhsVars2 = new List<EquationNameChunks>();
             List<string> rhsVars = new List<string>();
-            List<List<string>> rhsVars2 = new List<List<string>>();
+            List<EquationNameChunks> rhsVars2 = new List<EquationNameChunks>();
 
             try
             {
@@ -2240,7 +2235,7 @@ namespace Gekko
 
                             WalkTokensHandleParentheses(list);
                             List<string> vars = new List<string>();
-                            List<List<string>> vars2 = new List<List<string>>();
+                            List<EquationNameChunks> vars2 = new List<EquationNameChunks>();
                             WalkTokensGekkoSyntax(list, wh2, vars, vars2);
 
                             dollar = list.ToStringTrim();
@@ -2379,6 +2374,10 @@ namespace Gekko
                 {
                     equation.lhs = lhsGekko;
                     equation.rhs = rhsGekko;
+                    equation.lhsVars= lhsVars;
+                    equation.rhsVars= rhsVars;
+                    equation.lhsVarsChunks= lhsVars2;
+                    equation.rhsVarsChunks= rhsVars2;
 
                     // ------------- conditionals ---------------
                     // see also #9872034985732
@@ -2418,7 +2417,7 @@ namespace Gekko
         /// Tries to identify what is the LHS variable in the GAMS equation, and puts this into dictionaries for later retrieval by variable name or equation name.
         /// The method reacts to option model gams dep method = lhs|eqname, and also reacts to a #dependents list.
         /// </summary>
-        private static string ReadGamsModelGetLhsNameAndStoreEquation(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation equation, string eqnameGams, GekkoDictionary<string, string> dependents, List<string> problems, List<string> problems2, List<string> lhsVars, List<List<string>> lhsVars2, List<string> rhsVars, List<List<string>> rhsVars2, ref bool fromList)
+        private static string ReadGamsModelGetLhsNameAndStoreEquation(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation equation, string eqnameGams, GekkoDictionary<string, string> dependents, List<string> problems, List<string> problems2, List<string> lhsVars, List<EquationNameChunks> lhsVars2, List<string> rhsVars, List<EquationNameChunks> rhsVars2, ref bool fromList)
         {
             string lhs = null;
 
@@ -2426,7 +2425,7 @@ namespace Gekko
             {
                 Program.GetLhsVariable(lhsTokensGams2, ref lhs);
             }
-            else if (G.Equal(Program.options.model_gams_dep_method, "eqname"))
+            else if (G.Equal(Program.options.model_gams_dep_method, "eqname") || G.Equal(Program.options.model_gams_dep_method, "both"))
             {
                 string[] ss = SplitEqName(eqnameGams);
                 if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
@@ -2434,90 +2433,6 @@ namespace Gekko
                     G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
                 }
                 lhs = ss[1];
-            }
-            else if (G.Equal(Program.options.model_gams_dep_method, "both"))
-            {
-                //In var: Removes plings in x['a']
-                //In ex: Removes e_x_t1End so it becomes e_x, also for tEnd, End, aEnd.
-                //In eq: Replaces 'born' with 'boern'
-                
-                string[] ss = SplitEqName(eqnameGams);
-
-                List<string> eqChunks2 = new List<string>();
-                for (int i = 1; i < ss.Length; i++)
-                {
-                    string s = ss[i];
-                    if (G.Equal(s, "t1End")) continue;  //ignore it
-                    else if (G.Equal(s, "tEnd")) continue;  //ignore it
-                    else if (G.Equal(s, "End")) continue;  //ignore it
-                    else if (G.Equal(s, "aEnd")) continue;  //ignore it
-                    s = s.Replace("Born", "Boern");  //do something about a18 --> a?, but does not improve it
-                    //s = s.Replace("a18", "a");
-                    eqChunks2.Add(s);  //for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel"]
-                }
-                for (int i = 0; i < equation.setsGamsList.Count; i++)  //for E_vUdlAkt_andel[portf,t] we get ["portf"]
-                {
-                    if (G.Equal(equation.setsGamsList[i], Program.options.gams_time_set)) continue;  //skip "t"
-                    eqChunks2.Add(equation.setsGamsList[i]);
-                    //All in all for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel", "portf"]
-                }
-                                
-                List<string> xx = new List<string>();                
-                int minLhs = int.MaxValue;
-                string bestFirstChunkLhs = null;
-                xx.Add(eqnameGams + equation.setsGams + " --> " + Stringlist.GetListWithCommas(eqChunks2));
-                for (int i = 0; i < lhsVars2.Count; i++)
-                {
-                    List<string> lhsList = lhsVars2[i].Select(x => x.Replace("'", "")).ToList();
-                    int edit1 = Program.EditDistance(eqChunks2, lhsList);
-                    int edit2 = Program.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
-                    if (edit1 < minLhs || edit2 < minLhs)
-                    {
-                        bestFirstChunkLhs = lhsVars2[i][0];
-                        minLhs = Math.Min(edit1, edit2);
-                    }                    
-                    xx.Add(Math.Min(edit1, edit2) + " LHS: " + lhsVars[i] + " " + Stringlist.GetListWithCommas(lhsList));
-                }
-
-                int minRhs = int.MaxValue;
-                string bestFirstChunkRhs = null;
-                for (int i = 0; i < rhsVars2.Count; i++)
-                {
-                    List<string> rhsList = rhsVars2[i].Select(x => x.Replace("'", "")).ToList();
-                    int edit1 = Program.EditDistance(eqChunks2, rhsList);
-                    int edit2 = Program.EditDistance(eqChunks2, rhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
-                    if (edit1 < minRhs || edit2 < minRhs)
-                    {
-                        bestFirstChunkRhs = rhsVars2[i][0];
-                        minRhs = Math.Min(edit1, edit2);
-                    }
-                    xx.Add(Math.Min(edit1, edit2) + " RHS: " + rhsVars[i] + " " + Stringlist.GetListWithCommas(rhsList));
-                }
-                xx.Add("");
-                int min = Math.Min(minLhs, minRhs);
-
-                int point = min;
-                //Point system: we now deduct 1
-                if (point > 0)
-                {
-                    if (G.Equal(bestFirstChunkLhs, eqChunks2[0]))
-                    {
-                        point--;
-                    }
-                }
-
-                Globals.gamsLhsCount[min]++;         
-
-                if (Globals.gamsLhsCount != null && point > 0)
-                {
-                    G.Writeln("MIN = " + min);
-                    foreach (string s in xx)
-                    {
-                        G.Writeln(s);
-                    }
-                }                
-
-                //lhs = ss[1];
             }
             else
             {
@@ -2566,7 +2481,12 @@ namespace Gekko
             return varnameFound;
         }
 
-        private static string[] SplitEqName(string eqnameGams)
+        /// <summary>
+        /// Splits "e_a_b" into ["e", "a", "b"]
+        /// </summary>
+        /// <param name="eqnameGams"></param>
+        /// <returns></returns>
+        public static string[] SplitEqName(string eqnameGams)
         {
             if (eqnameGams.Contains("__"))
             {
@@ -2918,7 +2838,7 @@ namespace Gekko
         /// <summary>
         /// Helper
         /// </summary>
-        public static void WalkTokensGekkoSyntax(TokenList nodes, WalkTokensHelper th, List<string>vars, List<List<string>>vars2)
+        public static void WalkTokensGekkoSyntax(TokenList nodes, WalkTokensHelper th, List<string>vars, List<EquationNameChunks>vars2)
         {
             foreach (TokenHelper child in nodes.storage)
             {
@@ -2931,7 +2851,7 @@ namespace Gekko
         /// </summary>
         /// <param name="node"></param>
         /// <param name="th"></param>
-        public static void WalkTokensGekkoSyntax(TokenHelper node, WalkTokensHelper th, List<string> vars, List<List<string>> vars2)
+        public static void WalkTokensGekkoSyntax(TokenHelper node, WalkTokensHelper th, List<string> vars, List<EquationNameChunks> vars2)
         {
             //Performs these transformations:
             //- GAMS functions are not touched (log, etc)
@@ -3042,12 +2962,12 @@ namespace Gekko
                             if (isSetWithIndexer) node.s = "#" + node.s;
 
                             vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
-                            List<string> vars2a = new List<string>();
+                            EquationNameChunks vars2a = new EquationNameChunks();
                             string name = node.ToString();
                             string[] ss = name.Split('_');                            
                             foreach (string s in ss)
                             {
-                                vars2a.Add(s.Replace(" ", "")); //no need to remove blanks
+                                vars2a.chunks.Add(s.Replace(" ", "")); //no need to remove blanks
                             }
 
                             bool removeParenthesis = false;
@@ -3060,7 +2980,7 @@ namespace Gekko
                                 string s7 = thc.list.ToString().Replace(" ", "");
                                 if (!G.Equal(s7, Program.options.gams_time_set))
                                 {
-                                    vars2a.Add(s7);
+                                    vars2a.chunks.Add(s7);
                                 }
                             }
                             vars2.Add(vars2a);

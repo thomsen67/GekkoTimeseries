@@ -254,6 +254,25 @@ namespace Gekko
             }
         }
 
+        public static void GenerateCombinations(string[] input, string[] combination, int index)
+        {
+            if (index == combination.Length)
+            {
+                // Print the current combination
+                foreach (string value in combination)
+                {
+                    //Console.Write(value ? "true" : "false");
+                }
+                return;
+            }
+
+            combination[index] = input[index];
+            GenerateCombinations(input, combination, index + 1);
+
+            combination[index] = "*";
+            GenerateCombinations(input, combination, index + 1);
+        }
+
         public void FindSetEquationButtonsColors(string eqName, Model model)
         {
             try

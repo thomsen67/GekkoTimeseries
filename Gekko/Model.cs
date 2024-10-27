@@ -20,11 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Collections;
-using Microsoft.CSharp;
-using System.CodeDom;
-using System.CodeDom.Compiler;
-using System.Reflection;
 using MathNet.Numerics.LinearAlgebra.Sparse;
 using ProtoBuf;
 using System.IO;
@@ -39,6 +34,16 @@ namespace Gekko
         public string s_gekkoSyntax;
         public string s_gamsOrFrnSyntax;
         public bool hasHit = true;
+    }
+
+    /// <summary>
+    /// Because protobuf does not allow nested lists
+    /// </summary>
+    [ProtoContract]
+    public class EquationNameChunks
+    {
+        [ProtoMember(1)]
+        public List<string> chunks = new List<string>();
     }
 
     [Serializable]
@@ -717,6 +722,8 @@ namespace Gekko
         public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
         [ProtoMember(3)]
         public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
+
+        public GekkoDictionary<string, EquationLhsPoints> lhsVariables = null;  //Is created when FIND is first used -- at that point we have sets/lists, too.
         
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
@@ -1921,6 +1928,18 @@ namespace Gekko
         [ProtoMember(6)]
         public string rhsGams = null;
 
+        [ProtoMember(11)]
+        public List<string> lhsVars = new List<string>();
+
+        [ProtoMember(12)]
+        public List<EquationNameChunks> lhsVarsChunks = new List<EquationNameChunks>();
+
+        [ProtoMember(13)]
+        public List<string> rhsVars = new List<string>();
+
+        [ProtoMember(14)]
+        public List<EquationNameChunks> rhsVarsChunks = new List<EquationNameChunks>();
+
         // Gekko variant 1 (Gekko syntax) ----------------------------------
 
         [ProtoMember(7)]
@@ -1934,10 +1953,7 @@ namespace Gekko
 
         [ProtoMember(10)]
         public List<EquationVariablesGams> expressionVariablesWithSets = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
-
-        //[ProtoMember(11)]
-        //public VariableChops variableChops = null;
-
+        
         // ===========================================
         // ===========================================
         // ===========================================

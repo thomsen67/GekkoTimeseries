@@ -12762,7 +12762,7 @@ namespace UnitTests
 
                         // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                         // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                        // ShowDecompTable();  //will show the following decomp table and then abort
+                        //ShowDecompTable();  //will show the following decomp table and then abort
                         // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                         // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -18120,6 +18120,11 @@ namespace UnitTests
             }
         }
 
+        private static void ShowFind()
+        {
+            Globals.showFind = true;
+        }
+
         private static void ShowDecompTable()
         {
             Globals.showDecompTable = true;
@@ -18722,10 +18727,9 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Decomp_Scalar_Pivot()
+        public void _Test_Decomp_Scalar_Pivot1()
         {
-            //Not really testing much... mostly for seeing a GUI decomp table easily.
-            //Could be useful for testing hiding of dimensions etc.
+            //TODO: Do some tests, also "expand etc."
 
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
@@ -18741,10 +18745,10 @@ namespace UnitTests
             I("x1[a, d] = 2, 3, 4;");
             I("x1[b, c] = 3, 4, 5;");
             I("x1[b, d] = 4, 5, 6;");
-            I("x2[a, c] = 100, 200, 300;");
-            I("x2[a, d] = 200, 300, 400;");
-            I("x2[b, c] = 300, 400, 500;");
-            I("x2[b, d] = 400, 500, 600;");
+            I("x2[c, a] = 100, 200, 300;");
+            I("x2[c, b] = 200, 300, 400;");
+            I("x2[d, a] = 300, 400, 500;");
+            I("x2[d, b] = 400, 500, 600;");
             I("x3[a] = 10000, 20000, 30000;");
             I("x3[b] = 20000, 30000, 40000;");
             I("x4[c] = 1000000, 2000000, 3000000;");
@@ -18753,10 +18757,10 @@ namespace UnitTests
             I("#i = a, b;");
             I("#j = c, d;");
             I("x1.setdomains(('#i','#j'));");
-            I("x2.setdomains(('#i','#j'));");
+            I("x2.setdomains(('#j','#i'));");
             I("x3.setdomains(('#i',));");
-            //I("x4.setdomains(('#j',));");
-            I("y = sum((#i, #j), x1[#i, #j] + x2[#i, #j]) + sum(#i, x3[#i]) + sum(#j, x4[#j]);");
+            //x4 gets no domains
+            I("y = sum((#i, #j), x1[#i, #j] + x2[#j, #i]) + sum(#i, x3[#i]) + sum(#j, x4[#j]);");
 
             I("clone;");
 
@@ -18764,10 +18768,10 @@ namespace UnitTests
             I("ref:x1[a, d] += -1;");
             I("ref:x1[b, c] += -1;");
             I("ref:x1[b, d] += -1;");
-            I("ref:x2[a, c] += -100;");
-            I("ref:x2[a, d] += -100;");
-            I("ref:x2[b, c] += -100;");
-            I("ref:x2[b, d] += -100;");
+            I("ref:x2[c, a] += -100;");
+            I("ref:x2[c, b] += -100;");
+            I("ref:x2[d, a] += -100;");
+            I("ref:x2[d, b] += -100;");
             I("ref:x3[a] += -10000;");
             I("ref:x3[b] += -10000;");
             I("ref:x4[c] += -10000;");
@@ -18783,14 +18787,51 @@ namespace UnitTests
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             //ShowDecompTable();  //will show the following decomp table and then abort
-                                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
             //I("decomp <d ignore = 70> y from e endo y rows time cols vars, lags;");
             //I("decomp <d> x1[a, c] from e endo x1[a, c] rows time cols vars, lags;");
             //I("decomp <d> y from e endo y rows vars, lags cols time;");
             I("decomp <d> y from e rows vars, lags cols time;");
+        }
+
+
+        [TestMethod]
+        public void _Test_Decomp_Scalar_Pivot2()
+        {
+            //TODO: Do some tests, also "expand etc."
+
+            Program.Flush(); //wipes out existing cached models
+            Globals.unitTestScreenOutput.Clear();
+            I("reset; time 2001 2003;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
+            I("model <gms> pivot2.zip;");
+            I("y = series(1);");
+            I("x = series(1);");
+            I(" #i = a, b, tot;");
+            I("#i0 = a, b;");
+            I("x.setdomains(('#i',));");
+            I("y.setdomains(('#i',));");
+
+            I("time 2001 2003;");            
+            I("y[a] = 1.52948239, 2.4211134, 1.43998;");
+            I("y[b] = 0.57778239, 1.4276544, 2.55598;");
+            I("y[tot] =  0.5277739, 2.98743364, 1.4555598;");
+            I("x[a] =  2.5999939, 2.88888884, 1.2222245;");
+            I("x[b] =  3.523338239, 2.4456744, 1.75467898;");
+            I("x[tot] =  4.5000239, 5.4000211, 6.40003;");
+
+            I("y[tot] <2002 2003 dyn> = 0.1 * y[tot] + 0.1 * y[tot][-1] + sum(#i, y[#i]) + sum(#i, y[#i][-1]) + 0.1 * x[tot] + 0.1 * x[tot][-1] + sum(#i, x[#i]) + sum(#i, x[#i][-1]);");
+
+            I("time 2002 2003;");
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            //ShowDecompTable();  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            I("find y[tot];");
+            //I("decomp <2003 2003 d> y[tot] from e_y_tot;");            
         }
 
         [TestMethod]
@@ -23376,7 +23417,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void _Test_Decomp_GamsLhs()
+        public void _Test_Decomp_GamsFindLhs1()
         {
             //Tests LHS variable finder for raw GAMS models.
             Globals.gamsLhsCount = new int[10]; //Existence also used as a signal for printing this stuff out
@@ -23384,6 +23425,9 @@ print(df2)
             I("flush(); reset;");  //flush() to avoid cache setting in
             I("option model gams dep method = both;");
             I("model<gms> raw1.gms;");
+
+            Decomp.GetLhsVariables(Program.model.modelGams);
+
             for (int i = 0; i < Globals.gamsLhsCount.Length; i++)
             {
                 G.Writeln("edit " + i + " = " + Globals.gamsLhsCount[i]);

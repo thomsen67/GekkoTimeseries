@@ -1072,7 +1072,8 @@ namespace Gekko
         public static Table lastPrtOrMulprtTable = null; 
         public static Table lastDecompTable = null;  //only used for unit tests
         public static bool showDecompTable = false;  //only used for unit tests
-                
+        public static bool showFind = false;  //only used for unit tests
+
         public static CommandMemory commandMemory = new CommandMemory();
 
         public const string number1 = "1";
