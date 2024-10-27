@@ -50,7 +50,7 @@ namespace Gekko
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
 
-        public static bool decompSmartLhs = true;
+        public static bool decompSmartLhs = false;
         public static bool decompShowSingletonSet = true;
         public static bool decompUseBracketNames = true;
         public const string decompNull = "...";  //used to be "<null>"

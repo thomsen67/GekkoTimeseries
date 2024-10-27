@@ -5590,11 +5590,8 @@ namespace Gekko
 
                 // ------------------------------------
                 if (Globals.decompSmartLhs)
-                {
-                    if (G.Equal(Program.options.model_gams_dep_method, "both"))
-                    {
-                        GetLhsVariables(model.modelGams);
-                    }
+                {                    
+                    GetLhsVariables(model.modelGams);                    
                 }
 
                 // ------------------------------------
@@ -5671,6 +5668,28 @@ namespace Gekko
             //Done here: #6yafdhsd
             //This is only calculated 1 time, reused in later FIND windows.
             //We have to do it here, after a databank is read (so we have access to sets/lists).
+            //
+            //Observations:
+            //This is done from the raw GAMS equations. It is almost certain that a LHS variable is not
+            //from inside a sum(i, x[i, t]), so it is typically stand-alone in some sense.
+            //We could have x[i, j, t] = ... or x['tot', j, t] = ... or x[xtot, j, t] = ..., and
+            //FIND could ask if x['a', 'c', 2001] is LHS or not? The problem with this is when x[...] occurs
+            //several times, but with different set combinations. We may KNOW that for instance x['tot', j, t] is
+            //the LHS variable because it IS at the left and the equation name is e_x_tot, but then what is j?
+            //What if j is restriced like e_x_tot(i, j, t) $ (j0(j)) .. x['tot', j, t]  = ... ? Then if j = 'c', 'd', 'e'
+            //and j0 = 'c', 'd', the variable x['a', 'e', t] is not a LHS in e_x_tot, because in that equation x[i, j, t]
+            //does not run over 'e' in the second dimension. But if a scalar model is used, the good thing is that
+            //the variable x['a', 'e', t] will not be a part of any of the e_x_tot anyway, because it is not generated.
+            //So perhaps the problem with set combinations can be mostly isolated to this:
+            //e_x_tot(j, t) .. x['tot', j, t] = sum(i, x[i, j, t]) or this:
+            //e_x_tot(j, t) .. x['tot', j, t] = x['a', j, t] + x['b', j, t], where we want x['tot', *, *] to be accepted
+            //as LHS in the equation with high percentage, but NOT x['a', *, *] or x['b', *, *].
+            //
+            //Maybe start out mostly ignoring sets, except for singleton sets. These, and hardcoded values, get translated into
+            //x['tot', *, *] for instance. This would handle aggregations, which would be important. Would we ever see
+            //e_x_tot(xtot, j, t) .. x[xtot, j, t] = sum(i, x[i, j, t]), where xtot has > 1 elements? No because then
+            //xtot would need to be on the RHS too.
+
             if (modelGams.lhsVariables == null)
             {
                 modelGams.lhsVariables = new GekkoDictionary<string, EquationLhsPoints>(StringComparer.OrdinalIgnoreCase);
@@ -5684,66 +5703,29 @@ namespace Gekko
             {
                 foreach (ModelGamsEquation equation in kvp.Value)
                 {
-
                     //In var: Removes plings in x['a']
                     //In ex: Removes e_x_t1End so it becomes e_x, also for tEnd, End, aEnd.
-                    //In eq: Replaces 'born' with 'boern'
-
+                    //In eq: Replaces 'born' with 'boern' (spelling)
+                    
+                    List<string> print = new List<string>();
                     string eqnameGams = kvp.Key;
 
-                    string[] ss = GamsModel.SplitEqName(eqnameGams);
+                    //Here we take an eq name like e_x_tot and split it up into ["x", "tot"], not that t is ignored.
+                    //Then we try to match that with the variable names in the raw GAMS, for instance
+                    //x['tot'] which would be a perfect fit or x[atot] which after some rewriting would
+                    //be perfect too. If a variable x['tot'] matches perfectly but a variable like x['a'] is less perfect,
+                    //we will set x['tot'] as the equation's LHS, but not x['a'] or x[*] (the star if x['a'] occurs
+                    //as sum(i, x[i]) for instance).
 
-                    List<string> eqChunks2 = new List<string>();
-                    for (int i = 1; i < ss.Length; i++)
-                    {
-                        string s = ss[i];
-                        if (G.Equal(s, "t1End")) continue;  //ignore it
-                        else if (G.Equal(s, "tEnd")) continue;  //ignore it
-                        else if (G.Equal(s, "End")) continue;  //ignore it
-                        else if (G.Equal(s, "aEnd")) continue;  //ignore it
-                        s = s.Replace("Born", "Boern");  //do something about a18 --> a?, but does not improve it
-                                                         //s = s.Replace("a18", "a");
-                        eqChunks2.Add(s);  //for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel"]
-                    }
-                    for (int i = 0; i < equation.setsGamsList.Count; i++)  //for E_vUdlAkt_andel[portf,t] we get ["portf"]
-                    {
-                        if (G.Equal(equation.setsGamsList[i], Program.options.gams_time_set)) continue;  //skip "t"
-                        eqChunks2.Add(equation.setsGamsList[i]);
-                        //All in all for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel", "portf"]
-                    }
+                    List<string> eqChunks2 = GetEquationChunks(equation, eqnameGams);                                        
 
-                    List<string> xx = new List<string>();
-                    int minLhs = int.MaxValue;
-                    string bestFirstChunkLhs = null;
-                    xx.Add(eqnameGams + equation.setsGams + " --> " + Stringlist.GetListWithCommas(eqChunks2));
-                    for (int i = 0; i < equation.lhsVarsChunks.Count; i++)
-                    {
-                        List<string> lhsList = equation.lhsVarsChunks[i].chunks.Select(x => x.Replace("'", "")).ToList();
-                        int edit1 = Program.EditDistance(eqChunks2, lhsList);
-                        int edit2 = Program.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
-                        if (edit1 < minLhs || edit2 < minLhs)
-                        {
-                            bestFirstChunkLhs = equation.lhsVarsChunks[i].chunks[0];
-                            minLhs = Math.Min(edit1, edit2);
-                        }
-                        xx.Add(Math.Min(edit1, edit2) + " LHS: " + equation.lhsVars[i] + " " + Stringlist.GetListWithCommas(lhsList));
-                    }
+                    int minLhs; string bestFirstChunkLhs;
+                    EditDistance(true, equation, eqnameGams, eqChunks2, print, out minLhs, out bestFirstChunkLhs);
 
-                    int minRhs = int.MaxValue;
-                    string bestFirstChunkRhs = null;
-                    for (int i = 0; i < equation.rhsVarsChunks.Count; i++)
-                    {
-                        List<string> rhsList = equation.rhsVarsChunks[i].chunks.Select(x => x.Replace("'", "")).ToList();
-                        int edit1 = Program.EditDistance(eqChunks2, rhsList);
-                        int edit2 = Program.EditDistance(eqChunks2, rhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
-                        if (edit1 < minRhs || edit2 < minRhs)
-                        {
-                            bestFirstChunkRhs = equation.rhsVarsChunks[i].chunks[0];
-                            minRhs = Math.Min(edit1, edit2);
-                        }
-                        xx.Add(Math.Min(edit1, edit2) + " RHS: " + equation.rhsVars[i] + " " + Stringlist.GetListWithCommas(rhsList));
-                    }
-                    xx.Add("");
+                    int minRhs; string bestFirstChunkRhs;
+                    EditDistance(false, equation, eqnameGams, eqChunks2, print, out minRhs, out bestFirstChunkRhs);
+
+                    print.Add("");
                     int min = Math.Min(minLhs, minRhs);
 
                     int point = min;
@@ -5756,19 +5738,73 @@ namespace Gekko
                         }
                     }
 
-                    Globals.gamsLhsCount[min]++;
-
-                    if (Globals.gamsLhsCount != null && point > 0)
+                    if (Globals.gamsLhsCount != null)
                     {
-                        G.Writeln("MIN = " + min);
-                        foreach (string s in xx)
+                        Globals.gamsLhsCount[min]++;
+                        if (point > 1)
                         {
-                            G.Writeln(s);
+                            G.Writeln("MIN = " + min);
+                            foreach (string s in print)
+                            {
+                                G.Writeln(s);
+                            }
                         }
                     }
 
                     //lhs = ss[1];
                 }
+            }
+        }
+
+        private static List<string> GetEquationChunks(ModelGamsEquation equation, string eqnameGams)
+        {
+            string[] ss = GamsModel.SplitEqName(eqnameGams);
+            List<string> eqChunks2 = new List<string>();
+            for (int i = 1; i < ss.Length; i++)
+            {
+                string s = ss[i];
+                if (G.Equal(s, "t1End")) continue;  //ignore it
+                else if (G.Equal(s, "tEnd")) continue;  //ignore it
+                else if (G.Equal(s, "End")) continue;  //ignore it
+                else if (G.Equal(s, "aEnd")) continue;  //ignore it
+                s = s.Replace("Born", "Boern");  //do something about a18 --> a?, but does not improve it
+                                                 //s = s.Replace("a18", "a");
+                eqChunks2.Add(s);  //for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel"]
+            }
+            for (int i = 0; i < equation.setsGamsList.Count; i++)  //for E_vUdlAkt_andel[portf,t] we get ["portf"]
+            {
+                if (G.Equal(equation.setsGamsList[i], Program.options.gams_time_set)) continue;  //skip "t"
+                eqChunks2.Add(equation.setsGamsList[i]);
+                //All in all for E_vUdlAkt_andel[portf,t] we get ["vUdlAkt", "andel", "portf"]
+            }
+
+            return eqChunks2;
+        }
+
+        private static void EditDistance(bool isLhs, ModelGamsEquation equation, string eqnameGams, List<string> eqChunks2, List<string> xx, out int minLhs, out string bestFirstChunkLhs)
+        {
+            string s = "LHS";
+            if (!isLhs) s = "RHS";
+            minLhs = int.MaxValue;
+            bestFirstChunkLhs = null;
+            xx.Add(eqnameGams + equation.setsGams + " --> " + Stringlist.GetListWithCommas(eqChunks2));
+
+            List<EquationNameChunks> varsChunks = equation.lhsVarsChunks;
+            List<string> vars = equation.lhsVars;
+            if (!isLhs) varsChunks = equation.rhsVarsChunks;
+            if (!isLhs) vars = equation.rhsVars;
+
+            for (int i = 0; i < varsChunks.Count; i++)
+            {
+                List<string> lhsList = varsChunks[i].chunks.Select(x => x.Replace("'", "")).ToList();
+                int edit1 = Program.EditDistance(eqChunks2, lhsList);
+                int edit2 = Program.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
+                if (edit1 < minLhs || edit2 < minLhs)
+                {
+                    bestFirstChunkLhs = varsChunks[i].chunks[0];
+                    minLhs = Math.Min(edit1, edit2);
+                }
+                xx.Add(Math.Min(edit1, edit2) + " " + s + ": " + vars[i] + " " + Stringlist.GetListWithCommas(lhsList));
             }
         }
 
