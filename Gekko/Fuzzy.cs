@@ -10,9 +10,7 @@ namespace Gekko
     {
         // e_y_tot(j, t) .. y['tot', j, t] = x['tot', j, t] + sum(i, y[i, j, t]);
         // e_y(i, j, t) .. y[i, j, t] = x[i, j, t] + 0.00001 * y['tot', j, t];
-        //
-
-        public static List<Equation> equations = new List<Equation>();
+        //        
 
         public class VarName
         {
@@ -26,6 +24,7 @@ namespace Gekko
         public class Equation
         {
             public List<string> eqName = new List<string>();
+            public string eqNameSimple = null;
             public List<VarName> varNamesLhs = new List<VarName>();
             public List<VarName> varNamesRhs = new List<VarName>();
         }
@@ -34,23 +33,32 @@ namespace Gekko
         {
             List m = new List();
             m.list = new List<IVariable>() { new ScalarString("tot") };
-            Program.databanks.GetFirst().AddIVariable("#atot", m);
-
-            double penalty_rhs = 0.5;
+            Program.databanks.GetFirst().AddIVariable("#atot", m);                       
 
             List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" };  //"e" removed, always plings for middle elements                        
+            List<Equation> equations = new List<Equation>();
             Equation e1 = new Equation();
             e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
+            e1.eqNameSimple = "e_y_tot[j, t]"; //Because eqs cannot be redefined, another eq cannot start with e_y_tot.
             e1.varNamesLhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new VarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             equations.Add(e1);
             Equation e2 = new Equation();
             e2.eqName = new List<string>() { "y", "i", "j", "t" };
+            e2.eqNameSimple = "e_y[i, j, t]";
             e2.varNamesLhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             e2.varNamesRhs.Add(new VarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
             e2.varNamesRhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
             equations.Add(e2);
+                        
+            //Keeping the full eqName including [...], perhaps makes it easier to deal with lags/leads?
+            SortedDictionary<double, List<string>> order = OrderLhs(equations, chosen, 0.5, true);
+        }
+
+        public static SortedDictionary<double, List<string>> OrderLhs(List<Equation> equations, List<string> chosen, double penalty_rhs, bool print)
+        {
+            SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName
 
             Cleanup(chosen, false);
             int nE = 0;
@@ -59,6 +67,7 @@ namespace Gekko
                 nE++;
                 Cleanup(equation.eqName, true);
                 ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
+                double bestScore = int.MaxValue;
                 int nVLhs = 0;
                 foreach (VarName varName in equation.varNamesLhs)
                 {
@@ -68,8 +77,8 @@ namespace Gekko
                     varName.score = EditDistance(varName.storage, equation.eqName);
                     double score = varName.score + EditDistance(chosen, varName.storage);
                     if (!G.Equal(chosen[0], varName.storage[0])) continue;
-                    new Writeln("Eq " + nE + " VarLhs " + nVLhs + " " + varName.simple + " Score = " + score);
-
+                    if (print) new Writeln("Eq " + nE + " VarLhs " + nVLhs + " " + varName.simple + " Score = " + score);
+                    bestScore = Math.Min(bestScore, score);
                 }
                 int nVRhs = 0;
                 foreach (VarName varName in equation.varNamesRhs)
@@ -80,9 +89,26 @@ namespace Gekko
                     varName.score = EditDistance(varName.storage, equation.eqName) + penalty_rhs;
                     double score = varName.score + EditDistance(chosen, varName.storage);
                     if (!G.Equal(chosen[0], varName.storage[0])) continue;
-                    new Writeln("Eq " + nE + " VarRhs " + nVRhs + " " + varName.simple + " Score = " + score);
+                    if (print) new Writeln("Eq " + nE + " VarRhs " + nVRhs + " " + varName.simple + " Score = " + score);
+                    bestScore = Math.Min(bestScore, score);
+                }
+                List<string> eqsNames = null;
+                order.TryGetValue(bestScore, out eqsNames);
+                if (eqsNames == null)
+                {
+                    eqsNames = new List<string>();
+                    order.Add(bestScore, eqsNames);
+                }
+                eqsNames.Add(equation.eqNameSimple);
+            }
+            if (print)
+            {
+                foreach (KeyValuePair<double, List<string>> kvp in order)
+                {
+                    new Writeln(" --- " + kvp.Key + ": " + Stringlist.GetListWithCommas(kvp.Value));
                 }
             }
+            return order;
         }
 
         /// <summary>
