@@ -5716,6 +5716,18 @@ namespace Gekko
                     //be perfect too. If a variable x['tot'] matches perfectly but a variable like x['a'] is less perfect,
                     //we will set x['tot'] as the equation's LHS, but not x['a'] or x[*] (the star if x['a'] occurs
                     //as sum(i, x[i]) for instance).
+                    //
+                    //With the editDistance, we get a prioritization of the different variables, in raw format like
+                    //x[i, j, t]. These we match with edit distance again to the concrete x['a', 'c', t]. We cannot
+                    //match the concrete vars directly to the eq name chunks, because we then lose info like being on
+                    //lhs or rhs, etc. and other stuff like being inside a sum() function.
+
+                    // TODO:
+                    // TODO:
+                    // TODO: Maybe look at conrete sets (lists) from databank, particularly for singleton sets.
+                    // TODO: This is a bit handled now, identifying aTot with 'tot' etc., but could be better.
+                    // TODO:
+                    // TODO:
 
                     List<string> eqChunks2 = GetEquationChunks(equation, eqnameGams);                                        
 
@@ -5797,8 +5809,8 @@ namespace Gekko
             for (int i = 0; i < varsChunks.Count; i++)
             {
                 List<string> lhsList = varsChunks[i].chunks.Select(x => x.Replace("'", "")).ToList();
-                int edit1 = Program.EditDistance(eqChunks2, lhsList);
-                int edit2 = Program.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
+                int edit1 = Fuzzy.EditDistance(eqChunks2, lhsList);
+                int edit2 = Fuzzy.EditDistance(eqChunks2, lhsList.Select(x => { if (x.EndsWith("tot", StringComparison.OrdinalIgnoreCase)) x = "tot"; return x; }).ToList());
                 if (edit1 < minLhs || edit2 < minLhs)
                 {
                     bestFirstChunkLhs = varsChunks[i].chunks[0];

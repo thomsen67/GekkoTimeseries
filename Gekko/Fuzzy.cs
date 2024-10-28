@@ -1,0 +1,171 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Gekko
+{
+    public class Fuzzy
+    {
+        // e_y_tot(j, t) .. y['tot', j, t] = x['tot', j, t] + sum(i, y[i, j, t]);
+        // e_y(i, j, t) .. y[i, j, t] = x[i, j, t] + 0.00001 * y['tot', j, t];
+        //
+
+        public static List<Equation> equations = new List<Equation>();
+
+        public class VarName
+        {
+            public List<string> storage = new List<string>();
+            public string simple = null;
+            public double score = double.NaN;
+        }
+
+        //public static List<EquationBrowser>
+
+        public class Equation
+        {
+            public List<string> eqName = new List<string>();
+            public List<VarName> varNamesLhs = new List<VarName>();
+            public List<VarName> varNamesRhs = new List<VarName>();
+        }
+
+        public static void Test()
+        {
+            List m = new List();
+            m.list = new List<IVariable>() { new ScalarString("'tot'") };
+            Program.databanks.GetFirst().AddIVariable("#atot", m);
+
+            double penalty_rhs = 0.5;
+            double penalty_wrong_var = 100;
+
+            //CLEANUP blanks etc.
+
+            List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" };  //"e" removed, always plings for middle elements                        
+            Equation e1 = new Equation();
+            e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
+            e1.varNamesLhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
+            e1.varNamesRhs.Add(new VarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
+            e1.varNamesRhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
+            equations.Add(e1);
+            Equation e2 = new Equation();
+            e2.eqName = new List<string>() { "y", "i", "j", "t" };
+            e2.varNamesLhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
+            e2.varNamesRhs.Add(new VarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
+            e2.varNamesRhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
+            equations.Add(e2);                       
+
+            int nE = 0;
+            foreach (Equation equation in equations)
+            {
+                nE++;
+                ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
+                int nVLhs = 0;
+                foreach (VarName varName in equation.varNamesLhs)
+                {
+                    nVLhs++;
+                    ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
+                    varName.score = EditDistance(varName.storage, equation.eqName);
+                    double score = varName.score + EditDistance(chosen, varName.storage);
+                    if (!G.Equal(chosen[0], varName.storage[0])) score += penalty_wrong_var;
+                    new Writeln("Eq " + nE + " VarLhs " + nVLhs + " " + varName.simple + " Score = " + score);
+
+                }
+                int nVRhs = 0;
+                foreach (VarName varName in equation.varNamesRhs)
+                {
+                    nVRhs++;
+                    ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
+                    varName.score = EditDistance(varName.storage, equation.eqName) + penalty_rhs;
+                    double score = varName.score + EditDistance(chosen, varName.storage);
+                    if (!G.Equal(chosen[0], varName.storage[0])) score += penalty_wrong_var;
+                    new Writeln("Eq " + nE + " VarRhs " + nVRhs + " " + varName.simple + " Score = " + score);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Replace an element like atot with 'tot', because #atot is found in databank.
+        /// If not found in databank, it may still be replaced according to the name.
+        /// </summary>
+        /// <param name="m"></param>
+        private static void ReplaceSingletons(List<string> m)
+        {
+            for (int i = 1; i < m.Count - 1; i++)  //skip first, skip last
+            {
+                if (!IsElement(m[i]))
+                {
+                    bool hit = false;
+                    List list = O.GetIVariableFromString("#" + m[i], O.ECreatePossibilities.NoneReturnNullAlways) as List;
+                    if (list != null && list.Count() == 1 && list.list[0].Type() == EVariableType.String)
+                    {
+                        m[i] = "'" + O.ConvertToString(list.list[0]) + "'";
+                        hit = true;
+                    }
+                    if (hit == false)
+                    {
+                        //Special handling of tot stuff
+                        if (m[i].EndsWith("tot", StringComparison.OrdinalIgnoreCase))  //atot --> tot, xtot --> tot
+                        {
+                            m[i] = "'tot'";
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Has plings like 'x'.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static bool IsElement(string s) 
+        {
+            if(s.StartsWith("'") && s.EndsWith("'")) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Damerau–Levenshtein distance. Can delete a word, add a new word, change a word to another word, or swap two words. Immune
+        /// to blanks or casing.
+        /// https://gist.github.com/wickedshimmy/449595/a17ab0d689623f5e6730eeb1c8606ab771149819
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="modified"></param>
+        /// <returns></returns>
+        public static int EditDistance(List<string> original, List<string> modified)
+        {
+            if (original == modified)
+                return 0;
+
+            int len_orig = original.Count;
+            int len_diff = modified.Count;
+            if (len_orig == 0 || len_diff == 0) return len_orig == 0 ? len_diff : len_orig;
+
+            var matrix = new int[len_orig + 1, len_diff + 1];
+
+            for (int i = 1; i <= len_orig; i++)
+            {
+                matrix[i, 0] = i;
+                for (int j = 1; j <= len_diff; j++)
+                {
+                    int cost = G.EqualHandleBlanks(modified[j - 1], original[i - 1]) ? 0 : 1;
+                    if (i == 1)
+                        matrix[0, j] = j;
+
+                    var vals = new int[] {
+                    matrix[i - 1, j] + 1,
+                    matrix[i, j - 1] + 1,
+                    matrix[i - 1, j - 1] + cost
+                };
+                    matrix[i, j] = vals.Min();
+                    if (i > 1 && j > 1 && original[i - 1] == modified[j - 2] && original[i - 2] == modified[j - 1])
+                        matrix[i, j] = Math.Min(matrix[i, j], matrix[i - 2, j - 2] + cost);
+                }
+            }
+            return matrix[len_orig, len_diff];
+        }
+
+
+    }
+}

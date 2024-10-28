@@ -2494,6 +2494,12 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (Globals.runningOnTTComputer && (text == "f"))
+            {
+                Fuzzy.Test();
+                return;
+            }
+
             if (Globals.runningOnTTComputer && (text == "d"))
             {
                 //new Writeln("Distanace: " + EditDistance(new List<string>() { "c", "a", "b" }, new List<string>() { "c", "b" }));
@@ -19013,48 +19019,7 @@ namespace Gekko
         }
         
 
-        /// <summary>
-        /// Damerau–Levenshtein distance. Can delete a word, add a new word, change a word to another word, or swap two words. Immune
-        /// to blanks or casing.
-        /// https://gist.github.com/wickedshimmy/449595/a17ab0d689623f5e6730eeb1c8606ab771149819
-        /// </summary>
-        /// <param name="original"></param>
-        /// <param name="modified"></param>
-        /// <returns></returns>
-        public static int EditDistance(List<string> original, List<string> modified)
-        {
-            if (original == modified)
-                return 0;
-
-            int len_orig = original.Count;
-            int len_diff = modified.Count;
-            if (len_orig == 0 || len_diff == 0) return len_orig == 0 ? len_diff : len_orig;
-
-            var matrix = new int[len_orig + 1, len_diff + 1];
-
-            for (int i = 1; i <= len_orig; i++)
-            {
-                matrix[i, 0] = i;
-                for (int j = 1; j <= len_diff; j++)
-                {
-                    int cost = G.EqualHandleBlanks(modified[j - 1], original[i - 1])  ? 0 : 1;
-                    if (i == 1)
-                        matrix[0, j] = j;
-
-                    var vals = new int[] {
-                    matrix[i - 1, j] + 1,
-                    matrix[i, j - 1] + 1,
-                    matrix[i - 1, j - 1] + cost
-                };
-                    matrix[i, j] = vals.Min();
-                    if (i > 1 && j > 1 && original[i - 1] == modified[j - 2] && original[i - 2] == modified[j - 1])
-                        matrix[i, j] = Math.Min(matrix[i, j], matrix[i - 2, j - 2] + cost);
-                }
-            }
-            return matrix[len_orig, len_diff];
-        }
-
-
+        
         /// <summary>
         /// Will detect x[#i][-1] + y = ...  . Used in GetLhsVariable().
         /// </summary>
