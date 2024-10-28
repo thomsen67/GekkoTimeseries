@@ -5753,9 +5753,6 @@ namespace Gekko
                     if (Globals.decompSmartLhs)
                     {
                         GetLhsVariables(model.modelGams);
-
-
-
                     }
 
                     // ------------------------------------
@@ -5959,6 +5956,16 @@ namespace Gekko
             return eqChunks2;
         }
 
+        /// <summary>
+        /// THIS METHOD SHOULD DIE SOON!
+        /// </summary>
+        /// <param name="isLhs"></param>
+        /// <param name="equation"></param>
+        /// <param name="eqnameGams"></param>
+        /// <param name="eqChunks2"></param>
+        /// <param name="xx"></param>
+        /// <param name="minLhs"></param>
+        /// <param name="bestFirstChunkLhs"></param>
         private static void EditDistance(bool isLhs, ModelGamsEquation equation, string eqnameGams, List<string> eqChunks2, List<string> xx, out int minLhs, out string bestFirstChunkLhs)
         {
             string s = "LHS";
@@ -5971,6 +5978,11 @@ namespace Gekko
             List<string> vars = equation.lhsVars;
             if (!isLhs) varsChunks = equation.rhsVarsChunks;
             if (!isLhs) vars = equation.rhsVars;
+
+            foreach (EquationNameChunks x in varsChunks)
+            {
+                if (G.Equal(x.chunks[x.chunks.Count - 1], "t")) x.chunks.RemoveAt(x.chunks.Count - 1);
+            }
 
             for (int i = 0; i < varsChunks.Count; i++)
             {

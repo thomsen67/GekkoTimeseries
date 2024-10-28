@@ -3244,6 +3244,14 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper method used for sorting in the FIND window (trying to show the LHS equation first)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="vars"></param>
+        /// <param name="vars2"></param>
+        /// <param name="nextNode"></param>
+        /// <param name="split"></param>
         private static void GetVariableChunks(TokenHelper node, List<string> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split)
         {
             vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
@@ -3260,7 +3268,7 @@ namespace Gekko
             foreach (TokenHelperComma thc in split)
             {
                 string s7 = thc.list.ToString().Replace(" ", "");
-                if (!G.Equal(s7, Program.options.gams_time_set))
+                if (true || !G.Equal(s7, Program.options.gams_time_set))
                 {
                     vars2a.chunks.Add(s7);
                 }
