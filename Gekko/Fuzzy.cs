@@ -37,12 +37,11 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariable("#atot", m);
 
             double penalty_rhs = 0.5;
-            double penalty_wrong_var = 100;
 
             List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" };  //"e" removed, always plings for middle elements                        
             Equation e1 = new Equation();
             e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
-            e1.varNamesLhs.Add(new VarName() { simple = "y[atot, j, t]", storage = new List<string>() { "y", "atot", "j", "t" } });
+            e1.varNamesLhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new VarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             equations.Add(e1);
@@ -68,7 +67,7 @@ namespace Gekko
                     ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                     varName.score = EditDistance(varName.storage, equation.eqName);
                     double score = varName.score + EditDistance(chosen, varName.storage);
-                    if (!G.Equal(chosen[0], varName.storage[0])) score += penalty_wrong_var;
+                    if (!G.Equal(chosen[0], varName.storage[0])) continue;
                     new Writeln("Eq " + nE + " VarLhs " + nVLhs + " " + varName.simple + " Score = " + score);
 
                 }
@@ -80,7 +79,7 @@ namespace Gekko
                     ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                     varName.score = EditDistance(varName.storage, equation.eqName) + penalty_rhs;
                     double score = varName.score + EditDistance(chosen, varName.storage);
-                    if (!G.Equal(chosen[0], varName.storage[0])) score += penalty_wrong_var;
+                    if (!G.Equal(chosen[0], varName.storage[0])) continue;
                     new Writeln("Eq " + nE + " VarRhs " + nVRhs + " " + varName.simple + " Score = " + score);
                 }
             }
