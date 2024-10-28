@@ -5552,7 +5552,7 @@ namespace Gekko
                     {
                         new Error("FIND is only implemented for scalar models");
                         return;
-                    }                    
+                    }
 
                     modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, false);
 
@@ -5575,87 +5575,77 @@ namespace Gekko
                     PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
 
                     string firstText = null;
-                    List<string> firstList = new List<string>();                   
+                    List<string> firstList = new List<string>();
 
                     List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
                     if (eqNumbers == null)
                     {
                         new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
                         return;
-                    }                    
+                    }
 
                     if (model.modelGams == null)
                     {
                         //Gekko type
                         MessageBox.Show("Fix FIND list for Gekko type models");
                     }
-
-                    // ------------- Scalar equations -------------------
-                    // ------------- Scalar equations -------------------
-                    // ------------- Scalar equations -------------------
-
-                    List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
-
-                    // -------------- Raw equations -------------------
-                    // -------------- Raw equations -------------------
-                    // -------------- Raw equations -------------------
-
-                    string dbName, variableName2; string freq; string[] indexes;
-                    O.Chop(variableName, out dbName, out variableName2, out freq, out indexes);
-                    List<string> chosen = new List<string>();
-                    chosen.Add(variableName2);
-                    if (indexes != null)
-                    {
-                        foreach (string s in indexes) chosen.Add("'" + s + "'");
-                    }
-                    chosen.Add("t");
-                                           
-                    List<Fuzzy.Equation> fuzzyEquations = new List<Fuzzy.Equation>();
-                    foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
-                    {
-                        foreach (ModelGamsEquation equation in kvp.Value)
-                        {
-                            //Probably always only have 1 here...
-                            bool foundChosen = false;
-                            Fuzzy.Equation fuzzyEquation = new Fuzzy.Equation();
-                            string[] ss = GamsModel.SplitEqName(equation.nameGams);                            
-                            List<string> eqName = new List<string>();
-                            for (int i = 1; i < ss.Length; i++) eqName.Add(ss[i]);  //skip first "e"
-                            for (int i = 0; i < equation.setsGamsList.Count; i++) eqName.Add(equation.setsGamsList[i]);
-                            fuzzyEquation.eqName = eqName;
-                            fuzzyEquation.eqNameSimple = equation.nameGams;                            
-                            foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
-                            {
-                                Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
-                                fuzzyVarName.storage = lhsVars.chunks;
-                                //fuzzyVarName.storage.Add("t"); //FIXMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!
-                                if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
-                                fuzzyEquation.varNamesLhs.Add(fuzzyVarName);                                
-                            }
-                            foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
-                            {
-                                Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
-                                fuzzyVarName.storage = rhsVars.chunks;
-                                //fuzzyVarName.storage.Add("t"); //FIXMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!
-                                if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
-                                fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
-                            }
-                            if (Globals.decompSmartLhsSkipIrrelevant && !foundChosen)
-                            {
-                                //Do not add it
-                            }
-                            else
-                            {
-                                fuzzyEquations.Add(fuzzyEquation);
-                            }
-                        }
-                    }
                     
-                    // ---------------- End of equations
-                    // ---------------- End of equations
-                    // ---------------- End of equations                    
+                    //Setting up chunks for EditDistancd()
+                    List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
+                    List<string> chosen = GetChosenVariable(variableName);
+                    List<Fuzzy.Equation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);
+
+                    // ------------ Can be removed soon, start -------------------------------
+
+                    //if (!CheckOk(chosen))
+                    //    new Writeln("Error: " + Stringlist.GetListWithCommas(chosen));
+                    //foreach (Fuzzy.Equation e in fuzzyEquations)
+                    //{
+                    //    if (!CheckOk(e.eqName))
+                    //        new Writeln("Error: " + Stringlist.GetListWithCommas(e.eqName));
+                    //    foreach (Fuzzy.VarName v in e.varNamesLhs)
+                    //    {
+                    //        if (!CheckOk(v.storage))
+                    //            new Writeln("Error: " + Stringlist.GetListWithCommas(v.storage));
+                    //    }
+                    //    foreach (Fuzzy.VarName v in e.varNamesRhs)
+                    //    {
+                    //        if (!CheckOk(v.storage))
+                    //            new Writeln("Error: " + Stringlist.GetListWithCommas(v.storage));
+                    //    }
+                    //}
+                    //// ------------ Can be removed soon, end -------------------------------
 
                     SortedDictionary<double, List<string>> sorted = Fuzzy.OrderLhs(fuzzyEquations, chosen, 0.5, false);
+                    GekkoDictionary<string, double> dict = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                    foreach (KeyValuePair<double, List<string>> kvp in sorted)
+                    {
+                        foreach (string s2 in kvp.Value)
+                        {
+                            dict.Add(s2, kvp.Key);
+                        }
+                    }
+
+                    //string s1 = null;
+                    //foreach (KeyValuePair<double, List<string>> kvp in sorted)
+                    //{
+                    //    foreach (string s2 in kvp.Value)
+                    //    {
+                    //        s1 += kvp.Key + " --> " + s2 + G.NL;
+                    //    }
+                    //}
+                    //MessageBox.Show(s1);
+
+                    foreach (EqInfoSimple eqHelper in eqsNew)
+                    {
+                        double d = double.MaxValue;
+                        string[] ss = eqHelper.eqName.Split('[');
+                        string eqNameWithoutIndex = ss[0];
+                        dict.TryGetValue(eqNameWithoutIndex, out d);  //What about .eqNameLag????
+                        eqHelper.score = d;
+                    }
+
+                    eqsNew= eqsNew.OrderBy(x => x.score).ToList();
 
                     //This seems to just gather material for the GUI representation
                     int lineCounter = -1;
@@ -5824,6 +5814,96 @@ namespace Gekko
                     MessageBox.Show(e.Message + " --findtrace-> " + e.StackTrace);
                 }
             }
+        }
+
+        /// <summary>
+        /// From the raw GAMS equations, obtain these in a form suitable for EditDistance(). If the chosen variable is
+        /// x[...], only equations containing x[...] are returns (the rest are ignored)
+        /// </summary>
+        /// <param name="modelGams"></param>
+        /// <param name="chosen"></param>
+        /// <returns></returns>
+        private static List<Fuzzy.Equation> GetRawEquations(ModelGams modelGams, List<string> chosen)
+        {
+            List<Fuzzy.Equation> fuzzyEquations = new List<Fuzzy.Equation>();
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
+            {
+                foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
+                {
+                    //Probably always only have 1 here...
+                    bool foundChosen = false;
+                    Fuzzy.Equation fuzzyEquation = new Fuzzy.Equation();
+                    string[] ss = GamsModel.SplitEqName(equation.nameGams);
+                    List<string> eqName = new List<string>();
+                    for (int i = 1; i < ss.Length; i++) eqName.Add(ss[i]);  //skip first "e"
+                    for (int i = 0; i < equation.setsGamsList.Count; i++) eqName.Add(equation.setsGamsList[i]);
+                    fuzzyEquation.eqName = eqName;
+                    fuzzyEquation.eqNameSimple = equation.nameGams;
+                    foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
+                    {
+                        if (!CheckOk2(lhsVars.chunks[lhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
+                        Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
+                        fuzzyVarName.storage = lhsVars.chunks;
+                        if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
+                        fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
+                    }
+                    foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
+                    {
+                        if (!CheckOk2(rhsVars.chunks[rhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
+                        Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
+                        fuzzyVarName.storage = rhsVars.chunks;
+                        if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
+                        fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
+                    }
+                    if (Globals.decompSmartLhsSkipIrrelevant && !foundChosen)
+                    {
+                        //Do not add it
+                    }
+                    else
+                    {
+                        fuzzyEquations.Add(fuzzyEquation);
+                    }
+                }
+            }
+
+            return fuzzyEquations;
+        }
+
+        /// <summary>
+        /// Returns the chosen variable as chunks
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <returns></returns>
+        private static List<string> GetChosenVariable(string variableName)
+        {
+            string dbName, variableName2; string freq; string[] indexes;
+            O.Chop(variableName, out dbName, out variableName2, out freq, out indexes);
+            List<string> chosen = new List<string>();
+            chosen.Add(variableName2);
+            if (indexes != null)
+            {
+                foreach (string s in indexes) chosen.Add("'" + s + "'");
+            }
+            chosen.Add("t");
+            return chosen;
+        }
+
+        /// <summary>
+        /// Delete soon
+        /// </summary>
+        /// <param name="chosen"></param>
+        /// <returns></returns>
+        private static bool CheckOk(List<string> chosen)
+        {
+            bool b = chosen[chosen.Count - 1] == "t" || chosen[chosen.Count - 1].StartsWith("t-") || chosen[chosen.Count - 1].StartsWith("t+");
+            return b;
+        }
+
+        private static bool CheckOk2(string s)
+        {
+            string s2 = s.Replace(" ", "").ToLower();
+            bool b = s2 == "t" || s2.StartsWith("t-") || s2.StartsWith("t+");
+            return b;
         }
 
         public static void GetLhsVariables(ModelGams modelGams)
@@ -6091,9 +6171,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Input is a list of equations (represented as integer values) that contain the variableName. This info, the integers, is part of the scalarModel object.
-        /// The equations are sorted after "relevance".
-        /// A list of EqHelper objects is returned: basically the equation names.
+        /// Get scalar equations in simple text form.
         /// </summary>
         /// <param name="o"></param>
         /// <param name="model"></param>

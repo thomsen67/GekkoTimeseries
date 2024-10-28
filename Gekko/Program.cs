@@ -1744,6 +1744,7 @@ namespace Gekko
         public string eqNameWithLag = null;
         public int eqNumber = -12345;
         public bool best = false;
+        public double score = double.NaN;
     }
 
     public class Rich

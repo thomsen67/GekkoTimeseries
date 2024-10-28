@@ -2177,10 +2177,6 @@ namespace Gekko
                 string dollar = null;
 
                 eqnameGams = tok.Offset(i)?.s;
-
-                if (eqnameGams.ToLower().StartsWith("e_vtkilde"))
-                {
-                }
                 
                 i++;
 
@@ -2960,14 +2956,15 @@ namespace Gekko
                             // -------------------------------------
 
                             //first we check for stuff like a15t100(a), where a15t100 is a set, not a variable
-                            //so it should be #a15t100[#a], not a15t100[#a]
+                            //so it should be #a15t100[#a], not a15t100[#a]                                                        
 
+                            List<TokenHelperComma> split = nextNode.SplitCommas(true);
                             bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
                             if (isSetWithIndexer) node.s = "#" + node.s;
 
-                            List<TokenHelperComma> split = nextNode.SplitCommas(true);
-
-                            GetVariableChunks(node, vars, vars2, nextNode, split);
+                            //Beware, this will also put int sets like a18t100(a). These are filtered out later on,
+                            //but kept here for simplicity.
+                            GetVariableChunks(node, vars, vars2, nextNode, split);                            
 
                             bool removeParenthesis = false;
 

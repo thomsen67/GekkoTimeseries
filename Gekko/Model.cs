@@ -167,7 +167,13 @@ namespace Gekko
 
                         if (i > 0) sb2.AppendLine();
                         sb2.AppendLine(eq.lhsGams + " =E= " + eq.rhsGams + ";");
-                        if (!G.NullOrBlanks(eq.conditionalsGams)) sb2.AppendLine("with $-condition: " + eq.conditionalsGams);
+
+                        string sets = null;
+                        if (!G.NullOrBlanks(eq.setsGams)) sets = "over sets: " + eq.setsGams;
+                        string dollar = null;
+                        if (!G.NullOrBlanks(eq.conditionalsGams)) dollar = "with $-condition: " + eq.conditionalsGams;
+                        if (sets != null && dollar != null) sb2.AppendLine(sets + ", " + dollar);
+                        else sb2.AppendLine(sets + dollar);                        
                     }
                 }
             }
