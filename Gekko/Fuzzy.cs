@@ -35,7 +35,7 @@ namespace Gekko
             m.list = new List<IVariable>() { new ScalarString("tot") };
             Program.databanks.GetFirst().AddIVariable("#atot", m);                       
 
-            List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" };  //"e" removed, always plings for middle elements                        
+            List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" }; //Always plings for middle elements                        
             List<Equation> equations = new List<Equation>();
             Equation e1 = new Equation();
             e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
@@ -148,11 +148,12 @@ namespace Gekko
                 m[i] = m[i].Replace(" ", "");
                 if (isEqName)
                 {
+                    m[i] = m[i].Replace("Born", "Boern");  //Do before null-setting. Do something about a18 --> a?, but does not improve it
                     if (G.Equal(m[i], "t1End")) m[i] = null;
                     else if (G.Equal(m[i], "tEnd")) m[i] = null;
                     else if (G.Equal(m[i], "End")) m[i] = null;
                     else if (G.Equal(m[i], "aEnd")) m[i] = null;
-                    m[i] = m[i].Replace("Born", "Boern");  //do something about a18 --> a?, but does not improve it
+                    
                 }
             }            
             m.RemoveAll(x => x == null);            

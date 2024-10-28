@@ -1738,7 +1738,7 @@ namespace Gekko
         }
     }
 
-    public class EqHelper
+    public class EqInfoSimple
     {
         public string eqName = null;
         public string eqNameWithLag = null;

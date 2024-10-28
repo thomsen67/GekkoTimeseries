@@ -1189,7 +1189,7 @@ namespace Gekko
                     EquationBrowser.WriteHtmlBold(html1, "Related equations");
                     bool first2 = true;
                     string s8 = null;
-                    foreach (EqHelper eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
+                    foreach (EqInfoSimple eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
                     {
                         string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
                         string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
@@ -1464,7 +1464,7 @@ namespace Gekko
 
         private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)
         {
-            List<EqHelper> eqsNew = GetRelatedEquations(variableName, t1, model, modelGamsScalar);
+            List<EqInfoSimple> eqsNew = GetRelatedEquations(variableName, t1, model, modelGamsScalar);
             StringBuilder html2 = new StringBuilder();
             html2.AppendLine("<div id = `no-hash` class=`content`>");            
             html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
@@ -1475,7 +1475,7 @@ namespace Gekko
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
             string table = "<table cellpadding=`5`>";
-            foreach (EqHelper eqHelper in eqsNew)
+            foreach (EqInfoSimple eqHelper in eqsNew)
             {
                 table += "<tr>";
                 EquationTextHelper helper = new EquationTextHelper();
@@ -1791,7 +1791,7 @@ namespace Gekko
         /// <param name="model"></param>
         /// <param name="modelGamsScalar"></param>
         /// <returns></returns>
-        private static List<EqHelper> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
+        private static List<EqInfoSimple> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
         {
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345) new Error("Hov");
@@ -1803,7 +1803,7 @@ namespace Gekko
                 G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
                 eqNumbers = new List<int>();
             }
-            List<EqHelper> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
+            List<EqInfoSimple> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
             return eqsNew;
         }
 
