@@ -2103,7 +2103,7 @@ namespace Gekko
             List<string> lhsVars = new List<string>();
             List<EquationNameChunks> lhsVars2 = new List<EquationNameChunks>();
             List<string> rhsVars = new List<string>();
-            List<EquationNameChunks> rhsVars2 = new List<EquationNameChunks>();
+            List<EquationNameChunks> rhsVars2 = new List<EquationNameChunks>();            
 
             try
             {
@@ -2177,6 +2177,10 @@ namespace Gekko
                 string dollar = null;
 
                 eqnameGams = tok.Offset(i)?.s;
+
+                if (eqnameGams.ToLower().StartsWith("e_vtkilde"))
+                {
+                }
                 
                 i++;
 
@@ -2961,29 +2965,11 @@ namespace Gekko
                             bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
                             if (isSetWithIndexer) node.s = "#" + node.s;
 
-                            vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
-                            EquationNameChunks vars2a = new EquationNameChunks();
-                            string name = node.ToString();
-                            string[] ss = name.Split('_');                            
-                            foreach (string s in ss)
-                            {
-                                vars2a.chunks.Add(s.Replace(" ", "")); //no need to remove blanks
-                            }
-
-                            bool removeParenthesis = false;
-
-                            //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')
                             List<TokenHelperComma> split = nextNode.SplitCommas(true);
 
-                            foreach (TokenHelperComma thc in split)
-                            {
-                                string s7 = thc.list.ToString().Replace(" ", "");
-                                if (!G.Equal(s7, Program.options.gams_time_set))
-                                {
-                                    vars2a.chunks.Add(s7);
-                                }
-                            }
-                            vars2.Add(vars2a);
+                            GetVariableChunks(node, vars, vars2, nextNode, split);
+
+                            bool removeParenthesis = false;
 
                             for (int iSplit = 0; iSplit < split.Count; iSplit++)
                             {
@@ -3256,7 +3242,31 @@ namespace Gekko
                     WalkTokensGekkoSyntax(node.subnodes.storage[i], th, vars, vars2);
                 }
             }
-        }    
+        }
+
+        private static void GetVariableChunks(TokenHelper node, List<string> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split)
+        {
+            vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
+            EquationNameChunks vars2a = new EquationNameChunks();
+            string name = node.ToString();
+            string[] ss = name.Split('_');
+            foreach (string s in ss)
+            {
+                vars2a.chunks.Add(s.Replace(" ", "")); //no need to remove blanks
+            }
+
+            //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')                            
+
+            foreach (TokenHelperComma thc in split)
+            {
+                string s7 = thc.list.ToString().Replace(" ", "");
+                if (!G.Equal(s7, Program.options.gams_time_set))
+                {
+                    vars2a.chunks.Add(s7);
+                }
+            }
+            vars2.Add(vars2a);
+        }
 
         public static void WalkTokensHandleParentheses(TokenList nodes)
         {

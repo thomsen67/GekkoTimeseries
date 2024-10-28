@@ -5616,6 +5616,7 @@ namespace Gekko
                         foreach (ModelGamsEquation equation in kvp.Value)
                         {
                             //Probably always only have 1 here...
+                            bool foundChosen = false;
                             Fuzzy.Equation fuzzyEquation = new Fuzzy.Equation();
                             string[] ss = GamsModel.SplitEqName(equation.nameGams);                            
                             List<string> eqName = new List<string>();
@@ -5627,18 +5628,26 @@ namespace Gekko
                             {
                                 Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
                                 fuzzyVarName.storage = lhsVars.chunks;
-                                fuzzyVarName.storage.Add("t"); //FIXMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!
-                                fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
-                                
+                                //fuzzyVarName.storage.Add("t"); //FIXMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!
+                                if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
+                                fuzzyEquation.varNamesLhs.Add(fuzzyVarName);                                
                             }
                             foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
                             {
                                 Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
                                 fuzzyVarName.storage = rhsVars.chunks;
-                                fuzzyVarName.storage.Add("t"); //FIXMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!
+                                //fuzzyVarName.storage.Add("t"); //FIXMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!
+                                if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                                 fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
                             }
-                            fuzzyEquations.Add(fuzzyEquation);
+                            if (Globals.decompSmartLhsSkipIrrelevant && !foundChosen)
+                            {
+                                //Do not add it
+                            }
+                            else
+                            {
+                                fuzzyEquations.Add(fuzzyEquation);
+                            }
                         }
                     }
                     
@@ -5646,7 +5655,7 @@ namespace Gekko
                     // ---------------- End of equations
                     // ---------------- End of equations                    
 
-                    SortedDictionary<double, List<string>> xx = Fuzzy.OrderLhs(fuzzyEquations, chosen, 0.5, false);
+                    SortedDictionary<double, List<string>> sorted = Fuzzy.OrderLhs(fuzzyEquations, chosen, 0.5, false);
 
                     //This seems to just gather material for the GUI representation
                     int lineCounter = -1;
