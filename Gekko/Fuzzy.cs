@@ -33,18 +33,16 @@ namespace Gekko
         public static void Test()
         {
             List m = new List();
-            m.list = new List<IVariable>() { new ScalarString("'tot'") };
+            m.list = new List<IVariable>() { new ScalarString("tot") };
             Program.databanks.GetFirst().AddIVariable("#atot", m);
 
             double penalty_rhs = 0.5;
             double penalty_wrong_var = 100;
 
-            //CLEANUP blanks etc.
-
             List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" };  //"e" removed, always plings for middle elements                        
             Equation e1 = new Equation();
             e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
-            e1.varNamesLhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
+            e1.varNamesLhs.Add(new VarName() { simple = "y[atot, j, t]", storage = new List<string>() { "y", "atot", "j", "t" } });
             e1.varNamesRhs.Add(new VarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             equations.Add(e1);
@@ -53,17 +51,20 @@ namespace Gekko
             e2.varNamesLhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             e2.varNamesRhs.Add(new VarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
             e2.varNamesRhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
-            equations.Add(e2);                       
+            equations.Add(e2);
 
+            Cleanup(chosen, false);
             int nE = 0;
             foreach (Equation equation in equations)
             {
                 nE++;
+                Cleanup(equation.eqName, true);
                 ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                 int nVLhs = 0;
                 foreach (VarName varName in equation.varNamesLhs)
                 {
                     nVLhs++;
+                    Cleanup(varName.storage, false);
                     ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                     varName.score = EditDistance(varName.storage, equation.eqName);
                     double score = varName.score + EditDistance(chosen, varName.storage);
@@ -75,6 +76,7 @@ namespace Gekko
                 foreach (VarName varName in equation.varNamesRhs)
                 {
                     nVRhs++;
+                    Cleanup(varName.storage, false);
                     ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                     varName.score = EditDistance(varName.storage, equation.eqName) + penalty_rhs;
                     double score = varName.score + EditDistance(chosen, varName.storage);
@@ -112,6 +114,23 @@ namespace Gekko
                     }
                 }
             }
+        }
+
+        private static void Cleanup(List<string> m, bool isEqName)
+        {
+            for (int i = 0; i < m.Count; i++)  //skip first, skip last
+            {
+                m[i] = m[i].Replace(" ", "");
+                if (isEqName)
+                {
+                    if (G.Equal(m[i], "t1End")) m[i] = null;
+                    else if (G.Equal(m[i], "tEnd")) m[i] = null;
+                    else if (G.Equal(m[i], "End")) m[i] = null;
+                    else if (G.Equal(m[i], "aEnd")) m[i] = null;
+                    m[i] = m[i].Replace("Born", "Boern");  //do something about a18 --> a?, but does not improve it
+                }
+            }            
+            m.RemoveAll(x => x == null);            
         }
 
         /// <summary>
