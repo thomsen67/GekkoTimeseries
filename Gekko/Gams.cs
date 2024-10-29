@@ -3264,7 +3264,7 @@ namespace Gekko
             string[] ss = name.Split('_');
             foreach (string s in ss)
             {
-                vars2a.chunks.Add(s.Replace(" ", "")); //no need to remove blanks
+                vars2a.chunks.Add(s.Replace(" ", ""));
             }
 
             //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')                            
@@ -3272,10 +3272,7 @@ namespace Gekko
             foreach (TokenHelperComma thc in split)
             {
                 string s7 = thc.list.ToString().Replace(" ", "");
-                if (true || !G.Equal(s7, Program.options.gams_time_set))
-                {
-                    vars2a.chunks.Add(s7);
-                }
+                vars2a.chunks.Add(s7);                
             }
             vars2.Add(vars2a);
         }

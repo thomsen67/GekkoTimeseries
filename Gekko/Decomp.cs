@@ -5589,7 +5589,38 @@ namespace Gekko
                         //Gekko type
                         MessageBox.Show("Fix FIND list for Gekko type models");
                     }
-                    
+
+                    if (false)
+                    {
+                        //Testing
+                        List<string> eqNames = modelGamsScalar.GetVars(1);
+                        GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                        List<string> eqNames2 = new List<string>();
+                        foreach (string eqName in eqNames)
+                        {
+                            string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
+                            G.Chop_Chop(eqName, out bank, out name2, out freq2, out indexes); //freq2 will be == null
+                            if (!dict2.ContainsKey(name2))
+                            {
+                                dict2.Add(name2, false);
+                                eqNames2.Add(eqName);
+                            }
+                        }
+                        foreach (string eqName in eqNames2)
+                        {                            
+                            EqInfoSimple e = new EqInfoSimple();
+                            e.eqName = eqName;
+
+                            //Fuzzy.TestLhs(
+                        }
+                    }
+
+                    if (true)
+                    {
+                        List<Fuzzy.Equation> fuzzyEquationsAll = GetRawEquations(model.modelGams, null);  //all
+                        SortedDictionary<double, List<string>> order = Fuzzy.TestLhs(fuzzyEquationsAll, 0.5, false);
+                    }
+
                     //Setting up chunks for EditDistancd()
                     List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
                     List<string> chosen = GetChosenVariable(variableName);
@@ -5635,8 +5666,8 @@ namespace Gekko
                         eqHelper.score = d;
                     }
 
-                    eqsNew= eqsNew.OrderBy(x => x.score).ToList();
-
+                    eqsNew = eqsNew.OrderBy(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    
                     //This seems to just gather material for the GUI representation
                     int lineCounter = -1;
                     foreach (EqInfoSimple eqHelper in eqsNew)
@@ -5801,7 +5832,8 @@ namespace Gekko
 
         /// <summary>
         /// From the raw GAMS equations, obtain these in a form suitable for EditDistance(). If the chosen variable is
-        /// x[...], only equations containing x[...] are returns (the rest are ignored)
+        /// x[...], only equations containing x[...] are returned (the rest are ignored). If chosen == null, all equations
+        /// are returned.
         /// </summary>
         /// <param name="modelGams"></param>
         /// <param name="chosen"></param>
@@ -5815,6 +5847,7 @@ namespace Gekko
                 {
                     //Probably always only have 1 here...
                     bool foundChosen = false;
+                    if (chosen == null) foundChosen = true;
                     Fuzzy.Equation fuzzyEquation = new Fuzzy.Equation();
                     string[] ss = GamsModel.SplitEqName(equation.nameGams);
                     List<string> eqName = new List<string>();
@@ -5827,7 +5860,7 @@ namespace Gekko
                         if (!CheckOk2(lhsVars.chunks[lhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
                         Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
                         fuzzyVarName.storage = lhsVars.chunks;
-                        if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
+                        if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
                     }
                     foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
@@ -5835,14 +5868,10 @@ namespace Gekko
                         if (!CheckOk2(rhsVars.chunks[rhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
                         Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
                         fuzzyVarName.storage = rhsVars.chunks;
-                        if (G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
+                        if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
                     }
-                    if (Globals.decompSmartLhsSkipIrrelevant && !foundChosen)
-                    {
-                        //Do not add it
-                    }
-                    else
+                    if (!Globals.decompSmartLhsSkipIrrelevant || foundChosen)                    
                     {
                         fuzzyEquations.Add(fuzzyEquation);
                     }
