@@ -23420,28 +23420,51 @@ print(df2)
         [TestMethod]
         public void _Test_Decomp_GamsFindLhs1()
         {
-            //Tests LHS variable finder for raw GAMS models.
-            Globals.gamsLhsCount = new int[10]; //Existence also used as a signal for printing this stuff out
+            //Tests LHS variable finder for raw GAMS models.            
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
             I("flush(); reset;");  //flush() to avoid cache setting in
-            I("option model gams dep method = both;");
+            I("option model gams dep method = both;");            
             I("model<gms> raw1.gms;");
+            List<Fuzzy.Equation> fuzzyEquationsAll1 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
+            SortedDictionary<double, List<Fuzzy.Equation>> order1 = Fuzzy.TestLhs(fuzzyEquationsAll1, 0.5, false);
 
-            Decomp.GetLhsVariables(Program.model.modelGams);
-
-            for (int i = 0; i < Globals.gamsLhsCount.Length; i++)
+            int i = -1;
+            foreach (KeyValuePair<double, List<Fuzzy.Equation>> kvp in order1)
             {
-                G.Writeln("edit " + i + " = " + Globals.gamsLhsCount[i]);
+                i++;
+                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(918, kvp.Value.Count); }
+                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(234, kvp.Value.Count); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(11, kvp.Value.Count); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(39, kvp.Value.Count); }
+                else if (i == 5) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(6, kvp.Value.Count); }
+                else if (i == 6) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else if (i == 7) { Assert.AreEqual(4d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else if (i == 8) { Assert.AreEqual(5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else Assert.Fail();
             }
 
-            Assert.AreEqual(1028, Globals.gamsLhsCount[0]);
-            Assert.AreEqual(205, Globals.gamsLhsCount[1]);
-            Assert.AreEqual(35, Globals.gamsLhsCount[2]);
-            Assert.AreEqual(8, Globals.gamsLhsCount[3]);
-            Assert.AreEqual(0, Globals.gamsLhsCount[4]);
-            Assert.AreEqual(2, Globals.gamsLhsCount[5]);
-            Assert.AreEqual(0, Globals.gamsLhsCount[6]);
-            Globals.gamsLhsCount = null; //important 
+            I("read \\..\\Databanks\\makro;");
+            I("model<gms> raw1.gms;");
+
+            List<Fuzzy.Equation> fuzzyEquationsAll2 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
+            SortedDictionary<double, List<Fuzzy.Equation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, 0.5, false);
+
+            i = -1;
+            foreach (KeyValuePair<double, List<Fuzzy.Equation>> kvp in order2)
+            {
+                i++;
+                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(915, kvp.Value.Count); }
+                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(237, kvp.Value.Count); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(11, kvp.Value.Count); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(39, kvp.Value.Count); }
+                else if (i == 5) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(6, kvp.Value.Count); }
+                else if (i == 6) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else if (i == 7) { Assert.AreEqual(4d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else if (i == 8) { Assert.AreEqual(5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else Assert.Fail();
+            }
         }
 
         [TestMethod]

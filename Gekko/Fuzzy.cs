@@ -17,6 +17,12 @@ namespace Gekko
             public List<string> storage = new List<string>();
             public string simple = null;
             public double score = double.NaN;
+            public string ToString()
+            {
+                string s = score + ":" + " [" + string.Join(", ", storage) + "]";
+                if (simple != null) s += " --> " + simple;
+                return s;
+            }
         }
 
         //public static List<EquationBrowser>
@@ -79,18 +85,20 @@ namespace Gekko
                 nE++;
                 Cleanup(equation.eqName, true);
                 ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
-                double bestScore = int.MaxValue;
+                double bestScore = double.MaxValue;
                 int nVLhs = 0;
                 foreach (VarName varName in equation.varNamesLhs)
                 {
                     nVLhs++;
-                    bestScore = EquationPoints(true, equation, chosen, varName, bestScore, nE, nVLhs, print, penalty_rhs);
+                    double score = EquationPoints(true, equation, chosen, varName, nE, nVLhs, print, penalty_rhs);
+                    if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
                 }
                 int nVRhs = 0;
                 foreach (VarName varName in equation.varNamesRhs)
                 {
                     nVRhs++;
-                    bestScore = EquationPoints(false, equation, chosen, varName, bestScore, nE, nVLhs, print, penalty_rhs);
+                    double score = EquationPoints(false, equation, chosen, varName, nE, nVLhs, print, penalty_rhs);
+                    if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
                 }
                 List<string> eqsNames = null;
                 order.TryGetValue(bestScore, out eqsNames);
@@ -111,49 +119,46 @@ namespace Gekko
             return order;
         }
 
-        public static SortedDictionary<double, List<string>> TestLhs(List<Equation> equations, double penalty_rhs, bool print)
+        public static SortedDictionary<double, List<Equation>> TestLhs(List<Equation> equations, double penalty_rhs, bool print)
         {
-            SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName            
+            SortedDictionary<double, List<Equation>> order = new SortedDictionary<double, List<Equation>>(); //score, eqName            
             int nE = 0;
             foreach (Equation equation in equations)
             {
                 nE++;
                 Cleanup(equation.eqName, true);
-                ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
-                double bestScore = int.MaxValue;
+                ReplaceSingletons(equation.eqName);
+                double bestScore = double.MaxValue;
                 int nVLhs = 0;
                 foreach (VarName varName in equation.varNamesLhs)
                 {
+                    string simple = varName.simple;
                     nVLhs++;
-                    bestScore = EquationPoints(true, equation, null, varName, bestScore, nE, nVLhs, print, penalty_rhs);
+                    varName.score = EquationPoints(true, equation, null, varName, nE, nVLhs, print, penalty_rhs);
+                    bestScore = Math.Min(bestScore, varName.score);
                 }
                 int nVRhs = 0;
                 foreach (VarName varName in equation.varNamesRhs)
                 {
+                    string simple = varName.simple;
                     nVRhs++;
-                    bestScore = EquationPoints(false, equation, null, varName, bestScore, nE, nVLhs, print, penalty_rhs);
+                    varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print, penalty_rhs);
+                    bestScore = Math.Min(bestScore, varName.score);
                 }
-                List<string> eqsNames = null;
+                List<Equation> eqsNames = null;
                 order.TryGetValue(bestScore, out eqsNames);
                 if (eqsNames == null)
                 {
-                    eqsNames = new List<string>();
+                    eqsNames = new List<Equation>();
                     order.Add(bestScore, eqsNames);
                 }
-                eqsNames.Add(equation.eqNameSimple);
-            }
-            if (print)
-            {
-                foreach (KeyValuePair<double, List<string>> kvp in order)
-                {
-                    new Writeln(" --- " + kvp.Key + ": " + Stringlist.GetListWithCommas(kvp.Value));
-                }
-            }
+                eqsNames.Add(equation);
+            }            
             return order;
         }
 
 
-        private static double EquationPoints(bool isLhs, Equation equation, List<string> chosen, VarName varName, double bestScore, int nE, int nVLhs, bool print, double penalty_rhs)
+        private static double EquationPoints(bool isLhs, Equation equation, List<string> chosen, VarName varName, int nE, int nVLhs, bool print, double penalty_rhs)
         {
             string s = "Lhs";
             double p = 0d;
@@ -165,23 +170,21 @@ namespace Gekko
             Cleanup(varName.storage, false);
             ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]            
             varName.score = EditDistance(varName.storage, equation.eqName) + p;
+            double score;
             if (chosen == null)
             {
-                double score = varName.score;                
-                if (print) new Writeln("Eq " + nE + " Var" + s + " " + nVLhs + " " + varName.simple + " Score = " + score);
-                bestScore = Math.Min(bestScore, score);                
+                score = varName.score;                
+                if (print) new Writeln("Eq " + nE + " Var" + s + " " + nVLhs + " " + varName.simple + " Score = " + score);                            
             }
             else 
             {
-                double score = varName.score + EditDistance(chosen, varName.storage);
+                score = varName.score + EditDistance(chosen, varName.storage);
                 if (G.Equal(chosen[0], varName.storage[0]))
                 {
-                    if (print) new Writeln("Eq " + nE + " Var" + s + " " + nVLhs + " " + varName.simple + " Score = " + score);
-                    bestScore = Math.Min(bestScore, score);
+                    if (print) new Writeln("Eq " + nE + " Var" + s + " " + nVLhs + " " + varName.simple + " Score = " + score);                    
                 }
             }
-
-            return bestScore;
+            return score;
         }
 
         /// <summary>
