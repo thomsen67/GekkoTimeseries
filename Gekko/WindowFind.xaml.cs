@@ -470,8 +470,8 @@ namespace Gekko
         {
             Name = name;
             Sub = sub; //empty
-            Dep = dep; //"<flueben>"
-            Lhs = lhs; //empty
+            Dep = dep; //score
+            Lhs = lhs; //"<flueben>"
             Per = per; //"tx0"
             Vars = vars; //"nPop[0], nPop[1], ..."
             LineColor = lineColor; //"Black"
