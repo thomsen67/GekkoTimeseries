@@ -13502,7 +13502,8 @@ namespace UnitTests
 
                 I("flush();");
                 I("reset;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("option model gams dep method = lhs;");
                 I("model <gms> simul2.zip;");
                 // ----------------            
                 I("y <2000 2003> = 500, 499, 531, 540;");
@@ -13519,10 +13520,10 @@ namespace UnitTests
                 Assert.AreEqual(Globals.itemHandler.Items[0].Dep, Globals.protectSymbol);
                 Assert.AreEqual(Globals.itemHandler.Items[0].Vars, "y, c, g");
                 Assert.AreEqual(Globals.itemHandler.Items[1].Name, "e2");
-                Assert.AreEqual(Globals.itemHandler.Items[1].Dep, "");
+                Assert.AreEqual(Globals.itemHandler.Items[1].Lhs, "");
                 Assert.AreEqual(Globals.itemHandler.Items[1].Vars, "y[-1], y, y[+1], c");
                 Assert.AreEqual(Globals.itemHandler.Items[2].Name, "e2[-1]");
-                Assert.AreEqual(Globals.itemHandler.Items[2].Dep, "");
+                Assert.AreEqual(Globals.itemHandler.Items[2].Lhs, "");
                 Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");
 
                 Gekko.Table table = null;

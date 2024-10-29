@@ -5537,7 +5537,7 @@ namespace Gekko
         {
             try
             {
-                if (Globals.decompSmartLhs)
+                if (G.Equal(Program.options.model_gams_dep_method, "both"))
                 {
                     O.Find o = o2 as O.Find;
 
@@ -5728,15 +5728,7 @@ namespace Gekko
                     PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
 
                     string firstText = null;
-                    List<string> firstList = new List<string>();
-
-                    // ------------------------------------
-                    if (Globals.decompSmartLhs)
-                    {
-                        GetLhsVariables(model.modelGams);
-                    }
-
-                    // ------------------------------------
+                    List<string> firstList = new List<string>();                    
 
                     List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
                     if (eqNumbers == null)

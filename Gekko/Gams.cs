@@ -2428,11 +2428,18 @@ namespace Gekko
             else if (G.Equal(Program.options.model_gams_dep_method, "eqname") || G.Equal(Program.options.model_gams_dep_method, "both"))
             {
                 string[] ss = SplitEqName(eqnameGams);
-                if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
+                if (ss.Length > 1)
                 {
-                    G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
+                    if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
+                    {
+                        G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
+                    }
+                    lhs = ss[1];
                 }
-                lhs = ss[1];
+                else
+                {
+                    lhs = ss[0];
+                }                
             }
             else
             {
