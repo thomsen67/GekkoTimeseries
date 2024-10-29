@@ -6,34 +6,34 @@ using System.Threading.Tasks;
 
 namespace Gekko
 {
+    public class FuzzyVarName
+    {
+        public List<string> storage = new List<string>();
+        public string simple = null;
+        public double score = double.NaN;
+        public string ToString()
+        {
+            string s = score + ":" + " [" + string.Join(", ", storage) + "]";
+            if (simple != null) s += " --> " + simple;
+            return s;
+        }
+    }
+
+    //public static List<EquationBrowser>
+
+    public class FuzzyEquation
+    {
+        public List<string> eqName = new List<string>();
+        public string eqNameSimple = null;
+        public List<FuzzyVarName> varNamesLhs = new List<FuzzyVarName>();
+        public List<FuzzyVarName> varNamesRhs = new List<FuzzyVarName>();
+    }
+
     public class Fuzzy
     {
         // e_y_tot(j, t) .. y['tot', j, t] = x['tot', j, t] + sum(i, y[i, j, t]);
         // e_y(i, j, t) .. y[i, j, t] = x[i, j, t] + 0.00001 * y['tot', j, t];
-        //        
-
-        public class VarName
-        {
-            public List<string> storage = new List<string>();
-            public string simple = null;
-            public double score = double.NaN;
-            public string ToString()
-            {
-                string s = score + ":" + " [" + string.Join(", ", storage) + "]";
-                if (simple != null) s += " --> " + simple;
-                return s;
-            }
-        }
-
-        //public static List<EquationBrowser>
-
-        public class Equation
-        {
-            public List<string> eqName = new List<string>();
-            public string eqNameSimple = null;
-            public List<VarName> varNamesLhs = new List<VarName>();
-            public List<VarName> varNamesRhs = new List<VarName>();
-        }
+        //                
 
         public static void Test()
         {
@@ -42,20 +42,20 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariable("#atot", m);                       
 
             List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" }; //Always plings for middle elements                        
-            List<Equation> equations = new List<Equation>();
-            Equation e1 = new Equation();
+            List<FuzzyEquation> equations = new List<FuzzyEquation>();
+            FuzzyEquation e1 = new FuzzyEquation();
             e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
             e1.eqNameSimple = "e_y_tot[j, t]"; //Because eqs cannot be redefined, another eq cannot start with e_y_tot.
-            e1.varNamesLhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
-            e1.varNamesRhs.Add(new VarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
-            e1.varNamesRhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
+            e1.varNamesLhs.Add(new FuzzyVarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
+            e1.varNamesRhs.Add(new FuzzyVarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
+            e1.varNamesRhs.Add(new FuzzyVarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             equations.Add(e1);
-            Equation e2 = new Equation();
+            FuzzyEquation e2 = new FuzzyEquation();
             e2.eqName = new List<string>() { "y", "i", "j", "t" };
             e2.eqNameSimple = "e_y[i, j, t]";
-            e2.varNamesLhs.Add(new VarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
-            e2.varNamesRhs.Add(new VarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
-            e2.varNamesRhs.Add(new VarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
+            e2.varNamesLhs.Add(new FuzzyVarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
+            e2.varNamesRhs.Add(new FuzzyVarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
+            e2.varNamesRhs.Add(new FuzzyVarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
             equations.Add(e2);
                         
             //Keeping the full eqName including [...], perhaps makes it easier to deal with lags/leads?
@@ -75,26 +75,26 @@ namespace Gekko
         /// <param name="penalty_rhs"></param>
         /// <param name="print"></param>
         /// <returns></returns>
-        public static SortedDictionary<double, List<string>> OrderLhs(List<Equation> equations, List<string> chosen, double penalty_rhs, bool print)
+        public static SortedDictionary<double, List<string>> OrderLhs(List<FuzzyEquation> equations, List<string> chosen, double penalty_rhs, bool print)
         {
             SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName
             Cleanup(chosen, false);
             int nE = 0;
-            foreach (Equation equation in equations)
+            foreach (FuzzyEquation equation in equations)
             {
                 nE++;
                 Cleanup(equation.eqName, true);
                 ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                 double bestScore = double.MaxValue;
                 int nVLhs = 0;
-                foreach (VarName varName in equation.varNamesLhs)
+                foreach (FuzzyVarName varName in equation.varNamesLhs)
                 {
                     nVLhs++;
                     double score = EquationPoints(true, equation, chosen, varName, nE, nVLhs, print, penalty_rhs);
                     if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
                 }
                 int nVRhs = 0;
-                foreach (VarName varName in equation.varNamesRhs)
+                foreach (FuzzyVarName varName in equation.varNamesRhs)
                 {
                     nVRhs++;
                     double score = EquationPoints(false, equation, chosen, varName, nE, nVLhs, print, penalty_rhs);
@@ -119,18 +119,18 @@ namespace Gekko
             return order;
         }
 
-        public static SortedDictionary<double, List<Equation>> TestLhs(List<Equation> equations, double penalty_rhs, bool print)
+        public static SortedDictionary<double, List<FuzzyEquation>> TestLhs(List<FuzzyEquation> equations, double penalty_rhs, bool print)
         {
-            SortedDictionary<double, List<Equation>> order = new SortedDictionary<double, List<Equation>>(); //score, eqName            
+            SortedDictionary<double, List<FuzzyEquation>> order = new SortedDictionary<double, List<FuzzyEquation>>(); //score, eqName            
             int nE = 0;
-            foreach (Equation equation in equations)
+            foreach (FuzzyEquation equation in equations)
             {
                 nE++;
                 Cleanup(equation.eqName, true);
                 ReplaceSingletons(equation.eqName);
                 double bestScore = double.MaxValue;
                 int nVLhs = 0;
-                foreach (VarName varName in equation.varNamesLhs)
+                foreach (FuzzyVarName varName in equation.varNamesLhs)
                 {
                     string simple = varName.simple;
                     nVLhs++;
@@ -138,18 +138,18 @@ namespace Gekko
                     bestScore = Math.Min(bestScore, varName.score);
                 }
                 int nVRhs = 0;
-                foreach (VarName varName in equation.varNamesRhs)
+                foreach (FuzzyVarName varName in equation.varNamesRhs)
                 {
                     string simple = varName.simple;
                     nVRhs++;
                     varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print, penalty_rhs);
                     bestScore = Math.Min(bestScore, varName.score);
                 }
-                List<Equation> eqsNames = null;
+                List<FuzzyEquation> eqsNames = null;
                 order.TryGetValue(bestScore, out eqsNames);
                 if (eqsNames == null)
                 {
-                    eqsNames = new List<Equation>();
+                    eqsNames = new List<FuzzyEquation>();
                     order.Add(bestScore, eqsNames);
                 }
                 eqsNames.Add(equation);
@@ -158,7 +158,7 @@ namespace Gekko
         }
 
 
-        private static double EquationPoints(bool isLhs, Equation equation, List<string> chosen, VarName varName, int nE, int nVLhs, bool print, double penalty_rhs)
+        private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print, double penalty_rhs)
         {
             string s = "Lhs";
             double p = 0d;

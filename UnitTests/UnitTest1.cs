@@ -23425,11 +23425,11 @@ print(df2)
             I("flush(); reset;");  //flush() to avoid cache setting in
             I("option model gams dep method = both;");            
             I("model<gms> raw1.gms;");
-            List<Fuzzy.Equation> fuzzyEquationsAll1 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
-            SortedDictionary<double, List<Fuzzy.Equation>> order1 = Fuzzy.TestLhs(fuzzyEquationsAll1, 0.5, false);
+            List<FuzzyEquation> fuzzyEquationsAll1 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
+            SortedDictionary<double, List<FuzzyEquation>> order1 = Fuzzy.TestLhs(fuzzyEquationsAll1, 0.5, false);
 
             int i = -1;
-            foreach (KeyValuePair<double, List<Fuzzy.Equation>> kvp in order1)
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order1)
             {
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(918, kvp.Value.Count); }
@@ -23447,11 +23447,11 @@ print(df2)
             I("read \\..\\Databanks\\makro;");
             I("model<gms> raw1.gms;");
 
-            List<Fuzzy.Equation> fuzzyEquationsAll2 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
-            SortedDictionary<double, List<Fuzzy.Equation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, 0.5, false);
+            List<FuzzyEquation> fuzzyEquationsAll2 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
+            SortedDictionary<double, List<FuzzyEquation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, 0.5, false);
 
             i = -1;
-            foreach (KeyValuePair<double, List<Fuzzy.Equation>> kvp in order2)
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order2)
             {
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(915, kvp.Value.Count); }

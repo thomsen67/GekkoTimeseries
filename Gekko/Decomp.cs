@@ -5617,14 +5617,14 @@ namespace Gekko
 
                     if (true)
                     {
-                        List<Fuzzy.Equation> fuzzyEquationsAll = GetRawEquations(model.modelGams, null);  //all
-                        SortedDictionary<double, List<Fuzzy.Equation>> order = Fuzzy.TestLhs(fuzzyEquationsAll, 0.5, false);
+                        List<FuzzyEquation> fuzzyEquationsAll = GetRawEquations(model.modelGams, null);  //all
+                        SortedDictionary<double, List<FuzzyEquation>> order = Fuzzy.TestLhs(fuzzyEquationsAll, 0.5, false);
                     }
 
                     //Setting up chunks for EditDistancd()
                     List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
                     List<string> chosen = GetChosenVariable(variableName);
-                    List<Fuzzy.Equation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);
+                    List<FuzzyEquation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);
 
                     // ------------ Can be removed soon, start -------------------------------
 
@@ -5838,9 +5838,9 @@ namespace Gekko
         /// <param name="modelGams"></param>
         /// <param name="chosen"></param>
         /// <returns></returns>
-        public static List<Fuzzy.Equation> GetRawEquations(ModelGams modelGams, List<string> chosen)
+        public static List<FuzzyEquation> GetRawEquations(ModelGams modelGams, List<string> chosen)
         {
-            List<Fuzzy.Equation> fuzzyEquations = new List<Fuzzy.Equation>();
+            List<FuzzyEquation> fuzzyEquations = new List<FuzzyEquation>();
             foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
             {
                 foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
@@ -5848,7 +5848,7 @@ namespace Gekko
                     //Probably always only have 1 here...
                     bool foundChosen = false;
                     if (chosen == null) foundChosen = true;
-                    Fuzzy.Equation fuzzyEquation = new Fuzzy.Equation();
+                    FuzzyEquation fuzzyEquation = new FuzzyEquation();
                     string[] ss = GamsModel.SplitEqName(equation.nameGams);
                     List<string> eqName = new List<string>();
                     for (int i = 1; i < ss.Length; i++) eqName.Add(ss[i]);  //skip first "e"
@@ -5858,7 +5858,7 @@ namespace Gekko
                     foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
                     {
                         if (!CheckOk2(lhsVars.chunks[lhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
-                        Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
+                        FuzzyVarName fuzzyVarName = new FuzzyVarName();
                         fuzzyVarName.storage = lhsVars.chunks;
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
@@ -5866,7 +5866,7 @@ namespace Gekko
                     foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
                     {
                         if (!CheckOk2(rhsVars.chunks[rhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
-                        Fuzzy.VarName fuzzyVarName = new Fuzzy.VarName();
+                        FuzzyVarName fuzzyVarName = new FuzzyVarName();
                         fuzzyVarName.storage = rhsVars.chunks;
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
