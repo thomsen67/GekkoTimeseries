@@ -23436,11 +23436,11 @@ print(df2)
             foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order1)
             {
                 i++;
-                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(965, kvp.Value.Count); }
+                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(964, kvp.Value.Count); }
                 else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
-                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(192, kvp.Value.Count); }
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(12, kvp.Value.Count); }
-                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(35, kvp.Value.Count); }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(193, kvp.Value.Count); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(11, kvp.Value.Count); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(36, kvp.Value.Count); }
                 else if (i == 5) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(6, kvp.Value.Count); }
                 else if (i == 6) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
                 else if (i == 7) { Assert.AreEqual(5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }                

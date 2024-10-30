@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Gekko
 {
     public class FuzzyVarName
-    {
+    {        
         public List<string> storage = new List<string>();
         public string simple = null;
         public double score = double.NaN;
@@ -38,7 +38,7 @@ namespace Gekko
         // e_y_tot(j, t) .. y['tot', j, t] = x['tot', j, t] + sum(i, y[i, j, t]);
         // e_y(i, j, t) .. y[i, j, t] = x[i, j, t] + 0.00001 * y['tot', j, t];
         //                
-        
+
         /// <summary>
         /// From equations chunks and chosen chunks, this produces a distance. Method is to loop throug all equations. Then for each
         /// eqution, all variables are looped (their chunks are found). Then first a score is computed between the variable chunks
@@ -52,16 +52,22 @@ namespace Gekko
         /// <param name="penalty_rhs"></param>
         /// <param name="print"></param>
         /// <returns></returns>
+        /// 
+
+        enum ECleanupType
+        {
+            EquationNameFromRaw,
+            VariableNameFromRaw,
+            ChosenVariable
+        }
+
         public static SortedDictionary<double, List<string>> OrderLhs(List<FuzzyEquation> equations, List<string> chosen, double penalty_rhs, bool print)
         {
-            SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName
-            Cleanup(chosen, false);
+            SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName            
             int nE = 0;
             foreach (FuzzyEquation equation in equations)
             {
                 nE++;
-                Cleanup(equation.eqName, true);
-                ReplaceSingletons(equation.eqName); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]
                 double bestScore = double.MaxValue;
                 int nVLhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesLhs)
@@ -102,9 +108,7 @@ namespace Gekko
             int nE = 0;
             foreach (FuzzyEquation equation in equations)
             {
-                nE++;
-                Cleanup(equation.eqName, true);
-                ReplaceSingletons(equation.eqName);
+                nE++;                
                 double bestScore = double.MaxValue;
                 int nVLhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesLhs)
@@ -137,16 +141,21 @@ namespace Gekko
 
         private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print, double penalty_rhs)
         {
+
+            if (equation.eqContents.StartsWith("E_vUdlAkt_tot"))
+            {
+            }
+
+
+
             string s = "Lhs";
             double p = 0d;
             if (!isLhs)
             {
                 s = "Rhs";
                 p = penalty_rhs;
-            }
-            Cleanup(varName.storage, false);
-            ReplaceSingletons(varName.storage); //replace ["y", "atot", "j", "t"] with ["y", "'tot'", "j", "t"]            
-            varName.score = EditDistance(varName.storage, equation.eqName) + p;
+            }            
+            varName.score = EditDistance(Cleanup(varName.storage, ECleanupType.VariableNameFromRaw), Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw)) + p;
             double score;
             if (chosen == null)
             {
@@ -155,63 +164,74 @@ namespace Gekko
             }
             else 
             {
-                score = varName.score + EditDistance(chosen, varName.storage);
+                score = varName.score + EditDistance(Cleanup(chosen, ECleanupType.ChosenVariable), Cleanup(varName.storage, ECleanupType.VariableNameFromRaw));
                 if (G.Equal(chosen[0], varName.storage[0]))
                 {
                     if (print) new Writeln("Eq " + nE + " Var" + s + " " + nVLhs + " " + varName.simple + " Score = " + score);                    
                 }
             }
             return score;
-        }
+        }        
 
         /// <summary>
-        /// Replace an element like atot with 'tot', because #atot is found in databank.
-        /// If not found in databank, it may still be replaced according to the name.
+        /// Creates a new list where blanks are removed in elements, "Born" --> "Boern", and t1End, tEnd, End, aEnd are removed.
         /// </summary>
         /// <param name="m"></param>
-        private static void ReplaceSingletons(List<string> m)
+        /// <param name="isEqName"></param>
+        /// <returns></returns>
+        private static List<string> Cleanup(List<string> m5, ECleanupType type)
         {
-            for (int i = 1; i < m.Count - 1; i++)  //skip first, skip last
+            bool quotes = false;
+            List<string> copy = m5.ToList();
+
+            for (int i = 0; i < copy.Count; i++)  //skip first, skip last
             {
-                if (!IsElement(m[i]))
+                copy[i] = copy[i].Replace(" ", "");
+            }
+
+            for (int i = 1; i < copy.Count - 1; i++)  //skip first, skip last
+            {
+                if (!IsElement(copy[i]))
                 {
                     bool hit = false;
-                    List list = O.GetIVariableFromString("#" + m[i], O.ECreatePossibilities.NoneReturnNullAlways) as List;
+                    List list = O.GetIVariableFromString("#" + copy[i], O.ECreatePossibilities.NoneReturnNullAlways) as List;
                     if (list != null && list.Count() == 1 && list.list[0].Type() == EVariableType.String)
                     {
-                        if (Globals.decompSmartLhsRemoveAllQuotes) m[i] = O.ConvertToString(list.list[0]);
-                        else m[i] = "'" + O.ConvertToString(list.list[0]) + "'";
+                        if (!quotes) copy[i] = O.ConvertToString(list.list[0]);
+                        else copy[i] = "'" + O.ConvertToString(list.list[0]) + "'";
                         hit = true;
                     }
                     if (hit == false)
                     {
                         //Special handling of tot stuff
-                        if (m[i].EndsWith("tot", StringComparison.OrdinalIgnoreCase))  //atot --> tot, xtot --> tot
+                        if (copy[i].EndsWith("tot", StringComparison.OrdinalIgnoreCase))  //atot --> tot, xtot --> tot
                         {
-                            if (Globals.decompSmartLhsRemoveAllQuotes) m[i] = "tot";
-                            else m[i] = "'tot'";
+                            if (!quotes) copy[i] = "tot";
+                            else copy[i] = "'tot'";
                         }
                     }
                 }
             }
-        }
 
-        private static void Cleanup(List<string> m, bool isEqName)
-        {
-            for (int i = 0; i < m.Count; i++)  //skip first, skip last
+            if (type == ECleanupType.EquationNameFromRaw)
             {
-                m[i] = m[i].Replace(" ", "");
-                if (isEqName)
+                for (int i = 0; i < copy.Count; i++)  //skip first, skip last
                 {
-                    m[i] = m[i].Replace("Born", "Boern");  //Do before null-setting. Do something about a18 --> a?, but does not improve it
-                    if (G.Equal(m[i], "t1End")) m[i] = null;
-                    else if (G.Equal(m[i], "tEnd")) m[i] = null;
-                    else if (G.Equal(m[i], "End")) m[i] = null;
-                    else if (G.Equal(m[i], "aEnd")) m[i] = null;
-                    
+                    copy[i] = copy[i].Replace("Born", "Boern");  //Do before null-setting. Do something about a18 --> a?, but does not improve it
+                    if (G.Equal(copy[i], "t1End")) copy[i] = null;
+                    else if (G.Equal(copy[i], "tEnd")) copy[i] = null;
+                    else if (G.Equal(copy[i], "End")) copy[i] = null;
+                    else if (G.Equal(copy[i], "aEnd")) copy[i] = null;
                 }
-            }            
-            m.RemoveAll(x => x == null);            
+            }
+            copy.RemoveAll(x => x == null);
+
+            for (int i = 0; i < copy.Count; i++)  //skip first, skip last
+            {
+                copy[i] = G.StripQuotes2(G.StripQuotes(copy[i]));
+            }
+
+            return copy;
         }
 
         /// <summary>

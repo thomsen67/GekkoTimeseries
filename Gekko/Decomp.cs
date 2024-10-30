@@ -5835,18 +5835,16 @@ namespace Gekko
                     foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
                     {
                         if (!CheckOk2(lhsVars.chunks[lhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
-                        FuzzyVarName fuzzyVarName = new FuzzyVarName();
-                        if (Globals.decompSmartLhsRemoveAllQuotes) fuzzyVarName.storage = lhsVars.chunks.ConvertAll(d => G.StripQuotes2(G.StripQuotes(d)));
-                        else fuzzyVarName.storage = lhsVars.chunks;
+                        FuzzyVarName fuzzyVarName = new FuzzyVarName();                        
+                        fuzzyVarName.storage = lhsVars.chunks;
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
                     }
                     foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
                     {
                         if (!CheckOk2(rhsVars.chunks[rhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
-                        FuzzyVarName fuzzyVarName = new FuzzyVarName();
-                        if (Globals.decompSmartLhsRemoveAllQuotes) fuzzyVarName.storage = rhsVars.chunks.ConvertAll(d => G.StripQuotes2(G.StripQuotes(d)));
-                        else fuzzyVarName.storage = rhsVars.chunks;
+                        FuzzyVarName fuzzyVarName = new FuzzyVarName();                        
+                        fuzzyVarName.storage = rhsVars.chunks;
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
                     }
