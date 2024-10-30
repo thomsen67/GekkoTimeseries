@@ -38,34 +38,7 @@ namespace Gekko
         // e_y_tot(j, t) .. y['tot', j, t] = x['tot', j, t] + sum(i, y[i, j, t]);
         // e_y(i, j, t) .. y[i, j, t] = x[i, j, t] + 0.00001 * y['tot', j, t];
         //                
-
-        public static void Test()
-        {
-            List m = new List();
-            m.list = new List<IVariable>() { new ScalarString("tot") };
-            Program.databanks.GetFirst().AddIVariable("#atot", m);                       
-
-            List<string> chosen = new List<string>() { "y", "'tot'", "'a'", "t" }; //Always plings for middle elements                        
-            List<FuzzyEquation> equations = new List<FuzzyEquation>();
-            FuzzyEquation e1 = new FuzzyEquation();
-            e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
-            e1.eqContents = "e_y_tot[j, t]"; //Because eqs cannot be redefined, another eq cannot start with e_y_tot.
-            e1.varNamesLhs.Add(new FuzzyVarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
-            e1.varNamesRhs.Add(new FuzzyVarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
-            e1.varNamesRhs.Add(new FuzzyVarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
-            equations.Add(e1);
-            FuzzyEquation e2 = new FuzzyEquation();
-            e2.eqName = new List<string>() { "y", "i", "j", "t" };
-            e2.eqContents = "e_y[i, j, t]";
-            e2.varNamesLhs.Add(new FuzzyVarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
-            e2.varNamesRhs.Add(new FuzzyVarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
-            e2.varNamesRhs.Add(new FuzzyVarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
-            equations.Add(e2);
-                        
-            //Keeping the full eqName including [...], perhaps makes it easier to deal with lags/leads?
-            SortedDictionary<double, List<string>> order = OrderLhs(equations, chosen, 0.5, true);
-        }
-
+        
         /// <summary>
         /// From equations chunks and chosen chunks, this produces a distance. Method is to loop throug all equations. Then for each
         /// eqution, all variables are looped (their chunks are found). Then first a score is computed between the variable chunks
@@ -206,7 +179,8 @@ namespace Gekko
                     List list = O.GetIVariableFromString("#" + m[i], O.ECreatePossibilities.NoneReturnNullAlways) as List;
                     if (list != null && list.Count() == 1 && list.list[0].Type() == EVariableType.String)
                     {
-                        m[i] = "'" + O.ConvertToString(list.list[0]) + "'";
+                        if (Globals.decompSmartLhsRemoveAllQuotes) m[i] = O.ConvertToString(list.list[0]);
+                        else m[i] = "'" + O.ConvertToString(list.list[0]) + "'";
                         hit = true;
                     }
                     if (hit == false)
@@ -214,7 +188,8 @@ namespace Gekko
                         //Special handling of tot stuff
                         if (m[i].EndsWith("tot", StringComparison.OrdinalIgnoreCase))  //atot --> tot, xtot --> tot
                         {
-                            m[i] = "'tot'";
+                            if (Globals.decompSmartLhsRemoveAllQuotes) m[i] = "tot";
+                            else m[i] = "'tot'";
                         }
                     }
                 }

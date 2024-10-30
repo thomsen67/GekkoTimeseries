@@ -2494,13 +2494,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
-            if (Globals.runningOnTTComputer && (text == "f"))
-            {
-                Fuzzy.Test();
-                return;
-            }
-
+        {            
             if (Globals.runningOnTTComputer && (text == "d"))
             {
                 //new Writeln("Distanace: " + EditDistance(new List<string>() { "c", "a", "b" }, new List<string>() { "c", "b" }));

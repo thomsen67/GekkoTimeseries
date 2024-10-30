@@ -51,6 +51,7 @@ namespace Gekko
         // =======================================================
                 
         public static bool decompSmartLhsSkipIrrelevant = true;
+        public static bool decompSmartLhsRemoveAllQuotes = true;
         public static bool decompShowSingletonSet = true;
         public static bool decompUseBracketNames = true;
         public const string decompNull = "...";  //used to be "<null>"
