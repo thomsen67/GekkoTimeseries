@@ -23427,13 +23427,13 @@ print(df2)
             I("model<gms> raw1.gms;");
             List<FuzzyEquation> fuzzyEquationsAll1 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
             //Key: best distance, val: which equations?
-            SortedDictionary<double, List<FuzzyEquation>> order1 = Fuzzy.TestLhs(fuzzyEquationsAll1, 0.5, false);
+            SortedDictionary<double, List<FuzzyEquation>> order1 = Fuzzy.TestLhs(fuzzyEquationsAll1, false);
             //Key: best distance, val: how many equations have delta == 0 (best minus next best distance)
             SortedDictionary<double, List<FuzzyEquation>> noUnique = new SortedDictionary<double, List<FuzzyEquation>>();
             //Key: best distance, val: average delta (best minus next best distance)
             SortedDictionary<double, double> deltaAverageUnique = new SortedDictionary<double, double>();
             //Key: delta (best minus next best distance), val: how many equations?
-            SortedDictionary<double, int> deltaUnique = new SortedDictionary<double, int>();                        
+            SortedDictionary<double, List<FuzzyEquation>> deltaUnique = new SortedDictionary<double, List<FuzzyEquation>>();                        
 
             // --------------------------------------
             //  Without a databank
@@ -23485,7 +23485,7 @@ print(df2)
                         }
                     }
                     sum += dif;                    
-                    Fuzzy.SortedAdd1(deltaUnique, dif);
+                    Fuzzy.SortedAddEquation(deltaUnique, dif, equation);
                 }
                 double avg = sum / kvp.Value.Count;
                 deltaAverageUnique.Add(kvp.Key, avg);
@@ -23493,8 +23493,8 @@ print(df2)
 
             //Sanity checks
             Assert.AreEqual(fuzzyEquationsAll1.Count, order1.Sum(x => x.Value.Count));
-            Assert.AreEqual(fuzzyEquationsAll1.Count, deltaUnique.Sum(x => x.Value));
-            Assert.AreEqual(noUnique.Sum(x => x.Value.Count), deltaUnique[0d]);
+            Assert.AreEqual(fuzzyEquationsAll1.Count, deltaUnique.Sum(x => x.Value.Count));
+            Assert.AreEqual(noUnique.Sum(x => x.Value.Count), deltaUnique[0d].Count);
 
 
             int i = -1;
@@ -23512,15 +23512,15 @@ print(df2)
             }
 
             i = -1;
-            foreach (KeyValuePair<double, int> kvp in deltaUnique) //The larger the better
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in deltaUnique) //The larger the better
             {
                 i++;
-                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(9, kvp.Value); }
-                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(107, kvp.Value); }
-                else if (i == 2) { Assert.AreEqual(1.0d, kvp.Key); Assert.AreEqual(114, kvp.Value); }
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(703, kvp.Value); }
-                else if (i == 4) { Assert.AreEqual(2.0d, kvp.Key); Assert.AreEqual(52, kvp.Value); }
-                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(240, kvp.Value); }                
+                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(9, kvp.Value.Count); } //Problem
+                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(107, kvp.Value.Count); } //Only dinstinction: RHS
+                else if (i == 2) { Assert.AreEqual(1.0d, kvp.Key); Assert.AreEqual(114, kvp.Value.Count); } //LHS variable with a name that diverges a bit
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(703, kvp.Value.Count); } //RHS variable with a name that diverges a bit
+                else if (i == 4) { Assert.AreEqual(2.0d, kvp.Key); Assert.AreEqual(52, kvp.Value.Count); } //Good
+                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(240, kvp.Value.Count); } //Good          
             }
 
             i = -1;
@@ -23555,7 +23555,7 @@ print(df2)
                 I("model<gms> raw1.gms;");
 
                 List<FuzzyEquation> fuzzyEquationsAll2 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
-                SortedDictionary<double, List<FuzzyEquation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, 0.5, false);
+                SortedDictionary<double, List<FuzzyEquation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, false);
 
                 i = -1;
                 foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order2)

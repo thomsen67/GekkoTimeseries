@@ -5612,18 +5612,12 @@ namespace Gekko
                             e.eqName = eqName;
                         }
                     }
-
-                    if (false)
-                    {
-                        List<FuzzyEquation> fuzzyEquationsAll = GetRawEquations(model.modelGams, null);  //all
-                        SortedDictionary<double, List<FuzzyEquation>> order = Fuzzy.TestLhs(fuzzyEquationsAll, 0.5, false);
-                    }
-
+                    
                     //Setting up chunks for EditDistancd()
                     List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
                     List<string> chosen = GetChosenVariable(variableName);
                     List<FuzzyEquation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);                    
-                    SortedDictionary<double, List<string>> sorted = Fuzzy.OrderLhs(fuzzyEquations, chosen, 0.5, false);
+                    SortedDictionary<double, List<string>> sorted = Fuzzy.OrderLhs(false, fuzzyEquations, chosen, false);
                     GekkoDictionary<string, double> dict = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
                     foreach (KeyValuePair<double, List<string>> kvp in sorted)
                     {

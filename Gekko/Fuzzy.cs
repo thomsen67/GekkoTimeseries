@@ -70,7 +70,7 @@ namespace Gekko
             ChosenVariable
         }
 
-        public static SortedDictionary<double, List<string>> OrderLhs(List<FuzzyEquation> equations, List<string> chosen, double penalty_rhs, bool print)
+        public static SortedDictionary<double, List<string>> OrderLhs(bool testLhs, List<FuzzyEquation> equations, List<string> chosen, bool print)
         {
             SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName            
             int nE = 0;
@@ -78,19 +78,34 @@ namespace Gekko
             {
                 nE++;
                 double bestScore = double.MaxValue;
+                FuzzyEquation bestEquation = null;
                 int nVLhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesLhs)
                 {
                     nVLhs++;
                     double score = EquationPoints(true, equation, chosen, varName, nE, nVLhs, print);
-                    if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
+                    if (chosen == null || G.Equal(chosen[0], varName.storage[0]))
+                    {
+                        if (varName.score < bestScore)
+                        {
+                            bestScore = varName.score;
+                            bestEquation = equation;
+                        }
+                    }
                 }
                 int nVRhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesRhs)
                 {
                     nVRhs++;
                     double score = EquationPoints(false, equation, chosen, varName, nE, nVLhs, print);
-                    if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
+                    if (chosen == null || G.Equal(chosen[0], varName.storage[0]))
+                    {
+                        if (varName.score < bestScore)
+                        {
+                            bestScore = varName.score;
+                            bestEquation = equation;
+                        }
+                    }                    
                 }
                 List<string> eqsNames = null;
                 order.TryGetValue(bestScore, out eqsNames);
@@ -111,7 +126,7 @@ namespace Gekko
             return order;
         }
 
-        public static SortedDictionary<double, List<FuzzyEquation>> TestLhs(List<FuzzyEquation> equations, double penalty_rhs, bool print)
+        public static SortedDictionary<double, List<FuzzyEquation>> TestLhs(List<FuzzyEquation> equations, bool print)
         {
             SortedDictionary<double, List<FuzzyEquation>> order = new SortedDictionary<double, List<FuzzyEquation>>(); //score, eqName            
             int nE = 0;
@@ -119,13 +134,18 @@ namespace Gekko
             {
                 nE++;
                 double bestScore = double.MaxValue;
+                FuzzyEquation bestEquation = null;
                 int nVLhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesLhs)
                 {
                     string simple = varName.simple;
                     nVLhs++;
                     varName.score = EquationPoints(true, equation, null, varName, nE, nVLhs, print);
-                    bestScore = Math.Min(bestScore, varName.score);
+                    if (varName.score < bestScore)
+                    {
+                        bestScore = varName.score;
+                        bestEquation = equation;
+                    }
                 }
                 int nVRhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesRhs)
@@ -133,7 +153,11 @@ namespace Gekko
                     string simple = varName.simple;
                     nVRhs++;
                     varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print);
-                    bestScore = Math.Min(bestScore, varName.score);
+                    if (varName.score < bestScore)
+                    {
+                        bestScore = varName.score;
+                        bestEquation = equation;
+                    }
                 }
                 SortedAddEquation(order, bestScore, equation);
             }
