@@ -44,6 +44,8 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public List<string> chunks = new List<string>();
+        [ProtoMember(2)]
+        public GamsWalkerInfo info = new GamsWalkerInfo();
     }
 
     [Serializable]

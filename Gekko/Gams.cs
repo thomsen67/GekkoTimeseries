@@ -11,6 +11,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using System.CodeDom.Compiler;
 using System.Reflection;
+using ProtoBuf;
 
 namespace Gekko
 {
@@ -19,6 +20,18 @@ namespace Gekko
     {
         Full,
         NoIndexListOfStrings
+    }
+
+    [ProtoContract]
+    public struct GamsWalkerInfo  //A struct is easier so that one child node does not affect its parent node
+    {
+        [ProtoMember(1)]
+        public bool isInsideSum = false;
+        [ProtoMember(2)]
+        public bool isInsideDollar = false;        
+        public GamsWalkerInfo()
+        {            
+        }
     }
 
     public class ExtractTimeDimensionHelper
@@ -2221,7 +2234,7 @@ namespace Gekko
                             WalkTokensHandleParentheses(list);
                             List<string> vars = new List<string>();
                             List<EquationNameChunks> vars2 = new List<EquationNameChunks>();
-                            WalkTokensGekkoSyntax(list, wh2, vars, vars2);
+                            WalkTokensGekkoSyntax(list, wh2, vars, vars2, new GamsWalkerInfo());
 
                             dollar = list.ToStringTrim();
 
@@ -2317,13 +2330,13 @@ namespace Gekko
                 lhsTokensGekko = equation.lhsTokensGams.DeepClone(null);
                 WalkTokensHandleParentheses(lhsTokensGekko); //changes '[' and '{' into '('
                 WalkTokensHelper wt1Gekko = new WalkTokensHelper();                
-                WalkTokensGekkoSyntax(lhsTokensGekko, wt1Gekko, lhsVars, lhsVars2);
+                WalkTokensGekkoSyntax(lhsTokensGekko, wt1Gekko, lhsVars, lhsVars2, new GamsWalkerInfo());
                 string lhsGekko = lhsTokensGekko.ToStringTrim();
 
                 TokenHelper rhsTokensGekko = equation.rhsTokensGams.DeepClone(null);
                 WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
                 WalkTokensHelper wt2Gekko = new WalkTokensHelper();                
-                WalkTokensGekkoSyntax(rhsTokensGekko, wt2Gekko, rhsVars, rhsVars2);
+                WalkTokensGekkoSyntax(rhsTokensGekko, wt2Gekko, rhsVars, rhsVars2, new GamsWalkerInfo());
                 string rhsGekko = rhsTokensGekko.ToStringTrim();
 
                 if (true)
@@ -2830,11 +2843,11 @@ namespace Gekko
         /// <summary>
         /// Helper
         /// </summary>
-        public static void WalkTokensGekkoSyntax(TokenList nodes, WalkTokensHelper th, List<string>vars, List<EquationNameChunks>vars2)
+        public static void WalkTokensGekkoSyntax(TokenList nodes, WalkTokensHelper th, List<string>vars, List<EquationNameChunks>vars2, GamsWalkerInfo info)
         {
             foreach (TokenHelper child in nodes.storage)
             {
-                WalkTokensGekkoSyntax(child, th, vars, vars2);
+                WalkTokensGekkoSyntax(child, th, vars, vars2, info);
             }
         }
 
@@ -2843,7 +2856,7 @@ namespace Gekko
         /// </summary>
         /// <param name="node"></param>
         /// <param name="th"></param>
-        public static void WalkTokensGekkoSyntax(TokenHelper node, WalkTokensHelper th, List<string> vars, List<EquationNameChunks> vars2)
+        public static void WalkTokensGekkoSyntax(TokenHelper node, WalkTokensHelper th, List<string> vars, List<EquationNameChunks> vars2, GamsWalkerInfo info)
         {
             //Performs these transformations:
             //- GAMS functions are not touched (log, etc)
@@ -2948,7 +2961,8 @@ namespace Gekko
                             // -------------------------------------
 
                             //first we check for stuff like a15t100(a), where a15t100 is a set, not a variable
-                            //so it should be #a15t100[#a], not a15t100[#a]                                                        
+                            //so it should be #a15t100[#a], not a15t100[#a]
+                            //
 
                             List<TokenHelperComma> split = nextNode.SplitCommas(true);
                             bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
@@ -2956,7 +2970,7 @@ namespace Gekko
 
                             //Beware, this will also put int sets like a18t100(a). These are filtered out later on,
                             //but kept here for simplicity.
-                            GetVariableChunks(node, vars, vars2, nextNode, split);                            
+                            GetVariableChunks(node, vars, vars2, nextNode, split, info);                            
 
                             bool removeParenthesis = false;
 
@@ -3226,9 +3240,11 @@ namespace Gekko
             else
             {
                 //an empty node with children
+                if (node.id > 0 && node.parent.subnodes[node.id - 1].s == "$") info.isInsideDollar = true;                
+                if (node.id > 0 && node.parent.subnodes[node.id - 1].s == "sum") info.isInsideSum = true;                
                 for (int i = 0; i < node.subnodes.storage.Count; i++)  //the count may increase, because subnodes may be added dynamically (translating x[i, t-1] into x[#i][-1])
                 {
-                    WalkTokensGekkoSyntax(node.subnodes.storage[i], th, vars, vars2);
+                    WalkTokensGekkoSyntax(node.subnodes.storage[i], th, vars, vars2, info);
                 }
             }
         }
@@ -3241,10 +3257,11 @@ namespace Gekko
         /// <param name="vars2"></param>
         /// <param name="nextNode"></param>
         /// <param name="split"></param>
-        private static void GetVariableChunks(TokenHelper node, List<string> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split)
+        private static void GetVariableChunks(TokenHelper node, List<string> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split, GamsWalkerInfo info)
         {
             vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
             EquationNameChunks vars2a = new EquationNameChunks();
+            vars2a.info = info;
             string name = node.ToString();
             string[] ss = name.Split('_');
             foreach (string s in ss)

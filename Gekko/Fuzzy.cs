@@ -9,6 +9,7 @@ namespace Gekko
     public class FuzzyVarName
     {        
         public List<string> storage = new List<string>();
+        public GamsWalkerInfo info = new GamsWalkerInfo();
         public string simple = null;
         public double score = double.NaN;
         public string ToString()
@@ -81,14 +82,14 @@ namespace Gekko
                 foreach (FuzzyVarName varName in equation.varNamesLhs)
                 {
                     nVLhs++;
-                    double score = EquationPoints(true, equation, chosen, varName, nE, nVLhs, print, penalty_rhs);
+                    double score = EquationPoints(true, equation, chosen, varName, nE, nVLhs, print);
                     if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
                 }
                 int nVRhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesRhs)
                 {
                     nVRhs++;
-                    double score = EquationPoints(false, equation, chosen, varName, nE, nVLhs, print, penalty_rhs);
+                    double score = EquationPoints(false, equation, chosen, varName, nE, nVLhs, print);
                     if (chosen == null || G.Equal(chosen[0], varName.storage[0])) bestScore = Math.Min(bestScore, score);
                 }
                 List<string> eqsNames = null;
@@ -123,7 +124,7 @@ namespace Gekko
                 {
                     string simple = varName.simple;
                     nVLhs++;
-                    varName.score = EquationPoints(true, equation, null, varName, nE, nVLhs, print, penalty_rhs);
+                    varName.score = EquationPoints(true, equation, null, varName, nE, nVLhs, print);
                     bestScore = Math.Min(bestScore, varName.score);
                 }
                 int nVRhs = 0;
@@ -131,7 +132,7 @@ namespace Gekko
                 {
                     string simple = varName.simple;
                     nVRhs++;
-                    varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print, penalty_rhs);
+                    varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print);
                     bestScore = Math.Min(bestScore, varName.score);
                 }
                 SortedAddEquation(order, bestScore, equation);
@@ -151,16 +152,19 @@ namespace Gekko
             eqsNames.Add(equation);
         }
 
-        private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print, double penalty_rhs)
+        private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print)
         {
-            string s = "Lhs";
-            double p = 0d;
-            if (!isLhs)
-            {
-                s = "Rhs";
-                p = penalty_rhs;
-            }            
-            varName.score = EditDistance(Cleanup(varName.storage, ECleanupType.VariableNameFromRaw), Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw)) + p;
+            double penaltyRhs = 0.5d;
+            double penaltyInsideSum = 0;  //1 typically gets rhs penalty too. Should it be larger?
+            double penaltyInsideDollar = 0d;  //10 really cannot be relevant                        
+            
+            string s = "Lhs"; if (!isLhs) s = "Rhs";
+                     
+            varName.score = EditDistance(Cleanup(varName.storage, ECleanupType.VariableNameFromRaw), Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw));
+            if (!isLhs) varName.score += penaltyRhs;
+            if (varName.info.isInsideSum) varName.score += penaltyInsideSum;
+            if (varName.info.isInsideDollar) varName.score += penaltyInsideDollar;
+
             double score;
             if (chosen == null)
             {

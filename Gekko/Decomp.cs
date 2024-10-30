@@ -5835,7 +5835,8 @@ namespace Gekko
                     foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
                     {
                         if (!CheckOk2(lhsVars.chunks[lhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
-                        FuzzyVarName fuzzyVarName = new FuzzyVarName();                        
+                        FuzzyVarName fuzzyVarName = new FuzzyVarName();
+                        fuzzyVarName.info = lhsVars.info;
                         fuzzyVarName.storage = lhsVars.chunks;
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
@@ -5843,7 +5844,8 @@ namespace Gekko
                     foreach (EquationNameChunks rhsVars in equation.rhsVarsChunks)
                     {
                         if (!CheckOk2(rhsVars.chunks[rhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
-                        FuzzyVarName fuzzyVarName = new FuzzyVarName();                        
+                        FuzzyVarName fuzzyVarName = new FuzzyVarName();
+                        fuzzyVarName.info = rhsVars.info;
                         fuzzyVarName.storage = rhsVars.chunks;
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
