@@ -152,17 +152,31 @@ namespace Gekko
             eqsNames.Add(equation);
         }
 
+        public static void SortedAdd1(SortedDictionary<double, int> sortedDict, double score)
+        {
+            int n;
+            if (!sortedDict.TryGetValue(score, out n))
+            {                
+                sortedDict.Add(score, 1);
+            }
+            else
+            {
+                sortedDict[score]++;
+            }            
+        }
+
         private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print)
         {
             double penaltyRhs = 0.5d;
-            double penaltyInsideSum = 0;  //1 typically gets rhs penalty too. Should it be larger?
-            double penaltyInsideDollar = 0d;  //10 really cannot be relevant                        
+            double penaltyInsideSum = 1d;  //1 typically gets rhs penalty too. Should it be larger?
+            double penaltyInsideDollar = 10d;  //Really cannot be relevant, but penalty does not seem to have any effect on orderings
             
             string s = "Lhs"; if (!isLhs) s = "Rhs";
                      
             varName.score = EditDistance(Cleanup(varName.storage, ECleanupType.VariableNameFromRaw), Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw));
             if (!isLhs) varName.score += penaltyRhs;
-            if (varName.info.isInsideSum) varName.score += penaltyInsideSum;
+            if (varName.info.isInsideSum) 
+                varName.score += penaltyInsideSum;
             if (varName.info.isInsideDollar) varName.score += penaltyInsideDollar;
 
             double score;
