@@ -593,27 +593,12 @@ namespace Gekko
                             //not part of indexes
                         }
                     }
-
-                    //if (errorIfTimeNotFound && helper.time.IsNull())
-                    //{
-                    //    if (Globals.decompFixTimelessProblem)
-                    //    {                            
-                    //        if(Globals.runningOnTTComputer) new Writeln("Timeless --> " + start + "[" + Stringlist.GetListWithCommas(fullName, false) + "]");
-                    //    }
-                    //}                    
+                                 
                     if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
                     else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, null) + "]";                    
                 }
                 else
-                {
-                    //without index
-                    //if (errorIfTimeNotFound)
-                    //{
-                    //    if (Globals.decompFixTimelessProblem)
-                    //    {                            
-                    //        if (Globals.runningOnTTComputer) new Writeln("Timeless --> " + varname);
-                    //    }
-                    //}
+                {                    
                     start = varname;
                     helper.resultingFullName = varname;
                 }

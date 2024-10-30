@@ -23438,12 +23438,11 @@ print(df2)
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(964, kvp.Value.Count); }
                 else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
-                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(193, kvp.Value.Count); }
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(11, kvp.Value.Count); }
-                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(36, kvp.Value.Count); }
-                else if (i == 5) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(6, kvp.Value.Count); }
-                else if (i == 6) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
-                else if (i == 7) { Assert.AreEqual(5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }                
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(200, kvp.Value.Count); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(12, kvp.Value.Count); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(35, kvp.Value.Count); }
+                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                else if (i == 6) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(1, kvp.Value.Count); }              
                 else Assert.Fail();
             }
 
@@ -23486,10 +23485,10 @@ print(df2)
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(1.5995, kvp.Value, 0.0001); }
                 else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(0.6016, kvp.Value, 0.0001); }
-                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(1.1295, kvp.Value, 0.0001); }
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(0.5909, kvp.Value, 0.0001); }
-                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(0.8889, kvp.Value, 0.0001); }
-                else if (i == 4 || i == 5 || i == 6 || i == 7) { }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(1.1525, kvp.Value, 0.0001); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(0.5833, kvp.Value, 0.0001); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(0.9429, kvp.Value, 0.0001); }
+                else if (i == 4 || i == 5 || i == 6) { }
                 else Assert.Fail();
             }
 
@@ -23500,7 +23499,6 @@ print(df2)
                 if (i == 0) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(4, kvp.Value.Count); }
                 else if (i == 1) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(1, kvp.Value.Count); }
                 else if (i == 2) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(4, kvp.Value.Count); }
-                else if (i == 3) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(1, kvp.Value.Count); }
                 else Assert.Fail();
             }
 

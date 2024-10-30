@@ -179,7 +179,8 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// Creates a new list where blanks are removed in elements, "Born" --> "Boern", and t1End, tEnd, End, aEnd are removed.
+        /// Creates a new list where blanks are removed in elements, "Born" --> "Boern", and "t1End", "tEnd", "End", "aEnd" are removed.
+        /// Anything after a "via" is removed (including the "via").
         /// </summary>
         /// <param name="m"></param>
         /// <param name="isEqName"></param>
@@ -189,7 +190,7 @@ namespace Gekko
             bool quotes = false;
             List<string> copy = m5.ToList();
 
-            for (int i = 0; i < copy.Count; i++)  //skip first, skip last
+            for (int i = 0; i < copy.Count; i++)
             {
                 copy[i] = copy[i].Replace(" ", "");
             }
@@ -220,13 +221,24 @@ namespace Gekko
 
             if (type == ECleanupType.EquationNameFromRaw)
             {
-                for (int i = 0; i < copy.Count; i++)  //skip first, skip last
+                for (int i = 0; i < copy.Count; i++)
                 {
                     copy[i] = copy[i].Replace("Born", "Boern");  //Do before null-setting. Do something about a18 --> a?, but does not improve it
                     if (G.Equal(copy[i], "t1End")) copy[i] = null;
                     else if (G.Equal(copy[i], "tEnd")) copy[i] = null;
                     else if (G.Equal(copy[i], "End")) copy[i] = null;
                     else if (G.Equal(copy[i], "aEnd")) copy[i] = null;
+                }
+                for (int i = 0; i < copy.Count; i++)
+                {
+                    if (copy[i] != null && G.Equal(copy[i], "via"))
+                    {
+                        for (int j = i; j < copy.Count; j++)
+                        {
+                            copy[j] = null;
+                        }
+                        break;
+                    }
                 }
             }
             copy.RemoveAll(x => x == null);
