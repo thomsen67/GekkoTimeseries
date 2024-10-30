@@ -5617,13 +5617,22 @@ namespace Gekko
                     List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
                     List<string> chosen = GetChosenVariable(variableName);
                     List<FuzzyEquation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);                    
-                    SortedDictionary<double, List<string>> sorted = Fuzzy.OrderLhs(false, fuzzyEquations, chosen, false);
+                    SortedDictionary<double, List<FuzzyEquation>> sorted2 = Fuzzy.OrderLhs(false, fuzzyEquations, chosen, false);
+                    SortedDictionary<double, List<string>> sorted = new SortedDictionary<double, List<string>>();
+                    foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in sorted2)
+                    {
+                        List<string> temp = new List<string>();
+                        foreach (FuzzyEquation equation in kvp.Value) temp.Add(equation.eqContents);
+                        sorted.Add(kvp.Key, temp);
+                    }                    
                     GekkoDictionary<string, double> dict = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
                     foreach (KeyValuePair<double, List<string>> kvp in sorted)
                     {
                         foreach (string s2 in kvp.Value)
                         {
-                            dict.Add(s2, kvp.Key);
+                            string[] ss1 = s2.Split(new string[] { ".." }, StringSplitOptions.None);
+                            string[] ss2 = ss1[0].Split(new string[] { "[" }, StringSplitOptions.None);
+                            dict.Add(ss2[0].Trim(), kvp.Key);
                         }
                     }
 

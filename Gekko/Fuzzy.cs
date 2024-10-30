@@ -70,9 +70,9 @@ namespace Gekko
             ChosenVariable
         }
 
-        public static SortedDictionary<double, List<string>> OrderLhs(bool testLhs, List<FuzzyEquation> equations, List<string> chosen, bool print)
+        public static SortedDictionary<double, List<FuzzyEquation>> OrderLhs(bool testLhs, List<FuzzyEquation> equations, List<string> chosen, bool print)
         {
-            SortedDictionary<double, List<string>> order = new SortedDictionary<double, List<string>>(); //score, eqName            
+            SortedDictionary<double, List<FuzzyEquation>> order = new SortedDictionary<double, List<FuzzyEquation>>(); //score, eqName            
             int nE = 0;
             foreach (FuzzyEquation equation in equations)
             {
@@ -107,20 +107,14 @@ namespace Gekko
                         }
                     }                    
                 }
-                List<string> eqsNames = null;
-                order.TryGetValue(bestScore, out eqsNames);
-                if (eqsNames == null)
-                {
-                    eqsNames = new List<string>();
-                    order.Add(bestScore, eqsNames);
-                }
-                eqsNames.Add(equation.eqContents);
+                SortedAddEquation(order, bestScore, equation);
             }
             if (print)
             {
-                foreach (KeyValuePair<double, List<string>> kvp in order)
+                foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order)
                 {
-                    new Writeln(" --- " + kvp.Key + ": " + Stringlist.GetListWithCommas(kvp.Value));
+                    //new Writeln(" --- " + kvp.Key + ": " + Stringlist.GetListWithCommas(kvp.Value));
+                    new Writeln("!!!TODO");
                 }
             }
             return order;
