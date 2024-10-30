@@ -14,7 +14,12 @@ namespace Gekko
         public string ToString()
         {
             string s = score + ":" + " [" + string.Join(", ", storage) + "]";
-            if (simple != null) s += " --> " + simple;
+            List<string> ss = Fuzzy.Cleanup(storage, Fuzzy.ECleanupType.VariableNameFromRaw);
+            if (!ss.SequenceEqual(storage))
+            {
+                s += " --> " + " [" + string.Join(", ", ss) + "]";
+            }
+            if (simple != null) s += " SIMPLE: " + simple;
             return s;
         }
     }
@@ -28,8 +33,11 @@ namespace Gekko
         public List<FuzzyVarName> varNamesLhs = new List<FuzzyVarName>();
         public List<FuzzyVarName> varNamesRhs = new List<FuzzyVarName>();
         public string ToString()
-        {
-            return this.eqContents;
+        {            
+            List<string> ss = Fuzzy.Cleanup(eqName, Fuzzy.ECleanupType.EquationNameFromRaw);            
+            string s = "[" + string.Join(", ", ss) + "] --> ";            
+            s += this.eqContents;
+            return s;
         }
     }
 
@@ -54,7 +62,7 @@ namespace Gekko
         /// <returns></returns>
         /// 
 
-        enum ECleanupType
+        public enum ECleanupType
         {
             EquationNameFromRaw,
             VariableNameFromRaw,
@@ -108,7 +116,7 @@ namespace Gekko
             int nE = 0;
             foreach (FuzzyEquation equation in equations)
             {
-                nE++;                
+                nE++;
                 double bestScore = double.MaxValue;
                 int nVLhs = 0;
                 foreach (FuzzyVarName varName in equation.varNamesLhs)
@@ -126,28 +134,25 @@ namespace Gekko
                     varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print, penalty_rhs);
                     bestScore = Math.Min(bestScore, varName.score);
                 }
-                List<FuzzyEquation> eqsNames = null;
-                order.TryGetValue(bestScore, out eqsNames);
-                if (eqsNames == null)
-                {
-                    eqsNames = new List<FuzzyEquation>();
-                    order.Add(bestScore, eqsNames);
-                }
-                eqsNames.Add(equation);
-            }            
+                SortedAddEquation(order, bestScore, equation);
+            }
             return order;
         }
 
+        public static void SortedAddEquation(SortedDictionary<double, List<FuzzyEquation>> sortedDict, double score, FuzzyEquation equation)
+        {
+            List<FuzzyEquation> eqsNames = null;
+            sortedDict.TryGetValue(score, out eqsNames);
+            if (eqsNames == null)
+            {
+                eqsNames = new List<FuzzyEquation>();
+                sortedDict.Add(score, eqsNames);
+            }
+            eqsNames.Add(equation);
+        }
 
         private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print, double penalty_rhs)
         {
-
-            if (equation.eqContents.StartsWith("E_vUdlAkt_tot"))
-            {
-            }
-
-
-
             string s = "Lhs";
             double p = 0d;
             if (!isLhs)
@@ -179,7 +184,7 @@ namespace Gekko
         /// <param name="m"></param>
         /// <param name="isEqName"></param>
         /// <returns></returns>
-        private static List<string> Cleanup(List<string> m5, ECleanupType type)
+        public static List<string> Cleanup(List<string> m5, ECleanupType type)
         {
             bool quotes = false;
             List<string> copy = m5.ToList();

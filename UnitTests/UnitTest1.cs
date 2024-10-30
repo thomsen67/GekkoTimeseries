@@ -23447,30 +23447,91 @@ print(df2)
                 else Assert.Fail();
             }
 
-            // --------------------------------------
-            //  With a databank, NOT CHECKED FOR NOW
-            // --------------------------------------
+            SortedDictionary<double, List<FuzzyEquation>> noUnique = new SortedDictionary<double, List<FuzzyEquation>>();
+            SortedDictionary<double, double> standOutUnique = new SortedDictionary<double, double>();
 
-            I("read \\..\\Databanks\\makro;");
-            I("model<gms> raw1.gms;");
-
-            List<FuzzyEquation> fuzzyEquationsAll2 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
-            SortedDictionary<double, List<FuzzyEquation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, 0.5, false);
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order1)
+            {
+                double sum = 0d;
+                foreach (FuzzyEquation equation in kvp.Value)
+                {                    
+                    SortedDictionary<double, int> temp = new SortedDictionary<double, int>();
+                    foreach (var x in equation.varNamesLhs)
+                    {
+                        if (!temp.ContainsKey(x.score)) temp.Add(x.score, 0);
+                        temp[x.score]++;
+                    }
+                    foreach (var x in equation.varNamesRhs)
+                    {
+                        if (!temp.ContainsKey(x.score)) temp.Add(x.score, 0);
+                        temp[x.score]++;
+                    }
+                    if (temp.First().Value != 1)
+                    {                        
+                        Fuzzy.SortedAddEquation(noUnique, kvp.Key, equation);
+                    }
+                    List<double> scores = new List<double>();
+                    scores.AddRange(temp.Keys);
+                    double dif = 0;
+                    if (scores.Count > 1) dif = scores[1] - scores[0];
+                    sum += dif;
+                }
+                double avg = sum / kvp.Value.Count;
+                standOutUnique.Add(kvp.Key, avg);
+            }
 
             i = -1;
-            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order2)
+            foreach (KeyValuePair<double, double> kvp in standOutUnique)
             {
                 i++;
-                //if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(915, kvp.Value.Count); }
-                //else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
-                //else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(237, kvp.Value.Count); }
-                //else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(11, kvp.Value.Count); }
-                //else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(39, kvp.Value.Count); }
-                //else if (i == 5) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(6, kvp.Value.Count); }
-                //else if (i == 6) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
-                //else if (i == 7) { Assert.AreEqual(4d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
-                //else if (i == 8) { Assert.AreEqual(5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
-                //else Assert.Fail();
+                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(1.5995, kvp.Value, 0.0001); }
+                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(0.6016, kvp.Value, 0.0001); }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(1.1295, kvp.Value, 0.0001); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(0.5909, kvp.Value, 0.0001); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(0.8889, kvp.Value, 0.0001); }
+                else if (i == 4 || i == 5 || i == 6 || i == 7) { }
+                else Assert.Fail();
+            }
+
+            i = -1;
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in noUnique)
+            {
+                i++;
+                if (i == 0) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(4, kvp.Value.Count); }
+                else if (i == 1) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(1, kvp.Value.Count); }
+                else if (i == 2) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(4, kvp.Value.Count); }
+                else if (i == 3) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(1, kvp.Value.Count); }
+                else Assert.Fail();
+            }
+
+            if (false)
+            {
+
+                // --------------------------------------
+                //  With a databank, NOT CHECKED FOR NOW
+                // --------------------------------------
+
+                I("read \\..\\Databanks\\makro;");
+                I("model<gms> raw1.gms;");
+
+                List<FuzzyEquation> fuzzyEquationsAll2 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
+                SortedDictionary<double, List<FuzzyEquation>> order2 = Fuzzy.TestLhs(fuzzyEquationsAll2, 0.5, false);
+
+                i = -1;
+                foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order2)
+                {
+                    i++;
+                    if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(915, kvp.Value.Count); }
+                    else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
+                    else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(237, kvp.Value.Count); }
+                    else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(11, kvp.Value.Count); }
+                    else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(39, kvp.Value.Count); }
+                    else if (i == 5) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(6, kvp.Value.Count); }
+                    else if (i == 6) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                    else if (i == 7) { Assert.AreEqual(4d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                    else if (i == 8) { Assert.AreEqual(5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
+                    else Assert.Fail();
+                }
             }
         }
 
