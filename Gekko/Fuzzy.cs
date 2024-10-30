@@ -24,9 +24,13 @@ namespace Gekko
     public class FuzzyEquation
     {
         public List<string> eqName = new List<string>();
-        public string eqNameSimple = null;
+        public string eqContents = null;
         public List<FuzzyVarName> varNamesLhs = new List<FuzzyVarName>();
         public List<FuzzyVarName> varNamesRhs = new List<FuzzyVarName>();
+        public string ToString()
+        {
+            return this.eqContents;
+        }
     }
 
     public class Fuzzy
@@ -45,14 +49,14 @@ namespace Gekko
             List<FuzzyEquation> equations = new List<FuzzyEquation>();
             FuzzyEquation e1 = new FuzzyEquation();
             e1.eqName = new List<string>() { "y", "tot", "j", "t" }; //No "e", and will never have plings
-            e1.eqNameSimple = "e_y_tot[j, t]"; //Because eqs cannot be redefined, another eq cannot start with e_y_tot.
+            e1.eqContents = "e_y_tot[j, t]"; //Because eqs cannot be redefined, another eq cannot start with e_y_tot.
             e1.varNamesLhs.Add(new FuzzyVarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new FuzzyVarName() { simple = "x['tot', j, t]", storage = new List<string>() { "x", "'tot'", "j", "t" } });
             e1.varNamesRhs.Add(new FuzzyVarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             equations.Add(e1);
             FuzzyEquation e2 = new FuzzyEquation();
             e2.eqName = new List<string>() { "y", "i", "j", "t" };
-            e2.eqNameSimple = "e_y[i, j, t]";
+            e2.eqContents = "e_y[i, j, t]";
             e2.varNamesLhs.Add(new FuzzyVarName() { simple = "y[i, j, t]", storage = new List<string>() { "y", "i", "j", "t" } });
             e2.varNamesRhs.Add(new FuzzyVarName() { simple = "x[i, j, t]", storage = new List<string>() { "x", "i", "j", "t" } });
             e2.varNamesRhs.Add(new FuzzyVarName() { simple = "y['tot', j, t]", storage = new List<string>() { "y", "'tot'", "j", "t" } });
@@ -107,7 +111,7 @@ namespace Gekko
                     eqsNames = new List<string>();
                     order.Add(bestScore, eqsNames);
                 }
-                eqsNames.Add(equation.eqNameSimple);
+                eqsNames.Add(equation.eqContents);
             }
             if (print)
             {

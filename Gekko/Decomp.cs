@@ -5849,17 +5849,19 @@ namespace Gekko
                     bool foundChosen = false;
                     if (chosen == null) foundChosen = true;
                     FuzzyEquation fuzzyEquation = new FuzzyEquation();
+                    fuzzyEquation.eqContents = equation.nameGams + equation.setsGams + " .. " + equation.lhsGams + " = " + equation.rhs;
                     string[] ss = GamsModel.SplitEqName(equation.nameGams);
                     List<string> eqName = new List<string>();
                     for (int i = 1; i < ss.Length; i++) eqName.Add(ss[i]);  //skip first "e"
                     for (int i = 0; i < equation.setsGamsList.Count; i++) eqName.Add(equation.setsGamsList[i]);
                     fuzzyEquation.eqName = eqName;
-                    fuzzyEquation.eqNameSimple = equation.nameGams;
+                    //fuzzyEquation.eqNameSimple = equation.nameGams;
                     foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
                     {
                         if (!CheckOk2(lhsVars.chunks[lhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
                         FuzzyVarName fuzzyVarName = new FuzzyVarName();
-                        fuzzyVarName.storage = lhsVars.chunks;
+                        fuzzyVarName.storage = lhsVars.chunks.ConvertAll(d => G.StripQuotes2(G.StripQuotes(d)));
+
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesLhs.Add(fuzzyVarName);
                     }
@@ -5867,7 +5869,7 @@ namespace Gekko
                     {
                         if (!CheckOk2(rhsVars.chunks[rhsVars.chunks.Count - 1])) continue;  //NOTE: skipped if time is not last
                         FuzzyVarName fuzzyVarName = new FuzzyVarName();
-                        fuzzyVarName.storage = rhsVars.chunks;
+                        fuzzyVarName.storage = rhsVars.chunks.ConvertAll(d => G.StripQuotes2(G.StripQuotes(d)));
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyEquation.varNamesRhs.Add(fuzzyVarName);
                     }
