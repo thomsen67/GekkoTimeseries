@@ -23448,16 +23448,11 @@ print(df2)
                     // Temp: (0.0: 1), (0.5: 2), (1.5: 1), (2.5: 2), --> scores = (0.0, 0.5, 1.5, 2.5)
                     //
                     SortedDictionary<double, int> temp = new SortedDictionary<double, int>();
-                    foreach (var x in equation.varNamesLhs)
+                    foreach (var x in equation.varNames)
                     {
                         if (!temp.ContainsKey(x.score)) temp.Add(x.score, 0);
                         temp[x.score]++;
-                    }
-                    foreach (var x in equation.varNamesRhs)
-                    {
-                        if (!temp.ContainsKey(x.score)) temp.Add(x.score, 0);
-                        temp[x.score]++;
-                    }
+                    }                    
                     if (temp.First().Value > 1)
                     {                        
                         Fuzzy.SortedAddEquation(noUnique, kvp.Key, equation);

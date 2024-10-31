@@ -12,6 +12,7 @@ namespace Gekko
         public GamsWalkerInfo info = new GamsWalkerInfo();
         public string simple = null;
         public double score = double.NaN;
+        public bool isLhs = false;
         public string ToString()
         {
             string s = score + ":" + " [" + string.Join(", ", storage) + "]";
@@ -31,8 +32,8 @@ namespace Gekko
     {
         public List<string> eqName = new List<string>();
         public string eqContents = null;
-        public List<FuzzyVarName> varNamesLhs = new List<FuzzyVarName>();
-        public List<FuzzyVarName> varNamesRhs = new List<FuzzyVarName>();
+        public List<FuzzyVarName> varNames = new List<FuzzyVarName>();  //both lhs and rhs
+
         public string ToString()
         {            
             List<string> ss = Fuzzy.Cleanup(eqName, Fuzzy.ECleanupType.EquationNameFromRaw);            
@@ -81,10 +82,12 @@ namespace Gekko
                 double bestScore = double.MaxValue;
                 FuzzyEquation bestEquation = null;
                 int nVLhs = 0;
-                foreach (FuzzyVarName varName in equation.varNamesLhs)
+                int nVRhs = 0;
+                foreach (FuzzyVarName varName in equation.varNames)
                 {
-                    nVLhs++;
-                    double score = EquationPoints(true, equation, chosen, varName, nE, nVLhs, print);
+                    if (varName.isLhs) nVLhs++;
+                    else nVRhs++;
+                    double score = EquationPoints(varName.isLhs, equation, chosen, varName, nE, nVLhs, print);
                     if (chosen == null || G.Equal(chosen[0], varName.storage[0]))
                     {
                         if (varName.score < bestScore)
@@ -93,21 +96,8 @@ namespace Gekko
                             bestEquation = equation;
                         }
                     }
-                }
-                int nVRhs = 0;
-                foreach (FuzzyVarName varName in equation.varNamesRhs)
-                {
-                    nVRhs++;
-                    double score = EquationPoints(false, equation, chosen, varName, nE, nVLhs, print);
-                    if (chosen == null || G.Equal(chosen[0], varName.storage[0]))
-                    {
-                        if (varName.score < bestScore)
-                        {
-                            bestScore = varName.score;
-                            bestEquation = equation;
-                        }
-                    }                    
-                }
+                }                
+                
                 SortedAddEquation(orderInsideEq, bestScore, equation);
                 SortedAddEquation(order, bestScore, equation);
 
@@ -117,17 +107,14 @@ namespace Gekko
                 {
                     //Found exactly 1 best
                     FuzzyVarName bestVarName = null;
-                    foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
+                    foreach (FuzzyVarName varName in bestEquation.varNames)
                     {
                         if (varName.score == orderInsideEq.First().Key) bestVarName = varName;
                     }
-                    foreach (FuzzyVarName varName in bestEquation.varNamesRhs)
-                    {
-                        if (varName.score == orderInsideEq.First().Key) bestVarName = varName;
-                    }
+                    
                     // ----------------------------------------------
                     // ----------------------------------------------
-                    foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
+                    foreach (FuzzyVarName varName in bestEquation.varNames)
                     {
                         List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
                         List<string> storage2 = Cleanup(bestVarName.storage, ECleanupType.VariableNameFromRaw);
@@ -147,28 +134,7 @@ namespace Gekko
                                 varName.score += 100;
                             }
                         }
-                    }
-                    foreach (FuzzyVarName varName in bestEquation.varNamesRhs)
-                    {
-                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
-                        List<string> storage2 = Cleanup(bestVarName.storage, ECleanupType.VariableNameFromRaw);
-                        if (storage1.Count == storage2.Count)
-                        {
-                            bool good = true;
-                            for (int i = 0; i < storage1.Count; i++)
-                            {
-                                if (!G.Equal(storage1[i].Trim(), storage2[i].Trim()))
-                                {
-                                    good = false;
-                                    break;
-                                }
-                            }
-                            if (good && varName.score > orderInsideEq.First().Key)
-                            {
-                                varName.score += 100;
-                            }
-                        }
-                    }
+                    }                    
                 }
 
 
@@ -176,7 +142,7 @@ namespace Gekko
                 if (false)
                 {                     
                     List<string> storage2 = Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw);
-                    foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
+                    foreach (FuzzyVarName varName in bestEquation.varNames)
                     {
                         List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
                         bool good = true;
@@ -193,25 +159,7 @@ namespace Gekko
                             //all var chunks are in eq chunks
                             varName.score += -1;
                         }                        
-                    }
-                    foreach (FuzzyVarName varName in bestEquation.varNamesRhs)
-                    {
-                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
-                        bool good = true;
-                        foreach (string s in storage1)
-                        {
-                            if (!storage2.Contains(s, StringComparer.OrdinalIgnoreCase))
-                            {
-                                good = false;
-                                break;
-                            }
-                        }
-                        if (good)
-                        {
-                            //all var chunks are in eq chunks
-                            varName.score += -1;
-                        }
-                    }
+                    }                    
                 }
             }            
 
