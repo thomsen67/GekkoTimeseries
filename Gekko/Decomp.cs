@@ -5827,6 +5827,7 @@ namespace Gekko
                     for (int i = 1; i < ss.Length; i++) eqName.Add(ss[i]);  //skip first "e"
                     for (int i = 0; i < equation.setsGamsList.Count; i++) eqName.Add(equation.setsGamsList[i]);
                     fuzzyEquation.eqName = eqName;
+                    fuzzyEquation.eqNameCleanedUp = Fuzzy.Cleanup(fuzzyEquation.eqName, Fuzzy.ECleanupType.EquationNameFromRaw);
                     //fuzzyEquation.eqNameSimple = equation.nameGams;
                     foreach (EquationNameChunks lhsVars in equation.lhsVarsChunks)
                     {
@@ -5834,6 +5835,7 @@ namespace Gekko
                         FuzzyVarName fuzzyVarName = new FuzzyVarName();
                         fuzzyVarName.info = lhsVars.info;
                         fuzzyVarName.storage = lhsVars.chunks;
+                        fuzzyVarName.storageCleanedUp = Fuzzy.Cleanup(fuzzyVarName.storage, Fuzzy.ECleanupType.VariableNameFromRaw);
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyVarName.isLhs = true;
                         fuzzyEquation.varNames.Add(fuzzyVarName);
@@ -5844,6 +5846,7 @@ namespace Gekko
                         FuzzyVarName fuzzyVarName = new FuzzyVarName();
                         fuzzyVarName.info = rhsVars.info;
                         fuzzyVarName.storage = rhsVars.chunks;
+                        fuzzyVarName.storageCleanedUp = Fuzzy.Cleanup(fuzzyVarName.storage, Fuzzy.ECleanupType.VariableNameFromRaw);
                         if (chosen != null && G.Equal(fuzzyVarName.storage[0], chosen[0])) foundChosen = true;
                         fuzzyVarName.isLhs = false;
                         fuzzyEquation.varNames.Add(fuzzyVarName);

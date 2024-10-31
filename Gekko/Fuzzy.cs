@@ -9,6 +9,7 @@ namespace Gekko
     public class FuzzyVarName
     {        
         public List<string> storage = new List<string>();
+        public List<string> storageCleanedUp = new List<string>();
         public GamsWalkerInfo info = new GamsWalkerInfo();
         public string simple = null;
         public double score = double.NaN;
@@ -16,7 +17,8 @@ namespace Gekko
         public string ToString()
         {
             string s = score + ":" + " [" + string.Join(", ", storage) + "]";
-            List<string> ss = Fuzzy.Cleanup(storage, Fuzzy.ECleanupType.VariableNameFromRaw);
+            //List<string> ss = Fuzzy.Cleanup(storage, Fuzzy.ECleanupType.VariableNameFromRaw);
+            List<string> ss = storageCleanedUp;
             if (!ss.SequenceEqual(storage))
             {
                 s += " --> " + " [" + string.Join(", ", ss) + "]";
@@ -31,12 +33,13 @@ namespace Gekko
     public class FuzzyEquation
     {
         public List<string> eqName = new List<string>();
+        public List<string> eqNameCleanedUp = new List<string>();
         public string eqContents = null;
         public List<FuzzyVarName> varNames = new List<FuzzyVarName>();  //both lhs and rhs
 
         public string ToString()
-        {            
-            List<string> ss = Fuzzy.Cleanup(eqName, Fuzzy.ECleanupType.EquationNameFromRaw);            
+        {
+            List<string> ss = eqNameCleanedUp;
             string s = "[" + string.Join(", ", ss) + "] --> ";            
             s += this.eqContents;
             return s;
@@ -116,8 +119,8 @@ namespace Gekko
                     // ----------------------------------------------
                     foreach (FuzzyVarName varName in bestEquation.varNames)
                     {
-                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
-                        List<string> storage2 = Cleanup(bestVarName.storage, ECleanupType.VariableNameFromRaw);
+                        List<string> storage1 = varName.storageCleanedUp;
+                        List<string> storage2 = bestVarName.storageCleanedUp;
                         if (storage1.Count == storage2.Count)
                         {
                             bool good = true;
@@ -140,11 +143,11 @@ namespace Gekko
 
                 //Give priority to a variable with chunks completely found in eq chunks
                 if (false)
-                {                     
-                    List<string> storage2 = Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw);
+                {
+                    List<string> storage2 = equation.eqNameCleanedUp;
                     foreach (FuzzyVarName varName in bestEquation.varNames)
                     {
-                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
+                        List<string> storage1 = varName.storageCleanedUp;
                         bool good = true;
                         foreach (string s in storage1)
                         {
@@ -207,7 +210,7 @@ namespace Gekko
             
             string s = "Lhs"; if (!isLhs) s = "Rhs";
                      
-            varName.score = EditDistance(Cleanup(varName.storage, ECleanupType.VariableNameFromRaw), Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw));
+            varName.score = EditDistance(varName.storageCleanedUp, equation.eqNameCleanedUp);
             if (!isLhs) varName.score += penaltyRhs;
             if (varName.info.isInsideSum) 
                 varName.score += penaltyInsideSum;
@@ -221,7 +224,7 @@ namespace Gekko
             }
             else 
             {
-                score = varName.score + EditDistance(Cleanup(chosen, ECleanupType.ChosenVariable), Cleanup(varName.storage, ECleanupType.VariableNameFromRaw));
+                score = varName.score + EditDistance(Cleanup(chosen, ECleanupType.ChosenVariable), varName.storageCleanedUp);
                 if (G.Equal(chosen[0], varName.storage[0]))
                 {
                     if (print) new Writeln("Eq " + nE + " Var" + s + " " + nVLhs + " " + varName.simple + " Score = " + score);                    
