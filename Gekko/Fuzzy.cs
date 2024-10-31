@@ -76,6 +76,7 @@ namespace Gekko
             int nE = 0;
             foreach (FuzzyEquation equation in equations)
             {
+                SortedDictionary<double, List<FuzzyEquation>> orderInsideEq = new SortedDictionary<double, List<FuzzyEquation>>(); //score, eqName            
                 nE++;
                 double bestScore = double.MaxValue;
                 FuzzyEquation bestEquation = null;
@@ -107,8 +108,71 @@ namespace Gekko
                         }
                     }                    
                 }
+                SortedAddEquation(orderInsideEq, bestScore, equation);
                 SortedAddEquation(order, bestScore, equation);
-            }
+
+                //Handle for instance y = x + 0.1*y + z, where we do not want to have it look like the best
+                //and second best variables are close.
+                if (orderInsideEq.First().Value.Count == 1)
+                {
+                    //Found exactly 1 best
+                    FuzzyVarName bestVarName = null;
+                    foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
+                    {
+                        if (varName.score == orderInsideEq.First().Key) bestVarName = varName;
+                    }
+                    foreach (FuzzyVarName varName in bestEquation.varNamesRhs)
+                    {
+                        if (varName.score == orderInsideEq.First().Key) bestVarName = varName;
+                    }
+                    // ----------------------------------------------
+                    // ----------------------------------------------
+                    foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
+                    {
+                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
+                        List<string> storage2 = Cleanup(bestVarName.storage, ECleanupType.VariableNameFromRaw);
+                        if (storage1.Count == storage2.Count)
+                        {
+                            bool good = true;
+                            for (int i = 0; i < storage1.Count; i++)
+                            {
+                                if (!G.Equal(storage1[i].Trim(), storage2[i].Trim()))
+                                {
+                                    good = false;
+                                    break;
+                                }
+                            }
+                            if (good && varName.score > orderInsideEq.First().Key)
+                            {                                
+                                varName.score += 100;
+                            }
+                        }
+                    }
+                    foreach (FuzzyVarName varName in bestEquation.varNamesRhs)
+                    {
+                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
+                        List<string> storage2 = Cleanup(bestVarName.storage, ECleanupType.VariableNameFromRaw);
+                        if (storage1.Count == storage2.Count)
+                        {
+                            bool good = true;
+                            for (int i = 0; i < storage1.Count; i++)
+                            {
+                                if (!G.Equal(storage1[i].Trim(), storage2[i].Trim()))
+                                {
+                                    good = false;
+                                    break;
+                                }
+                            }
+                            if (good && varName.score > orderInsideEq.First().Key)
+                            {
+                                varName.score += 100;
+                            }
+                        }
+                    }
+                }
+
+            }            
+
             if (print)
             {
                 foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order)
@@ -118,45 +182,7 @@ namespace Gekko
                 }
             }
             return order;
-        }
-
-        public static SortedDictionary<double, List<FuzzyEquation>> TestLhs(List<FuzzyEquation> equations, bool print)
-        {
-            SortedDictionary<double, List<FuzzyEquation>> order = new SortedDictionary<double, List<FuzzyEquation>>(); //score, eqName            
-            int nE = 0;
-            foreach (FuzzyEquation equation in equations)
-            {
-                nE++;
-                double bestScore = double.MaxValue;
-                FuzzyEquation bestEquation = null;
-                int nVLhs = 0;
-                foreach (FuzzyVarName varName in equation.varNamesLhs)
-                {
-                    string simple = varName.simple;
-                    nVLhs++;
-                    varName.score = EquationPoints(true, equation, null, varName, nE, nVLhs, print);
-                    if (varName.score < bestScore)
-                    {
-                        bestScore = varName.score;
-                        bestEquation = equation;
-                    }
-                }
-                int nVRhs = 0;
-                foreach (FuzzyVarName varName in equation.varNamesRhs)
-                {
-                    string simple = varName.simple;
-                    nVRhs++;
-                    varName.score = EquationPoints(false, equation, null, varName, nE, nVLhs, print);
-                    if (varName.score < bestScore)
-                    {
-                        bestScore = varName.score;
-                        bestEquation = equation;
-                    }
-                }
-                SortedAddEquation(order, bestScore, equation);
-            }
-            return order;
-        }
+        }        
 
         public static void SortedAddEquation(SortedDictionary<double, List<FuzzyEquation>> sortedDict, double score, FuzzyEquation equation)
         {

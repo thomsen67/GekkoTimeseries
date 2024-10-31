@@ -23427,7 +23427,7 @@ print(df2)
             I("model<gms> raw1.gms;");
             List<FuzzyEquation> fuzzyEquationsAll1 = Decomp.GetRawEquations(Program.model.modelGams, null);  //all
             //Key: best distance, val: which equations?
-            SortedDictionary<double, List<FuzzyEquation>> order1 = Fuzzy.TestLhs(fuzzyEquationsAll1, false);            
+            SortedDictionary<double, List<FuzzyEquation>> orderLhs = Fuzzy.OrderLhs(true, fuzzyEquationsAll1, null, false);
             //Key: best distance, val: how many equations have delta == 0 (best minus next best distance)
             SortedDictionary<double, List<FuzzyEquation>> noUnique = new SortedDictionary<double, List<FuzzyEquation>>();
             //Key: best distance, val: average delta (best minus next best distance)
@@ -23439,7 +23439,7 @@ print(df2)
             //  Without a databank
             // --------------------------------------
             
-            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order1)
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in orderLhs)
             {
                 double sum = 0d;
                 foreach (FuzzyEquation equation in kvp.Value)
@@ -23492,13 +23492,13 @@ print(df2)
             }
 
             //Sanity checks
-            Assert.AreEqual(fuzzyEquationsAll1.Count, order1.Sum(x => x.Value.Count));
+            Assert.AreEqual(fuzzyEquationsAll1.Count, orderLhs.Sum(x => x.Value.Count));
             Assert.AreEqual(fuzzyEquationsAll1.Count, deltaUnique.Sum(x => x.Value.Count));
             Assert.AreEqual(noUnique.Sum(x => x.Value.Count), deltaUnique[0d].Count);
 
 
             int i = -1;
-            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in order1) //The smaller the better
+            foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in orderLhs) //The smaller the better
             {
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(964, kvp.Value.Count); }
@@ -23516,10 +23516,10 @@ print(df2)
             {
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(9, kvp.Value.Count); } //Problem
-                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(107, kvp.Value.Count); } //Only dinstinction: RHS
-                else if (i == 2) { Assert.AreEqual(1.0d, kvp.Key); Assert.AreEqual(114, kvp.Value.Count); } //LHS variable with a name that diverges a bit
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(703, kvp.Value.Count); } //RHS variable with a name that diverges a bit
-                else if (i == 4) { Assert.AreEqual(2.0d, kvp.Key); Assert.AreEqual(52, kvp.Value.Count); } //Good
+                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(87, kvp.Value.Count); } //Only dinstinction: RHS
+                else if (i == 2) { Assert.AreEqual(1.0d, kvp.Key); Assert.AreEqual(116, kvp.Value.Count); } //LHS variable with a name that diverges a bit
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(714, kvp.Value.Count); } //RHS variable with a name that diverges a bit
+                else if (i == 4) { Assert.AreEqual(2.0d, kvp.Key); Assert.AreEqual(53, kvp.Value.Count); } //Good
                 else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(240, kvp.Value.Count); } //Good          
             }
 
@@ -23527,9 +23527,9 @@ print(df2)
             foreach (KeyValuePair<double, double> kvp in deltaAverageUnique) //The larger the better
             {
                 i++;
-                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(1.8636, kvp.Value, 0.0001); }
+                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(1.8776, kvp.Value, 0.0001); }
                 else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(0.6016, kvp.Value, 0.0001); }
-                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(2.105, kvp.Value, 0.0001); }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(5.105, kvp.Value, 0.0001); }
                 else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(0.5417, kvp.Value, 0.0001); }
                 else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(1.2286, kvp.Value, 0.0001); }
             }
