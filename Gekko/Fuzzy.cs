@@ -173,9 +173,8 @@ namespace Gekko
 
 
                 //Give priority to a variable with chunks completely found in eq chunks
-                if (true)
-                {                                    
-                    TJEKDETTE.
+                if (false)
+                {                     
                     List<string> storage2 = Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw);
                     foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
                     {
@@ -214,8 +213,6 @@ namespace Gekko
                         }
                     }
                 }
-
-
             }            
 
             if (print)
