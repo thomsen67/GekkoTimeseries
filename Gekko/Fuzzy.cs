@@ -171,6 +171,51 @@ namespace Gekko
                     }
                 }
 
+
+                //Give priority to a variable with chunks completely found in eq chunks
+                if (true)
+                {                                    
+                    TJEKDETTE.
+                    List<string> storage2 = Cleanup(equation.eqName, ECleanupType.EquationNameFromRaw);
+                    foreach (FuzzyVarName varName in bestEquation.varNamesLhs)
+                    {
+                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
+                        bool good = true;
+                        foreach (string s in storage1)
+                        {
+                            if (!storage2.Contains(s, StringComparer.OrdinalIgnoreCase))
+                            {
+                                good = false;
+                                break;
+                            }
+                        }
+                        if (good)
+                        {
+                            //all var chunks are in eq chunks
+                            varName.score += -1;
+                        }                        
+                    }
+                    foreach (FuzzyVarName varName in bestEquation.varNamesRhs)
+                    {
+                        List<string> storage1 = Cleanup(varName.storage, ECleanupType.VariableNameFromRaw);
+                        bool good = true;
+                        foreach (string s in storage1)
+                        {
+                            if (!storage2.Contains(s, StringComparer.OrdinalIgnoreCase))
+                            {
+                                good = false;
+                                break;
+                            }
+                        }
+                        if (good)
+                        {
+                            //all var chunks are in eq chunks
+                            varName.score += -1;
+                        }
+                    }
+                }
+
+
             }            
 
             if (print)
