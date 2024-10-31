@@ -99,8 +99,8 @@ namespace Gekko
                             bestEquation = equation;
                         }
                     }
-                }                
-                
+                }
+
                 SortedAddEquation(orderInsideEq, bestScore, equation);
                 SortedAddEquation(order, bestScore, equation);
 
@@ -114,7 +114,7 @@ namespace Gekko
                     {
                         if (varName.score == orderInsideEq.First().Key) bestVarName = varName;
                     }
-                    
+
                     // ----------------------------------------------
                     // ----------------------------------------------
                     foreach (FuzzyVarName varName in bestEquation.varNames)
@@ -133,38 +133,13 @@ namespace Gekko
                                 }
                             }
                             if (good && varName.score > orderInsideEq.First().Key)
-                            {                                
+                            {
                                 varName.score += 100;
                             }
                         }
-                    }                    
+                    }
                 }
-
-
-                //Give priority to a variable with chunks completely found in eq chunks
-                if (false)
-                {
-                    List<string> storage2 = equation.eqNameCleanedUp;
-                    foreach (FuzzyVarName varName in bestEquation.varNames)
-                    {
-                        List<string> storage1 = varName.storageCleanedUp;
-                        bool good = true;
-                        foreach (string s in storage1)
-                        {
-                            if (!storage2.Contains(s, StringComparer.OrdinalIgnoreCase))
-                            {
-                                good = false;
-                                break;
-                            }
-                        }
-                        if (good)
-                        {
-                            //all var chunks are in eq chunks
-                            varName.score += -1;
-                        }                        
-                    }                    
-                }
-            }            
+            }        
 
             if (print)
             {
@@ -204,17 +179,37 @@ namespace Gekko
 
         private static double EquationPoints(bool isLhs, FuzzyEquation equation, List<string> chosen, FuzzyVarName varName, int nE, int nVLhs, bool print)
         {
-            double penaltyRhs = 0.5d;
-            double penaltyInsideSum = 1d;  //1 typically gets rhs penalty too. Should it be larger?
-            double penaltyInsideDollar = 10d;  //Really cannot be relevant, but penalty does not seem to have any effect on orderings
+            double penaltyRhs = -0.5d;
+            double penaltyInsideSum = -1d;  //1 typically gets rhs penalty too. Should it be larger?
+            double penaltyInsideDollar = -10d;  //Really cannot be relevant, but penalty does not seem to have any effect on orderings
+            double penaltyVarnameContainedInEqName = 1;  //If all variable chunks are contained inside equation chunks, we get benefit (and if not, there is an implicit penalty)
             
             string s = "Lhs"; if (!isLhs) s = "Rhs";
-                     
-            varName.score = EditDistance(varName.storageCleanedUp, equation.eqNameCleanedUp);
-            if (!isLhs) varName.score += penaltyRhs;
-            if (varName.info.isInsideSum) 
-                varName.score += penaltyInsideSum;
-            if (varName.info.isInsideDollar) varName.score += penaltyInsideDollar;
+
+            varName.score = penaltyVarnameContainedInEqName;
+            double ed = EditDistance(varName.storageCleanedUp, equation.eqNameCleanedUp);
+            varName.score += ed;
+
+            if (varName.storageCleanedUp.Count > 0 && equation.eqNameCleanedUp.Count > 0 && G.Equal(varName.storageCleanedUp[0], equation.eqNameCleanedUp[0]))
+            {
+                bool good = true;
+                for (int i = 1; i < varName.storageCleanedUp.Count; i++)
+                {
+                    if (!equation.eqNameCleanedUp.Contains(varName.storageCleanedUp[i], StringComparer.OrdinalIgnoreCase))
+                    {
+                        good = false;
+                        break;
+                    }
+                }
+                if (good)
+                {
+                    varName.score += -penaltyVarnameContainedInEqName;
+                }
+            }
+
+            if (!isLhs) varName.score += -penaltyRhs;
+            if (varName.info.isInsideSum) varName.score += -penaltyInsideSum;
+            if (varName.info.isInsideDollar) varName.score += -penaltyInsideDollar;
 
             double score;
             if (chosen == null)
@@ -235,7 +230,7 @@ namespace Gekko
 
         /// <summary>
         /// Creates a new list where blanks are removed in elements, "Born" --> "Boern", and "t1End", "tEnd", "End", "aEnd" are removed.
-        /// Anything after a "via" is removed (including the "via").
+        /// Anything after a "via" is removed (including the "via"). All blanks are removed.
         /// </summary>
         /// <param name="m"></param>
         /// <param name="isEqName"></param>
@@ -327,8 +322,7 @@ namespace Gekko
         /// <returns></returns>
         public static int EditDistance(List<string> original, List<string> modified)
         {
-            if (original == modified)
-                return 0;
+            if (original == modified) return 0;
 
             int len_orig = original.Count;
             int len_diff = modified.Count;
@@ -341,7 +335,7 @@ namespace Gekko
                 matrix[i, 0] = i;
                 for (int j = 1; j <= len_diff; j++)
                 {
-                    int cost = G.EqualHandleBlanks(modified[j - 1], original[i - 1]) ? 0 : 1;
+                    int cost = G.Equal(modified[j - 1], original[i - 1]) ? 0 : 1;
                     if (i == 1)
                         matrix[0, j] = j;
 
@@ -357,7 +351,5 @@ namespace Gekko
             }
             return matrix[len_orig, len_diff];
         }
-
-
     }
 }
