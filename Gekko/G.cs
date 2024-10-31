@@ -133,6 +133,48 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Case-insensitive pairwise compare of two lists of strings. Returns false if either list is null, or if different number of elements.
+        /// </summary>
+        /// <param name="m1"></param>
+        /// <param name="m2"></param>
+        /// <returns></returns>
+        public static bool Equal(List<string> m1, List<string> m2)
+        {
+            if (m1 == null || m2 == null) return false;
+            if (m1.Count != m2.Count) return false;
+            bool good = true;
+            for (int i = 0; i < m1.Count; i++)
+            {
+                if (!G.Equal(m1[i], m2[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Case-insensitive pairwise compare of two lists of strings. Returns false if either list is null, or if different number of elements. Blanks are removed before compare.
+        /// </summary>
+        /// <param name="m1"></param>
+        /// <param name="m2"></param>
+        /// <returns></returns>
+        public static bool EqualHandleBlanks(List<string> m1, List<string> m2)
+        {
+            if (m1 == null || m2 == null) return false;
+            if (m1.Count != m2.Count) return false;
+            bool good = true;
+            for (int i = 0; i < m1.Count; i++)
+            {
+                if (!G.EqualHandleBlanks(m1[i], m2[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Fastest version of StartsWith(), use if case-insensitive is not required (the method is like 5x faster than G.StartsWith()).
         /// </summary>
         /// <param name="s1"></param>

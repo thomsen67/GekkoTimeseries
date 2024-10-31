@@ -23429,9 +23429,7 @@ print(df2)
             //Key: best distance, val: which equations?
             SortedDictionary<double, List<FuzzyEquation>> orderLhs = Fuzzy.OrderLhs(true, fuzzyEquationsAll1, null, false);
             //Key: best distance, val: how many equations have delta == 0 (best minus next best distance)
-            SortedDictionary<double, List<FuzzyEquation>> noUnique = new SortedDictionary<double, List<FuzzyEquation>>();
-            //Key: best distance, val: average delta (best minus next best distance)
-            SortedDictionary<double, double> deltaAverageUnique = new SortedDictionary<double, double>();
+            SortedDictionary<double, List<FuzzyEquation>> noUnique = new SortedDictionary<double, List<FuzzyEquation>>();            
             //Key: delta (best minus next best distance), val: how many equations?
             SortedDictionary<double, List<FuzzyEquation>> deltaUnique = new SortedDictionary<double, List<FuzzyEquation>>();                        
 
@@ -23440,8 +23438,7 @@ print(df2)
             // --------------------------------------
             
             foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in orderLhs)
-            {
-                double sum = 0d;
+            {                
                 foreach (FuzzyEquation equation in kvp.Value)
                 {
                     // Imagine: lhs=0.0, rhs=2.5, 0.5, 1.5, 0.5, 2.5
@@ -23478,12 +23475,9 @@ print(df2)
                             //We assign arbitray large value.
                             dif = 100;
                         }
-                    }
-                    sum += dif;                    
+                    }                              
                     Fuzzy.SortedAddEquation(deltaUnique, dif, equation);
-                }
-                double avg = sum / kvp.Value.Count;
-                deltaAverageUnique.Add(kvp.Key, avg);
+                }                
             }
 
             //Sanity checks
@@ -23498,10 +23492,10 @@ print(df2)
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(964, kvp.Value.Count); }
                 else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(64, kvp.Value.Count); }
-                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(134, kvp.Value.Count); }
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(8, kvp.Value.Count); }
-                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(69, kvp.Value.Count); }
-                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(4, kvp.Value.Count); }
+                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(143, kvp.Value.Count); }
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(10, kvp.Value.Count); }
+                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(59, kvp.Value.Count); }
+                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(3, kvp.Value.Count); }
                 else if (i == 6) { Assert.AreEqual(3d, kvp.Key); Assert.AreEqual(32, kvp.Value.Count); }
                 else if (i == 7) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); }
                 else if (i == 8) { Assert.AreEqual(4d, kvp.Key); Assert.AreEqual(1, kvp.Value.Count); }
@@ -23513,24 +23507,13 @@ print(df2)
             {
                 i++;
                 if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(9, kvp.Value.Count); }
-                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(29, kvp.Value.Count); }
-                else if (i == 2) { Assert.AreEqual(1.0d, kvp.Key); Assert.AreEqual(2, kvp.Value.Count); } 
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(120, kvp.Value.Count); } 
-                else if (i == 4) { Assert.AreEqual(2.0d, kvp.Key); Assert.AreEqual(114, kvp.Value.Count); } 
-                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(683, kvp.Value.Count); } 
+                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(26, kvp.Value.Count); }
+                else if (i == 2) { Assert.AreEqual(1.0d, kvp.Key); Assert.AreEqual(3, kvp.Value.Count); } 
+                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(182, kvp.Value.Count); } 
+                else if (i == 4) { Assert.AreEqual(2.0d, kvp.Key); Assert.AreEqual(113, kvp.Value.Count); } 
+                else if (i == 5) { Assert.AreEqual(2.5d, kvp.Key); Assert.AreEqual(621, kvp.Value.Count); } 
                 else if (i == 6) { Assert.AreEqual(3.0d, kvp.Key); Assert.AreEqual(53, kvp.Value.Count); } 
-                else if (i == 7) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(209, kvp.Value.Count); }                                                                                                           
-            }
-
-            i = -1;
-            foreach (KeyValuePair<double, double> kvp in deltaAverageUnique) //The larger the better
-            {
-                i++;
-                if (i == 0) { Assert.AreEqual(0d, kvp.Key); Assert.AreEqual(2.8579, kvp.Value, 0.0001); }
-                else if (i == 1) { Assert.AreEqual(0.5d, kvp.Key); Assert.AreEqual(1.5703, kvp.Value, 0.0001); }
-                else if (i == 2) { Assert.AreEqual(1d, kvp.Key); Assert.AreEqual(7.7463, kvp.Value, 0.0001); }
-                else if (i == 3) { Assert.AreEqual(1.5d, kvp.Key); Assert.AreEqual(1.5625, kvp.Value, 0.0001); }
-                else if (i == 4) { Assert.AreEqual(2d, kvp.Key); Assert.AreEqual(1.5870, kvp.Value, 0.0001); }
+                else if (i == 7) { Assert.AreEqual(3.5d, kvp.Key); Assert.AreEqual(212, kvp.Value.Count); }                                                                                                           
             }
 
             i = -1;

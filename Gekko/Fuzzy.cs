@@ -12,7 +12,7 @@ namespace Gekko
         public List<string> storageCleanedUp = new List<string>();
         public GamsWalkerInfo info = new GamsWalkerInfo();
         public string simple = null;
-        public double score = double.NaN;
+        public double score = 0d;
         public bool isLhs = false;
         public string ToString()
         {
@@ -186,14 +186,14 @@ namespace Gekko
             
             string s = "Lhs"; if (!isLhs) s = "Rhs";
 
-            varName.score = penaltyVarnameContainedInEqName;
+            varName.score += penaltyVarnameContainedInEqName;
             double ed = EditDistance(varName.storageCleanedUp, equation.eqNameCleanedUp);
             varName.score += ed;
 
             if (varName.storageCleanedUp.Count > 0 && equation.eqNameCleanedUp.Count > 0 && G.Equal(varName.storageCleanedUp[0], equation.eqNameCleanedUp[0]))
             {
                 bool good = true;
-                for (int i = 1; i < varName.storageCleanedUp.Count; i++)
+                for (int i = 1; i < varName.storageCleanedUp.Count - 1; i++)  //We know the first element matches, but we omit the last (time, so we do not distinguish between "t" and "t-1")
                 {
                     if (!equation.eqNameCleanedUp.Contains(varName.storageCleanedUp[i], StringComparer.OrdinalIgnoreCase))
                     {

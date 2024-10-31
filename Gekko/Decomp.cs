@@ -5851,6 +5851,21 @@ namespace Gekko
                         fuzzyVarName.isLhs = false;
                         fuzzyEquation.varNames.Add(fuzzyVarName);
                     }
+
+                    //This has almost no effect, unclear why. The idea is that in an eq like this: x[a]/(x[a]+1) = 1/x[a] + ... ;
+                    //only the first x[a] has low value. This will make x[a] stand out lmore compared to other variables --> the
+                    //dif will be larger.
+                    for (int i = 0; i < fuzzyEquation.varNames.Count; i++)  //LHS will come first
+                    {
+                        for (int j = i + 1; j < fuzzyEquation.varNames.Count; j++)
+                        {
+                            if (G.Equal(fuzzyEquation.varNames[i].storageCleanedUp, fuzzyEquation.varNames[j].storageCleanedUp)) 
+                            {
+                                fuzzyEquation.varNames[j].score += 100;
+                            }
+                        }
+                    }
+
                     if (!Globals.decompSmartLhsSkipIrrelevant || foundChosen)                    
                     {
                         fuzzyEquations.Add(fuzzyEquation);
