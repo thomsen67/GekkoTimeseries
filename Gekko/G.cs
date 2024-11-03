@@ -55,7 +55,7 @@ namespace Gekko
 
         public const string NL = "\r\n";  //official Windows, cf. https://stackoverflow.com/questions/3986093/in-c-whats-the-difference-between-n-and-r-n
         public const char NL2 = '\n';     //best for counting number of newlines, since Windows accepts both \r\n and \n as newline. Mac uses \r, hmm, never mind.
-        public const string NL_ToolTip = "&#x0a;";  //not used in xaml, just put here for remembrance
+        public const string NL_ToolTip = "&#x0a;";  //This can be used directly in XAML if neede, just put here for remembrance.
 
         // ------------------------------------------------------------------------------------------------
         // Compare strings start

@@ -1503,9 +1503,17 @@ namespace Gekko
             return new TokenList(a);
         }
 
+        /// <summary>
+        /// TokenList is basically just a very simple List of TokenHelper's.
+        /// </summary>
+        /// <param name="textInputRaw"></param>
+        /// <param name="commentsClosed"></param>
+        /// <param name="commentsNonClosed"></param>
+        /// <param name="commentsClosedOnlyStartOfLine"></param>
+        /// <param name="commentsNonClosedOnlyStartOfLine"></param>
+        /// <returns></returns>
         public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
-        {
-            //TokenList is basically just a very simple List<TokenHelper>
+        {            
             //TokenHelper contains the token and other info, and may contain a TokenList (for instance the contents of a (...) parenthesis)
             //
             //             TokenHelper                    this node is artificial and contains nothing but a TokenList

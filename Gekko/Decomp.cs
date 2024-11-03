@@ -5490,7 +5490,7 @@ namespace Gekko
 
         public static void Find(O.Find o)
         {
-            if (G.IsUnitTesting() && Globals.showDecompTable == true)
+            if (G.IsUnitTesting() && Globals.showFind == true)
             {
                 //Skip the "Decomp" thread stuff when unit testing -- will give TreadAbortedException for some reason not understood.
                 CreateFindWindow(o);
@@ -5639,12 +5639,19 @@ namespace Gekko
                     }
 
                     eqsNew = eqsNew.OrderBy(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                    
+
                     //This seems to just gather material for the GUI representation
+                    double lastScore = double.MinValue;
+                    double scoreCounter = 0;
                     int lineCounter = -1;
                     foreach (EqInfoSimple eqHelper in eqsNew)
                     {
                         lineCounter++;
+                        if (eqHelper.score != lastScore)
+                        {
+                            scoreCounter++;
+                            lastScore = eqHelper.score;
+                        }
                         string eqName = eqHelper.eqName;
                         string eqName3 = eqHelper.eqNameWithLag;
                         EquationTextHelper helper2 = new EquationTextHelper();
@@ -5652,8 +5659,9 @@ namespace Gekko
                         List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, o.tSelected);
                         string bool1 = "";  //lhs                        
                         if (eqHelper.score % 1 == 0) bool1 = Globals.protectSymbol;
-                        string bool2 = "";  //dep
-                        bool2 = Math.Round(eqHelper.score, 2).ToString();
+                        string dep = "";  //dep
+                        dep = scoreCounter.ToString();
+                        if (Globals.runningOnTTComputer) dep += " TTH: " + Math.Round(eqHelper.score, 1).ToString();
                         string tt = "tx0";
                         int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
                         string textColor = "Black";
@@ -5666,7 +5674,7 @@ namespace Gekko
                         }
                         //This is where the contents of each GUI line is set
                         //Hack that it is a global variable...
-                        Globals.itemHandler.Add(new EquationListItem(eqName3, " ", bool2, bool1, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
+                        Globals.itemHandler.Add(new EquationListItem(eqName3, " ", dep, bool1, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
                     }
 
                     string firstEqName2 = eqsNew[0].eqName;

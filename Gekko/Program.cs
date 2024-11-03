@@ -2494,14 +2494,197 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {            
+        {
             if (Globals.runningOnTTComputer && (text == "d"))
             {
-                //new Writeln("Distanace: " + EditDistance(new List<string>() { "c", "a", "b" }, new List<string>() { "c", "b" }));
+                List<string> writer = new List<string>();
+
+                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                //List<string> vars = modelGamsScalar.GetVars(2);
+                //List<string> relevant = new List<string>();
+                List<string> eqs = modelGamsScalar.GetEqs(2);
+
+                Dictionary<string, List<string>> batches = new Dictionary<string, List<string>>();
+
+                string lastEqName = null;
+                List<string> batch = new List<string>();
+                foreach (string eq in eqs)
+                {
+                    string noIndex = G.Chop_GetName(eq);
+                    if (!batches.ContainsKey(noIndex))
+                    {
+                        batches.Add(noIndex, new List<string>());
+                    }
+                    //batches[noIndex].Add(eq);
+                    GekkoTime t1 = new GekkoTime(EFreq.A, 2030, 1);
+                    GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
+                    string s2 = G.Chop_DimensionAddLast(eq, tUsedHere.ToString(), null);
+                    EquationTextHelper helper = new EquationTextHelper();
+                    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+                    batches[noIndex].Add(helper22.s_scalarModel);
+                }
+
+                List<List<List<string>>> m1 = new List<List<List<string>>>();                                
+
+                foreach (KeyValuePair<string, List<string>> kvp in batches)
+                {
+                    string lhs = kvp.Key.Split('_')[1];
+
+                    foreach (string s in kvp.Value)
+                    {
+                        //See also #jkadf773js7s                    
+
+                        string txt = s;
+
+                        TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, null, null, null, null);
+                                                
+                        List<List<string>> m2 = new List<List<string>>();
+
+                        foreach (TokenHelper tok in tokens2.subnodes.storage)
+                        {
+                            if (G.Equal(tok.s, lhs))
+                            {
+                                TokenHelper next = tok.SiblingAfter();
+                                if (next != null)
+                                {
+                                    if (next.SubnodesTypeParenthesisStart())
+                                    {
+                                        List<TokenHelperComma> split = next.SplitCommas(true);
+
+                                        if (split.Count == 1 && (split[0].list.ToStringTrim().StartsWith("-") || split[0].list.ToStringTrim().StartsWith("+")))
+                                        {
+                                            //do nothing
+                                        }
+                                        else
+                                        {
+                                            bool isLag2 = false;
+                                            TokenHelper next2 = next.SiblingAfter();
+                                            if (next2.SubnodesTypeParenthesisStart())
+                                            {
+                                                List<TokenHelperComma> split2 = next2.SplitCommas(true);
+                                                if (split2.Count == 1 && (split2[0].list.ToStringTrim().StartsWith("-") || split2[0].list.ToStringTrim().StartsWith("+")))
+                                                {
+                                                    isLag2 = true;
+                                                }
+                                            }
+
+                                            if (!isLag2)
+                                            {
+                                                List<string> m3 = new List<string>();
+                                                foreach (TokenHelperComma xx in split)
+                                                {
+                                                    m3.Add(xx.list.ToStringTrim());
+                                                }
+                                                m2.Add(m3);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        m1.Add(m2);
+                        writer.Add("Equation " + kvp.Key + ": " + s + ":");
+                        if (m2 != null && m2.Count > 0)
+                        {
+                            if (m2.Count == 1)
+                            {
+                                writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2[0]) + "]");
+                            }
+                            else
+                            {
+                                writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2[0]) + "]" + " ----- " + lhs + "[" + Stringlist.GetListWithCommas(m2[m2.Count - 1]) + "]");
+                            }                            
+                        }
+                        writer.Add("");
+                    }
+                }
+                using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\lhs.txt", null, GekkoFileReadOrWrite.Write))
+                using (StreamWriter res = G.GekkoStreamWriter(fs))
+                {
+                    foreach (string s in writer)
+                    {
+                        res.WriteLine(s);
+                    }
+                }
+            }
+
+            
+
+            if (Globals.runningOnTTComputer && (text == "d2"))
+            {
+                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                List<string> vars = modelGamsScalar.GetVars(2);
+                List<string> relevant = new List<string>();
+                GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                int n = 0;
+                int nfix = 0;
+
+                GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" }) 
+                {
+                    d.Add(s, false);
+                }
+
+                GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
+                {
+                    portf.Add(s, false);
+                }
+
+                GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
+                {
+                    ovf.Add(s, false);
+                }                
+
+                foreach (string varNameWithIndexes in vars)
+                {
+                    n++;
+                    List<GekkoTime> fixVars = modelGamsScalar.GetFixedPeriods(varNameWithIndexes);
+                    if (fixVars.Contains(new GekkoTime(EFreq.A, 2030, 1)))
+                    {
+                        nfix++;
+                    }
+                    else
+                    {
+                        relevant.Add(varNameWithIndexes);
+                        string dbName, varName, freq; string[] indexes;
+                        O.Chop(varNameWithIndexes, out dbName, out varName, out freq, out indexes);
+
+                        if (indexes != null)
+                        {
+                            for (int pos = 0; pos < indexes.Length; pos++)
+                            {
+                                int i;
+                                if (int.TryParse(indexes[pos], out i))
+                                {
+                                    if (i >= 0 && i <= 120)
+                                    {
+                                        indexes[pos] = "40";
+                                    }
+                                }
+                                else
+                                {
+                                    if (d.ContainsKey(indexes[pos])) indexes[pos] = "tje";
+                                    else if (portf.ContainsKey(indexes[pos])) indexes[pos] = "Obl";
+                                    else if (ovf.ContainsKey(indexes[pos])) indexes[pos] = "orlov";
+                                }
+                            }
+                        }
+                        string varNameWithIndexes2 = O.UnChop(dbName, varName, freq, indexes);
+                        if (indexes != null && !relevant2.ContainsKey(varNameWithIndexes2)) relevant2.Add(varNameWithIndexes2, false);
+                    }
+                }
+                List<string> important = relevant2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                foreach (string s in important)
+                {
+                    G.Writeln(s);
+                }
+                new Writeln("n = " + n + " nfix = " + nfix + " ratio = " + (double)nfix / (double)n + "   " + relevant2.Count);
                 return;
             }
 
-            if (Globals.runningOnTTComputer && (text == "d"))
+            if (Globals.runningOnTTComputer && (text == "d3"))
             {
                 EquationBrowser.BrowserNew(false, false);
                 return;

@@ -18831,6 +18831,7 @@ namespace UnitTests
             //ShowDecompTable();  //will show the following decomp table and then abort
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+            //ShowFind();
             I("find y[tot];");
             //I("decomp <2003 2003 d> y[tot] from e_y_tot;");            
         }
