@@ -179,7 +179,8 @@ namespace Gekko
     public class EquationHelper2 
     {
         public string eqName = null;
-        public string eqMath = null;
+        public string eqMathScalar = null;
+        public string eqMathRaw = null;
     }
 
     public class LaspeyresOptions
@@ -2548,6 +2549,9 @@ namespace Gekko
                 //Since ib or im do not vary, dim #1 is set as ib or im. For dim #2, first one is spTot and last one is udv. From the name, we choose spTot.
                 //
 
+                int nAll = 0;
+                int nFail = 0;
+
                 List<string> writer = new List<string>();
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
@@ -2565,15 +2569,23 @@ namespace Gekko
 
                     foreach (EquationHelper2 eh in kvp.Value)
                     {
+                        nAll++;
                         string equationNameWithIndexes = eh.eqName;
                         string[] eqNameChunks = equationNameWithoutIndexes.Split('_');
-                        string lhsName = eqNameChunks[1]; //[0] is always "e"                        
-                        List<VariableDims> m1 = SplitUpEquations(lhsName, eh, writer);
-                        VariableDims first = m1.First();
-                        VariableDims last = m1.Last();
+                        string lhsName = eqNameChunks[1]; //[0] is always "e"
+                        string indexName = null;
+                        if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
+                        VariableDims m1 = SplitUpEquations(lhsName, eh, writer);
+                        Dims first = null;
+                        Dims last = null;
+                        if (m1.storage.Count > 0)
+                        {
+                            first = m1.storage.First();
+                            last = m1.storage.Last();
+                        }
                         int nDim = GetDim(m1);
                         GekkoDictionary<string, bool>[] span = GetSpan(m1, nDim, writer);
-                        List<string> eqIndexes = G.Chop_GetIndex(eh.eqName);
+                        List<string> eqIndexes = G.Chop_GetIndex(equationNameWithIndexes);
                         int summedDimensions = nDim - eqIndexes.Count;
                         string[] names = new string[nDim];
                         if (summedDimensions > 1)
@@ -2589,6 +2601,7 @@ namespace Gekko
                             }
                         }
 
+                        bool success = false;
                         for (int i = 0; i < nDim; i++)
                         {
                             if (span[i].Count == 0)
@@ -2597,24 +2610,60 @@ namespace Gekko
                             }
                             else if (span[i].Count == 1)
                             {
-                                names[i] = span[i].First().Key;
+                                names[i] = span[i].First().Key;  //Same as last
+                                success = true;
                             }
                             else
                             {
-                                var sFirst = first.storage[i];
-                                var sLast = last.storage[i];
-                                //if (G.Equal(sFirst, sLast)) names[i] = sFirst;
-                                //else
-                                //{
+                                //We must select the first or the last                                
+                                string sFirst = first.storage[i];
+                                string sLast = last.storage[i];                                
 
-                                //}
-                                names[i] = "<TOT>";  //probably
+                                if (indexName != null)
+                                {
+                                    if (G.Equal(sFirst, indexName))
+                                    {
+                                        names[i] = sFirst;
+                                        success = true;
+                                    }
+                                    else if (G.Equal(sLast, indexName))
+                                    {
+                                        names[i] = sLast;
+                                        success = true;
+                                    }
+                                }
+
+                                if (!success)
+                                {
+                                    if (G.Contains(sFirst, "tot") && !G.Contains(sLast, "tot"))
+                                    {
+                                        names[i] = sFirst;
+                                        success = true;
+                                    }
+                                    else if (!G.Contains(sFirst, "tot") && G.Contains(sLast, "tot"))
+                                    {
+                                        names[i] = sLast;
+                                        success = true;
+                                    }                                    
+                                }
+
+                                if (!success)
+                                {
+                                    string s = equationNameWithoutIndexes;
+                                    string s1 = equationNameWithIndexes;
+                                    string s2 = eh.eqMathRaw;
+                                    string s3 = eh.eqMathScalar;
+                                    names[i] = "<TOT>";  //probably
+                                }
                             }
                         }
+
+                        if (!success) nFail++;
+
                         lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
 
                         writer.Add(eh.eqName + " ..");
-                        writer.Add(eh.eqMath);
+                        writer.Add(eh.eqMathScalar);
                         writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
                         writer.Add("");
                     }
@@ -2628,6 +2677,7 @@ namespace Gekko
                         res.WriteLine(s);
                     }
                 }
+                new Writeln("nAll = " + nAll + ", nFail = " + nFail);
             }
 
 
@@ -3209,7 +3259,8 @@ namespace Gekko
                 {
                 }
                 EquationHelper2 eh = new EquationHelper2();
-                eh.eqMath = helper22.s_scalarModel;
+                eh.eqMathScalar = helper22.s_scalarModel;
+                eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
                 eh.eqName = G.Chop_DimensionRemoveLast(eq);
                 batches[noIndex].Add(eh);
             }
@@ -3217,14 +3268,14 @@ namespace Gekko
             return batches;
         }
 
-        private static List<VariableDims> SplitUpEquations(string lhsName, EquationHelper2 eh, List<string> writer)
-        {            
-            List<VariableDims> m1 = new List<VariableDims>();
+        private static VariableDims SplitUpEquations(string lhsName, EquationHelper2 eh, List<string> writer)
+        {
+            
             int nM2 = -12345;
             //For each sub-equation under the equation name
 
             //See also #jkadf773js7s
-            string s = eh.eqMath;
+            string s = eh.eqMathScalar;
 
             string txt = s;
 
@@ -3297,22 +3348,20 @@ namespace Gekko
                     //writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]" + " ----- " + lhs + "[" + Stringlist.GetListWithCommas(m2.storage[m2.storage.Count - 1].storage) + "]");
                 }
             }
-            writer.Add("");
-            m1.Add(m2);
+            writer.Add("");            
 
-            return m1;
+            return m2;
         }
 
-        private static int GetDim(List<VariableDims> m1)
-        {            
-            int nDim = 0;            
-            foreach (VariableDims list in m1)
+        private static int GetDim(VariableDims m1)
+        {
+            int nDim = 0;
+
+            foreach (Dims dim in m1.storage)
             {
-                foreach (Dims dim in list.storage)
-                {
-                    nDim = Math.Max(dim.storage.Count, nDim);
-                }
+                nDim = Math.Max(dim.storage.Count, nDim);
             }
+
             return nDim;
         }
 
@@ -3376,7 +3425,7 @@ namespace Gekko
             return pp;
         }
 
-        private static GekkoDictionary<string, bool>[] GetSpan(List<VariableDims> equation, int nDim, List<string> writer)
+        private static GekkoDictionary<string, bool>[] GetSpan(VariableDims equation, int nDim, List<string> writer)
         {
             int eqCounter = 0;
             double[] pp = new double[nDim];
@@ -3385,7 +3434,9 @@ namespace Gekko
             GekkoDictionary<string, bool>[] probability = new GekkoDictionary<string, bool>[nDim];
             for (int i = 0; i < nDim; i++) probability[i] = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (VariableDims temp in equation) //For each scalar equation. This loops through "columns" (variables in an equation), for instance the variables in qK[iB, spTot] = qK[iB, tje] + qK[iB, fre] + qK[iB, byg] + qK[iB, lan] + qK[iB, soe] + qK[iB, bol] + qK[iB, ene] + qK[iB, udv]
+            VariableDims temp = equation;
+
+            //foreach (VariableDims temp in equation) //For each scalar equation. This loops through "columns" (variables in an equation), for instance the variables in qK[iB, spTot] = qK[iB, tje] + qK[iB, fre] + qK[iB, byg] + qK[iB, lan] + qK[iB, soe] + qK[iB, bol] + qK[iB, ene] + qK[iB, udv]
             {
                 eqCounter++;
                 int varCounter = 0;                                
