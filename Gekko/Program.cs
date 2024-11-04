@@ -2554,7 +2554,8 @@ namespace Gekko
 
                 int nAll = 0;
                 int nNoDimOk = 0;
-                int notFound = 0;
+                int notFound = 0;  //at all
+                int notFound2 = 0; //in eq
                 int nFail = 0;                
 
                 List<string> writer = new List<string>();
@@ -2572,18 +2573,6 @@ namespace Gekko
                 {
                     string equationNameWithoutIndexes = kvp.Key;                    
 
-                    if (equationNameWithoutIndexes == "E_qK_spTot")
-                    {
-                    }
-
-                    if (equationNameWithoutIndexes == "E_vOffPas_FM")
-                    {
-                    }
-
-                    if (equationNameWithoutIndexes == "E_snL")
-                    {
-                    }
-
                     foreach (EquationHelper2 eh in kvp.Value)
                     {
                         nAll++;
@@ -2593,21 +2582,15 @@ namespace Gekko
                         string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
                         if (spelling)
                         {
-                            //eqNameChunks[i] = eqNameChunks[i].Replace("Born", "Boern");
-                            //eqNameChunks[i] = eqNameChunks[i].Replace("rOffTilVirk", "rOffTilVirk2BNP");
-                            //tSubLoen
+                            equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_vHhTilBorn_aTot", "E_vHhTilBoern_aTot");
+                            equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_rOffTilVirk", "E_rOffTilVirk2BNP");
+                            //equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_jfvKapIndPos_atot", "E_vKapIndPos_atot");
+                            //equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_jfvKapIndNeg_atot", "E_vKapIndNeg_atot");
+                            equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_tSubLoen_sTot", "E_vSubLoen_sTot");                            
                         }
 
-                        string[] eqNameChunks = equationNameWithoutIndexes.Split('_');
-
-                        if (spelling)
-                        {
-                            for (int i = 0; i < eqNameChunks.Length; i++)
-                            {
-                                
-                            }
-                        }
-                        
+                        string[] eqNameChunks = equationNameWithoutIndexesTemp.Split('_');
+                                                
                         string lhsName = null;
                         string indexName = null;
                         for (int i = eqNameChunks.Length - 1; i > 0; i--)
@@ -2632,16 +2615,31 @@ namespace Gekko
 
                         if (lhsName == null)
                         {
-                            //MessageBox.Show("Hovsa5"); //Not possible
-                            notFound++;
+                            //MessageBox.Show("Hovsa5"); //Not possible                            
+                            if (equationNameWithoutIndexes.StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
+                            {
+                                //ignore
+                            }
+                            else
+                            {
+                                notFound++;
+                            }
                         }
-
-                        if (lhsName != null && lhsName.StartsWith("rPensIndb"))
-                        {
-                        }
-
+                        
                         //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
-                        VariableDims m1 = SplitUpEquations(lhsName, eh, writer);                        
+                        VariableDims m1 = SplitUpEquations(lhsName, eh, writer);
+
+                        if (m1.storage.Count == 0)
+                        {                            
+                            if (equationNameWithoutIndexes.StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
+                            {
+                                //ignore
+                            }
+                            else
+                            {
+                                notFound2++;
+                            }
+                        }
                         
                         Dims first = null;
                         Dims last = null;
@@ -2786,14 +2784,18 @@ namespace Gekko
                         if (!success)
                         {
                             nFail++;
+                        }                        
+
+                        if (m1.storage.Count == 0)
+                        {
+                            lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+
+                            writer.Add(equationNameWithIndexes + " ..");
+                            writer.Add(eh.eqMathScalar);
+                            writer.Add(eh.eqMathRaw);
+                            writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+                            writer.Add("");
                         }
-
-                        lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-
-                        writer.Add(eh.eqName + " ..");
-                        writer.Add(eh.eqMathScalar);
-                        writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-                        writer.Add("");
                     }
                 }                            
 
@@ -2805,10 +2807,8 @@ namespace Gekko
                         res.WriteLine(s);
                     }
                 }
-                new Writeln("nAll = " + nAll + ", nFail = " + nFail + " (nNoDimOk = " + nNoDimOk + ", notFound = " + notFound + ")");
+                new Writeln("nAll = " + nAll + ", nFail = " + nFail + " (nNoDimOk = " + nNoDimOk + ", notFound = " + notFound + ", notFound2 = " + notFound2 + ")");
             }
-
-
 
             if (Globals.runningOnTTComputer && (text == "d2"))
             {
