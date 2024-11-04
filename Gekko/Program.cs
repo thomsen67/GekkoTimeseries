@@ -176,6 +176,12 @@ namespace Gekko
         Unknown
     }
 
+    public class EquationHelper2 
+    {
+        public string eqName = null;
+        public string eqMath = null;
+    }
+
     public class LaspeyresOptions
     {
         public bool annualOverlap = false;
@@ -2544,12 +2550,12 @@ namespace Gekko
 
                 List<string> writer = new List<string>();
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                GekkoDictionary<string, List<string>> batches = GetBatches(modelGamsScalar.GetEqs(1));
+                GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
 
                 GekkoDictionary<string, string> lhs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 
                 //For each equation name (without indexes)
-                foreach (KeyValuePair<string, List<string>> kvp in batches)
+                foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
                 {
                     if (kvp.Key == "E_qK_spTot")
                     {
@@ -3134,9 +3140,9 @@ namespace Gekko
             else G.Writeln(text);
         }
 
-        private static GekkoDictionary<string, List<string>> GetBatches(List<string> eqs)
+        private static GekkoDictionary<string, List<EquationHelper2>> GetBatches(List<string> eqs)
         {
-            GekkoDictionary<string, List<string>> batches = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, List<EquationHelper2>> batches = new GekkoDictionary<string, List<EquationHelper2>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> known = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
             foreach (string eq in eqs)
@@ -3157,7 +3163,7 @@ namespace Gekko
 
                 if (!batches.ContainsKey(noIndex))
                 {
-                    batches.Add(noIndex, new List<string>());
+                    batches.Add(noIndex, new List<EquationHelper2>());
                     //known = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                 }
 
@@ -3168,21 +3174,25 @@ namespace Gekko
                 if (scalar.Contains("found"))
                 {
                 }
-                batches[noIndex].Add(helper22.s_scalarModel);
+                EquationHelper2 eh = new EquationHelper2();
+                eh.eqMath = helper22.s_scalarModel;
+                eh.eqName = G.Chop_DimensionRemoveLast(eq);
+                batches[noIndex].Add(eh);
             }
 
             return batches;
         }
 
-        private static List<VariableDims> SplitUpEquations(KeyValuePair<string, List<string>> kvp, List<string> writer)
+        private static List<VariableDims> SplitUpEquations(KeyValuePair<string, List<EquationHelper2>> kvp, List<string> writer)
         {
             string lhs = kvp.Key.Split('_')[1];
             List<VariableDims> m1 = new List<VariableDims>();
             int nM2 = -12345;
             //For each sub-equation under the equation name
-            foreach (string s in kvp.Value)
+            foreach (EquationHelper2 eh in kvp.Value)
             {
                 //See also #jkadf773js7s
+                string s = eh.eqMath;
 
                 string txt = s;
 
