@@ -2563,17 +2563,13 @@ namespace Gekko
 
                     List<VariableDims> m1 = SplitUpEquations(kvp, writer);
 
-                    Tuple<Dictionary<int, List<VariableDims>>, int> tup = GetEquations(m1);
+                    int nDim = GetDim(m1);
 
-                    if (tup.Item1.Count > 1)
+                    if (nDim > 1)
                     {
                     }
                     
-                    double[] pp = GetProbability(tup.Item1, tup.Item2, writer);
-
-                    if (tup.Item2 >= 2)
-                    {
-                    }
+                    double[] pp = GetProbability(m1, nDim, writer);
 
                     int sumDim = -12345;
                     for (int i = 0; i < pp.Length; i++)
@@ -3272,24 +3268,17 @@ namespace Gekko
             return m1;
         }
 
-        private static Tuple<Dictionary<int, List<VariableDims>>, int> GetEquations(List<VariableDims> m1)
+        private static int GetDim(List<VariableDims> m1)
         {            
-            int nDim = 0;
-            Dictionary<int, List<VariableDims>> equations = new Dictionary<int, List<VariableDims>>();
+            int nDim = 0;            
             foreach (VariableDims list in m1)
             {
                 foreach (Dims dim in list.storage)
                 {
                     nDim = Math.Max(dim.storage.Count, nDim);
                 }
-
-                if (!equations.ContainsKey(list.storage.Count))
-                {
-                    equations.Add(list.storage.Count, new List<VariableDims>());
-                }
-                equations[list.storage.Count].Add(list);
             }
-            return new Tuple<Dictionary<int, List<VariableDims>>, int>(equations, nDim);
+            return nDim;
         }
 
         /// <summary>
@@ -3299,54 +3288,51 @@ namespace Gekko
         /// <param name="nDim"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        private static double[] GetProbability(Dictionary<int, List<VariableDims>> equations, int nDim, List<string> writer)
+        private static double[] GetProbability(List<VariableDims> equations, int nDim, List<string> writer)
         {
             int eqCounter = 0;
             double[] pp = new double[nDim];
-            foreach (KeyValuePair<int, List<VariableDims>> kv2 in equations)  //For each scalar equation, split up into number of "columns" (see below). Number of columns not used for now.
+            string[] zz = null;
+
+            foreach (VariableDims temp in equations) //For each scalar equation. This loops through "columns" (variables in an equation), for instance the variables in qK[iB, spTot] = qK[iB, tje] + qK[iB, fre] + qK[iB, byg] + qK[iB, lan] + qK[iB, soe] + qK[iB, bol] + qK[iB, ene] + qK[iB, udv]
             {
-                string[] zz = null;
+                eqCounter++;
+                int varCounter = 0;
 
-                foreach (VariableDims temp in kv2.Value) //For each scalar equation. This loops through "columns" (variables in an equation), for instance the variables in qK[iB, spTot] = qK[iB, tje] + qK[iB, fre] + qK[iB, byg] + qK[iB, lan] + qK[iB, soe] + qK[iB, bol] + qK[iB, ene] + qK[iB, udv]
+                List<GekkoDictionary<string, bool>> probability = new List<GekkoDictionary<string, bool>>();
+                for (int i = 0; i < nDim; i++) probability.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                double[] p = new double[nDim];
+
+                foreach (Dims dims in temp.storage) //for each variable
                 {
-                    eqCounter++;
-                    int varCounter = 0;
-
-                    List<GekkoDictionary<string, bool>> probability = new List<GekkoDictionary<string, bool>>();
-                    for (int i = 0; i < nDim; i++) probability.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
-                    double[] p = new double[nDim];
-
-                    foreach (Dims dims in temp.storage) //for each variable
+                    varCounter++;
+                    int c = -1;
+                    if (zz == null) zz = new string[nDim];
+                    foreach (string s7 in dims.storage) //for each variable dimension, for instance "iB", "spTot".
                     {
-                        varCounter++;
-                        int c = -1;
-                        if (zz == null) zz = new string[nDim];
-                        foreach (string s7 in dims.storage) //for each variable dimension, for instance "iB", "spTot".
-                        {
-                            c++;
-                            if (!probability[c].ContainsKey(s7)) probability[c].Add(s7, false);
-                            if (zz[c] == null) zz[c] = s7;
-                            else if (zz[c] == "*") continue;
-                            else if (!G.Equal(zz[c], s7)) zz[c] = "*";
-                        }
-                    }
-
-                    for (int i = 0; i < nDim; i++)
-                    {
-                        p[i] = (double)probability[i].Count / (double)varCounter;
-                        pp[i] += p[i];
+                        c++;
+                        if (!probability[c].ContainsKey(s7)) probability[c].Add(s7, false);
+                        if (zz[c] == null) zz[c] = s7;
+                        else if (zz[c] == "*") continue;
+                        else if (!G.Equal(zz[c], s7)) zz[c] = "*";
                     }
                 }
 
                 for (int i = 0; i < nDim; i++)
                 {
-                    G.Writeln("Dim " + i + " probability = " + pp[i]);
+                    p[i] = (double)probability[i].Count / (double)varCounter;
+                    pp[i] += p[i];
                 }
-
-                string s = "...none...";
-                if (zz != null) s = Stringlist.GetListWithCommas(zz);
-                writer.Add("CHANGE for sub-eqs with " + kv2.Key + " occurrences: [" + s + "]");
             }
+
+            //for (int i = 0; i < nDim; i++)
+            //{
+            //    G.Writeln("Dim " + i + " probability = " + pp[i]);
+            //}
+
+            //string s = "...none...";
+            //if (zz != null) s = Stringlist.GetListWithCommas(zz);
+            //writer.Add("CHANGE for sub-eqs with " + kv2.Key + " occurrences: [" + s + "]");
 
             for (int i = 0; i < nDim; i++)
             {
