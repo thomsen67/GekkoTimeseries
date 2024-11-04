@@ -2552,35 +2552,61 @@ namespace Gekko
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
 
-                GekkoDictionary<string, string> lhs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                
+                GekkoDictionary<string, string> lhs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);                
+
                 //For each equation name (without indexes)
                 foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
                 {
+                    string lhsName = kvp.Key.Split('_')[1];
+
                     if (kvp.Key == "E_qK_spTot")
                     {
                     }
 
-                    List<VariableDims> m1 = SplitUpEquations(kvp, writer);
-
-                    int nDim = GetDim(m1);
-
-                    if (nDim > 1)
+                    foreach (EquationHelper2 eh in kvp.Value)
                     {
+                        List<VariableDims> m1 = SplitUpEquations(lhsName, eh, writer);
+                        int nDim = GetDim(m1);
+                        GekkoDictionary<string, bool>[] span = GetSpan(m1, nDim, writer);
+                        List<string> eqIndexes = G.Chop_GetIndex(eh.eqName);
+                        int summedDimensions = nDim - eqIndexes.Count;
+                        string[] names = new string[nDim];
+                        if (summedDimensions < 2)
+                        {                            
+                            for (int i = 0; i < nDim; i++)
+                            {
+                                if (span[i].Count == 0)
+                                {
+                                    if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa3");
+                                }
+                                else if (span[i].Count == 1)
+                                {
+                                    names[i] = span[i].First().Key;
+                                }
+                                else 
+                                {
+                                    names[i] = "--TOT--";  //probably
+                                }
+                            }
+                            lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+
+                            writer.Add(eh.eqName + " ..");
+                            writer.Add(eh.eqMath);
+                            writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+                            writer.Add("");
+                        }
+                        else
+                        {
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO   sum((i, j), x[i, j, k])
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa2");
+                        }
+
                     }
-                    
-                    double[] pp = GetProbability(m1, nDim, writer);
-
-                    int sumDim = -12345;
-                    for (int i = 0; i < pp.Length; i++)
-                    {
-
-                    }
-
-                    writer.Add("");
-                    writer.Add(" ----------------------------------------------- ");
-                    writer.Add("");
-                }
+                }                            
 
                 using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\lhs.txt", null, GekkoFileReadOrWrite.Write))
                 using (StreamWriter res = G.GekkoStreamWriter(fs))
@@ -3179,91 +3205,88 @@ namespace Gekko
             return batches;
         }
 
-        private static List<VariableDims> SplitUpEquations(KeyValuePair<string, List<EquationHelper2>> kvp, List<string> writer)
-        {
-            string lhs = kvp.Key.Split('_')[1];
+        private static List<VariableDims> SplitUpEquations(string lhsName, EquationHelper2 eh, List<string> writer)
+        {            
             List<VariableDims> m1 = new List<VariableDims>();
             int nM2 = -12345;
             //For each sub-equation under the equation name
-            foreach (EquationHelper2 eh in kvp.Value)
+
+            //See also #jkadf773js7s
+            string s = eh.eqMath;
+
+            string txt = s;
+
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, null, null, null, null);
+
+            VariableDims m2 = new VariableDims();  //Count is # found variables in equation
+
+            //For each token in the equation name
+            foreach (TokenHelper tok in tokens2.subnodes.storage)
             {
-                //See also #jkadf773js7s
-                string s = eh.eqMath;
-
-                string txt = s;
-
-                TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, null, null, null, null);
-
-                VariableDims m2 = new VariableDims();  //Count is # found variables in equation
-
-                //For each token in the equation name
-                foreach (TokenHelper tok in tokens2.subnodes.storage)
+                if (G.Equal(tok.s, lhsName))
                 {
-                    if (G.Equal(tok.s, lhs))
+                    TokenHelper next = tok.SiblingAfter();
+                    if (next != null)
                     {
-                        TokenHelper next = tok.SiblingAfter();
-                        if (next != null)
+                        if (next.SubnodesTypeParenthesisStart())
                         {
-                            if (next.SubnodesTypeParenthesisStart())
+                            List<TokenHelperComma> split = next.SplitCommas(true);
+
+                            if (split.Count == 1 && (split[0].list.ToStringTrim().StartsWith("-") || split[0].list.ToStringTrim().StartsWith("+")))
                             {
-                                List<TokenHelperComma> split = next.SplitCommas(true);
-
-                                if (split.Count == 1 && (split[0].list.ToStringTrim().StartsWith("-") || split[0].list.ToStringTrim().StartsWith("+")))
+                                //do nothing
+                            }
+                            else
+                            {
+                                bool isLag2 = false;
+                                TokenHelper next2 = next.SiblingAfter();
+                                if (next2.SubnodesTypeParenthesisStart())
                                 {
-                                    //do nothing
+                                    List<TokenHelperComma> split2 = next2.SplitCommas(true);
+                                    if (split2.Count == 1 && (split2[0].list.ToStringTrim().StartsWith("-") || split2[0].list.ToStringTrim().StartsWith("+")))
+                                    {
+                                        isLag2 = true;
+                                    }
                                 }
-                                else
-                                {
-                                    bool isLag2 = false;
-                                    TokenHelper next2 = next.SiblingAfter();
-                                    if (next2.SubnodesTypeParenthesisStart())
-                                    {
-                                        List<TokenHelperComma> split2 = next2.SplitCommas(true);
-                                        if (split2.Count == 1 && (split2[0].list.ToStringTrim().StartsWith("-") || split2[0].list.ToStringTrim().StartsWith("+")))
-                                        {
-                                            isLag2 = true;
-                                        }
-                                    }
 
-                                    if (!isLag2)
+                                if (!isLag2)
+                                {
+                                    Dims m3 = new Dims();
+                                    foreach (TokenHelperComma xx in split)
                                     {
-                                        Dims m3 = new Dims();
-                                        foreach (TokenHelperComma xx in split)
-                                        {
-                                            m3.storage.Add(xx.list.ToStringTrim());
-                                        }
-                                        m2.storage.Add(m3);
+                                        m3.storage.Add(xx.list.ToStringTrim());
                                     }
+                                    m2.storage.Add(m3);
                                 }
                             }
                         }
                     }
                 }
+            }
 
-                if (nM2 != -12345)
+            if (nM2 != -12345)
+            {
+                if (nM2 != m2.storage.Count)
                 {
-                    if (nM2 != m2.storage.Count)
-                    {
 
-                    }
                 }
+            }
 
-                nM2 = m2.storage.Count;
-                writer.Add("Equation " + kvp.Key + ": " + s + ":");
-                if (m2 != null && m2.storage.Count > 0)
+            nM2 = m2.storage.Count;
+            //writer.Add("Equation " + kvp.Key + ": " + s + ":");
+            if (m2 != null && m2.storage.Count > 0)
+            {
+                if (m2.storage.Count == 1)
                 {
-                    if (m2.storage.Count == 1)
-                    {
-                        writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]");
-                    }
-                    else
-                    {
-                        writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]" + " ----- " + lhs + "[" + Stringlist.GetListWithCommas(m2.storage[m2.storage.Count - 1].storage) + "]");
-                    }
+                    //writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]");
                 }
-                writer.Add("");
-                m1.Add(m2);
-            } //end of foreach sub-equation
+                else
+                {
+                    //writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]" + " ----- " + lhs + "[" + Stringlist.GetListWithCommas(m2.storage[m2.storage.Count - 1].storage) + "]");
+                }
+            }
+            writer.Add("");
+            m1.Add(m2);
 
             return m1;
         }
@@ -3288,7 +3311,7 @@ namespace Gekko
         /// <param name="nDim"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        private static double[] GetProbability(List<VariableDims> equations, int nDim, List<string> writer)
+        private static double[] GetProbability_OLD_DELETE(List<VariableDims> equations, int nDim, List<string> writer)
         {
             int eqCounter = 0;
             double[] pp = new double[nDim];
@@ -3339,6 +3362,60 @@ namespace Gekko
                 pp[i] = pp[i] / eqCounter;
             }
             return pp;
+        }
+
+        private static GekkoDictionary<string, bool>[] GetSpan(List<VariableDims> equation, int nDim, List<string> writer)
+        {
+            int eqCounter = 0;
+            double[] pp = new double[nDim];
+            string[] zz = null;
+
+            GekkoDictionary<string, bool>[] probability = new GekkoDictionary<string, bool>[nDim];
+            for (int i = 0; i < nDim; i++) probability[i] = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (VariableDims temp in equation) //For each scalar equation. This loops through "columns" (variables in an equation), for instance the variables in qK[iB, spTot] = qK[iB, tje] + qK[iB, fre] + qK[iB, byg] + qK[iB, lan] + qK[iB, soe] + qK[iB, bol] + qK[iB, ene] + qK[iB, udv]
+            {
+                eqCounter++;
+                int varCounter = 0;                                
+                
+                double[] p = new double[nDim];
+
+                foreach (Dims dims in temp.storage) //for each variable
+                {
+                    varCounter++;
+                    int c = -1;
+                    if (zz == null) zz = new string[nDim];
+                    foreach (string s7 in dims.storage) //for each variable dimension, for instance "iB", "spTot".
+                    {
+                        c++;
+                        if (!probability[c].ContainsKey(s7)) probability[c].Add(s7, false);
+                        if (zz[c] == null) zz[c] = s7;
+                        else if (zz[c] == "*") continue;
+                        else if (!G.Equal(zz[c], s7)) zz[c] = "*";
+                    }
+                }
+
+                for (int i = 0; i < nDim; i++)
+                {
+                    p[i] = (double)probability[i].Count / (double)varCounter;
+                    pp[i] += p[i];
+                }
+            }
+
+            //for (int i = 0; i < nDim; i++)
+            //{
+            //    G.Writeln("Dim " + i + " probability = " + pp[i]);
+            //}
+
+            //string s = "...none...";
+            //if (zz != null) s = Stringlist.GetListWithCommas(zz);
+            //writer.Add("CHANGE for sub-eqs with " + kv2.Key + " occurrences: [" + s + "]");
+
+            for (int i = 0; i < nDim; i++)
+            {
+                pp[i] = pp[i] / eqCounter;
+            }
+            return probability;
         }
 
         /// <summary>
