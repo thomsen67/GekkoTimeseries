@@ -2549,12 +2549,21 @@ namespace Gekko
                 //Since ib or im do not vary, dim #1 is set as ib or im. For dim #2, first one is spTot and last one is udv. From the name, we choose spTot.
                 //
 
+                bool mayUseDatabank = true;
+                bool spelling = true;
+
                 int nAll = 0;
-                int nFail = 0;
+                int nNoDimOk = 0;
+                int notFound = 0;
+                int nFail = 0;                
 
                 List<string> writer = new List<string>();
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
+
+                GekkoDictionary<string, bool> varsNoIndex = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                List<string> varsNoIndex2 = modelGamsScalar.GetVars(3);
+                foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);               
 
                 GekkoDictionaryBlanks<string> lhs = new GekkoDictionaryBlanks<string>();                
 
@@ -2567,15 +2576,73 @@ namespace Gekko
                     {
                     }
 
+                    if (equationNameWithoutIndexes == "E_vOffPas_FM")
+                    {
+                    }
+
+                    if (equationNameWithoutIndexes == "E_snL")
+                    {
+                    }
+
                     foreach (EquationHelper2 eh in kvp.Value)
                     {
                         nAll++;
                         string equationNameWithIndexes = eh.eqName;
+                        if (equationNameWithoutIndexes.Contains("__")) MessageBox.Show("Hovsa3"); //Not possible
+
+                        string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
+                        if (spelling)
+                        {
+                            //eqNameChunks[i] = eqNameChunks[i].Replace("Born", "Boern");
+                            //eqNameChunks[i] = eqNameChunks[i].Replace("rOffTilVirk", "rOffTilVirk2BNP");
+                            //tSubLoen
+                        }
+
                         string[] eqNameChunks = equationNameWithoutIndexes.Split('_');
-                        string lhsName = eqNameChunks[1]; //[0] is always "e"
+
+                        if (spelling)
+                        {
+                            for (int i = 0; i < eqNameChunks.Length; i++)
+                            {
+                                
+                            }
+                        }
+                        
+                        string lhsName = null;
                         string indexName = null;
-                        if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
-                        VariableDims m1 = SplitUpEquations(lhsName, eh, writer);
+                        for (int i = eqNameChunks.Length - 1; i > 0; i--)
+                        {
+                            string s = null;
+                            for (int j = 1; j <= i; j++)
+                            {
+                                s += eqNameChunks[j] + "_";
+                            }
+                            s = s.Substring(0, s.Length - "_".Length);
+                            if (varsNoIndex.ContainsKey(s))
+                            {
+                                //Good
+                                lhsName = s;
+                                if (i + 1 < eqNameChunks.Length)
+                                {
+                                    indexName= eqNameChunks[i + 1];  //TODO: What about > 1 index names???
+                                }
+                                break;
+                            }
+                        }
+
+                        if (lhsName == null)
+                        {
+                            //MessageBox.Show("Hovsa5"); //Not possible
+                            notFound++;
+                        }
+
+                        if (lhsName != null && lhsName.StartsWith("rPensIndb"))
+                        {
+                        }
+
+                        //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
+                        VariableDims m1 = SplitUpEquations(lhsName, eh, writer);                        
+                        
                         Dims first = null;
                         Dims last = null;
                         if (m1.storage.Count > 0)
@@ -2602,63 +2669,124 @@ namespace Gekko
                         }
 
                         bool success = false;
-                        for (int i = 0; i < nDim; i++)
+
+                        if (nDim == 0)
                         {
-                            if (span[i].Count == 0)
+                            success = true;  //can only be that one, without indexes (shown as x[]).
+                            nNoDimOk++;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < nDim; i++)
                             {
-                                if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa3"); //Not possible
-                            }
-                            else if (span[i].Count == 1)
-                            {
-                                names[i] = span[i].First().Key;  //Same as last
-                                success = true;
-                            }
-                            else
-                            {
-                                //We must select the first or the last                                
-                                string sFirst = first.storage[i];
-                                string sLast = last.storage[i];                                
-
-                                if (indexName != null)
+                                if (span[i].Count == 0)
                                 {
-                                    if (G.Equal(sFirst, indexName))
-                                    {
-                                        names[i] = sFirst;
-                                        success = true;
-                                    }
-                                    else if (G.Equal(sLast, indexName))
-                                    {
-                                        names[i] = sLast;
-                                        success = true;
-                                    }
+                                    if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa3"); //Not possible
                                 }
-
-                                if (!success)
+                                else if (span[i].Count == 1)
                                 {
-                                    if (G.Contains(sFirst, "tot") && !G.Contains(sLast, "tot"))
-                                    {
-                                        names[i] = sFirst;
-                                        success = true;
-                                    }
-                                    else if (!G.Contains(sFirst, "tot") && G.Contains(sLast, "tot"))
-                                    {
-                                        names[i] = sLast;
-                                        success = true;
-                                    }                                    
+                                    names[i] = span[i].First().Key;  //Same as last
+                                    success = true;
                                 }
-
-                                if (!success)
+                                else
                                 {
-                                    string s = equationNameWithoutIndexes;
-                                    string s1 = equationNameWithIndexes;
-                                    string s2 = eh.eqMathRaw;
-                                    string s3 = eh.eqMathScalar;
-                                    names[i] = "<TOT>";  //probably
+                                    //We must select the first or the last                                
+                                    string sFirst = first.storage[i];
+                                    string sLast = last.storage[i];                                    
+
+                                    if (!success && indexName != null)
+                                    {
+                                        if (G.Equal(sFirst, indexName))
+                                        {
+                                            names[i] = sFirst;
+                                            success = true;
+                                        }
+                                        else if (G.Equal(sLast, indexName))
+                                        {
+                                            names[i] = sLast;
+                                            success = true;
+                                        }
+                                    }
+
+                                    if (!success && mayUseDatabank)
+                                    {
+                                        List iv = O.GetIVariableFromString("#" + indexName, O.ECreatePossibilities.NoneReturnNullAlways) as List;
+                                        if (iv != null)
+                                        {
+                                            if (iv.list.Count() == 1)
+                                            {
+                                                ScalarString ss = iv.list[0] as ScalarString;
+                                                if (ss != null)
+                                                {
+                                                    if (G.Equal(sFirst, ss.string2))
+                                                    {
+                                                        names[i] = sFirst;
+                                                        success = true;
+                                                    }
+                                                    else if (G.Equal(sLast, ss.string2))
+                                                    {
+                                                        names[i] = sLast;
+                                                        success = true;
+                                                    }                                                    
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!success)
+                                    {
+                                        if (G.Contains(sFirst, "tot") && !G.Contains(sLast, "tot"))
+                                        {
+                                            names[i] = sFirst;
+                                            success = true;
+                                        }
+                                        else if (!G.Contains(sFirst, "tot") && G.Contains(sLast, "tot"))
+                                        {
+                                            names[i] = sLast;
+                                            success = true;
+                                        }
+                                    }
+
+                                    if (!success)
+                                    {
+                                        //TODO: Use domain 
+                                        //TODO: Use domain 
+                                        //TODO: Use domain to know how dimensions match. Perhaps it can be induced from the scalar eqs rolling out?
+                                        //TODO: Use domain 
+                                        //TODO: Use domain 
+                                        //
+                                        //A bit hacky and not completely accurate as it is.
+                                        foreach (string index in eqIndexes)
+                                        {
+                                            if (G.Equal(sFirst, index))
+                                            {
+                                                names[i] = sFirst;
+                                                success = true;
+                                            }
+                                            else if (G.Equal(sLast, index))
+                                            {
+                                                names[i] = sLast;
+                                                success = true;
+                                            }
+                                        }
+                                    }
+
+                                    if (!success)
+                                    {
+                                        string s = equationNameWithoutIndexes + G.NL;
+                                        s += equationNameWithIndexes + G.NL + G.NL;
+                                        s += eh.eqMathRaw + G.NL + G.NL;
+                                        s += eh.eqMathScalar + G.NL;
+                                        names[i] = "<TOT>";  //probably
+                                    }
                                 }
                             }
                         }
 
-                        if (!success) nFail++;
+                        if (!success)
+                        {
+                            nFail++;
+                        }
 
                         lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
 
@@ -2677,7 +2805,7 @@ namespace Gekko
                         res.WriteLine(s);
                     }
                 }
-                new Writeln("nAll = " + nAll + ", nFail = " + nFail);
+                new Writeln("nAll = " + nAll + ", nFail = " + nFail + " (nNoDimOk = " + nNoDimOk + ", notFound = " + notFound + ")");
             }
 
 
@@ -3322,6 +3450,12 @@ namespace Gekko
                                     m2.storage.Add(m3);
                                 }
                             }
+                        }
+                        else
+                        {
+                            //No dimensions, no lag
+                            Dims m3 = new Dims();
+                            m2.storage.Add(m3);
                         }
                     }
                 }
