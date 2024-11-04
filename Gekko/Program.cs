@@ -2552,59 +2552,71 @@ namespace Gekko
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
 
-                GekkoDictionary<string, string> lhs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);                
+                GekkoDictionaryBlanks<string> lhs = new GekkoDictionaryBlanks<string>();                
 
                 //For each equation name (without indexes)
                 foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
                 {
-                    string lhsName = kvp.Key.Split('_')[1];
+                    string equationNameWithoutIndexes = kvp.Key;                    
 
-                    if (kvp.Key == "E_qK_spTot")
+                    if (equationNameWithoutIndexes == "E_qK_spTot")
                     {
                     }
 
                     foreach (EquationHelper2 eh in kvp.Value)
                     {
+                        string equationNameWithIndexes = eh.eqName;
+                        string[] eqNameChunks = equationNameWithoutIndexes.Split('_');
+                        string lhsName = eqNameChunks[1]; //[0] is always "e"                        
                         List<VariableDims> m1 = SplitUpEquations(lhsName, eh, writer);
+                        VariableDims first = m1.First();
+                        VariableDims last = m1.Last();
                         int nDim = GetDim(m1);
                         GekkoDictionary<string, bool>[] span = GetSpan(m1, nDim, writer);
                         List<string> eqIndexes = G.Chop_GetIndex(eh.eqName);
                         int summedDimensions = nDim - eqIndexes.Count;
                         string[] names = new string[nDim];
-                        if (summedDimensions < 2)
-                        {                            
+                        if (summedDimensions > 1)
+                        {
+                            int sum = 0;
                             for (int i = 0; i < nDim; i++)
                             {
-                                if (span[i].Count == 0)
-                                {
-                                    if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa3");
-                                }
-                                else if (span[i].Count == 1)
-                                {
-                                    names[i] = span[i].First().Key;
-                                }
-                                else 
-                                {
-                                    names[i] = "--TOT--";  //probably
-                                }
+                                if (span[i].Count > 1) sum++;
                             }
-                            lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-
-                            writer.Add(eh.eqName + " ..");
-                            writer.Add(eh.eqMath);
-                            writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-                            writer.Add("");
+                            if (sum > 1)
+                            {
+                                //Probably a double sum, seems only around two of these
+                            }
                         }
-                        else
+
+                        for (int i = 0; i < nDim; i++)
                         {
-                            //TODO TODO TODO
-                            //TODO TODO TODO
-                            //TODO TODO TODO   sum((i, j), x[i, j, k])
-                            //TODO TODO TODO
-                            //TODO TODO TODO
-                            if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa2");
-                        }
+                            if (span[i].Count == 0)
+                            {
+                                if (Globals.runningOnTTComputer) MessageBox.Show("Hovsa3"); //Not possible
+                            }
+                            else if (span[i].Count == 1)
+                            {
+                                names[i] = span[i].First().Key;
+                            }
+                            else
+                            {
+                                var sFirst = first.storage[i];
+                                var sLast = last.storage[i];
+                                //if (G.Equal(sFirst, sLast)) names[i] = sFirst;
+                                //else
+                                //{
 
+                                //}
+                                names[i] = "<TOT>";  //probably
+                            }
+                        }
+                        lhs.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+
+                        writer.Add(eh.eqName + " ..");
+                        writer.Add(eh.eqMath);
+                        writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+                        writer.Add("");
                     }
                 }                            
 
