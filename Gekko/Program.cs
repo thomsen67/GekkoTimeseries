@@ -1780,7 +1780,7 @@ namespace Gekko
         public string eqNameWithLag = null;
         public int eqNumber = -12345;
         public bool best = false;
-        public double score = double.NaN;
+        public double score = 0d;
     }
 
     public class Rich
@@ -2572,6 +2572,16 @@ namespace Gekko
                     string equationNameWithIndexes = eh.eqName;
                     if (equationNameWithoutIndexes.Contains("__")) MessageBox.Show("Hovsa3"); //Not possible
 
+                    if (G.Equal(equationNameWithIndexes, "e_vtmoms[tje,tje]"))
+                    {
+
+                    }
+
+                    if (G.Equal(equationNameWithoutIndexes, "e_vtmoms"))
+                    {
+
+                    }
+
                     string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
                     if (spelling)
                     {
@@ -2615,6 +2625,7 @@ namespace Gekko
                         {
                             notFound++;
                         }
+                        continue;
                     }
 
                     //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
@@ -2788,19 +2799,24 @@ namespace Gekko
 
                     if (success)
                     {
-                        string xx = lhsName + "[" + Stringlist.GetListWithCommas(names) + "]";
+                        if (eh.eqName == null)
+                        {
+                        }
+                        
+                        if (names.Length > 0) lhsName += "[" + Stringlist.GetListWithCommas(names) + "]";
+
                         if (lhs1.ContainsKey(eh.eqName))
                         {
                             nDublets++;  //WHY???
                         }
                         else
                         {
-                            lhs1.Add(eh.eqName, xx);
+                            lhs1.Add(eh.eqName, lhsName);
                         }
-                        List<string> temp = lhs2.Get(xx);
+                        List<string> temp = lhs2.Get(lhsName);
                         if (temp == null)
                         {
-                            lhs2.Add(xx, new List<string>() { eh.eqName });
+                            lhs2.Add(lhsName, new List<string>() { eh.eqName });
                         }
                         else
                         {
@@ -2824,8 +2840,7 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer)
             {
-                G.WritelnGray("TTH: nAll = " + nAll + ", nFail = " + nFail + " (nNoDimOk = " + nNoDimOk + ", notFound = " + notFound + ", notFound2 = " + notFound2 + ", DUBLETS = " + nDublets + ")");
-                G.WritelnGray("TTH: Time: " + G.Seconds(t0));
+                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (nNoDimOk = " + nNoDimOk + ", notFound = " + notFound + ", notFound2 = " + notFound2 + ", DUBLETS = " + nDublets + "). EqDict = " + lhs1.Count() + " NameDict = " + lhs2.Count() + ". Time: " + G.Seconds(t0));
             }            
             modelGamsScalar.lhs = lhs2;
         }
@@ -2837,7 +2852,12 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {           
+        {
+            if (Globals.runningOnTTComputer && (text == "d"))
+            {
+                Program.Lhs(Program.model.modelGamsScalar);
+                return;
+            }
 
             if (Globals.runningOnTTComputer && (text == "d2"))
             {

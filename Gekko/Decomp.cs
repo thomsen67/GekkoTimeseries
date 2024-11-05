@@ -5615,32 +5615,53 @@ namespace Gekko
 
                     List<string> lhsEqs = modelGamsScalar.lhs.Get(variableName);
 
-                    //Setting up chunks for EditDistancd()
-                    List <EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
-                    List<string> chosen = GetChosenVariable(variableName);
-                    List<FuzzyEquation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);                    
-                    SortedDictionary<double, List<FuzzyEquation>> orderLhs = Fuzzy.OrderLhs(false, fuzzyEquations, chosen, false);
-                    GekkoDictionary<string, double> dict = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-                    foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in orderLhs)
-                    {
-                        foreach (FuzzyEquation s2 in kvp.Value)
-                        {
-                            string[] ss1 = s2.eqContents.Split(new string[] { ".." }, StringSplitOptions.None);
-                            string[] ss2 = ss1[0].Split(new string[] { "[" }, StringSplitOptions.None);
-                            dict.Add(ss2[0].Trim(), kvp.Key);
-                        }
-                    }
-
-                    foreach (EqInfoSimple eqHelper in eqsNew)
+                    List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
+                    foreach (EqInfoSimple eqHelper in eqsNew2)
                     {
                         double d = double.MaxValue;
                         string[] ss = eqHelper.eqName.Split('[');
                         string eqNameWithoutIndex = ss[0];
-                        dict.TryGetValue(eqNameWithoutIndex, out d);  //What about .eqNameLag????
-                        eqHelper.score = d;
+                        string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
+                        bool hit = false;
+                        foreach (string s in lhsEqs)
+                        {
+                            if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit = true; break; }
+                        }
+                        if (hit)
+                        {
+                            eqHelper.score += 100;
+                        }
                     }
 
-                    eqsNew = eqsNew.OrderBy(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    if (false)
+                    {
+                        //Setting up chunks for EditDistancd()
+                        //List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
+                        List<string> chosen = GetChosenVariable(variableName);
+                        List<FuzzyEquation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);
+                        SortedDictionary<double, List<FuzzyEquation>> orderLhs = Fuzzy.OrderLhs(false, fuzzyEquations, chosen, false);
+                        GekkoDictionary<string, double> dict = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                        foreach (KeyValuePair<double, List<FuzzyEquation>> kvp in orderLhs)
+                        {
+                            foreach (FuzzyEquation s2 in kvp.Value)
+                            {
+                                string[] ss1 = s2.eqContents.Split(new string[] { ".." }, StringSplitOptions.None);
+                                string[] ss2 = ss1[0].Split(new string[] { "[" }, StringSplitOptions.None);
+                                dict.Add(ss2[0].Trim(), kvp.Key);
+                            }
+                        }
+
+                        foreach (EqInfoSimple eqHelper in eqsNew2)
+                        {
+                            double d = double.MaxValue;
+                            string[] ss = eqHelper.eqName.Split('[');
+                            string eqNameWithoutIndex = ss[0];
+                            dict.TryGetValue(eqNameWithoutIndex, out d);  //What about .eqNameLag????
+                            eqHelper.score = d;
+                        }
+                    }
+
+                    List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
                     //This seems to just gather material for the GUI representation
                     double lastScore = double.MinValue;
@@ -5663,7 +5684,7 @@ namespace Gekko
                         if (eqHelper.score % 1 == 0) bool1 = Globals.protectSymbol;
                         string dep = "";  //dep
                         dep = scoreCounter.ToString();
-                        if (Globals.runningOnTTComputer) dep += " TTH: " + Math.Round(eqHelper.score, 1).ToString();
+                        if (Globals.runningOnTTComputer) dep += " " + Math.Round(eqHelper.score, 1).ToString();
                         string tt = "tx0";
                         int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
                         string textColor = "Black";

@@ -26,12 +26,14 @@ namespace Gekko
     public struct GamsWalkerInfo  //A struct is easier so that one child node does not affect its parent node
     {
         [ProtoMember(1)]
-        public bool isInsideSum = false;
+        public bool isInsideSum;
         [ProtoMember(2)]
-        public bool isInsideDollar = false;        
-        public GamsWalkerInfo()
-        {            
-        }
+        public bool isInsideDollar;        
+        //public GamsWalkerInfo(bool isInsideSum, bool isInsideDollar)
+        //{            
+        //    this.isInsideSum = isInsideSum;
+        //    this.isInsideDollar = isInsideDollar;
+        //}
     }
 
     public class ExtractTimeDimensionHelper
@@ -965,8 +967,8 @@ namespace Gekko
 
             dt1 = DateTime.Now;
 
-            ModelGamsScalar modelGamsScalar = new ModelGamsScalar(model);
-                        
+            ModelGamsScalar modelGamsScalar = new ModelGamsScalar(model);            
+
             // -------------- these can evaluate an equation --------
             modelGamsScalar.functions = functions;
             modelGamsScalar.a = a;
@@ -1018,8 +1020,7 @@ namespace Gekko
             modelGamsScalar.isTimeless = helper.isTimeless;  //the a-vars that are timeless
             
             CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
-
-            Program.Lhs(modelGamsScalar);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -1035,9 +1036,9 @@ namespace Gekko
                     }
                     new Writeln(s7);
                 }
-            }
+            }            
 
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
+            //Program.Lhs(modelGamsScalar);  //Finding out which variables are dependent, from eq naming conventions.
 
             if (Globals.runningOnTTComputer)
             {
