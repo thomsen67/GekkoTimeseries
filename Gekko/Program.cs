@@ -2563,15 +2563,13 @@ namespace Gekko
             bool spelling = true;
             bool shouldWrite = false;
 
-            int nAll = 0;
-            int nNoDimOk = 0;
-            int notFound = 0;  //at all
-            int notFound2 = 0; //in eq
+            int nAll = 0;            
+            int notFoundInModel = 0;  //at all
+            int notFoundInEq = 0; //in eq
             int nFail = 0;
-            int nDublets = 0;
+            //int nDublets = 0;
 
             List<string> writer = new List<string>();
-            //ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
 
             GekkoDictionary<string, bool> varsNoIndex = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -2586,6 +2584,7 @@ namespace Gekko
             {
                 string equationNameWithoutIndexes = kvp.Key;
 
+                //For each scalar equation
                 foreach (EquationHelper2 eh in kvp.Value)
                 {
                     nAll++;
@@ -2643,9 +2642,9 @@ namespace Gekko
                         }
                         else
                         {
-                            notFound++;
+                            notFoundInModel++;
                         }
-                        continue;
+                        continue; //Variable does not exist at all
                     }
 
                     //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
@@ -2659,8 +2658,9 @@ namespace Gekko
                         }
                         else
                         {
-                            notFound2++;
+                            notFoundInEq++;
                         }
+                        continue;  //Variable exists, but is not found in equation in any form
                     }
 
                     Dims first = null;
@@ -2692,11 +2692,11 @@ namespace Gekko
 
                     if (nDim == 0)
                     {
-                        success = true;  //can only be that one, without indexes (shown as x[]).
-                        nNoDimOk++;
+                        success = true;  //can only be that one, without indexes (shown as x[]).                        
                     }
                     else
                     {
+                        bool[] successDim = new bool[nDim];
                         for (int i = 0; i < nDim; i++)
                         {
                             if (span[i].Count == 0)
@@ -2706,7 +2706,7 @@ namespace Gekko
                             else if (span[i].Count == 1)
                             {
                                 names[i] = span[i].First().Key;  //Same as last
-                                success = true;
+                                successDim[i] = true;
                             }
                             else
                             {
@@ -2714,21 +2714,21 @@ namespace Gekko
                                 string sFirst = first.storage[i];
                                 string sLast = last.storage[i];
 
-                                if (!success && indexName != null)
+                                if (!successDim[i] && indexName != null)
                                 {
                                     if (G.Equal(sFirst, indexName))
                                     {
                                         names[i] = sFirst;
-                                        success = true;
+                                        successDim[i] = true;
                                     }
                                     else if (G.Equal(sLast, indexName))
                                     {
                                         names[i] = sLast;
-                                        success = true;
+                                        successDim[i] = true;
                                     }
                                 }
 
-                                if (!success && mayUseDatabank)
+                                if (!successDim[i] && mayUseDatabank)
                                 {
                                     List iv = O.GetIVariableFromString("#" + indexName, O.ECreatePossibilities.NoneReturnNullAlways) as List;
                                     if (iv != null)
@@ -2741,33 +2741,33 @@ namespace Gekko
                                                 if (G.Equal(sFirst, ss.string2))
                                                 {
                                                     names[i] = sFirst;
-                                                    success = true;
+                                                    successDim[i] = true;
                                                 }
                                                 else if (G.Equal(sLast, ss.string2))
                                                 {
                                                     names[i] = sLast;
-                                                    success = true;
+                                                    successDim[i] = true;
                                                 }
                                             }
                                         }
                                     }
                                 }
 
-                                if (!success)
+                                if (!successDim[i])
                                 {
                                     if (G.Contains(sFirst, "tot") && !G.Contains(sLast, "tot"))
                                     {
                                         names[i] = sFirst;
-                                        success = true;
+                                        successDim[i] = true;
                                     }
                                     else if (!G.Contains(sFirst, "tot") && G.Contains(sLast, "tot"))
                                     {
                                         names[i] = sLast;
-                                        success = true;
+                                        successDim[i] = true;
                                     }
                                 }
 
-                                if (!success)
+                                if (!successDim[i])
                                 {
                                     //TODO: Use domain 
                                     //TODO: Use domain 
@@ -2781,12 +2781,12 @@ namespace Gekko
                                         if (G.Equal(sFirst, index))
                                         {
                                             names[i] = sFirst;
-                                            success = true;
+                                            successDim[i] = true;
                                         }
                                         else if (G.Equal(sLast, index))
                                         {
                                             names[i] = sLast;
-                                            success = true;
+                                            successDim[i] = true;
                                         }
                                     }
                                 }
@@ -2801,7 +2801,13 @@ namespace Gekko
                                 }
                             }
                         }
-                    }
+
+                        success = true;
+                        foreach (bool b in successDim)
+                        {
+                            if (!b) success = false;  //all must be true
+                        }
+                    }                 
 
                     if (m1.storage.Count == 0)
                     {
@@ -2827,7 +2833,7 @@ namespace Gekko
 
                         if (lhs1.ContainsKey(eh.eqName))
                         {
-                            nDublets++;  //WHY???
+                            MessageBox.Show("Hovsa6"); //Not possible?
                         }
                         else
                         {
@@ -2860,7 +2866,7 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (nNoDimOk = " + nNoDimOk + ", notFound = " + notFound + ", notFound2 = " + notFound2 + ", DUBLETS = " + nDublets + "). EqDict = " + lhs1.Count() + " NameDict = " + lhs2.Count() + ". Time: " + G.Seconds(t0));
+                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhs1.Count() + " NameDict = " + lhs2.Count() + ". Time: " + G.Seconds(t0));
             }            
             modelGamsScalar.lhs = lhs2;
         }
@@ -2881,15 +2887,16 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer && (text == "d2"))
             {
+
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                List<string> vars = modelGamsScalar.GetVars(2);
+                List<string> eqs = modelGamsScalar.GetEqs(2);
                 List<string> relevant = new List<string>();
                 GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                 int n = 0;
                 int nfix = 0;
 
                 GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" }) 
+                foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" })
                 {
                     d.Add(s, false);
                 }
@@ -2904,53 +2911,79 @@ namespace Gekko
                 foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
                 {
                     ovf.Add(s, false);
-                }                
+                }               
 
-                foreach (string varNameWithIndexes in vars)
-                {
-                    n++;
-                    List<GekkoTime> fixVars = modelGamsScalar.GetFixedPeriods(varNameWithIndexes);
-                    if (fixVars.Contains(new GekkoTime(EFreq.A, 2030, 1)))
-                    {
-                        nfix++;
-                    }
-                    else
-                    {
-                        relevant.Add(varNameWithIndexes);
-                        string dbName, varName, freq; string[] indexes;
-                        O.Chop(varNameWithIndexes, out dbName, out varName, out freq, out indexes);
 
-                        if (indexes != null)
-                        {
-                            for (int pos = 0; pos < indexes.Length; pos++)
-                            {
-                                int i;
-                                if (int.TryParse(indexes[pos], out i))
-                                {
-                                    if (i >= 0 && i <= 120)
-                                    {
-                                        indexes[pos] = "40";
-                                    }
-                                }
-                                else
-                                {
-                                    if (d.ContainsKey(indexes[pos])) indexes[pos] = "tje";
-                                    else if (portf.ContainsKey(indexes[pos])) indexes[pos] = "Obl";
-                                    else if (ovf.ContainsKey(indexes[pos])) indexes[pos] = "orlov";
-                                }
-                            }
-                        }
-                        string varNameWithIndexes2 = O.UnChop(dbName, varName, freq, indexes);
-                        if (indexes != null && !relevant2.ContainsKey(varNameWithIndexes2)) relevant2.Add(varNameWithIndexes2, false);
-                    }
-                }
-                List<string> important = relevant2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                foreach (string s in important)
-                {
-                    G.Writeln(s);
-                }
-                new Writeln("n = " + n + " nfix = " + nfix + " ratio = " + (double)nfix / (double)n + "   " + relevant2.Count);
-                return;
+                //ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                //List<string> vars = modelGamsScalar.GetVars(2);
+                //List<string> relevant = new List<string>();
+                //GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                //int n = 0;
+                //int nfix = 0;
+
+                //GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                //foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" }) 
+                //{
+                //    d.Add(s, false);
+                //}
+
+                //GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                //foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
+                //{
+                //    portf.Add(s, false);
+                //}
+
+                //GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                //foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
+                //{
+                //    ovf.Add(s, false);
+                //}                
+
+                //foreach (string varNameWithIndexes in vars)
+                //{
+                //    n++;
+                //    List<GekkoTime> fixVars = modelGamsScalar.GetFixedPeriods(varNameWithIndexes);
+                //    if (fixVars.Contains(new GekkoTime(EFreq.A, 2030, 1)))
+                //    {
+                //        nfix++;
+                //    }
+                //    else
+                //    {
+                //        relevant.Add(varNameWithIndexes);
+                //        string dbName, varName, freq; string[] indexes;
+                //        O.Chop(varNameWithIndexes, out dbName, out varName, out freq, out indexes);
+
+                //        if (indexes != null)
+                //        {
+                //            for (int pos = 0; pos < indexes.Length; pos++)
+                //            {
+                //                int i;
+                //                if (int.TryParse(indexes[pos], out i))
+                //                {
+                //                    if (i >= 0 && i <= 120)
+                //                    {
+                //                        indexes[pos] = "40";
+                //                    }
+                //                }
+                //                else
+                //                {
+                //                    if (d.ContainsKey(indexes[pos])) indexes[pos] = "tje";
+                //                    else if (portf.ContainsKey(indexes[pos])) indexes[pos] = "Obl";
+                //                    else if (ovf.ContainsKey(indexes[pos])) indexes[pos] = "orlov";
+                //                }
+                //            }
+                //        }
+                //        string varNameWithIndexes2 = O.UnChop(dbName, varName, freq, indexes);
+                //        if (indexes != null && !relevant2.ContainsKey(varNameWithIndexes2)) relevant2.Add(varNameWithIndexes2, false);
+                //    }
+                //}
+                //List<string> important = relevant2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                //foreach (string s in important)
+                //{
+                //    G.Writeln(s);
+                //}
+                //new Writeln("n = " + n + " nfix = " + nfix + " ratio = " + (double)nfix / (double)n + "   " + relevant2.Count);
+                //return;
             }
 
             if (Globals.runningOnTTComputer && (text == "d3"))
