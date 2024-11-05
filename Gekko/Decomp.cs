@@ -5553,6 +5553,7 @@ namespace Gekko
                         new Error("FIND is only implemented for scalar models");
                         return;
                     }
+                    ModelGams modelGams = model.modelGams;
 
                     modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, false);
 
@@ -5622,19 +5623,26 @@ namespace Gekko
                         string[] ss = eqHelper.eqName.Split('[');
                         string eqNameWithoutIndex = ss[0];
                         string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
-                        bool hit = false;
+                        bool hit1 = false;
                         foreach (string s in lhsEqs)
                         {
-                            if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit = true; break; }
+                            if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
                         }
-                        if (hit)
+                        if (hit1) eqHelper.score += 100;                        
+
+
+                        List<string> lhsVars = Program.LhsVars(eqNameWithoutIndex, modelGams);
+                        bool hit2 = false;
+                        foreach (string s in lhsVars)
                         {
-                            eqHelper.score += 100;
+                            if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
                         }
+                        if (hit2) eqHelper.score += 0.5;
                     }
 
                     if (false)
-                    {
+                    {                       
+                        
                         //Setting up chunks for EditDistancd()
                         //List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
                         List<string> chosen = GetChosenVariable(variableName);

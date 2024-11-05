@@ -1780,7 +1780,7 @@ namespace Gekko
         public string eqNameWithLag = null;
         public int eqNumber = -12345;
         public bool best = false;
-        public double score = 0d;
+        public double score = 0.5d;  //rhs
     }
 
     public class Rich
@@ -2518,6 +2518,26 @@ namespace Gekko
             return stackTrace;
         }
 
+        public static List<string> LhsVars(string eqName, ModelGams modelGams)
+        {
+            List<string> rv = new List<string>();
+            if (modelGams == null) return rv;
+
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
+            {
+                if (!G.EqualHandleBlanks(eqName, kvp.Key)) continue;
+                foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
+                {
+                    foreach (string s in equation.lhsVars)
+                    {
+                        rv.Add(s.Split('(')[0]);  //Indexes here look like x(i, j), not x[i, j].
+                    }
+                    //rv.AddRange(equation.lhsVars);
+                }
+            }
+
+            return rv;
+        }
         public static void Lhs(ModelGamsScalar modelGamsScalar)
         {
 
