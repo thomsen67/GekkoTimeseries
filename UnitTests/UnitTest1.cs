@@ -16802,10 +16802,8 @@ namespace UnitTests
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("read makro_20241011;");
-            I("model <gms> makro_20241011.zip;");
-            Program.Lhs(Program.model.modelGamsScalar);
-            GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;
-            GekkoDictionaryBlanks<List<string>> lhsNames2 = Program.model.modelGamsScalar.lhsNames;
+            I("model <gms> makro_20241011.zip;");            
+            GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
 
             GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
             Assert.AreEqual(19088, lhsEquations1.Count());

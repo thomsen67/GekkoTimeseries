@@ -1036,9 +1036,7 @@ namespace Gekko
                     }
                     new Writeln(s7);
                 }
-            }            
-
-            //Program.Lhs(modelGamsScalar);  //Finding out which variables are dependent, from eq naming conventions.
+            }                        
 
             if (Globals.runningOnTTComputer)
             {

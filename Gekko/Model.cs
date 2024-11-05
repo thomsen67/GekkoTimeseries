@@ -979,12 +979,9 @@ namespace Gekko
         public int fakeEqCounts = -12345;
 
         [ProtoMember(31)]
-        public int fakeVarCounts = -12345;
+        public int fakeVarCounts = -12345;        
 
         [ProtoMember(33)]
-        public GekkoDictionaryBlanks<List<string>> lhsNames = new GekkoDictionaryBlanks<List<string>>();
-
-        [ProtoMember(34)]
         public GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
 
         // =============================================
@@ -1234,6 +1231,25 @@ namespace Gekko
             {
                 G.SetNaN(this.r_ref);
             }
+        }
+
+        /// <summary>
+        /// For a variable (possibly with indexes excluding time), it returns equation names (possibly with indexes) where
+        /// the variable is considered LHS.
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <returns></returns>
+        public List<string> GetLhsEquations(string variableName)
+        {
+            List<string> lhsEqs = new List<string>();
+            foreach (KeyValuePair<string, string> kvp in this.lhsEquations.GetDictionaryForIteration())
+            {
+                if (G.EqualHandleBlanks(kvp.Value, variableName))
+                {
+                    lhsEqs.Add(kvp.Key);
+                }
+            }
+            return lhsEqs;
         }
 
 

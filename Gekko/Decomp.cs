@@ -5608,13 +5608,13 @@ namespace Gekko
                             }
                         }
                         foreach (string eqName in eqNames2)
-                        {                            
+                        {
                             EqInfoSimple e = new EqInfoSimple();
                             e.eqName = eqName;
                         }
                     }
 
-                    List<string> lhsEqs = modelGamsScalar.lhsNames.Get(variableName);
+                    List<string> lhsEqs = modelGamsScalar.GetLhsEquations(variableName);
 
                     List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
                     foreach (EqInfoSimple eqHelper in eqsNew2)
@@ -5628,7 +5628,7 @@ namespace Gekko
                         {
                             if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
                         }
-                        if (hit1) eqHelper.score += 100;                        
+                        if (hit1) eqHelper.score += 100;
 
 
                         List<string> lhsVars = Program.LhsVars(eqNameWithoutIndex, modelGams);
@@ -5638,7 +5638,7 @@ namespace Gekko
                             if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
                         }
                         if (hit2) eqHelper.score += 0.5;
-                    }                    
+                    }
 
                     List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 

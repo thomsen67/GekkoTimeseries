@@ -2562,7 +2562,7 @@ namespace Gekko
             bool mayUseDatabank = true;
             bool spelling = true;
             bool shouldWrite = true;
-            bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!!
+            bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!! Perhaps even take copies of the two files before overwriting.
 
             int nAll = 0;            
             int notFoundInModel = 0;  //at all
@@ -2825,16 +2825,7 @@ namespace Gekko
                         else
                         {
                             lhsEquations.Add(eh.eqName, lhsName);
-                        }
-                        List<string> temp = lhsNames.Get(lhsName);
-                        if (temp == null)
-                        {
-                            lhsNames.Add(lhsName, new List<string>() { eh.eqName });
-                        }
-                        else
-                        {
-                            temp.Add(eh.eqName);
-                        }
+                        }                        
                     }
                     else
                     {
@@ -2856,7 +2847,7 @@ namespace Gekko
             {
                 new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhsEquations.Count() + " NameDict = " + lhsNames.Count() + ". Time: " + G.Seconds(t0));
             }            
-            modelGamsScalar.lhsNames = lhsNames;
+            
             modelGamsScalar.lhsEquations = lhsEquations;
             if (createProtobufferFileForUnitTests)
             {
@@ -2888,8 +2879,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer && (text == "d"))
-            {
-                Program.Lhs(Program.model.modelGamsScalar);
+            {                
                 return;
             }
 
@@ -19397,13 +19387,15 @@ namespace Gekko
                     if (false) GamsModel.GAMSParser();
                     if (false) GamsModel.GamsGMO();
                     Program.model = model;
+                    Program.Lhs(Program.model.modelGamsScalar);  //Finding out which variables are dependent, from eq naming conventions.
                 }
                 else new Error("No model defined");
 
                 model.modelCommon.cacheParameters = cacheParameters; //a cache hit must also match this object
 
-                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                try 
                 {
+                    //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                     DateTime dt1 = DateTime.Now;
                     if (model.modelGamsScalar != null) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
                     //TODO what about last argument ms?                    
