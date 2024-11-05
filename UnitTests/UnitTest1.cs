@@ -13516,13 +13516,13 @@ namespace UnitTests
 
                 I("decomp <2002 2002> y;");
                 Thread.Sleep(1000);  //seems it otherwise may progress too fast 
-                Assert.AreEqual(Globals.itemHandler.Items[0].Name, "e1");
-                Assert.AreEqual(Globals.itemHandler.Items[0].Dep, Globals.protectSymbol);
+                Assert.AreEqual(Globals.itemHandler.Items[0].EquationName, "e1");
+                Assert.AreEqual(Globals.itemHandler.Items[0].Name, Globals.protectSymbol);
                 Assert.AreEqual(Globals.itemHandler.Items[0].Vars, "y, c, g");
-                Assert.AreEqual(Globals.itemHandler.Items[1].Name, "e2");
+                Assert.AreEqual(Globals.itemHandler.Items[1].EquationName, "e2");
                 Assert.AreEqual(Globals.itemHandler.Items[1].Lhs, "");
                 Assert.AreEqual(Globals.itemHandler.Items[1].Vars, "y[-1], y, y[+1], c");
-                Assert.AreEqual(Globals.itemHandler.Items[2].Name, "e2[-1]");
+                Assert.AreEqual(Globals.itemHandler.Items[2].EquationName, "e2[-1]");
                 Assert.AreEqual(Globals.itemHandler.Items[2].Lhs, "");
                 Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");
 
@@ -13840,7 +13840,7 @@ namespace UnitTests
                         I("decomp vtBund;");
                         List<EquationListItem> items = Globals.itemHandler.Items;
                         EquationListItem item0 = items[0];
-                        Assert.AreEqual(items[0].Dep, Globals.protectSymbol);
+                        Assert.AreEqual(items[0].Name, Globals.protectSymbol);
                     }
 
                     Gekko.Table table = null;

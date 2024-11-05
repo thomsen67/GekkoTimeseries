@@ -5688,11 +5688,12 @@ namespace Gekko
                         EquationTextHelper helper2 = new EquationTextHelper();
                         helper2.showTime = o.decompFind.decompOptions2.showTime;
                         List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, o.tSelected);
-                        string bool1 = "";  //lhs                        
-                        if (eqHelper.score % 1 == 0) bool1 = Globals.protectSymbol;
-                        string dep = "";  //dep
-                        dep = scoreCounter.ToString();
-                        if (Globals.runningOnTTComputer) dep += " " + Math.Round(eqHelper.score, 1).ToString();
+                        string boolLhs = "";  //lhs                        
+                        if (eqHelper.score % 1 == 0) boolLhs = Globals.protectSymbol;
+                        string boolName = "";  //name
+                        boolName = "";
+                        if (eqHelper.score >= 100d) boolName = Globals.protectSymbol;
+                        //if (Globals.runningOnTTComputer) boolName += " : " + eqHelper.score.ToString();
                         string tt = "tx0";
                         int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
                         string textColor = "Black";
@@ -5705,7 +5706,7 @@ namespace Gekko
                         }
                         //This is where the contents of each GUI line is set
                         //Hack that it is a global variable...
-                        Globals.itemHandler.Add(new EquationListItem(eqName3, " ", dep, bool1, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
+                        Globals.itemHandler.Add(new EquationListItem(eqName3, " ", boolName, boolLhs, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
                     }
 
                     string firstEqName2 = eqsNew[0].eqName;

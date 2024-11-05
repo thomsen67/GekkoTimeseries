@@ -58,21 +58,22 @@
             <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView" SelectionChanged="OnEquationListSelectLine" PreviewMouseLeftButtonDown="OnEquationListLeftButtonDown" >
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="150" DisplayMemberBinding="{Binding Name}">
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="150" DisplayMemberBinding="{Binding EquationName}">
                             <GridViewColumn.Header>
                                 <TextBlock Text="Name     " ToolTip="Equation name, possibly with dimensions"/>
                             </GridViewColumn.Header>
-                        </GridViewColumn>                        
+                        </GridViewColumn>
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="40" DisplayMemberBinding="{Binding Name}" >
+                            <GridViewColumn.Header>
+                                <TextBlock Text="Name   " ToolTip="Shows checkmark if the variable name fits with the equation name (including dimensions)"/>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="40" DisplayMemberBinding="{Binding Lhs}" >
                             <GridViewColumn.Header>
-                                <TextBlock Text="Lhs   " ToolTip="Shows checkmark if the variable is on the left-hand side of the equation"/>
+                                <TextBlock Text="Lhs   " ToolTip="Shows checkmark if the variable name (regardless of dimensions) appears on the left-hand side of the equation"/>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="40" DisplayMemberBinding="{Binding Dep}" >
-                            <GridViewColumn.Header>
-                                <TextBlock Text="Dep   " ToolTip="Confidence regarding whether the variable is the dependent variable.&#x0a;The confidence levels are 1, 2, 3, and so on, where 1 is the best."/>
-                            </GridViewColumn.Header>
-                        </GridViewColumn>
+                        
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="570" DisplayMemberBinding="{Binding Vars}" >
                             <GridViewColumn.Header>
                                 <TextBlock Text="Vars         " ToolTip="List of variables that are part of the equation"/>

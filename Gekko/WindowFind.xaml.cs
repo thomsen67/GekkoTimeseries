@@ -466,12 +466,12 @@ namespace Gekko
 
     public class EquationListItem
     {
-        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, string textColor, bool isSelected, string fullName2)
+        public EquationListItem(string eqName, string sub, string boolName, string boolLhs, string per, string vars, string lineColor, string textColor, bool isSelected, string fullName2)
         {
-            Name = name;
+            EquationName = eqName;
             Sub = sub; //empty
-            Dep = dep; //score
-            Lhs = lhs; //"<flueben>"
+            Name = boolName; //score
+            Lhs = boolLhs; //"<flueben>"
             Per = per; //"tx0"
             Vars = vars; //"nPop[0], nPop[1], ..."
             LineColor = lineColor; //"Black"
@@ -480,11 +480,11 @@ namespace Gekko
             fullName = fullName2; //"E_ftAktie[2025]"
         }
 
-        public string Name { get; set; }
+        public string EquationName { get; set; }
 
         public string Sub { get; set; }
 
-        public string Dep { get; set; }
+        public string Name { get; set; }
 
         public string Lhs { get; set; }
 
