@@ -5614,7 +5614,7 @@ namespace Gekko
                         }
                     }
 
-                    List<string> lhsEqs = modelGamsScalar.lhs.Get(variableName);
+                    List<string> lhsEqs = modelGamsScalar.lhsNames.Get(variableName);
 
                     List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
                     foreach (EqInfoSimple eqHelper in eqsNew2)

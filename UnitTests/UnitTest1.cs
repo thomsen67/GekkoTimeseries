@@ -8522,7 +8522,7 @@ namespace UnitTests
             //   "x[i,j] versus x[i, j]
             //
             //
-            
+
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("read scramble;");  //MAKROBK, scrambled data
@@ -8640,7 +8640,7 @@ namespace UnitTests
                 }
                 else Assert.Fail();
 
-                double msMin = double.MaxValue;         
+                double msMin = double.MaxValue;
                 for (int j = 0; j < 5; j++)
                 {
                     DateTime t0 = DateTime.UtcNow;
@@ -8651,7 +8651,7 @@ namespace UnitTests
 
                 new Writeln("Code " + i + ": " + code);
                 new Writeln("--> Time = " + msMin / 1000d + ", speed = " + n2 / msMin * 1000d);
-                
+
                 double cps = n2 / msMin * 1000d;
                 double p = 15d;  //+-15%, also speedups will fail, and in that case the target can be adjusted.
 
@@ -8661,31 +8661,31 @@ namespace UnitTests
                     Helper_Speed(cps, target, p);
                 }
                 else if (i == 2)
-                {                    
+                {
                     double target = 31000;
                     Helper_Speed(cps, target, p);
                 }
                 else if (i == 3)
-                {                    
+                {
                     double target = 31000;
                     Helper_Speed(cps, target, p);
                 }
                 else if (i == 4)
-                {                    
+                {
                     double target = 42000;
                     Helper_Speed(cps, target, p);
                 }
                 else if (i == 5)
-                {                    
+                {
                     double target = 91000;
                     Helper_Speed(cps, target, p);
                 }
                 else if (i == 6)
-                {                    
+                {
                     double target = 69000;
                     Helper_Speed(cps, target, p);
                 }
-                else Assert.Fail();               
+                else Assert.Fail();
             }
         }
 
@@ -9078,9 +9078,9 @@ namespace UnitTests
 
             I("reset; option freq a; time 2000 2010;");
             I("#m = (1, 2, 3, 4 rep 2, 5 rep *);");  //rep * is just ignored for non-series calculations
-            _AssertListSize(First(), "#m", 6);            
+            _AssertListSize(First(), "#m", 6);
 
-            void Test1() 
+            void Test1()
             {
                 _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
                 _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 1d, sharedDelta);
@@ -9152,7 +9152,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_AREMOS_ras()
-        {            
+        {
             Databank work = First();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\AREMOS\Ras';");
@@ -9642,9 +9642,9 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "a", "b" }, 2007, 4d, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a", "b" }, 2008, double.NaN, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a", "b" }, 2009, double.NaN, sharedDelta);
-            
+
             // --------------------
-            
+
             I("reset;");
             I("x = series(2);");
             I("x[a, b] <2003 2009> = 1, 1, 2, 3, 4, 5, 5;");
@@ -10784,7 +10784,7 @@ namespace UnitTests
             _AssertScalarVal(First(), "%am", 0d);
 
             I("reset; time 2001 2003;");
-            I("create x;");            
+            I("create x;");
             I("%am = x.allMiss();");
             _AssertScalarVal(First(), "%am", 1d);
 
@@ -10798,7 +10798,7 @@ namespace UnitTests
             I("reset; time 2001 2003;");
             I("x = timeless(1);");
             I("%am = x.allMiss();");
-            _AssertScalarVal(First(), "%am", 0d);            
+            _AssertScalarVal(First(), "%am", 0d);
 
             // ================
 
@@ -10811,7 +10811,7 @@ namespace UnitTests
             I("x[a] = m();");
             I("x[a] <2002 2002> = 1;");
             I("%am = x[a].allMiss();");
-            _AssertScalarVal(First(), "%am", 0d);            
+            _AssertScalarVal(First(), "%am", 0d);
         }
 
         [TestMethod]
@@ -10836,7 +10836,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Invalid_Period()
-        {            
+        {
             I("reset;");
             FAIL("time 2003 2001;");
             I("time 2001 2003;");
@@ -10859,7 +10859,7 @@ namespace UnitTests
 
             I("reset;");
             I("option freq q;");
-            I("option databank trace = yes;");            
+            I("option databank trace = yes;");
             I("time 2001q1 2003q4;");
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
             I("%qslut = 2004q1;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
@@ -10870,16 +10870,16 @@ namespace UnitTests
 
             I("reset;");
             I("option freq q;");
-            I("option databank trace = yes;");            
+            I("option databank trace = yes;");
             I("time 2001q1 2003q4;");
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
             I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
             //Below will be 2004q1 to 2003q4 which is invalid
             FAIL("series <work:iy!q.fromSeries('dataEnd')+1 %qslut dyn> work:iy = work:iy.1;");
-            
+
             I("reset;");
             I("option freq q;");
-            I("option databank trace = no;");            
+            I("option databank trace = no;");
             I("time 2001q1 2003q4;");
             I("iy!q = 1,2,3,4, 11,12,13,14, 21,22,23,24;");
             I("%qslut = 2003q4;");  //failer hvis 2003q4. Men kan godt hvis samtidigt trace = no
@@ -10904,11 +10904,11 @@ namespace UnitTests
         {
             G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
-            I("reset;");            
+            I("reset;");
             I("#m = ((1, 2), (3, 4));");
             I("sheet #m file = list.xlsx;");  //TTH 23/5 2024: har nok aldrig virket, og måske har der ligget en list.xlsx-fil. Pt. giver kommandoen bare et skærmprint. Bør fikses.
             I("reset;");
-            I("sheet <import list> #m file = list.xlsx;");            
+            I("sheet <import list> #m file = list.xlsx;");
             List m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
             Assert.AreEqual(m.list.Count, 2);
             List m1 = m.list[0] as List;
@@ -10933,7 +10933,7 @@ namespace UnitTests
 
             try
             {
-                                
+
                 I("reset;");
                 G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
@@ -11019,7 +11019,7 @@ namespace UnitTests
                 FAIL("write '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig';");
                 I("read '" + Globals.ttPath2 + @"\regres\Databanks\sletmig777';");
                 I("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\sletmig777';");
-                I("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig777';");                
+                I("read '" + Globals.ttPath2 + @"\regres\Databanks\temp\temp2\sletmig777';");
 
                 // ==== WHITE READ
 
@@ -11077,7 +11077,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_GekkoVersion()
-        {                        
+        {
             //Just a sanity check
             I("gekko version >= '" + Globals.gekkoVersion + "';");
             I("gekko version == '" + Globals.gekkoVersion + "';");
@@ -12323,7 +12323,7 @@ namespace UnitTests
             I("#j1 = x1.getdomains();");
             _AssertListString(First(), "#i1", 1, "#a1");
             _AssertListString(First(), "#j1", 1, "#a1");
-        }        
+        }
 
         [TestMethod]
         public void _Test_Decomp_Frm_Lags()
@@ -12618,7 +12618,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_IsWord()
-        {                       
+        {
             Assert.IsTrue(G.Match("abcde", new List<string>() { "abcde" }));
             Assert.IsTrue(G.Match("abcde", new List<string>() { "xyz", "cd", "abcde" }));
             Assert.IsTrue(G.Match(",abcde,", new List<string>() { "abcde" }));
@@ -12635,12 +12635,12 @@ namespace UnitTests
             Assert.IsTrue(G.Match("abcd\\", new List<string>() { "abcd" }));
             Assert.IsTrue(G.Match("\\bcde", new List<string>() { "bcde" }));
             Assert.IsTrue(G.Match("abcd,", new List<string>() { "abcd" }));
-            Assert.IsTrue(G.Match(",bcde", new List<string>() { "bcde" }));            
+            Assert.IsTrue(G.Match(",bcde", new List<string>() { "bcde" }));
         }
 
         [TestMethod]
         public void _Test_Sim_MONA()
-        {            
+        {
             for (int i = 0; i < 2; i++)
             {
                 if (i == 0) I("flush();");
@@ -13917,7 +13917,7 @@ namespace UnitTests
         public void _Test_TracePowerPointExample()
         {
             Series x1 = null;
-            Series x2 = null;            
+            Series x2 = null;
 
             for (int i = 0; i < 3; i++)   //0: no banks, 1: banks and flush, 2: banks no flush
             {
@@ -13926,7 +13926,7 @@ namespace UnitTests
                 {
                     I("flush();");  //but do not do it for i == 2!
                 }
-                
+
                 I("reset;");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
@@ -13944,7 +13944,7 @@ namespace UnitTests
                 Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text);
 
-                
+
 
                 // =============================================================================================
 
@@ -14075,7 +14075,7 @@ namespace UnitTests
             {
                 double cacheSizeRemember = Globals.cacheSize2;
                 try
-                {                    
+                {
                     Globals.cacheSize2 = 0;
                     I("write sletmig;");
                     I("reset;");
@@ -14100,7 +14100,7 @@ namespace UnitTests
                 }
             }
         }
-        
+
         [TestMethod]
         public void _Test_TraceEndogenousOnRhs()
         {
@@ -14127,7 +14127,7 @@ namespace UnitTests
             m1.Add("log(y) <2001 2005> = 1;");
             m1.Add("y[2003] = 1;");  //gets 2 traces due to shadowing
             foreach (string ss2 in m1)
-            {                
+            {
                 I("reset;");
                 string ss1 = "y <2001 2005> = 1;";
                 I(ss1);
@@ -14235,7 +14235,7 @@ namespace UnitTests
             }
 
             //
-            
+
             // 
             for (int i = 0; i < 3; i++)
             {
@@ -14307,10 +14307,10 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_TraceCommands()
-        {            
+        {
             Program.Flush();
             Series y;
-            TraceContents2 tracec;            
+            TraceContents2 tracec;
 
             // -----------------------------------------------------------------------------
             // The following tests for both normal series x and for array-series x[a]
@@ -14397,7 +14397,7 @@ namespace UnitTests
                     I("option freq q;");
                 }
                 if (i == 0) I("collapse y!a = x1;");
-                else I("collapse y!a[a] = x1[a];");                
+                else I("collapse y!a[a] = x1[a];");
                 if (i == 0) y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
                 else y = O.GetIVariableFromString("Work:" + "y!a[a]", ECreatePossibilities.NoneReportError) as Series;
                 tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
@@ -14555,9 +14555,9 @@ namespace UnitTests
                     I("rebase y 2001q4;");
                 }
                 else
-                {                    
+                {
                     I("y!q = series(1);");
-                    I("y!q[a] = 2;"); 
+                    I("y!q[a] = 2;");
                     I("rebase y[a] 2001q4;");
                 }
 
@@ -14632,18 +14632,18 @@ namespace UnitTests
                     Assert.AreEqual(null, trace0.GetContents().dataFile);
                     Assert.AreEqual("Solve (sim) jul05.frm, hash = rtamRJATOLALMm8du5T6Ug", trace0.GetContents().text);
                     Assert.AreEqual(new GekkoTime(EFreq.A, 2006, 1, 1), trace0.GetContents().period.t1);
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace0.GetContents().period.t2);                    
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace0.GetContents().period.t2);
                     Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
                     Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
                     Assert.AreEqual(2010, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
-                }                
+                }
 
                 //====================================================
                 // SMOOTH
                 //====================================================
                 I("reset; option freq q; time 2001q1 2002q4;");
                 I("option databank trace = yes;");
-                
+
 
                 if (i == 0)
                 {
@@ -14676,7 +14676,7 @@ namespace UnitTests
                 //====================================================
                 I("reset; option freq q; time 2001q1 2002q4;");
                 I("option databank trace = yes;");
-                
+
 
                 if (i == 0)
                 {
@@ -14750,11 +14750,11 @@ namespace UnitTests
             I("disp z;");
             Assert.Fail("Somehow do a test of this. The x1 = 1 trace appears two times when z traces are unfolded, first with active in two parts then in 1 part. With x1 <2020 2021> = 2, the x1 = 1 trace only appear 1 time when unfolded.");
 
-            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';"); 
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read makrobk;");
             Series q = O.GetIVariableFromString("qBNP!a", ECreatePossibilities.NoneReportError) as Series;
-            Trace2 trace = q.meta.trace2;            
-            
+            Trace2 trace = q.meta.trace2;
+
             //No DAG identified
             Assert.AreEqual(4, Trace2.CallTraceViewer(trace, 2));
             Assert.AreEqual(11, Trace2.CallTraceViewer(trace, 3));
@@ -14910,7 +14910,7 @@ namespace UnitTests
         public void _Test_TraceResurrection()
         {
             Assert.Fail();
-            
+
             //Get this in from working folder:
             //read usmec;
             //trace2 upsp;
@@ -14940,7 +14940,7 @@ namespace UnitTests
             I("x2 <2003 2003> = 101;");
             I("x2 <2004 2004> = 102;");
             I("x2 <2002 2002> = x2[-1] + x1 + x1a + 2;"); //--> if <2001 2006> all x2 traces at d=0 would disappear.
-            
+
             //
 
             //9 traces when folded out --> only 4 should be enough?
@@ -14990,7 +14990,7 @@ namespace UnitTests
                 Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Trace2 trace = x2.meta.trace2;
                 Assert.IsFalse(trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text.Contains(s));
-                Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());                
+                Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());
             }
 
             I("reset; time 2000 2004; x = 1; rename x as y; rename y as z;"); //  --> GOOD, no accumulation, 3 traces
@@ -15010,7 +15010,7 @@ namespace UnitTests
                 Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
                 Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
                 Assert.AreEqual(2003, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
-            }            
+            }
 
             I("reset; time 2000 2004; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
             if (true)
@@ -15055,13 +15055,13 @@ namespace UnitTests
             I("read sletmig;");
             long x1a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
             TraceContents2 trace777_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.traceContents;
-            long x1b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().counter;            
+            long x1b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().counter;
             long x2a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().counter;
             long x2b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().counter;
             long x3_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
             //good test of trace identity after write + read
             if (true)
-            {                
+            {
                 //Not same object, but still same id
                 Assert.IsFalse(Object.ReferenceEquals(trace777, trace777_i));
             }
@@ -15083,7 +15083,7 @@ namespace UnitTests
             Assert.AreEqual(x1b, x1b_ii);
             Assert.AreEqual(x2a, x2a_ii);
             Assert.AreEqual(x2b, x2b_ii);
-            Assert.AreEqual(x3, x3_ii);            
+            Assert.AreEqual(x3, x3_ii);
             I("copy <2001 2002> x3 to x5;");
             long x1a_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
             TraceContents2 trace777_iii = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.traceContents;
@@ -15320,7 +15320,7 @@ namespace UnitTests
                 Assert.AreEqual(2, x1.meta.trace2.TimeShadow2()[0].periods.Count()); //chopped up
                 Assert.AreEqual(1, x1.meta.trace2.TimeShadow2()[1].periods.Count()); //not chopped up                
             }
-            
+
             Assert.AreEqual(2, x1.meta.trace2.TimeShadow2().Count);
             Assert.AreEqual(1, x1.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2, x1.meta.trace2.TimeShadow2()[1].periods.Count());
@@ -15374,7 +15374,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);            
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
@@ -15430,9 +15430,9 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
-            
+
             // ========== timeless traces
-                        
+
             I("reset; time 2000 2010;");
             I("option databank trace = yes;");
             I("x <2004 2006> = 1;");
@@ -15446,7 +15446,7 @@ namespace UnitTests
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
-            
+
             // -----
             I("x <2005 2005> = 2;");  //should have no effect on y, even though x gets a new trace                                    
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2().Count);
@@ -15459,11 +15459,11 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
             x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(1, x.meta.trace2.TimeShadow2().Count); //x has 1 trace when found via series object
-            
+
             // -----
             I("y <2005 2005> = 3;");
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
-            
+
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
@@ -15493,7 +15493,7 @@ namespace UnitTests
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
-            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);            
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
             // ========== Test of databank read/write, open/close                       
 
@@ -15519,7 +15519,7 @@ namespace UnitTests
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
-            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);            
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
             I("close *;");
 
@@ -15562,7 +15562,7 @@ namespace UnitTests
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
-            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);            
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
             // ======================================================================
             // ======================================================================
@@ -15585,13 +15585,13 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
-                        
+
             {
                 Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].trace.GetContents().text);
                 Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count());
                 Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods[0].t1.super);
                 Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods[0].t2.super);
-            }           
+            }
 
 
             // ======================================================================
@@ -15614,7 +15614,7 @@ namespace UnitTests
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.GetContents().text);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
-            Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);                        
+            Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.TimeShadow2()[1].trace.GetContents().text);
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
@@ -15707,7 +15707,7 @@ namespace UnitTests
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
-            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);            
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
             // ======================================================================
             // ======================================================================
@@ -15728,7 +15728,7 @@ namespace UnitTests
             Assert.AreEqual("read <2005 2006 tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.GetContents().text);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
-            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);                       
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
             // ======================================================================
             // ======================================================================
@@ -15751,7 +15751,7 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
-            
+
             Assert.AreEqual("read <merge tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.GetContents().text);
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
@@ -15788,7 +15788,7 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
-            
+
             Assert.AreEqual("read <2005 2006 merge tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.GetContents().text);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
@@ -16203,7 +16203,7 @@ namespace UnitTests
                         }
                     }
                     finally
-                    {                        
+                    {
                         //Why?
                         Globals.traceContainer = null;
                         Globals.precedentsContainer = null;
@@ -16228,7 +16228,7 @@ namespace UnitTests
                 a = "x!a[a]";
                 d = "x!a[d]";
                 txt = "x[a] = 2, 3, 4;";
-            }            
+            }
 
             string temp = (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text;
             Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text);
@@ -16250,7 +16250,7 @@ namespace UnitTests
         }
 
         private static void Helper_CheckTrace(string name, String2 c1)
-        {            
+        {
             Trace2 trace2 = (O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError) as Series).meta.trace2;
             Helper_WalkTrace(trace2, c1, 0);
         }
@@ -16267,7 +16267,7 @@ namespace UnitTests
                 else Assert.AreEqual(trace.GetContents().text, m.s);
                 List<TraceAndPeriods2> temp = trace.TimeShadow2();
                 if (temp == null) temp = new List<TraceAndPeriods2>();  //an obect with 0 elements is easier to handle in the following lines
-                Assert.AreEqual(temp.Count, m.m.Count);                
+                Assert.AreEqual(temp.Count, m.m.Count);
                 for (int i = 0; i < temp.Count; i++)
                 {
                     Trace2 traceTemp = null;
@@ -16793,8 +16793,50 @@ namespace UnitTests
             // e1 $ (...) .. y = x;
             // y $ (...) = x;
             // y = sum(i $ (...), x(i))
+        }
 
+        [TestMethod]
+        public void _Test_Decomp_Lhs()
+        {
+            //To create this file, go here: #tbjjjdf7hdsfas            
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("read makro_20241011;");
+            I("model <gms> makro_20241011.zip;");
+            Program.Lhs(Program.model.modelGamsScalar);
+            GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;
+            GekkoDictionaryBlanks<List<string>> lhsNames2 = Program.model.modelGamsScalar.lhsNames;
 
+            GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
+            Assert.AreEqual(19088, lhsEquations1.Count());
+
+            GekkoDictionary<string, bool> dict1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, string> kvp in lhsEquations1.GetDictionaryForIteration()) 
+            {
+                dict1.Add(kvp.Key + " --> " + kvp.Value, false);
+            }
+
+            GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, string> kvp in lhsEquations2.GetDictionaryForIteration())
+            {
+                dict2.Add(kvp.Key + " --> " + kvp.Value, false);
+            }
+
+            List<string> in1NotIn2 = new List<string>();
+            List<string> in2NotIn1 = new List<string>();
+            List<string> inBoth = new List<string>();
+            foreach (string s1 in dict1.Keys)
+            {
+                if (dict2.ContainsKey(s1)) inBoth.Add(s1);
+                else in1NotIn2.Add(s1);
+            }
+            foreach (string s2 in dict2.Keys)
+            {
+                if (!dict1.ContainsKey(s2)) in2NotIn1.Add(s2);
+            }
+            Assert.AreEqual(0, in1NotIn2.Count);
+            Assert.AreEqual(0, in2NotIn1.Count);
+            Assert.AreEqual(19088, inBoth.Count);
         }
 
         [TestMethod]

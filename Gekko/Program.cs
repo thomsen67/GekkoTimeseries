@@ -2561,7 +2561,8 @@ namespace Gekko
 
             bool mayUseDatabank = true;
             bool spelling = true;
-            bool shouldWrite = false;
+            bool shouldWrite = true;
+            bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!!
 
             int nAll = 0;            
             int notFoundInModel = 0;  //at all
@@ -2576,8 +2577,8 @@ namespace Gekko
             List<string> varsNoIndex2 = modelGamsScalar.GetVars(3);
             foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);
 
-            GekkoDictionaryBlanks<string> lhs1 = new GekkoDictionaryBlanks<string>();
-            GekkoDictionaryBlanks<List<string>> lhs2 = new GekkoDictionaryBlanks<List<string>>();
+            GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
+            GekkoDictionaryBlanks<List<string>> lhsNames = new GekkoDictionaryBlanks<List<string>>();
 
             //For each equation name (without indexes)
             foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
@@ -2634,8 +2635,7 @@ namespace Gekko
                     }
 
                     if (lhsName == null)
-                    {
-                        //MessageBox.Show("Hovsa5"); //Not possible                            
+                    {                        
                         if (equationNameWithoutIndexes.StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
                         {
                             //ignore
@@ -2660,6 +2660,7 @@ namespace Gekko
                         {
                             notFoundInEq++;
                         }
+                        //WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
                         continue;  //Variable exists, but is not found in equation in any form
                     }
 
@@ -2807,21 +2808,7 @@ namespace Gekko
                         {
                             if (!b) success = false;  //all must be true
                         }
-                    }                 
-
-                    if (m1.storage.Count == 0)
-                    {
-                        //lhs1.Add(eh.eqName, lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-                        if (shouldWrite)
-                        {
-                            writer.Add(equationNameWithIndexes + " ..");
-                            writer.Add(eh.eqMathScalar);
-                            writer.Add(eh.eqMathRaw);
-                            writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-                            writer.Add(" ------------------------------------------------------------------------------------ ");
-                            writer.Add("");
-                        }
-                    }
+                    }                                     
 
                     if (success)
                     {
@@ -2831,18 +2818,18 @@ namespace Gekko
                         
                         if (names.Length > 0) lhsName += "[" + Stringlist.GetListWithCommas(names) + "]";
 
-                        if (lhs1.ContainsKey(eh.eqName))
+                        if (lhsEquations.ContainsKey(eh.eqName))
                         {
                             MessageBox.Show("Hovsa6"); //Not possible?
                         }
                         else
                         {
-                            lhs1.Add(eh.eqName, lhsName);
+                            lhsEquations.Add(eh.eqName, lhsName);
                         }
-                        List<string> temp = lhs2.Get(lhsName);
+                        List<string> temp = lhsNames.Get(lhsName);
                         if (temp == null)
                         {
-                            lhs2.Add(lhsName, new List<string>() { eh.eqName });
+                            lhsNames.Add(lhsName, new List<string>() { eh.eqName });
                         }
                         else
                         {
@@ -2851,7 +2838,8 @@ namespace Gekko
                     }
                     else
                     {
-                        nFail++;
+                        nFail++;                        
+                        WriteEquation(eh, lhsName, equationNameWithIndexes, names, shouldWrite, writer);
                     }
                 }
             }
@@ -2866,9 +2854,29 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhs1.Count() + " NameDict = " + lhs2.Count() + ". Time: " + G.Seconds(t0));
+                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhsEquations.Count() + " NameDict = " + lhsNames.Count() + ". Time: " + G.Seconds(t0));
             }            
-            modelGamsScalar.lhs = lhs2;
+            modelGamsScalar.lhsNames = lhsNames;
+            modelGamsScalar.lhsEquations = lhsEquations;
+            if (createProtobufferFileForUnitTests)
+            {
+                //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
+                ProtobufWrite(lhsEquations, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
+                ProtobufWrite(lhsNames, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_names.data");
+            }
+        }
+
+        private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, bool shouldWrite, List<string> writer)
+        {
+            if (shouldWrite)
+            {
+                writer.Add(equationNameWithIndexes + " ..");
+                writer.Add(eh.eqMathRaw);
+                writer.Add(eh.eqMathScalar);
+                writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+                writer.Add(" ------------------------------------------------------------------------------------ ");
+                writer.Add("");
+            }
         }
 
 
