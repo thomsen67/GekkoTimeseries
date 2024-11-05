@@ -1420,6 +1420,33 @@ namespace Gekko
         }
 
         /// <summary>
+        /// This method is simple and fast, but is it bug-free?? Use it for Gekko 4.0.
+        /// No trimming done at the end, should be superfluous.
+        /// </summary>
+        /// <param name="inputName"></param>
+        /// <returns></returns>
+        public static string Chop_DimensionRemoveLast_FASTER(string inputName)
+        {            
+            int i3 = inputName.LastIndexOf(']');
+            if (i3 == -1) return inputName;            
+            int i2 = inputName.LastIndexOf(',');
+            int i1 = inputName.LastIndexOf('[');
+            if (i2 != -1 && i1 < i2 && i2 < i3)
+            {
+                //Comma
+                string s = G.Substring(inputName, 0, i2 - 1) + "]";
+                return s;
+            }
+            else if (i1 < i3)
+            {
+                //No comma
+                string s = G.Substring(inputName, 0, i1 - 1);
+                return s;
+            }
+            else return inputName;
+        }
+
+        /// <summary>
         /// Handles a lag or lead like for instance "x[+1]".
         /// If name = "x", t0 = 2001 and t = 2002, it will return "x[+1]".
         /// With merge=false, "x[a]" will become "x[a][+1]", whereas with merge=true,

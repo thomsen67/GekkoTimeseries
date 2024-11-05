@@ -981,6 +981,9 @@ namespace Gekko
         [ProtoMember(31)]
         public int fakeVarCounts = -12345;
 
+        [ProtoMember(33)]
+        public GekkoDictionaryBlanks<List<string>> lhs = new GekkoDictionaryBlanks<List<string>>();
+
         // =============================================
         // =============================================
         // =============================================

@@ -1019,6 +1019,8 @@ namespace Gekko
             
             CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
 
+            Program.Lhs(modelGamsScalar);
+
             if (false && Globals.runningOnTTComputer)
             {
                 foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)

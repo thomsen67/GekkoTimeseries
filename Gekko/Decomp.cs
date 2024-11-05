@@ -5612,9 +5612,11 @@ namespace Gekko
                             e.eqName = eqName;
                         }
                     }
-                    
+
+                    List<string> lhsEqs = modelGamsScalar.lhs.Get(variableName);
+
                     //Setting up chunks for EditDistancd()
-                    List<EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
+                    List <EqInfoSimple> eqsNew = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);                                        
                     List<string> chosen = GetChosenVariable(variableName);
                     List<FuzzyEquation> fuzzyEquations = GetRawEquations(model.modelGams, chosen);                    
                     SortedDictionary<double, List<FuzzyEquation>> orderLhs = Fuzzy.OrderLhs(false, fuzzyEquations, chosen, false);
