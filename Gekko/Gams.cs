@@ -1083,7 +1083,7 @@ namespace Gekko
             //int nDublets = 0;
 
             List<string> writer = new List<string>();
-            GekkoDictionary<string, List<EquationHelper2>> batches = GetBatches(modelGamsScalar.GetEqs(1));
+            GekkoDictionary<string, List<EquationHelper2>> batches = GetScalarEquations(modelGamsScalar.GetEqs(1));
 
             GekkoDictionary<string, bool> varsNoIndex = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             List<string> varsNoIndex2 = modelGamsScalar.GetVars(3);
@@ -1160,7 +1160,7 @@ namespace Gekko
                     }
 
                     //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
-                    VariableDims m1 = SplitUpEquations(lhsName, eh, writer);
+                    VariableDims m1 = GetScalarVariables(lhsName, eh, writer);
 
                     if (m1.storage.Count == 0)
                     {
@@ -1184,7 +1184,7 @@ namespace Gekko
                         last = m1.storage.Last();
                     }
                     int nDim = GetDim(m1);
-                    GekkoDictionary<string, bool>[] span = GetSpan(m1, nDim, writer);
+                    GekkoDictionary<string, bool>[] span = GetIndexesFromScalarEquations(m1, nDim, writer);
                     List<string> eqIndexes = G.Chop_GetIndex(equationNameWithIndexes);
                     int summedDimensions = nDim - eqIndexes.Count;
                     string[] names = new string[nDim];
@@ -1383,7 +1383,7 @@ namespace Gekko
         }
 
 
-        private static void Walk(string lhsName, TokenHelper tok, VariableDims m2)
+        private static void WalkScalarEquations(string lhsName, TokenHelper tok, VariableDims m2)
         {
             if (tok.HasNoChildren())
             {
@@ -1439,13 +1439,13 @@ namespace Gekko
                 {
                     for (int i = 0; i < tok.subnodes.storage.Count; i++)  //the count may increase, because subnodes may be added dynamically (translating x[i, t-1] into x[#i][-1])
                     {
-                        Walk(lhsName, tok.subnodes[i], m2);
+                        WalkScalarEquations(lhsName, tok.subnodes[i], m2);
                     }
                 }
             }
         }
 
-        private static GekkoDictionary<string, bool>[] GetSpan(VariableDims equation, int nDim, List<string> writer)
+        private static GekkoDictionary<string, bool>[] GetIndexesFromScalarEquations(VariableDims equation, int nDim, List<string> writer)
         {
             int eqCounter = 0;
             double[] pp = new double[nDim];
@@ -1513,32 +1513,17 @@ namespace Gekko
             return nDim;
         }
 
-        private static VariableDims SplitUpEquations(string lhsName, EquationHelper2 eh, List<string> writer)
+        private static VariableDims GetScalarVariables(string lhsName, EquationHelper2 eh, List<string> writer)
         {
-
             int nM2 = -12345;
             //For each sub-equation under the equation name
-
             //See also #jkadf773js7s
             string s = eh.eqMathScalar;
-
             string txt = s;
-
             TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, null, null, null, null);
-
             VariableDims m2 = new VariableDims();  //Count is # found variables in equation
-
             //For each token in the equation name
-            Walk(lhsName, tokens2, m2);
-
-            if (nM2 != -12345)
-            {
-                if (nM2 != m2.storage.Count)
-                {
-
-                }
-            }
-
+            WalkScalarEquations(lhsName, tokens2, m2);
             nM2 = m2.storage.Count;
             //writer.Add("Equation " + kvp.Key + ": " + s + ":");
             if (m2 != null && m2.storage.Count > 0)
@@ -1553,12 +1538,10 @@ namespace Gekko
                 }
             }
             //writer.Add("");
-
             return m2;
         }
 
-
-        private static GekkoDictionary<string, List<EquationHelper2>> GetBatches(List<string> eqs)
+        private static GekkoDictionary<string, List<EquationHelper2>> GetScalarEquations(List<string> eqs)
         {
             GekkoDictionary<string, List<EquationHelper2>> batches = new GekkoDictionary<string, List<EquationHelper2>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> known = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
