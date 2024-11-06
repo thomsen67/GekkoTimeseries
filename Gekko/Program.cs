@@ -2681,9 +2681,9 @@ namespace Gekko
 
             if (text == "flowgraph1" || text == "flowgraph2")
             {
-                WpfApplicationSample xx = new WpfApplicationSample();
+                MainWindow xx = new MainWindow();
                 if (text == "flowgraph1") xx.rotate = true;
-                xx.Run();
+                xx.ShowDialog();
                 return;
             }
 
