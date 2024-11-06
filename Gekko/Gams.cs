@@ -1161,7 +1161,7 @@ namespace Gekko
                         {
                             notFoundInEq++;
                         }
-                        //WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
+                        WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
                         continue;  //Variable exists, but is not found in equation in any form
                     }
 
@@ -1220,14 +1220,6 @@ namespace Gekko
                                 string sFirst = first.storage[i];
                                 string sLast = last.storage[i];
                                 
-                                List<int> spiral0 = GenerateSpiral(0);
-                                List<int> spiral1 = GenerateSpiral(1);
-                                List<int> spiral2 = GenerateSpiral(2);
-                                List<int> spiral3 = GenerateSpiral(3);
-                                List<int> spiral4 = GenerateSpiral(4);
-                                List<int> spiral5 = GenerateSpiral(5);
-                                List<int> spiral6 = GenerateSpiral(6);
-
                                 if (!successDim[i] && indexName != null)
                                 {
                                     foreach (int j in GenerateSpiral(m1.storage.Count - 1))
@@ -1242,20 +1234,6 @@ namespace Gekko
                                     }
                                 }
 
-                                //if (!successDim[i] && indexName != null)
-                                //{
-                                //    if (G.Equal(sFirst, indexName))
-                                //    {
-                                //        names[i] = sFirst;
-                                //        successDim[i] = true;
-                                //    }
-                                //    else if (G.Equal(sLast, indexName))
-                                //    {
-                                //        names[i] = sLast;
-                                //        successDim[i] = true;
-                                //    }
-                                //}
-
                                 if (!successDim[i] && mayUseDatabank)
                                 {
                                     List iv = O.GetIVariableFromString("#" + indexName, O.ECreatePossibilities.NoneReturnNullAlways) as List;
@@ -1266,15 +1244,15 @@ namespace Gekko
                                             ScalarString ss = iv.list[0] as ScalarString;
                                             if (ss != null)
                                             {
-                                                if (G.Equal(sFirst, ss.string2))
+                                                foreach (int j in GenerateSpiral(m1.storage.Count - 1))
                                                 {
-                                                    names[i] = sFirst;
-                                                    successDim[i] = true;
-                                                }
-                                                else if (G.Equal(sLast, ss.string2))
-                                                {
-                                                    names[i] = sLast;
-                                                    successDim[i] = true;
+                                                    string s = m1.storage[j].storage[i];
+                                                    if (G.Equal(s, ss.string2))
+                                                    {
+                                                        names[i] = s;
+                                                        successDim[i] = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -1283,17 +1261,17 @@ namespace Gekko
 
                                 if (!successDim[i])
                                 {
-                                    if (G.Contains(sFirst, "tot") && !G.Contains(sLast, "tot"))
+                                    foreach (int j in GenerateSpiral(m1.storage.Count - 1))
                                     {
-                                        names[i] = sFirst;
-                                        successDim[i] = true;
+                                        string s = m1.storage[j].storage[i];
+                                        if (G.Contains(s, "tot"))
+                                        {
+                                            names[i] = s;
+                                            successDim[i] = true;
+                                            break;
+                                        }
                                     }
-                                    else if (!G.Contains(sFirst, "tot") && G.Contains(sLast, "tot"))
-                                    {
-                                        names[i] = sLast;
-                                        successDim[i] = true;
-                                    }
-                                }
+                                }                                
 
                                 if (!successDim[i])
                                 {
@@ -1304,17 +1282,18 @@ namespace Gekko
                                     //TODO: Use domain 
                                     //
                                     //A bit hacky and not completely accurate as it is.
+
                                     foreach (string index in eqIndexes)
                                     {
-                                        if (G.Equal(sFirst, index))
+                                        foreach (int j in GenerateSpiral(m1.storage.Count - 1))
                                         {
-                                            names[i] = sFirst;
-                                            successDim[i] = true;
-                                        }
-                                        else if (G.Equal(sLast, index))
-                                        {
-                                            names[i] = sLast;
-                                            successDim[i] = true;
+                                            string s = m1.storage[j].storage[i];
+                                            if (G.Contains(s, index))
+                                            {
+                                                names[i] = s;
+                                                successDim[i] = true;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
