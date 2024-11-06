@@ -1090,7 +1090,6 @@ namespace Gekko
             foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);
 
             GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
-            GekkoDictionaryBlanks<List<string>> lhsNames = new GekkoDictionaryBlanks<List<string>>();
 
             //For each equation name (without indexes)
             foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
@@ -1103,16 +1102,6 @@ namespace Gekko
                     nAll++;
                     string equationNameWithIndexes = eh.eqName;
                     if (equationNameWithoutIndexes.Contains("__")) System.Windows.Forms.MessageBox.Show("Hovsa3"); //Not possible
-
-                    if (G.Equal(equationNameWithIndexes, "e_vtmoms[tje,tje]"))
-                    {
-
-                    }
-
-                    if (G.Equal(equationNameWithoutIndexes, "e_vtmoms"))
-                    {
-
-                    }
 
                     string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
                     if (spelling)
@@ -1223,23 +1212,49 @@ namespace Gekko
                             }
                             else
                             {
-                                //We must select the first or the last                                
+                                // -----------------------------------------------------------------------
+                                // We must find which one fits best.
+                                // Cannot count on first/last, because GAMS may garble this.
+                                // -----------------------------------------------------------------------
+
                                 string sFirst = first.storage[i];
                                 string sLast = last.storage[i];
+                                
+                                List<int> spiral0 = GenerateSpiral(0);
+                                List<int> spiral1 = GenerateSpiral(1);
+                                List<int> spiral2 = GenerateSpiral(2);
+                                List<int> spiral3 = GenerateSpiral(3);
+                                List<int> spiral4 = GenerateSpiral(4);
+                                List<int> spiral5 = GenerateSpiral(5);
+                                List<int> spiral6 = GenerateSpiral(6);
 
                                 if (!successDim[i] && indexName != null)
                                 {
-                                    if (G.Equal(sFirst, indexName))
+                                    foreach (int j in GenerateSpiral(m1.storage.Count - 1))
                                     {
-                                        names[i] = sFirst;
-                                        successDim[i] = true;
-                                    }
-                                    else if (G.Equal(sLast, indexName))
-                                    {
-                                        names[i] = sLast;
-                                        successDim[i] = true;
+                                        string s = m1.storage[j].storage[i];
+                                        if (G.EqualHandleBlanks(s, indexName))
+                                        {
+                                            names[i] = s;
+                                            successDim[i] = true;
+                                            break;
+                                        }
                                     }
                                 }
+
+                                //if (!successDim[i] && indexName != null)
+                                //{
+                                //    if (G.Equal(sFirst, indexName))
+                                //    {
+                                //        names[i] = sFirst;
+                                //        successDim[i] = true;
+                                //    }
+                                //    else if (G.Equal(sLast, indexName))
+                                //    {
+                                //        names[i] = sLast;
+                                //        successDim[i] = true;
+                                //    }
+                                //}
 
                                 if (!successDim[i] && mayUseDatabank)
                                 {
@@ -1357,7 +1372,7 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhsEquations.Count() + " NameDict = " + lhsNames.Count() + ". Time: " + G.Seconds(t0));
+                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhsEquations.Count() + ". Time: " + G.Seconds(t0));
             }
 
             modelGamsScalar.lhsEquations = lhsEquations;
@@ -1365,8 +1380,22 @@ namespace Gekko
             {
                 //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
                 Program.ProtobufWrite(lhsEquations, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
-                Program.ProtobufWrite(lhsNames, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_names.data");
             }
+        }
+
+        public static List<int> GenerateSpiral(int n)
+        {
+            List<int> result = new List<int>();
+            int start = 0;
+            int end = n;
+
+            while (start <= end)
+            {
+                if (start <= end) result.Add(start++);
+                if (start <= end) result.Add(end--);
+            }
+
+            return result;
         }
 
         private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, bool shouldWrite, List<string> writer)

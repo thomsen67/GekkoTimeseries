@@ -16799,15 +16799,21 @@ namespace UnitTests
         public void _Test_Decomp_Lhs()
         {
             //To create this file, go here: #tbjjjdf7hdsfas            
-            I("reset;");
+
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // Remove flush() at some point
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            //
+            I("reset; flush();");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("read makro_20241011;");
             I("model <gms> makro_20241011.zip;");            
             GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
 
             GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
-            Assert.AreEqual(19088, lhsEquations1.Count());
-
+            
             GekkoDictionary<string, bool> dict1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, string> kvp in lhsEquations1.GetDictionaryForIteration()) 
             {
@@ -16832,9 +16838,11 @@ namespace UnitTests
             {
                 if (!dict1.ContainsKey(s2)) in2NotIn1.Add(s2);
             }
+
+            Assert.AreEqual(19110, lhsEquations1.Count());
             Assert.AreEqual(0, in1NotIn2.Count);
             Assert.AreEqual(0, in2NotIn1.Count);
-            Assert.AreEqual(19088, inBoth.Count);
+            Assert.AreEqual(19110, inBoth.Count);
         }
 
         [TestMethod]
