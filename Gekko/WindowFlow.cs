@@ -81,10 +81,10 @@ namespace Gekko
                     GekkoDictionary<string, string> matches = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                     string supreme = "vtKilde";
-                    matches.Add("vtKilde", "E_vtKilde");
-                    //matches.Add("vtKommune[tot]", "E_vtkommune_tot");
-                    //matches.Add("vtBund[tot]", "E_vtbund_tot");
-                    //matches.Add("vtAktie[tot]", "E_vtaktie_tot");
+                    List<EqInfoSimple> temp = Decomp.GetSortedEquations(supreme, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
+                    string eq2 = temp[0].eqName;
+                    string eq = G.Chop_DimensionRemoveLast_FASTER(eq2);
+                    matches.Add(supreme, eq);
 
                     Edge e = null;
                     Node n = null;
@@ -92,21 +92,10 @@ namespace Gekko
                     GekkoDictionary<string, bool> vars = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                     foreach (KeyValuePair<string, string> match in matches)
                     {
-
                         GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
                         GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
 
                         FlowInfo flowInfo = Decomp.GetFlowInfoFromDecomp(t1, t2, match.Key, match.Value, "d", 2);
-
-                        foreach (FlowItem xx in flowInfo.children)
-                        {
-                            if (G.Equal(xx.from, "vtKommune[tot]")) xx.from = "vtKommune";
-                            if (G.Equal(xx.to, "vtKommune[tot]")) xx.to = "vtKommune";
-                            if (G.Equal(xx.from, "vtBunt[tot]")) xx.from = "vtBund";
-                            if (G.Equal(xx.to, "vtBund[tot]")) xx.to = "vtBund";
-                            if (G.Equal(xx.from, "vtAktie[tot]")) xx.from = "vtAktie";
-                            if (G.Equal(xx.to, "vtAktie[tot]")) xx.to = "vtAktie";
-                        }
 
                         double factor = 0.02;
 
@@ -122,6 +111,7 @@ namespace Gekko
                             e.Attr.Color = Color(flowChild.v / flowParent.v);
                             if (!vars.ContainsKey(flowChild.from)) vars.Add(flowChild.from, false);
                             if (!vars.ContainsKey(flowChild.to)) vars.Add(flowChild.to, false);
+                            //Call recursively
                         }
                     }
 
