@@ -16805,27 +16805,25 @@ namespace UnitTests
             // Remove flush() at some point
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            //
+            //            
+
             I("reset; flush();");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-            I("read makro_20241011;");
-            I("model <gms> makro_20241011.zip;");            
-            GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
-
-            GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
+            I("read makro_20241011;");  // --> will actually also pass without reading that databank first
+            I("model <gms> makro_20241011.zip;");      
             
+            GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
+            GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");            
             GekkoDictionary<string, bool> dict1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, string> kvp in lhsEquations1.GetDictionaryForIteration()) 
             {
                 dict1.Add(kvp.Key + " --> " + kvp.Value, false);
             }
-
             GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, string> kvp in lhsEquations2.GetDictionaryForIteration())
             {
                 dict2.Add(kvp.Key + " --> " + kvp.Value, false);
             }
-
             List<string> in1NotIn2 = new List<string>();
             List<string> in2NotIn1 = new List<string>();
             List<string> inBoth = new List<string>();
@@ -16839,6 +16837,8 @@ namespace UnitTests
                 if (!dict1.ContainsKey(s2)) in2NotIn1.Add(s2);
             }
 
+            Assert.AreEqual(0, Globals.unitTestLhsNotFoundInModel.Count);
+            Assert.AreEqual(482, Globals.unitTestLhsNotFoundInEq.Count);
             Assert.AreEqual(19110, lhsEquations1.Count());
             Assert.AreEqual(0, in1NotIn2.Count);
             Assert.AreEqual(0, in2NotIn1.Count);

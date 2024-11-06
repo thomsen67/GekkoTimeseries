@@ -252,11 +252,11 @@ namespace Gekko
 
         /// <summary>
         /// Fast parse of a simple string into an integer. Strings like '123', '007', no minus, delimiters. ...
+        /// NOTE: only deals with ints like 123, 007, 5. No minus, delimiters etc.!
+        /// Returns -12345 if s is not such an integer
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        //NOTE: only deals with ints like 123, 007, 5. No minus, delimiters etc.!
-        //Returns -12345 if s is not such an integer
         public static int IntParse(string s)
         {
             int y = 0;

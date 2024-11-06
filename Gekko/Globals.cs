@@ -249,6 +249,8 @@ namespace Gekko
         public static StreamWriter sw = null;
 
         public static List<string> unitTestsPromtingHelper = null;
+        public static List<string> unitTestLhsNotFoundInModel = null;
+        public static List<string> unitTestLhsNotFoundInEq = null;
 
         public static bool nolog = false;      //-nolog parameter for gekko.exe
         public static bool hideGui = false;    //true for use without GUI window

@@ -2549,7 +2549,8 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer && (text == "d"))
-            {                
+            {
+                GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
                 return;
             }
 
@@ -18844,9 +18845,9 @@ namespace Gekko
                 {
                     Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                     if (false) GamsModel.GAMSParser();
-                    if (false) GamsModel.GamsGMO();
+                    if (false) GamsModel.GamsGMO();                    
+                    model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
                     Program.model = model;
-                    GamsModel.Lhs(Program.model.modelGamsScalar);  //Finding out which variables are dependent, from eq naming conventions.
                 }
                 else new Error("No model defined");
 

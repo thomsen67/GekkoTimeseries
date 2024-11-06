@@ -1050,7 +1050,15 @@ namespace Gekko
             return model;
         }
 
-        public static void Lhs(ModelGamsScalar modelGamsScalar)
+        /// <summary>
+        /// For a scalar model, finds (with help of equation names) the dependent variable in each equation (abstracting from
+        /// the time dimensions). Looks at the scalar equations as they are shown in FIND or DECOMP for an equation, and tries
+        /// to match the "e_..." equation name to variables there. Mostly uses model.modelGamsScalar, but also model.modelGams
+        /// is used when finding equation text (maybe model.modelGams is not used at all at the moment, but could be in the future
+        /// if analyzing the equations gets more advanced).
+        /// </summary>
+        /// <param name="modelGamsScalar"></param>
+        public static GekkoDictionaryBlanks<string> Lhs(Model model)
         {
 
             //# m1 = 3 --> sub-equations, first batch
@@ -1071,22 +1079,23 @@ namespace Gekko
 
             DateTime t0 = DateTime.Now;
 
+            if (model.modelGamsScalar == null) new Error("No scalar model defined");
+
             bool mayUseDatabank = true;
             bool spelling = true;
-            bool shouldWrite = true;
+            bool shouldWrite = false;
             bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!! Perhaps even take copies of the two files before overwriting.
 
             int nAll = 0;
-            int notFoundInModel = 0;  //at all
-            int notFoundInEq = 0; //in eq
+            List<string> notFoundInModel = new List<string>();
+            List<string> notFoundInEq = new List<string>();
             int nFail = 0;
-            //int nDublets = 0;
 
             List<string> writer = new List<string>();
-            GekkoDictionary<string, List<EquationHelper2>> batches = GetScalarEquations(modelGamsScalar.GetEqs(1));
+            GekkoDictionary<string, List<EquationHelper2>> batches = GetScalarEquations(model);
 
             GekkoDictionary<string, bool> varsNoIndex = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            List<string> varsNoIndex2 = modelGamsScalar.GetVars(3);
+            List<string> varsNoIndex2 = model.modelGamsScalar.GetVars(3);
             foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);
 
             GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
@@ -1143,7 +1152,7 @@ namespace Gekko
                         }
                         else
                         {
-                            notFoundInModel++;
+                            notFoundInModel.Add(equationNameWithoutIndexes);
                         }
                         continue; //Variable does not exist at all
                     }
@@ -1158,8 +1167,8 @@ namespace Gekko
                             //ignore
                         }
                         else
-                        {
-                            notFoundInEq++;
+                        {                            
+                            notFoundInEq.Add(equationNameWithoutIndexes);
                         }
                         WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
                         continue;  //Variable exists, but is not found in equation in any form
@@ -1371,10 +1380,17 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel + ", notFoundInEq = " + notFoundInEq + "). EqDict = " + lhsEquations.Count() + ". Time: " + G.Seconds(t0));
+                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel.Count + ", notFoundInEq = " + notFoundInEq.Count + "). EqDict = " + lhsEquations.Count() + ". Time: " + G.Seconds(t0));
             }
 
-            modelGamsScalar.lhsEquations = lhsEquations;
+            if (G.IsUnitTesting())
+            {
+                Globals.unitTestLhsNotFoundInModel = notFoundInModel;
+                Globals.unitTestLhsNotFoundInEq = notFoundInEq;
+            }
+
+            return lhsEquations;
+            
             if (createProtobufferFileForUnitTests)
             {
                 //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
@@ -1574,8 +1590,10 @@ namespace Gekko
             return m2;
         }
 
-        private static GekkoDictionary<string, List<EquationHelper2>> GetScalarEquations(List<string> eqs)
-        {
+        private static GekkoDictionary<string, List<EquationHelper2>> GetScalarEquations(Model model)
+        {            
+            List<string> eqs = model.modelGamsScalar.GetEqs(1);
+
             GekkoDictionary<string, List<EquationHelper2>> batches = new GekkoDictionary<string, List<EquationHelper2>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> known = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -1603,7 +1621,7 @@ namespace Gekko
                 }
 
                 EquationTextHelper helper = new EquationTextHelper();
-                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eq }, helper, time);
+                GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
                 string scalar = helper22.s_scalarModel;
                 EquationHelper2 eh = new EquationHelper2();
                 eh.eqMathScalar = helper22.s_scalarModel;
