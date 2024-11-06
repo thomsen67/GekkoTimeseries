@@ -1158,7 +1158,7 @@ namespace Gekko
                     }
 
                     //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
-                    VariableDims m1 = GetScalarVariables(lhsName, eh, writer);
+                    VariableDims m1 = GetScalarModelVariables(lhsName, eh, writer);
 
                     if (m1.storage.Count == 0)
                     {
@@ -1172,13 +1172,14 @@ namespace Gekko
                         }
                         WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
                         continue;  //Variable exists, but is not found in equation in any form
-                    }
+                    }                    
                     
-                    int nDim = GetDim(m1);
-                    GekkoDictionary<string, bool>[] span = GetIndexesFromScalarEquations(m1, nDim, writer);
+                    GekkoDictionary<string, bool>[] span = GetIndexesFromScalarEquations(m1);
                     List<string> eqIndexes = G.Chop_GetIndex(equationNameWithIndexes);
+                    int nDim = GetDim(m1);
                     int summedDimensions = nDim - eqIndexes.Count;
                     string[] names = new string[nDim];
+                    
                     if (summedDimensions > 1)
                     {
                         int sum = 0;
@@ -1494,60 +1495,28 @@ namespace Gekko
             }
         }
 
-        private static GekkoDictionary<string, bool>[] GetIndexesFromScalarEquations(VariableDims equation, int nDim, List<string> writer)
+        /// <summary>
+        /// For a list of occurrences of the same varible like x[..., ...], this findes the occurrences of elements, for
+        /// instace if we have input "x[a, m], x[b, m]" we get returned dim1 = ('a', 'b') and dim2 = ('m',).
+        /// </summary>
+        /// <param name="variables"></param>
+        /// <returns></returns>
+        public static GekkoDictionary<string, bool>[] GetIndexesFromScalarEquations(VariableDims variables)
         {
-            int eqCounter = 0;
-            double[] pp = new double[nDim];
-            string[] zz = null;
-
-            GekkoDictionary<string, bool>[] probability = new GekkoDictionary<string, bool>[nDim];
-            for (int i = 0; i < nDim; i++) probability[i] = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-            VariableDims temp = equation;
-
-            //foreach (VariableDims temp in equation) //For each scalar equation. This loops through "columns" (variables in an equation), for instance the variables in qK[iB, spTot] = qK[iB, tje] + qK[iB, fre] + qK[iB, byg] + qK[iB, lan] + qK[iB, soe] + qK[iB, bol] + qK[iB, ene] + qK[iB, udv]
-            {
-                eqCounter++;
-                int varCounter = 0;
-
-                double[] p = new double[nDim];
-
-                foreach (Dims dims in temp.storage) //for each variable
+            int nDim = GetDim(variables);
+            GekkoDictionary<string, bool>[] occurrences = new GekkoDictionary<string, bool>[nDim];
+            for (int i = 0; i < nDim; i++) occurrences[i] = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            VariableDims temp = variables;
+            foreach (Dims dims in temp.storage) //for each variable
+            {                
+                int c = -1;
+                foreach (string s7 in dims.storage) //for each variable dimension, for instance "iB", "spTot".
                 {
-                    varCounter++;
-                    int c = -1;
-                    if (zz == null) zz = new string[nDim];
-                    foreach (string s7 in dims.storage) //for each variable dimension, for instance "iB", "spTot".
-                    {
-                        c++;
-                        if (!probability[c].ContainsKey(s7)) probability[c].Add(s7, false);
-                        if (zz[c] == null) zz[c] = s7;
-                        else if (zz[c] == "*") continue;
-                        else if (!G.Equal(zz[c], s7)) zz[c] = "*";
-                    }
-                }
-
-                for (int i = 0; i < nDim; i++)
-                {
-                    p[i] = (double)probability[i].Count / (double)varCounter;
-                    pp[i] += p[i];
+                    c++;
+                    if (!occurrences[c].ContainsKey(s7)) occurrences[c].Add(s7, false);                    
                 }
             }
-
-            //for (int i = 0; i < nDim; i++)
-            //{
-            //    G.Writeln("Dim " + i + " probability = " + pp[i]);
-            //}
-
-            //string s = "...none...";
-            //if (zz != null) s = Stringlist.GetListWithCommas(zz);
-            //writer.Add("CHANGE for sub-eqs with " + kv2.Key + " occurrences: [" + s + "]");
-
-            for (int i = 0; i < nDim; i++)
-            {
-                pp[i] = pp[i] / eqCounter;
-            }
-            return probability;
+            return occurrences;
         }
 
         private static int GetDim(VariableDims m1)
@@ -1562,7 +1531,7 @@ namespace Gekko
             return nDim;
         }
 
-        private static VariableDims GetScalarVariables(string lhsName, EquationHelper2 eh, List<string> writer)
+        private static VariableDims GetScalarModelVariables(string lhsName, EquationHelper2 eh, List<string> writer)
         {
             int nM2 = -12345;
             //For each sub-equation under the equation name

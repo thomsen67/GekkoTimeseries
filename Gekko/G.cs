@@ -913,7 +913,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get index part of bankvarname, for instance x!q[a, b] returns ["a", "b"]
+        /// Get index part of bankvarname, for instance x!q[a, b] returns ["a", "b"]. May return empty list.
         /// </summary>
         /// <param name="s1"></param>
         /// <returns></returns>

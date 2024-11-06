@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ProtoBuf;
 using System.Threading;
+using System.Text;
 
 namespace Gekko
 {
@@ -3572,7 +3573,7 @@ namespace Gekko
         /// <summary>
         /// For a data cell, it finds the list of variables inside (.vars_hack). Will return the first of these,
         /// with any "¤[-1]" etc. stripped off, so "x¤[-1]" becomes "x". If onlyIfUnique==true and the list count
-        /// is not 1, null is returned. May retur null.
+        /// is not 1, null is returned. May return null.
         /// </summary>
         /// <param name="c2"></param>
         /// <param name="onlyIfUnique"></param>
@@ -4888,7 +4889,7 @@ namespace Gekko
                         Cell c1 = table2.Get(i, 1);
                         Cell c2 = table2.Get(i, 2);
                         string s = c1.CellText.TextData[0];
-                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
+                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && c2.vars_hack != null) s = ReplaceStars(c2.vars_hack, s);
                         s = TrimAndRemoveLag0(s);
                         c1.CellText.TextData = new List<string> { s };
                     }
@@ -4900,7 +4901,7 @@ namespace Gekko
                         Cell c1 = table2.Get(1, j);
                         Cell c2 = table2.Get(2, j);
                         string s = c1.CellText.TextData[0];
-                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = FullVariableNamePretty(c2.vars_hack[0], true);
+                        if (Globals.decompShowSingletonSet && !decompOptions2.expand && s.Contains("*") && c2.vars_hack != null && c2.vars_hack.Count == 1) s = ReplaceStars(c2.vars_hack, s);
                         s = TrimAndRemoveLag0(s);
                         c1.CellText.TextData = new List<string> { s };
                     }
@@ -4909,6 +4910,73 @@ namespace Gekko
 
             DecompOutput decompOutput = new DecompOutput(table2, ignoredText, red, black);
             return decompOutput;
+        }
+
+        /// <summary>
+        /// For a variable like "x[a, *, m] with one or more "*", it will loook into the vars_hack vars to see if the second dimension varies or not.
+        /// If it does not vary, the concrete non-varying element is set instead of the "*".
+        /// </summary>
+        /// <param name="vars_hack"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static string ReplaceStars(List<string> vars_hack, string s)
+        {
+            VariableDims variableDims = new VariableDims();
+
+            string name = null;
+            foreach (string var in vars_hack)
+            {
+                string s2 = var.Split('¤')[0];
+                string input2, dbName, varName, freq; string[] indexes;
+                O.Chop(s2, out dbName, out varName, out freq, out indexes);
+                if (name == null) name = varName;
+                Dims dims = new Dims();
+                if (indexes != null)
+                {
+                    foreach (string index in indexes) dims.storage.Add(index);
+                }
+                variableDims.storage.Add(dims);
+            }
+
+            GekkoDictionary<string, bool>[] span = GamsModel.GetIndexesFromScalarEquations(variableDims);
+
+            //
+            // Inject this instead of a possible '*'
+            //
+
+            StringBuilder sb = new StringBuilder();
+            bool bracket = false;
+            int commaCounter = 0;
+            bool hit = false;
+            foreach (char c in s)
+            {
+                bool addChar = true;
+                if (c == '[')
+                {
+                    bracket = true;
+                }
+                else if (c == ',')
+                {
+                    commaCounter++;
+                }
+                else if (c == '*')
+                {
+                    try
+                    {
+                        if (bracket && span[commaCounter].Count == 1)
+                        {
+                            sb.Append(span[commaCounter].First().Key);
+                            hit = true;
+                            addChar = false;
+                        }
+                    }
+                    catch { }
+                }
+                if (addChar) sb.Append(c);
+            }
+
+            if (hit) s = sb.ToString();
+            return s;
         }
 
         /// <summary>
@@ -5537,271 +5605,166 @@ namespace Gekko
         {
             try
             {
-                if (G.Equal(Program.options.model_gams_dep_method, "both"))
+                //Done the same modern way regardless of Program.options.model_gams_dep_method == "both" or not.
+                //This option only does stuff for DISP.
+
+                O.Find o = o2 as O.Find;
+
+                Model model = Program.model;
+                if (model == null)
                 {
-                    O.Find o = o2 as O.Find;
-
-                    Model model = Program.model;
-                    if (model == null)
-                    {
-                        new Error("It seems no model is loaded, cf. the MODEL command.");
-                        return;
-                    }
-                    ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-                    if (modelGamsScalar == null)
-                    {
-                        new Error("FIND is only implemented for scalar models");
-                        return;
-                    }
-                    ModelGams modelGams = model.modelGams;
-
-                    modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, false);
-
-                    Globals.itemHandler = new ItemHandler();  //hack
-
-                    o.tSelected = o.decompFind.decompOptions2.t1;  //selected time
-                    List<string> vars = O.Restrict(o.iv, false, false, false, true);
-
-                    if (o.iv2 != null) { List<string> vars2 = O.Restrict(o.iv2, false, false, false, true); FindConnection(o.tSelected, vars[0], vars2[0], modelGamsScalar); return; }
-
-                    string variableName = vars[0]; //.Replace(" ", "");  //no blanks
-                    int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-                    if (aNumber == -12345)
-                    {
-                        new Error(NonFoundInModelError(variableName, modelGamsScalar));
-                        return;
-                    }
-
-                    int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
-                    PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-
-                    string firstText = null;
-                    List<string> firstList = new List<string>();
-
-                    List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-                    if (eqNumbers == null)
-                    {
-                        new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
-                        return;
-                    }
-
-                    if (model.modelGams == null)
-                    {
-                        //Gekko type
-                        MessageBox.Show("Fix FIND list for Gekko type models");
-                    }
-
-                    if (false)
-                    {
-                        //Testing
-                        List<string> eqNames = modelGamsScalar.GetVars(1);
-                        GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                        List<string> eqNames2 = new List<string>();
-                        foreach (string eqName in eqNames)
-                        {
-                            string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
-                            G.Chop_Chop(eqName, out bank, out name2, out freq2, out indexes); //freq2 will be == null
-                            if (!dict2.ContainsKey(name2))
-                            {
-                                dict2.Add(name2, false);
-                                eqNames2.Add(eqName);
-                            }
-                        }
-                        foreach (string eqName in eqNames2)
-                        {
-                            EqInfoSimple e = new EqInfoSimple();
-                            e.eqName = eqName;
-                        }
-                    }
-
-                    List<string> lhsEqs = modelGamsScalar.GetLhsEquations(variableName);
-
-                    List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
-                    foreach (EqInfoSimple eqHelper in eqsNew2)
-                    {
-                        double d = double.MaxValue;
-                        string[] ss = eqHelper.eqName.Split('[');
-                        string eqNameWithoutIndex = ss[0];
-                        string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
-                        bool hit1 = false;
-                        foreach (string s in lhsEqs)
-                        {
-                            if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
-                        }
-                        if (hit1) eqHelper.score += 100;
-
-
-                        List<string> lhsVars = Program.LhsVars(eqNameWithoutIndex, modelGams);
-                        bool hit2 = false;
-                        foreach (string s in lhsVars)
-                        {
-                            if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-                        }
-                        if (hit2) eqHelper.score += 0.5;
-                    }
-
-                    List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-
-                    //This seems to just gather material for the GUI representation
-                    double lastScore = double.MinValue;
-                    double scoreCounter = 0;
-                    int lineCounter = -1;
-                    foreach (EqInfoSimple eqHelper in eqsNew)
-                    {
-                        lineCounter++;
-                        if (eqHelper.score != lastScore)
-                        {
-                            scoreCounter++;
-                            lastScore = eqHelper.score;
-                        }
-                        string eqName = eqHelper.eqName;
-                        string eqName3 = eqHelper.eqNameWithLag;
-                        EquationTextHelper helper2 = new EquationTextHelper();
-                        helper2.showTime = o.decompFind.decompOptions2.showTime;
-                        List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, o.tSelected);
-                        string boolLhs = "";  //lhs                        
-                        if (eqHelper.score % 1 == 0) boolLhs = Globals.protectSymbol;
-                        string boolName = "";  //name
-                        boolName = "";
-                        if (eqHelper.score >= 100d) boolName = Globals.protectSymbol;
-                        //if (Globals.runningOnTTComputer) boolName += " : " + eqHelper.score.ToString();
-                        string tt = "tx0";
-                        int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
-                        string textColor = "Black";
-                        if (o.decompFind.decompOptions2.new_from != null)
-                        {
-                            if (o.decompFind.decompOptions2.new_from.Contains(eqName3, StringComparer.OrdinalIgnoreCase))
-                            {
-                                textColor = "Gray";
-                            }
-                        }
-                        //This is where the contents of each GUI line is set
-                        //Hack that it is a global variable...
-                        Globals.itemHandler.Add(new EquationListItem(eqName3, " ", boolName, boolLhs, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
-                    }
-
-                    string firstEqName2 = eqsNew[0].eqName;
-                    WindowFind windowFind = new WindowFind(o);
-                    windowFind.Title = variableName + " - " + "Gekko equations";
-                    windowFind.FindSetButtons(firstEqName2, firstList, model);
-                    windowFind.FindSetLabel(variableName);
-                    windowFind._activeEquation = firstEqName2;
-                    windowFind._activeVariable = null;
-                    EquationTextHelper helper = new EquationTextHelper();
-                    helper.showTime = o.decompFind.decompOptions2.showTime;
-                    windowFind.FindSetEquation(firstEqName2, helper, o.tSelected, model);
-                    windowFind.decompFind.SetWindow(windowFind);
-                    windowFind.ShowDialog();
-
+                    new Error("It seems no model is loaded, cf. the MODEL command.");
                     return;
                 }
-                else
+                ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
+                if (modelGamsScalar == null)
                 {
-                    //OLD STUFF, OBSOLETE SOON
-
-                    //O.Find o = o2 as O.Find;
-
-                    //Model model = Program.model;
-                    //if (model == null)
-                    //{
-                    //    new Error("It seems no model is loaded, cf. the MODEL command.");
-                    //    return;
-                    //}
-                    //ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-                    //if (modelGamsScalar == null)
-                    //{
-                    //    new Error("FIND is only implemented for scalar models");
-                    //    return;
-                    //}
-
-                    ////For scalar model
-
-                    //modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, false);
-
-                    //Globals.itemHandler = new ItemHandler();  //hack
-
-                    //o.tSelected = o.decompFind.decompOptions2.t1;  //selected time
-                    //List<string> vars = O.Restrict(o.iv, false, false, false, true);
-
-                    //if (o.iv2 != null)
-                    //{
-                    //    List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
-                    //    FindConnection(o.tSelected, vars[0], vars2[0], modelGamsScalar);
-                    //    return;
-                    //}
-
-                    //string variableName = vars[0]; //.Replace(" ", "");  //no blanks
-                    //int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-                    //if (aNumber == -12345)
-                    //{
-                    //    new Error(NonFoundInModelError(variableName, modelGamsScalar));
-                    //    return;
-                    //}
-
-                    //int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
-                    //PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-
-                    //string firstText = null;
-                    //List<string> firstList = new List<string>();                    
-
-                    //List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-                    //if (eqNumbers == null)
-                    //{
-                    //    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
-                    //    return;
-                    //}
-
-                    //List<EqInfoSimple> eqsNew = FindEquationsThatContainGivenVariableSorted(variableName, o.tSelected, eqNumbers, model);
-
-                    ////This seems to just gather material for the GUI representation
-                    //int lineCounter = -1;
-                    //foreach (EqInfoSimple eqHelper in eqsNew)
-                    //{
-                    //    lineCounter++;
-                    //    string eqName = eqHelper.eqName;
-                    //    string eqName3 = eqHelper.eqNameWithLag;
-                    //    EquationTextHelper helper2 = new EquationTextHelper();
-                    //    helper2.showTime = o.decompFind.decompOptions2.showTime;
-                    //    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, o.tSelected);
-                    //    string bool1 = "";
-                    //    string bool2 = "";
-
-                    //    if (eqHelper.best) bool1 = Globals.protectSymbol;
-                    //    //bool2 = Globals.protectSymbol;
-
-                    //    string tt = "tx0";
-
-                    //    int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
-
-                    //    string textColor = "Black";
-                    //    if (o.decompFind.decompOptions2.new_from != null)
-                    //    {
-                    //        if (o.decompFind.decompOptions2.new_from.Contains(eqName3, StringComparer.OrdinalIgnoreCase))
-                    //        {
-                    //            textColor = "Gray";
-                    //        }
-                    //    }
-
-                    //    //This is where the contents of each GUI line is set
-                    //    //Hack that it is a global variable...
-                    //    Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
-                    //}
-
-                    //string firstEqName2 = eqsNew[0].eqName;
-                    //WindowFind windowFind = new WindowFind(o);
-                    //windowFind.Title = variableName + " - " + "Gekko equations";
-                    //windowFind.FindSetButtons(firstEqName2, firstList, model);
-                    //windowFind.FindSetLabel(variableName);
-                    //windowFind._activeEquation = firstEqName2;
-                    //windowFind._activeVariable = null;
-                    //EquationTextHelper helper = new EquationTextHelper();
-                    //helper.showTime = o.decompFind.decompOptions2.showTime;
-                    //windowFind.FindSetEquation(firstEqName2, helper, o.tSelected, model);
-                    //windowFind.decompFind.SetWindow(windowFind);
-                    //windowFind.ShowDialog();
-
-                    //return;
+                    new Error("FIND is only implemented for scalar models");
+                    return;
                 }
+                ModelGams modelGams = model.modelGams;
+
+                modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, false);
+
+                Globals.itemHandler = new ItemHandler();  //hack
+
+                o.tSelected = o.decompFind.decompOptions2.t1;  //selected time
+                List<string> vars = O.Restrict(o.iv, false, false, false, true);
+
+                if (o.iv2 != null) { List<string> vars2 = O.Restrict(o.iv2, false, false, false, true); FindConnection(o.tSelected, vars[0], vars2[0], modelGamsScalar); return; }
+
+                string variableName = vars[0]; //.Replace(" ", "");  //no blanks
+                int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+                if (aNumber == -12345)
+                {
+                    new Error(NonFoundInModelError(variableName, modelGamsScalar));
+                    return;
+                }
+
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
+                PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+
+                string firstText = null;
+                List<string> firstList = new List<string>();
+
+                List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+                if (eqNumbers == null)
+                {
+                    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                    return;
+                }
+
+                if (model.modelGams == null)
+                {
+                    //Gekko type
+                    MessageBox.Show("Fix FIND list for Gekko type models");
+                }
+
+                if (false)
+                {
+                    //Testing
+                    List<string> eqNames = modelGamsScalar.GetVars(1);
+                    GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    List<string> eqNames2 = new List<string>();
+                    foreach (string eqName in eqNames)
+                    {
+                        string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
+                        G.Chop_Chop(eqName, out bank, out name2, out freq2, out indexes); //freq2 will be == null
+                        if (!dict2.ContainsKey(name2))
+                        {
+                            dict2.Add(name2, false);
+                            eqNames2.Add(eqName);
+                        }
+                    }
+                    foreach (string eqName in eqNames2)
+                    {
+                        EqInfoSimple e = new EqInfoSimple();
+                        e.eqName = eqName;
+                    }
+                }
+
+                List<string> lhsEqs = modelGamsScalar.GetLhsEquations(variableName);
+
+                List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, o.tSelected, eqNumbers, model);
+                foreach (EqInfoSimple eqHelper in eqsNew2)
+                {
+                    double d = double.MaxValue;
+                    string[] ss = eqHelper.eqName.Split('[');
+                    string eqNameWithoutIndex = ss[0];
+                    string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
+                    bool hit1 = false;
+                    foreach (string s in lhsEqs)
+                    {
+                        if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+                    }
+                    if (hit1) eqHelper.score += 100;
+
+
+                    List<string> lhsVars = Program.LhsVars(eqNameWithoutIndex, modelGams);
+                    bool hit2 = false;
+                    foreach (string s in lhsVars)
+                    {
+                        if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
+                    }
+                    if (hit2) eqHelper.score += 0.5;
+                }
+
+                List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+
+                //This seems to just gather material for the GUI representation
+                double lastScore = double.MinValue;
+                double scoreCounter = 0;
+                int lineCounter = -1;
+                foreach (EqInfoSimple eqHelper in eqsNew)
+                {
+                    lineCounter++;
+                    if (eqHelper.score != lastScore)
+                    {
+                        scoreCounter++;
+                        lastScore = eqHelper.score;
+                    }
+                    string eqName = eqHelper.eqName;
+                    string eqName3 = eqHelper.eqNameWithLag;
+                    EquationTextHelper helper2 = new EquationTextHelper();
+                    helper2.showTime = o.decompFind.decompOptions2.showTime;
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, o.tSelected);
+                    string boolLhs = "";  //lhs                        
+                    if (eqHelper.score % 1 == 0) boolLhs = Globals.protectSymbol;
+                    string boolName = "";  //name
+                    boolName = "";
+                    if (eqHelper.score >= 100d) boolName = Globals.protectSymbol;
+                    //if (Globals.runningOnTTComputer) boolName += " : " + eqHelper.score.ToString();
+                    string tt = "tx0";
+                    int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
+                    string textColor = "Black";
+                    if (o.decompFind.decompOptions2.new_from != null)
+                    {
+                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3, StringComparer.OrdinalIgnoreCase))
+                        {
+                            textColor = "Gray";
+                        }
+                    }
+                    //This is where the contents of each GUI line is set
+                    //Hack that it is a global variable...
+                    Globals.itemHandler.Add(new EquationListItem(eqName3, " ", boolName, boolLhs, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
+                }
+
+                string firstEqName2 = eqsNew[0].eqName;
+                WindowFind windowFind = new WindowFind(o);
+                windowFind.Title = variableName + " - " + "Gekko equations";
+                windowFind.FindSetButtons(firstEqName2, firstList, model);
+                windowFind.FindSetLabel(variableName);
+                windowFind._activeEquation = firstEqName2;
+                windowFind._activeVariable = null;
+                EquationTextHelper helper = new EquationTextHelper();
+                helper.showTime = o.decompFind.decompOptions2.showTime;
+                windowFind.FindSetEquation(firstEqName2, helper, o.tSelected, model);
+                windowFind.decompFind.SetWindow(windowFind);
+                windowFind.ShowDialog();
+
+                return;
+
+
             }
             catch (Exception e)
             {

@@ -1405,7 +1405,7 @@ namespace Gekko
             checkBox.Width = 10;
             checkBox.Opacity = 0.30;
             bool visible = false; try { visible = ShowBlackArrow(black, ij); } catch { };  //should not fail, but for safety
-            int hidden = 0; if (black != null) hidden = black[ij].Count;
+            int hidden = 0; if (black != null && black[ij] != null) hidden = black[ij].Count;
             if (visible) checkBox.Visibility = Visibility.Visible;
             else checkBox.Visibility = Visibility.Hidden;
             string text = "Contains " + hidden +" aggregated variables: interactive expand/collapse will be improved in a later Gekko version.\nFor now, use the 'Expand' checkbox to expand all aggregated variables, or inspect count/names with the 'Count' or 'Names' checkboxes.\nYou may expand dimensions more selectively from the Rows/Cols selector to the right.\n(Aggregated variables may also be the result of selecting the 'Group age' checkbox).";
@@ -1436,7 +1436,7 @@ namespace Gekko
         private static bool ShowBlackArrow(List<List<string>> black, int ij)
         {
             bool visible = false;
-            if (black != null) visible = black[ij].Count > 1;
+            if (black != null && black[ij] != null) visible = black[ij].Count > 1;
             return visible;
         }
 
