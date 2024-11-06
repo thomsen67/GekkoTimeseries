@@ -2679,10 +2679,10 @@ namespace Gekko
                 return;
             }
 
-            if (text == "flowgraph1" || text == "flowgraph2")
+            if (text == "fg" || text == "fg2")
             {
                 MainWindow xx = new MainWindow();
-                if (text == "flowgraph1") xx.rotate = true;
+                if (text == "fg") xx.rotate = true;
                 xx.ShowDialog();
                 return;
             }

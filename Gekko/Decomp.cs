@@ -6180,6 +6180,7 @@ namespace Gekko
             decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
             DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             Table decompTable = decompOutput.table;
+            List<string> xx = decompTable.PrintText();
 
             for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
             {
@@ -6195,20 +6196,11 @@ namespace Gekko
                 string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
                 string label = null;
                 if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
-                string name = cellVariableName.CellText.TextData[0];
-                name = name.Replace(" | [0]", "");
-                name = name.Replace(" | ", "");
+                string name = cellVariableName.CellText.TextData[0];                
                 name = name.Trim();
 
-                FlowItem flowItem = new FlowItem();
-                if (useRealNames)
-                {
-
-                }
-                else
-                {
-                    flowItem.from = name;
-                }
+                FlowItem flowItem = new FlowItem();                
+                flowItem.from = name;                
                 flowItem.to = flowInfo.variableName;                
 
                 for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
