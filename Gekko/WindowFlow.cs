@@ -79,28 +79,19 @@ namespace Gekko
                 GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
 
                 if (true)
-                {                    
-                    string supreme = "vtKilde";
-                    
-                    List<EqInfoSimple> temp = Decomp.GetSortedEquations(supreme, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);                    
-                    string eq = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-
+                {
                     GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    
-                    FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(t1, t2, supreme, eq, "d", 2);                                         
-                    
-                    FlowItem flowParent = arrowsFromTo.children[0];
-                    for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
-                    {
-                        FlowItem flowChild = arrowsFromTo.children[i];
-                        if (G.Equal(flowChild.from, "Error")) continue;
-                        if (G.Equal(flowChild.from, "Residual")) continue;
-                        Edge e = graph.AddEdge(flowChild.from, flowChild.to);
-                        e.Attr.Color = Color(flowChild.v / flowParent.v);
-                        if (!alreadySeen.ContainsKey(flowChild.from)) alreadySeen.Add(flowChild.from, false);
-                        if (!alreadySeen.ContainsKey(flowChild.to)) alreadySeen.Add(flowChild.to, false);
-                        //Call recursively
-                    }
+
+                    string varName = "vtKilde";
+                    int depth = 0;
+
+                    List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
+                    string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);                    
+
+                    //a varName points to --> an eqName
+                    //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
+
+                    WalkNodes(depth, 2, graph, t1, t2, alreadySeen, varName, eqName);
 
                     Node n = null;
                     foreach (string s in alreadySeen.Keys)
@@ -108,7 +99,7 @@ namespace Gekko
                         n = graph.FindNode(s);
                         n.Attr.LabelMargin = 4;
                         n.Attr.Color = Color(0.3);
-                        if (G.Equal(s, supreme)) n.Attr.FillColor = Color(0.3);
+                        if (G.Equal(s, varName)) n.Attr.FillColor = Color(0.3);
                     }
 
                     if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
@@ -368,6 +359,28 @@ namespace Gekko
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString(), "Loading of Gekko flowgraph Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private static void WalkNodes(int depth, int maxDepth, Microsoft.Msagl.Drawing.Graph graph, GekkoTime t1, GekkoTime t2, GekkoDictionary<string, bool> alreadySeen, string varName, string eqName)
+        {
+            if (depth >= maxDepth) return;
+            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(t1, t2, varName, eqName, "d", 2);
+            for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
+            {
+                FlowItem flowChild = arrowsFromTo.children[i];
+                if (G.Equal(flowChild.from, "Error")) continue;
+                if (G.Equal(flowChild.from, "Residual")) continue;
+                Edge e = graph.AddEdge(flowChild.from, flowChild.to);
+                e.Attr.Color = Color(flowChild.v / arrowsFromTo.children[0].v);
+                if (!alreadySeen.ContainsKey(flowChild.from)) alreadySeen.Add(flowChild.from, false);
+                if (!alreadySeen.ContainsKey(flowChild.to)) alreadySeen.Add(flowChild.to, false);
+
+                string varNameChild = flowChild.from;
+                List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
+                string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+
+                WalkNodes(depth + 1, maxDepth, graph, t1, t2, alreadySeen, varNameChild, eqNameChild);
             }
         }
 

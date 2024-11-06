@@ -2682,7 +2682,7 @@ namespace Gekko
             if (text == "fg" || text == "fg2")
             {
                 MainWindow xx = new MainWindow();
-                if (text == "fg") xx.rotate = true;
+                if (text == "fg2") xx.rotate = true;
                 xx.ShowDialog();
                 return;
             }

@@ -6147,6 +6147,7 @@ namespace Gekko
             decompOptions2.new_endo = new List<string>() { variableName };
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
+            decompOptions2.expand = true;
             GekkoSmpl smpl = new GekkoSmpl(t1, t2);
             DecompDatas decompDatas = new DecompDatas();
             GekkoTime gt1, gt2;
@@ -6183,6 +6184,14 @@ namespace Gekko
                 if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
                 string name = cellVariableName.CellText.TextData[0];                
                 name = name.Trim();
+
+
+                //TODO 
+                //TODO 
+                //TODO What to do about this? Lags/leads.
+                //TODO 
+                //TODO 
+                name = G.Chop_RemoveLagOrLead(name);
 
                 FlowItem flowItem = new FlowItem();                
                 flowItem.from = name;                
