@@ -72,50 +72,38 @@ namespace Gekko
             {
                 Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph();
                 graphViewer.Graph = graph;
+                //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();
+                //double factor = 0.02;
+                //
+                GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
+                GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
 
                 if (true)
-                {
-                    //Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\Decomp\Decomp2";
-                    //Program.RunGekkoCommands("reset; time 2028 2035; model<gms>makro.zip; read makro1;", "", 0, new P());
-
-                    GekkoDictionary<string, string> matches = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
+                {                    
                     string supreme = "vtKilde";
-                    List<EqInfoSimple> temp = Decomp.GetSortedEquations(supreme, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
-                    string eq2 = temp[0].eqName;
-                    string eq = G.Chop_DimensionRemoveLast_FASTER(eq2);
-                    matches.Add(supreme, eq);
+                    
+                    List<EqInfoSimple> temp = Decomp.GetSortedEquations(supreme, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);                    
+                    string eq = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
 
-                    Edge e = null;
-                    Node n = null;
-
-                    GekkoDictionary<string, bool> vars = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (KeyValuePair<string, string> match in matches)
+                    GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    
+                    FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(t1, t2, supreme, eq, "d", 2);                                         
+                    
+                    FlowItem flowParent = arrowsFromTo.children[0];
+                    for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
                     {
-                        GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
-                        GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
-
-                        FlowInfo flowInfo = Decomp.GetFlowInfoFromDecomp(t1, t2, match.Key, match.Value, "d", 2);
-
-                        double factor = 0.02;
-
-                        //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();                    
-
-                        FlowItem flowParent = flowInfo.children[0];
-                        for (int i = 1; i < flowInfo.children.Count; i++)  //skips first
-                        {
-                            FlowItem flowChild = flowInfo.children[i];
-                            if (G.Equal(flowChild.from, "Error")) continue;
-                            if (G.Equal(flowChild.from, "Residual")) continue;
-                            e = graph.AddEdge(flowChild.from, flowChild.to);
-                            e.Attr.Color = Color(flowChild.v / flowParent.v);
-                            if (!vars.ContainsKey(flowChild.from)) vars.Add(flowChild.from, false);
-                            if (!vars.ContainsKey(flowChild.to)) vars.Add(flowChild.to, false);
-                            //Call recursively
-                        }
+                        FlowItem flowChild = arrowsFromTo.children[i];
+                        if (G.Equal(flowChild.from, "Error")) continue;
+                        if (G.Equal(flowChild.from, "Residual")) continue;
+                        Edge e = graph.AddEdge(flowChild.from, flowChild.to);
+                        e.Attr.Color = Color(flowChild.v / flowParent.v);
+                        if (!alreadySeen.ContainsKey(flowChild.from)) alreadySeen.Add(flowChild.from, false);
+                        if (!alreadySeen.ContainsKey(flowChild.to)) alreadySeen.Add(flowChild.to, false);
+                        //Call recursively
                     }
 
-                    foreach (string s in vars.Keys)
+                    Node n = null;
+                    foreach (string s in alreadySeen.Keys)
                     {
                         n = graph.FindNode(s);
                         n.Attr.LabelMargin = 4;
