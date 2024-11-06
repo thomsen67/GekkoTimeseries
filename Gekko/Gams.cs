@@ -1164,14 +1164,7 @@ namespace Gekko
                         WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
                         continue;  //Variable exists, but is not found in equation in any form
                     }
-
-                    Dims first = null;
-                    Dims last = null;
-                    if (m1.storage.Count > 0)
-                    {
-                        first = m1.storage.First();
-                        last = m1.storage.Last();
-                    }
+                    
                     int nDim = GetDim(m1);
                     GekkoDictionary<string, bool>[] span = GetIndexesFromScalarEquations(m1, nDim, writer);
                     List<string> eqIndexes = G.Chop_GetIndex(equationNameWithIndexes);
@@ -1217,12 +1210,16 @@ namespace Gekko
                                 // Cannot count on first/last, because GAMS may garble this.
                                 // -----------------------------------------------------------------------
 
-                                string sFirst = first.storage[i];
-                                string sLast = last.storage[i];
-                                
+                                List<int> spiral = GenerateSpiral(m1.storage.Count - 1);
+
+                                //See if an index from the equation name (like "e_x_tot" indicating x[tot])
+                                //can be used.
+                                //
+                                //TODO: What if there are several indexes, like "e_x_tot_atot"??
+                                //
                                 if (!successDim[i] && indexName != null)
                                 {
-                                    foreach (int j in GenerateSpiral(m1.storage.Count - 1))
+                                    foreach (int j in spiral)
                                     {
                                         string s = m1.storage[j].storage[i];
                                         if (G.EqualHandleBlanks(s, indexName))
@@ -1234,6 +1231,12 @@ namespace Gekko
                                     }
                                 }
 
+                                //See if an index from an equation name like "e_x_atot" is a set/list, like #atot instead of 'atot'.
+                                //
+                                //TODO: What if there are several indexes, like "e_x_tot_atot"??
+                                //TODO: This would be best to do dynamically, when calling the FIND window, so that a databank
+                                //      with sets is loaded already.
+                                //
                                 if (!successDim[i] && mayUseDatabank)
                                 {
                                     List iv = O.GetIVariableFromString("#" + indexName, O.ECreatePossibilities.NoneReturnNullAlways) as List;
@@ -1244,7 +1247,7 @@ namespace Gekko
                                             ScalarString ss = iv.list[0] as ScalarString;
                                             if (ss != null)
                                             {
-                                                foreach (int j in GenerateSpiral(m1.storage.Count - 1))
+                                                foreach (int j in spiral)
                                                 {
                                                     string s = m1.storage[j].storage[i];
                                                     if (G.Equal(s, ss.string2))
@@ -1259,9 +1262,26 @@ namespace Gekko
                                     }
                                 }
 
+                                //If an element has the name "tot", it is assumed that it is the LHS element.
+                                //This is done before checking if the name *contains* "tot", which is done below.
                                 if (!successDim[i])
                                 {
-                                    foreach (int j in GenerateSpiral(m1.storage.Count - 1))
+                                    foreach (int j in spiral)
+                                    {
+                                        string s = m1.storage[j].storage[i];
+                                        if (G.Equal(s, "tot"))
+                                        {
+                                            names[i] = s;
+                                            successDim[i] = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                //If an element contains "tot", it is assumed that it is the LHS element.
+                                if (!successDim[i])
+                                {
+                                    foreach (int j in spiral)
                                     {
                                         string s = m1.storage[j].storage[i];
                                         if (G.Contains(s, "tot"))
@@ -1271,21 +1291,21 @@ namespace Gekko
                                             break;
                                         }
                                     }
-                                }                                
+                                }
 
+                                //Here, we look at an equation name like e_x_tot[i, j] and try to match the "i" and "j"
+                                //with the variable dimension elements (that may be for instance x[tot, j, i]).
+                                //TODO: Use domain 
+                                //TODO: Use domain 
+                                //TODO: Use domain to know how dimensions match. Perhaps it can be induced from the scalar eqs rolling out?
+                                //TODO: Use domain 
+                                //TODO: Use domain 
+                                //A bit hacky and not completely accurate as it is.                                
                                 if (!successDim[i])
-                                {
-                                    //TODO: Use domain 
-                                    //TODO: Use domain 
-                                    //TODO: Use domain to know how dimensions match. Perhaps it can be induced from the scalar eqs rolling out?
-                                    //TODO: Use domain 
-                                    //TODO: Use domain 
-                                    //
-                                    //A bit hacky and not completely accurate as it is.
-
+                                {                                    
                                     foreach (string index in eqIndexes)
                                     {
-                                        foreach (int j in GenerateSpiral(m1.storage.Count - 1))
+                                        foreach (int j in spiral)
                                         {
                                             string s = m1.storage[j].storage[i];
                                             if (G.Contains(s, index))
@@ -1362,6 +1382,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// If for instance n = 7, it returns 0, 7, 1, 6, 2, 5, 3, 4. So it takes the first and last first.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public static List<int> GenerateSpiral(int n)
         {
             List<int> result = new List<int>();
