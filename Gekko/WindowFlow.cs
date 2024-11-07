@@ -15,7 +15,7 @@ namespace Gekko
 {
     public class WindowFlow : Window
     {
-        public DecompOptions2 decompOptions2 = null;        
+        public DecompFind decompFind = null;        
         public bool rotate = false;
         public static readonly RoutedUICommand LoadSampleGraphCommand = new RoutedUICommand("Open File...", "OpenFileCommand",
                                                                                        typeof(WindowFlow));
@@ -28,10 +28,10 @@ namespace Gekko
         private GraphViewer graphViewer = new GraphViewer();
         private TextBox statusTextBox = new TextBox();
 
-        public WindowFlow(DecompOptions2 decompOptions2)
+        public WindowFlow(DecompFind decompFind)
         {
             //InitializeComponent(); // Removed - no XAML used here
-            this.decompOptions2 = decompOptions2;
+            this.decompFind = decompFind;
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Closing += Window_Closing;
             SetupToolbar();
@@ -53,24 +53,6 @@ namespace Gekko
             WindowState = WindowState.Normal;
         }
 
-        private void CloseOnEscape(object sender, KeyEventArgs e)
-        {
-            //only work with showdialog ........ HMMMMMMMMMMMMMMMM! ---> Well, it seems to work with .Show(), so what is the problem?
-            if (e.Key == Key.Escape)
-            {
-                Close();
-            }
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (Globals.windowsFlow != null && this != null) Globals.windowsFlow.Remove(this);
-        }
-
-        void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
-        {
-            statusTextBox.Text = "there was a click...";
-        }
 
         private void CreateAndLayoutAndDisplayGraph(object sender, RoutedEventArgs ee)
         {
@@ -81,19 +63,24 @@ namespace Gekko
                 //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();
                 //double factor = 0.02;
 
-                GekkoTime t1 = this.decompOptions2.t1;
-                GekkoTime t2 = this.decompOptions2.t1;  //Note: using t1 here too!
-                GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                //GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-                string varName = this.decompOptions2.new_select[0];
+                string varName = this.decompFind.decompOptions2.new_select[0];
                 int depth = 0;
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
                 string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
 
                 //a varName points to --> an eqName
                 //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
+                WalkInfo wi = new WalkInfo();
+                wi.t1 = this.decompFind.decompOptions2.t1;
+                wi.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
+                wi.alreadySeen = new GekkoDictionaryBlanks<string>();
+                wi.maxDepth = Program.options.decomp_flowgraph_depth;
+                wi.ignoreDJZ = true;
+                wi.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
 
-                WalkNodes(depth, Program.options.decomp_flowgraph_depth, graph, t1, t2, alreadySeen, varName, eqName);
+                WalkNodes(depth, graph, varName, eqName, wi);
 
                 if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
                 else graph.Attr.LayerDirection = LayerDirection.RL;
@@ -107,37 +94,45 @@ namespace Gekko
             }
         }
 
-        private static void WalkNodes(int depth, int maxDepth, Microsoft.Msagl.Drawing.Graph graph, GekkoTime t1, GekkoTime t2, GekkoDictionary<string, bool> alreadySeen, string varName, string eqName)
+        private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
-            if (depth >= maxDepth) return;
-            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(t1, t2, varName, eqName, "d");            
+            if (depth >= walkInfo.maxDepth) return;
+            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, "d");            
 
             for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
             {
-                FlowItem flowChild = arrowsFromTo.children[i];
+                FlowItem flowChild = arrowsFromTo.children[i];                                
+                double share = flowChild.v / arrowsFromTo.children[0].v;
                 if (G.Equal(flowChild.from, "Error")) continue;
                 if (G.Equal(flowChild.from, "Residual")) continue;
+                if (walkInfo.isGekkoModel && walkInfo.ignoreDJZ && (G.isNumericalError(share) || Math.Abs(share) <= 0.01d))
+                {
+                    if (G.Equal(flowChild.from, "d" + flowChild.to)) continue;
+                    if (G.Equal(flowChild.from, "j" + flowChild.to)) continue;
+                    if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
+                }
+
                 Edge e = graph.AddEdge(flowChild.from, flowChild.to);
 
                 Node nodeFrom = graph.FindNode(flowChild.from);
                 nodeFrom.Attr.LabelMargin = 4;
                 nodeFrom.Attr.Color = Color(0.3);
-                
+                                
                 Node nodeTo = graph.FindNode(flowChild.to);                
                 nodeTo.Attr.LabelMargin = 4;
                 nodeTo.Attr.Color = Color(0.3);                
                 if (depth == 0) nodeTo.Attr.Color = Color(1.0);
 
-                e.Attr.Color = Color(flowChild.v / arrowsFromTo.children[0].v);
-                if (!alreadySeen.ContainsKey(flowChild.from)) alreadySeen.Add(flowChild.from, false);
-                if (!alreadySeen.ContainsKey(flowChild.to)) alreadySeen.Add(flowChild.to, false);
+                e.Attr.Color = Color(share);
+                if (!walkInfo.alreadySeen.ContainsKey(flowChild.from)) walkInfo.alreadySeen.Add(flowChild.from, null);
+                if (!walkInfo.alreadySeen.ContainsKey(flowChild.to)) walkInfo.alreadySeen.Add(flowChild.to, null);
 
                 string varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
                 if (temp.Count > 0 && temp[0].score >= 100d)  //Only eqs that are found with checkbox "Name" in FIND window.
                 {
                     string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                    WalkNodes(depth + 1, maxDepth, graph, t1, t2, alreadySeen, varNameChild, eqNameChild);
+                    WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);
                 }
                 else
                 {                    
@@ -153,7 +148,7 @@ namespace Gekko
             if (d > 1) d = 1;
             else if (d < 0.20) d = 0.20;
             byte b = (byte)((1 - d) * 255);
-            if (d2 > 0) return new Color(255, b, b, b);
+            if (d2 >= -0.01) return new Color(255, b, b, b);
             else return new Color(255, 255, b, b);
         }
 
@@ -209,6 +204,26 @@ namespace Gekko
             SetViewMenu(mainMenu);
         }
 
+
+        private void CloseOnEscape(object sender, KeyEventArgs e)
+        {
+            //only work with showdialog ........ HMMMMMMMMMMMMMMMM! ---> Well, it seems to work with .Show(), so what is the problem?
+            if (e.Key == Key.Escape)
+            {
+                Close();
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Globals.windowsFlow != null && this != null) Globals.windowsFlow.Remove(this);
+        }
+
+        void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
+        {
+            statusTextBox.Text = "there was a click...";
+        }
+
         void SetViewMenu(Menu mainMenu)
         {
             var viewMenu = new MenuItem { Header = "_View" };
@@ -237,5 +252,15 @@ namespace Gekko
         {
             this.ShowDialog(); // Show the window as a modal dialog
         }
+    }
+
+    public class WalkInfo
+    {
+        public GekkoTime t1;
+        public GekkoTime t2;
+        public GekkoDictionaryBlanks<string> alreadySeen;
+        public int maxDepth;
+        public bool ignoreDJZ;
+        public bool isGekkoModel;
     }
 }

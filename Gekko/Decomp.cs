@@ -5729,10 +5729,18 @@ namespace Gekko
             List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
             if (eqNumbers == null)
             {
-                new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                {
+                    //Some variable has an "e_" prefixed, but the equation may not exist if it is an exogenous variable.
+                    return new List<EqInfoSimple>();
+                }
+                else
+                {
+                    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                }
             }
             
-            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelGams == null);
+            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
             List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, t, eqNumbers, model);
             foreach (EqInfoSimple eqHelper in eqsNew2)
             {
