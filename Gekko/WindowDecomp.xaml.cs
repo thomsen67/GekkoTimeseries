@@ -3102,7 +3102,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 //WindowFlow w = new WindowFlow(decompFind);
-                WindowFlow w = new WindowFlow();
+                WindowFlow w = new WindowFlow(this.decompFind);
                 Globals.windowsFlow.Add(w);                
                 w.Title = "Gekko flowgraph";
                 w.Show();
