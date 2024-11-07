@@ -39,7 +39,7 @@ namespace Gekko
             SetupToolbar();
             graphViewerPanel.ClipToBounds = true;
             //mainGrid.Children.Add(toolBar);
-            toolBar.VerticalAlignment = VerticalAlignment.Top;
+            //toolBar.VerticalAlignment = VerticalAlignment.Top;
             graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;            
             //graphViewer.MouseDown += WpfApplicationSample_MouseDown;
 
@@ -129,6 +129,8 @@ namespace Gekko
                 {
                     if (G.Equal(flowChild.from, "d" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "j" + flowChild.to)) continue;
+                    if (G.Equal(flowChild.from, "jr" + flowChild.to)) continue;
+                    if (G.Equal(flowChild.from, "jd" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
                 }
 
@@ -227,16 +229,16 @@ namespace Gekko
         private void SetupToolbar()
         {
             SetupCommands();
-            DockPanel.SetDock(toolBar, Dock.Top);            
+            //DockPanel.SetDock(toolBar, Dock.Top);            
             SetMainMenu();
         }
 
         private void SetMainMenu()
         {
-            var mainMenu = new Menu { IsMainMenu = true };
-            toolBar.Items.Add(mainMenu);
-            SetFileMenu(mainMenu);
-            SetViewMenu(mainMenu);
+            //var mainMenu = new Menu { IsMainMenu = true };
+            //toolBar.Items.Add(mainMenu);
+            //SetFileMenu(mainMenu);
+            //SetViewMenu(mainMenu);
 
         }
 
@@ -255,8 +257,8 @@ namespace Gekko
 
         void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
         {
-            //statusTextBox.Text = "there was a click...";
-            statusTextBox.Text = "";
+            statusTextBox.Text = "Flowgraph clicked...";
+            //statusTextBox.Text = "";
         }
 
         private void SetViewMenu(Menu mainMenu)
