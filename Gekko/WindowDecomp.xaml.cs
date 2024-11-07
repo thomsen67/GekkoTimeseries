@@ -3097,6 +3097,17 @@ namespace Gekko
             }
         }
 
+        private void ButtonFlow_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {                
+                WindowFlow w = new WindowFlow(decompFind.decompOptions2);
+                Globals.windowsFlow.Add(w);                
+                w.Title = "Gekko flowgraph";
+                w.Show();
+            }
+        }
+
         private void Style_Click(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)

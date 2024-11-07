@@ -416,7 +416,15 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button Content="Refresh" Margin="18,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
+                <Button Content="Flow" Margin="18,-3,0,0" Width="35" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Flowgraph of decomposed values, recursively. Note: expands aggregated cells." Click="ButtonFlow_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="Refresh" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>

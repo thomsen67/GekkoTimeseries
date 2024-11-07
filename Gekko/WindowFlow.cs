@@ -15,13 +15,12 @@ namespace Gekko
 {
     public class WindowFlow : Window
     {
+        public DecompOptions2 decompOptions2 = null;        
         public bool rotate = false;
         public static readonly RoutedUICommand LoadSampleGraphCommand = new RoutedUICommand("Open File...", "OpenFileCommand",
                                                                                        typeof(WindowFlow));
         public static readonly RoutedUICommand HomeViewCommand = new RoutedUICommand("Home view...", "HomeViewCommand",
                                                                                         typeof(WindowFlow));
-
-
 
         private Grid mainGrid = new Grid();
         private DockPanel graphViewerPanel = new DockPanel();
@@ -29,9 +28,10 @@ namespace Gekko
         private GraphViewer graphViewer = new GraphViewer();
         private TextBox statusTextBox = new TextBox();
 
-        public WindowFlow()
+        public WindowFlow(DecompOptions2 decompOptions2)
         {
             //InitializeComponent(); // Removed - no XAML used here
+            this.decompOptions2 = decompOptions2;
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Closing += Window_Closing;
             SetupToolbar();
@@ -80,16 +80,13 @@ namespace Gekko
                 graphViewer.Graph = graph;
                 //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();
                 //double factor = 0.02;
-                
-                GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
-                GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
+
+                GekkoTime t1 = this.decompOptions2.t1;
+                GekkoTime t2 = this.decompOptions2.t1;  //Note: using t1 here too!
                 GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-                //string varName = "vtKilde";
-                string varName = "vtTop[tot]";
-                //string varName = "fy";
+                string varName = this.decompOptions2.new_select[0];
                 int depth = 0;
-
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
                 string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
 
@@ -113,7 +110,8 @@ namespace Gekko
         private static void WalkNodes(int depth, int maxDepth, Microsoft.Msagl.Drawing.Graph graph, GekkoTime t1, GekkoTime t2, GekkoDictionary<string, bool> alreadySeen, string varName, string eqName)
         {
             if (depth >= maxDepth) return;
-            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(t1, t2, varName, eqName, "d", 2);
+            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(t1, t2, varName, eqName, "d");            
+
             for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
             {
                 FlowItem flowChild = arrowsFromTo.children[i];
@@ -181,9 +179,9 @@ namespace Gekko
             {
                 var drawingNode = (Node)node.DrawingObject;               
                 string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);
-                string s = drawingNode.Label.Text;
-                if (!G.NullOrBlanks(label)) s += ": " + label;
-                statusTextBox.Text = s;
+                //string s = drawingNode.Label.Text;                
+                //if (!G.NullOrBlanks(label)) s += ": " + label;                
+                statusTextBox.Text = label;
             }
             else
             {

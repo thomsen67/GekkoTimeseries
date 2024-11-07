@@ -6121,7 +6121,7 @@ namespace Gekko
         /// <param name="equationName"></param>
         /// <param name="variableName"></param>
         /// <returns></returns>
-        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, string op, int offset)
+        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, string op)
         {
             bool useRealNames = true;
             
@@ -6129,11 +6129,11 @@ namespace Gekko
 
             flowInfo.variableName = variableName;
             flowInfo.equationName = equationName;
-            flowInfo.period = t1.Add(offset);  //2030
+            //flowInfo.period = t1.Add(offset);  //2030
 
             ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             Model model = Program.model;
-            modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
+            //modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = t1;
             decompOptions2.t2 = t2;
@@ -6197,7 +6197,7 @@ namespace Gekko
                 {
                     Cell cellData = decompTable.Get(i2, j2);
                     double value = cellData.number;
-                    if (j2 == 2 + offset) flowItem.v = value;
+                    if (j2 == 2) flowItem.v = value;
                 }                
                 flowInfo.children.Add(flowItem);
             }

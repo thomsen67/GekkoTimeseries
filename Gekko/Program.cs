@@ -2693,19 +2693,6 @@ namespace Gekko
             if (text == "fg" || text == "fg2")
             {
 
-                Thread sta = new Thread(delegate ()
-                {
-                    WindowFlow w = new WindowFlow();
-                    Globals.windowsFlow.Add(w);
-                    if (text == "fg2") w.rotate = true;
-                    w.Title = "Gekko flowgraph";
-                    w.Show();
-                    System.Windows.Threading.Dispatcher.Run();
-                });
-                sta.SetApartmentState(ApartmentState.STA);
-                sta.Start();
-
-                return;
             }
 
             if (text == "bash" && Globals.runningOnTTComputer)
