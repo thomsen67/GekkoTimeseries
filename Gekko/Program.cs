@@ -2681,9 +2681,19 @@ namespace Gekko
 
             if (text == "fg" || text == "fg2")
             {
-                MainWindow xx = new MainWindow();
-                if (text == "fg2") xx.rotate = true;
-                xx.ShowDialog();
+
+                Thread sta = new Thread(delegate ()
+                {
+                    WindowFlow w = new WindowFlow();
+                    Globals.windowsFlow.Add(w);
+                    if (text == "fg2") w.rotate = true;
+                    w.Title = "Gekko flowgraph";
+                    w.Show();
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+                sta.SetApartmentState(ApartmentState.STA);
+                sta.Start();
+
                 return;
             }
 
@@ -10234,6 +10244,10 @@ namespace Gekko
                 i++;
             }
             foreach (WindowTreeViewWithTable g in Globals.windowsTrace)
+            {
+                i++;
+            }
+            foreach (WindowFlow g in Globals.windowsFlow)
             {
                 i++;
             }
@@ -20088,12 +20102,13 @@ namespace Gekko
 
         public static void CutPrint(bool print)
         {
-            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter + Globals.ch.windowsTraceCloseCounter > 0)
+            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter + Globals.ch.windowsTraceCloseCounter + Globals.ch.windowsFlowCloseCounter > 0)
             {
                 G.Writeln();
-                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT window" + G.S(Globals.ch.windowsGraphCloseCounter));
-                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP window" + G.S(Globals.ch.windowsDecompCloseCounter));
-                if (Globals.ch.windowsTraceCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsTraceCloseCounter + " TRACE windows" + G.S(Globals.ch.windowsTraceCloseCounter));
+                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " plot window" + G.S(Globals.ch.windowsGraphCloseCounter));
+                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " decomp window" + G.S(Globals.ch.windowsDecompCloseCounter));
+                if (Globals.ch.windowsTraceCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsTraceCloseCounter + " trace window" + G.S(Globals.ch.windowsTraceCloseCounter));
+                if (Globals.ch.windowsFlowCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsFlowCloseCounter + " flowgraph window" + G.S(Globals.ch.windowsFlowCloseCounter));
             }
         }
 
@@ -20132,6 +20147,18 @@ namespace Gekko
                 CrossThreadStuff.CloseTrace(windowsTrace[i]);  //fails silently
             }
             Globals.windowsTrace = new List<WindowTreeViewWithTable>();
+        }
+
+        public static void CutFlow()
+        {
+            List<WindowFlow> windowsFlow = new List<WindowFlow>();
+            windowsFlow.AddRange(Globals.windowsFlow);
+            for (int i = 0; i < windowsFlow.Count; i++)
+            {
+                if (windowsFlow[i] == null) continue;
+                CrossThreadStuff.CloseFlow(windowsFlow[i]);  //fails silently
+            }
+            Globals.windowsFlow = new List<WindowFlow>();
         }
 
         /// <summary>

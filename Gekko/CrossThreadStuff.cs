@@ -858,6 +858,25 @@ namespace Gekko
             catch { };  //fail silently
         }
 
+        delegate void CloseFlowCallback(WindowFlow w);
+        public static void CloseFlow(WindowFlow w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new CloseFlowCallback(CloseFlow), new object[] { w });
+                }
+                else
+                {                    
+                    Globals.ch.windowsFlowCloseCounter++;
+                    w.Close();
+                }
+            }
+            catch { };  //fail silently
+        }
+
         //weird delegate pattern, but it works!
         delegate void GetDecompSizesCallback(WindowDecomp w);
         public static void GetDecompSizes(WindowDecomp w)

@@ -13,13 +13,13 @@ using ModifierKeys = System.Windows.Input.ModifierKeys;
 
 namespace Gekko
 {
-    class MainWindow : Window
+    public class WindowFlow : Window
     {
         public bool rotate = false;
         public static readonly RoutedUICommand LoadSampleGraphCommand = new RoutedUICommand("Open File...", "OpenFileCommand",
-                                                                                       typeof(MainWindow));
+                                                                                       typeof(WindowFlow));
         public static readonly RoutedUICommand HomeViewCommand = new RoutedUICommand("Home view...", "HomeViewCommand",
-                                                                                        typeof(MainWindow));
+                                                                                        typeof(WindowFlow));
 
 
 
@@ -29,10 +29,11 @@ namespace Gekko
         private GraphViewer graphViewer = new GraphViewer();
         private TextBox statusTextBox = new TextBox();
 
-        public MainWindow()
+        public WindowFlow()
         {
             //InitializeComponent(); // Removed - no XAML used here
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
+            this.Closing += Window_Closing;
             SetupToolbar();
             graphViewerPanel.ClipToBounds = true;
             mainGrid.Children.Add(toolBar);
@@ -54,11 +55,16 @@ namespace Gekko
 
         private void CloseOnEscape(object sender, KeyEventArgs e)
         {
-            //only work with showdialog ........ HMMMMMMMMMMMMMMMM!
+            //only work with showdialog ........ HMMMMMMMMMMMMMMMM! ---> Well, it seems to work with .Show(), so what is the problem?
             if (e.Key == Key.Escape)
             {
                 Close();
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Globals.windowsFlow != null && this != null) Globals.windowsFlow.Remove(this);
         }
 
         void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
@@ -80,9 +86,12 @@ namespace Gekko
 
                 if (true)
                 {
+                    int maxDepth = 2;
+                    
                     GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-                    string varName = "vtKilde";
+                    //string varName = "vtKilde";
+                    string varName = "vtTop[tot]";
                     int depth = 0;
 
                     List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
@@ -91,7 +100,7 @@ namespace Gekko
                     //a varName points to --> an eqName
                     //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
 
-                    WalkNodes(depth, 2, graph, t1, t2, alreadySeen, varName, eqName);
+                    WalkNodes(depth, maxDepth, graph, t1, t2, alreadySeen, varName, eqName);
 
                     Node n = null;
                     foreach (string s in alreadySeen.Keys)

@@ -2928,6 +2928,7 @@ namespace Gekko
                 Program.CutPlot();
                 Program.CutDecomp2();
                 Program.CutTrace();
+                Program.CutFlow();
                 Program.CutPrint(print);
             }
             catch { }
@@ -2961,6 +2962,17 @@ namespace Gekko
             {
                 //Close all decomp
                 Program.CutTrace();
+                Program.CutPrint(true);
+            }
+            catch { }
+        }
+
+        private void allFLOWGRAPHToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //Close all decomp
+                Program.CutFlow();
                 Program.CutPrint(true);
             }
             catch { }

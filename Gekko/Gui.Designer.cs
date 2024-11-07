@@ -124,6 +124,7 @@ namespace Gekko
             this.allPPLOTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allUDVALGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allTRACEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allFLOWGRAPHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.showMenuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -469,7 +470,7 @@ namespace Gekko
             this.toolStripButton6.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.toolStripButton6.Name = "toolStripButton6";
             this.toolStripButton6.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton6.Text = "Close all PLOT, DECOMP and TRACE windows";
+            this.toolStripButton6.Text = "Close all plot/decomp/trace/flowgraph windows";
             this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
             // 
             // menuStrip1
@@ -1016,7 +1017,9 @@ namespace Gekko
             this.allPPLOTUDVALGToolStripMenuItem,
             this.allPPLOTToolStripMenuItem,
             this.allUDVALGToolStripMenuItem,
-            this.allTRACEToolStripMenuItem});
+            this.allTRACEToolStripMenuItem,
+            this.allFLOWGRAPHToolStripMenuItem,
+            });
             this.closeToolStripMenuItem1.Name = "closeToolStripMenuItem1";
             this.closeToolStripMenuItem1.Size = new System.Drawing.Size(164, 22);
             this.closeToolStripMenuItem1.Text = "Close";
@@ -1026,31 +1029,37 @@ namespace Gekko
             // 
             this.allPPLOTUDVALGToolStripMenuItem.Name = "allPPLOTUDVALGToolStripMenuItem";
             this.allPPLOTUDVALGToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.allPPLOTUDVALGToolStripMenuItem.Text = "Close all PLOT+DECOMP+TRACE";
-            this.allPPLOTUDVALGToolStripMenuItem.ToolTipText = "Close all PLOT, DECOMP and TRACE windows";
+            this.allPPLOTUDVALGToolStripMenuItem.Text = "Close all plot/decomp/trace/flowgraph windows";
+            this.allPPLOTUDVALGToolStripMenuItem.ToolTipText = "Close all plot, decomp, trace and flowgraph windows";
             this.allPPLOTUDVALGToolStripMenuItem.Click += new System.EventHandler(this.allPPLOTUDVALGToolStripMenuItem_Click);
             // 
             // allPPLOTToolStripMenuItem
             // 
             this.allPPLOTToolStripMenuItem.Name = "allPPLOTToolStripMenuItem";
             this.allPPLOTToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.allPPLOTToolStripMenuItem.Text = "Close all PLOT";
-            this.allPPLOTToolStripMenuItem.ToolTipText = "Close all PLOT windows";
+            this.allPPLOTToolStripMenuItem.Text = "Close all plot windows";
+            this.allPPLOTToolStripMenuItem.ToolTipText = "Close all plot windows";
             this.allPPLOTToolStripMenuItem.Click += new System.EventHandler(this.allPPLOTToolStripMenuItem_Click);
             // 
             // allUDVALGToolStripMenuItem
             // 
             this.allUDVALGToolStripMenuItem.Name = "allUDVALGToolStripMenuItem";
             this.allUDVALGToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.allUDVALGToolStripMenuItem.Text = "Close all DECOMP";
-            this.allUDVALGToolStripMenuItem.ToolTipText = "Close all DECOMP windows";
+            this.allUDVALGToolStripMenuItem.Text = "Close all decomp windows";
+            this.allUDVALGToolStripMenuItem.ToolTipText = "Close all decomp windows";
             this.allUDVALGToolStripMenuItem.Click += new System.EventHandler(this.allUDVALGToolStripMenuItem_Click);
 
             this.allTRACEToolStripMenuItem.Name = "allTRACEToolStripMenuItem";
             this.allTRACEToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.allTRACEToolStripMenuItem.Text = "Close all TRACE";
-            this.allTRACEToolStripMenuItem.ToolTipText = "Close all TRACE windows";
+            this.allTRACEToolStripMenuItem.Text = "Close all trace windows";
+            this.allTRACEToolStripMenuItem.ToolTipText = "Close all trace windows";
             this.allTRACEToolStripMenuItem.Click += new System.EventHandler(this.allTRACEToolStripMenuItem_Click);
+
+            this.allFLOWGRAPHToolStripMenuItem.Name = "allFLOWGRAPHToolStripMenuItem";
+            this.allFLOWGRAPHToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.allFLOWGRAPHToolStripMenuItem.Text = "Close all flowgraph windows";
+            this.allFLOWGRAPHToolStripMenuItem.ToolTipText = "Close all TRACE windows";
+            this.allFLOWGRAPHToolStripMenuItem.Click += new System.EventHandler(this.allFLOWGRAPHToolStripMenuItem_Click);
             // 
             // toolStripSeparator8
             // 
@@ -1946,6 +1955,7 @@ namespace Gekko
         private ToolStripMenuItem allPPLOTToolStripMenuItem;
         private ToolStripMenuItem allUDVALGToolStripMenuItem;
         private ToolStripMenuItem allTRACEToolStripMenuItem;
+        private ToolStripMenuItem allFLOWGRAPHToolStripMenuItem;
         private ToolStripMenuItem updateToolStripMenuItem;
         private ToolStripMenuItem allPPLOTAndUDVALGToolStripMenuItem;
         private ToolStripMenuItem allPPLOTToolStripMenuItem1;
