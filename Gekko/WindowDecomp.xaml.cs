@@ -3100,8 +3100,9 @@ namespace Gekko
         private void ButtonFlow_Click(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {                
-                WindowFlow w = new WindowFlow(decompFind);
+            {
+                //WindowFlow w = new WindowFlow(decompFind);
+                WindowFlow w = new WindowFlow();
                 Globals.windowsFlow.Add(w);                
                 w.Title = "Gekko flowgraph";
                 w.Show();

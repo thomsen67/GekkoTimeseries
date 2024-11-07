@@ -1,0 +1,18 @@
+﻿<Window x:Class="Gekko.WindowFlow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Gekko"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" d:Title="Gekko flowgraph" d:WindowStartupLocation="CenterScreen">
+    <Grid x:Name="mainGrid">
+        <ToolBar x:Name="toolBar" VerticalAlignment="Top" DockPanel.Dock="Top"/>
+        <DockPanel x:Name="graphViewerPanel" ClipToBounds="True">
+            <!--<local:GraphViewer x:Name="graphViewer"/>-->
+        </DockPanel>
+        <StatusBar VerticalAlignment="Bottom">
+            <TextBox x:Name="statusTextBox" Text=""/>
+        </StatusBar>
+    </Grid>
+</Window>
