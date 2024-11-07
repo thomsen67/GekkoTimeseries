@@ -79,6 +79,9 @@ namespace Gekko
                 wi.maxDepth = Program.options.decomp_flowgraph_depth;
                 wi.ignoreDJZ = true;
                 wi.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
+                wi.decompFind = this.decompFind;
+                wi.removeSelfReferences = true;  //lags??
+                wi.removeResidualIgnoredError = true;
 
                 WalkNodes(depth, graph, varName, eqName, wi);
 
@@ -95,21 +98,47 @@ namespace Gekko
         }
 
         private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
-        {
+        {            
             if (depth >= walkInfo.maxDepth) return;
-            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, "d");            
+            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind);
+
+            GekkoDictionary<string, bool> same = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
             for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
             {
-                FlowItem flowChild = arrowsFromTo.children[i];                                
+                FlowItem flowChild = arrowsFromTo.children[i];
+
+                if (Globals.runningOnTTComputer && G.Equal("vwhh[tot]", flowChild.from))
+                {
+                    MessageBox.Show("Several from vwhh[tot] to vPersIndx[tot]");
+                }
+
                 double share = flowChild.v / arrowsFromTo.children[0].v;
-                if (G.Equal(flowChild.from, "Error")) continue;
-                if (G.Equal(flowChild.from, "Residual")) continue;
+                if (walkInfo.removeResidualIgnoredError)
+                {
+                    if (G.StartsWith(flowChild.from, "Error")) continue;
+                    if (G.StartsWith(flowChild.from, "Residual")) continue;
+                    if (G.StartsWith(flowChild.from, "Ignored")) continue;
+                }
                 if (walkInfo.isGekkoModel && walkInfo.ignoreDJZ && (G.isNumericalError(share) || Math.Abs(share) <= 0.01d))
                 {
                     if (G.Equal(flowChild.from, "d" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "j" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
+                }
+
+                if (walkInfo.removeSelfReferences)
+                {
+                    if (G.Equal(flowChild.from, flowChild.to)) continue;
+                    string s = (flowChild.from + "-->" + flowChild.to).Replace(" ", "");
+                    if (same.ContainsKey(s))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        same.Add(s, false);
+                    }                    
                 }
 
                 Edge e = graph.AddEdge(flowChild.from, flowChild.to);
@@ -262,5 +291,8 @@ namespace Gekko
         public int maxDepth;
         public bool ignoreDJZ;
         public bool isGekkoModel;
+        public DecompFind decompFind;
+        public bool removeSelfReferences;
+        public bool removeResidualIgnoredError;
     }
 }
