@@ -8,6 +8,7 @@ using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.Layout.Layered;
 using Microsoft.Msagl.WpfGraphControl;
+using System.Windows.Media;
 using Color = Microsoft.Msagl.Drawing.Color;
 using ModifierKeys = System.Windows.Input.ModifierKeys;
 
@@ -200,7 +201,9 @@ namespace Gekko
             statusBar.Items.Add(statusTextBox);
             mainGrid.Children.Add(statusBar);
             statusBar.VerticalAlignment = VerticalAlignment.Bottom;
-            statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.GekkoModeYellow);
+            //statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.GekkoModeYellow);
+            statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
+            statusTextBox.Visibility = Visibility.Hidden;
         }
 
         void graphViewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
@@ -208,20 +211,24 @@ namespace Gekko
             var node = graphViewer.ObjectUnderMouseCursor as IViewerNode;
             if (node != null)
             {
+                statusTextBox.Visibility = Visibility.Visible;
                 var drawingNode = (Node)node.DrawingObject;
-                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);
-                //string s = drawingNode.Label.Text;                
-                //if (!G.NullOrBlanks(label)) s += ": " + label;                
+                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);                             
                 statusTextBox.Text = label;
             }
             else
             {
                 var edge = graphViewer.ObjectUnderMouseCursor as IViewerEdge;
                 if (edge != null)
-                    statusTextBox.Text = ((Edge)edge.DrawingObject).SourceNode.Label.Text + " --> " +
-                                         ((Edge)edge.DrawingObject).TargetNode.Label.Text;
+                {
+                    statusTextBox.Visibility = Visibility.Visible;
+                    statusTextBox.Text = ((Edge)edge.DrawingObject).SourceNode.Label.Text + " --> " + ((Edge)edge.DrawingObject).TargetNode.Label.Text;
+                }
                 else
-                    statusTextBox.Text = "";  // "No object";
+                {
+                    statusTextBox.Visibility = Visibility.Hidden;
+                    statusTextBox.Text = "";  // "No object";                    
+                }
             }
         }
 
@@ -293,6 +300,17 @@ namespace Gekko
             this.ShowDialog(); // Show the window as a modal dialog
         }
 
+        private void CheckBoxRotate_Checked(object sender, RoutedEventArgs e)
+        {
+            this.rotate = true;
+            CreateAndLayoutAndDisplayGraph(sender, e);
+        }
+
+        private void CheckBoxRotate_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.rotate = false;
+            CreateAndLayoutAndDisplayGraph(sender, e);
+        }
 
     }
 

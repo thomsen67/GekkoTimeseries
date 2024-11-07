@@ -7,11 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" d:Title="Gekko flowgraph" d:WindowStartupLocation="CenterScreen">
     <Grid x:Name="mainGrid">
-        <!--<ToolBar x:Name="toolBar" VerticalAlignment="Top" DockPanel.Dock="Top"/>-->
-        <DockPanel x:Name="graphViewerPanel" ClipToBounds="True">
+        <!--<ToolBar x:Name="toolBar" VerticalAlignment="Top" DockPanel.Dock="Top"/>-->        
+        <DockPanel x:Name="graphViewerPanel" ClipToBounds="True">            
         </DockPanel>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" >
+            <CheckBox x:Name="checkBoxRotate" Width="100" Margin="10,10,10,10" ToolTip="Rotate (orientation)" Content="Rotate" Checked="CheckBoxRotate_Checked" Unchecked="CheckBoxRotate_Unchecked"/>
+        </StackPanel>
         <StatusBar VerticalAlignment="Bottom">
-            <TextBox x:Name="statusTextBox" Text=""/>
+            <TextBox x:Name="statusTextBox" Text="" />
         </StatusBar>
     </Grid>
 </Window>
