@@ -80,14 +80,14 @@ namespace Gekko
                 graphViewer.Graph = graph;
                 //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();
                 //double factor = 0.02;
-                //
+                
                 GekkoTime t1 = new GekkoTime(EFreq.A, 2028, 1, 1);
                 GekkoTime t2 = new GekkoTime(EFreq.A, 2035, 1, 1);
                 GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
                 //string varName = "vtKilde";
-                //string varName = "vtTop[tot]";
-                string varName = "fy";
+                string varName = "vtTop[tot]";
+                //string varName = "fy";
                 int depth = 0;
 
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
@@ -97,15 +97,6 @@ namespace Gekko
                 //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
 
                 WalkNodes(depth, Program.options.decomp_flowgraph_depth, graph, t1, t2, alreadySeen, varName, eqName);
-
-                Node n = null;
-                foreach (string s in alreadySeen.Keys)
-                {
-                    n = graph.FindNode(s);
-                    n.Attr.LabelMargin = 4;
-                    n.Attr.Color = Color(0.3);
-                    if (G.Equal(s, varName)) n.Attr.FillColor = Color(0.3);
-                }
 
                 if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
                 else graph.Attr.LayerDirection = LayerDirection.RL;
@@ -129,15 +120,32 @@ namespace Gekko
                 if (G.Equal(flowChild.from, "Error")) continue;
                 if (G.Equal(flowChild.from, "Residual")) continue;
                 Edge e = graph.AddEdge(flowChild.from, flowChild.to);
+
+                Node nodeFrom = graph.FindNode(flowChild.from);
+                nodeFrom.Attr.LabelMargin = 4;
+                nodeFrom.Attr.Color = Color(0.3);
+                
+                Node nodeTo = graph.FindNode(flowChild.to);                
+                nodeTo.Attr.LabelMargin = 4;
+                nodeTo.Attr.Color = Color(0.3);                
+                if (depth == 0) nodeTo.Attr.Color = Color(1.0);
+
                 e.Attr.Color = Color(flowChild.v / arrowsFromTo.children[0].v);
                 if (!alreadySeen.ContainsKey(flowChild.from)) alreadySeen.Add(flowChild.from, false);
                 if (!alreadySeen.ContainsKey(flowChild.to)) alreadySeen.Add(flowChild.to, false);
 
                 string varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
-                string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-
-                WalkNodes(depth + 1, maxDepth, graph, t1, t2, alreadySeen, varNameChild, eqNameChild);
+                if (temp.Count > 0 && temp[0].score >= 100d)  //Only eqs that are found with checkbox "Name" in FIND window.
+                {
+                    string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                    WalkNodes(depth + 1, maxDepth, graph, t1, t2, alreadySeen, varNameChild, eqNameChild);
+                }
+                else
+                {                    
+                    Node n = graph.FindNode(flowChild.from);
+                    n.Attr.FillColor = new Color(230, 230, 230);
+                }
             }
         }
 
@@ -171,22 +179,11 @@ namespace Gekko
             var node = graphViewer.ObjectUnderMouseCursor as IViewerNode;
             if (node != null)
             {
-                var drawingNode = (Node)node.DrawingObject;
-                statusTextBox.Text = drawingNode.Label.Text;
-                if (statusTextBox.Text == "vtKilde") statusTextBox.Text = "Kildeskatter";
-                else if (statusTextBox.Text == "vtAktie") statusTextBox.Text = "Aktieskatter";
-                else if (statusTextBox.Text == "vtBund") statusTextBox.Text = "Bundskatter";
-                else if (statusTextBox.Text == "vtKommune") statusTextBox.Text = "Kommunale indkomstskatter";
-                else if (statusTextBox.Text == "vPersFradrag") statusTextBox.Text = "Imputeret personfradrag";
-                else if (statusTextBox.Text == "vSkatteplInd") statusTextBox.Text = "Skattepligtig indkomst";
-                else if (statusTextBox.Text == "vPersInd") statusTextBox.Text = "Personlig indkomst";
-                else if (statusTextBox.Text == "vPensIndb") statusTextBox.Text = "Pensionsindbetalinger";
-                else if (statusTextBox.Text == "vWHh") statusTextBox.Text = "Årsløn per beskæftiget";
-                else if (statusTextBox.Text == "vtHhAM") statusTextBox.Text = "Arbejdsmarkedsbidrag betalt af husholdningerne";
-                else if (statusTextBox.Text == "vRealiseretAktieOmv") statusTextBox.Text = "Skøn over realiseret gevinst ved salg af aktier";
-                else if (statusTextBox.Text == "vHh[-1]") statusTextBox.Text = "Husholdningernes finansielle portefølje";
-                else if (statusTextBox.Text == "vSatsIndeks") statusTextBox.Text = "Satsregulering";
-                else if (statusTextBox.Text == "vBeskFradrag") statusTextBox.Text = "Imputeret beskæftigelsesfradrag";
+                var drawingNode = (Node)node.DrawingObject;               
+                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);
+                string s = drawingNode.Label.Text;
+                if (!G.NullOrBlanks(label)) s += ": " + label;
+                statusTextBox.Text = s;
             }
             else
             {
@@ -231,54 +228,16 @@ namespace Gekko
         }
 
         void SetupCommands()
-        {
-            //appWindow.CommandBindings.Add(new CommandBinding(LoadSampleGraphCommand, CreateAndLayoutAndDisplayGraph));
-            //appWindow.CommandBindings.Add(new CommandBinding(HomeViewCommand, (a, b) => graphViewer.SetInitialTransform()));
-            //appWindow.InputBindings.Add(new InputBinding(LoadSampleGraphCommand, new KeyGesture(Key.L, ModifierKeys.Control)));
-            //appWindow.InputBindings.Add(new InputBinding(HomeViewCommand, new KeyGesture(Key.H, ModifierKeys.Control)));
-
+        {            
             CommandBindings.Add(new CommandBinding(LoadSampleGraphCommand, CreateAndLayoutAndDisplayGraph));
             CommandBindings.Add(new CommandBinding(HomeViewCommand, (a, b) => graphViewer.SetInitialTransform()));
             InputBindings.Add(new InputBinding(LoadSampleGraphCommand, new KeyGesture(Key.L, ModifierKeys.Control)));
             InputBindings.Add(new InputBinding(HomeViewCommand, new KeyGesture(Key.H, ModifierKeys.Control)));
-        }
-    
-
-        //void SetMainMenu()
-        //{
-        //    var mainMenu = new Menu { IsMainMenu = true };
-        //    toolBar.Items.Add(mainMenu);
-        //    SetFileMenu(mainMenu);
-        //    SetViewMenu(mainMenu);
-        //}
-
-        //void SetViewMenu(Menu mainMenu)
-        //{
-        //    var viewMenu = new MenuItem { Header = "_View" };
-        //    var viewMenuItem = new MenuItem { Header = "_Home", Command = HomeViewCommand };
-        //    viewMenu.Items.Add(viewMenuItem);
-        //    mainMenu.Items.Add(viewMenu);
-        //}
-
-        //void SetFileMenu(Menu mainMenu)
-        //{
-        //    var fileMenu = new MenuItem { Header = "_File" };
-        //    var openFileMenuItem = new MenuItem { Header = "_Load Sample Graph", Command = LoadSampleGraphCommand };
-        //    fileMenu.Items.Add(openFileMenuItem);
-        //    mainMenu.Items.Add(fileMenu);
-        //}
-
+        }        
 
         private void ShowWindow()
         {
             this.ShowDialog(); // Show the window as a modal dialog
         }
-
-        //public static void Main(string[] args)
-        //{
-        //    MainWindow window = new MainWindow();
-        //    window.ShowWindow(); // Call the ShowWindow method to display the window
-        //}
-
     }
 }
