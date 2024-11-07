@@ -2518,24 +2518,35 @@ namespace Gekko
             return stackTrace;
         }
 
+        /// <summary>
+        /// From the GAMS raw model, this tries to find out which variables (without indexes) are on the left-hand side.
+        /// For a Gekko model, this will return "fY" if the eqName is "e_fY".
+        /// </summary>
+        /// <param name="eqName"></param>
+        /// <param name="modelGams"></param>
+        /// <returns></returns>
         public static List<string> LhsVars(string eqName, ModelGams modelGams)
-        {
+        {            
             List<string> rv = new List<string>();
-            if (modelGams == null) return rv;
-
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
+            if (modelGams == null)
             {
-                if (!G.EqualHandleBlanks(eqName, kvp.Key)) continue;
-                foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
+                rv.Add(eqName.Substring("e_".Length));
+            }
+            else
+            {
+                foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
                 {
-                    foreach (string s in equation.lhsVars)
+                    if (!G.EqualHandleBlanks(eqName, kvp.Key)) continue;
+                    foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
                     {
-                        rv.Add(s.Split('(')[0]);  //Indexes here look like x(i, j), not x[i, j].
+                        foreach (string s in equation.lhsVars)
+                        {
+                            rv.Add(s.Split('(')[0]);  //Indexes here look like x(i, j), not x[i, j].
+                        }
+                        //rv.AddRange(equation.lhsVars);
                     }
-                    //rv.AddRange(equation.lhsVars);
                 }
             }
-
             return rv;
         }        
 

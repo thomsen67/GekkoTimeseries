@@ -66,11 +66,12 @@ namespace Gekko
         public bool databank_trace_divide = false;
 
         // ---
+        public int decomp_flowgraph_depth = 2;
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
-        public int decomp_plot_zoom = 100;
+        public int decomp_plot_zoom = 100;        
         // ---
-        public int fit_ols_rekur_dfmin = 10;
+        public int fit_ols_rekur_dfmin = 10;        
         // ---
         public bool folder = true;
         public string folder_bank = "";
@@ -378,7 +379,8 @@ namespace Gekko
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 
             Add("DATABANK TRACE DIVIDE", Globals.xbool);
-
+                        
+            Add("DECOMP FLOWGRAPH DEPTH", Globals.xint);
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);
             Add("DECOMP PLOT ZOOM", Globals.xint);

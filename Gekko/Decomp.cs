@@ -5731,12 +5731,8 @@ namespace Gekko
             {
                 new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
             }
-            if (model.modelGams == null)
-            {
-                //Gekko type
-                MessageBox.Show("Fix FIND list for Gekko type models");
-            }
-            List<string> lhsEqs = modelGamsScalar.GetLhsEquations(variableName);
+            
+            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelGams == null);
             List<EqInfoSimple> eqsNew2 = GetScalarEquations(variableName, t, eqNumbers, model);
             foreach (EqInfoSimple eqHelper in eqsNew2)
             {

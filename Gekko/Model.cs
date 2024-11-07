@@ -1235,18 +1235,27 @@ namespace Gekko
 
         /// <summary>
         /// For a variable (possibly with indexes excluding time), it returns equation names (possibly with indexes) where
-        /// the variable is considered LHS.
+        /// the variable is considered dependent (from the eq name). For a Gekko model, the variable name is returned with
+        /// prefix "e_".
         /// </summary>
         /// <param name="variableName"></param>
+        /// <param name="isModelGekko"></param>
         /// <returns></returns>
-        public List<string> GetLhsEquations(string variableName)
+        public List<string> GetDependentEquations(string variableName, bool isModelGekko)
         {
             List<string> lhsEqs = new List<string>();
-            foreach (KeyValuePair<string, string> kvp in this.lhsEquations.GetDictionaryForIteration())
+            if (isModelGekko)
             {
-                if (G.EqualHandleBlanks(kvp.Value, variableName))
+                lhsEqs.Add("e_" + variableName);
+            }
+            else
+            {
+                foreach (KeyValuePair<string, string> kvp in this.lhsEquations.GetDictionaryForIteration())
                 {
-                    lhsEqs.Add(kvp.Key);
+                    if (G.EqualHandleBlanks(kvp.Value, variableName))
+                    {
+                        lhsEqs.Add(kvp.Key);
+                    }
                 }
             }
             return lhsEqs;
