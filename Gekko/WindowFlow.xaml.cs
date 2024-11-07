@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.Layout.Layered;
@@ -40,7 +41,7 @@ namespace Gekko
             //mainGrid.Children.Add(toolBar);
             toolBar.VerticalAlignment = VerticalAlignment.Top;
             graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;            
-            graphViewer.MouseDown += WpfApplicationSample_MouseDown;
+            //graphViewer.MouseDown += WpfApplicationSample_MouseDown;
 
             //mainGrid.Children.Add(graphViewerPanel);
             graphViewer.BindToPanel(graphViewerPanel);
@@ -54,15 +55,10 @@ namespace Gekko
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             WindowState = WindowState.Normal;
 
-            SetupCommands();            
+            //SetupCommands();            
         }
 
         private void CreateAndLayoutAndDisplayGraph(object sender, RoutedEventArgs ee)
-        {
-            // Omitted Logic
-        }
-
-        private void SetStatusBar()
         {
             try
             {
@@ -105,7 +101,8 @@ namespace Gekko
             }
         }
 
-        private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
+
+    private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
             if (depth >= walkInfo.maxDepth) return;
             FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind);
@@ -194,46 +191,14 @@ namespace Gekko
             return d * factor;
         }
 
-        private void SetupToolbar()
+        private void SetStatusBar()
         {
-            SetupCommands();
-            DockPanel.SetDock(toolBar, Dock.Top);            
-            SetMainMenu();
-        }
-
-        private void SetMainMenu()
-        {
-            var mainMenu = new Menu { IsMainMenu = true };
-            toolBar.Items.Add(mainMenu);
-            SetFileMenu(mainMenu);
-            SetViewMenu(mainMenu);
-
-        }
-
-        private void CloseOnEscape(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                Close();
-            }
-        }
-
-        private void SetViewMenu(Menu mainMenu)
-        {
-            var viewMenu = new MenuItem { Header = "_View" };
-            var viewMenuItem = new MenuItem { Header = "_Home", Command = HomeViewCommand };
-            viewMenu.Items.Add(viewMenuItem);
-            mainMenu.Items.Add(viewMenu);
-
-        }
-
-        private void SetFileMenu(Menu mainMenu)
-        {
-            var fileMenu = new MenuItem { Header = "_File" };
-            var openFileMenuItem = new MenuItem { Header = "_Load Sample Graph", Command = LoadSampleGraphCommand };
-            fileMenu.Items.Add(openFileMenuItem);
-            mainMenu.Items.Add(fileMenu);
-
+            var statusBar = new StatusBar();
+            statusTextBox = new TextBox { Text = "" };  //{ Text = "No object" };            
+            statusBar.Items.Add(statusTextBox);
+            mainGrid.Children.Add(statusBar);
+            statusBar.VerticalAlignment = VerticalAlignment.Bottom;
+            statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.GekkoModeYellow);
         }
 
         void graphViewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
@@ -258,6 +223,61 @@ namespace Gekko
             }
         }
 
+
+        private void SetupToolbar()
+        {
+            SetupCommands();
+            DockPanel.SetDock(toolBar, Dock.Top);            
+            SetMainMenu();
+        }
+
+        private void SetMainMenu()
+        {
+            var mainMenu = new Menu { IsMainMenu = true };
+            toolBar.Items.Add(mainMenu);
+            SetFileMenu(mainMenu);
+            SetViewMenu(mainMenu);
+
+        }
+
+        private void CloseOnEscape(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Close();
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Globals.windowsFlow != null && this != null) Globals.windowsFlow.Remove(this);
+        }
+
+        void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
+        {
+            //statusTextBox.Text = "there was a click...";
+            statusTextBox.Text = "";
+        }
+
+        private void SetViewMenu(Menu mainMenu)
+        {
+            var viewMenu = new MenuItem { Header = "_View" };
+            var viewMenuItem = new MenuItem { Header = "_Home", Command = HomeViewCommand };
+            viewMenu.Items.Add(viewMenuItem);
+            mainMenu.Items.Add(viewMenu);
+
+        }
+
+        private void SetFileMenu(Menu mainMenu)
+        {
+            var fileMenu = new MenuItem { Header = "_File" };
+            var openFileMenuItem = new MenuItem { Header = "_Load Sample Graph", Command = LoadSampleGraphCommand };
+            fileMenu.Items.Add(openFileMenuItem);
+            mainMenu.Items.Add(fileMenu);
+
+        }
+
+        
         private void SetupCommands()
         {
             CommandBindings.Add(new CommandBinding(LoadSampleGraphCommand, CreateAndLayoutAndDisplayGraph));
@@ -266,16 +286,12 @@ namespace Gekko
             InputBindings.Add(new InputBinding(HomeViewCommand, new KeyGesture(Key.H, ModifierKeys.Control)));
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void ShowWindow()
         {
-            // Implement logic for closing the window (optional)
+            this.ShowDialog(); // Show the window as a modal dialog
         }
 
-        void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
-        {
-            //statusTextBox.Text = "there was a click...";
-            statusTextBox.Text = "";
-        }
+
     }
 
     public class WalkInfo
