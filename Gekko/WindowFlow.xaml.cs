@@ -58,7 +58,15 @@ namespace Gekko
         public WindowFlow(DecompFind decompFind)
         {
             this.isInitializing = true;
-            InitializeComponent();
+            if (true)
+            {
+                InitializeComponent();
+                //this.ignoredNum.Text = decompFind.decompOptions2.ignore.ToString();
+                //this.depthNum.Text = Program.options.decomp_flowgraph_depth.ToString();
+                if (G.isNumericalError(decompFind.decompOptions2.ignore)) IgnoredNumValue = 0;
+                else IgnoredNumValue = (int)decompFind.decompOptions2.ignore;
+                DepthNumValue = Program.options.decomp_flowgraph_depth;
+            }
             this.isInitializing = false;
             this.decompFind = decompFind;
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);

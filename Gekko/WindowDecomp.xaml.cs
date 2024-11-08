@@ -3079,7 +3079,9 @@ namespace Gekko
             if (!isInitializing)
             {
                 //WindowFlow w = new WindowFlow(decompFind);
-                WindowFlow w = new WindowFlow(this.decompFind);
+                DecompFind df = this.decompFind;
+                df.decompOptions2 = df.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+                WindowFlow w = new WindowFlow(df);
                 Globals.windowsFlow.Add(w);                
                 w.Title = "Gekko flowgraph";
                 w.Show();
