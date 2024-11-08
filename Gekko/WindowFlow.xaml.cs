@@ -41,7 +41,7 @@ namespace Gekko
             graphViewerPanel.ClipToBounds = true;
             //mainGrid.Children.Add(toolBar);
             //toolBar.VerticalAlignment = VerticalAlignment.Top;
-            graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;            
+            graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;
             //graphViewer.MouseDown += WpfApplicationSample_MouseDown;
 
             //mainGrid.Children.Add(graphViewerPanel);
@@ -103,7 +103,7 @@ namespace Gekko
         }
 
 
-    private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
+        private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
             if (depth >= walkInfo.maxDepth) return;
             FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind);
@@ -213,7 +213,7 @@ namespace Gekko
             {
                 statusTextBox.Visibility = Visibility.Visible;
                 var drawingNode = (Node)node.DrawingObject;
-                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);                             
+                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);
                 statusTextBox.Text = label;
             }
             else
@@ -286,7 +286,7 @@ namespace Gekko
 
         }
 
-        
+
         private void SetupCommands()
         {
             CommandBindings.Add(new CommandBinding(LoadSampleGraphCommand, CreateAndLayoutAndDisplayGraph));
@@ -312,6 +312,31 @@ namespace Gekko
             CreateAndLayoutAndDisplayGraph(sender, e);
         }
 
+        private void depthNum_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void ignoredNum_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void depthUp_Click(object sender, RoutedEventArgs e)
+        {            
+        }
+
+        private void depthDown_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ignoredUp_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ignoredDown_Click(object sender, RoutedEventArgs e)
+        {
+        }
     }
 
     public class WalkInfo
