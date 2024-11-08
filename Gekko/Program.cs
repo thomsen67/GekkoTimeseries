@@ -10268,6 +10268,35 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Helper method for the up/down fields in DECOMP and FLOW windows.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <param name="b"></param>
+        public static void GuiHandleNum(string s, out int i, out bool b)
+        {
+            i = 0;
+            b = false;
+            if (s == null || s == "")
+            {
+                b = true;
+                i = 0;
+            }
+            else
+            {
+                if (s.StartsWith("00"))
+                {
+                    //do not accept, b will be = false
+                }
+                else
+                {
+                    b = int.TryParse(s, out i);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// For a given input series x (can be array-series), a list of normal series or subseries names is returned,
         /// where the names are found inside the traces of x. Does not return null, but can return empty collection.
         /// </summary>

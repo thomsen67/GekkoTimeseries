@@ -109,31 +109,8 @@ namespace Gekko
         /// <param name="e"></param>
         private void txtNum_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (txtNum == null)
-            {
-                return;
-            }
-
-            string s = txtNum.Text.Trim();
-            int i = 0;
-            bool b = false;
-            if (s == null || s == "")
-            {
-                b = true;
-                i = 0;
-            }
-            else
-            {
-                if (s.StartsWith("00"))
-                {
-                    //do not accept, b will be = false
-                }
-                else
-                {
-                    b = int.TryParse(s, out i);
-                }
-            }
-
+            if (txtNum == null) return;            
+            int i; bool b; Program.GuiHandleNum(txtNum.Text.Trim(), out i, out b);
             if (b && i >= 0 && i <= 100)
             {
                 if (!isInitializing)
@@ -147,8 +124,8 @@ namespace Gekko
             {
                 txtNum.Text = _numValue.ToString();
             }
-        }        
-
+        }
+        
         public ObservableCollection<GekkoTask> taskList
         {
             get

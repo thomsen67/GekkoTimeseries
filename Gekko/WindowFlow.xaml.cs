@@ -23,6 +23,30 @@ namespace Gekko
         public DecompFind decompFind = null;
         public bool rotate = false;
 
+        public bool isInitializing = false;
+
+        int _depthNumValue = 0;
+        public int DepthNumValue
+        {
+            get { return _depthNumValue; }
+            set
+            {
+                _depthNumValue = value;
+                depthNum.Text = value.ToString();
+            }
+        }
+
+        int _ignoredNumValue = 0;
+        public int IgnoredNumValue
+        {
+            get { return _ignoredNumValue; }
+            set
+            {
+                _ignoredNumValue = value;
+                ignoredNum.Text = value.ToString();
+            }
+        }
+
         public static readonly RoutedUICommand LoadSampleGraphCommand = new RoutedUICommand("Open File...", "OpenFileCommand",
                                                                                           typeof(WindowFlow));
 
@@ -33,7 +57,9 @@ namespace Gekko
 
         public WindowFlow(DecompFind decompFind)
         {
+            this.isInitializing = true;
             InitializeComponent();
+            this.isInitializing = false;
             this.decompFind = decompFind;
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Closing += Window_Closing;
@@ -314,28 +340,71 @@ namespace Gekko
 
         private void depthNum_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            if (depthNum == null) return;
+            int i; bool b; Program.GuiHandleNum(depthNum.Text.Trim(), out i, out b);
+            if (b && i >= 0 && i <= 100)
+            {
+                if (!this.isInitializing)
+                {
+                    //BEWARE: CLONE
+                    //BEWARE: CLONE
+                    //BEWARE: CLONE
+                    //this.decompFind.decompOptions2.ignore = i;
+                    _depthNumValue = i;
+                    //HACK
+                    //HACK
+                    //HACK
+                    Program.options.decomp_flowgraph_depth = i;
+                    CreateAndLayoutAndDisplayGraph(sender, e);
+                }
+            }
+            else
+            {
+                depthNum.Text = _depthNumValue.ToString();
+            }            
         }
 
         private void ignoredNum_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            if (ignoredNum == null) return;
+            int i; bool b; Program.GuiHandleNum(ignoredNum.Text.Trim(), out i, out b);
+            if (b && i >= 0 && i <= 100)
+            {
+                if (!this.isInitializing)
+                {
+                    //BEWARE: CLONE
+                    //BEWARE: CLONE
+                    //BEWARE: CLONE                    
+                    _ignoredNumValue = i;
+                    this.decompFind.decompOptions2.ignore = i;
+                    CreateAndLayoutAndDisplayGraph(sender, e);
+                }
+            }
+            else
+            {
+                ignoredNum.Text = _ignoredNumValue.ToString();
+            }
         }
 
+
         private void depthUp_Click(object sender, RoutedEventArgs e)
-        {            
+        {
+            if (DepthNumValue < 100) DepthNumValue++;
         }
 
         private void depthDown_Click(object sender, RoutedEventArgs e)
         {
+            if (DepthNumValue > 0) DepthNumValue--;
         }
 
         private void ignoredUp_Click(object sender, RoutedEventArgs e)
         {
+            if (IgnoredNumValue < 100) IgnoredNumValue++;
         }
 
         private void ignoredDown_Click(object sender, RoutedEventArgs e)
         {
+            if (IgnoredNumValue > 0) IgnoredNumValue--;
         }
     }
 
