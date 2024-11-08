@@ -300,7 +300,6 @@ namespace Gekko
             var viewMenuItem = new MenuItem { Header = "_Home", Command = HomeViewCommand };
             viewMenu.Items.Add(viewMenuItem);
             mainMenu.Items.Add(viewMenu);
-
         }
 
         private void SetFileMenu(Menu mainMenu)
@@ -309,9 +308,7 @@ namespace Gekko
             var openFileMenuItem = new MenuItem { Header = "_Load Sample Graph", Command = LoadSampleGraphCommand };
             fileMenu.Items.Add(openFileMenuItem);
             mainMenu.Items.Add(fileMenu);
-
         }
-
 
         private void SetupCommands()
         {
