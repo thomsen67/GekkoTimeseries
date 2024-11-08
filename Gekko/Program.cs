@@ -26208,10 +26208,18 @@ namespace Gekko
                     O.Ols ols = new O.Ols();
                     ols.t1 = t1_y;
                     ols.t2 = t2_y;
-                    ols.expressions = new List<IVariable>() { y, z_collapse, trend };
                     string s = "Total-";
                     if (isAvg) s = "Avg-";
-                    ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator", "trend" };
+                    if (Program.options.interpolate_olsette_trend)
+                    {
+                        ols.expressions = new List<IVariable>() { y, z_collapse, trend };
+                        ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator", "trend" };
+                    }
+                    else
+                    {
+                        ols.expressions = new List<IVariable>() { y, z_collapse };
+                        ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator" };
+                    }                                   
                     output = Estimation.Ols(ols);
                 }
                 finally
@@ -26230,7 +26238,15 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_x, t2_x))
                 {
                     double trendQ = Functions.helper_time(t).ConvertToVal() - TWO_THOUSAND - ZERO_DOT_FIVE;
-                    double value = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
+                    double value;
+                    if (Program.options.interpolate_olsette_trend)
+                    {
+                        value = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0] * trendQ + output.name_param.data[2, 0];
+                    }
+                    else
+                    {
+                        value = output.name_param.data[0, 0] * z.GetDataSimple(t) + output.name_param.data[1, 0];
+                    }
                     z_adjusted.SetData(t, value / factor);  //value will always have same level as y!a, so we scale it down for use in Denton-Cholette
                 }
 

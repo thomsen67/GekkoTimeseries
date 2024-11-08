@@ -3182,9 +3182,9 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = new List<FrameFilter>();
         public List<string> mergeNewVariables = null;  //do clone for this
-        //public Tuple<bool, bool> rowsOrColsPrimes = new Tuple<bool, bool>(false, false);
+        public int flowgraphDepth = Program.options.decomp_flowgraph_depth;
 
-        //-------- No clone for this ----------------
+        //-------- No clone for this, except guiDecompValues as a shallow copy  ----------------
         public int guiDecompLastClickedRow = 0;
         public int guiDecompLastClickedCol = 0;
         public int guiDecompSelectedColMin = 0;
@@ -3270,7 +3270,12 @@ namespace Gekko
         public DecompOptions2 Clone(bool includeRowsColumnsFilters)
         {
             //clones relevant parts for new window
+
+            Table guiDecompValuesRemember = this.guiDecompValues;
+
             DecompOptions2 d = new DecompOptions2();
+
+            d.guiDecompValues = this.guiDecompValues; //Shallow copyp. We pass this object on --> otherwise, after flowgraph and return, this table is empty.
 
             if (this.decompOperator != null) d.decompOperator = this.decompOperator.Clone();
                         
@@ -3306,6 +3311,8 @@ namespace Gekko
             //d.decimalsLevel = this.decimalsLevel;
 
             d.dream = this.dream;
+
+            d.flowgraphDepth = this.flowgraphDepth;
 
             foreach (string s in this.subst)
             {

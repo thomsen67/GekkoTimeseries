@@ -154,6 +154,7 @@ namespace Gekko
         public int interface_zoom = 100;
         // ---
         public string interpolate_method = "avg"; //total|avg ... (prorate/repeat are obsolete). Gekko 4.0: set this as "total" to mirror collapse.
+        public bool interpolate_olsette_trend = true;
         // ---
         public bool library_cache = true;  //if using cache on file or not        
         // ---
@@ -458,6 +459,7 @@ namespace Gekko
             Add("INTERFACE TABLE OPERATORS", Globals.xbool);            
             Add("INTERFACE ZOOM", Globals.xint);
             Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
+            Add("INTERPOLATE OLSETTE TREND", Globals.xbool);
             Add("LIBRARY CACHE", Globals.xbool);
             Add("MENU STARTFILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("MODEL CACHE", Globals.xbool);

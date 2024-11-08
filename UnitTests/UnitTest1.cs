@@ -25243,7 +25243,7 @@ print(df2)
                     I("z!q <2014q1 2023q4 n> = 2780.234000, 2787.687000, 2792.678000, 2801.417000, 2814.326000, 2824.003000, 2833.368000, 2844.286000, 2857.291000, 2870.408000, 2882.986000, 2895.116000, 2905.325000, 2915.554000, 2922.590000, 2934.783000, 2943.970000, 2958.162000, 2971.185000, 2977.820000, 2991.733000, 3003.015000, 3012.896000, 3014.303000, 3013.140000, 2934.399000, 2977.958000, 3000.259000, 2969.985000, 3027.656000, 3090.351000, 3119.460000, 3147.321000, 3160.733000, 3174.133000, 3189.275000, 3208.872000, 3213.575000, 3217.033000, 3218.138000;");
                     I("z!q /= 4;");  //To simulate an indicator of 'total' type.
                     if (i == 1) I("z!q /= 1000;");  //To simulate a unit confusion
-                    I("interpolate x!q = y!a indicator = z!q total olsette;");
+                    I("interpolate <print> x!q = y!a indicator = z!q total olsette;");
 
                     //How do we know that this is right? We cannot really, but
                     //Asger Olsen has looked at it, and it resembles Cholette a lot in this case.
@@ -25257,6 +25257,22 @@ print(df2)
                     _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9654d, delta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.4271d, delta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.5215d, delta);
+
+
+                    if (true)
+                    {
+                        //Olsette with no trend. Not really testing the data, but the trend is insignificant and the data resembles the trend-estimation a lot, so trend = no is probably correct.
+                        I("interpolate <print; option interpolate olsette trend = no> x!q = y!a indicator = z!q total olsette;");
+                        I("print <n> x!q;");
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 672.8205d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2014, 2, 674.5701d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2014, 3, 675.7434d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2014, 4, 677.7972d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2023, 1, 773.4049d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2023, 2, 773.9722d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2023, 3, 774.4261d, delta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2023, 4, 774.5067d, delta);
+                    }
 
                     //
                     // ========= avg =================
@@ -25292,7 +25308,7 @@ print(df2)
             if (true)
             {
                 // ===================================================================
-                //  FIXED POINT: tests Denton, Cholette and Olsen on perfect data
+                //  FIXED POINT: tests Denton, Cholette and Olsette on perfect data
                 // ===================================================================
 
                 for (int i = 0; i < 6; i++) {

@@ -65,7 +65,7 @@ namespace Gekko
                 //this.depthNum.Text = Program.options.decomp_flowgraph_depth.ToString();
                 if (G.isNumericalError(decompFind.decompOptions2.ignore)) IgnoredNumValue = 0;
                 else IgnoredNumValue = (int)decompFind.decompOptions2.ignore;
-                DepthNumValue = Program.options.decomp_flowgraph_depth;
+                DepthNumValue = decompFind.decompOptions2.flowgraphDepth;
             }
             this.isInitializing = false;
             this.decompFind = decompFind;
@@ -115,7 +115,7 @@ namespace Gekko
                 wi.t1 = this.decompFind.decompOptions2.t1;
                 wi.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
                 wi.alreadySeen = new GekkoDictionaryBlanks<string>();
-                wi.maxDepth = Program.options.decomp_flowgraph_depth;
+                wi.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 wi.ignoreDJZ = true;
                 wi.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
                 wi.decompFind = this.decompFind;
@@ -192,7 +192,11 @@ namespace Gekko
                 Node nodeTo = graph.FindNode(flowChild.to);
                 nodeTo.Attr.LabelMargin = 4;
                 nodeTo.Attr.Color = Color(0.3);
-                if (depth == 0) nodeTo.Attr.Color = Color(1.0);
+                if (depth == 0)
+                {
+                    nodeTo.Attr.Color = Color(1.0);
+                    nodeTo.Attr.FillColor = new Color(204, 213, 240);
+                }
 
                 e.Attr.Color = Color(share);
                 if (!walkInfo.alreadySeen.ContainsKey(flowChild.from)) walkInfo.alreadySeen.Add(flowChild.from, null);
@@ -208,7 +212,7 @@ namespace Gekko
                 else
                 {
                     Node n = graph.FindNode(flowChild.from);
-                    n.Attr.FillColor = new Color(230, 230, 230);
+                    n.Attr.FillColor = new Color(238, 238, 238);
                 }
             }
         }
@@ -359,7 +363,8 @@ namespace Gekko
                     //HACK
                     //HACK
                     //HACK
-                    Program.options.decomp_flowgraph_depth = i;
+                    //Program.options.decomp_flowgraph_depth = i;
+                    this.decompFind.decompOptions2.flowgraphDepth = i;
                     CreateAndLayoutAndDisplayGraph(sender, e);
                 }
             }
