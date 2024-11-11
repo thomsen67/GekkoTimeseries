@@ -112,21 +112,21 @@ namespace Gekko
                 //a varName points to --> an eqName
                 //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
 
-                WalkInfo wi = new WalkInfo();
-                wi.t1 = this.decompFind.decompOptions2.t1;
-                wi.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
-                wi.alreadySeen = new GekkoDictionaryBlanks<bool>();
-                wi.nodeNames = new GekkoDictionaryBlanks<string>();
-                wi.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
-                wi.ignoreDJZ = true;
-                wi.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
-                wi.decompFind = this.decompFind;
-                wi.removeSelfReferences = true;  //lags??
-                wi.removeResidualIgnoredError = true;
-                wi.ignoreLags = true;
+                WalkInfo walkInfo = new WalkInfo();
+                walkInfo.t1 = this.decompFind.decompOptions2.t1;
+                walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
+                walkInfo.alreadySeen = new GekkoDictionaryBlanks<bool>();
+                walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
+                walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
+                walkInfo.ignoreDJZ = true;
+                walkInfo.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
+                walkInfo.decompFind = this.decompFind;
+                walkInfo.removeSelfReferences = true;  //lags??
+                walkInfo.removeResidualIgnoredError = true;
+                walkInfo.ignoreLags = true;
 
-                WalkNodes(depth, graph, varName, eqName, wi);
-                if (wi.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
+                WalkNodes(depth, graph, varName, eqName, walkInfo);
+                if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
 
                 if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
                 else graph.Attr.LayerDirection = LayerDirection.RL;
@@ -224,8 +224,10 @@ namespace Gekko
             }
         }
 
-        private static Color Color(double d2)
+        private static Color Color(double d3)
         {
+            double d2 = d3;
+            if (G.isNumericalError(d3)) d2 = 0d;
             double d = Math.Abs(d2);
             if (d > 1) d = 1;
             else if (d < 0.20) d = 0.20;

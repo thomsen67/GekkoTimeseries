@@ -6151,7 +6151,7 @@ namespace Gekko
             decompOptions2.decompOperator = new DecompOperator(op);
             decompOptions2.new_select = new List<string>() { variableName };
             decompOptions2.new_from = new List<string>() { equationName };
-            decompOptions2.new_endo = new List<string>() { variableName };
+            decompOptions2.new_endo = new List<string>() { variableName };            
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
             decompOptions2.expand = true;
@@ -6176,6 +6176,9 @@ namespace Gekko
             DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             Table decompTable = decompOutput.table;
 
+            //Hack, because after expand, removing lags does not work in pivot (maybe it should...!)
+            GekkoDictionary<string, double> poolingFrom = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+
             for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
             {
                 Cell cellVariableName = decompTable.Get(i2, 1);
@@ -6187,9 +6190,9 @@ namespace Gekko
                     vars = cellFirstData.vars_hack;
                     uniqueName = Decomp.HiddenVariableHelper(cellFirstData, true);
                 }
-                string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
-                string label = null;
-                if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
+                //string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
+                //string label = null;
+                //if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
                 string name = cellVariableName.CellText.TextData[0];
                 name = name.Trim();
 
@@ -6197,14 +6200,22 @@ namespace Gekko
                 if (walkInfo.ignoreLags) name2 = G.Chop_RemoveLagOrLead(name);
                 if (name2 != name) walkInfo.lagsOrLeadsWereEncountered = true;
 
-                FlowItem flowItem = new FlowItem();
-                flowItem.from = name2;
-                flowItem.to = flowInfo.variableName;
-
                 Cell cellData = decompTable.Get(i2, 2);
                 double value = cellData.number;
-                flowItem.v = value;
 
+                if (poolingFrom.ContainsKey(name2))
+                {
+                    poolingFrom[name2] += value;
+                }
+                else poolingFrom.Add(name2, value);
+            }
+
+            foreach (KeyValuePair<string, double> kvp in poolingFrom)
+            {
+                FlowItem flowItem = new FlowItem();
+                flowItem.from = kvp.Key;
+                flowItem.to = flowInfo.variableName;
+                flowItem.v = kvp.Value;
                 flowInfo.children.Add(flowItem);
             }
 

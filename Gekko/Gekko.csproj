@@ -442,7 +442,6 @@
     <Compile Include="WindowFind.xaml.cs">
       <DependentUpon>WindowFind.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WindowFlow.cs" />
     <Compile Include="WindowFlow.xaml.cs">
       <DependentUpon>WindowFlow.xaml</DependentUpon>
     </Compile>
