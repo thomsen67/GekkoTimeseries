@@ -115,7 +115,7 @@ namespace Gekko
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = this.decompFind.decompOptions2.t1;
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
-                walkInfo.visited = new GekkoDictionaryBlanks<int>();
+                walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
                 walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
                 walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 walkInfo.ignoreDJZ = true;
@@ -148,27 +148,31 @@ namespace Gekko
             // This works regarding depth, but is wasteful, because redoing a branch entails new decomp calls.
             // Better to keep the results of the decomps (FlowInfo basically), so there is no double work.
             //
-
-            bool hasBeenDrawnAlready = false;
+            //
+            bool hasBeenSeenAlready = false;
             
             if (depth >= walkInfo.maxDepth) return;
-            
-            if (!walkInfo.visited.ContainsKey(varName))
+
+            FlowInfo arrowsFromTo = null;
+
+            if (!walkInfo.visitedDepths.ContainsKey(varName))
             {                
-                walkInfo.visited.Add(varName, depth);
+                hasBeenSeenAlready = false;
+                arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);                
+                walkInfo.visitedDepths.Add(varName, arrowsFromTo);
             }
-            else if (depth < walkInfo.visited.GetInt(varName))
+            else if (depth < walkInfo.visitedDepths.Get(varName).depth)
             {
                 //It may have been seen before, but at a higher depth. If so, we try again.
-                walkInfo.visited.GetDictionaryForIteration()[varName] = depth;
-                hasBeenDrawnAlready = true;
+                arrowsFromTo = walkInfo.visitedDepths.GetDictionaryForIteration()[varName];                
+                hasBeenSeenAlready = true;
             }
             else
             {
                 return;
             }
 
-            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);
+            arrowsFromTo.depth = depth;  //In all cases here, if seen before this depth is smaller
 
             GekkoDictionary<string, bool> same = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -199,7 +203,7 @@ namespace Gekko
                     if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
                 }
 
-                if (!hasBeenDrawnAlready)
+                if (!hasBeenSeenAlready)
                 {
 
                     Edge e = graph.AddEdge(flowChild.from, flowChild.to);
@@ -233,7 +237,7 @@ namespace Gekko
                     //TODO TODO TODO Find out if the eq is not found (bad eq name) or it is a .fx variable. Color differently.
                     //TODO TODO TODO
                     //TODO TODO TODO
-                    if (!hasBeenDrawnAlready)
+                    if (!hasBeenSeenAlready)
                     {
                         Node n = graph.FindNode(flowChild.from);
                         n.Attr.FillColor = new Color(238, 238, 238);
@@ -454,8 +458,8 @@ namespace Gekko
     public class WalkInfo
     {
         public GekkoTime t1;
-        public GekkoTime t2;
-        public GekkoDictionaryBlanks<int> visited;
+        public GekkoTime t2;        
+        public GekkoDictionaryBlanks<FlowInfo> visitedDepths;
         public GekkoDictionaryBlanks<string> nodeNames;
         public int maxDepth;
         public bool ignoreDJZ;
