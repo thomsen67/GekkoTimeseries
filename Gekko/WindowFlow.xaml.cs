@@ -115,7 +115,7 @@ namespace Gekko
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = this.decompFind.decompOptions2.t1;
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
-                walkInfo.alreadySeen = new GekkoDictionaryBlanks<bool>();
+                walkInfo.visited = new GekkoDictionaryBlanks<int>();
                 walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
                 walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 walkInfo.ignoreDJZ = true;
@@ -145,15 +145,28 @@ namespace Gekko
 
         private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
+            // This works regarding depth, but is wasteful, because redoing a branch entails new decomp calls.
+            // Better to keep the results of the decomps (FlowInfo basically), so there is no double work.
+            //
+
+            bool hasBeenDrawnAlready = false;
+            
             if (depth >= walkInfo.maxDepth) return;
-            if (walkInfo.alreadySeen.ContainsKey(varName))
+            
+            if (!walkInfo.visited.ContainsKey(varName))
+            {                
+                walkInfo.visited.Add(varName, depth);
+            }
+            else if (depth < walkInfo.visited.GetInt(varName))
             {
-                return;
+                //It may have been seen before, but at a higher depth. If so, we try again.
+                walkInfo.visited.GetDictionaryForIteration()[varName] = depth;
+                hasBeenDrawnAlready = true;
             }
             else
             {
-                walkInfo.alreadySeen.Add(varName, false);
-            }            
+                return;
+            }
 
             FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);
 
@@ -185,24 +198,26 @@ namespace Gekko
                     if (G.Equal(flowChild.from, "jd" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
                 }
-                
-                Edge e = graph.AddEdge(flowChild.from, flowChild.to);
 
-                Node nodeFrom = graph.FindNode(flowChild.from);
-                nodeFrom.Attr.LabelMargin = 4;
-                nodeFrom.Attr.Color = Color(0.3);
-
-                Node nodeTo = graph.FindNode(flowChild.to);
-                nodeTo.Attr.LabelMargin = 4;
-                nodeTo.Attr.Color = Color(0.3);
-
-                if (depth == 0)
+                if (!hasBeenDrawnAlready)
                 {
-                    nodeTo.Attr.Color = Color(1.0);
-                    nodeTo.Attr.FillColor = new Color(204, 213, 240);
-                }
 
-                e.Attr.Color = Color(share);
+                    Edge e = graph.AddEdge(flowChild.from, flowChild.to);
+                    e.Attr.Color = Color(share);
+                    Node nodeFrom = graph.FindNode(flowChild.from);
+                    nodeFrom.Attr.LabelMargin = 4;
+                    nodeFrom.Attr.Color = Color(0.3);
+
+                    Node nodeTo = graph.FindNode(flowChild.to);
+                    nodeTo.Attr.LabelMargin = 4;
+                    nodeTo.Attr.Color = Color(0.3);
+
+                    if (depth == 0)
+                    {
+                        nodeTo.Attr.Color = Color(1.0);
+                        nodeTo.Attr.FillColor = new Color(204, 213, 240);
+                    }
+                }                
                 
                 string varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
@@ -218,8 +233,11 @@ namespace Gekko
                     //TODO TODO TODO Find out if the eq is not found (bad eq name) or it is a .fx variable. Color differently.
                     //TODO TODO TODO
                     //TODO TODO TODO
-                    Node n = graph.FindNode(flowChild.from);
-                    n.Attr.FillColor = new Color(238, 238, 238);
+                    if (!hasBeenDrawnAlready)
+                    {
+                        Node n = graph.FindNode(flowChild.from);
+                        n.Attr.FillColor = new Color(238, 238, 238);
+                    }
                 }
             }
         }
@@ -437,7 +455,7 @@ namespace Gekko
     {
         public GekkoTime t1;
         public GekkoTime t2;
-        public GekkoDictionaryBlanks<bool> alreadySeen;
+        public GekkoDictionaryBlanks<int> visited;
         public GekkoDictionaryBlanks<string> nodeNames;
         public int maxDepth;
         public bool ignoreDJZ;
