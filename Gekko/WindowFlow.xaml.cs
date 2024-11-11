@@ -69,7 +69,7 @@ namespace Gekko
             }
             this.isInitializing = false;
             this.decompFind = decompFind;
-            this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
+            //this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Closing += Window_Closing;
             SetupToolbar();
             graphViewerPanel.ClipToBounds = true;
@@ -114,7 +114,8 @@ namespace Gekko
                 WalkInfo wi = new WalkInfo();
                 wi.t1 = this.decompFind.decompOptions2.t1;
                 wi.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
-                wi.alreadySeen = new GekkoDictionaryBlanks<string>();
+                wi.alreadySeen = new GekkoDictionaryBlanks<bool>();
+                wi.nodeNames = new GekkoDictionaryBlanks<string>();
                 wi.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 wi.ignoreDJZ = true;
                 wi.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
@@ -140,6 +141,15 @@ namespace Gekko
         private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
             if (depth >= walkInfo.maxDepth) return;
+            if (walkInfo.alreadySeen.ContainsKey(varName))
+            {
+                return;
+            }
+            else
+            {
+                walkInfo.alreadySeen.Add(varName, false);
+            }            
+
             FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind);
 
             GekkoDictionary<string, bool> same = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -147,11 +157,13 @@ namespace Gekko
             for (int i = 1; i < arrowsFromTo.children.Count; i++)  //skips first
             {
                 FlowItem flowChild = arrowsFromTo.children[i];
-
-                if (Globals.runningOnTTComputer && G.Equal("vwhh[tot]", flowChild.from))
-                {
-                    MessageBox.Show("Several from vwhh[tot] to vPersIndx[tot]");
-                }
+                if (walkInfo.removeSelfReferences && G.Equal(flowChild.from, flowChild.to)) continue;
+                if (depth == 0) flowChild.to = arrowsFromTo.children[0].from;  //To get the first node capitalization right. The .to here will have wrong capitalization, but the .from has the correct one taken from eqs.
+                //Here, we do not want for instance "qbnp" to be a different node than "qBNP"
+                if (walkInfo.nodeNames.ContainsKey(flowChild.from)) flowChild.from = walkInfo.nodeNames.Get(flowChild.from);
+                else walkInfo.nodeNames.Add(flowChild.from, flowChild.from);
+                if (walkInfo.nodeNames.ContainsKey(flowChild.to)) flowChild.to = walkInfo.nodeNames.Get(flowChild.to);
+                else walkInfo.nodeNames.Add(flowChild.to, flowChild.to);                                
 
                 double share = flowChild.v / arrowsFromTo.children[0].v;
                 if (walkInfo.removeResidualIgnoredError)
@@ -168,21 +180,7 @@ namespace Gekko
                     if (G.Equal(flowChild.from, "jd" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
                 }
-
-                if (walkInfo.removeSelfReferences)
-                {
-                    if (G.Equal(flowChild.from, flowChild.to)) continue;
-                    string s = (flowChild.from + "-->" + flowChild.to).Replace(" ", "");
-                    if (same.ContainsKey(s))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        same.Add(s, false);
-                    }
-                }
-
+                
                 Edge e = graph.AddEdge(flowChild.from, flowChild.to);
 
                 Node nodeFrom = graph.FindNode(flowChild.from);
@@ -192,6 +190,7 @@ namespace Gekko
                 Node nodeTo = graph.FindNode(flowChild.to);
                 nodeTo.Attr.LabelMargin = 4;
                 nodeTo.Attr.Color = Color(0.3);
+
                 if (depth == 0)
                 {
                     nodeTo.Attr.Color = Color(1.0);
@@ -199,9 +198,7 @@ namespace Gekko
                 }
 
                 e.Attr.Color = Color(share);
-                if (!walkInfo.alreadySeen.ContainsKey(flowChild.from)) walkInfo.alreadySeen.Add(flowChild.from, null);
-                if (!walkInfo.alreadySeen.ContainsKey(flowChild.to)) walkInfo.alreadySeen.Add(flowChild.to, null);
-
+                
                 string varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
                 if (temp.Count > 0 && temp[0].score >= 100d)  //Only eqs that are found with checkbox "Name" in FIND window.
@@ -211,6 +208,11 @@ namespace Gekko
                 }
                 else
                 {
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+                    //TODO TODO TODO Find out if the eq is not found (bad eq name) or it is a .fx variable. Color differently.
+                    //TODO TODO TODO
+                    //TODO TODO TODO
                     Node n = graph.FindNode(flowChild.from);
                     n.Attr.FillColor = new Color(238, 238, 238);
                 }
@@ -287,13 +289,13 @@ namespace Gekko
 
         }
 
-        private void CloseOnEscape(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                Close();
-            }
-        }
+        //private void CloseOnEscape(object sender, KeyEventArgs e)
+        //{
+        //    if (e.Key == Key.Escape)
+        //    {
+        //        Close();
+        //    }
+        //}
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -422,7 +424,8 @@ namespace Gekko
     {
         public GekkoTime t1;
         public GekkoTime t2;
-        public GekkoDictionaryBlanks<string> alreadySeen;
+        public GekkoDictionaryBlanks<bool> alreadySeen;
+        public GekkoDictionaryBlanks<string> nodeNames;
         public int maxDepth;
         public bool ignoreDJZ;
         public bool isGekkoModel;

@@ -6144,10 +6144,10 @@ namespace Gekko
             //modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = t1;
-            decompOptions2.t2 = t2;
+            decompOptions2.t2 = t2;            
+            string op2 = decompFind.decompOptions2.decompOperator.OperatorLower().Replace("x", "");
             string op = "d";
-            if (decompFind.decompOptions2.decompOperator.type == EContribType.M) op = "m";
-            else if (decompFind.decompOptions2.decompOperator.type == EContribType.RD) op = "rd";
+            if (op2 == "m" || op2 == "q" || op2 == "mp") op = "m";
             decompOptions2.decompOperator = new DecompOperator(op);
             decompOptions2.new_select = new List<string>() { variableName };
             decompOptions2.new_from = new List<string>() { equationName };

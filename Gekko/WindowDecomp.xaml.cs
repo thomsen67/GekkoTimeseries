@@ -3084,7 +3084,7 @@ namespace Gekko
                 WindowFlow w = new WindowFlow(df);
                 Globals.windowsFlow.Add(w);                
                 w.Title = "Gekko flowgraph";
-                w.Show();
+                w.ShowDialog();
             }
         }
 
