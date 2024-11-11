@@ -6129,7 +6129,7 @@ namespace Gekko
         /// <param name="equationName"></param>
         /// <param name="variableName"></param>
         /// <returns></returns>
-        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, DecompFind decompFind)
+        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, DecompFind decompFind, WalkInfo walkInfo)
         {
             bool useRealNames = true;
             
@@ -6190,27 +6190,21 @@ namespace Gekko
                 string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
                 string label = null;
                 if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
-                string name = cellVariableName.CellText.TextData[0];                
+                string name = cellVariableName.CellText.TextData[0];
                 name = name.Trim();
 
+                string name2 = name;
+                if (walkInfo.ignoreLags) name2 = G.Chop_RemoveLagOrLead(name);
+                if (name2 != name) walkInfo.lagsOrLeadsWereEncountered = true;
 
-                //TODO 
-                //TODO 
-                //TODO What to do about this? Lags/leads.
-                //TODO 
-                //TODO 
-                name = G.Chop_RemoveLagOrLead(name);
+                FlowItem flowItem = new FlowItem();
+                flowItem.from = name2;
+                flowItem.to = flowInfo.variableName;
 
-                FlowItem flowItem = new FlowItem();                
-                flowItem.from = name;                
-                flowItem.to = flowInfo.variableName;                
+                Cell cellData = decompTable.Get(i2, 2);
+                double value = cellData.number;
+                flowItem.v = value;
 
-                for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
-                {
-                    Cell cellData = decompTable.Get(i2, j2);
-                    double value = cellData.number;
-                    if (j2 == 2) flowItem.v = value;
-                }                
                 flowInfo.children.Add(flowItem);
             }
 

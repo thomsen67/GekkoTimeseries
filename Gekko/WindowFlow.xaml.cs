@@ -22,8 +22,8 @@ namespace Gekko
 
         public DecompFind decompFind = null;
         public bool rotate = false;
-
         public bool isInitializing = false;
+        public bool lagsOrLeadsWereEncountered = false;
 
         int _depthNumValue = 0;
         public int DepthNumValue
@@ -80,13 +80,13 @@ namespace Gekko
 
             //mainGrid.Children.Add(graphViewerPanel);
             graphViewer.BindToPanel(graphViewerPanel);
-
-            SetStatusBar();
+            
             graphViewer.MouseDown += WpfApplicationSample_MouseDown;
 
             Loaded += CreateAndLayoutAndDisplayGraph; // Event handler on Loaded event
             Title = "Gekko flowgraph";
             Content = mainGrid;
+            
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             WindowState = WindowState.Normal;
 
@@ -111,6 +111,7 @@ namespace Gekko
 
                 //a varName points to --> an eqName
                 //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
+
                 WalkInfo wi = new WalkInfo();
                 wi.t1 = this.decompFind.decompOptions2.t1;
                 wi.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
@@ -122,13 +123,17 @@ namespace Gekko
                 wi.decompFind = this.decompFind;
                 wi.removeSelfReferences = true;  //lags??
                 wi.removeResidualIgnoredError = true;
+                wi.ignoreLags = true;
 
                 WalkNodes(depth, graph, varName, eqName, wi);
+                if (wi.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
 
                 if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
                 else graph.Attr.LayerDirection = LayerDirection.RL;
 
                 graphViewer.Graph = graph;
+
+                SetStatusBar();
 
             }
             catch (Exception ex)
@@ -150,7 +155,7 @@ namespace Gekko
                 walkInfo.alreadySeen.Add(varName, false);
             }            
 
-            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind);
+            FlowInfo arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);
 
             GekkoDictionary<string, bool> same = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -237,13 +242,14 @@ namespace Gekko
         private void SetStatusBar()
         {
             var statusBar = new StatusBar();
-            statusTextBox = new TextBox { Text = "" };  //{ Text = "No object" };            
+            string s = null;
+            if (this.lagsOrLeadsWereEncountered) s = "Note: lags or leads were encountered and ignored";
+            statusTextBox = new TextBox { Text = "Hover over boxes to see labels. " + s };  //{ Text = "No object" };            
             statusBar.Items.Add(statusTextBox);
             mainGrid.Children.Add(statusBar);
             statusBar.VerticalAlignment = VerticalAlignment.Bottom;
             //statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.GekkoModeYellow);
             statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
-            statusTextBox.Visibility = Visibility.Hidden;
         }
 
         void graphViewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
@@ -437,5 +443,8 @@ namespace Gekko
         public DecompFind decompFind;
         public bool removeSelfReferences;
         public bool removeResidualIgnoredError;
+        public bool ignoreLags;
+        //return values:
+        public bool lagsOrLeadsWereEncountered;
     }
 }
