@@ -297,6 +297,11 @@ namespace Gekko
         //    }
         //}
 
+        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (Globals.windowsFlow != null && this != null) Globals.windowsFlow.Remove(this);
