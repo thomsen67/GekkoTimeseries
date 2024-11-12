@@ -3101,13 +3101,14 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                //WindowFlow w = new WindowFlow(decompFind);
-                DecompFind df = this.decompFind;
-                df.decompOptions2 = df.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
-                WindowFlow w = new WindowFlow(df);
-                Globals.windowsFlow.Add(w);                
+                //WindowFlow w = new WindowFlow(decompFind);                
+                DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
+                this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+                WindowFlow w = new WindowFlow(this.decompFind);
+                Globals.windowsFlow.Add(w);
                 w.Title = "Gekko flowgraph";
                 w.ShowDialog();
+                this.decompFind.decompOptions2 = decompOptions2Remember;
             }
         }
 

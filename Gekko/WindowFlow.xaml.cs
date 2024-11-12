@@ -104,11 +104,6 @@ namespace Gekko
 
                 //GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-                string varName = this.decompFind.decompOptions2.new_select[0];
-                int depth = 0;
-                List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
-                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-
                 //a varName points to --> an eqName
                 //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
 
@@ -124,6 +119,11 @@ namespace Gekko
                 walkInfo.removeSelfReferences = true;  //lags??
                 walkInfo.removeResidualIgnoredError = true;
                 walkInfo.ignoreLags = true;
+
+                string varName = this.decompFind.decompOptions2.new_select[0];
+                int depth = 0;
+                List<EqInfoSimple> temp = Decomp.GetSortedEquations(varName, walkInfo.t1, Program.model, false);
+                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
 
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
                 if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
@@ -224,7 +224,7 @@ namespace Gekko
                 }                
                 
                 string varNameChild = flowChild.from;
-                List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, new GekkoTime(EFreq.A, 2028, 1, 1), Program.model);
+                List<EqInfoSimple> temp = Decomp.GetSortedEquations(varNameChild, walkInfo.t1, Program.model, false);
                 if (temp.Count > 0 && temp[0].score >= 100d)  //Only eqs that are found with checkbox "Name" in FIND window.
                 {
                     string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);

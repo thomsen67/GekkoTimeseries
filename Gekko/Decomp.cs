@@ -5635,7 +5635,7 @@ namespace Gekko
 
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 
-                List<EqInfoSimple> eqsNew = GetSortedEquations(variableName, o.tSelected, model);
+                List<EqInfoSimple> eqsNew = GetSortedEquations(variableName, o.tSelected, model, true);
 
                 List<string> firstList = new List<string>();
 
@@ -5713,7 +5713,7 @@ namespace Gekko
         /// <param name="variableName"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime t, Model model)
+        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime t, Model model, bool isFindWindow)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
@@ -5736,7 +5736,8 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                    if(isFindWindow) new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                    else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
                 }
             }
             
