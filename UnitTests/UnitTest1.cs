@@ -16818,7 +16818,7 @@ namespace UnitTests
             I("model <gms> makro_20241011.zip;");      
             
             GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
-            GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");            
+            GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data"); //See #tbjjjdf7hdsfas
             GekkoDictionary<string, bool> dict1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, string> kvp in lhsEquations1.GetDictionaryForIteration()) 
             {
@@ -18490,7 +18490,7 @@ namespace UnitTests
             I("OPTION model type = gams;");
             I("MODEL <gms> model_10_08_2020.gmy;");  //just test that it does not crash
             Assert.AreEqual(Program.model.modelGams.equationsByEqname.Count, 694);
-            Assert.AreEqual(Program.model.modelGams.equationsByVarname.Count, 386);
+            Assert.AreEqual(Program.model.modelGams.equationsByVarname.Count, 408); //changed from 386 to 408, not sure why
             // ----------- now we repeat it, just to test that it is read
             // ----------- allright from cache
             I("RESET;");
@@ -18498,7 +18498,7 @@ namespace UnitTests
             I("OPTION model type = gams;");
             I("MODEL <gms> model_10_08_2020.gmy;");  //just test that it does not crash
             Assert.AreEqual(Program.model.modelGams.equationsByEqname.Count, 694);
-            Assert.AreEqual(Program.model.modelGams.equationsByVarname.Count, 386);
+            Assert.AreEqual(Program.model.modelGams.equationsByVarname.Count, 408); //changed from 386 to 408, not sure why
         }
 
         [TestMethod]

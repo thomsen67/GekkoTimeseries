@@ -952,7 +952,7 @@ namespace Gekko
                     Cell c = decompOutput.table.Get(i, j);
                     if (c == null)
                     {
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, false);  //transparent
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, false, decompOptions);  //transparent
                         continue;
                     }
                     string s = "";
@@ -998,7 +998,7 @@ namespace Gekko
                         }
                     }
 
-                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, canExpand);
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOutput.black, decompOutput.rowsOrColsSumUp, decompOptions.decompOperator, canExpand, decompOptions);
                 }
             }
         }        
@@ -1085,7 +1085,7 @@ namespace Gekko
             Clipboard.SetText(s, TextDataFormat.Text);            
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, List<List<string>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator, bool canExpand)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, List<List<string>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator, bool canExpand, DecompOptions2 decompOptions2)
         {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
@@ -1111,7 +1111,7 @@ namespace Gekko
             {
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {                    
-                    bool isEndogenous = IsEndogenous(i, j);
+                    bool isEndogenous = IsEndogenous(i, j, decompOptions2);
                     
                     textBlock.MouseDown += Mouse_Down;
 
@@ -1210,7 +1210,7 @@ namespace Gekko
             }
         }
 
-        private bool IsEndogenous(int i, int j)
+        private bool IsEndogenous(int i, int j, DecompOptions2 decompOptions2)
         {            
             //TODO: offsets...
             //2 below because the row or col labels all start in coord (0, 0), and guiDecompValues is 1-based. So first coord will be (2, 2).
@@ -1233,12 +1233,35 @@ namespace Gekko
                     //All of these must be exogenous for the return value to be false (so any one endogenous among a list of otherwise exogenous will make the name blue)
                     string name; int lag;
                     Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
-                    GekkoTimeSpans fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(name));
-                    if (fixList.data.Count == 0)
+                    List<GekkoTime> fixed2 = Program.model.modelGamsScalar.GetFixedPeriods(name);
+
+                    //Test if ALL are fixed
+                    bool allAreFixed = true;
+                    foreach (GekkoTime tt in new GekkoTimeIterator(decompOptions2.t1, decompOptions2.t2))
+                    {
+                        bool match = false;
+                        foreach (GekkoTime t in fixed2)
+                        {                            
+                            if (t.EqualsGekkoTime(tt))
+                            {
+                                match = true;
+                                break;
+                            }
+                        }
+                        if (!match)
+                        {
+                            allAreFixed = false;
+                            break;
+                        }
+                    }                    
+
+                    if (!allAreFixed)
                     {
                         isEndogenous = true;
                         break;
                     }
+
+                    //GekkoTimeSpans fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(fixed2);
                 }
             }
             else

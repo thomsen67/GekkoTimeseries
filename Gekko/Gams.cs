@@ -852,7 +852,7 @@ namespace Gekko
                 }
             }
 
-            if (false)
+            if (Program.options.model_gams_scalar_data)
             {                
                 //We don't read the endo values from gams.gms anymore: reading data from a databank is mandatory now.
                 //Do not delete this: is may be resurrected sometime, but for now we do not like data to be stored
@@ -1084,7 +1084,7 @@ namespace Gekko
             bool mayUseDatabank = true;
             bool spelling = true;
             bool shouldWrite = false;
-            bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!! Perhaps even take copies of the two files before overwriting.
+            bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!! Perhaps even take copies of the current file before overwriting.
 
             int nAll = 0;
             List<string> notFoundInModel = new List<string>();
@@ -1104,6 +1104,10 @@ namespace Gekko
             foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
             {
                 string equationNameWithoutIndexes = kvp.Key;
+
+                //if (equationNameWithoutIndexes.ToLower().Contains("e_qm_tot"))
+                //{
+                //}
 
                 //For each scalar equation
                 foreach (EquationHelper2 eh in kvp.Value)
@@ -1326,16 +1330,7 @@ namespace Gekko
                                             }
                                         }
                                     }
-                                }
-
-                                if (!success)
-                                {
-                                    string s = equationNameWithoutIndexes + G.NL;
-                                    s += equationNameWithIndexes + G.NL + G.NL;
-                                    s += eh.eqMathRaw + G.NL + G.NL;
-                                    s += eh.eqMathScalar + G.NL;
-                                    names[i] = "<TOT>";  //probably
-                                }
+                                }                                
                             }
                         }
 
@@ -1367,6 +1362,15 @@ namespace Gekko
                     {
                         nFail++;
                         WriteEquation(eh, lhsName, equationNameWithIndexes, names, shouldWrite, writer);
+
+                        if (true)
+                        {
+                            //Must for inspection in the debugger
+                            string s = equationNameWithoutIndexes + G.NL;
+                            s += equationNameWithIndexes + G.NL + G.NL;
+                            s += eh.eqMathRaw + G.NL + G.NL;
+                            s += eh.eqMathScalar + G.NL;
+                        }
                     }
                 }
             }
@@ -1388,15 +1392,15 @@ namespace Gekko
             {
                 Globals.unitTestLhsNotFoundInModel = notFoundInModel;
                 Globals.unitTestLhsNotFoundInEq = notFoundInEq;
-            }
-
-            return lhsEquations;
+            }            
             
             if (createProtobufferFileForUnitTests)
             {
                 //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
                 Program.ProtobufWrite(lhsEquations, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
             }
+
+            return lhsEquations;
         }
 
         /// <summary>
@@ -1568,35 +1572,40 @@ namespace Gekko
 
             foreach (string eq in eqs)
             {
-                if (eq.Contains("e_temp")) continue;
+                try
+                {                    
+                    if (eq.Contains(Globals.scalarModelExtraVariable)) continue;
+                    if (eq.Contains("e_temp")) continue;
 
-                string noTime = G.Chop_DimensionRemoveLast_FASTER(eq);
+                    string noTime = G.Chop_DimensionRemoveLast_FASTER(eq);
 
-                if (!known.ContainsKey(noTime))
-                {
-                    known.Add(noTime, false);
+                    if (!known.ContainsKey(noTime))
+                    {
+                        known.Add(noTime, false);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    GekkoTime time = G.Chop_DimensionGetPeriod(eq);
+                    string noIndex = G.Chop_GetName(eq);
+
+                    if (!batches.ContainsKey(noIndex))
+                    {
+                        batches.Add(noIndex, new List<EquationHelper2>());
+                    }
+
+                    EquationTextHelper helper = new EquationTextHelper();
+                    GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
+                    string scalar = helper22.s_scalarModel;
+                    EquationHelper2 eh = new EquationHelper2();
+                    eh.eqMathScalar = helper22.s_scalarModel;
+                    eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
+                    eh.eqName = G.Chop_DimensionRemoveLast(eq);
+                    batches[noIndex].Add(eh);
                 }
-                else
-                {
-                    continue;
-                }
-
-                GekkoTime time = G.Chop_DimensionGetPeriod(eq);
-                string noIndex = G.Chop_GetName(eq);
-
-                if (!batches.ContainsKey(noIndex))
-                {
-                    batches.Add(noIndex, new List<EquationHelper2>());
-                }
-
-                EquationTextHelper helper = new EquationTextHelper();
-                GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
-                string scalar = helper22.s_scalarModel;
-                EquationHelper2 eh = new EquationHelper2();
-                eh.eqMathScalar = helper22.s_scalarModel;
-                eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
-                eh.eqName = G.Chop_DimensionRemoveLast(eq);
-                batches[noIndex].Add(eh);
+                catch { }  //We live with a fail on this
             }
 
             return batches;
