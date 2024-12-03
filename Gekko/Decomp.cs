@@ -633,7 +633,7 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void DecompStart(O.Decomp2 o)
-        {
+        {            
             Model model = Program.model;
 
             if (model.modelCommon.GetModelSourceType() == EModelType.Unknown) new Error("DECOMP: It seems no model is loaded, cf. the MODEL statement");
@@ -755,7 +755,7 @@ namespace Gekko
                 //       the for instance e1[a] by GekkoTime, so it can call
                 //       e1[a][2001a1], e1[a][2002a1], etc.
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
-
+                
                 if (o.select.Count > 0) decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 if (o.from.Count > 0) decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);
                 if (o.endo.Count > 0) decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
@@ -839,7 +839,7 @@ namespace Gekko
                 MessageBox.Show("DECOMP: You cannot mix option <shares> with 'Raw' operators like <xn>, <xd>, <xm>, etc.");
                 return;
             }
-
+            
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
         }
 
@@ -2295,7 +2295,7 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
-        {
+        {            
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompFind.model.DecompType() == EModelType.Unknown)
             {
@@ -2355,7 +2355,7 @@ namespace Gekko
                     }
                 }
                 else new Error("Model type error");
-            }
+            }            
 
             if (windowDecomp == null)
             {
@@ -2369,19 +2369,21 @@ namespace Gekko
                     CrossThreadStuff.GetDecompSizes(parent);
                 }
 
-                if (G.IsUnitTesting() && Globals.showDecompTable == true)
-                {
+                if (!Globals.python && (G.IsUnitTesting() && Globals.showDecompTable == true))
+                {                    
                     //Skip the "Decomp" thread stuff when unit testing -- will give TreadAbortedException for some reason not understood.
                     CreateDecompWindow(decompFind);
                 }
                 else
                 {
+                    //if(Globals.python) MessageBox.Show("decomp 7");
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
                     thread.Name = "Decomp";
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
                     thread.Start(decompFind);
+                    if (Globals.python) System.Threading.Thread.Sleep(int.MaxValue);  //HACK
                 }
 
                 //Also see #9237532567
@@ -2415,7 +2417,7 @@ namespace Gekko
         /// </summary>
         /// <param name="o2"></param>
         private static void CreateDecompWindow(object o2)
-        {
+        {            
             DecompFind decompFind = o2 as DecompFind;
             WindowDecomp windowDecomp = null;
 
@@ -2430,7 +2432,7 @@ namespace Gekko
 
                 windowDecomp.RecalcCellsWithNewType(decompFind.model);
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
-                if (G.IsUnitTesting() && Globals.showDecompTable == false)
+                if (!Globals.python && G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
                     Globals.windowsDecomp2.Clear();
                     windowDecomp = null;
@@ -2445,7 +2447,9 @@ namespace Gekko
                     }
                     else
                     {
+                        //if (Globals.python) MessageBox.Show("decomp 77");
                         windowDecomp.ShowDialog();
+                        //if(Globals.python) MessageBox.Show("decomp 777");
                         if (Globals.showDecompTable)
                         {
                             Globals.showDecompTable = false;
@@ -5558,7 +5562,7 @@ namespace Gekko
 
         public static void Find(O.Find o)
         {
-            if (G.IsUnitTesting() && Globals.showFind == true)
+            if (!Globals.python && G.IsUnitTesting() && Globals.showFind == true)
             {
                 //Skip the "Decomp" thread stuff when unit testing -- will give TreadAbortedException for some reason not understood.
                 CreateFindWindow(o);

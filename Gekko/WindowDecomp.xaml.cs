@@ -2269,7 +2269,7 @@ namespace Gekko
                 webBrowser.Visibility = Visibility.Collapsed;
                 scrollView1.Visibility = Visibility.Visible;
 
-                if (G.IsUnitTesting() && Globals.showDecompTable == false)
+                if (!Globals.python && G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
                     Globals.lastDecompTable = decompOutput.table;
                 }

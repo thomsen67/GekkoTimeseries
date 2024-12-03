@@ -16844,6 +16844,16 @@ namespace UnitTests
 
             Assert.AreEqual(0, Globals.unitTestLhsNotFoundInModel.Count);
             Assert.AreEqual(482, Globals.unitTestLhsNotFoundInEq.Count);
+            if (true)
+            {
+                Globals.unitTestLhsNotFoundInEq.Sort();
+                string s2 = null;
+                foreach (string s in Globals.unitTestLhsNotFoundInEq)
+                {
+                    s2 += s + G.NL;
+                }
+                Program.WriteFileWithWait("c:\\tools\\lhs.txt", s2);
+            }
             Assert.AreEqual(19110, lhsEquations1.Count());
             Assert.AreEqual(0, in1NotIn2.Count);
             Assert.AreEqual(0, in2NotIn1.Count);

@@ -2549,9 +2549,7 @@ namespace Gekko
                 }
             }
             return rv;
-        }        
-
-        
+        }
 
         /// <summary>
         /// TELL statement.
@@ -2562,7 +2560,11 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && (text == "d"))
             {
-                GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
+                //GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
+                DateTime dt = DateTime.Now;
+                double sum = Sum_numbers();
+                new Writeln("" + sum);
+                new Writeln(G.Seconds(dt));
                 return;
             }
 
@@ -3130,10 +3132,23 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }        
+        }
 
-        
-        
+        private static double Sum_numbers()
+        {
+            double sum = 0.0;
+            double i = 1.0;
+            while (i < 1e10)
+            {
+                sum += i;
+                i++;
+            }
+
+            return sum;
+        }
+
+
+
 
         /// <summary>
         /// Dimensions with high value (for instance 1.0) are probably summed up with sum(i, x[i]) in the equations.
@@ -4251,12 +4266,12 @@ namespace Gekko
                 }
                 new Writeln(G.GekkoInfo("short4"));
             }
-        }
+        }        
 
         /// <summary>
         /// Sets some objects up that are necessary when running Gekko without a GUI
         /// </summary>
-        private static void SetupGekkoForNonGuiUse()
+        public static void SetupGekkoForNonGuiUse()
         {
             //See also #89aos8dbjdfjkdsf
             Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
@@ -9857,7 +9872,7 @@ namespace Gekko
 
             Globals.suggestions.Clear();  //to not fill out ram too much
 
-            if (Globals.excelDna || Globals.hideGui)
+            if (Globals.excelDna || Globals.python || Globals.hideGui)
             {
                 if (!Globals.nolog)
                 {
@@ -16030,7 +16045,7 @@ namespace Gekko
         }
 
         public static void TraceCommand2(O.TraceCommand2 o)
-        {
+        {            
             List<string> names = null;
             List<IVariable> m = new List<IVariable>();
             //See also #87582903573829
@@ -16075,7 +16090,7 @@ namespace Gekko
                     new Writeln("As seen above, '" + ts.GetNameAndParentDatabank() + "' is an array-series. Please choose one of its elements (sub-series) for data tracing.");
                 }
                 else
-                {
+                {                    
                     Trace2 trace = ts.meta.trace2;
                     if (trace == null)
                     {
@@ -16087,7 +16102,7 @@ namespace Gekko
                     {
                         new Writeln("Limit of 10 consecutive data trace windows exceeded.");
                         break;
-                    }
+                    }                    
                     Trace2.CallTraceViewer(trace, int.MaxValue);
                 }
             }
@@ -18887,8 +18902,16 @@ namespace Gekko
                 {
                     Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                     if (false) GamsModel.GAMSParser();
-                    if (false) GamsModel.GamsGMO();                    
-                    model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
+                    if (false) GamsModel.GamsGMO();
+                    try
+                    {
+                        model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
+                    }
+                    catch 
+                    {
+                        //No need to choke on this
+                        new Note("The module that identifies dependent variables from equation names failed to load");
+                    }
                     Program.model = model;
                 }
                 else new Error("No model defined");
@@ -19726,7 +19749,7 @@ namespace Gekko
             // \files.zip\sub2\zz.csv
             // g:\data\files.zip\sub2\zz.csv
             // \\localhost\g$\data\files.zip\sub2\zz.csv
-            // ----------------------------------------------- 
+            // -----------------------------------------------             
 
             FindFileHelper rv = new FindFileHelper();
             bool success = false;

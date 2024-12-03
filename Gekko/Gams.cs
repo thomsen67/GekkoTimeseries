@@ -1081,10 +1081,13 @@ namespace Gekko
 
             if (model.modelGamsScalar == null) new Error("No scalar model defined");
 
+            // ------------------------------------------------------------
             bool mayUseDatabank = true;
             bool spelling = true;
+            // -------- internal, normally false --------
             bool shouldWrite = false;
             bool createProtobufferFileForUnitTests = false;  //Set it back to false right afterwards!! Perhaps even take copies of the current file before overwriting.
+            // ------------------------------------------------------------
 
             int nAll = 0;
             List<string> notFoundInModel = new List<string>();
@@ -1105,16 +1108,15 @@ namespace Gekko
             {
                 string equationNameWithoutIndexes = kvp.Key;
 
-                //if (equationNameWithoutIndexes.ToLower().Contains("e_qm_tot"))
-                //{
-                //}
-
                 //For each scalar equation
                 foreach (EquationHelper2 eh in kvp.Value)
                 {
                     nAll++;
                     string equationNameWithIndexes = eh.eqName;
-                    if (equationNameWithoutIndexes.Contains("__")) System.Windows.Forms.MessageBox.Show("Hovsa3"); //Not possible
+                    if (Globals.runningOnTTComputer && equationNameWithoutIndexes.Contains("__"))
+                    {
+                        MessageBox.Show("Hovsa3"); //Not possible
+                    }
 
                     string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
                     if (spelling)
@@ -1162,7 +1164,7 @@ namespace Gekko
                     }
 
                     //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
-                    VariableDims m1 = GetScalarModelVariables(lhsName, eh, writer);
+                    VariableDims m1 = GetScalarModelVariables(lhsName, eh);
 
                     if (m1.storage.Count == 0)
                     {
@@ -1174,7 +1176,7 @@ namespace Gekko
                         {                            
                             notFoundInEq.Add(equationNameWithoutIndexes);
                         }
-                        WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, shouldWrite, writer);
+                        if (shouldWrite) WriteEquation(eh, lhsName, equationNameWithIndexes, new string[] { "...unknown..." }, writer);
                         continue;  //Variable exists, but is not found in equation in any form
                     }                    
                     
@@ -1349,7 +1351,7 @@ namespace Gekko
 
                         if (names.Length > 0) lhsName += "[" + Stringlist.GetListWithCommas(names) + "]";
 
-                        if (lhsEquations.ContainsKey(eh.eqName))
+                        if (Globals.runningOnTTComputer && lhsEquations.ContainsKey(eh.eqName))
                         {
                             MessageBox.Show("Hovsa6"); //Not possible?
                         }
@@ -1361,11 +1363,11 @@ namespace Gekko
                     else
                     {
                         nFail++;
-                        WriteEquation(eh, lhsName, equationNameWithIndexes, names, shouldWrite, writer);
+                        if (shouldWrite) WriteEquation(eh, lhsName, equationNameWithIndexes, names, writer);
 
-                        if (true)
+                        if (true && Globals.runningOnTTComputer)
                         {
-                            //Must for inspection in the debugger
+                            //Just for inspection in the debugger
                             string s = equationNameWithoutIndexes + G.NL;
                             s += equationNameWithIndexes + G.NL + G.NL;
                             s += eh.eqMathRaw + G.NL + G.NL;
@@ -1375,17 +1377,26 @@ namespace Gekko
                 }
             }
 
-            using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\lhs.txt", null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            if (Globals.runningOnTTComputer && shouldWrite && writer.Count > 0)
             {
-                foreach (string s in writer)
+                using (FileStream fs = Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\lhs.txt", null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter res = G.GekkoStreamWriter(fs))
                 {
-                    res.WriteLine(s);
+                    foreach (string s in writer)
+                    {
+                        res.WriteLine(s);
+                    }
                 }
             }
             if (Globals.runningOnTTComputer)
             {
                 new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel.Count + ", notFoundInEq = " + notFoundInEq.Count + "). EqDict = " + lhsEquations.Count() + ". Time: " + G.Seconds(t0));
+
+                if (createProtobufferFileForUnitTests)
+                {
+                    //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
+                    Program.ProtobufWrite(lhsEquations, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
+                }
             }
 
             if (G.IsUnitTesting())
@@ -1393,12 +1404,6 @@ namespace Gekko
                 Globals.unitTestLhsNotFoundInModel = notFoundInModel;
                 Globals.unitTestLhsNotFoundInEq = notFoundInEq;
             }            
-            
-            if (createProtobufferFileForUnitTests)
-            {
-                //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
-                Program.ProtobufWrite(lhsEquations, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
-            }
 
             return lhsEquations;
         }
@@ -1423,19 +1428,15 @@ namespace Gekko
             return result;
         }
 
-        private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, bool shouldWrite, List<string> writer)
+        private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, List<string> writer)
         {
-            if (shouldWrite)
-            {
-                writer.Add(equationNameWithIndexes + " ..");
-                writer.Add(eh.eqMathRaw);
-                writer.Add(eh.eqMathScalar);
-                writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
-                writer.Add(" ------------------------------------------------------------------------------------ ");
-                writer.Add("");
-            }
+            writer.Add(equationNameWithIndexes + " ..");
+            writer.Add(eh.eqMathRaw);
+            writer.Add(eh.eqMathScalar);
+            writer.Add("--> " + lhsName + "[" + Stringlist.GetListWithCommas(names) + "]");
+            writer.Add(" ------------------------------------------------------------------------------------ ");
+            writer.Add("");
         }
-
 
         private static void WalkScalarEquations(string lhsName, TokenHelper tok, VariableDims m2)
         {
@@ -1535,7 +1536,7 @@ namespace Gekko
             return nDim;
         }
 
-        private static VariableDims GetScalarModelVariables(string lhsName, EquationHelper2 eh, List<string> writer)
+        private static VariableDims GetScalarModelVariables(string lhsName, EquationHelper2 eh)
         {
             int nM2 = -12345;
             //For each sub-equation under the equation name
@@ -1546,20 +1547,7 @@ namespace Gekko
             VariableDims m2 = new VariableDims();  //Count is # found variables in equation
             //For each token in the equation name
             WalkScalarEquations(lhsName, tokens2, m2);
-            nM2 = m2.storage.Count;
-            //writer.Add("Equation " + kvp.Key + ": " + s + ":");
-            if (m2 != null && m2.storage.Count > 0)
-            {
-                if (m2.storage.Count == 1)
-                {
-                    //writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]");
-                }
-                else
-                {
-                    //writer.Add(lhs + "[" + Stringlist.GetListWithCommas(m2.storage[0].storage) + "]" + " ----- " + lhs + "[" + Stringlist.GetListWithCommas(m2.storage[m2.storage.Count - 1].storage) + "]");
-                }
-            }
-            //writer.Add("");
+            nM2 = m2.storage.Count;            
             return m2;
         }
 

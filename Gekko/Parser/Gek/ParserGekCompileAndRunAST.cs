@@ -115,6 +115,12 @@ namespace Gekko.Parser.Gek
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
             }
+            else if (Globals.python)
+            {
+                string xx = Path.GetDirectoryName(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\"); //HACK
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
+            }
             else if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path, this will never be run by users                
@@ -391,6 +397,8 @@ namespace Gekko.Parser.Gek
                         }
                         //e.MainNewLineTight();
                     }
+
+                    if (Globals.python) MessageBox.Show(ce.FileName + " line " + ce.Line + ": " + ce.ErrorText);
                 }
 
                 if (Globals.threadIsInProcessOfAborting)
@@ -401,7 +409,7 @@ namespace Gekko.Parser.Gek
                 {
                     if (p.lastFileSentToANTLR == "") e.MainAdd("Internal Gekko error regarding user input.");
                     else e.MainAdd("Internal Gekko error regarding file: " + p.lastFileSentToANTLR + ".");
-                }
+                }                
 
                 throw new GekkoException();
             }

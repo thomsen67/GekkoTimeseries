@@ -703,7 +703,7 @@ namespace Gekko
         {
             if (count == 1) return "";
             else return "s";
-        }
+        }        
 
         /// <summary>
         /// For current freq, returns 4 for !q, 12 for !m, else 1. So 1 for !a and !u (but also 1 for !d and !w...).
@@ -5474,6 +5474,7 @@ namespace Gekko
         public static bool IsUnitTesting()
         {
             if (Globals.hideGui) return true;
+            if (Globals.python) return true;
             if (Globals.excelDna) return true;            
             if ((Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe") || Application.ExecutablePath.Contains("testhost.exe"))) return true;
             return false;
@@ -5668,7 +5669,7 @@ namespace Gekko
                 {                    
                     if (newline)
                     {                        
-                        if (Globals.excelDna || Globals.hideGui)
+                        if (Globals.excelDna || Globals.python || Globals.hideGui)
                         {                            
                             if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);                         
                         }                        
@@ -5680,7 +5681,7 @@ namespace Gekko
                     }
                     else
                     {
-                        if (Globals.excelDna || Globals.hideGui)
+                        if (Globals.excelDna || Globals.python || Globals.hideGui)
                         {                            
                             if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);                         
                         }
@@ -6030,7 +6031,7 @@ namespace Gekko
             {
                 if (G.IsUnitTesting())
                 {
-                    if (Globals.excelDna || Globals.hideGui)
+                    if (Globals.excelDna || Globals.python || Globals.hideGui)
                     {
                         if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
                     }
