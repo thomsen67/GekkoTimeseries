@@ -5622,8 +5622,20 @@ namespace Gekko
                 }
                 ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
                 if (modelGamsScalar == null)
-                {
-                    new Error("FIND is only implemented for scalar models");
+                {                    
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("DECOMP/FIND cannot access the model equations in a userful form (scalar representation).");
+                        txt.MainAdd("This error usually only happes when a .gms file is loaded with for instance 'model <gms> model.gms;',");
+                        txt.MainAdd("where you may use DISP to show equations, but DECOMP and FIND does not work. For DECOMP/FIND to work,");
+                        txt.MainAdd("you need to use a GAMS scalar model (in form of a zip-file), loaded with 'model <gms> model.zip'.");  //!!! Done this way because it becomes a popup-window !!!
+
+                        txt.MainAdd("The zip-file is produced by GAMS and usually contains the three files gams.gms, dict.txt, and raw.gms inside.");
+                        txt.MainAdd("The file raw.gms may be omitted (raw GAMS eqautions), whereas gams.gms/dict.txt contains 'unrolled' (scalar) GAMS equations.");
+                        txt.MainAdd("To produce a GAMS scalar model, GAMS must solve the model using the so-called 'convert' option.");
+                        txt.MainAdd("Read mere about scalar models in the help system regarding the MODEL statement.");
+                    }
+
                     return;
                 }
                 ModelGams modelGams = model.modelGams;
