@@ -802,7 +802,7 @@ namespace Gekko
 
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
-                    model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2, false);
+                    model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2, decompOptions2.missingAsZero, false);
                 }
                 else
                 {
@@ -5640,7 +5640,7 @@ namespace Gekko
                 }
                 ModelGams modelGams = model.modelGams;
 
-                modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, false);
+                modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, o.decompFind.decompOptions2.missingAsZero, false);
 
                 Globals.itemHandler = new ItemHandler();  //hack
 

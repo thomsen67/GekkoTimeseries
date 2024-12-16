@@ -203,12 +203,15 @@ namespace Gekko
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
-        //public string series_modify = "update";
-        public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
-        public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
+        
+        // remove start --> remove these 2 in Gekko 4.0
+        public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;         //Not used??
+        public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;          //Not used?? for sum, zero = skip
+        // remove end
+
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
-        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip                
+        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip --> the whole array-subseries x[i] is missing                
         public ESeriesMissing series_array_table_missing = ESeriesMissing.Error;          //not used at the moment
         public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero, last one only when accessing a series from an open databank, not in other cases. Not implemented for SIM (has its own solve option for that)
         // ---

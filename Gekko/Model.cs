@@ -1268,7 +1268,7 @@ namespace Gekko
         /// 
         /// </summary>
         /// <returns></returns>
-        public void MaybeLoadDataIntoModel(int depth, GekkoTime gt1, GekkoTime gt2, bool forceRefresh)
+        public void MaybeLoadDataIntoModel(int depth, GekkoTime gt1, GekkoTime gt2, bool ignoreMissing, bool forceRefresh)
         {
             bool hasPeriodChanged = false;
             bool hasDatabankChanged = true;  //in the longer run, keep track of that
@@ -1308,8 +1308,8 @@ namespace Gekko
 
             DateTime t0 = DateTime.Now;
             this.FlushAAndRArrays();
-            this.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-            this.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+            this.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false, ignoreMissing);
+            this.FromDatabankToAScalarModel(Program.databanks.GetRef(), true, ignoreMissing);
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: Loading data to a array: " + G.Seconds(t0), System.Drawing.Color.Gray);  //writeln2 to avoid popup
 
             if (false)
@@ -1361,11 +1361,8 @@ namespace Gekko
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        public void FromDatabankToAScalarModel(Databank db, bool isRef)
+        public void FromDatabankToAScalarModel(Databank db, bool isRef, bool decompIgnoreMissing)
         {
-            //Beware of OPTION series data missing, if it is set.
-            //Beware of timeless series -- not handled...
-
             GekkoTime tStart = this.absoluteT1;
             GekkoTime tEnd = this.absoluteT2;
             if (this.isPerpetualModel)
@@ -1427,39 +1424,59 @@ namespace Gekko
                 
                 Series ts = DatabankAHelperScalarModel(db, i, name, true, isRef);
                 if (ts == null)
-                    continue;  //If not in the databank, it will contain NaN's
-
-                //This runs pretty fast, operating directly on the internal timeseries array
-                //Cannot use array copy, because a has time dimension first.
-                //
-                // NB: beware of OPTION series data missing, if it is set.
-                int index1 = -12345;
-                int index2 = -12345;
-
-                if (ts.type == ESeriesType.Timeless)
                 {
-                    if (Globals.decompFixTimelessProblem)
+                    //Will have missing values
+                }
+                else
+                {
+
+                    //This runs pretty fast, operating directly on the internal timeseries array
+                    //Cannot use array copy, because a has time dimension first.
+                    //
+                    // NB: beware of OPTION series data missing, if it is set.
+                    int index1 = -12345;
+                    int index2 = -12345;
+
+                    if (ts.type == ESeriesType.Timeless)
                     {
-                        double data = ts.GetTimelessData();
-                        for (int t = 0; t < n; t++)
+                        if (Globals.decompFixTimelessProblem)
                         {
-                            a[t][i] = data;
+                            double data = ts.GetTimelessData();
+                            for (int t = 0; t < n; t++)
+                            {
+                                a[t][i] = data;
+                            }
+                        }
+                        else
+                        {
+                            new Error("Problem loading timeless variable '" + name + "' into GAMS scalar model");
                         }
                     }
                     else
                     {
-                        new Error("Problem loading timeless variable '" + name + "' into GAMS scalar model");
+                        double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);
+                        for (int t = 0; t < n; t++)
+                        {
+                            a[t][i] = data[index1 + t];
+                        }
                     }
                 }
-                else
+
+                if (Globals.decompFixMissingIgnoreProblem && (decompIgnoreMissing || Program.options.series_data_missing == ESeriesMissing.Zero))
                 {
-                    double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);
+                    //In principle, here we could distinguish between a missing sub-series or a missing normal series,
+                    //but for simplicity in DECOMP we just use one option: option series data missing = zero, and we
+                    //perform the replacement at the very end of the method.
+                    //
+                    //The reason Program.options.series_data_missing has not already changed the data is that we are using
+                    //the non-cloning GetDataSequenceUnsafePointerAlterBEWARE().
+                    //
                     for (int t = 0; t < n; t++)
                     {
-                        a[t][i] = data[index1 + t];
+                        if (G.isNumericalError(a[t][i])) a[t][i] = 0d;
                     }
                 }
-            }            
+            }
         }
 
         /// <summary>

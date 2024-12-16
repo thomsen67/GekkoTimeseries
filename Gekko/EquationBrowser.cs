@@ -996,7 +996,7 @@ namespace Gekko
 
         public static void BrowserNew(bool limit, bool onlyHtml)
         {
-            
+            bool ignoreMissing = false;
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -1066,7 +1066,7 @@ namespace Gekko
             //The following loads the databank values into the scalar model, for reuse for all the DECOMP
             //calculations later on.
             //BEWARE: should t1 have 2-3 periods subtraced for instance? But t1.Add(-3) does not seem to change anything.
-            model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, false);
+            model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, ignoreMissing, false);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar);
 

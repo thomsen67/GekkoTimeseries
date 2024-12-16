@@ -788,11 +788,13 @@ namespace Gekko
             {
                 this.buttonStyle.Content = Globals.decompStyleA1;
                 this.buttonStyle.ToolTip = Globals.decompStyleA2;
+                //this.buttonStyle.Opacity = 0.7d;
             }
             else
             {
                 this.buttonStyle.Content = Globals.decompStyleB1;
                 this.buttonStyle.ToolTip = Globals.decompStyleB2;
+                //this.buttonStyle.Opacity = 0.7d;
             }
 
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
@@ -2349,7 +2351,7 @@ namespace Gekko
                 cmdDown.Opacity = 1.0;
 
                 buttonStyle.IsEnabled = true;
-                buttonStyle.Opacity = 1.0;
+                buttonStyle.Opacity = 0.7;
             }
 
             if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
@@ -2615,6 +2617,7 @@ namespace Gekko
             if (!isInitializing)
             {                
                 this.decompFind.decompOptions2.missingAsZero = true;
+                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, decompFind.decompOptions2.missingAsZero, true);
                 RecalcCellsWithNewType(decompFind.model);
             }
         }
@@ -2624,6 +2627,7 @@ namespace Gekko
             if (!isInitializing)
             {                
                 this.decompFind.decompOptions2.missingAsZero = false;
+                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, decompFind.decompOptions2.missingAsZero, true);
                 RecalcCellsWithNewType(decompFind.model);
             }
         }
@@ -3092,7 +3096,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {                
-                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
+                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, decompFind.decompOptions2.missingAsZero, true);
                 RecalcCellsWithNewType(decompFind.model);
             }
         }
@@ -3117,7 +3121,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 decompFind.decompOptions2.useBracketNames = !decompFind.decompOptions2.useBracketNames;                
-                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, true);
+                decompFind.model.modelGamsScalar.MaybeLoadDataIntoModel(decompFind.depth, decompFind.decompOptions2.t1, decompFind.decompOptions2.t2, decompFind.decompOptions2.missingAsZero, true);
                 RecalcCellsWithNewType(decompFind.model);
 
                 Button b = sender as Button;
