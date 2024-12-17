@@ -669,7 +669,7 @@ namespace Gekko
             if (o.decompFind != null)
             {                
                 decompOptions2 = o.decompFind.decompOptions2;
-                if (o.decompFind.depth < 2 && o.decompFind.children.Count == 0) SetDecompOptions(o, decompOptions2);
+                if (o.decompFind.depth < 2 && o.decompFind.children.Count == 0) SetSomeDecompOptions(decompOptions2, o);
             }
             else
             {
@@ -681,7 +681,7 @@ namespace Gekko
                 decompOptions2.expressionOld = o.label;
                 decompOptions2.expression = o.expression;
                 decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
-                SetDecompOptions(o, decompOptions2);
+                SetSomeDecompOptions(decompOptions2, o);
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
@@ -828,8 +828,9 @@ namespace Gekko
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
         }
 
-        private static void SetDecompOptions(O.Decomp2 o, DecompOptions2 decompOptions2)
+        public static void SetSomeDecompOptions(DecompOptions2 decompOptions2, O.Decomp2 o)
         {
+            if (o == null) return;
             if (G.Equal(o.opt_shares, "yes")) decompOptions2.isShares = true;
             if (G.Equal(o.opt_count, "yes") && G.Equal(o.opt_names, "yes")) new Error("You cannot use option <count> and <names> at the same time");
             if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;

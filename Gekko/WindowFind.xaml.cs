@@ -35,7 +35,7 @@ namespace Gekko
             if (this.decompFind.decompOptions2.t1.IsNull()) this.decompFind.decompOptions2.t1 = o.t1;
             if (this.decompFind.decompOptions2.t2.IsNull()) this.decompFind.decompOptions2.t2 = o.t2;
             this.decompFind.decompOptions2.iv = o.iv;
-            if (o.oDecomp.opt_prtcode != null) this.decompFind.decompOptions2.decompOperator = new DecompOperator(o.oDecomp.opt_prtcode.ToLower());
+            if (o.oDecomp != null && o.oDecomp.opt_prtcode != null) this.decompFind.decompOptions2.decompOperator = new DecompOperator(o.oDecomp.opt_prtcode.ToLower());
                         
             InitializeComponent();
             this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));

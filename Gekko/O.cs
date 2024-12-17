@@ -8931,7 +8931,10 @@ namespace Gekko
                 if (this.decompFind == null)
                 {
                     Gekko.Model model = Program.model;
-                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null, model);
+                    DecompOptions2 decompOptions2 = new DecompOptions2();
+                    Decomp.SetSomeDecompOptions(decompOptions2, this.oDecomp);
+                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, decompOptions2, null, model);                    
+
                     this.decompFind.decompOptions2.t1 = this.t1;
                     this.decompFind.decompOptions2.t2 = this.t2;
                                         
