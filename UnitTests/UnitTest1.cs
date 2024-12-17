@@ -18764,7 +18764,7 @@ namespace UnitTests
 
             //A good test of reading and writing from GAMS scalar model a array.
             Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false, false);
 
             try
             {
@@ -18918,9 +18918,9 @@ namespace UnitTests
 
                 //Note: the first one is mandatory, else SIM has not data.
                 //The two next a good test of reading and writing from GAMS scalar model a array.
-                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false, false);
                 Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
-                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false, false);
 
                 if (true)
                 {
@@ -18947,7 +18947,7 @@ namespace UnitTests
                     {
                         Globals.modelResUnitTest = true;
                         I("READ <gdx> makro.zip\\makro0.gdx;");
-                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false, false);
                         I("SIM;");
                     }
                     finally

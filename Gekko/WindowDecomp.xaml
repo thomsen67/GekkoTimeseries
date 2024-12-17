@@ -376,7 +376,7 @@
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
                 <CheckBox  x:Name="checkBoxCount" Width="62" Margin="0,3.5,0,0" VerticalAlignment="Top" ToolTip="Show count of elements (&lt;count> option)" Checked="checkBoxCount_Checked" Unchecked="CheckBoxCount_Unchecked"  Content="Count" />
                 <CheckBox x:Name="checkBoxNames" Width="57" VerticalAlignment="Center" ToolTip="Show names of elements (&lt;names> option)" Margin="3,0,0,0" Content="Names"  Checked="CheckBoxNames_Checked" Unchecked="CheckBoxNames_Unchecked" />
-                <CheckBox Name="checkMZero" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkBoxMZero_Checked" Unchecked="checkBoxMZero_Unchecked" ToolTip="Treat missing values as zeroes" Content="Miss=0" Margin="10,3,6.333,3"></CheckBox>
+                <CheckBox Name="checkMZero" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkBoxMZero_Checked" Unchecked="checkBoxMZero_Unchecked" ToolTip="Treat missing values as zeroes (&lt;missing=zero> option).&#x0a;(You may alternatively use the function 'bankReplace(m(), 0);')" Content="Miss=0" Margin="10,3,6.333,3"></CheckBox>
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">

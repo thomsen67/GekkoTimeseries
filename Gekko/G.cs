@@ -213,6 +213,16 @@ namespace Gekko
         // ------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Helper method to keep stuff together.
+        /// </summary>
+        /// <param name="missingAsZero"></param>
+        /// <returns></returns>
+        public static bool DecompShouldHandleMissings(bool missingAsZero)
+        {
+            return Globals.decompFixMissingIgnoreProblem && (missingAsZero || Program.options.series_data_missing == ESeriesMissing.Zero);
+        }
+
+        /// <summary>
         /// In a double[] array, replaces missing values with 0
         /// </summary>
         /// <param name="temp"></param>

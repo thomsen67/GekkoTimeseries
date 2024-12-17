@@ -128,8 +128,10 @@ namespace Gekko
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
                 if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
 
-                if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
-                else graph.Attr.LayerDirection = LayerDirection.RL;
+                //if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
+                //else graph.Attr.LayerDirection = LayerDirection.RL;
+                if (rotate) graph.Attr.LayerDirection = LayerDirection.RL;
+                else graph.Attr.LayerDirection = LayerDirection.TB;
 
                 graphViewer.Graph = graph;
 

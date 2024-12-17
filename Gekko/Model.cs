@@ -1421,7 +1421,11 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                
+
+                if (Globals.runningOnTTComputer && G.Equal(name, "vtmellem[tot]"))
+                {
+                }
+
                 Series ts = DatabankAHelperScalarModel(db, i, name, true, isRef);
                 if (ts == null)
                 {
@@ -1462,7 +1466,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.decompFixMissingIgnoreProblem && (decompIgnoreMissing || Program.options.series_data_missing == ESeriesMissing.Zero))
+                if (G.DecompShouldHandleMissings(decompIgnoreMissing))
                 {
                     //In principle, here we could distinguish between a missing sub-series or a missing normal series,
                     //but for simplicity in DECOMP we just use one option: option series data missing = zero, and we

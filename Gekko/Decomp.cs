@@ -666,8 +666,9 @@ namespace Gekko
 
             DecompOptions2 decompOptions2 = null;
             if (o.decompFind != null)
-            {
+            {                
                 decompOptions2 = o.decompFind.decompOptions2;
+                if (o.decompFind.depth < 2 && o.decompFind.children.Count == 0) SetDecompOptions(o, decompOptions2);
             }
             else
             {
@@ -679,24 +680,7 @@ namespace Gekko
                 decompOptions2.expressionOld = o.label;
                 decompOptions2.expression = o.expression;
                 decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
-                if (G.Equal(o.opt_shares, "yes")) decompOptions2.isShares = true;
-                if (G.Equal(o.opt_count, "yes") && G.Equal(o.opt_names, "yes")) new Error("You cannot use option <count> and <names> at the same time");
-                if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;
-                if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
-                if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
-                if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
-                if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
-                if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
-                if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
-                if (G.Equal(o.opt_expand, "yes")) decompOptions2.expand = true;
-                if (!double.IsNaN(o.opt_ignore))
-                {
-                    if (o.opt_ignore < 0d || o.opt_ignore > 100d)
-                    {
-                        new Error("Option <ignore=...> must be between 0 and 100 (inclusive). The value is " + o.opt_ignore + ".");
-                    }
-                    decompOptions2.ignore = o.opt_ignore;
-                }
+                SetDecompOptions(o, decompOptions2);
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
@@ -841,6 +825,28 @@ namespace Gekko
             }
             
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
+        }
+
+        private static void SetDecompOptions(O.Decomp2 o, DecompOptions2 decompOptions2)
+        {
+            if (G.Equal(o.opt_shares, "yes")) decompOptions2.isShares = true;
+            if (G.Equal(o.opt_count, "yes") && G.Equal(o.opt_names, "yes")) new Error("You cannot use option <count> and <names> at the same time");
+            if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;
+            if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
+            if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
+            if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
+            if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
+            if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
+            if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
+            if (G.Equal(o.opt_expand, "yes")) decompOptions2.expand = true;
+            if (!double.IsNaN(o.opt_ignore))
+            {
+                if (o.opt_ignore < 0d || o.opt_ignore > 100d)
+                {
+                    new Error("Option <ignore=...> must be between 0 and 100 (inclusive). The value is " + o.opt_ignore + ".");
+                }
+                decompOptions2.ignore = o.opt_ignore;
+            }
         }
 
         /// <summary>
@@ -1916,8 +1922,9 @@ namespace Gekko
                     DecompDict dd = null;
                     if (op.isRaw)
                     {
-                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar);
-                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar);
+                        //???? Why is this ever necessary: are such variables not already done beforehand???
+                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar, decompOptions2);
+                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);
                     }
                     else
                     {
@@ -1936,8 +1943,17 @@ namespace Gekko
             //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
-        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq, ModelGamsScalar modelGamsScalar)
+        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq, ModelGamsScalar modelGamsScalar, DecompOptions2 decompOptions2)
         {
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // ==> Why are these variables not taken from the a or a_ref array at least? And they are probably also present in other parts of DecompDatas!!
+            // ==> Fix this in Gekko 4.0, make it more clean. Here we have to check for null, etc.
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+
             int lag2; string name2;
             ConvertFromTurtleName(name, true, out name2, out lag2);
 
@@ -1962,6 +1978,10 @@ namespace Gekko
                         }
                         ts = (ts.DeepClone(0, null, null) as Series);
                         ts.Lag(lag2);
+                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                        {
+                            DecompMainStoreRawVariableHelper(ts);
+                        }
                     }
                     else
                     {
@@ -1984,6 +2004,10 @@ namespace Gekko
                         }
                         ts = (ts.DeepClone(0, null, null) as Series);
                         ts.Lag(lag2);
+                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                        {
+                            DecompMainStoreRawVariableHelper(ts);
+                        }
                     }
                     else
                     {
@@ -1994,6 +2018,19 @@ namespace Gekko
                     }
                     decompDatas.MAIN_data.cellsRef.Add(name, ts);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles M --> 0, ok to change the array values because the series has already been cloned
+        /// </summary>
+        /// <param name="ts"></param>
+        private static void DecompMainStoreRawVariableHelper(Series ts)
+        {            
+            double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE();
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (G.isNumericalError(data[i])) data[i] = 0d;
             }
         }
 
@@ -2058,21 +2095,33 @@ namespace Gekko
 
         private static void MergeDecompDict(DecompDict d, DecompDict dStorage)
         {
+            //Gekko 4.0: Do some proper logic regarding "windows" of data getting updated
+            //The following is hacky
+
+            //foreach (KeyValuePair<string, Series> kvp in d.storage)
+            //{
+            //    Series ts = kvp.Value;
+            //    Series tsStorage = dStorage[kvp.Key]; //may be created
+
+            //    GekkoTime t1 = ts.GetRealDataPeriodFirst();
+            //    GekkoTime t2 = ts.GetRealDataPeriodLast();
+            //    if (!t1.IsNull())
+            //    {
+            //        foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            //        {
+            //            //the following if is probably not necessary
+            //            //The IF is dropped ... if (G.isNumericalError(tsStorage.GetDataSimple(t))) tsStorage.SetData(t, ts.GetDataSimple(t));
+            //            tsStorage.SetData(t, ts.GetDataSimple(t));
+            //        }
+            //    }
+            //}
+
             foreach (KeyValuePair<string, Series> kvp in d.storage)
             {
                 Series ts = kvp.Value;
-                Series tsStorage = dStorage[kvp.Key]; //may be created
-                GekkoTime t1 = ts.GetRealDataPeriodFirst();
-                GekkoTime t2 = ts.GetRealDataPeriodLast();
-                if (!t1.IsNull())
-                {
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-                    {
-                        //the following if is probably not necessary
-                        //The IF is dropped ... if (G.isNumericalError(tsStorage.GetDataSimple(t))) tsStorage.SetData(t, ts.GetDataSimple(t));
-                        tsStorage.SetData(t, ts.GetDataSimple(t));
-                    }
-                }
+                Series tsClone = ts.DeepClone(0, null, null) as Series;
+                if (dStorage.ContainsKey(kvp.Key)) dStorage.Remove(kvp.Key);
+                dStorage.Add(kvp.Key, tsClone);                
             }
         }
 
@@ -4023,6 +4072,12 @@ namespace Gekko
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero)) 
+                                {
+                                    if (G.isNumericalError(dLevel)) dLevel = 0d;
+                                    if (G.isNumericalError(dLevelLag)) dLevelLag = 0d;
+                                    if (G.isNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
+                                }
                             }
                             Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsRef != null)
@@ -4030,6 +4085,12 @@ namespace Gekko
                                 dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                                {
+                                    if (G.isNumericalError(dLevelRef)) dLevelRef = 0d;
+                                    if (G.isNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
+                                    if (G.isNumericalError(dLevelRefLag2)) dLevelRefLag2 = 0d;
+                                }
                             }
                         }
                         else
@@ -4046,6 +4107,12 @@ namespace Gekko
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                                {
+                                    if (G.isNumericalError(dLevel)) dLevel = 0d;
+                                    if (G.isNumericalError(dLevelLag)) dLevelLag = 0d;
+                                    if (G.isNumericalError(dLevelLag2)) dLevelLag2 = 0d;
+                                }
                             }
 
                             if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
@@ -4060,6 +4127,12 @@ namespace Gekko
                                 dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                                {
+                                    if (G.isNumericalError(dLevelRef)) dLevelRef = 0d;
+                                    if (G.isNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
+                                    if (G.isNumericalError(dLevelRefLag2)) dLevelRefLag2 = 0d;
+                                }
                             }
                         }
                     }
