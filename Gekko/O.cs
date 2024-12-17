@@ -8903,7 +8903,8 @@ namespace Gekko
             //input
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set      
-            public string opt_prtcode = null;
+            //public string opt_prtcode = null;
+            public O.Decomp2 oDecomp = null;
             public List iv = null;  //why list?
             public List iv2 = null;  //why list?
 
@@ -8933,13 +8934,14 @@ namespace Gekko
                     this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null, model);
                     this.decompFind.decompOptions2.t1 = this.t1;
                     this.decompFind.decompOptions2.t2 = this.t2;
-                    if (this.opt_prtcode == null)
+                                        
+                    if (this.oDecomp == null || this.oDecomp.opt_prtcode == null)
                     {                        
                         this.decompFind.decompOptions2.decompOperator = Decomp.GetFindOperator();
                     }
                     else
                     {
-                        this.decompFind.decompOptions2.decompOperator = new DecompOperator(this.opt_prtcode.ToLower());
+                        this.decompFind.decompOptions2.decompOperator = new DecompOperator(this.oDecomp.opt_prtcode.ToLower());
                     }
                 }                                
                 G.CheckLegalPeriod(this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2);

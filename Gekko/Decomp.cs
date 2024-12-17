@@ -647,7 +647,8 @@ namespace Gekko
                 O.Find find = new O.Find();
                 find.t1 = o.t1;
                 find.t2 = o.t2;
-                find.opt_prtcode = o.opt_prtcode;
+                //find.opt_prtcode = o.opt_prtcode;
+                find.oDecomp = o;
                 find.iv = o.select[0] as List;
                 find.Exe();
                 return;
