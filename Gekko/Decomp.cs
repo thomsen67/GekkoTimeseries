@@ -1970,6 +1970,9 @@ namespace Gekko
             {
                 if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(name))
                 {
+                    // HACK HACK HACK HACK HACK
+                    // Why taken from databank?
+                    // HACK HACK HACK HACK HACK
                     Series ts = null;
                     ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
@@ -1997,6 +2000,9 @@ namespace Gekko
 
                 if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name))
                 {
+                    // HACK HACK HACK HACK HACK
+                    // Why taken from databank?
+                    // HACK HACK HACK HACK HACK
                     Series ts = O.GetIVariableFromString(name2.Replace(DecompFirst() + ":", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {

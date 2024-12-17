@@ -213,7 +213,9 @@ namespace Gekko
         // ------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Helper method to keep stuff together.
+        /// Helper method to keep stuff together. For Gekko 4.0 we should only have 1 of these calls from Decomp.cs, not
+        /// a lot from different places, and the levels (Quo / QuoRef) should be stored in the decomp objects at the
+        /// beginning.
         /// </summary>
         /// <param name="missingAsZero"></param>
         /// <returns></returns>
