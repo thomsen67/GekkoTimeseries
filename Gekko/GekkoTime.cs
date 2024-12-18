@@ -1425,6 +1425,64 @@ namespace Gekko
             return tt;
         }
 
+        /// <summary>
+        /// Returns the highest of two freqs, for instance is EFreq.M higher than EFreq.Q.
+        /// Both freqs are required to be either A, Q, M, W, D, otherwise EFreq.None is returned.
+        /// </summary>
+        /// <param name="f1"></param>
+        /// <param name="f2"></param>
+        /// <returns></returns>
+        public static EFreq HighestFreq(EFreq f1, EFreq f2)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            if (G.isNumericalError(FreqNumber(f1)) || G.isNumericalError(FreqNumber(f2))) return EFreq.None;
+            if (FreqNumber(f1) >= FreqNumber(f2)) return f1;
+            else return f2;
+        }
+
+        /// <summary>
+        /// Returns the lowest of two freqs, cf. HighestFreq().
+        /// </summary>
+        /// <param name="f1"></param>
+        /// <param name="f2"></param>
+        /// <returns></returns>
+        public static EFreq LowestFreq(EFreq f1, EFreq f2)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            if (G.isNumericalError(FreqNumber(f1)) || G.isNumericalError(FreqNumber(f2))) return EFreq.None;
+            if (FreqNumber(f1) <= FreqNumber(f2)) return f1;
+            else return f2;
+        }
+
+        private static double FreqNumber(EFreq f)
+        {
+            if (f == EFreq.A)
+            {
+                return 1d;
+            }
+            else if (f == EFreq.Q)
+            {
+                return 4d;
+            }
+            else if (f == EFreq.M)
+            {
+                return 12d;
+            }
+            else if (f == EFreq.W)
+            {
+                return 52d;
+            }
+            else if (f == EFreq.D)
+            {
+                return 365d;
+            }
+            else return double.NaN;
+        }
+
         private void CheckSameFreq(GekkoTime gt2)
         {
             if (this.freq != gt2.freq)

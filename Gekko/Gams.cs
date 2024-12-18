@@ -2208,8 +2208,8 @@ namespace Gekko
                     if (!seenBefore)
                     {
                         //avoid dublets in an equation (for instance y[2020] = x[2020] + x[2020]/z[2020])
-                        helper.endo.Add(i1);
-                        helper.endo.Add(i2);
+                        helper.endo.Add(i1);  //time
+                        helper.endo.Add(i2);  //variable
                     }
                 }
                 else

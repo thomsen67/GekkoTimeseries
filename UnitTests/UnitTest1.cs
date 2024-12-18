@@ -12325,6 +12325,47 @@ namespace UnitTests
             _AssertListString(First(), "#j1", 1, "#a1");
         }
 
+
+        [TestMethod]
+        public void _Test_HighestFreq()
+        {
+            Assert.AreEqual(EFreq.None, GekkoTime.HighestFreq(EFreq.M, EFreq.U));
+            // ---
+            Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.M, EFreq.Q));
+            Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.Q, EFreq.M));
+            Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.M, EFreq.A));
+            Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.A, EFreq.M));
+            Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.Q, EFreq.A));
+            Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.A, EFreq.Q));            
+            Assert.AreEqual(EFreq.A, GekkoTime.HighestFreq(EFreq.A, EFreq.A));
+            Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.Q, EFreq.Q));
+            Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.M, EFreq.M));
+            Assert.AreEqual(EFreq.Q, GekkoTime.LowestFreq(EFreq.M, EFreq.Q));
+            Assert.AreEqual(EFreq.Q, GekkoTime.LowestFreq(EFreq.Q, EFreq.M));
+            Assert.AreEqual(EFreq.A, GekkoTime.LowestFreq(EFreq.M, EFreq.A));
+            Assert.AreEqual(EFreq.A, GekkoTime.LowestFreq(EFreq.A, EFreq.M));
+            Assert.AreEqual(EFreq.A, GekkoTime.LowestFreq(EFreq.Q, EFreq.A));
+            Assert.AreEqual(EFreq.A, GekkoTime.LowestFreq(EFreq.A, EFreq.Q));
+            Assert.AreEqual(EFreq.A, GekkoTime.LowestFreq(EFreq.A, EFreq.A));
+            Assert.AreEqual(EFreq.Q, GekkoTime.LowestFreq(EFreq.Q, EFreq.Q));
+            Assert.AreEqual(EFreq.M, GekkoTime.LowestFreq(EFreq.M, EFreq.M));
+        }
+
+
+        [TestMethod]
+        public void _Test_Decomp_Timeless()
+        {
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            //option series data missing = zero;
+            I("time 2020 2026;");
+            I("model <gms> makro2gekko.zip;");
+            I("read <gdx> dec24;");
+            //option series data missing = zero;
+            //ShowDecompTable();
+            I("decomp <m> qXy[xVar] from E_qXy[xVar] endo qXy[xVar] rows vars, lags cols time;");
+        }
+
         [TestMethod]
         public void _Test_Decomp_Frm_Lags()
         {

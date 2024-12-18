@@ -1415,24 +1415,29 @@ namespace Gekko
                 {
                     bool b = false;
 
-                    GekkoTime tEnd = GekkoTime.tNull;
+                    GekkoTime t2Ort3 = GekkoTime.tNull;
+                    int numberOfErrorsRemember = Globals.numberOfErrors;
                     try
                     {
-                        tEnd = GetTEnd(smpl.t2, smpl.t3, G.Equal(o.opt_dyn, "yes"));
-                        b = smpl.t1.StrictlyLargerThan(tEnd);
+                        t2Ort3 = GetTEnd(smpl.t2, smpl.t3, G.Equal(o.opt_dyn, "yes"));
+                        GekkoTime tt1 = GekkoTime.tNull; GekkoTime tt2 = GekkoTime.tNull;
+                        GekkoTime.ConvertFreqs(lhs_series.freq, smpl.t1, t2Ort3, ref tt1, ref tt2); //Fast if the freqs fit together                                                
+                        b = tt1.StrictlyLargerThan(tt2);
                     }
                     catch
                     {
                         //Do nothing, so this check can never crash due to somthing missing or being null regarding periods.
                         //Should never be thrown, so should have no cost.
                         G.WarningInternal("TTH: Dates check problem!");
+                        //if it fails, we live with that, and no errors will be shown.
+                        Globals.numberOfErrors = numberOfErrorsRemember;  //so we are not shown a count of error messages because of this                   
                     }
 
                     if (b)
                     {
                         using (Error txt = new Error())
                         {
-                            txt.MainAdd("Invalid date interval " + smpl.t1.ToString() + "-" + tEnd + " detected in series statement. Start period must be <= end period.");
+                            txt.MainAdd("Invalid date interval " + smpl.t1.ToString() + "-" + t2Ort3.ToString() + " detected in series statement. Start period must be <= end period.");
                             txt.MoreAdd("If you are upgrading from a Gekko version < 3.1.19 to a");
                             txt.MoreAdd("Gekko version >= 3.1.19, this error may come out of the blue. It would be best to fix the error, but");
                             txt.MoreAdd("if this turns problematic or cumbersome, as a workaround you may set 'OPTION bugfix dates = no;' in order to");
