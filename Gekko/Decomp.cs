@@ -5876,7 +5876,13 @@ namespace Gekko
                 }
                 else
                 {
-                    if(isFindWindow) new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ". You may want to adjust the DECOMP time period.");
+                    if (isFindWindow)
+                    {
+                        string s = ". You may want to adjust the DECOMP time period.";
+                        bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
+                        if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension).";
+                        new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
+                    }
                     else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
                 }
             }

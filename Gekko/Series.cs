@@ -2679,7 +2679,26 @@ namespace Gekko
                     e.MainAdd("  NOTE: " + warning);
                 }
                 e.MainNewLineTight();
-                e.MainAdd("You may ignore such errors with 'OPTION series array print missing = ... ;' and 'OPTION series array calc missing = ... ;'");
+                e.MainAdd("If the error occurs in a PRT/PLOT/SHEET statement, for instance 'prt x[#i];', you may consider 'option series array print missing = skip;'.");                
+                e.MainAdd("If instead the error occurs in an assignment/expression, for instance inside the sum-function 'y = sum(#i, x[#i]);', you may consider 'option series array calc missing = zero;'.");                
+                // ---
+                e.MoreAdd("The following example illustrates the two options:");
+                e.MoreNewLine();
+                e.MoreAdd("x = series(1);"); e.MoreNewLineTight();
+                e.MoreAdd("x[a] = 2;"); e.MoreNewLineTight();
+                e.MoreAdd("x[c] = 3;"); e.MoreNewLineTight();
+                e.MoreAdd("//Note: x[b] is not defined"); e.MoreNewLineTight();
+                e.MoreAdd("#i = a, b, c;"); e.MoreNewLineTight();
+                e.MoreAdd("option series array print missing = skip; //Does not show x[b] at all"); e.MoreNewLineTight();
+                e.MoreAdd("p x[#i];"); e.MoreNewLineTight();
+                e.MoreAdd("option series array calc missing = zero;  //Treats x[b] as a series that contains zeroes."); e.MoreNewLineTight();
+                e.MoreAdd("y = sum(#i, x[#i]);"); e.MoreNewLineTight();
+                e.MoreAdd("prt y;");
+                e.MoreNewLine();
+                e.MoreAdd("Regarding 'option series array print missing', you may alternatively use '= zero' or '= m', and regarding 'option series array calc missing' you may alternatively use '= m'.");
+                e.MoreAdd("You may try out these options in the above example");
+                e.MoreNewLine();
+                e.MoreAdd("More details about missing values {a{here¤appendix_missings.htm}a}.");
             }            
         }
 
