@@ -1168,9 +1168,9 @@ namespace Gekko
         /// <param name="s"></param>
         /// <returns></returns>
         public Series this[string s]
-        {
+        {            
             get
-            {
+            {                
                 Series ts = null; storage.TryGetValue(s, out ts);
                 if (ts == null)
                 {

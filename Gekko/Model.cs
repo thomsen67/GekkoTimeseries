@@ -1478,10 +1478,11 @@ namespace Gekko
                         if (Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2)
                         {
                             double data = ts.GetTimelessData();
-                            for (int t = 0; t < n; t++)
-                            {
-                                a[t][i] = data;
-                            }
+                            //for (int t = 0; t < n; t++)
+                            //{
+                            //    a[t][i] = data;
+                            //}
+                            a[Globals.decompTimelessNumber][i] = data;
                         }
                         else
                         {

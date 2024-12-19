@@ -1928,6 +1928,14 @@ namespace Gekko
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
 
+                    if (Globals.decompFixTimelessProblem == 2)
+                    {
+                        int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(G.Chop_RemoveBank(xname));
+                        if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
+                        {
+                            xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
+                        }                        
+                    }
                     string xnewName = ConvertToTurtleName(xname, xlag);
 
                     int ZERO = 0;

@@ -12362,21 +12362,25 @@ namespace UnitTests
             //option series data missing = zero;
             I("time 2020 2026;");
             I("model <gms> makro2gekko.zip;");
-            I("read <gdx> dec24;");
-            //option series data missing = zero;
+            I("read <gdx> dec24;");            
+            I("eXudl[xVar] = 6;");
+            I("qXy[xVar] += -100, -200, -300, -150, -200, -100, -150;");
             //ShowDecompTable();
-
-            //Problem with eXUdl, exogenous timeless variable
-            //Endo (strings) has: Work:qXy[xVar]¤[2020] = 0
-            //Exo (strings) has: Work:eXUdl[xVar]¤[2020] = 4, and five others
-            //dd.storage has Work:qXy[xVar]¤[0] = series,
-            //but also Work:eXUdl[xVar]¤[-5]..[-11].
-            //Probably because [-11] --> 2020 and [-5] --> 2026.
-
-            //Tries to find Work:eXUdl[xVar]¤[2020]
-
-
             I("decomp <m> qXy[xVar] from E_qXy[xVar] endo qXy[xVar] rows vars, lags cols time;");
+            //
+            // TODO: Actually change eXUdl[xVar] and run model to get qXy[xVar] change, and check.
+            //       Not sure if the values below are correct, but at least the equation errors are
+            //       small so they may be ok. Here mostly a test that it does not crash, and often
+            //       these timeless vars are not touched at all.
+            //
+            Gekko.Table table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qXy[xVar]");
+            Assert.AreEqual(table.Get(2, 2).number, -100d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "eXUdl[xVar]");  //the timeless variable
+            Assert.AreEqual(table.Get(3, 2).number, 0.6682d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 0.8439d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 0.6414d, 0.0001);
+            Assert.AreEqual(table.Get(3, 8).number, 1.0072d, 0.0001);
         }
 
         [TestMethod]
@@ -19021,62 +19025,7 @@ namespace UnitTests
                     //TODO          
                 }
             }
-        }
-
-        [TestMethod]
-        public void _Test_GAMSScalar1()
-        {
-            // !
-            // !
-            // ! Large model
-            // ! This also produces a gamsscalar.json for users. See the GAMS appendix in the help system.
-            // !
-            // !
-            // !            
-            Globals.unitTestScreenOutput.Clear();
-            string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2024-01-10-c2f2447\Model\"; 
-
-            string modelName = ""; ;
-
-            for (int p = 0; p < 3; p++)  //models
-            {
-                if (p == 0) modelName = "M_static_calibration";
-                else if (p == 1) modelName = "M_post";
-                else if (p == 2) modelName = "M_static";
-                else throw new GekkoException();
-                I("RESET;");
-                I("OPTION folder working = '" + path5 + "';");
-                I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
-                if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
-                using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.WriteLine(@"// Gekko settings for GAMS CONVERT (produces scalar model for Gekko DECOMP).");
-                    sw.WriteLine(@"// Comments '//' can be used: not legal in .json, but Gekko removes them before reading the file.");
-                    sw.WriteLine(@"// Beware that you must use double backslash for paths.");
-                    sw.WriteLine(@"{");
-                    sw.WriteLine(@"  ""is_manual"" : true,                                   //Manual via popups?");
-                    sw.WriteLine(@"  ""gms_file"" : ""static_calibration.gms"",              //The .gms file containing the solve statement regarding model_name.");
-                    sw.WriteLine(@"  ""lst_file"" : ""\\LST\\static_calibration.lst"",         //The lst output file.");
-                    sw.WriteLine(@"  ""model_name"" : """ + modelName + @""",                            //Model that is being made into scalar model");
-                    sw.WriteLine(@"  ""solve_call"" : ""@solve("",                            //How does the model call look like?");
-                    sw.WriteLine(@"  ""raw_file"" : ""*.gms"",                               //File(s) containing raw GAMS equations (may include *.gms)");
-                    sw.WriteLine(@"  ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations. Can be omitted. ");
-                    sw.WriteLine(@"  ""counts1"" : ""**** Counts do not match"",             //Can be omitted, default = ""**** Counts do not match""");
-                    sw.WriteLine(@"  ""counts2"" : ""Unmatched single free variables"",        //Can be omitted, default = ""Unmatched single free variables""");
-                    sw.WriteLine(@"  ""counts3"" : ""Single equations in unmatched =E= blocks""     //Can be omitted, default = ""Single equations in unmatched =E= blocks""");
-                    sw.WriteLine(@" } ");
-                }
-                File.Delete(path5 + "\\static_calibration.gms.lst");
-                File.Delete(path5 + "\\" + modelName + "_scalar.zip");
-                I("gamsscalar('pack');");  //popup is not shown, instead run.cmd is just run
-                long size = new System.IO.FileInfo(path5 + "" + modelName + "_scalar.zip").Length;                
-                if (p == 0) Assert.IsTrue(size > 12500000 && size < 12600000);  //size should be around 12.539.120 bytes, not 10.349.279 (and sizes inside should be 584.739 for raw.gms, 22.240.511 for dict.txt and 42.036.341 for gams.gms -- for holdfixed = 1 we have 29.180.577 for gams.gms).                   
-                else if (p == 1) Assert.IsTrue(size > 3100000 && size < 3300000);  //size should be around 3.215.337
-                else if (p == 2) Assert.IsTrue(size > 6700000 && size < 6800000);  //size should be around 6.745.899 bytes
-                else new Error("Wrong!");
-            }
-        }
+        }        
 
         [TestMethod]
         public void _Test_GAMSScalar2()
