@@ -1740,18 +1740,28 @@ namespace Gekko
 
                                 int add2 = 0;
 
-                                if (Globals.decompFixTimelessProblem && modelGamsScalar.isTimeless[dp.variable])
+                                if (Globals.decompFixTimelessProblem == 1 && modelGamsScalar.isTimeless[dp.variable])
                                 {
                                     if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
                                     add2 = t.Subtract(modelGamsScalar.tBasis);
                                     //problem is that exudl gets a dp.date that seems fixed to first period.
                                     //check hos this .precedents[eqNumber] list is made, perhaps indicate
                                     //with .date = -12345 that the variable is timeless????
-                                }
+                                }                                
 
                                 int date = dp.date;
-                                string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add + add2, modelGamsScalar.tBasis);
-                                string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add + add2 - t.Subtract(modelGamsScalar.tBasis));
+                                int tt1 = date + add + add2;
+                                int tt2 = date + add + add2 - t.Subtract(modelGamsScalar.tBasis);
+
+                                if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                {
+                                    if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
+                                    tt2 = 0;  //always show as if unlagged, even if it really points back to .tBasis.
+                                }
+
+                                string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt1, modelGamsScalar.tBasis);
+                                string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt2);
+                                
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
                             }
@@ -1981,7 +1991,11 @@ namespace Gekko
                         {
                             new Error("Did not expect variable '" + name2 + "' to be an array-series");
                         }
-                        ts = (ts.DeepClone(0, null, null) as Series);
+                        ts = ts.DeepClone(0, null, null) as Series;
+                        if (Globals.runningOnTTComputer && ts.type == ESeriesType.Timeless)
+                        {
+                            //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
+                        }
                         ts.Lag(lag2);
                         if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
                         {
@@ -2011,6 +2025,10 @@ namespace Gekko
                             new Error("Did not expect variable '" + name2 + "' to be an array-series");
                         }
                         ts = (ts.DeepClone(0, null, null) as Series);
+                        if (Globals.runningOnTTComputer && ts.type == ESeriesType.Timeless)
+                        {
+                            //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
+                        }
                         ts.Lag(lag2);
                         if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
                         {
@@ -2030,7 +2048,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Handles M --> 0, ok to change the array values because the series has already been cloned
+        /// Handles M --> 0, ok to change the array values because the series has already been cloned.
+        /// Will also work for timeless series.
         /// </summary>
         /// <param name="ts"></param>
         private static void DecompMainStoreRawVariableHelper(Series ts)
@@ -3052,6 +3071,10 @@ namespace Gekko
                         double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
                         double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
                         int lag2 = dp.date + timeIndex2;
+                        if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                        {
+                            lag2 = 0;
+                        }
                         string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                         d.cellsRef[name].SetData(t, x0);
                         d.cellsQuo[name].SetData(t, x1);
@@ -3077,8 +3100,8 @@ namespace Gekko
 
                             try
                             {
-                                double x0_after = x0_before + eps;
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, false, x0_after);
+                                double x0_after = x0_before + eps;                                
+                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, false, x0_after);                                
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                                 double grad = (y0_after - y0a) / eps;
 
@@ -3087,7 +3110,11 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
-                                    if (Globals.decompFixTimelessProblem && modelGamsScalar.isTimeless[dp.variable])
+                                    if (Globals.decompFixTimelessProblem == 1 && modelGamsScalar.isTimeless[dp.variable])
+                                    {
+                                        lag2 = 0;
+                                    }
+                                    else if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
                                     {
                                         lag2 = 0;
                                     }
@@ -3132,6 +3159,10 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
+                                    if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                    {
+                                        lag2 = 0;
+                                    }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
@@ -3173,6 +3204,10 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
+                                    if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                    {
+                                        lag2 = 0;
+                                    }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before);
                                     d.cellsQuo[name].SetData(t, x1);

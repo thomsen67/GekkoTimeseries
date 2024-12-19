@@ -12329,6 +12329,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_HighestFreq()
         {
+            //The functions are not actually used at the moment...
+
             Assert.AreEqual(EFreq.None, GekkoTime.HighestFreq(EFreq.M, EFreq.U));
             // ---
             Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.M, EFreq.Q));
@@ -12363,6 +12365,17 @@ namespace UnitTests
             I("read <gdx> dec24;");
             //option series data missing = zero;
             //ShowDecompTable();
+
+            //Problem with eXUdl, exogenous timeless variable
+            //Endo (strings) has: Work:qXy[xVar]¤[2020] = 0
+            //Exo (strings) has: Work:eXUdl[xVar]¤[2020] = 4, and five others
+            //dd.storage has Work:qXy[xVar]¤[0] = series,
+            //but also Work:eXUdl[xVar]¤[-5]..[-11].
+            //Probably because [-11] --> 2020 and [-5] --> 2026.
+
+            //Tries to find Work:eXUdl[xVar]¤[2020]
+
+
             I("decomp <m> qXy[xVar] from E_qXy[xVar] endo qXy[xVar] rows vars, lags cols time;");
         }
 

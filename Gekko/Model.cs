@@ -1118,17 +1118,35 @@ namespace Gekko
         public double GetData(int period, int t, int variable, bool missingAsZero, bool isRef)
         {
             //Beware: does missingAsZero==false still slow this down for simations??
-            if (isRef)
+            if (Globals.decompFixTimelessProblem == 2 && this.isTimeless[variable])
             {
-                double d = this.a_ref[period + t][variable];
-                if (missingAsZero && double.IsNaN(d)) d = 0d;
-                return d;
+                if (isRef)
+                {
+                    double d = this.a_ref[Globals.decompTimelessNumber][variable];
+                    if (missingAsZero && double.IsNaN(d)) d = 0d;
+                    return d;
+                }
+                else
+                {
+                    double d = this.a[Globals.decompTimelessNumber][variable];
+                    if (missingAsZero && double.IsNaN(d)) d = 0d;
+                    return d;
+                }
             }
             else
             {
-                double d = this.a[period + t][variable];
-                if (missingAsZero && double.IsNaN(d)) d = 0d;
-                return d;
+                if (isRef)
+                {
+                    double d = this.a_ref[period + t][variable];
+                    if (missingAsZero && double.IsNaN(d)) d = 0d;
+                    return d;
+                }
+                else
+                {
+                    double d = this.a[period + t][variable];
+                    if (missingAsZero && double.IsNaN(d)) d = 0d;
+                    return d;
+                }
             }
         }
 
@@ -1141,13 +1159,27 @@ namespace Gekko
         /// <param name="value"></param>
         public void SetData(int period, int t, int variable, bool isRef, double value)
         {
-            if (isRef)
+            if (Globals.decompFixTimelessProblem == 2 && this.isTimeless[variable])
             {
-                this.a_ref[period + t][variable] = value;
+                if (isRef)
+                {
+                    this.a_ref[Globals.decompTimelessNumber][variable] = value;
+                }
+                else
+                {
+                    this.a[Globals.decompTimelessNumber][variable] = value;
+                }
             }
             else
             {
-                this.a[period + t][variable] = value;
+                if (isRef)
+                {
+                    this.a_ref[period + t][variable] = value;
+                }
+                else
+                {
+                    this.a[period + t][variable] = value;
+                }
             }
         }
 
@@ -1443,7 +1475,7 @@ namespace Gekko
 
                     if (ts.type == ESeriesType.Timeless)
                     {
-                        if (Globals.decompFixTimelessProblem)
+                        if (Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2)
                         {
                             double data = ts.GetTimelessData();
                             for (int t = 0; t < n; t++)
@@ -1908,7 +1940,7 @@ namespace Gekko
                     int i1 = this.bb[eq][int.Parse(tokens[i + 4].s)];
                     int i2 = this.bb[eq][int.Parse(tokens[i + 12].s)];
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
-                    if (Globals.decompFixTimelessProblem && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
+                    if ((Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2) && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
                     string varname = this.GetVarNameA(i2);
                     string varname2 = null;
                     if (helper.showTime)
