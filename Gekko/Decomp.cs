@@ -1950,11 +1950,13 @@ namespace Gekko
                     {
                         dd = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types);
                         Series ts2 = dd[xnewName];
-                        ts2.SetData(time, effect[row, col]);
+                        if (true) ts2.SetData(time, effect[row, col]);
+                        else ts2.SetData(time, effect[row, col] * Globals.decompFixNonchangingEndoNumber);
                         if (col == 0)  //just once
                         {
                             Series ts3 = dd[enewName];
-                            ts3.SetData(time, 1d);
+                            if (true) ts3.SetData(time, 1d);
+                            else ts3.SetData(time, 1d * Globals.decompFixNonchangingEndoNumber);
                         }
                     }
                 }
@@ -3252,7 +3254,7 @@ namespace Gekko
                             double vQuo = d.cellsQuo[s].GetDataSimple(t);
                             double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
                             double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
-                            double dContribD = vGradQuoLag * (vQuo - vQuoLag);
+                            double dContribD = vGradQuoLag * (vQuo - vQuoLag) * Globals.decompFixNonchangingEndoNumber;
                             d.cellsContribD[s].SetData(t, dContribD);
                         }
 
@@ -3261,7 +3263,7 @@ namespace Gekko
                             double vRef = d.cellsRef[s].GetDataSimple(t);
                             double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
                             double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
-                            double dContribDRef = vGradRefLag * (vRef - vRefLag);
+                            double dContribDRef = vGradRefLag * (vRef - vRefLag) * Globals.decompFixNonchangingEndoNumber;
                             d.cellsContribDRef[s].SetData(t, dContribDRef);
                         }
 
@@ -3270,24 +3272,24 @@ namespace Gekko
                             double vQuo = d.cellsQuo[s].GetDataSimple(t);
                             double vRef = d.cellsRef[s].GetDataSimple(t);
                             double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
-                            double dContribM = vGradRef * (vQuo - vRef);
+                            double dContribM = vGradRef * (vQuo - vRef) * Globals.decompFixNonchangingEndoNumber;
                             d.cellsContribM[s].SetData(t, dContribM);
                         }
                     }
 
                     if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
                     {
-                        d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
+                        d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))) * Globals.decompFixNonchangingEndoNumber);
                     }
 
                     if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
                     {
-                        d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
+                        d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))) * Globals.decompFixNonchangingEndoNumber);
                     }
 
                     if (op.lowLevel == ELowLevel.Multiplier)
                     {
-                        d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
+                        d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)) * Globals.decompFixNonchangingEndoNumber);
                     }
                 }
             }
@@ -5390,7 +5392,8 @@ namespace Gekko
                     bool found = false;
                     foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                     {
-                        kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                        if (true) kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                        else kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t) / Globals.decompFixNonchangingEndoNumber);
                     }
                 }
             }

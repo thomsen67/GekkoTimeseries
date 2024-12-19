@@ -174,9 +174,11 @@ namespace Gekko
         public static bool bugfixLhsIsFunctionParameter = true;        
 
         public const int startPrime = 1013;  //next is 1019.
-                    
-        public static int decompFixTimelessProblem = 2;  //1 or 2
-        public static bool decompFixMissingIgnoreProblem = true;
+
+        public const bool decompFixNonchangingEndo = true;
+        public const double decompFixNonchangingEndoNumber = 1000d;
+        public const int decompFixTimelessProblem = 2;  //1 or 2
+        public const bool decompFixMissingIgnoreProblem = true;
         public const string decompErrorText = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";
         public const string decompIgnoreText1 = "Ignored contributions (";
         public const string decompIgnoreText2 = "), cf. the 'Ignore' option.";
