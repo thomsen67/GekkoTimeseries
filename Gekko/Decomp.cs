@@ -5880,7 +5880,7 @@ namespace Gekko
                     {
                         string s = ". You may want to adjust the DECOMP time period.";
                         bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
-                        if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension).";
+                        if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";
                         new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
                     }
                     else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem

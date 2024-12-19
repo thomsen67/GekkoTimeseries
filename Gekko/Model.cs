@@ -1988,7 +1988,7 @@ namespace Gekko
 
         public string GamsModelDefinedString()
         {
-            return "GAMS model is defined over the period " + this.absoluteT1.ToString() + " to " + this.absoluteT2.ToString();
+            return "The GAMS model is defined over the period " + this.absoluteT1.ToString() + " to " + this.absoluteT2.ToString();
         }
 
     }
