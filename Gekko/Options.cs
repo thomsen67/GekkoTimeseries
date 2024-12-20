@@ -47,6 +47,7 @@ namespace Gekko
         public int bugfix_tracedepth = -1;         //not mentioned in help, -1 = inactive: if we get DeepClone() problem with traces and stacktrace errors, try to set this to something large like 100 or 1000. Removed in the longer run.
         public bool bugfix_nullseries = true;      //not mentioned in help, fixes create x; x <dyn> = x[-1] + 1, and the like.
         public bool bugfix_speed = true;           //not mentioned in help, faster series statements
+        public bool bugfix_decomp_jacobi = true;   //not mentioned in help, better matrix for inversion
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -369,6 +370,7 @@ namespace Gekko
             Add("BUGFIX TRACEDEPTH", Globals.xsint);
             Add("BUGFIX NULLSERIES", Globals.xbool);
             Add("BUGFIX SPEED", Globals.xbool);
+            Add("BUGFIX DECOMP JACOBI", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

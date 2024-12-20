@@ -1911,56 +1911,48 @@ namespace Gekko
 
             if (!op.isRaw)
             {
-                if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
+
+
+                if (Program.options.bugfix_decomp_jacobi)
                 {
-                    //nothing happens, so we can say that the effect is also zeroes...
-                    effect = new double[endo.Count(), exo.Count()];
+                    try
+                    {
+                        double[,] temp = (double[,])mEndo2.Clone();  //gradients
+                        inverse = Program.InvertMatrix(temp);
+                    }
+                    catch (Exception e)
+                    {
+                        bool nan = false;
+                        foreach (double d in mEndo2)
+                        {
+                            if (G.isNumericalError(d))
+                            {
+                                nan = true;
+                                break;
+                            }
+                        }
+                        if (!nan)
+                        {
+                            string extra = null;
+                            if (CheckIfEverythingIsZero(mEndo2)) extra = " Note that the " + mEndo2.GetLength(0) + " x " + mEndo2.GetLength(1) + " Jacobian matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not affect the equation(s), and hence the effects cannot be calculated.";
+                            new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
+                            throw;
+                        }
+                        else
+                        {
+                            //We allow this, may just be some missing data
+                            inverse = G.CreateArrayDouble(mEndo2.GetLength(0), mEndo2.GetLength(1), double.NaN);
+                        }
+                    }
+                    effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
+
                 }
                 else
                 {
-                    if (Globals.decompFixNonchangingEndo)
+                    if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
                     {
-                        try
-                        {
-                            double[,] temp = (double[,])mEndo2.Clone();  //gradients
-                            inverse = Program.InvertMatrix(temp);
-                        }
-                        catch (Exception e)
-                        {
-                            bool nan = false;
-                            foreach (double d in mEndo)
-                            {
-                                if (G.isNumericalError(d))
-                                {
-                                    nan = true;
-                                    break;
-                                }
-                            }
-                            if (!nan)
-                            {
-                                string extra = null;
-                                if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";
-                                new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
-                                throw;
-                            }
-                            else
-                            {
-                                //We allow this, may just be some missing data
-                                inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
-                            }
-                        }
-                        //effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
-                        
-                        effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
-
-                        //for (int i = 0; i < effect.GetLength(0); i++)
-                        //{
-                        //    for (int j = 0; j < effect.GetLength(1); j++)
-                        //    {
-                        //        effect[i, j] = effect[i, j] / mEndo3[i, i];  //Note: i, i.
-                        //    }
-                        //}
-
+                        //nothing happens, so we can say that the effect is also zeroes...
+                        effect = new double[endo.Count(), exo.Count()];
                     }
                     else
                     {
@@ -1995,7 +1987,6 @@ namespace Gekko
                         }
 
                         effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
-
                     }
                 }
             }
@@ -2047,15 +2038,19 @@ namespace Gekko
                     {
                         dd = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types);
                         Series ts2 = dd[xnewName];
-                        if (true) ts2.SetData(time, effect[row, col]);
-                        else ts2.SetData(time, effect[row, col] * Globals.decompFixNonchangingEndoNumber);
+                        ts2.SetData(time, effect[row, col]);                        
                         if (col == 0)  //just once
                         {
                             Series ts3 = dd[enewName];
-                            //if (true) ts3.SetData(time, 1d);
-                            //else ts3.SetData(time, 1d * Globals.decompFixNonchangingEndoNumber);
-                            double ddd = mEndo3[row, row];  //IS THIS ALWAYS RIGHT???
-                            ts3.SetData(time, ddd);
+                            if (Program.options.bugfix_decomp_jacobi)
+                            {
+                                double ddd = mEndo3[row, row];  //IS THIS ALWAYS RIGHT??? Row is time, col is #endo. Or is it. Maybe take it directly from the name and the diff...?
+                                ts3.SetData(time, ddd);
+                            }
+                            else
+                            {
+                                ts3.SetData(time, 1d);                             
+                            }
                         }
                     }
                 }
@@ -3353,7 +3348,7 @@ namespace Gekko
                             double vQuo = d.cellsQuo[s].GetDataSimple(t);
                             double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
                             double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
-                            double dContribD = vGradQuoLag * (vQuo - vQuoLag) * Globals.decompFixNonchangingEndoNumber;
+                            double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t, dContribD);
                         }
 
@@ -3362,7 +3357,7 @@ namespace Gekko
                             double vRef = d.cellsRef[s].GetDataSimple(t);
                             double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
                             double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
-                            double dContribDRef = vGradRefLag * (vRef - vRefLag) * Globals.decompFixNonchangingEndoNumber;
+                            double dContribDRef = vGradRefLag * (vRef - vRefLag);
                             d.cellsContribDRef[s].SetData(t, dContribDRef);
                         }
 
@@ -3371,24 +3366,24 @@ namespace Gekko
                             double vQuo = d.cellsQuo[s].GetDataSimple(t);
                             double vRef = d.cellsRef[s].GetDataSimple(t);
                             double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
-                            double dContribM = vGradRef * (vQuo - vRef) * Globals.decompFixNonchangingEndoNumber;
+                            double dContribM = vGradRef * (vQuo - vRef);
                             d.cellsContribM[s].SetData(t, dContribM);
                         }
                     }
 
                     if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
                     {
-                        d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))) * Globals.decompFixNonchangingEndoNumber);
+                        d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
                     }
 
                     if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
                     {
-                        d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))) * Globals.decompFixNonchangingEndoNumber);
+                        d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
                     }
 
                     if (op.lowLevel == ELowLevel.Multiplier)
                     {
-                        d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)) * Globals.decompFixNonchangingEndoNumber);
+                        d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
                     }
                 }
             }
@@ -5451,52 +5446,62 @@ namespace Gekko
             //This is similar to ADAM-style xa = -500 * xb + 1000 * xa[-1]/xb[+1]. Here, aggregating the RHS
             //lags would only aggregate xb and xb[+1], not xa and xa[-1].
 
-            int zero = 0;
             DecompData d = decompDatasSupremeClone;
             string name = decompOptions2.link[parentI].varnames;
             d.lhs = DecompFirst() + ":" + ConvertToTurtleName(name, 0);  //lag = 0
 
-            if (!decompOptions2.decompOperator.isRaw)
+            if (Program.options.bugfix_decomp_jacobi)
             {
-                Series lhs2 = GetDecompDatas(decompDatasSupremeClone, operatorOneOf3Types)[d.lhs];
-
-                Tuple<Series, Series> tsTuple = GetRealTimeseries(decompDatas, d.lhs);  //May contain null's, at least when doing html browser
-
-                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                if (!decompOptions2.decompOperator.isRaw)
                 {
-                    double d1 = lhs2.GetDataSimple(t);
-                    double d2 = double.NaN;
-                    if (operatorOneOf3Types == EContribType.D)
-                    {
-                        if (tsTuple.Item1 != null)
-                        {
-                            d2 = tsTuple.Item1.GetDataSimple(t) - tsTuple.Item1.GetDataSimple(t.Add(-1));
-                        }
-                    }
-                    else if (operatorOneOf3Types == EContribType.RD)
-                    {
-                        if (tsTuple.Item2 != null)
-                        {
-                            d2 = tsTuple.Item2.GetDataSimple(t) - tsTuple.Item2.GetDataSimple(t.Add(-1));
-                        }
-                    }
-                    else if (operatorOneOf3Types == EContribType.M)
-                    {
-                        if (tsTuple.Item1 != null && tsTuple.Item2 != null)
-                        {
-                            d2 = tsTuple.Item1.GetDataSimple(t) - tsTuple.Item2.GetDataSimple(t);
-                        }
-                    }
-                    double factor = d2 / d1;
-                    bool found = false;
-                    //foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
-                    //{
-                    //    if (true) kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                    //    else kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t) / Globals.decompFixNonchangingEndoNumber);
-                    //}
                     foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                     {
-                        kvp.Value.SetData(t, -kvp.Value.GetDataSimple(t));
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                        {
+                            kvp.Value.SetData(t, -kvp.Value.GetDataSimple(t));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (!decompOptions2.decompOperator.isRaw)
+                {
+                    Series lhs2 = GetDecompDatas(decompDatasSupremeClone, operatorOneOf3Types)[d.lhs];
+
+                    Tuple<Series, Series> tsTuple = GetRealTimeseries(decompDatas, d.lhs);  //May contain null's, at least when doing html browser
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    {
+                        double d1 = lhs2.GetDataSimple(t);
+                        double d2 = double.NaN;
+                        if (operatorOneOf3Types == EContribType.D)
+                        {
+                            if (tsTuple.Item1 != null)
+                            {
+                                d2 = tsTuple.Item1.GetDataSimple(t) - tsTuple.Item1.GetDataSimple(t.Add(-1));
+                            }
+                        }
+                        else if (operatorOneOf3Types == EContribType.RD)
+                        {
+                            if (tsTuple.Item2 != null)
+                            {
+                                d2 = tsTuple.Item2.GetDataSimple(t) - tsTuple.Item2.GetDataSimple(t.Add(-1));
+                            }
+                        }
+                        else if (operatorOneOf3Types == EContribType.M)
+                        {
+                            if (tsTuple.Item1 != null && tsTuple.Item2 != null)
+                            {
+                                d2 = tsTuple.Item1.GetDataSimple(t) - tsTuple.Item2.GetDataSimple(t);
+                            }
+                        }
+                        double factor = d2 / d1;
+                        bool found = false;
+                        foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+                        {
+                            kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                        }
                     }
                 }
             }
