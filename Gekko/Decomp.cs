@@ -8,7 +8,24 @@ using System.Text;
 
 namespace Gekko
 {
- 
+
+    public enum EStorage
+    {
+        cellsQuo,
+        cellsGradQuo,
+        cellsContribD,
+        cellsChangeD,
+        // -------------------------------------
+        cellsRef,
+        cellsGradRef,
+        cellsContribDRef,
+        cellsChangeDRef,
+        // -------------------------------------
+        cellsContribM,
+        cellsChangeM,
+        None
+}
+    
     /// <summary>
     /// Helper class to chop up the key from the DecompDict (containing decomp results)
     /// </summary>
@@ -43,12 +60,15 @@ namespace Gekko
         public DecompDict cellsQuo = null;
         public DecompDict cellsGradQuo = null;
         public DecompDict cellsContribD = null;
+        public DecompDict cellsChangeD = null;
         // -------------------------------------
         public DecompDict cellsRef = null;
         public DecompDict cellsGradRef = null;
         public DecompDict cellsContribDRef = null;
+        public DecompDict cellsChangeDRef = null;
         // -------------------------------------
         public DecompDict cellsContribM = null;
+        public DecompDict cellsChangeM = null;
         // -------------------------------------
 
         public string lhs = null;  //name of the LHS variable, for instance "Work:y2¤[0]
@@ -59,10 +79,13 @@ namespace Gekko
             dd.cellsQuo = this.cellsQuo.DeepClone();
             dd.cellsGradQuo = this.cellsGradQuo.DeepClone();
             dd.cellsContribD = this.cellsContribD.DeepClone();
+            dd.cellsChangeD = this.cellsChangeD.DeepClone();
             dd.cellsRef = this.cellsRef.DeepClone();
             dd.cellsGradRef = this.cellsGradRef.DeepClone();
             dd.cellsContribDRef = this.cellsContribDRef.DeepClone();
+            dd.cellsChangeDRef = this.cellsChangeDRef.DeepClone();
             dd.cellsContribM = this.cellsContribM.DeepClone();
+            dd.cellsChangeM = this.cellsChangeM.DeepClone();
             dd.lhs = this.lhs;
             return dd;
         }
@@ -1812,55 +1835,15 @@ namespace Gekko
                                             new Error("DECOMP matrix invert problem");
                                         }
 
-                                        {
-                                            Series ts = dd.storage[x2];
-                                            double d = ts.GetDataSimple(t);
-                                            mEndo[row, col] = d;
-                                        }
+                                        Series ts = dd.storage[x2];
+                                        double d1 = ts.GetDataSimple(t);
+                                        mEndo[row, col] = d1;
 
-                                        {
-                                            DecompData d = decompDatas.storage[ii][jj];
-                                            double x = double.NaN;
-                                            if (operatorOneOf3Types == EContribType.D)
-                                            {
-                                                x = d.cellsGradQuo[x2].GetDataSimple(t.Add(-1));
-                                            }
-                                            else if (operatorOneOf3Types == EContribType.RD)
-                                            {
-                                                x = d.cellsGradRef[x2].GetDataSimple(t.Add(-1));
-                                            }
-                                            else if (operatorOneOf3Types == EContribType.M)
-                                            {
-                                                x = d.cellsGradRef[x2].GetDataSimple(t);
-                                            }
-                                            else throw new GekkoException("Hov");
-                                            mEndo2[row, col] = x;
-                                        }
+                                        double d2 = InvertGetGradient(decompDatas.storage[ii][jj], x2, t, operatorOneOf3Types);
+                                        mEndo2[row, col] = d2;
 
-                                        {
-                                            DecompData d = decompDatas.storage[ii][jj];
-                                            double x = double.NaN;
-                                            if (operatorOneOf3Types == EContribType.D)
-                                            {
-                                                double vQuo = d.cellsQuo[x2].GetDataSimple(t);
-                                                double vQuoLag = d.cellsQuo[x2].GetDataSimple(t.Add(-1));
-                                                x = vQuo - vQuoLag;
-                                            }
-                                            else if (operatorOneOf3Types == EContribType.RD)
-                                            {                                                
-                                                double vRef = d.cellsRef[x2].GetDataSimple(t);
-                                                double vRefLag = d.cellsRef[x2].GetDataSimple(t.Add(-1));
-                                                x = vRef - vRefLag;
-                                            }
-                                            else if (operatorOneOf3Types == EContribType.M)
-                                            {                                                
-                                                double vQuo = d.cellsQuo[x2].GetDataSimple(t);
-                                                double vRef = d.cellsRef[x2].GetDataSimple(t);
-                                                x = vQuo - vRef;
-                                            }
-                                            else throw new GekkoException("Hov");
-                                            mEndo3[row, col] = x;
-                                        }                                        
+                                        double d3 = InvertGetDifference(decompDatas.storage[ii][jj], x2, t, operatorOneOf3Types);
+                                        mEndo3[row, col] = d3;
                                     }
                                     else if (exo.ContainsKey(x1))
                                     {
@@ -2044,8 +2027,17 @@ namespace Gekko
                             Series ts3 = dd[enewName];
                             if (Program.options.bugfix_decomp_jacobi)
                             {
-                                double ddd = mEndo3[row, row];  //IS THIS ALWAYS RIGHT??? Row is time, col is #endo. Or is it. Maybe take it directly from the name and the diff...?
-                                ts3.SetData(time, ddd);
+
+                                EStorage type = EStorage.None;
+                                if (operatorOneOf3Types == EContribType.D) type = EStorage.cellsChangeD;
+                                else if (operatorOneOf3Types == EContribType.RD) type = EStorage.cellsChangeDRef;
+                                else if (operatorOneOf3Types == EContribType.M) type = EStorage.cellsChangeM;
+                                Series ts = GetRealTimeseries2(decompDatas, enewName, type);
+                                double ddd2 = double.NaN;
+                                if (ts != null) ddd2 = ts.GetDataSimple(time);                                
+                                double ddd1 = mEndo3[row, row];  //IS THIS ALWAYS RIGHT??? Cannot be mEndo3[row, col] because mEndo2 is only over endo x endo.
+                                if (Globals.runningOnTTComputer && ddd1 != ddd2) MessageBox.Show("Decomp problem, check that!");
+                                ts3.SetData(time, ddd2);
                             }
                             else
                             {
@@ -2057,6 +2049,50 @@ namespace Gekko
             }
 
             //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+        }
+
+        private static double InvertGetGradient(DecompData d, string x2, GekkoTime t, EContribType operatorOneOf3Types)
+        {
+            double x = double.NaN;
+            if (operatorOneOf3Types == EContribType.D)
+            {
+                x = d.cellsGradQuo[x2].GetDataSimple(t.Add(-1));
+            }
+            else if (operatorOneOf3Types == EContribType.RD)
+            {
+                x = d.cellsGradRef[x2].GetDataSimple(t.Add(-1));
+            }
+            else if (operatorOneOf3Types == EContribType.M)
+            {
+                x = d.cellsGradRef[x2].GetDataSimple(t);
+            }
+            else throw new GekkoException("Hov");
+            return x;
+        }
+
+        private static double InvertGetDifference(DecompData d, string x2, GekkoTime t, EContribType operatorOneOf3Types)
+        {
+            double x = double.NaN;
+            if (operatorOneOf3Types == EContribType.D)
+            {
+                double vQuo = d.cellsQuo[x2].GetDataSimple(t);
+                double vQuoLag = d.cellsQuo[x2].GetDataSimple(t.Add(-1));
+                x = vQuo - vQuoLag;
+            }
+            else if (operatorOneOf3Types == EContribType.RD)
+            {
+                double vRef = d.cellsRef[x2].GetDataSimple(t);
+                double vRefLag = d.cellsRef[x2].GetDataSimple(t.Add(-1));
+                x = vRef - vRefLag;
+            }
+            else if (operatorOneOf3Types == EContribType.M)
+            {
+                double vQuo = d.cellsQuo[x2].GetDataSimple(t);
+                double vRef = d.cellsRef[x2].GetDataSimple(t);
+                x = vQuo - vRef;
+            }
+            else throw new GekkoException("Hov");
+            return x;
         }
 
         private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq, ModelGamsScalar modelGamsScalar, DecompOptions2 decompOptions2)
@@ -2188,6 +2224,11 @@ namespace Gekko
             MergeDecompDict(dd.cellsContribD, decompDatas.storage[ii][jj].cellsContribD);
             MergeDecompDict(dd.cellsContribDRef, decompDatas.storage[ii][jj].cellsContribDRef);
             MergeDecompDict(dd.cellsContribM, decompDatas.storage[ii][jj].cellsContribM);
+
+            MergeDecompDict(dd.cellsChangeD, decompDatas.storage[ii][jj].cellsChangeD);
+            MergeDecompDict(dd.cellsChangeDRef, decompDatas.storage[ii][jj].cellsChangeDRef);
+            MergeDecompDict(dd.cellsChangeM, decompDatas.storage[ii][jj].cellsChangeM);
+
             MergeDecompDict(dd.cellsGradQuo, decompDatas.storage[ii][jj].cellsGradQuo);
             MergeDecompDict(dd.cellsGradRef, decompDatas.storage[ii][jj].cellsGradRef);
             MergeDecompDict(dd.cellsQuo, decompDatas.storage[ii][jj].cellsQuo);
@@ -3350,6 +3391,7 @@ namespace Gekko
                             double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
                             double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t, dContribD);
+                            d.cellsChangeD[s].SetData(t, vQuo - vQuoLag);
                         }
 
                         if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
@@ -3359,6 +3401,7 @@ namespace Gekko
                             double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
                             double dContribDRef = vGradRefLag * (vRef - vRefLag);
                             d.cellsContribDRef[s].SetData(t, dContribDRef);
+                            d.cellsChangeDRef[s].SetData(t, vRef - vRefLag);
                         }
 
                         if (op.lowLevel == ELowLevel.Multiplier)
@@ -3368,6 +3411,7 @@ namespace Gekko
                             double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
                             double dContribM = vGradRef * (vQuo - vRef);
                             d.cellsContribM[s].SetData(t, dContribM);
+                            d.cellsChangeM[s].SetData(t, vQuo - vRef);
                         }
                     }
 
@@ -3401,10 +3445,13 @@ namespace Gekko
             if (d.cellsGradQuo == null) d.cellsGradQuo = new DecompDict();
             if (d.cellsQuo == null) d.cellsQuo = new DecompDict();
             if (d.cellsContribD == null) d.cellsContribD = new DecompDict();
+            if (d.cellsChangeD == null) d.cellsChangeD = new DecompDict();
             if (d.cellsGradRef == null) d.cellsGradRef = new DecompDict();
             if (d.cellsRef == null) d.cellsRef = new DecompDict();
             if (d.cellsContribDRef == null) d.cellsContribDRef = new DecompDict();
+            if (d.cellsChangeDRef == null) d.cellsChangeDRef = new DecompDict();
             if (d.cellsContribM == null) d.cellsContribM = new DecompDict();
+            if (d.cellsChangeM == null) d.cellsChangeM = new DecompDict();
         }
 
         /// <summary>
@@ -5520,32 +5567,37 @@ namespace Gekko
         /// <param name="tsRef"></param>
         public static Tuple<Series, Series> GetRealTimeseries(DecompDatas decompDatas, string s)
         {
-            Series tsQuo = null;
-            Series tsRef = null;
-
             //Find the real values of the series for normalization
+            Series tsQuo = GetRealTimeseries2(decompDatas, s, EStorage.cellsQuo);
+            Series tsRef = GetRealTimeseries2(decompDatas, s, EStorage.cellsRef);            
+            Tuple<Series, Series> ts = new Tuple<Series, Series>(tsQuo, tsRef);
+            return ts;
+        }
 
+        /// <summary>
+        /// May return null.
+        /// </summary>
+        /// <param name="decompDatas"></param>
+        /// <param name="s"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static Series GetRealTimeseries2(DecompDatas decompDatas, string s, EStorage type)
+        {
+            Series ts = null;
             foreach (List<DecompData> temp in decompDatas.storage)
             {
                 foreach (DecompData decompData in temp)
                 {
-                    decompData.cellsQuo.storage.TryGetValue(s, out tsQuo);
-                    if (tsQuo != null) goto Label1;
+                    if (type == EStorage.cellsQuo) decompData.cellsQuo.storage.TryGetValue(s, out ts);
+                    else if (type == EStorage.cellsRef) decompData.cellsRef.storage.TryGetValue(s, out ts);
+                    else if (type == EStorage.cellsChangeD) decompData.cellsChangeD.storage.TryGetValue(s, out ts);
+                    else if (type == EStorage.cellsChangeDRef) decompData.cellsChangeDRef.storage.TryGetValue(s, out ts);
+                    else if (type == EStorage.cellsChangeM) decompData.cellsChangeM.storage.TryGetValue(s, out ts);
+                    else new Error("Type error: EStorage");                    
+                    if (ts != null) goto Label1;
                 }
             }
         Label1:;
-
-            foreach (List<DecompData> temp in decompDatas.storage)
-            {
-                foreach (DecompData decompData in temp)
-                {
-                    decompData.cellsRef.storage.TryGetValue(s, out tsRef);
-                    if (tsRef != null) goto Label2;
-                }
-            }
-        Label2:;
-
-            Tuple<Series, Series> ts = new Tuple<Series, Series>(tsQuo, tsRef);
             return ts;
         }
 
