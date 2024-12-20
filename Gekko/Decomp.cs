@@ -1953,13 +1953,13 @@ namespace Gekko
                         
                         effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
 
-                        for (int i = 0; i < effect.GetLength(0); i++)
-                        {
-                            for (int j = 0; j < effect.GetLength(1); j++)
-                            {
-                                effect[i, j] = effect[i, j] / mEndo3[i, i];  //Note: i, i.
-                            }
-                        }
+                        //for (int i = 0; i < effect.GetLength(0); i++)
+                        //{
+                        //    for (int j = 0; j < effect.GetLength(1); j++)
+                        //    {
+                        //        effect[i, j] = effect[i, j] / mEndo3[i, i];  //Note: i, i.
+                        //    }
+                        //}
 
                     }
                     else
@@ -2052,8 +2052,10 @@ namespace Gekko
                         if (col == 0)  //just once
                         {
                             Series ts3 = dd[enewName];
-                            if (true) ts3.SetData(time, 1d);
-                            else ts3.SetData(time, 1d * Globals.decompFixNonchangingEndoNumber);
+                            //if (true) ts3.SetData(time, 1d);
+                            //else ts3.SetData(time, 1d * Globals.decompFixNonchangingEndoNumber);
+                            double ddd = mEndo3[row, row];  //IS THIS ALWAYS RIGHT???
+                            ts3.SetData(time, ddd);
                         }
                     }
                 }
@@ -5487,10 +5489,14 @@ namespace Gekko
                     }
                     double factor = d2 / d1;
                     bool found = false;
+                    //foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+                    //{
+                    //    if (true) kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                    //    else kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t) / Globals.decompFixNonchangingEndoNumber);
+                    //}
                     foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                     {
-                        if (true) kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                        else kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t) / Globals.decompFixNonchangingEndoNumber);
+                        kvp.Value.SetData(t, -kvp.Value.GetDataSimple(t));
                     }
                 }
             }
