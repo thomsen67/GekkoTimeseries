@@ -1664,6 +1664,8 @@ namespace Gekko
             //residuals are not part of precedents here
 
             double[,] mEndo = null;
+            double[,] mEndo2 = null;  //gradients
+            double[,] mEndo3 = null;  //differences
             double[,] mExo = null;
             List<string> eqNames = new List<string>();
 
@@ -1703,6 +1705,8 @@ namespace Gekko
                     }
 
                     mEndo = new double[endo.Count(), endo.Count()];
+                    mEndo2 = new double[endo.Count(), endo.Count()];
+                    mEndo3 = new double[endo.Count(), endo.Count()];
                     mExo = new double[endo.Count(), exo.Count()];
                 }
                 int row = -1;
@@ -1807,9 +1811,56 @@ namespace Gekko
                                         {
                                             new Error("DECOMP matrix invert problem");
                                         }
-                                        Series ts = dd.storage[x2];
-                                        double d = ts.GetDataSimple(t);
-                                        mEndo[row, col] = d;
+
+                                        {
+                                            Series ts = dd.storage[x2];
+                                            double d = ts.GetDataSimple(t);
+                                            mEndo[row, col] = d;
+                                        }
+
+                                        {
+                                            DecompData d = decompDatas.storage[ii][jj];
+                                            double x = double.NaN;
+                                            if (operatorOneOf3Types == EContribType.D)
+                                            {
+                                                x = d.cellsGradQuo[x2].GetDataSimple(t.Add(-1));
+                                            }
+                                            else if (operatorOneOf3Types == EContribType.RD)
+                                            {
+                                                x = d.cellsGradRef[x2].GetDataSimple(t.Add(-1));
+                                            }
+                                            else if (operatorOneOf3Types == EContribType.M)
+                                            {
+                                                x = d.cellsGradRef[x2].GetDataSimple(t);
+                                            }
+                                            else throw new GekkoException("Hov");
+                                            mEndo2[row, col] = x;
+                                        }
+
+                                        {
+                                            DecompData d = decompDatas.storage[ii][jj];
+                                            double x = double.NaN;
+                                            if (operatorOneOf3Types == EContribType.D)
+                                            {
+                                                double vQuo = d.cellsQuo[x2].GetDataSimple(t);
+                                                double vQuoLag = d.cellsQuo[x2].GetDataSimple(t.Add(-1));
+                                                x = vQuo - vQuoLag;
+                                            }
+                                            else if (operatorOneOf3Types == EContribType.RD)
+                                            {                                                
+                                                double vRef = d.cellsRef[x2].GetDataSimple(t);
+                                                double vRefLag = d.cellsRef[x2].GetDataSimple(t.Add(-1));
+                                                x = vRef - vRefLag;
+                                            }
+                                            else if (operatorOneOf3Types == EContribType.M)
+                                            {                                                
+                                                double vQuo = d.cellsQuo[x2].GetDataSimple(t);
+                                                double vRef = d.cellsRef[x2].GetDataSimple(t);
+                                                x = vQuo - vRef;
+                                            }
+                                            else throw new GekkoException("Hov");
+                                            mEndo3[row, col] = x;
+                                        }                                        
                                     }
                                     else if (exo.ContainsKey(x1))
                                     {
@@ -1867,39 +1918,85 @@ namespace Gekko
                 }
                 else
                 {
-
-                    try
+                    if (Globals.decompFixNonchangingEndo)
                     {
-                        double[,] temp = (double[,])mEndo.Clone();
-                        inverse = Program.InvertMatrix(temp);
-                    }
-                    catch (Exception e)
-                    {
-                        bool nan = false;
-                        foreach (double d in mEndo)
+                        try
                         {
-                            if (G.isNumericalError(d))
+                            double[,] temp = (double[,])mEndo2.Clone();  //gradients
+                            inverse = Program.InvertMatrix(temp);
+                        }
+                        catch (Exception e)
+                        {
+                            bool nan = false;
+                            foreach (double d in mEndo)
                             {
-                                nan = true;
-                                break;
+                                if (G.isNumericalError(d))
+                                {
+                                    nan = true;
+                                    break;
+                                }
+                            }
+                            if (!nan)
+                            {
+                                string extra = null;
+                                if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";
+                                new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
+                                throw;
+                            }
+                            else
+                            {
+                                //We allow this, may just be some missing data
+                                inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
                             }
                         }
-                        if (!nan)
-                        {
-                            string extra = null;
-                            if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";
-                            new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
-                            throw;
-                        }
-                        else
-                        {
-                            //We allow this, may just be some missing data
-                            inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
-                        }
-                    }
+                        //effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
+                        
+                        effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
 
-                    effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
-                                                                       //the effect matrix is #endo x #exo    
+                        for (int i = 0; i < effect.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < effect.GetLength(1); j++)
+                            {
+                                effect[i, j] = effect[i, j] / mEndo3[i, i];  //Note: i, i.
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        try
+                        {
+                            double[,] temp = (double[,])mEndo.Clone();
+                            inverse = Program.InvertMatrix(temp);
+                        }
+                        catch (Exception e)
+                        {
+                            bool nan = false;
+                            foreach (double d in mEndo)
+                            {
+                                if (G.isNumericalError(d))
+                                {
+                                    nan = true;
+                                    break;
+                                }
+                            }
+                            if (!nan)
+                            {
+                                string extra = null;
+                                if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";
+                                new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
+                                throw;
+                            }
+                            else
+                            {
+                                //We allow this, may just be some missing data
+                                inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
+                            }
+                        }
+
+                        effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
+
+                    }
                 }
             }
 
