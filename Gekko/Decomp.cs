@@ -2036,7 +2036,15 @@ namespace Gekko
                                 double ddd2 = double.NaN;
                                 if (ts != null) ddd2 = ts.GetDataSimple(time);                                
                                 double ddd1 = mEndo3[row, row];  //IS THIS ALWAYS RIGHT??? Cannot be mEndo3[row, col] because mEndo2 is only over endo x endo.
-                                if (Globals.runningOnTTComputer && ddd1 != ddd2) MessageBox.Show("Decomp problem, check that!");
+                                
+                                if (Globals.runningOnTTComputer)
+                                {
+                                    bool bad = false; 
+                                    if (ddd1 != ddd2) bad = true; 
+                                    if (G.IsBothNumericalError(ddd1, ddd2)) bad = false;
+                                    if (bad) MessageBox.Show("Decomp problem, check that!");
+                                }
+                                
                                 ts3.SetData(time, ddd2);
                             }
                             else

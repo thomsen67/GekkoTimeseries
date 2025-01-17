@@ -493,9 +493,10 @@ namespace Gekko
         }
         
         private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int lineWidth, Color color, EWrapType type, bool mustAlsoPrintOnScreen)
-        {
+        {            
             while (true)
             {
+                if (text == null) text = "";
                 if (colCounter + text.Length > lineWidth)
                 {
                     //          |mmmmm..............................|

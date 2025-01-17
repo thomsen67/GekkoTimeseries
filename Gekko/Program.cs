@@ -16366,7 +16366,7 @@ namespace Gekko
                     {
                         if (Program.model.modelGams.equationsByVarname != null)
                         {
-                            eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, true, varnameWithoutFreq, varnameWithoutFreq, eqsPrinted);
+                            eqsPrinted = DispHelperShowGamsEquations(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, true, varnameWithoutFreq, varnameWithoutFreq, eqsPrinted, bank, isGams);
                         }
                     }
                     else
@@ -16526,76 +16526,158 @@ namespace Gekko
         /// <param name="varnameWithoutFreq"></param>
         /// <param name="eqsPrinted"></param>
         /// <returns></returns>
-        private static bool DispHelperShowGamsEquations(bool showDetailed, bool clickedLink, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted)
+        private static bool DispHelperShowGamsEquations(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted, string bank, bool isGams)
         {
-            string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
-
-            GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
+            if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.model_gams_scalar_disp, "modern"))
             {
-                foreach (ModelGamsEquation e5 in e4.Value)
+                Model model = Program.model;
+                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);                
+
+                List<EqInfoSimple> eqsContainingVariable = EquationBrowser.GetRelatedEquations(varnameWithoutFreq, tUsedHere, model, modelGamsScalar);
+                
+                if (eqsContainingVariable.Count == 0)
                 {
-                    GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
-                    if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key))
+                    //new Writeln("The variable does not appear in any equations");
+                    eqsPrinted = false;
+                }
+                else 
+                {
+                    //Gets the most promising equation
+                    EqInfoSimple bestEq = eqsContainingVariable[0];
+
+                    //Gets dependents: equations that contain the variable                    
+                    string dependentEqs = null;
+                    string dependentEqs2 = null;
+                    List<string> eq2 = new List<string>();
+                    foreach (EqInfoSimple eqHelper in eqsContainingVariable)
                     {
-                        dependents.Add(e4.Key, null);
+                        eq2.Add(eqHelper.eqName);
+                    }
+                    eq2.Sort(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in eq2)
+                    {
+                        string eqName = G.Chop_RemoveIndex(s);
+                        dependentEqs += ", " + eqName;
+                    }
+                    dependentEqs = dependentEqs.Substring(", ".Length);                    
+
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainOmitVeryFirstNewLine();
+                        txt.MainAdd("Equation " + G.Chop_RemoveIndex(bestEq.eqName) + ":");
+                    }
+
+                    //Gets the equation text (raw)
+                    EquationTextHelper helper = new EquationTextHelper();
+                    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helper, tUsedHere);
+                    new Writeln(helper22.s_gekkoSyntax, "", int.MaxValue, Color.Empty, false, ETabs.Main);
+
+                    //Gets precedents (variables found in the equation)
+                    EquationTextHelper helper2 = new EquationTextHelper();
+                    helper2.showTime = false;
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(bestEq.eqNumber, helper2, tUsedHere);
+                    precedents.Sort(StringComparer.OrdinalIgnoreCase);
+                    List<string> precedents2 = new List<string>();
+                    foreach (string variableName2 in precedents)
+                    {
+                        string varnameWithoutLag = G.Chop_RemoveLagOrLead(variableName2);
+                        //if (G.Equal(varnameWithoutLag, varnameWithoutFreq)) continue;  //Shown at top
+                        Series ts2 = O.GetIVariableFromString(varnameWithoutLag, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                        if (ts2 == null)
+                        {
+                            precedents2.Add(varnameWithoutLag);
+                        }
+                        else
+                        {
+                            Action<GAO> a = (gao) =>
+                            {
+                                DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts2, varnameWithoutLag, bank, isGams);
+                            };
+                            precedents2.Add(G.GetLinkAction(varnameWithoutLag, new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                        }
+
+                    }                    
+                    string ss = Stringlist.GetListWithCommas(precedents2);                    
+                    new Writeln("Variables: " + ss);                    
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainOmitVeryFirstNewLine();
+                        txt.MainAdd("Influences: " + dependentEqs);
                     }
                 }
             }
-
-            List<string> precedents2 = new List<string>();
-            precedents2.AddRange(dependents.Keys);
-            precedents2.Sort();
-
-            if (precedents2.Count > 0)
+            else
             {
-                G.Write("Variable " + varnameWithoutFreqAndIndex + " influences: ");
-                int counter = -1;
-                foreach (string s in precedents2)
-                {
-                    counter++;
-                    if (counter > 0)
-                    {
-                        G.Write(", ");
-                    }
-                    G.WriteLink(s, "disp:" + s);
-                }
-                G.Writeln();
-            }
+                string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
 
-            List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
-
-            if (G.IsUnitTesting())
-            {
-                Globals.unitTestDependents = new List<string>();
-                if (eqs != null)
+                GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
                 {
-                    foreach (ModelGamsEquation eq in eqs)
+                    foreach (ModelGamsEquation e5 in e4.Value)
                     {
-                        Globals.unitTestDependents.Add(eq.nameGams);
+                        GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
+                        if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key))
+                        {
+                            dependents.Add(e4.Key, null);
+                        }
                     }
                 }
-            }
 
-            if (eqs != null && eqs.Count > 0)
-            {
-                if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
+                List<string> precedents2 = new List<string>();
+                precedents2.AddRange(dependents.Keys);
+                precedents2.Sort();
+
+                if (precedents2.Count > 0)
                 {
-                    new Note("Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
-                }
-
-                PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
-                eqsPrinted = true;
-
-                if (!showDetailed)
-                {
+                    G.Write("Variable " + varnameWithoutFreqAndIndex + " influences: ");
+                    int counter = -1;
+                    foreach (string s in precedents2)
+                    {
+                        counter++;
+                        if (counter > 0)
+                        {
+                            G.Write(", ");
+                        }
+                        G.WriteLink(s, "disp:" + s);
+                    }
                     G.Writeln();
-                    G.WriteLink("Show GAMS equation" + G.S(eqs.Count), "disp2:" + var);
-                    G.Writeln();
                 }
-            }
 
-            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
+                List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
+
+                if (G.IsUnitTesting())
+                {
+                    Globals.unitTestDependents = new List<string>();
+                    if (eqs != null)
+                    {
+                        foreach (ModelGamsEquation eq in eqs)
+                        {
+                            Globals.unitTestDependents.Add(eq.nameGams);
+                        }
+                    }
+                }
+
+                if (eqs != null && eqs.Count > 0)
+                {
+                    if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
+                    {
+                        new Note("Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
+                    }
+
+                    PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
+                    eqsPrinted = true;
+
+                    if (!showDetailed)
+                    {
+                        G.Writeln();
+                        G.WriteLink("Show GAMS equation" + G.S(eqs.Count), "disp2:" + var);
+                        G.Writeln();
+                    }
+                }
+
+                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
+            }
             return eqsPrinted;
         }
 
@@ -17729,9 +17811,9 @@ namespace Gekko
                     IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                     if (iv != null)
                     {
-                        if (iv.Type() == EVariableType.List)
+                        if (!wildCardLhs.StartsWith(Globals.symbolCollection.ToString()) && iv.Type() == EVariableType.List)
                         {
-                            //x[*], x[?] etc.
+                            //DISP x[*], DISP x[?] etc., but not DISP #i.
                             foreach (IVariable child in (iv as List).list)
                             {
                                 Series child_ts = child as Series;

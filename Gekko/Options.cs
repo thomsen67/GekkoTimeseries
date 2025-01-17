@@ -166,6 +166,7 @@ namespace Gekko
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "both";  //lhs|eqname|both
         public bool model_gams_scalar_data = false;  //set yes to read data from a scalar model gams.gms file. But does not work...
+        public string model_gams_scalar_disp = "modern";  //uses DECOMP logic for precedents/dependents
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //default | gams
         // ---
@@ -178,7 +179,7 @@ namespace Gekko
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
         // ---
         public string print_collapse = "none";  //avg or total or none
-        public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
+        public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown        
         public int print_elements_max = 400;
         public int print_fields_ndec = 4;
         public int print_fields_nwidth = 13;
@@ -472,6 +473,7 @@ namespace Gekko
             Add("MODEL GAMS DEP CURRENT", Globals.xbool);
             Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname", "both");
             Add("MODEL GAMS SCALAR DATA", Globals.xbool);
+            Add("MODEL GAMS SCALAR DISP", Globals.xnameOrString, "standard", "modern");
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
             Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");
             Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
@@ -482,7 +484,7 @@ namespace Gekko
             Add("PLOT XLABELS DIGITS", Globals.xint);
             Add("PLOT XLABELS NONANNUAL", Globals.xnameOrString, "at", "between");    //#hsfsksgsdfg                        
             Add("PRINT COLLAPSE", Globals.xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
-            Add("PRINT DISP MAXLINES", Globals.xsint);
+            Add("PRINT DISP MAXLINES", Globals.xsint);            
             Add("PRINT ELEMENTS MAX", Globals.xint);            
             Add("PRINT FIELDS NDEC", Globals.xint);
             Add("PRINT FIELDS NWIDTH", Globals.xint);

@@ -1337,7 +1337,7 @@ namespace Gekko
         /// <param name="t"></param>
         /// <param name="modelGamsScalar"></param>
         /// <returns></returns>
-        private static GekkoDictionary<string, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar)
+        public static GekkoDictionary<string, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar)
         {
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
 
@@ -1791,10 +1791,11 @@ namespace Gekko
         /// <param name="model"></param>
         /// <param name="modelGamsScalar"></param>
         /// <returns></returns>
-        private static List<EqInfoSimple> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
+        public static List<EqInfoSimple> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
         {
+            List<EqInfoSimple> eqsNew = new List<EqInfoSimple>();
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-            if (aNumber == -12345) new Error("Hov");
+            if (aNumber == -12345) return eqsNew;
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
             List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
@@ -1803,7 +1804,7 @@ namespace Gekko
                 G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
                 eqNumbers = new List<int>();
             }
-            List<EqInfoSimple> eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
+            eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
             return eqsNew;
         }
 
