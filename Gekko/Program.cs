@@ -16550,15 +16550,17 @@ namespace Gekko
                     string dependentEqs = null;
                     string dependentEqs2 = null;
                     List<string> eq2 = new List<string>();
+                    GekkoDictionaryBlanks<int> eq2a = new GekkoDictionaryBlanks<int>();
                     foreach (EqInfoSimple eqHelper in eqsContainingVariable)
                     {
-                        eq2.Add(eqHelper.eqName);
+                        string eqName = G.Chop_RemoveIndex(eqHelper.eqName);
+                        if (!eq2a.ContainsKey(eqName)) eq2a.Add(eqName, 0);
                     }
+                    eq2 = eq2a.GetKeys();
                     eq2.Sort(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in eq2)
-                    {
-                        string eqName = G.Chop_RemoveIndex(s);
-                        dependentEqs += ", " + eqName;
+                    {                        
+                        dependentEqs += ", " + s;
                     }
                     dependentEqs = dependentEqs.Substring(", ".Length);                    
 
