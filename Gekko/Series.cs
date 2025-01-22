@@ -1316,17 +1316,30 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
             return FromGekkoTimeToArrayIndexAbstract(gt, this.data.anchorPeriod, this.GetAnchorPeriodPositionInArray());
-        }        
+        }
 
         private int ResizeDataArray(GekkoTime gt)
+        {
+            return ResizeDataArray(gt, 0);
+        }
+
+        /// <summary>
+        /// The minIndex makes sure that the returned index is >= minIndex. Normally minIndex is == 0, but sometimes
+        /// it can be useful to make it > 0, for instance if a lagged value is to be used. MinIndex is expected to
+        /// be >= 0, but if negative it is perceived as 0.
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <param name="minIndex"></param>
+        /// <returns></returns>
+        private int ResizeDataArray(GekkoTime gt, int minIndex)
         {
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
             // ----------------------------------------------------------------------------
             
-            int index = GetArrayIndex(gt);
+            int index = GetArrayIndex(gt);            
 
-            while (index < 0 || index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
+            while (index < Math.Max(0, minIndex) || index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
             {
 
                 //Resize data array
@@ -1400,9 +1413,6 @@ namespace Gekko
                     }
 
                 }
-
-                //this.data.GetDataArray_ONLY_FOR_INTERNAL_USE() = newDataArray;
-                //this.data.SetDataArray_ONLY_FOR_INTERNAL_USE(newDataArray);
 
                 this.data.SetDataarray_ONLY_INTERNAL_USE(newDataArray);
                 index = GetArrayIndex(gt);
@@ -1547,8 +1557,8 @@ namespace Gekko
 
                     int ia1 = rv_series.ResizeDataArray(window1);  //t0
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ia1, array is enlarged not moved around
-                    int ib1 = x1_series.ResizeDataArray(window1);  //t0
-                    int ib2 = x1_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ib1, array is enlarged not moved around
+                    int ib1 = x1_series.ResizeDataArray(window1, lag);  //t0 --- makes sure ib1 >= lag, because ib1 - lag is used as array index later on
+                    int ib2 = x1_series.ResizeDataArray(window2, lag);  //t3 -----------> note: this cannot change ib1, array is enlarged not moved around
                     double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     bool b = MissingZero(x1_series);

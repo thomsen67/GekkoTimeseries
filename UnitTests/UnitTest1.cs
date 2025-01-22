@@ -1332,6 +1332,14 @@ namespace UnitTests
             _AssertSeries(First(), "k2", 2005, 2005, 0d, sharedDelta);
             _AssertSeries(First(), "k2", 2006, double.NaN, sharedDelta);
 
+            I("reset;");
+            I("time 2015 2025;");
+            I("x <2021 2025> = 1,2,3,4,5;");
+            I("write sletmig;");
+            I("read sletmig;");
+            I("y = 100;");
+            I("dif(y) <2021 2025> = dif(x);"); //has always been ok for <2022 2025> or <2020 2025>, but used not to work for <2021 2025>. Fixed.
+            I("prt y;");
         }
 
         [TestMethod]
