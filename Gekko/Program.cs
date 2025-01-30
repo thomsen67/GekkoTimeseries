@@ -16164,7 +16164,7 @@ namespace Gekko
 
             EquationTextHelper helper = new EquationTextHelper();
 
-            //Print any equations now
+            //Direct printing of an equation, like "DISP e_fy" rather than "DISP fy". No links are done.
             if (originalList != null)
             {
                 foreach (IVariable iv in originalList.list)
@@ -16436,29 +16436,36 @@ namespace Gekko
                 Program.options.print_width = int.MaxValue;
                 try
                 {
-                    //check for endo (but really not necessary, exo just does not exist)
-                    //G.Writeln(found.equationFormula);
-                    string strSplit = found.equationText;
-                    strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
-                    char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
-                    List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
-                    foreach (string s in alWork)
+                    if (Program.options.bugfix_disp)
                     {
-                        if (s == "£") G.Writeln();
-                        else
+
+                    }
+                    else
+                    {
+                        //check for endo (but really not necessary, exo just does not exist)
+                        //G.Writeln(found.equationFormula);
+                        string strSplit = found.equationText;
+                        strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
+                        char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
+                        List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
+                        foreach (string s in alWork)
                         {
-                            if (Program.model.modelGekko.varsAType.ContainsKey(s))
-                            {
-                                //seems the word exists as variable
-                                G.WriteLink(s, "disp:" + s);
-                            }
+                            if (s == "£") G.Writeln();
                             else
                             {
-                                G.Write(s);
+                                if (Program.model.modelGekko.varsAType.ContainsKey(s))
+                                {
+                                    //seems the word exists as variable
+                                    G.WriteLink(s, "disp:" + s);
+                                }
+                                else
+                                {
+                                    G.Write(s);
+                                }
                             }
                         }
+                        G.Writeln();
                     }
-                    G.Writeln();
                 }
                 finally
                 {

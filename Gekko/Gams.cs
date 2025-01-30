@@ -1111,7 +1111,7 @@ namespace Gekko
             {
                 string equationNameWithoutIndexes = kvp.Key;
 
-                //For each scalar equation
+                //For each scalar equation (no time dimension)
                 foreach (EquationHelper2 eh in kvp.Value)
                 {
                     nAll++;
@@ -1554,6 +1554,12 @@ namespace Gekko
             return m2;
         }
 
+        /// <summary>
+        /// Gets all scalar equations by equation name (abstracting from indexes). Inside each value of key-value-pair, a list of equations
+        /// is stored, showing the dimensions (abstracting from time).
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         private static GekkoDictionary<string, List<EquationHelper2>> GetScalarEquations(Model model)
         {            
             List<string> eqs = model.modelGamsScalar.GetEqs(1);
