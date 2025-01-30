@@ -865,91 +865,181 @@ namespace Gekko
 
             o.emfName = emfName;
 
-            if (!o.guiGraphIsRefreshing)
+            if (Program.options.bugfix_plot)
             {
-                PrtOptionsHelper po = new PrtOptionsHelper();
-
-                string code = null;
-                List<OptString> codes = o.operators;
-                if (codes.Count == 1 && G.Equal(codes[0].s2, "yes")) code = codes[0].s1;
-
-                if (code != null)
+                if (!o.guiGraphIsRefreshing)
                 {
-                    if (G.Equal(code, "m"))
+                    PrtOptionsHelper po = new PrtOptionsHelper();
+
+                    string code = null;
+                    List<OptString> codes = o.operators;
+                    if (codes.Count == 1 && G.Equal(codes[0].s2, "yes")) code = codes[0].s1;
+
+                    if (code != null)
                     {
-                        po.isLevel = false;
-                        po.isDiff = true;
-                        po.isPch = false;
-                        po.isMultiplier = true;
+                        if (G.Equal(code, "m"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = true;
+                            po.isPch = false;
+                            po.isMultiplier = true;
+                        }
+                        else if (G.Equal(code, "q"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = false;
+                            po.isPch = true;
+                            po.isMultiplier = true;
+                        }
+                        else if (G.Equal(code, "d") || G.Equal(code, "rd"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = true;
+                            po.isPch = false;
+                            po.isMultiplier = false;
+                        }
+                        else if (G.Equal(code, "p") || G.Equal(code, "rp"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = false;
+                            po.isPch = true;
+                            po.isMultiplier = false;
+                        }
                     }
-                    else if (G.Equal(code, "q"))
+                    else
                     {
-                        po.isLevel = false;
+                        po.isLevel = true;
                         po.isDiff = false;
-                        po.isPch = true;
-                        po.isMultiplier = true;
-                    }
-                    else if (G.Equal(code, "d") || G.Equal(code, "rd"))
-                    {
-                        po.isLevel = false;
-                        po.isDiff = true;
                         po.isPch = false;
                         po.isMultiplier = false;
                     }
-                    else if (G.Equal(code, "p") || G.Equal(code, "rp"))
+                    po.isLog = false;
+                    po.isDlog = false;
+
+                    GraphOptions graphOptions = new GraphOptions();
+                    graphOptions.counter = o.counter;
+                    graphOptions.localBanks = null;
+                    graphOptions.emfName = emfName;
+                    graphOptions.po = po;
+                    graphOptions.pph = null;
+                    graphOptions.precedents = null;
+                    graphOptions.tEnd = o.t2;
+                    graphOptions.tStart = o.t1;
+                    graphOptions.graphVars = null;
+                    graphOptions.graphVarsNames = labelsNonBroken;
+                    graphOptions.title = null;
+                    graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
+
+                    Thread thread = new Thread(new ParameterizedThreadStart(Program.PlotThreadFunction));
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.CurrentCulture = CultureInfo.InvariantCulture;
+                    //thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
+                    thread.Start(graphOptions);
+
+                    //Also see #9237532567
+                    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                     {
-                        po.isLevel = false;
-                        po.isDiff = false;
-                        po.isPch = true;
-                        po.isMultiplier = false;
+                        System.Threading.Thread.Sleep(10);  //0.01s
+                        if (graphOptions.windowIsShown)
+                        {
+                            break;
+                        }
                     }
                 }
                 else
                 {
-                    po.isLevel = true;
-                    po.isDiff = false;
-                    po.isPch = false;
-                    po.isMultiplier = false;
-                }
-                po.isLog = false;
-                po.isDlog = false;
-
-                GraphOptions graphOptions = new GraphOptions();
-                graphOptions.counter = o.counter;
-                graphOptions.localBanks = null;
-                graphOptions.emfName = emfName;
-                graphOptions.po = po;
-                graphOptions.pph = null;
-                graphOptions.precedents = null;
-                graphOptions.tEnd = o.t2;
-                graphOptions.tStart = o.t1;
-                graphOptions.graphVars = null;
-                graphOptions.graphVarsNames = labelsNonBroken;
-                graphOptions.title = null;
-                graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
-
-                //G.Writeln("Calling gnuplot2");
-
-                Thread thread = new Thread(new ParameterizedThreadStart(Program.GraphThreadFunction));
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.CurrentCulture = CultureInfo.InvariantCulture;
-                //thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
-                thread.Start(graphOptions);
-
-                //Also see #9237532567
-                //This stuff makes sure we wait for the window to open, before we move on with the code.
-                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                {
-                    System.Threading.Thread.Sleep(10);  //0.01s
-                    if (graphOptions.windowIsShown)
-                    {
-                        break;
-                    }
+                    o.guiGraphRefreshingFilename = emfName;
                 }
             }
             else
             {
-                o.guiGraphRefreshingFilename = emfName;
+                if (!o.guiGraphIsRefreshing)
+                {
+                    PrtOptionsHelper po = new PrtOptionsHelper();
+
+                    string code = null;
+                    List<OptString> codes = o.operators;
+                    if (codes.Count == 1 && G.Equal(codes[0].s2, "yes")) code = codes[0].s1;
+
+                    if (code != null)
+                    {
+                        if (G.Equal(code, "m"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = true;
+                            po.isPch = false;
+                            po.isMultiplier = true;
+                        }
+                        else if (G.Equal(code, "q"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = false;
+                            po.isPch = true;
+                            po.isMultiplier = true;
+                        }
+                        else if (G.Equal(code, "d") || G.Equal(code, "rd"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = true;
+                            po.isPch = false;
+                            po.isMultiplier = false;
+                        }
+                        else if (G.Equal(code, "p") || G.Equal(code, "rp"))
+                        {
+                            po.isLevel = false;
+                            po.isDiff = false;
+                            po.isPch = true;
+                            po.isMultiplier = false;
+                        }
+                    }
+                    else
+                    {
+                        po.isLevel = true;
+                        po.isDiff = false;
+                        po.isPch = false;
+                        po.isMultiplier = false;
+                    }
+                    po.isLog = false;
+                    po.isDlog = false;
+
+                    GraphOptions graphOptions = new GraphOptions();
+                    graphOptions.counter = o.counter;
+                    graphOptions.localBanks = null;
+                    graphOptions.emfName = emfName;
+                    graphOptions.po = po;
+                    graphOptions.pph = null;
+                    graphOptions.precedents = null;
+                    graphOptions.tEnd = o.t2;
+                    graphOptions.tStart = o.t1;
+                    graphOptions.graphVars = null;
+                    graphOptions.graphVarsNames = labelsNonBroken;
+                    graphOptions.title = null;
+                    graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
+
+                    //G.Writeln("Calling gnuplot2");
+
+                    Thread thread = new Thread(new ParameterizedThreadStart(Program.GraphThreadFunction));
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.CurrentCulture = CultureInfo.InvariantCulture;
+                    //thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
+                    thread.Start(graphOptions);
+
+                    //Also see #9237532567
+                    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                    {
+                        System.Threading.Thread.Sleep(10);  //0.01s
+                        if (graphOptions.windowIsShown)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    o.guiGraphRefreshingFilename = emfName;
+                }
             }
         }
 

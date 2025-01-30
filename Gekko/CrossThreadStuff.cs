@@ -509,6 +509,7 @@ namespace Gekko
             catch {  };  //fail silently
         }
 
+        
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);
         public static void CutButtonEnabled(bool status)
@@ -833,6 +834,30 @@ namespace Gekko
                     //w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
                     
                     Globals.ch.windowsDecompCloseCounter++;
+                    w.Close();
+                }
+            }
+            catch { };  //fail silently
+        }
+
+        //weird delegate pattern, but it works!
+        delegate void ClosePlotCallback2(WindowPlot w);
+        public static void ClosePlot2(WindowPlot w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new ClosePlotCallback2(ClosePlot2), new object[] { w });
+                }
+                else
+                {
+                    ////w.Close();
+                    //Globals.ch.windowsPlotCloseCounter++;
+                    //w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
+
+                    Globals.ch.windowsGraphCloseCounter++;
                     w.Close();
                 }
             }

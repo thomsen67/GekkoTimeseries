@@ -10252,7 +10252,11 @@ namespace Gekko
             foreach (Graph g in Globals.windowsGraph)
             {
                 i++;
-            }            
+            }
+            foreach (WindowPlot g in Globals.windowsPlot)
+            {
+                i++;
+            }
             foreach (WindowDecomp g in Globals.windowsDecomp2)
             {
                 i++;
@@ -20268,15 +20272,29 @@ namespace Gekko
 
         public static void CutPlot()
         {
-            List<Graph> windowsGraphTemp = new List<Graph>();
-            windowsGraphTemp.AddRange(Globals.windowsGraph);
-            Globals.ch = new CounterHelper();
-            for (int i = 0; i < windowsGraphTemp.Count; i++)
             {
-                if (windowsGraphTemp[i] == null) continue;
-                CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
+                List<Graph> windowsGraphTemp = new List<Graph>();
+                windowsGraphTemp.AddRange(Globals.windowsGraph);
+                Globals.ch = new CounterHelper();
+                for (int i = 0; i < windowsGraphTemp.Count; i++)
+                {
+                    if (windowsGraphTemp[i] == null) continue;
+                    CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
+                }
+                Globals.windowsGraph = new List<Graph>();
             }
-            Globals.windowsGraph = new List<Graph>();
+
+            {
+                List<WindowPlot> windowsGraphTemp = new List<WindowPlot>();
+                windowsGraphTemp.AddRange(Globals.windowsPlot);
+                Globals.ch = new CounterHelper();
+                for (int i = 0; i < windowsGraphTemp.Count; i++)
+                {
+                    if (windowsGraphTemp[i] == null) continue;
+                    CrossThreadStuff.ClosePlot2(windowsGraphTemp[i]);  //fails silently
+                }
+                Globals.windowsGraph = new List<Graph>();
+            }
         }
 
         public static void CutTrace()
@@ -28693,6 +28711,15 @@ namespace Gekko
             g.Close();
             g.Dispose();
             g = null;
+        }
+
+        public static void PlotThreadFunction(Object o)
+        {
+            GraphOptions graphOptions = (GraphOptions)o;
+            WindowPlot g = new WindowPlot();            
+            Globals.windowsPlot.Add(g);
+            g.ShowDialog();
+            graphOptions.windowIsShown = true;            
         }
 
         private static void MaybeStartPipe2(string fileName)

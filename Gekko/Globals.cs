@@ -783,6 +783,7 @@ namespace Gekko
         public const int systemTthreadsExtra = 3;
 
         public static List<Graph> windowsGraph = new List<Graph>();
+        public static List<WindowPlot> windowsPlot = new List<WindowPlot>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
         public static List<WindowTreeViewWithTable> windowsTrace = new List<WindowTreeViewWithTable>();
         public static List<WindowFlow> windowsFlow = new List<WindowFlow>();

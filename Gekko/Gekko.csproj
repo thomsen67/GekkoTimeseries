@@ -446,6 +446,9 @@
     <Compile Include="WindowFlow.xaml.cs">
       <DependentUpon>WindowFlow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowPlot.xaml.cs">
+      <DependentUpon>WindowPlot.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowTableViewer.xaml.cs">
       <DependentUpon>WindowTableViewer.xaml</DependentUpon>
     </Compile>
@@ -661,6 +664,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowPlot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WindowRunStatus.xaml">
       <SubType>Designer</SubType>
