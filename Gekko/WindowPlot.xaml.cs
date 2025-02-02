@@ -37,5 +37,109 @@ namespace Gekko
             catch { }
         }
 
+        private void CheckBox_ref_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_ref_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_shares_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_shares_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_index_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_index_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_log_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_log_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_n1_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void radioButton_d_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_p_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_dp_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_n2_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_m_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_q_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radioButton_mp_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_copy(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_save(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_saveas(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_refresh(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

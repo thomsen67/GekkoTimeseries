@@ -62,6 +62,7 @@ namespace Gekko
             //========================================================================================================
 
             string extension = "emf";
+            if (Program.options.bugfix_plot) extension = "svg";
             if (o.opt_filename != null)
             {
                 extension = Path.GetExtension(o.opt_filename);
@@ -76,7 +77,7 @@ namespace Gekko
                     new Error("In PLOT, expected file type is emf, png, svg or pdf");
                 }
                 extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
-            }
+            }            
 
             //bool isInside = true;
             //bool test2 = false;

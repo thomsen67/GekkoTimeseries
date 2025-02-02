@@ -1781,7 +1781,7 @@ namespace Gekko
         public string eqNameWithLag = null;
         public int eqNumber = -12345;
         public bool best = false;
-        public double score = 0.5d;  //rhs
+        public double score = Globals.lhsScore0;  //rhs
     }
 
     public class Rich
@@ -19003,6 +19003,16 @@ namespace Gekko
                         model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
                     }
                     catch 
+                    {
+                        //No need to choke on this
+                        new Note("The module that identifies dependent variables from equation names failed to load");
+                    }
+                    try
+                    {
+                        //TODO TODO .Add(-1)
+                        GamsModel.LhsScore(model.modelGamsScalar.absoluteT2.Add(-1), model);  //"Lhs"-score for each equation
+                    }
+                    catch
                     {
                         //No need to choke on this
                         new Note("The module that identifies dependent variables from equation names failed to load");

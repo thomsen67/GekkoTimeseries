@@ -4,11 +4,11 @@
     xmlns:jas="clr-namespace:Gekko"    
     Title="Decomposition" HorizontalAlignment="Left" Height="710" Width="900" Left="100" Top="30" Closing="Window_Closing">
 
-    
     <Window.InputBindings>
         <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
-    </Window.InputBindings>
-
+        <!--The following Window.CommandBindings (and its method) are necessary-->
+    </Window.InputBindings>    
+    
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
     </Window.CommandBindings>
@@ -103,12 +103,12 @@
 
             <DockPanel Grid.Row="2" Grid.Column="3">
                 <Border BorderThickness="3,3,3,0" BorderBrush="LightGray" CornerRadius="10,10,0,0">
-                    <RadioButton IsChecked="True" Name="radioButton1" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton1_Checked" ToolTip="Levels as they are in databank"></RadioButton>
+                    <RadioButton IsChecked="True" Name="radioButton_n1" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_n1_Checked" ToolTip="Levels as they are in databank"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="3">
                 <Border BorderThickness="3,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton2" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton2_Checked" ToolTip="Absolute time-change (differences)"></RadioButton>
+                    <RadioButton Name="radioButton_d" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton_d_Checked" ToolTip="Absolute time-change (differences)"></RadioButton>
                 </Border>
             </DockPanel>
 
@@ -120,12 +120,12 @@
 
             <DockPanel Grid.Row="4" Grid.Column="3">
                 <Border BorderThickness="3,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton4" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton4_Checked" ToolTip="Percentage time growth rate"></RadioButton>
+                    <RadioButton Name="radioButton_p" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_p_Checked" ToolTip="Percentage time growth rate"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="3">
                 <Border BorderThickness="3,0,3,3" BorderBrush="LightGray" CornerRadius="0,0,10,10">
-                    <RadioButton Name="radioButton9" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton9_Checked" ToolTip="Absolute time-change in percentage time growth rate"></RadioButton>
+                    <RadioButton Name="radioButton_dp" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_dp_Checked" ToolTip="Absolute time-change in percentage time growth rate"></RadioButton>
                 </Border>
             </DockPanel>
 
@@ -180,12 +180,12 @@
 
             <DockPanel Grid.Row="2" Grid.Column="8">
                 <Border BorderThickness="3,3,3,0" BorderBrush="LightGray" CornerRadius="10,10,0,0">
-                    <RadioButton IsChecked="True" Name="radioButton1777" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton1_Checked" ToolTip="Levels as they are in databank"></RadioButton>
+                    <RadioButton IsChecked="True" Name="radioButton_n2" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_n2_Checked" ToolTip="Levels as they are in databank"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="8">
                 <Border BorderThickness="3,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton777" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton2_Checked" ToolTip="Absolute time-change (differences)"></RadioButton>
+                    <RadioButton Name="radioButton_m" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton_m_Checked" ToolTip="Absolute time-change (differences)"></RadioButton>
                 </Border>
             </DockPanel>
 
@@ -197,141 +197,34 @@
 
             <DockPanel Grid.Row="4" Grid.Column="8">
                 <Border BorderThickness="3,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton4777" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton4_Checked" ToolTip="Percentage time growth rate"></RadioButton>
+                    <RadioButton Name="radioButton_q" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_q_Checked" ToolTip="Percentage time growth rate"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="8">
                 <Border BorderThickness="3,0,3,3" BorderBrush="LightGray" CornerRadius="0,0,10,10">
-                    <RadioButton Name="radioButton9777" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton9_Checked" ToolTip="Absolute time-change in percentage time growth rate"></RadioButton>
+                    <RadioButton Name="radioButton_mp" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_mp_Checked" ToolTip="Absolute time-change in percentage time growth rate"></RadioButton>
                 </Border>
             </DockPanel>
-
-
-            <!--<DockPanel Grid.ColumnSpan="2" Grid.Row="0" Grid.Column="8">
-                <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares first-position and reference databanks">Multiplier</TextBlock>
-            </DockPanel>
-
-            <DockPanel Grid.Row="1" Grid.Column="8">
-                <Border BorderThickness="3,3,0,0" BorderBrush="LightGray"  CornerRadius="10,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Shows each variable as it is">Raw</TextBlock>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="1" Grid.Column="9">
-                <Border BorderThickness="0,3,3,0" BorderBrush="LightGray" CornerRadius="0,10,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Decompose: right-side variables sum up to left-side variable">Decomp</TextBlock>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="2" Grid.Column="6">
-                <Border BorderThickness="1,1,0,0" BorderBrush="LightGray" CornerRadius="10,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="x">Levels</TextBlock>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="3" Grid.Column="6">
-                <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;m&gt; or MULPRT&lt;abs&gt;&#xa;x-@x">Abs. multiplier</TextBlock>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="4" Grid.Column="6">
-                <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;q&gt; or MULPRT&lt;pch&gt;&#xa;[x/@x-1]*100">Relative multiplier</TextBlock>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="5" Grid.Column="6">
-                <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [@x/@x(-1)-1]*100">Mul. growth rate</TextBlock>
-                </Border>
-
-            </DockPanel>
-
-            <DockPanel Grid.Row="2" Grid.Column="7">
-                <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic">n</TextBlock>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="3" Grid.Column="7">
-                <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;m&gt; or MULPRT&lt;abs&gt;&#xa;x-@x">m</TextBlock>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="4" Grid.Column="7">
-                <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;q&gt; or MULPRT&lt;pch&gt;&#xa;[x/@x-1]*100">q</TextBlock>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="5" Grid.Column="7">
-                <Border BorderThickness="0,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [@x/@x(-1)-1]*100">mp</TextBlock>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="2" Grid.Column="8">
-                <Border BorderThickness="3,1,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton21" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton21_Checked" ToolTip="Levels as they are in databank"></RadioButton>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="3" Grid.Column="8">
-                <Border BorderThickness="3,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton22" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton22_Checked" ToolTip="Absolute multiplier difference"></RadioButton>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="4" Grid.Column="8">
-                <Border BorderThickness="3,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton24" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton24_Checked" ToolTip="Percentage multiplier difference"></RadioButton>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="5" Grid.Column="8">
-                <Border BorderThickness="3,0,0,3" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <RadioButton Name="radioButton29" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton29_Checked" ToolTip="Abs. multiplier in percentage time growth rate"></RadioButton>
-                </Border>
-            </DockPanel>
-
-
-            <DockPanel Grid.Row="2" Grid.Column="9">
-                <Border BorderThickness="0,1,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Opacity="0.5" IsEnabled="False" Name="radioButton25" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" ToolTip="Levels as they are in databank"></RadioButton>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="3" Grid.Column="9">
-                <Border BorderThickness="0,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton26" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton26_Checked" ToolTip="Absolute multiplier difference (decomposed)"></RadioButton>
-                </Border>
-            </DockPanel>
-
-            <DockPanel Grid.Row="4" Grid.Column="9">
-                <Border BorderThickness="0,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton28" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton28_Checked" ToolTip="Percentage multiplier difference (decomposed)"></RadioButton>
-                </Border>
-            </DockPanel>
-            <DockPanel Grid.Row="5" Grid.Column="9">
-                <Border BorderThickness="0,0,3,3" BorderBrush="LightGray" CornerRadius="0,0,10,0">
-                    <RadioButton Name="radioButton30" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton30_Checked" ToolTip="Abs. multiplier in percentage time growth rate (decomposed)"></RadioButton>
-                </Border>
-            </DockPanel>-->
 
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
-                <CheckBox  x:Name="checkBoxCount" Width="62" Margin="0,3.5,0,0" VerticalAlignment="Top" ToolTip="Show count of elements (&lt;count> option)" Checked="checkBoxCount_Checked" Unchecked="CheckBoxCount_Unchecked"  Content="Shares" />
+                <CheckBox  x:Name="CheckBox_shares" Width="62" Margin="0,3.5,0,0" VerticalAlignment="Top" ToolTip="Show count of elements (&lt;count> option)" Checked="CheckBox_shares_Checked" Unchecked="CheckBox_shares_Unchecked"  Content="Shares" />
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
-                <CheckBox x:Name="checkBoxErrors"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Index" Checked="CheckBoxErrors_Checked" Unchecked="CheckBoxErrors_Unchecked"/>
+                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                <CheckBox x:Name="checkBoxErrors777"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Log" Checked="CheckBoxErrors_Checked" Unchecked="CheckBoxErrors_Unchecked"/>
+                <CheckBox x:Name="CheckBox_log"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Log" Checked="CheckBox_log_Checked" Unchecked="CheckBox_log_Unchecked"/>
             </StackPanel>
 
             <TextBlock Grid.Column="11" Grid.Row="1" Name="textBlock1" FontWeight="Bold">Options</TextBlock>
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
-                <CheckBox Name="checkBoxShares" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBoxShares_Checked" Unchecked="CheckBoxShares_Unchecked" ToolTip="Show decomposition shares (&lt;shares> option), not meaningful for &quot;Raw&quot; options.">Ref</CheckBox>
+                <CheckBox Name="CheckBox_ref" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Show decomposition shares (&lt;shares> option), not meaningful for &quot;Raw&quot; options.">Ref</CheckBox>
             </StackPanel>
 
-            <Button Grid.Column="11" Grid.Row="2" Content="Copy" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
+            <Button Grid.Column="11" Grid.Row="2" Content="Copy" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_copy">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -339,7 +232,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button Grid.Column="11" Grid.Row="3" Content="Save" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
+            <Button Grid.Column="11" Grid.Row="3" Content="Save" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_save">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -347,7 +240,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button Grid.Column="11" Grid.Row="4" Content="Save As" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
+            <Button Grid.Column="11" Grid.Row="4" Content="Save As" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_saveas">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -355,89 +248,14 @@
                 </Button.Resources>
             </Button>
 
-            <Button Grid.Column="11" Grid.Row="5" Content="Refresh" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_Click">
+            <Button Grid.Column="11" Grid.Row="5" Content="Refresh" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_refresh">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
                     </Style>
                 </Button.Resources>
             </Button>
-
-
-
-
-        </Grid>
-
-
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" Name="splitterHorizontal" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Grid HorizontalAlignment="Left">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" Name="splitterVertical" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <WebBrowser Name="webBrowser" />
-
-                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <Border BorderThickness="0" BorderBrush="Black" Name="canvasBorder">
-                        <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=grid1, Path=ActualHeight}" Width="{Binding ElementName=grid1, Path=ActualWidth}" Name="canvas">
-                            <DockPanel Canvas.Left="{Binding ElementName=frezenBorder, Path=ActualWidth}" Canvas.Top="{Binding ElementName=frezenBorder2, Path=ActualHeight}" Name="dockPanel1">
-                                <Grid Name="grid1">
-                                </Grid>
-                            </DockPanel>
-                            <Border x:Name="frezenBorder" Background="White" Canvas.Left="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
-                                <Grid Name="grid1Left">
-                                </Grid>
-                            </Border>
-                            <Border x:Name="frezenBorder2" Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
-                                <Grid Name="grid1Top" Background="White">
-                                </Grid>
-                            </Border>
-                            <Border Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" 
-                                Canvas.Left="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" Name="frezenBorderUpperLeft">
-                                <Grid Name="gridUpperLeft"></Grid>
-                            </Border>
-                        </Canvas>
-                    </Border>
-                </ScrollViewer>
-
-                <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-
-                <TabControl Grid.Row="2"  Margin="0, 5, 0, 0">
-                    <TabItem Header="Equations">
-                        <ScrollViewer Name="scrollViewerDecomp1">
-                            <RichTextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10">
-                                <RichTextBox.Resources>
-                                    <Style TargetType="{x:Type Paragraph}">
-                                        <Setter Property="Margin" Value="0" />
-                                    </Style>
-                                </RichTextBox.Resources>
-                            </RichTextBox>
-                        </ScrollViewer>
-                    </TabItem>
-                    <TabItem Header="Code">
-                        <ScrollViewer Name="scrollViewerDecomp2">
-                            <RichTextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10">
-                                <RichTextBox.Resources>
-                                    <Style TargetType="{x:Type Paragraph}">
-                                        <Setter Property="Margin" Value="0" />
-                                    </Style>
-                                </RichTextBox.Resources>
-                            </RichTextBox>
-                        </ScrollViewer>
-                    </TabItem>
-                </TabControl>
-
-            </Grid>
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />            
-        </Grid>
+        </Grid>        
     </DockPanel>
 </Window>
     

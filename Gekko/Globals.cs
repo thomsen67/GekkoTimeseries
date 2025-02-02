@@ -184,7 +184,10 @@ namespace Gekko
         public const string decompResidualText2 = " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
         public const double redNaN = 1000000d;
         public const int decompTimelessNumber = 0;
-                
+        public const double lhsScore0 = 0.5d;
+        public const double lhsScore1 = 0.5d;
+        public const double lhsScore2 = 100d;
+
         public const bool fixForGekko4_0 = false;
 
         public const string cacheExtension = ".cache";  //used for libraries and databanks (models have .mdl)

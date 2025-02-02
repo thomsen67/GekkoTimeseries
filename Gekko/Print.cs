@@ -508,8 +508,10 @@ namespace Gekko
             //}
 
             if (type == EPrintTypes.Plot)
-            {                
-                string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, new PlotHelper(), smpl.p);
+            {
+                PlotHelper plotHelper = new PlotHelper();
+                //if (Program.options.bugfix_plot) plotHelper.isDecompPlot = true;
+                string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, plotHelper, smpl.p);
                 if (Globals.browserPlotFiles != null) Globals.browserPlotFiles.Add(fileName);
             }
             else if (type == EPrintTypes.Sheet)
