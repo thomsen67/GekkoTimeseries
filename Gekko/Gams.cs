@@ -1456,18 +1456,22 @@ namespace Gekko
                 //string eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(t), false);                
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
                 if (t.EqualsGekkoTime(helper.time) && !temp.ContainsKey(helper.resultingFullName))
-                {
-                    //add to temp, scores.add(eqNameWithLag)
+                {                    
                     temp.Add(helper.resultingFullName, 0);
                     GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
                     scores.Add(helper.resultingFullName, scores2);
                                   
                     string lhs = model.modelGamsScalar.lhsEquations.Get(helper.resultingFullName);
+                    if (lhs == null)
+                    {
+                        //WHAT TO DO?
+                        //WHAT TO DO?
+                        //WHAT TO DO?
+                    }
                     //double d = double.MaxValue;
                     string[] ss = helper.resultingFullName.Split('[');
                     string eqNameWithoutIndex = ss[0];
-                    //string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName);  //Note: what about lagged/leaded equation???
-                    List<string> lhsVars = Program.LhsVars(eqNameWithoutIndex, modelGams);
+                    List<string> lhsVarsWithoutAnyIndexes = Program.LhsVars(eqNameWithoutIndex, modelGams);
                     //TODO: break in loop?
                     //bool hit1 = false;
                     foreach (PeriodAndVariable dp in modelGamsScalar.precedents[n].vars)
@@ -1477,12 +1481,21 @@ namespace Gekko
                         //GekkoTime tHere = modelGamsScalar.FromTimeIntegerToGekkoTime(dp.date);                        
                         if (G.EqualHandleBlanks(lhs, varName)) score += Globals.lhsScore2; //100                        
                         bool hit2 = false;
-                        foreach (string s in lhsVars)
+                        foreach (string s in lhsVarsWithoutAnyIndexes)
                         {
                             if (G.EqualHandleBlanks(varName.Split('[')[0], s)) { hit2 = true; break; }
                         }
                         if (hit2) score += Globals.lhsScore1; //0.5
-                        scores2.Add(varName, score);
+                        if (scores2.ContainsKey(varName))
+                        {
+                            //OVERWRITE???
+                            //OVERWRITE???
+                            //OVERWRITE???
+                        }
+                        else
+                        {
+                            scores2.Add(varName, score);
+                        }
                     }
                 }
             }            
