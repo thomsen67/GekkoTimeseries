@@ -984,6 +984,9 @@ namespace Gekko
         [ProtoMember(33)]
         public GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
 
+        [ProtoMember(34)]
+        public GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> lhsEquations2 = new GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>>();
+
         // =============================================
         // =============================================
         // =============================================

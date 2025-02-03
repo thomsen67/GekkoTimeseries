@@ -4398,6 +4398,7 @@ namespace Gekko
         }
 
 
+
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable pchy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
@@ -4417,11 +4418,32 @@ namespace Gekko
             return null;
         }
 
+        [MyCustom(Lag = "lag=13")]  //alias for pchy()
+        public static IVariable pcha(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            return pchy(smplOriginal, smpl, _t1, _t2, x1);
+        }
+
+
+
+
+
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable diffy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             return dify(smplOriginal, smpl, _t1, _t2, x1);
         }
+
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable diffa(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            return dify(smplOriginal, smpl, _t1, _t2, x1);
+        }
+
+
+
+
+
 
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable dify(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
@@ -4436,10 +4458,19 @@ namespace Gekko
             else
             {
                 new Error("dify() function only valid for time series arguments");
-                //throw new GekkoException();
             }
             return null;
         }
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable difa(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            return dify(smplOriginal, smpl, _t1, _t2, x1);
+        }
+
+
+
+
+
 
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable dlogy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
@@ -4459,6 +4490,16 @@ namespace Gekko
             }
             return null;
         }
+
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable dloga(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            return dlogy(smplOriginal, smpl, _t1, _t2, x1);
+        }
+
+
+
+
 
         private static int SeriesLagYNumber(Series x1_series)
         {

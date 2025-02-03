@@ -1438,7 +1438,7 @@ namespace Gekko
             return lhsEquations;
         }
 
-        public static void LhsScore(GekkoTime t, Model model)
+        public static GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> LhsScore(GekkoTime t, Model model)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;                       
@@ -1456,51 +1456,33 @@ namespace Gekko
                 //string eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(t), false);                
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
                 if (t.EqualsGekkoTime(helper.time) && !temp.ContainsKey(helper.resultingFullName))
-                {                    
+                {
                     temp.Add(helper.resultingFullName, 0);
                     GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
                     scores.Add(helper.resultingFullName, scores2);
-                                  
                     string lhs = model.modelGamsScalar.lhsEquations.Get(helper.resultingFullName);
-                    if (lhs == null)
-                    {
-                        //WHAT TO DO?
-                        //WHAT TO DO?
-                        //WHAT TO DO?
-                    }
-                    //double d = double.MaxValue;
                     string[] ss = helper.resultingFullName.Split('[');
                     string eqNameWithoutIndex = ss[0];
-                    List<string> lhsVarsWithoutAnyIndexes = Program.LhsVars(eqNameWithoutIndex, modelGams);
-                    //TODO: break in loop?
-                    //bool hit1 = false;
+                    List<string> beforeEqualSignNoIndexes = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
                     foreach (PeriodAndVariable dp in modelGamsScalar.precedents[n].vars)
                     {
                         double score = Globals.lhsScore0;
                         string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                        if (scores2.ContainsKey(varName)) continue;
                         //GekkoTime tHere = modelGamsScalar.FromTimeIntegerToGekkoTime(dp.date);                        
-                        if (G.EqualHandleBlanks(lhs, varName)) score += Globals.lhsScore2; //100                        
+                        if (lhs != null && G.EqualHandleBlanks(lhs, varName)) score += Globals.lhsScore2; //100                        
                         bool hit2 = false;
-                        foreach (string s in lhsVarsWithoutAnyIndexes)
+                        foreach (string s in beforeEqualSignNoIndexes)
                         {
                             if (G.EqualHandleBlanks(varName.Split('[')[0], s)) { hit2 = true; break; }
                         }
-                        if (hit2) score += Globals.lhsScore1; //0.5
-                        if (scores2.ContainsKey(varName))
-                        {
-                            //OVERWRITE???
-                            //OVERWRITE???
-                            //OVERWRITE???
-                        }
-                        else
-                        {
-                            scores2.Add(varName, score);
-                        }
+                        if (hit2) score += Globals.lhsScore1; //0.5                                                
+                        scores2.Add(varName, score);
                     }
                 }
-            }            
-            
-            return;
+            }
+
+            return scores;
         }
 
         /// <summary>
@@ -1516,6 +1498,21 @@ namespace Gekko
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
+
+            if (true)
+            {
+                foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
+                {
+                    string eqName = kvp1.Key;
+                    foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.GetDictionaryForIteration())
+                    {
+                        if (G.Equal(variableName, kvp2.Key))
+                        {
+                            double score = kvp2.Value;
+                        }
+                    }
+                }
+            }
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
@@ -1560,7 +1557,7 @@ namespace Gekko
                     if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
                 }
                 if (hit1) eqHelper.score += Globals.lhsScore2; //100
-                List<string> lhsVars = Program.LhsVars(eqNameWithoutIndex, modelGams);
+                List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
                 bool hit2 = false;
                 foreach (string s in lhsVars)
                 {

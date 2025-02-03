@@ -2526,7 +2526,7 @@ namespace Gekko
         /// <param name="eqName"></param>
         /// <param name="modelGams"></param>
         /// <returns></returns>
-        public static List<string> LhsVars(string eqName, ModelGams modelGams)
+        public static List<string> BeforeEqualSign(string eqName, ModelGams modelGams)
         {            
             List<string> rv = new List<string>();
             if (modelGams == null)
@@ -19011,7 +19011,7 @@ namespace Gekko
                     try
                     {
                         //TODO TODO .Add(-1)
-                        GamsModel.LhsScore(model.modelGamsScalar.absoluteT2.Add(-1), model);  //"Lhs"-score for each equation
+                        model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.absoluteT2.Add(-1), model);  //"Lhs"-score for each equation
                     }
                     catch
                     {
