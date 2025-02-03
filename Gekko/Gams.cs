@@ -1497,22 +1497,7 @@ namespace Gekko
         public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime t, Model model, bool isFindWindow)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-            ModelGams modelGams = model.modelGams;
-
-            if (true)
-            {
-                foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
-                {
-                    string eqName = kvp1.Key;
-                    foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.GetDictionaryForIteration())
-                    {
-                        if (G.Equal(variableName, kvp2.Key))
-                        {
-                            double score = kvp2.Value;
-                        }
-                    }
-                }
-            }
+            ModelGams modelGams = model.modelGams;            
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
@@ -1567,6 +1552,43 @@ namespace Gekko
             }
 
             List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                        
+            if (true)
+            {
+                List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
+                foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
+                {
+                    string eqName = kvp1.Key;
+                    foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.GetDictionaryForIteration())
+                    {
+                        if (G.Equal(variableName, kvp2.Key))
+                        {
+                            double score = kvp2.Value;
+                            EqInfoSimple simple = new EqInfoSimple();
+                            simple.eqName = eqName;
+                            simple.score = score;
+                            eqsNewA2.Add(simple);
+                        }
+                    }                    
+                }
+                List<EqInfoSimple> eqsNewA = eqsNewA2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                if (eqsNew.Count != eqsNewA.Count)
+                {
+                }
+                else
+                {
+                    for (int i = 0; i < eqsNew.Count; i++)
+                    {
+                        if (!G.Equal(G.Chop_RemoveIndex(eqsNew[i].eqName), eqsNewA[i].eqName))
+                        {
+                        }
+                        if (eqsNew[i].score != eqsNewA[i].score)
+                        {
+                        }
+                    }
+                }
+            }            
+            
             return eqsNew;
         }
 

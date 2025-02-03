@@ -4551,15 +4551,17 @@ namespace Gekko
             if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) i = Globals.freqASubperiods;
             else if (x1_series.freq == EFreq.Q) i = Globals.freqQSubperiods;
             else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods;
+            else new Error("You cannot show annual change for higher frequencies than monthly (difa(), pcha() or dloga()).");
             return i;
         }
 
         private static int SeriesLagQNumber(Series x1_series)
         {
             int i = 1;
-            if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) new Error("You cannot show quarterly change for an annual series");
+            if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) new Error("You cannot show quarterly change for an annual or undated series (difq(), pchq() or dlogq()).");
             else if (x1_series.freq == EFreq.Q) i = 1;
             else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+            else new Error("You cannot show quarterly change for higher frequencies than monthly (difq(), pchq() or dlogq()).");
             return i;
         }
 
