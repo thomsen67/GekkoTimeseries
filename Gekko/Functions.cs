@@ -4407,7 +4407,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagYNumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagANumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
             {
@@ -4424,9 +4424,24 @@ namespace Gekko
             return pchy(smplOriginal, smpl, _t1, _t2, x1);
         }
 
-
-
-
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable pchq(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            if (G.IsGekkoNull(x1)) return x1;
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                Series x1_series = x1 as Series;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagQNumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
+            }
+            else
+            {
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("pchq(): type " + x1.Type().ToString() + " not supported" + s);
+            }
+            return null;
+        }
 
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable diffy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
@@ -4440,11 +4455,6 @@ namespace Gekko
             return dify(smplOriginal, smpl, _t1, _t2, x1);
         }
 
-
-
-
-
-
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable dify(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
@@ -4453,7 +4463,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], SeriesLagYNumber(x1_series));  // (x1, x2) => x1 - x2;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], SeriesLagANumber(x1_series));  // (x1, x2) => x1 - x2;
             }
             else
             {
@@ -4468,9 +4478,28 @@ namespace Gekko
         }
 
 
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable difq(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            if (G.IsGekkoNull(x1)) return x1;
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                Series x1_series = x1 as Series;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], SeriesLagQNumber(x1_series));  // (x1, x2) => x1 - x2;
+            }
+            else
+            {
+                new Error("difq() function only valid for time series arguments");
+            }
+            return null;
+        }
 
-
-
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable diffq(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            return difq(smplOriginal, smpl, _t1, _t2, x1);
+        }
 
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable dlogy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
@@ -4480,7 +4509,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagYNumber(x1_series));  // Math.Log(x1 / x2);
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagANumber(x1_series));  // Math.Log(x1 / x2);
             }
             else
             {
@@ -4497,13 +4526,40 @@ namespace Gekko
             return dlogy(smplOriginal, smpl, _t1, _t2, x1);
         }
 
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable dlogq(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            if (G.IsGekkoNull(x1)) return x1;
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                Series x1_series = x1 as Series;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagQNumber(x1_series));  // Math.Log(x1 / x2);
+            }
+            else
+            {
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("dlogy(): type " + x1.Type().ToString() + " not supported" + s);
+            }
+            return null;
+        }
 
-        private static int SeriesLagYNumber(Series x1_series)
+        private static int SeriesLagANumber(Series x1_series)
         {
             int i = 1;
             if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) i = Globals.freqASubperiods;
             else if (x1_series.freq == EFreq.Q) i = Globals.freqQSubperiods;
             else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods;
+            return i;
+        }
+
+        private static int SeriesLagQNumber(Series x1_series)
+        {
+            int i = 1;
+            if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) new Error("You cannot show quarterly change for an annual series");
+            else if (x1_series.freq == EFreq.Q) i = 1;
+            else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
             return i;
         }
 
