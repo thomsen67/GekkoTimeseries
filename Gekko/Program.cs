@@ -19011,7 +19011,10 @@ namespace Gekko
                     try
                     {
                         //TODO TODO .Add(-1)
-                        model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.absoluteT2.Add(-1), model);  //"Lhs"-score for each equation
+                        if (Program.options.bugfix_lhsscore)
+                        {
+                            model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.absoluteT2.Add(-1), model);  //"Lhs"-score for each equation
+                        }
                     }
                     catch
                     {

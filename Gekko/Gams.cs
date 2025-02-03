@@ -1448,6 +1448,26 @@ namespace Gekko
 
             GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> scores = new GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>>();
 
+
+
+
+
+
+            //int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+            //if (aNumber == -12345)
+            //{
+            //    new Error(Decomp.NonFoundInModelError(variableName, modelGamsScalar));
+            //}
+            //int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(t));
+            //PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+
+            //List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+
+
+
+
+
+
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             int n = -1;
             foreach (string eqName in modelGamsScalar.dict_FromEqNumberToEqName)
@@ -1457,9 +1477,11 @@ namespace Gekko
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
                 if (t.EqualsGekkoTime(helper.time) && !temp.ContainsKey(helper.resultingFullName))
                 {
-                    temp.Add(helper.resultingFullName, 0);
+                    //temp.Add(helper.resultingFullName, 0);
+                    string withLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(t), false);
+                    temp.Add(withLag, 0);
                     GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
-                    scores.Add(helper.resultingFullName, scores2);
+                    scores.Add(withLag, scores2);
                     string lhs = model.modelGamsScalar.lhsEquations.Get(helper.resultingFullName);
                     string[] ss = helper.resultingFullName.Split('[');
                     string eqNameWithoutIndex = ss[0];
@@ -1552,8 +1574,8 @@ namespace Gekko
             }
 
             List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                        
-            if (true)
+
+            if (Program.options.bugfix_lhsscore)                
             {
                 List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
                 foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())

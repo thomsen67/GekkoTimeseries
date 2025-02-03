@@ -48,8 +48,9 @@ namespace Gekko
         public bool bugfix_nullseries = true;      //not mentioned in help, fixes create x; x <dyn> = x[-1] + 1, and the like.
         public bool bugfix_speed = true;           //not mentioned in help, faster series statements
         public bool bugfix_decomp_jacobi = true;   //not mentioned in help, better matrix for inversion
-        public bool bugfix_disp = true;            //not mentioned in help, set false for old link generation for gekko models
-        public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT
+        public bool bugfix_disp = false;            //not mentioned in help, set false for old link generation for gekko models
+        public bool bugfix_plot = false;            //not mentioned in help, set false for old PLOT
+        public bool bugfix_lhsscore = false;        //not mentioned in help, set false for old PLOT
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -168,7 +169,7 @@ namespace Gekko
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "both";  //lhs|eqname|both
         public bool model_gams_scalar_data = false;  //set yes to read data from a scalar model gams.gms file. But does not work...
-        public string model_gams_scalar_disp = "modern";  //uses DECOMP logic for precedents/dependents
+        public string model_gams_scalar_disp = "standard";  //standard|modern --> with "modern" uses DECOMP logic for precedents/dependents
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //default | gams
         // ---
@@ -376,6 +377,7 @@ namespace Gekko
             Add("BUGFIX DECOMP JACOBI", Globals.xbool);
             Add("BUGFIX DISP", Globals.xbool);
             Add("BUGFIX PLOT", Globals.xbool);
+            Add("BUGFIX LHSSCORE", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
