@@ -304,10 +304,10 @@ namespace Gekko.Parser.Frm
                             wh2.rightHandSideCsCode.Append("max(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
-                        else if (G.Equal(function, "dlog") || G.Equal(function, "dlogy"))
+                        else if (G.Equal(function, "dlog") || G.Equal(function, "dloga") || G.Equal(function, "dlogy"))
                         {
                             int lag = 1;
-                            if (G.Equal(function, "dlogy"))
+                            if (G.Equal(function, "dloga") || G.Equal(function, "dlogy"))
                             {
                                 lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -363,10 +363,10 @@ namespace Gekko.Parser.Frm
                             d.Add(e);
                             d.Add(subTree);
                         }
-                        else if (G.Equal(function, "pch") || G.Equal(function, "pchy"))
+                        else if (G.Equal(function, "pch") || G.Equal(function, "pcha") || G.Equal(function, "pchy"))
                         {
                             int lag = 1;
-                            if (G.Equal(function, "pchy"))
+                            if (G.Equal(function, "pcha") || G.Equal(function, "pchy"))
                             {
                                 lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -474,10 +474,10 @@ namespace Gekko.Parser.Frm
                             c.Add(c1);
                             c.Add(c2);
                         }
-                        else if (G.Equal(function, "dif") || G.Equal(function, "diff") || G.Equal(function, "dify") || G.Equal(function, "diffy"))
+                        else if (G.Equal(function, "dif") || G.Equal(function, "diff") || G.Equal(function, "difa") || G.Equal(function, "diffa") || G.Equal(function, "dify") || G.Equal(function, "diffy"))
                         {
                             int lag = 1;
-                            if (G.Equal(function, "dify") || G.Equal(function, "diffy"))
+                            if (G.Equal(function, "difa") || G.Equal(function, "diffa") || G.Equal(function, "dify") || G.Equal(function, "diffy"))
                             {
                                 lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -876,10 +876,10 @@ namespace Gekko.Parser.Frm
                             root1 = new ASTNodeSimple("ASTFUNCTION", "exp");
                             root1.Add(root0);
                         }
-                        else if (G.Equal(wh2.leftSideFunction, "dlog") || G.Equal(wh2.leftSideFunction, "dlogy"))
+                        else if (G.Equal(wh2.leftSideFunction, "dlog") || G.Equal(wh2.leftSideFunction, "dloga") || G.Equal(wh2.leftSideFunction, "dlogy"))
                         {
                             int lag = 1;
-                            if (G.Equal(wh2.leftSideFunction, "dlogy"))
+                            if (G.Equal(wh2.leftSideFunction, "dloga") || G.Equal(wh2.leftSideFunction, "dlogy"))
                             {
                                 lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -897,10 +897,10 @@ namespace Gekko.Parser.Frm
                             child2.Add(new ASTNodeSimple("exp"));
                             child2.Add(root0);
                         }
-                        else if (G.Equal(wh2.leftSideFunction, "pch") || G.Equal(wh2.leftSideFunction, "pchy"))
+                        else if (G.Equal(wh2.leftSideFunction, "pch") || G.Equal(wh2.leftSideFunction, "pcha") || G.Equal(wh2.leftSideFunction, "pchy"))
                         {
                             int lag = 1;
-                            if (G.Equal(wh2.leftSideFunction, "pchy"))
+                            if (G.Equal(wh2.leftSideFunction, "pcha") || G.Equal(wh2.leftSideFunction, "pchy"))
                             {
                                 lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -922,10 +922,10 @@ namespace Gekko.Parser.Frm
                             child2.Add(child21);
                             child2.Add(child22);
                         }
-                        else if (G.Equal(wh2.leftSideFunction, "dif") || G.Equal(wh2.leftSideFunction, "diff") || G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
+                        else if (G.Equal(wh2.leftSideFunction, "dif") || G.Equal(wh2.leftSideFunction, "diff") || G.Equal(wh2.leftSideFunction, "difa") || G.Equal(wh2.leftSideFunction, "diffa") || G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                         {
                             int lag = 1;
-                            if (G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
+                            if (G.Equal(wh2.leftSideFunction, "difa") || G.Equal(wh2.leftSideFunction, "diffa") || G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                             {
                                 lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.

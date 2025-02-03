@@ -4498,9 +4498,6 @@ namespace Gekko
         }
 
 
-
-
-
         private static int SeriesLagYNumber(Series x1_series)
         {
             int i = 1;
