@@ -10323,7 +10323,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname)
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, StringBuilder print)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -10336,11 +10336,12 @@ namespace Gekko
                     Series ts = kvp.Value as Series;
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
+                    if (print != null) th1.type = ETraceHelper.GetAllMetasAndTracesPrint;
                     ts.DeepTrace(th1);
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
-                        TraceGetPrecedentsHelper(trace, bankname, found);
-                    }
+                        TraceGetPrecedentsHelper(trace, bankname, found, print);
+                    }                    
                 }
             }
             else
@@ -10362,7 +10363,7 @@ namespace Gekko
                 ts.DeepTrace(th1);
                 foreach (Trace2 trace in th1.traces.Keys)
                 {
-                    TraceGetPrecedentsHelper(trace, bankname, found);
+                    TraceGetPrecedentsHelper(trace, bankname, found, print);
                 }
             }
 
@@ -10375,16 +10376,54 @@ namespace Gekko
         /// <param name="trace"></param>
         /// <param name="bankname"></param>
         /// <param name="found"></param>
-        private static void TraceGetPrecedentsHelper(Trace2 trace, string bankname, GekkoDictionary<string, bool> found)
+        private static void TraceGetPrecedentsHelper(Trace2 trace, string bankname, GekkoDictionary<string, bool> found, StringBuilder print)
         {
             List<string> precedentsNames = trace.traceContents.precedentsNames;
             if (precedentsNames != null)
-            {
-                foreach (string pname in precedentsNames)
+            {                
+                List<string> names = new List<string>();
+                if (print != null)
                 {
-                    string aname = TraceGetPrecedentsHelper2(bankname, pname);
-                    if (aname != null && !found.ContainsKey(aname))
-                        found.Add(aname, false);
+                    foreach (string pname in precedentsNames)
+                    {
+                        string aname = TraceGetPrecedentsHelper2(bankname, pname);
+                        if (aname != null)
+                        {
+                            names.Add(G.Chop_AddBank(G.Chop_RemoveFreq(aname), "adambk"));
+                        }
+                    }
+                }
+
+                if (names.Count > 0)
+                {
+                    print.AppendLine(G.Chop_RemoveBank(G.Chop_RemoveFreq(trace.traceContents.name)));
+                    print.AppendLine(Stringlist.GetListWithCommas(names));
+                    print.AppendLine(trace.traceContents.period.t1 + "-" + trace.traceContents.period.t2);
+                    print.AppendLine(trace.traceContents.text);
+
+                    //s1 = this.GetContents().text;
+                    //string period = this.GetContents().period.t1 + "-" + this.GetContents().period.t2;
+                    //int len = "---".Length;
+                    //if (s1 != null) len = s1.Length;
+                    //s2 += G.Blanks(50 - len - 2 * d) + " --> period: " + period;
+                    ////s2 += ", stamp: " + this.GetId().stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOW!
+                    //s2 += ", stamp: " + this.GetId().StampInLocalTime().ToString("g", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
+
+
+                    print.AppendLine();
+                    print.AppendLine("---------------------------");
+                    print.AppendLine();
+                }
+                else
+                {
+                    foreach (string pname in precedentsNames)
+                    {
+                        string aname = TraceGetPrecedentsHelper2(bankname, pname);
+                        if (aname != null && !found.ContainsKey(aname))
+                        {
+                            found.Add(aname, false);
+                        }
+                    }
                 }
             }
         }
@@ -10404,7 +10443,6 @@ namespace Gekko
             {
                 aname = G.Chop_RemoveBank(s); //TODO: could be faster, but is inside an IF, so oh well...                        
             }
-
             return aname;
         }
 

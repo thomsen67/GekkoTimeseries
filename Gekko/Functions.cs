@@ -5960,6 +5960,26 @@ namespace Gekko
             temp[2] = new ScalarString("precedents");
             return tracebank(smpl, _t1, _t2, temp);
         }
+
+        public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            //precedents
+            StringBuilder print = new StringBuilder();
+            found = Program.TraceGetPrecedents(null, "adambk", print);
+            if (true)
+            {
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "xxx.txt", null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(print);
+                    sw.Flush();
+                    sw.Close();
+                }
+            }
+        }
+        
+
         public static IVariable tracebank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             //bankname, precOrDep
@@ -5997,9 +6017,9 @@ namespace Gekko
                 GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
                 if (type == ETraceBank.Precedents)
-                {                    
-                    //precedents
-                    found = Program.TraceGetPrecedents(ivName, bankname);
+                {
+                    //precedents                                  
+                    found = Program.TraceGetPrecedents(ivName, bankname, null);                    
                 }
                 else
                 {

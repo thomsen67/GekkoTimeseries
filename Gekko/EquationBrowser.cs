@@ -1289,7 +1289,7 @@ namespace Gekko
                     GekkoDictionary<string, bool> found = null;
                     try
                     {
-                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk");
+                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk", null);
                     }
                     catch { };
                     if (found != null && found.Count > 0)
