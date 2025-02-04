@@ -5965,14 +5965,14 @@ namespace Gekko
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             //precedents
-            StringBuilder print = new StringBuilder();
-            found = Program.TraceGetPrecedents(null, "adambk", print);
+            TraceBankHelpler helper = new TraceBankHelpler();
+            found = Program.TraceGetPrecedents(null, "adambk", helper);
             if (true)
             {
                 using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "xxx.txt", null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
-                    sw.Write(print);
+                    sw.Write(helper.print);
                     sw.Flush();
                     sw.Close();
                 }
@@ -6015,7 +6015,7 @@ namespace Gekko
                 else new Error("Tracebank(): the type must be 'precedents' or 'dependents'");
 
                 GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
+                
                 if (type == ETraceBank.Precedents)
                 {
                     //precedents                                  

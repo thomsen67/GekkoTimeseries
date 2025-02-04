@@ -3022,7 +3022,7 @@ namespace Gekko
                 {
                     if (this.meta != null)
                     {
-                        if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesPrint || th.type == ETraceHelper.OnlyGetMetas) th.metas.Add(this.meta);
+                        if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.OnlyGetMetas) th.metas.Add(this.meta);
                         if (this.meta.trace2 != null && th.type != ETraceHelper.OnlyGetMetas)
                         {
                             this.meta.trace2.DeepTrace(th, Globals.traceDeepStartDepth);

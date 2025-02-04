@@ -401,6 +401,11 @@ namespace Gekko
         public List<GekkoTime> dates = new List<GekkoTime>();
     }
 
+    public class TraceBankHelpler
+    {
+        public StringBuilder print = new StringBuilder();
+    }
+
     public class DependencyTracking
     {
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -10323,7 +10328,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, StringBuilder print)
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, TraceBankHelpler helper)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -10336,11 +10341,10 @@ namespace Gekko
                     Series ts = kvp.Value as Series;
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
-                    if (print != null) th1.type = ETraceHelper.GetAllMetasAndTracesPrint;
                     ts.DeepTrace(th1);
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
-                        TraceGetPrecedentsHelper(trace, bankname, found, print);
+                        TraceGetPrecedentsHelper(trace, bankname, found, helper);
                     }                    
                 }
             }
@@ -10363,7 +10367,7 @@ namespace Gekko
                 ts.DeepTrace(th1);
                 foreach (Trace2 trace in th1.traces.Keys)
                 {
-                    TraceGetPrecedentsHelper(trace, bankname, found, print);
+                    TraceGetPrecedentsHelper(trace, bankname, found, helper);
                 }
             }
 
@@ -10376,13 +10380,13 @@ namespace Gekko
         /// <param name="trace"></param>
         /// <param name="bankname"></param>
         /// <param name="found"></param>
-        private static void TraceGetPrecedentsHelper(Trace2 trace, string bankname, GekkoDictionary<string, bool> found, StringBuilder print)
+        private static void TraceGetPrecedentsHelper(Trace2 trace, string bankname, GekkoDictionary<string, bool> found, TraceBankHelpler helper)
         {
             List<string> precedentsNames = trace.traceContents.precedentsNames;
             if (precedentsNames != null)
             {                
                 List<string> names = new List<string>();
-                if (print != null)
+                if (helper != null)
                 {
                     foreach (string pname in precedentsNames)
                     {
@@ -10394,12 +10398,12 @@ namespace Gekko
                     }
                 }
 
-                if (names.Count > 0)
+                if (helper != null && names.Count > 0)
                 {
-                    print.AppendLine(G.Chop_RemoveBank(G.Chop_RemoveFreq(trace.traceContents.name)));
-                    print.AppendLine(Stringlist.GetListWithCommas(names));
-                    print.AppendLine(trace.traceContents.period.t1 + "-" + trace.traceContents.period.t2);
-                    print.AppendLine(trace.traceContents.text);
+                    helper.print.AppendLine(G.Chop_RemoveBank(G.Chop_RemoveFreq(trace.traceContents.name)));
+                    helper.print.AppendLine(Stringlist.GetListWithCommas(names));
+                    helper.print.AppendLine(trace.traceContents.period.t1 + "-" + trace.traceContents.period.t2);
+                    helper.print.AppendLine(trace.traceContents.text);
 
                     //s1 = this.GetContents().text;
                     //string period = this.GetContents().period.t1 + "-" + this.GetContents().period.t2;
@@ -10410,9 +10414,9 @@ namespace Gekko
                     //s2 += ", stamp: " + this.GetId().StampInLocalTime().ToString("g", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
 
 
-                    print.AppendLine();
-                    print.AppendLine("---------------------------");
-                    print.AppendLine();
+                    helper.print.AppendLine();
+                    helper.print.AppendLine("---------------------------");
+                    helper.print.AppendLine();
                 }
                 else
                 {

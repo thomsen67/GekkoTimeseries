@@ -57,7 +57,6 @@ namespace Gekko
     public enum ETraceHelper
     {        
         GetAllMetasAndTraces,
-        GetAllMetasAndTracesPrint,
         OnlyGetMetas,
         TrimWithTimeShadowing,
         Scramble  //not actually used for traces
@@ -619,7 +618,7 @@ namespace Gekko
 
         public void DeepTrace(TraceHelper th, int depth)
         {
-            if (th.type == ETraceHelper.GetAllMetasAndTraces || (th.type == ETraceHelper.GetAllMetasAndTracesPrint && depth <= int.MaxValue))  //0 corresponds to direct effect from bank variable (e.g. "adambk:"), not indirect effect.
+            if (th.type == ETraceHelper.GetAllMetasAndTraces)  //0 corresponds to direct effect from bank variable (e.g. "adambk:"), not indirect effect.
             {                
                 th.unittestTraceCountIncludeInvisible++; //only for testing
 
@@ -1851,7 +1850,10 @@ namespace Gekko
         //
         // --- this is for time-shadowing        
         public Dictionary<Trace2, string> timeShadowing = new Dictionary<Trace2, string>();
-        
+
+        // --- this is for traceadam2()
+        public TraceBankHelpler helper = null;
+
         /// <summary>
         /// Depth of traces. Returns -1 if no traces are found.
         /// </summary>
