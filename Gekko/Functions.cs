@@ -5969,10 +5969,20 @@ namespace Gekko
             found = Program.TraceGetPrecedents(null, "adambk", helper);
             if (true)
             {
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "xxx.txt", null, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "traceadam2.txt", null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
-                    sw.Write(helper.print);
+                    List<TraceBankHelpler2> temp = helper.elements.OrderBy(xx => xx.makroName).ToList();
+                    foreach (TraceBankHelpler2 element in temp)
+                    {
+                        sw.WriteLine(element.makroName);
+                        sw.WriteLine(element.adamNames);
+                        sw.WriteLine(element.period);
+                        sw.WriteLine(element.code);
+                        sw.WriteLine();
+                        sw.WriteLine("---------------------------");
+                        sw.WriteLine();
+                    }                    
                     sw.Flush();
                     sw.Close();
                 }

@@ -402,8 +402,16 @@ namespace Gekko
     }
 
     public class TraceBankHelpler
+    {        
+        public List<TraceBankHelpler2> elements = new List<TraceBankHelpler2>();        
+    }
+
+    public class TraceBankHelpler2
     {
-        public StringBuilder print = new StringBuilder();
+        public string makroName = null;
+        public string adamNames = null;
+        public string period = null;
+        public string code = null;
     }
 
     public class DependencyTracking
@@ -10400,11 +10408,11 @@ namespace Gekko
 
                 if (helper != null && names.Count > 0)
                 {
-                    helper.print.AppendLine(G.Chop_RemoveBank(G.Chop_RemoveFreq(trace.traceContents.name)));
-                    helper.print.AppendLine(Stringlist.GetListWithCommas(names));
-                    helper.print.AppendLine(trace.traceContents.period.t1 + "-" + trace.traceContents.period.t2);
-                    helper.print.AppendLine(trace.traceContents.text);
-
+                    TraceBankHelpler2 tb = new TraceBankHelpler2();
+                    tb.makroName = G.Chop_RemoveBank(G.Chop_RemoveFreq(trace.traceContents.name));
+                    tb.adamNames = Stringlist.GetListWithCommas(names);
+                    tb.period = trace.traceContents.period.t1 + "-" + trace.traceContents.period.t2;
+                    tb.code = trace.traceContents.text;
                     //s1 = this.GetContents().text;
                     //string period = this.GetContents().period.t1 + "-" + this.GetContents().period.t2;
                     //int len = "---".Length;
@@ -10413,10 +10421,14 @@ namespace Gekko
                     ////s2 += ", stamp: " + this.GetId().stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOW!
                     //s2 += ", stamp: " + this.GetId().StampInLocalTime().ToString("g", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
 
-
-                    helper.print.AppendLine();
-                    helper.print.AppendLine("---------------------------");
-                    helper.print.AppendLine();
+                    if (G.Equal(G.Chop_GetName(tb.makroName), "adam2") || G.Equal(G.Chop_GetName(tb.makroName), "adam_io"))
+                    {
+                        //skip
+                    }
+                    else
+                    {                        
+                        helper.elements.Add(tb);                        
+                    }
                 }
                 else
                 {
