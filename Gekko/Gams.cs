@@ -1575,7 +1575,7 @@ namespace Gekko
 
             List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
-            if (Program.options.bugfix_lhsscore)                
+            if (Program.options.bugfix_lhsscore)               
             {
                 List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
                 foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
@@ -1594,8 +1594,8 @@ namespace Gekko
                     }                    
                 }
                 List<EqInfoSimple> eqsNewA = eqsNewA2.OrderByDescending(x => x.score).ThenBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                if (eqsNew.Count != eqsNewA.Count)
-                {
+                if (eqsNew.Count != eqsNewA.Count) //qwerty
+                {                    
                 }
                 else
                 {

@@ -50,7 +50,7 @@ namespace Gekko
         public bool bugfix_decomp_jacobi = true;   //not mentioned in help, better matrix for inversion
         public bool bugfix_disp = false;            //not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_plot = false;            //not mentioned in help, set false for old PLOT
-        public bool bugfix_lhsscore = false;        //not mentioned in help, set false for old PLOT
+        public bool bugfix_lhsscore = true;        //not mentioned in help qwerty
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
