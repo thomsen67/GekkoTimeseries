@@ -982,7 +982,7 @@ namespace Gekko
         public int fakeVarCounts = -12345;        
 
         [ProtoMember(33)]
-        public GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
+        public GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //keys and values must be without blanks
 
         [ProtoMember(34)]
         public GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> lhsEquations2 = new GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>>();
@@ -1285,9 +1285,9 @@ namespace Gekko
             }
             else
             {
-                foreach (KeyValuePair<string, string> kvp in this.lhsEquations.GetDictionaryForIteration())
+                foreach (KeyValuePair<string, string> kvp in this.lhsEquations)
                 {
-                    if (G.EqualHandleBlanks(kvp.Value, variableName))
+                    if (G.Equal(kvp.Value, variableName))
                     {
                         lhsEqs.Add(kvp.Key);
                     }

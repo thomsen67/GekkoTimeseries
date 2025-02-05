@@ -16883,15 +16883,15 @@ namespace UnitTests
             I("read makro_20241011;");  // --> will actually also pass without reading that databank first
             I("model <gms> makro_20241011.zip;");      
             
-            GekkoDictionaryBlanks<string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
-            GekkoDictionaryBlanks<string> lhsEquations1 = Program.ProtobufRead<GekkoDictionaryBlanks<string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data"); //See #tbjjjdf7hdsfas
+            GekkoDictionary<string, string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
+            GekkoDictionary<string, string> lhsEquations1 = Program.ProtobufRead<GekkoDictionary<string, string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data"); //See #tbjjjdf7hdsfas
             GekkoDictionary<string, bool> dict1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, string> kvp in lhsEquations1.GetDictionaryForIteration()) 
+            foreach (KeyValuePair<string, string> kvp in lhsEquations1) 
             {
                 dict1.Add(kvp.Key + " --> " + kvp.Value, false);
             }
             GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, string> kvp in lhsEquations2.GetDictionaryForIteration())
+            foreach (KeyValuePair<string, string> kvp in lhsEquations2)
             {
                 dict2.Add(kvp.Key + " --> " + kvp.Value, false);
             }

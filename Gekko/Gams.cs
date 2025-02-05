@@ -1061,7 +1061,7 @@ namespace Gekko
         /// if analyzing the equations gets more advanced).
         /// </summary>
         /// <param name="modelGamsScalar"></param>
-        public static GekkoDictionaryBlanks<string> Lhs(Model model)
+        public static GekkoDictionary<string, string> Lhs(Model model)
         {
 
             //Is called with MODEL statement, used for GetSortedEquations() point system.
@@ -1131,7 +1131,7 @@ namespace Gekko
             List<string> varsNoIndex2 = model.modelGamsScalar.GetVars(3);
             foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);
 
-            GekkoDictionaryBlanks<string> lhsEquations = new GekkoDictionaryBlanks<string>();
+            GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             //For each equation name (without indexes)
             foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
@@ -1381,13 +1381,13 @@ namespace Gekko
 
                         if (names.Length > 0) lhsName += "[" + Stringlist.GetListWithCommas(names) + "]";
 
-                        if (Globals.runningOnTTComputer && lhsEquations.ContainsKey(eh.eqName))
+                        if (Globals.runningOnTTComputer && lhsEquations.ContainsKey(G.HandleBlanksRemove(eh.eqName)))
                         {
                             MessageBox.Show("Hovsa6"); //Not possible?
                         }
                         else
                         {
-                            lhsEquations.Add(eh.eqName, lhsName);
+                            lhsEquations.Add(G.HandleBlanksRemove(eh.eqName), G.HandleBlanksRemove(lhsName));
                         }
                     }
                     else
@@ -1503,79 +1503,7 @@ namespace Gekko
                         }
                     }
                 }
-            }
-
-            //List<string> eqs = modelGamsScalar.GetEqs(2);
-            //List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);  //Made by Lhs() method            
-
-
-
-
-
-
-
-
-            //int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-            //if (aNumber == -12345)
-            //{
-            //    new Error(Decomp.NonFoundInModelError(variableName, modelGamsScalar));
-            //}
-            //int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(t));
-            //PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-
-            //List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-
-
-            // For each scalar equation
-            //   Time t is extracted, 
-            //
-            //
-            //
-
-            if (false)
-            {
-
-
-                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                int n = -1;
-                foreach (string eqName in modelGamsScalar.dict_FromEqNumberToEqName)
-                {
-                    if (G.Contains(eqName, "E_rpCInflSnit")) //qwerty
-                    {
-
-                    }
-                    n++;
-                    string eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(t), false);
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
-                    if (t.EqualsGekkoTime(helper.time) && !temp.ContainsKey(helper.resultingFullName))
-                    {
-                        //temp.Add(helper.resultingFullName, 0);
-                        string withLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(t), false);
-                        temp.Add(withLag, 0);
-                        GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
-                        scores.Add(withLag, scores2);
-                        string lhs = model.modelGamsScalar.lhsEquations.Get(helper.resultingFullName);
-                        string[] ss = helper.resultingFullName.Split('[');
-                        string eqNameWithoutIndex = ss[0];
-                        List<string> beforeEqualSignNoIndexes = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
-                        foreach (PeriodAndVariable dp in modelGamsScalar.precedents[n].vars)
-                        {
-                            double score = Globals.lhsScore0;
-                            string varName = modelGamsScalar.GetVarNameA(dp.variable);
-                            if (scores2.ContainsKey(varName)) continue;
-                            //GekkoTime tHere = modelGamsScalar.FromTimeIntegerToGekkoTime(dp.date);                        
-                            if (lhs != null && G.EqualHandleBlanks(lhs, varName)) score += Globals.lhsScore2; //100                        
-                            bool hit2 = false;
-                            foreach (string s in beforeEqualSignNoIndexes)
-                            {
-                                if (G.EqualHandleBlanks(varName.Split('[')[0], s)) { hit2 = true; break; }
-                            }
-                            if (hit2) score += Globals.lhsScore1; //0.5                                                
-                            scores2.Add(varName, score);
-                        }
-                    }
-                }
-            }
+            }            
 
             return scores;
         }
@@ -1592,7 +1520,7 @@ namespace Gekko
         public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime t, Model model, bool isFindWindow)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-            ModelGams modelGams = model.modelGams;            
+            ModelGams modelGams = model.modelGams;
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
@@ -1623,69 +1551,52 @@ namespace Gekko
                 }
             }
 
-            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);  //Made by Lhs() method
-            List<EqInfoSimple> eqsNew2 = Decomp.GetScalarEquations(variableName, t, eqNumbers, model);
-            foreach (EqInfoSimple eqHelper in eqsNew2)
-            {
-                double d = double.MaxValue;
-                string[] ss = eqHelper.eqName.Split('[');
-                string eqNameWithoutIndex = ss[0];
-                string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
-                bool hit1 = false;
-                foreach (string s in lhsEqs)
-                {
-                    if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
-                }
-                if (hit1) eqHelper.score += Globals.lhsScore2; //100
-                List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
-                bool hit2 = false;
-                foreach (string s in lhsVars)
-                {
-                    if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-                }
-                if (hit2) eqHelper.score += Globals.lhsScore1; //0.5
-            }
+            //List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);  //Made by Lhs() method
+            //List<EqInfoSimple> eqsNew2 = Decomp.GetScalarEquations(variableName, t, eqNumbers, model);
+            //foreach (EqInfoSimple eqHelper in eqsNew2)
+            //{
+            //    double d = double.MaxValue;
+            //    string[] ss = eqHelper.eqName.Split('[');
+            //    string eqNameWithoutIndex = ss[0];
+            //    string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
+            //    bool hit1 = false;
+            //    foreach (string s in lhsEqs)
+            //    {
+            //        if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+            //    }
+            //    if (hit1) eqHelper.score += Globals.lhsScore2; //100
+            //    List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
+            //    bool hit2 = false;
+            //    foreach (string s in lhsVars)
+            //    {
+            //        if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
+            //    }
+            //    if (hit2) eqHelper.score += Globals.lhsScore1; //0.5
+            //}
 
-            List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            //List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
-            if (Program.options.bugfix_lhsscore)               
+
+            List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
+            foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
             {
-                List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
-                foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
+                string eqName = kvp1.Key;
+                foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.GetDictionaryForIteration())
                 {
-                    string eqName = kvp1.Key;
-                    foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.GetDictionaryForIteration())
+                    if (G.Equal(variableName, kvp2.Key))
                     {
-                        if (G.Equal(variableName, kvp2.Key))
-                        {
-                            double score = kvp2.Value;
-                            EqInfoSimple simple = new EqInfoSimple();
-                            simple.eqName = null;
-                            simple.eqNameWithLag = eqName;
-                            simple.score = score;
-                            eqsNewA2.Add(simple);
-                        }
-                    }                    
-                }
-                List<EqInfoSimple> eqsNewA = eqsNewA2.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                if (eqsNew.Count != eqsNewA.Count) //qwerty
-                {                    
-                }
-                else
-                {
-                    for (int i = 0; i < eqsNew.Count; i++)
-                    {
-                        if (!G.Equal(eqsNew[i].eqNameWithLag, eqsNewA[i].eqNameWithLag))
-                        {
-                        }
-                        if (eqsNew[i].score != eqsNewA[i].score)
-                        {
-                        }
+                        double score = kvp2.Value;
+                        EqInfoSimple simple = new EqInfoSimple();
+                        simple.eqName = null;
+                        simple.eqNameWithLag = eqName;
+                        simple.score = score;
+                        eqsNewA2.Add(simple);
                     }
                 }
-            }            
-            
-            return eqsNew;
+            }
+            List<EqInfoSimple> eqsNewA = eqsNewA2.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+
+            return eqsNewA;
         }
 
         /// <summary>
