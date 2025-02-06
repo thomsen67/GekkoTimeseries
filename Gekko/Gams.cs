@@ -45,6 +45,17 @@ namespace Gekko
         public List<string> indexes = null;
     }
 
+    [ProtoContract]
+    public class EqHelper
+    {
+        [ProtoMember(1)]
+        public GekkoDictionaryBlanks<double> scores = new GekkoDictionaryBlanks<double>();
+        [ProtoMember(2)]
+        public int eqNumber = -12345;
+        [ProtoMember(3)]
+        public string eqName = null;
+    }
+
     public class EquationLhsPoints
     {
         public string eqname = null;
@@ -1438,12 +1449,12 @@ namespace Gekko
             return lhsEquations;
         }
 
-        public static GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> LhsScore(GekkoTime t, Model model)
+        public static GekkoDictionaryBlanks<EqHelper> LhsScore(GekkoTime t, Model model)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
 
-            GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> scores = new GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>>();
+            GekkoDictionaryBlanks<EqHelper> scores = new GekkoDictionaryBlanks<EqHelper>();
 
             if (true)
             {
@@ -1493,12 +1504,15 @@ namespace Gekko
                         if (hit2) eqHelper.score += Globals.lhsScore1; //0.5
                         if (scores.ContainsKey(eqHelper.eqNameWithLag))
                         {
-                            scores.Get(eqHelper.eqNameWithLag).Add(variableName, eqHelper.score);
+                            scores.Get(eqHelper.eqNameWithLag).scores.Add(variableName, eqHelper.score);
                         }
                         else
                         {
-                            GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
-                            scores2.Add(variableName, eqHelper.score);
+                            //GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
+                            EqHelper scores2 = new EqHelper();
+                            scores2.eqNumber = eqHelper.eqNumber;
+                            scores2.eqName = eqHelper.eqName;
+                            scores2.scores.Add(variableName, eqHelper.score);
                             scores.Add(eqHelper.eqNameWithLag, scores2);
                         }
                     }
@@ -1578,18 +1592,19 @@ namespace Gekko
 
 
             List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
-            foreach (KeyValuePair<string, GekkoDictionaryBlanks<double>> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
+            foreach (KeyValuePair<string, EqHelper> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
             {
                 string eqName = kvp1.Key;
-                foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.GetDictionaryForIteration())
+                foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.scores.GetDictionaryForIteration())
                 {
                     if (G.Equal(variableName, kvp2.Key))
                     {
                         double score = kvp2.Value;
                         EqInfoSimple simple = new EqInfoSimple();
-                        simple.eqName = null;
+                        simple.eqName = kvp1.Value.eqName;
                         simple.eqNameWithLag = eqName;
                         simple.score = score;
+                        simple.eqNumber = kvp1.Value.eqNumber;
                         eqsNewA2.Add(simple);
                     }
                 }

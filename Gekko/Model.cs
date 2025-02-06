@@ -985,7 +985,7 @@ namespace Gekko
         public GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //keys and values must be without blanks
 
         [ProtoMember(34)]
-        public GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>> lhsEquations2 = new GekkoDictionaryBlanks<GekkoDictionaryBlanks<double>>();
+        public GekkoDictionaryBlanks<EqHelper> lhsEquations2 = new GekkoDictionaryBlanks<EqHelper>();
 
         // =============================================
         // =============================================
