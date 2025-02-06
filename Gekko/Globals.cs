@@ -59,6 +59,7 @@ namespace Gekko
         public const string decompDimension2 = "dims";
         public const string decompUniversal = "#universal";
         public const string decompNoLag = "[0]";
+        public const int decompPeriodDistanceFromEndPeriod = -1;
         //
         public const string col_variable = "vars";
         public const string col_lag = "lags";

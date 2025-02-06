@@ -1531,10 +1531,11 @@ namespace Gekko
         /// <param name="variableName"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime t, Model model, bool isFindWindow)
+        public static List<EqInfoSimple> GetSortedEquations(string variableName, Model model, bool isFindWindow)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
+            GekkoTime t = modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
@@ -1564,32 +1565,6 @@ namespace Gekko
                     else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
                 }
             }
-
-            //List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);  //Made by Lhs() method
-            //List<EqInfoSimple> eqsNew2 = Decomp.GetScalarEquations(variableName, t, eqNumbers, model);
-            //foreach (EqInfoSimple eqHelper in eqsNew2)
-            //{
-            //    double d = double.MaxValue;
-            //    string[] ss = eqHelper.eqName.Split('[');
-            //    string eqNameWithoutIndex = ss[0];
-            //    string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
-            //    bool hit1 = false;
-            //    foreach (string s in lhsEqs)
-            //    {
-            //        if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
-            //    }
-            //    if (hit1) eqHelper.score += Globals.lhsScore2; //100
-            //    List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
-            //    bool hit2 = false;
-            //    foreach (string s in lhsVars)
-            //    {
-            //        if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-            //    }
-            //    if (hit2) eqHelper.score += Globals.lhsScore1; //0.5
-            //}
-
-            //List<EqInfoSimple> eqsNew = eqsNew2.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-
 
             List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
             foreach (KeyValuePair<string, EqHelper> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())

@@ -183,7 +183,7 @@ namespace Gekko
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(item.fullName, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            this.FindSetButtons(item.fullName, helper, this.decompFind.model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod), decompFind.model);
             this._activeEquation = item.fullName;
         }
 

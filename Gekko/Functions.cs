@@ -5963,7 +5963,7 @@ namespace Gekko
 
         public static void lhs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.absoluteT2.Add(-1), Program.model);  //"Lhs"-score for each equation
+            Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod), Program.model);  //"Lhs"-score for each equation
         }
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)

@@ -5916,6 +5916,8 @@ namespace Gekko
                     return;
                 }
                 ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
+                GekkoTime t = Program.model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
+
                 if (modelGamsScalar == null)
                 {                    
                     using (Error txt = new Error())
@@ -5946,7 +5948,7 @@ namespace Gekko
 
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 
-                List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, o.tSelected, model, true);
+                List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, model, true);
 
                 List<string> firstList = new List<string>();
 
@@ -5966,7 +5968,7 @@ namespace Gekko
                     string eqName3 = eqHelper.eqNameWithLag;
                     EquationTextHelper helper2 = new EquationTextHelper();
                     helper2.showTime = o.decompFind.decompOptions2.showTime;
-                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, o.tSelected);
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, t);
                     string boolLhs = "";  //lhs                        
                     if (eqHelper.score % 1 == 0) boolLhs = Globals.protectSymbol;
                     string boolName = "";  //name
@@ -5997,7 +5999,7 @@ namespace Gekko
                 windowFind._activeVariable = null;
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = o.decompFind.decompOptions2.showTime;
-                windowFind.FindSetEquation(firstEqName2, helper, o.tSelected, model);
+                windowFind.FindSetEquation(firstEqName2, helper, t, model);
                 windowFind.decompFind.SetWindow(windowFind);
                 windowFind.ShowDialog();
 
