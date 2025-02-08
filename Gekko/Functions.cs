@@ -5963,7 +5963,7 @@ namespace Gekko
 
         public static void lhs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod), Program.model);  //"Lhs"-score for each equation
+            Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.GetDecompT(), Program.model);  //"Lhs"-score for each equation
         }
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
@@ -5978,15 +5978,21 @@ namespace Gekko
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     List<TraceBankHelpler2> temp = helper.elements.OrderBy(xx => xx.makroName).ToList();
+                    string start = "";
                     foreach (TraceBankHelpler2 element in temp)
                     {
-                        sw.WriteLine(element.makroName);
-                        sw.WriteLine(element.adamNames);
-                        sw.WriteLine(element.period);
-                        sw.WriteLine(element.code);
-                        sw.WriteLine();
-                        sw.WriteLine("---------------------------");
-                        sw.WriteLine();
+                        string start2 = element.makroName + "//" + element.adamNames + "//" + element.period + "//" + element.code;
+                        if (start != start2)  //skip already seen (could use trace id, but never mind).
+                        {
+                            sw.WriteLine(element.makroName);
+                            sw.WriteLine(element.adamNames);
+                            sw.WriteLine(element.period);
+                            sw.WriteLine(element.code);
+                            sw.WriteLine();
+                            sw.WriteLine("---------------------------");
+                            sw.WriteLine();
+                        }
+                        start = start2;
                     }                    
                     sw.Flush();
                     sw.Close();

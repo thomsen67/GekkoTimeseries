@@ -1535,14 +1535,13 @@ namespace Gekko
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
-            GekkoTime t = modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
             {
                 new Error(Decomp.NonFoundInModelError(variableName, modelGamsScalar));
             }
-            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(t));
+            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT()));
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
 
             List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);

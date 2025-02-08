@@ -1994,6 +1994,11 @@ namespace Gekko
             return "The GAMS model is defined over the period " + this.absoluteT1.ToString() + " to " + this.absoluteT2.ToString();
         }
 
+        public GekkoTime GetDecompT()
+        {
+            return this.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
+        }
+
     }
 
     [ProtoContract]

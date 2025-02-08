@@ -81,7 +81,7 @@ namespace Gekko
             this._activeVariable = null;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetEquation(_activeEquation, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            this.FindSetEquation(_activeEquation, helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -116,7 +116,7 @@ namespace Gekko
             {
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = this.decompFind.decompOptions2.showTime;
-                this.FindSetEquation(_activeEquation, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
+                this.FindSetEquation(_activeEquation, helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
             }
         }
 
@@ -183,7 +183,7 @@ namespace Gekko
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(item.fullName, helper, this.decompFind.model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod), decompFind.model);
+            this.FindSetButtons(item.fullName, helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
             this._activeEquation = item.fullName;
         }
 
@@ -194,7 +194,7 @@ namespace Gekko
             EquationListItem item = x.Content as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(item.fullName, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            this.FindSetButtons(item.fullName, helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -204,7 +204,7 @@ namespace Gekko
             GekkoTime t0 = this.decompFind.decompOptions2.t1;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(_activeEquation, helper, this.decompFind.decompOptions2.tSelected, decompFind.model);
+            this.FindSetButtons(_activeEquation, helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 

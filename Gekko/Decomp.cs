@@ -5915,8 +5915,7 @@ namespace Gekko
                     new Error("It seems no model is loaded, cf. the MODEL command.");
                     return;
                 }
-                ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-                GekkoTime t = Program.model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
+                ModelGamsScalar modelGamsScalar = model.modelGamsScalar;                
 
                 if (modelGamsScalar == null)
                 {                    
@@ -5968,7 +5967,7 @@ namespace Gekko
                     string eqName3 = eqHelper.eqNameWithLag;
                     EquationTextHelper helper2 = new EquationTextHelper();
                     helper2.showTime = o.decompFind.decompOptions2.showTime;
-                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, t);
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, modelGamsScalar.GetDecompT());
                     string boolLhs = "";  //lhs                        
                     if (eqHelper.score % 1 == 0) boolLhs = Globals.protectSymbol;
                     string boolName = "";  //name
@@ -5999,7 +5998,7 @@ namespace Gekko
                 windowFind._activeVariable = null;
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = o.decompFind.decompOptions2.showTime;
-                windowFind.FindSetEquation(firstEqName2, helper, t, model);
+                windowFind.FindSetEquation(firstEqName2, helper, modelGamsScalar.GetDecompT(), model);
                 windowFind.decompFind.SetWindow(windowFind);
                 windowFind.ShowDialog();
 

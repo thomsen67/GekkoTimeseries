@@ -19068,7 +19068,7 @@ namespace Gekko
                         if (Program.options.bugfix_lhsscore)
                         {
                             new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");  //qwerty
-                            model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod), model);  //"Lhs"-score for each equation
+                            model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
                         }
                     }
                     catch
