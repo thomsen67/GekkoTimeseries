@@ -16503,7 +16503,7 @@ namespace Gekko
                 {
                     if (false && Program.options.bugfix_disp)
                     {
-
+                        //Show links in a more modern way here, if the variable can be identified.
                     }
                     else
                     {
@@ -16601,8 +16601,7 @@ namespace Gekko
         private static bool DispHelperShowGamsEquations(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted, string bank, bool isGams)
         {
             if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.model_gams_scalar_disp, "modern"))
-            {
-                bool showInfluencesAsEquations = false;
+            {                
                 Model model = Program.model;
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);                
@@ -16675,7 +16674,7 @@ namespace Gekko
                     }                    
                     string ss = Stringlist.GetListWithCommas(precedents2);                    
                     new Writeln("Variables: " + ss);
-                    if (showInfluencesAsEquations)
+                    if (Program.options.bugfix_disp_influences_equ)
                     {
                         using (Writeln txt = new Writeln())
                         {
