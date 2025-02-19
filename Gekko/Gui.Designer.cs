@@ -1348,7 +1348,7 @@ namespace Gekko
         }
 
         private void richTextBox1_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {            
+        {
             EEditorStyle style = GetEditorStyle();
 
             bool isLessThanSign = false;
@@ -1470,14 +1470,17 @@ namespace Gekko
                 textBoxMainTabLower.Paste(DataFormats.GetFormat(DataFormats.Text));  //to avoid formatting, colors etc., when pasting from e.g. Word examples, mails etc.
                 e.Handled = true;
             }
-            else if (e.Control && e.KeyCode == Keys.C)
+            else if (e.Control && e.KeyCode == Keys.C)  //Ctrl+X seems to just work without anything like this
             {
                 //
                 // Ctrl+C
                 //
                 if (this.textBoxMainTabLower.SelectedText != null)
                 {
-                    Clipboard.SetText(this.textBoxMainTabLower.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
+                    if (!G.NullOrEmpty(this.textBoxMainTabLower.SelectedText))
+                    {
+                        Clipboard.SetText(this.textBoxMainTabLower.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
+                    }
                 }
                 e.Handled = true;
             }

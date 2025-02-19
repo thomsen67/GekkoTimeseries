@@ -10259,7 +10259,13 @@ namespace Gekko
                 string ss2 = G.FreqAndPeriodPretty(false, false) + banks + "    |    " + workingFolder;
                 WorkerThreadHelper1 wh = new WorkerThreadHelper1();
                 wh.statusField = ss2;
-                Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
+                try
+                {
+                    Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
+                }
+                catch 
+                { 
+                } //This may for instance fail with an illegal copy-paste
             }
 
             int i = 0;
@@ -16495,7 +16501,7 @@ namespace Gekko
                 Program.options.print_width = int.MaxValue;
                 try
                 {
-                    if (Program.options.bugfix_disp)
+                    if (false && Program.options.bugfix_disp)
                     {
 
                     }
@@ -16596,6 +16602,7 @@ namespace Gekko
         {
             if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.model_gams_scalar_disp, "modern"))
             {
+                bool showInfluencesAsEquations = false;
                 Model model = Program.model;
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);                
@@ -16667,11 +16674,48 @@ namespace Gekko
 
                     }                    
                     string ss = Stringlist.GetListWithCommas(precedents2);                    
-                    new Writeln("Variables: " + ss);                    
-                    using (Writeln txt = new Writeln())
+                    new Writeln("Variables: " + ss);
+                    if (showInfluencesAsEquations)
                     {
-                        txt.MainOmitVeryFirstNewLine();
-                        txt.MainAdd("Influences: " + dependentEqs);
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.MainOmitVeryFirstNewLine();
+                            txt.MainAdd("Influences: " + dependentEqs);
+                        }
+                    }
+                    else
+                    {
+                        string vars = null;
+                        string dependentVars = null;
+                        foreach (string eq in eq2)
+                        {
+                            EqHelper eh = modelGamsScalar.lhsEquations2.Get(eq);
+                            if (eh != null)
+                            {
+                                double max = double.MinValue;
+                                string best = null;
+                                foreach (KeyValuePair<string, double> kvp2 in eh.scores.GetDictionaryForIteration())
+                                {
+                                    if (kvp2.Value > max)
+                                    {
+                                        max = kvp2.Value;
+                                        best = kvp2.Key;
+                                    }
+                                }
+                                dependentVars += ", " + best;
+                            }
+                            else
+                            {
+                                dependentVars += "<unknown>" + ", ";
+                            }                            
+                        }
+                        dependentVars = dependentVars.Substring(", ".Length);
+
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.MainOmitVeryFirstNewLine();
+                            txt.MainAdd("Influences: " + dependentVars);
+                        }
                     }
                 }
             }
