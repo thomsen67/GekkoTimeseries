@@ -16619,22 +16619,33 @@ namespace Gekko
                     EqInfoSimple bestEq = eqsContainingVariable[0];
 
                     //Gets dependents: equations that contain the variable                    
-                    string dependentEqs = null;
-                    string dependentEqs2 = null;
-                    List<string> eq2 = new List<string>();
-                    GekkoDictionaryBlanks<int> eq2a = new GekkoDictionaryBlanks<int>();
+                    string dependentEqsWithoutIndexes = null;
+                    string dependentEqsWithIndexes = null;
+                    List<string> eqNamesWithoutIndexesNoTimeList = new List<string>();
+                    List<string> eqNamesWithIndexesNoTimeList = new List<string>();
+                    GekkoDictionaryBlanks<int> eqNamesWithoutIndexesNoTime = new GekkoDictionaryBlanks<int>();
+                    GekkoDictionaryBlanks<int> eqNamesWithIndexesNoTime = new GekkoDictionaryBlanks<int>();
                     foreach (EqInfoSimple eqHelper in eqsContainingVariable)
                     {
-                        string eqName = G.Chop_RemoveIndex(eqHelper.eqName);
-                        if (!eq2a.ContainsKey(eqName)) eq2a.Add(eqName, 0);
+                        string temp1 = G.Chop_RemoveIndex(eqHelper.eqName);
+                        if (!eqNamesWithoutIndexesNoTime.ContainsKey(temp1)) eqNamesWithoutIndexesNoTime.Add(temp1, 0);
+                        string temp2 = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);
+                        if (!eqNamesWithIndexesNoTime.ContainsKey(temp2)) eqNamesWithIndexesNoTime.Add(temp2, 0);
                     }
-                    eq2 = eq2a.GetKeys();
-                    eq2.Sort(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in eq2)
+                    eqNamesWithoutIndexesNoTimeList = eqNamesWithoutIndexesNoTime.GetKeys();
+                    eqNamesWithoutIndexesNoTimeList.Sort(StringComparer.OrdinalIgnoreCase);
+                    eqNamesWithIndexesNoTimeList = eqNamesWithIndexesNoTime.GetKeys();
+                    eqNamesWithIndexesNoTimeList.Sort(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in eqNamesWithoutIndexesNoTimeList)
                     {                        
-                        dependentEqs += ", " + s;
+                        dependentEqsWithoutIndexes += ", " + s;
                     }
-                    dependentEqs = dependentEqs.Substring(", ".Length);                    
+                    dependentEqsWithoutIndexes = dependentEqsWithoutIndexes.Substring(", ".Length);
+                    foreach (string s in eqNamesWithIndexesNoTimeList)
+                    {
+                        dependentEqsWithIndexes += ", " + s;
+                    }
+                    dependentEqsWithIndexes = dependentEqsWithIndexes.Substring(", ".Length);
 
                     using (Writeln txt = new Writeln())
                     {
@@ -16679,14 +16690,14 @@ namespace Gekko
                         using (Writeln txt = new Writeln())
                         {
                             txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd("Influences: " + dependentEqs);
+                            txt.MainAdd("Influences: " + dependentEqsWithoutIndexes);
                         }
                     }
                     else
                     {
                         string vars = null;
                         string dependentVars = null;
-                        foreach (string eq in eq2)
+                        foreach (string eq in eqNamesWithIndexesNoTimeList)
                         {
                             EqHelper eh = modelGamsScalar.lhsEquations2.Get(eq);
                             if (eh != null)
