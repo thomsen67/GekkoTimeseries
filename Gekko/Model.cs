@@ -972,6 +972,8 @@ namespace Gekko
         /// </summary>
         public GekkoTime perpetualT2 = GekkoTime.tNull;
 
+        public List<string> varnamesWithoutDimensions = null;  //cache, not protobuffed
+
         [ProtoMember(29)]
         public ModelInfoGamsScalar modelInfoGamsScalar = null; //contains just statistics for when the model loads from cache. Nothing serious here.
 
@@ -1026,6 +1028,7 @@ namespace Gekko
 
         /// <summary>
         /// Here, varNumber is number without time dimension, used in the a array.
+        /// The string does not contain blanks around commas.
         /// </summary>
         /// <param name="varNumber"></param>
         /// <returns></returns>
@@ -1038,6 +1041,7 @@ namespace Gekko
         /// <summary>
         /// For an equation number, get the string names of precedents. If showTime is false, a list like "x", "x[-1]"
         /// is returned, else a list like "x[2001]", "x[2000]" is returned. In the latter case, t0 can be set to TNull.
+        /// The names do not contain blanks around commas.
         /// </summary>
         /// <param name="eqNumber"></param>
         /// <param name="showTime"></param>
@@ -1611,7 +1615,7 @@ namespace Gekko
 
         /// <summary>
         /// Variables. Type 1 = all. Type 2 = omit time dimension (corresponds to a-array variables). Type 3 = omit all dimensions.
-        /// See also CountVars().
+        /// See also CountVars(). Type 3 takes time, but the result is cached for later reuse.
         /// </summary>
         /// <returns></returns>
         public List<string> GetVars(int type)
@@ -1627,13 +1631,22 @@ namespace Gekko
             }
             else if (type == 3)
             {
-                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s2 in this.dict_FromVarNumberToVarName)
+                //Now uses a cache to speed up
+                if (this.varnamesWithoutDimensions != null)
                 {
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
-                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                    rv = this.varnamesWithoutDimensions;  //retrieve from cache
                 }
-                rv = temp.Keys.ToList();
+                else
+                {
+                    GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s2 in this.dict_FromANumberToVarName)
+                    {
+                        string name = G.Chop_GetName(s2);                        
+                        if (!temp.ContainsKey(name)) temp.Add(name, 0);
+                    }
+                    rv = temp.Keys.ToList();
+                    this.varnamesWithoutDimensions = new List<string>(rv);  //cloned and put into cache, 958
+                }
             }
             else new Error("Unexpected");
             rv.Sort();

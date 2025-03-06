@@ -2169,6 +2169,38 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Removes a string like for instance "x[i, j]" in the list of strings "a", "b", "X[i,j]", "c", because
+        /// blanks are ignored and case does not matter.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static void HandleBlanksRemove(List<string> m, string s)
+        {
+            List<string> m2 = new List<string>();
+            bool hit = false;
+            foreach (string x in m)
+            {
+                if (G.EqualHandleBlanks(s, x))
+                {
+                    hit = true;
+                }
+                else
+                {                    
+                    m2.Add(x);
+                }
+            }
+            if (hit)
+            {
+                m.Clear();
+                foreach (string x in m2)
+                {
+                    m.Add(x);
+                }
+            }            
+        }
+
+        /// <summary>
         /// Resurrects blank characters around commas, cf. HandleBlanksRemove().
         /// Note "a,b,c,'d,e,f',h" becomes --> "a, b, c, 'd,e,f', h". So inside quotes is not touched.
         /// </summary>

@@ -179,14 +179,14 @@ namespace Gekko
                 return this.mmi.GetName();
             }
             else return this.name;
-        }
+        }        
 
         /// <summary>
         /// Returns a string like "b1:y2"
         /// </summary>
         /// <returns></returns>
         public string GetNameAndParentDatabank()
-        {
+        {            
             string rv = null;
             string name = this.GetName();
             string parentDatabank = null;
@@ -2586,7 +2586,8 @@ namespace Gekko
 
                         //we start checking out settings (may be null). These origin from FindIVariableFromString(), will be null in normal expressions etc.
 
-                        if (settings?.create == O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)
+                        //On 6/3 2025, added O.ECreatePossibilities.NoneReturnNullAlways just below. So that x[a] can return null if [a] element is not found.
+                        if (settings?.create == O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries || settings?.create == O.ECreatePossibilities.NoneReturnNullAlways)
                         {
                             rv = null;  //just return null
                         }

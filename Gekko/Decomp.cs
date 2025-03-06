@@ -6520,7 +6520,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Converts from ints into something understandable
+        /// Converts from ints into something understandable. The name does not contain blanks around commas.
         /// </summary>
         /// <returns></returns>
         public Tuple<string, GekkoTime> GetVariableAndPeriod(ModelGamsScalar modelGamsScalar)
