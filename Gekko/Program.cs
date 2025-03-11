@@ -16599,7 +16599,7 @@ namespace Gekko
         /// <returns></returns>
         private static bool DispHelperShowGamsEquations(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted, string bank, bool isGams)
         {
-            if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.model_gams_scalar_disp, "modern"))
+            if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.print_disp_model_gams_scalar, "modern"))
             {
                 //
                 // MODERN LOOK FOR SCALAR MODELS
@@ -16723,6 +16723,9 @@ namespace Gekko
                                     if (hit) ts2 = O.GetIVariableFromString(mm, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                     if (ts2 != null)
                                     {
+                                        //
+                                        // This is the math equation, with links inserted
+                                        //
                                         Action<GAO> a = (gao) =>
                                         {
                                             DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, true, ts2, mm, bank, isGams);
@@ -16741,10 +16744,8 @@ namespace Gekko
                             }                            
                         }
                         new Writeln(resulting, "", int.MaxValue, Color.Empty, false, ETabs.Main);
-                    }
-                                        
-                    //new Writeln(helper22.s_gekkoSyntax, "", int.MaxValue, Color.Empty, false, ETabs.Main);
-
+                    }                                        
+                    
                     //Gets precedents (variables found in the equation)
                     EquationTextHelper helper2 = new EquationTextHelper();
                     helper2.showTime = false;
@@ -16752,15 +16753,22 @@ namespace Gekko
                     precedents.Sort(StringComparer.OrdinalIgnoreCase);
                     //G.HandleBlanksRemove(precedents, varnameWithoutFreq); //keep own name in list, nice if sets are used.
                     List<string> precedents2 = new List<string>();
+                    //
+                    // This is the list of variables in the math equation, with links inserted
+                    //
                     ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, precedents, precedents2);
                     string ss = Stringlist.GetListWithCommas(precedents2);
-                    new Writeln("Variables: " + ss);
+                    using (Writeln txt = new Writeln("Variables:  ", -12345, Color.Empty, false, ETabs.Main))
+                    {
+                        txt.MainAdd(ss);
+                    }
+
                     if (Program.options.bugfix_disp_influences_equ)
                     {
-                        using (Writeln txt = new Writeln())
+                        using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
                         {
                             txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd("Influences: " + dependentEqsWithoutIndexes);
+                            txt.MainAdd(dependentEqsWithoutIndexes);
                         }
                     }
                     else
@@ -16798,11 +16806,14 @@ namespace Gekko
                         dependentVarsList.Sort(StringComparer.OrdinalIgnoreCase);
                         dependentVars = Stringlist.GetListWithCommas(dependentVarsList);
                         List<string> dependentVarsList2 = new List<string>();
+                        //
+                        // This is the list of variables influenced by the variable, with links inserted
+                        //
                         ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, dependentVarsList, dependentVarsList2);
-                        using (Writeln txt = new Writeln())
+                        using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
                         {
                             txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd("Influences: " + Stringlist.GetListWithCommas(dependentVarsList2));
+                            txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2));
                         }
                     }
                 }

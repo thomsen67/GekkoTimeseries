@@ -211,7 +211,7 @@ namespace Gekko
             string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_vars_foldername;
 
             BrowserCleanupFolders(rootFolder, subFolder);
-
+            
             //index.html and styles.css is copied to root folder of browser system
             List<string> filesToCopy = new List<string>();
             filesToCopy.Add(settings_index_filename);
