@@ -1554,16 +1554,22 @@ namespace Gekko
         [STAThread]
         public void toolStripButton1_Click(object sender, EventArgs e)
         {
+            //Browse backwards, see also browse forwards, see #ayfs6afdsahfd
             if (Gui.gui.tabControl1.SelectedIndex == 0)
             {
                 if (Program.guiBrowseNumber < 2) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 2];
                 Program.guiBrowseNumber += -2;  //1 will be added later, when calling "disp". Net result: -1.
-
+                List<string> temp = new List<string>();
+                temp.Add(var);
+                
+                if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.print_disp_model_gams_scalar, "modern"))
+                {
+                    //Hmmm, no difference between this and the below anyway...
+                    Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
+                }
                 if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
                 {
-                    List<string> temp = new List<string>();
-                    temp.Add(var);
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
                 else
@@ -1591,19 +1597,24 @@ namespace Gekko
             }
         }
 
-
-
         public void toolStripButton2_Click(object sender, EventArgs e)
         {
+            //Browse forwards, see also browse backwards, #ayfs6afdsahfd
             if (Gui.gui.tabControl1.SelectedIndex == 0)
             {
                 if (Program.guiBrowseNumber >= Program.guiBrowseHistory.Count) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 0];
                 Program.guiBrowseNumber += 0;  //1 will be added later, when calling "disp". Net result: 1.
-                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
+                List<string> temp = new List<string>();
+                temp.Add(var);
+
+                if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.print_disp_model_gams_scalar, "modern"))
                 {
-                    List<string> temp = new List<string>();
-                    temp.Add(var);
+                    //Hmmm, no difference between this and the below anyway...
+                    Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
+                }
+                else if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
+                {                    
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
                 gui.textBoxMainTabLower.Focus();
