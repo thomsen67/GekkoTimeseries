@@ -176,6 +176,111 @@ namespace Gekko
         Unknown
     }
 
+    public class Masks
+    {
+
+        Dictionary<MultidimItem, MaskPeriods> storage = new Dictionary<MultidimItem, MaskPeriods>();
+
+        public bool Get(MultidimItem mmi, GekkoTime t)
+        {
+            bool rv = false;
+            MaskPeriods p = this.GetPeriods(mmi);
+            if (p == null)
+            {
+                //return false
+            }
+            else
+            {
+                int offset = t.Subtract(p.t0);
+                if (offset < 0 || offset >= p.ba.Length)
+                {
+                    //do nothing, keep it false
+                }
+                else
+                {
+                    rv = p.ba.Get(offset);
+                }
+            }
+            return rv;
+        }
+
+        public void Set(MultidimItem mmi, GekkoTime t)
+        {
+            int minEnlarge = 32;  //BitArray is internally an int[].
+            MaskPeriods p = this.GetPeriods(mmi);
+
+            if (p == null)
+            {
+                p = new MaskPeriods();
+                p.t0 = t;
+                p.ba = new BitArray(minEnlarge);
+                p.ba.Set(0, true);
+                this.storage.Add(mmi, p);
+            }
+            else
+            {
+                int offset = t.Subtract(p.t0);
+                if (offset < 0)
+                {
+                    //Must enlarge and move
+                    int n1 = p.ba.Length;
+                    int enlarge = G.RoundUpToNearest32(p.ba.Length - offset);
+                    p.ba = Masks.EnlargeBitArrayLeft(p.ba, enlarge, false);
+                    int n2 = p.ba.Length;
+                    p.t0 = p.t0.Add(n1 - n2);
+                    offset += n2 - n1;
+                }
+                else if (offset >= p.ba.Length)
+                {
+                    p.ba.Length = G.RoundUpToNearest32(offset + 1);  //with offset == 32, we then get 64
+                }
+                p.ba.Set(offset, true);                
+            }
+        }        
+
+        /// <summary>
+        /// Tries to find an array of active periods
+        /// </summary>
+        /// <param name="mmi"></param>
+        /// <returns></returns>
+        private MaskPeriods GetPeriods(MultidimItem mmi)
+        {
+            MaskPeriods p = null; this.storage.TryGetValue(mmi, out p);
+            return p;
+        }
+
+        public static BitArray EnlargeBitArrayLeft(BitArray original, int newSize, bool fillValue)
+        {
+            if (newSize <= original.Length) new Error("New size must be larger than the original size.");
+            // Create a new BitArray with the desired size
+            BitArray newArray = new BitArray(newSize, fillValue);
+            // Convert BitArray to bool array for fast copying
+            bool[] originalArray = new bool[original.Length];
+            original.CopyTo(originalArray, 0);
+            bool[] newArrayData = new bool[newSize];
+            // Fast block copy to shifted position
+            Array.Copy(originalArray, 0, newArrayData, newSize - original.Length, original.Length);
+            // Convert back to BitArray
+            return new BitArray(newArrayData);
+        }       
+    }
+
+    public class MaskPeriods 
+    {
+        public GekkoTime t0 = GekkoTime.tNull;
+        public BitArray ba = null;
+
+        public string ToString()
+        {
+            string s = null;
+            for (int i = 0; i < this.ba.Length; i++)
+            {
+                if (this.ba[i]) s += (t0.Add(i)).ToString() + " ";
+            }
+            return s;
+        }
+    }
+
     public class EquationHelper2 
     {
         public string eqName = null;
@@ -2572,6 +2677,29 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (Globals.runningOnTTComputer)
+            {                
+                Masks m = new Masks();
+                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
+                m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
+                                
+                bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
+                bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
+
+                bool b4 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                bool b5 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                
+            }
+
             if (Globals.runningOnTTComputer && (text == "d"))
             {
                 //GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
@@ -16314,7 +16442,7 @@ namespace Gekko
 
                 GekkoTime first = ts.GetRealDataPeriodFirst();
                 GekkoTime last = ts.GetRealDataPeriodLast();
-
+                                
                 G.Write(type3);
                 string stamp = null;
                 if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
@@ -16379,7 +16507,6 @@ namespace Gekko
                                 G.Writeln("Fixed: " + s);
                             }
                         }
-
                     }
                 }
 
@@ -16637,9 +16764,9 @@ namespace Gekko
                         if (!eqNamesWithIndexesNoTime.ContainsKey(temp2)) eqNamesWithIndexesNoTime.Add(temp2, 0);
                     }
                     eqNamesWithoutIndexesNoTimeList = eqNamesWithoutIndexesNoTime.GetKeys();
-                    eqNamesWithoutIndexesNoTimeList.Sort(StringComparer.OrdinalIgnoreCase);
+                    eqNamesWithoutIndexesNoTimeList.Sort(G.CompareNaturalIgnoreCase);
                     eqNamesWithIndexesNoTimeList = eqNamesWithIndexesNoTime.GetKeys();
-                    eqNamesWithIndexesNoTimeList.Sort(StringComparer.OrdinalIgnoreCase);
+                    eqNamesWithIndexesNoTimeList.Sort(G.CompareNaturalIgnoreCase);
                     foreach (string s in eqNamesWithoutIndexesNoTimeList)
                     {
                         dependentEqsWithoutIndexes += ", " + s;
@@ -16750,7 +16877,7 @@ namespace Gekko
                     EquationTextHelper helper2 = new EquationTextHelper();
                     helper2.showTime = false;
                     List<string> precedents = modelGamsScalar.GetPrecedentsNames(bestEq.eqNumber, helper2, tUsedHere);
-                    precedents.Sort(StringComparer.OrdinalIgnoreCase);
+                    precedents.Sort(G.CompareNaturalIgnoreCase);
                     //G.HandleBlanksRemove(precedents, varnameWithoutFreq); //keep own name in list, nice if sets are used.
                     List<string> precedents2 = new List<string>();
                     //
@@ -16773,6 +16900,7 @@ namespace Gekko
                     }
                     else
                     {
+                        string eq1 = "$$$"; string eq2 = "equation ";
                         string vars = null;
                         string dependentVars = null;
                         GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
@@ -16791,19 +16919,31 @@ namespace Gekko
                                         best = kvp2.Key;
                                     }
                                 }
-                                if (!dependentVarsDict.ContainsKey(best)) dependentVarsDict.Add(best, 0);
-                                //dependentVars += ", " + best;
+                                if (!dependentVarsDict.ContainsKey(best))
+                                {
+                                    if (false && max <= Globals.lhsScore0)
+                                    {
+                                        // Switched off for now
+                                        //
+                                        //The variable is not recognized from eq name and is not on LHS
+                                        //Will this ever happen? Rarely probably, no variable on LHS...
+                                        dependentVarsDict.Add(eq1 + G.Chop_DimensionRemoveLast_FASTER(eh.eqName), 0);
+                                    }
+                                    else
+                                    {
+                                        dependentVarsDict.Add(best, 0);
+                                    }
+                                }
                             }
                             else
                             {
                                 if (!dependentVarsDict.ContainsKey("<unknown>")) dependentVarsDict.Add("<unknown>", 0);
-                                //dependentVars += "<unknown>" + ", ";
                             }
                         }
 
                         List<string> dependentVarsList = dependentVarsDict.GetKeys();                        
                         G.HandleBlanksRemove(dependentVarsList, varnameWithoutFreq); //do not show own name
-                        dependentVarsList.Sort(StringComparer.OrdinalIgnoreCase);
+                        dependentVarsList.Sort(G.CompareNaturalIgnoreCase);
                         dependentVars = Stringlist.GetListWithCommas(dependentVarsList);
                         List<string> dependentVarsList2 = new List<string>();
                         //
@@ -16813,7 +16953,7 @@ namespace Gekko
                         using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
                         {
                             txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2));
+                            txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2).Replace(eq1, eq2));
                         }
                     }
                 }
@@ -19225,7 +19365,9 @@ namespace Gekko
                     if (false) GamsModel.GamsGMO();
                     try
                     {
+                        DateTime dt = DateTime.Now;
                         model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
+                        if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt));
                     }
                     catch 
                     {
@@ -19238,7 +19380,9 @@ namespace Gekko
                         if (Program.options.bugfix_lhsscore)
                         {
                             //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
+                            DateTime dt = DateTime.Now;
                             model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
+                            if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
                         }
                     }
                     catch

@@ -7482,6 +7482,47 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_BitArray()
+        {
+            Masks m = new Masks();
+            for (int i = -300; i < 300; i++)
+            {
+                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + i, 1));
+
+                for (int ii = -500; ii <= 500; ii++)
+                {
+                    if (ii >= -300 && ii <= i)
+                    {
+                        Assert.IsTrue(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                    }
+                    else
+                    {
+                        Assert.IsFalse(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                    }
+                }
+            }
+
+            m = new Masks();
+            for (int i = 300; i >= -300; i--)
+            {
+                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + i, 1));
+
+                for (int ii = -500; ii <= 500; ii++)
+                {
+                    if (ii >= i && ii <= 300)
+                    {
+                        Assert.IsTrue(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                    }
+                    else
+                    {
+                        Assert.IsFalse(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                    }
+                }
+            }
+        }
+
+
+        [TestMethod]
         public void _Test_ModelRunAfter()
         {
             for (int i = 0; i < 3; i++)

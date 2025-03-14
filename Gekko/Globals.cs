@@ -185,9 +185,9 @@ namespace Gekko
         public const string decompResidualText2 = " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
         public const double redNaN = 1000000d;
         public const int decompTimelessNumber = 0;
-        public const double lhsScore0 = 0.5d;
-        public const double lhsScore1 = 0.5d;
-        public const double lhsScore2 = 100d;
+        public const double lhsScore0 = 0.5d;  //start-score
+        public const double lhsScore1 = 0.5d;  //if left of equals sign
+        public const double lhsScore2 = 100d;  //if name corresponds to equation name
 
         public const bool fixForGekko4_0 = false;
 

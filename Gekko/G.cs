@@ -2594,6 +2594,12 @@ namespace Gekko
             return 0;
         }
 
+        public static int RoundUpToNearest32(int value)
+        {
+            int d = (value + 31) & ~31;
+            return d;
+        }
+
         /// <summary>
         /// Helper class for natural file listing sorting 
         /// (a8, a9, a10, a11 instead of a10, a11, a8, a9). Will ignore case, and
