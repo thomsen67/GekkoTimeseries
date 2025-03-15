@@ -1009,7 +1009,8 @@ namespace Gekko
                 index2 = ResizeDataArray(gt2); //this would never change index1, since slots are added at the end                            
             }
 
-            double[] temp = null;
+            double[] temp = null;                                   
+
             if (hasSkips || replaceNaNWith0)
             {
                 for (int i = 0; i < index2 - index1 + 1; i++)

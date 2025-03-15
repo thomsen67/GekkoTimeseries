@@ -231,6 +231,7 @@ namespace Gekko
         // Protobuf tuning end
         // ------------------------------------------------------------
 
+        public static bool useMasks = true;
         public const string dimensionWithoutDomain = "*";
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
         public const string rootError1 = "This is not allowed, in order to avoid confusion. Please change your Gekko working folder (File --> Set working folder...) and try again.";
@@ -1050,7 +1051,8 @@ namespace Gekko
         public static double missingVariableArtificialNumberLow = 2.999e303d;
         public static double missingVariableArtificialNumberHigh = 3.001e303d;
         public static double skippedObservationArtificialNumber = 3e302d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
-        
+        public static double eps = 1e-300;
+
         public static char pxInternalDelimiter = '¤';
 
         public static GekkoDictionary<string, int> suggestions = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);

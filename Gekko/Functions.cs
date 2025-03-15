@@ -5966,13 +5966,28 @@ namespace Gekko
             Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.GetDecompT(), Program.model);  //"Lhs"-score for each equation
         }
 
-        public static void missings(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        public static IVariable eps(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            if (x.Length == 0) new Error("Expected missings() to have > 0 arguments");
+            return new ScalarVal(Globals.eps);
+        }
+
+        public static void expand(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            //Only eps values are expanded!
+            //
+            if (x.Length != 2) new Error("Function expand() has wrong number of arguments");
             Series ts = x[0] as Series;
             if (ts.type != ESeriesType.ArraySuper) new Error("Expected an array-series as argument");
-            ts.missings = new Masks();  //will record any missings encountered.
-            ts.masks = null;
+            GekkoTime gt = O.ConvertToDate(x[1]);
+            foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+            {
+                MultidimItem item = kvp.Key;
+                Series subseries = kvp.Value as Series;
+                double vlag = subseries.GetDataSimple(gt.Add(-1));
+                if (vlag == Globals.eps) subseries.SetData(gt, vlag);
+            }
+            //ts.missings = new Masks();  //will record any missings encountered.
+            //ts.masks = null;
         }
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)

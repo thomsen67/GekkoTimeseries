@@ -23058,6 +23058,41 @@ print(df2)
             I("CLONE;");
             u = Data("fy", 2006, "a"); Assert.AreEqual(u.w, u.b); Assert.AreEqual(u.w, fy0 + 100); //both 100 higher now
         }
+        
+
+            [TestMethod]
+        public void _Test_Masks()
+        {
+            I("reset;");
+            I("time 2001 2005;");
+            I("x = series(2);");
+            I("x[a,b] = m();");
+            I("x[a,b] <2001 2001> = 100;");  //Dataframe
+            I("x.expand(2002);");
+            I("x[a,b] <2002 2002> = 110;");  //Dataframe
+            _AssertSeries(First(), "x!a", new string[] { "a", "b" }, 2002, 110d, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2005;");
+            I("x = series(2);");
+            I("x[a,b] = m();");
+            I("x[a,b] <2001 2001> = 100;");  //Dataframe
+            I("x.expand(2002);");
+            _AssertSeries(First(), "x!a", new string[] { "a", "b" }, 2002, double.NaN, sharedDelta);
+
+            //Because of missings-errors, we set eps for 2002
+
+            I("reset;");
+            I("time 2001 2005;");
+            I("x = series(2);");
+            I("x[a,b] = m();");
+            I("x[a,b] <2001 2001> = 100;");  //Dataframe
+            I("x.expand(2002);");
+            I("x[a,b] <2002 2002> = eps();");
+            _AssertSeries(First(), "x!a", new string[] { "a", "b" }, 2002, 0d, sharedDelta);
+
+
+        }
 
         [TestMethod]
         public void _Test_Sys()

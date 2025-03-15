@@ -59,6 +59,13 @@ namespace Gekko
         Pause
     }
 
+    public enum EMasks
+    {
+        None,
+        IsRecordingMissings,
+        IsUsingMasks
+    }
+
     public enum EDataTrace
     {
         None,
