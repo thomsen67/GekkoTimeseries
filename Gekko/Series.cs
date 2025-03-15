@@ -138,6 +138,9 @@ namespace Gekko
         
         public MultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
+                
+        public Masks masks = null; //are missings allowed?
+        public Masks missings = null; //are missings encountered and turned into 0?
 
         private Series()
         {

@@ -5966,6 +5966,15 @@ namespace Gekko
             Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.GetDecompT(), Program.model);  //"Lhs"-score for each equation
         }
 
+        public static void missings(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            if (x.Length == 0) new Error("Expected missings() to have > 0 arguments");
+            Series ts = x[0] as Series;
+            if (ts.type != ESeriesType.ArraySuper) new Error("Expected an array-series as argument");
+            ts.missings = new Masks();  //will record any missings encountered.
+            ts.masks = null;
+        }
+
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
