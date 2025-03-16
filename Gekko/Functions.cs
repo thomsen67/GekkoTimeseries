@@ -5973,7 +5973,7 @@ namespace Gekko
 
         public static void expand(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            //Only eps values are expanded!
+            //Only eps values are expanded, and only if they expand into NaN!
             //
             if (x.Length != 2) new Error("Function expand() has wrong number of arguments");
             Series ts = x[0] as Series;
@@ -5983,8 +5983,12 @@ namespace Gekko
             {
                 MultidimItem item = kvp.Key;
                 Series subseries = kvp.Value as Series;
-                double vlag = subseries.GetDataSimple(gt.Add(-1));
-                if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps, true);
+                double v = subseries.GetDataSimple(gt);
+                if (G.isNumericalError(v))
+                {
+                    double vlag = subseries.GetDataSimple(gt.Add(-1));
+                    if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps, true);
+                }
             }            
         }
 
