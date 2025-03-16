@@ -230,8 +230,7 @@ namespace Gekko
         // ------------------------------------------------------------
         // Protobuf tuning end
         // ------------------------------------------------------------
-
-        public static bool useMasks = true;
+                
         public const string dimensionWithoutDomain = "*";
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
         public const string rootError1 = "This is not allowed, in order to avoid confusion. Please change your Gekko working folder (File --> Set working folder...) and try again.";
