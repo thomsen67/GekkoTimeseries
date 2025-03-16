@@ -23098,37 +23098,46 @@ print(df2)
             //Because of missings-errors, we set eps for 2002. Later, data for 2003 is added, too.
             //In 2004, we add a non-missing
 
-            I("reset;");
-            I("time 2001 2005;");
-            I("#i = a,;");
-            I("#j = b, c;");
-            I("x = series(2);");
-            I("x[a,b] = m();");
-            I("x[a,c] = m();");
-            I("x[a,b] <2001 2001> = 100;");  //Dataframe
-            I("x[a,c] <2001 2001> = 200;");  //Dataframe
-            // ---------------------------------------------------------
-            I("x.expand(2002);");
-            I("x[a,b] <2002 2002> = 110;");  //Dataframe
-            //Dataframe: combination [a,c][2002] is missing
-            I("x[a,c] <2002 2002> = eps();");  // <---------- MASK
-            // ---------------------------------------------------------
-            I("x.expand(2003);");
-            I("x[a,b] <2003 2003> = 120;");  //Dataframe
-            //Dataframe: combination [a,c][2003] is missing
-            //Mask for [a,c][2003] is not necessary
-            // ---------------------------------------------------------
-            I("expand(x, 2004);");
-            I("x[a,b] <2004 2004> = 130;");  //Dataframe
-            FAIL("x[a,c] <2004 2004> = 230;");  //Dataframe, fails
-            I("activate(x[a,c], 2004);");
-            I("x[a,c] <2004 2004> = 230;");  //Dataframe
-            // ---------------------------------------------------------
-            I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
-            _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2002, 110d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2003, 120d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2004, 360d, sharedDelta);
+            for (int i = 0; i < 2; i++)
+            {
+
+                I("reset;");
+                I("time 2001 2005;");
+                I("x = series(2);");
+                I("#i = a,;");
+                if (i == 0) I("#j = b, c;");
+                else
+                {
+                    I("x[a, d] = eps();");
+                    I("#j = b, c, d;");
+                }                
+                I("x[a,b] = m();");
+                I("x[a,c] = m();");
+                I("x[a,b] <2001 2001> = 100;");  //Dataframe
+                I("x[a,c] <2001 2001> = 200;");  //Dataframe                
+                // ---------------------------------------------------------
+                I("expand(x, 2002);");
+                I("x[a,b] <2002 2002> = 110;");  //Dataframe
+                //Dataframe: combination [a,c][2002] is missing
+                I("x[a,c] <2002 2002> = eps();");  // <---------- MASK
+                // ---------------------------------------------------------
+                I("expand(x, 2003);");
+                I("x[a,b] <2003 2003> = 120;");  //Dataframe
+                //Dataframe: combination [a,c][2003] is missing
+                //Mask for [a,c][2003] is not necessary
+                // ---------------------------------------------------------
+                I("expand(x, 2004);");
+                I("x[a,b] <2004 2004> = 130;");  //Dataframe
+                FAIL("x[a,c] <2004 2004> = 230;");  //Dataframe, fails
+                I("activate(x[a,c], 2004);");
+                I("x[a,c] <2004 2004> = 230;");  //Dataframe                
+                // ---------------------------------------------------------
+                I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
+                _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 110d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2003, 120d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2004, 360d, sharedDelta);
+            }
         }
 
         [TestMethod]

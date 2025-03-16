@@ -5984,10 +5984,8 @@ namespace Gekko
                 MultidimItem item = kvp.Key;
                 Series subseries = kvp.Value as Series;
                 double vlag = subseries.GetDataSimple(gt.Add(-1));
-                if (vlag == Globals.eps) subseries.SetData(gt, vlag);
-            }
-            //ts.missings = new Masks();  //will record any missings encountered.
-            //ts.masks = null;
+                if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps, true);
+            }            
         }
 
         public static void activate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
