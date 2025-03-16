@@ -5975,8 +5975,8 @@ namespace Gekko
         {
             //Only eps values are expanded, and only if they expand into NaN!
             //
-            if (x.Length != 2) new Error("Function expand() has wrong number of arguments");
-            Series ts = x[0] as Series;
+            if (x.Length != 2) new Error("Function epsclone() has wrong number of arguments");
+            Series ts = Helper_eps(x[0]);
             if (ts.type != ESeriesType.ArraySuper) new Error("Expected an array-series as argument");
             GekkoTime gt = O.ConvertToDate(x[1]);
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
@@ -5989,16 +5989,45 @@ namespace Gekko
                     double vlag = subseries.GetDataSimple(gt.Add(-1));
                     if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps, true);
                 }
-            }            
-        }
+            }
+        }        
 
         public static void epsremove(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {            
-            if (x.Length != 2) new Error("Function expand() has wrong number of arguments");
-            Series ts = x[0] as Series;
+            if (x.Length != 2) new Error("Function epsremove() has wrong number of arguments");            
+            Series ts = Helper_eps(x[0]);
             if (ts.type != ESeriesType.Normal) new Error("Expected an array-subseries as argument");
             GekkoTime gt = O.ConvertToDate(x[1]);
             ts.SetData(gt, double.NaN, true);
+        }
+
+        public static void epsadd(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            if (x.Length == 1)
+            {
+                //The whole subseries is eps'ed
+                string s = O.ConvertToString(x[0]);
+                string s2 = G.Chop_RemoveIndex(s);
+                Series ts = O.GetIVariableFromString(s2, O.ECreatePossibilities.NoneReportError) as Series;
+                if (ts.type != ESeriesType.ArraySuper) new Error("Expected an existing array-series as argument");
+                List<string> index = G.Chop_GetIndex(s);
+                MultidimItem mmi = new MultidimItem(index.ToArray());
+                if (ts.eps == null) ts.eps = new Dictionary<MultidimItem, bool>();
+                if (!ts.eps.ContainsKey(mmi)) ts.eps.Add(mmi, false);
+            }
+            else
+            {
+                new Error("Function epsadd() has wrong number of arguments");
+            }           
+        }
+
+        private static Series Helper_eps(IVariable x)
+        {
+            ScalarString ss = x as ScalarString;
+            if (ss == null) new Error("Expected string as first argument");
+            Series ts = O.GetIVariableFromString(ss.ConvertToString(), O.ECreatePossibilities.NoneReportError) as Series;
+            if (ts == null) new Error("Expected series variable");
+            return ts;
         }
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)

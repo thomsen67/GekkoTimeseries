@@ -138,9 +138,9 @@ namespace Gekko
         
         public MultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
-                
-        public Masks masks = null; //are missings allowed?
-        public Masks missings = null; //are missings encountered and turned into 0?
+
+        [ProtoMember(12)]
+        public Dictionary<MultidimItem, bool> eps = null;
 
         private Series()
         {
@@ -2619,6 +2619,13 @@ namespace Gekko
                             this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
                             rv = ts;
                         }
+                        else if (this.eps != null && this.eps.ContainsKey(new MultidimItem(keys)))
+                        {
+                            //Same behavior as ESeriesMissing.Zero below
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                            ((Series)rv).mmi = new MultidimItem(keys, this);
+                            ((Series)rv).SetTimelessData(0d);
+                        }
                         else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
                         {
                             FindArraySeriesHelper2(keys);  //error
@@ -2631,6 +2638,7 @@ namespace Gekko
                         }
                         else if (Program.options.series_array_calc_missing == ESeriesMissing.Zero)
                         {
+                            //Same behavior as eps.ContainsKey() above
                             rv = new Series(ESeriesType.Timeless, this.freq, name2);
                             ((Series)rv).mmi = new MultidimItem(keys, this);
                             ((Series)rv).SetTimelessData(0d);

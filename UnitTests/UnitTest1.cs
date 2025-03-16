@@ -23072,7 +23072,7 @@ print(df2)
             I("x[a,c] = m();");
             I("x[a,b] <2001 2001> = 100;");  //Dataframe
             I("x[a,c] <2001 2001> = 200;");  //Dataframe
-            I("x.epsclone(2002);");
+            I("epsclone('x', 2002);");
             I("x[a,b] <2002 2002> = 110;");  //Dataframe
             I("x[a,c] <2002 2002> = 120;");  //Dataframe
             I("y <2001 2002> = sum((#i, #j), x[#i, #j]);");
@@ -23088,7 +23088,7 @@ print(df2)
             I("x[a,c] = m();");
             I("x[a,b] <2001 2001> = 100;");  //Dataframe
             I("x[a,c] <2001 2001> = 200;");  //Dataframe
-            I("x.epsclone(2002);");
+            I("epsclone('x', 2002);");
             I("x[a,b] <2002 2002> = 110;");  //Dataframe
             //I("x[a,c] <2002 2002> = 120;");  //Dataframe
             I("y <2001 2002> = sum((#i, #j), x[#i, #j]);");
@@ -23114,7 +23114,8 @@ print(df2)
                 if (i == 0) I("#j = b, c;");
                 else
                 {
-                    I("x[a, d] = eps();");
+                    //I("x[a, d] = eps();");
+                    I("epsadd('x[a,d]');");
                     I("#j = b, c, d;");
                 }                
                 I("x[a,b] = m();");
@@ -23122,20 +23123,20 @@ print(df2)
                 I("x[a,b] <2001 2001> = 100;");  //Dataframe
                 I("x[a,c] <2001 2001> = 200;");  //Dataframe                
                 // ---------------------------------------------------------
-                I("epsclone(x, 2002);");
+                I("epsclone('x', 2002);");
                 I("x[a,b] <2002 2002> = 110;");  //Dataframe
                 //Dataframe: combination [a,c][2002] is missing
                 I("x[a,c] <2002 2002> = eps();");  // <---------- MASK
                 // ---------------------------------------------------------
-                I("epsclone(x, 2003);");
+                I("epsclone('x', 2003);");
                 I("x[a,b] <2003 2003> = 120;");  //Dataframe
                 //Dataframe: combination [a,c][2003] is missing
                 //Mask for [a,c][2003] is not necessary
                 // ---------------------------------------------------------
-                I("epsclone(x, 2004);");
+                I("epsclone('x', 2004);");
                 I("x[a,b] <2004 2004> = 130;");  //Dataframe
                 FAIL("x[a,c] <2004 2004> = 230;");  //Dataframe, fails
-                I("epsremove(x[a,c], 2004);");
+                I("epsremove('x[a,c]', 2004);");
                 I("x[a,c] <2004 2004> = 230;");  //Dataframe                
                 // ---------------------------------------------------------
                 I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
