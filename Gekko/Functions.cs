@@ -5971,7 +5971,7 @@ namespace Gekko
             return new ScalarVal(Globals.eps);
         }
 
-        public static void expand(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        public static void epsclone(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             //Only eps values are expanded, and only if they expand into NaN!
             //
@@ -5992,17 +5992,13 @@ namespace Gekko
             }            
         }
 
-        public static void activate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
-        {
-            //Only eps values are expanded!
-            //
+        public static void epsremove(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {            
             if (x.Length != 2) new Error("Function expand() has wrong number of arguments");
             Series ts = x[0] as Series;
             if (ts.type != ESeriesType.Normal) new Error("Expected an array-subseries as argument");
             GekkoTime gt = O.ConvertToDate(x[1]);
             ts.SetData(gt, double.NaN, true);
-            //ts.missings = new Masks();  //will record any missings encountered.
-            //ts.masks = null;
         }
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
