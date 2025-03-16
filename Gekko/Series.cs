@@ -669,13 +669,18 @@ namespace Gekko
             return this.data.GetDataArray_ONLY_INTERNAL_USE()[0];
         }
 
+        public void SetData(GekkoTime t, double value)
+        {
+            SetData(t, value, false);
+        }
+
         /// <summary>
         /// This sets the observation (period) to the given value.
         /// </summary>
         /// <param name="t">The period.</param>
         /// <param name="value">The value.</param>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
-        public void SetData(GekkoTime t, double value)
+        public void SetData(GekkoTime t, double value, bool allowOverwriteEps)
         {   
             
             // ----------------------------------------------------------------------------
@@ -712,6 +717,19 @@ namespace Gekko
                 //be resized (1.5 times larger).
                 int index = ResizeDataArray(t);
                 //the index is offset safe
+                if (Globals.useEps && !allowOverwriteEps)
+                {
+                    if (this.data.GetDataArray_ONLY_INTERNAL_USE()[index] == Globals.eps)
+                    {
+                        using (Error txt = new Error())
+                        {
+                            string obs = this.GetName() + "[" + t.ToString() + "]";                            ;
+                            txt.MainAdd("You are trying to overwrite " + obs + " with the value " + value + ".");
+                            txt.MainAdd("This is not allowed, because " + obs + " is set to 'eps' (infinitely small value).");
+                            txt.MainAdd("To allow overwriting, use " + this.GetName() + ".activate(" + t.ToString() + "]" + " before this statement.");
+                        }
+                    }
+                }
                 this.data.GetDataArray_ONLY_INTERNAL_USE()[index] = value;
                 //Start and end date for observations are adjusted.
                 //for the first obs put into a new timeseries, both the if's should trigger.

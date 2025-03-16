@@ -23118,9 +23118,11 @@ print(df2)
             //Dataframe: combination [a,c][2003] is missing
             //Mask for [a,c][2003] is not necessary
             // ---------------------------------------------------------
-            I("x.expand(2004);");
+            I("expand(x, 2004);");
             I("x[a,b] <2004 2004> = 130;");  //Dataframe
-            I("x[a,c] <2004 2004> = 230;");  //Dataframe            
+            FAIL("x[a,c] <2004 2004> = 230;");  //Dataframe, fails
+            I("activate(x[a,c], 2004);");
+            I("x[a,c] <2004 2004> = 230;");  //Dataframe
             // ---------------------------------------------------------
             I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
             _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
