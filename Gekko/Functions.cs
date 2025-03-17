@@ -5971,6 +5971,48 @@ namespace Gekko
             return new ScalarVal(Globals.eps);
         }
 
+        // ===============================================================================
+        // ============================ eps start ========================================
+        // ===============================================================================
+
+        /// <summary>
+        /// Adds a new 'eps' to an existing array-superseries, for all possible periods. For epsadd('x[a]'), it will refuse
+        /// if x does not already exist, or if x[a] already exists.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        public static void epsadd(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            string s = O.ConvertToString(x[0]);
+            string s2 = G.Chop_RemoveIndex(s);
+            Series ts = O.GetIVariableFromString(s2, O.ECreatePossibilities.NoneReportError) as Series;
+            if (ts.type != ESeriesType.ArraySuper) new Error("Expected an existing array-series as argument");
+            MultidimItem mmi = new MultidimItem(G.Chop_GetIndex(s).ToArray());
+            if (x.Length == 1)
+            {
+                //The whole subseries is eps'ed                
+                if (ts.dimensionsStorage.storage.ContainsKey(mmi)) new Error("The series " + ts.GetName() + " already contains the element/subseries [" + mmi.GetName() + "]");
+                if (ts.eps == null) ts.eps = new Dictionary<MultidimItem, bool>();
+                if (!ts.eps.ContainsKey(mmi)) ts.eps.Add(mmi, false);
+            }
+            else if (x.Length == 2)
+            {
+                GekkoTime gt = O.ConvertToDate(x[1]);
+                if (!ts.dimensionsStorage.storage.ContainsKey(mmi)) new Error("The series " + ts.GetName() + " does not contain the element/subseries [" + mmi.GetName() + "]");
+                Series subseries = ts.dimensionsStorage.storage[mmi] as Series;
+                if (G.isNumericalError(subseries.GetDataSimple(gt)))
+                {
+                    subseries.SetData(gt, Globals.eps);
+                }
+            }
+            else
+            {
+                new Error("Function epsadd() has wrong number of arguments");
+            }
+        }
+
         public static void epsclone(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             //Only eps values are expanded, and only if they expand into NaN!
@@ -5982,44 +6024,25 @@ namespace Gekko
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
             {
                 MultidimItem item = kvp.Key;
-                Series subseries = kvp.Value as Series;
-                double v = subseries.GetDataSimple(gt);
-                if (G.isNumericalError(v))
+                Series subseries = kvp.Value as Series;                
+                if (G.isNumericalError(subseries.GetDataSimple(gt)))
                 {
                     double vlag = subseries.GetDataSimple(gt.Add(-1));
-                    if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps, true);
+                    if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps);
                 }
             }
         }        
 
-        public static void epsremove(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
-        {            
-            if (x.Length != 2) new Error("Function epsremove() has wrong number of arguments");            
-            Series ts = Helper_eps(x[0]);
-            if (ts.type != ESeriesType.Normal) new Error("Expected an array-subseries as argument");
-            GekkoTime gt = O.ConvertToDate(x[1]);
-            ts.SetData(gt, double.NaN, true);
-        }
+        //public static void epsremove(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        //{            
+        //    if (x.Length != 2) new Error("Function epsremove() has wrong number of arguments");            
+        //    Series ts = Helper_eps(x[0]);
+        //    if (ts.type != ESeriesType.Normal) new Error("Expected an array-subseries as argument");
+        //    GekkoTime gt = O.ConvertToDate(x[1]);
+        //    ts.SetData(gt, double.NaN);
+        //}
 
-        public static void epsadd(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
-        {
-            if (x.Length == 1)
-            {
-                //The whole subseries is eps'ed
-                string s = O.ConvertToString(x[0]);
-                string s2 = G.Chop_RemoveIndex(s);
-                Series ts = O.GetIVariableFromString(s2, O.ECreatePossibilities.NoneReportError) as Series;
-                if (ts.type != ESeriesType.ArraySuper) new Error("Expected an existing array-series as argument");
-                List<string> index = G.Chop_GetIndex(s);
-                MultidimItem mmi = new MultidimItem(index.ToArray());
-                if (ts.eps == null) ts.eps = new Dictionary<MultidimItem, bool>();
-                if (!ts.eps.ContainsKey(mmi)) ts.eps.Add(mmi, false);
-            }
-            else
-            {
-                new Error("Function epsadd() has wrong number of arguments");
-            }           
-        }
+        // -----------------------------------------------------
 
         private static Series Helper_eps(IVariable x)
         {
@@ -6029,6 +6052,10 @@ namespace Gekko
             if (ts == null) new Error("Expected series variable");
             return ts;
         }
+
+        // ===============================================================================
+        // ============================ eps start ========================================
+        // ===============================================================================
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {

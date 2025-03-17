@@ -23104,22 +23104,20 @@ print(df2)
             //epsremove('x')
             //epsremove('x', 2014)
 
+            // !!!! when x[a,d] is constructed, or if x[a,d] is epsed, remove the ts.eps element [a,d]!
+
             for (int i = 0; i < 2; i++)
             {
-
                 I("reset;");
                 I("time 2001 2005;");
                 I("x = series(2);");
                 I("#i = a,;");
                 if (i == 0) I("#j = b, c;");
                 else
-                {
-                    //I("x[a, d] = eps();");
+                {                    
                     I("epsadd('x[a,d]');");
                     I("#j = b, c, d;");
-                }                
-                I("x[a,b] = m();");
-                I("x[a,c] = m();");
+                }                                
                 I("x[a,b] <2001 2001> = 100;");  //Dataframe
                 I("x[a,c] <2001 2001> = 200;");  //Dataframe                
                 // ---------------------------------------------------------
@@ -23134,9 +23132,7 @@ print(df2)
                 //Mask for [a,c][2003] is not necessary
                 // ---------------------------------------------------------
                 I("epsclone('x', 2004);");
-                I("x[a,b] <2004 2004> = 130;");  //Dataframe
-                FAIL("x[a,c] <2004 2004> = 230;");  //Dataframe, fails
-                I("epsremove('x[a,c]', 2004);");
+                I("x[a,b] <2004 2004> = 130;");  //Dataframe                
                 I("x[a,c] <2004 2004> = 230;");  //Dataframe                
                 // ---------------------------------------------------------
                 I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
