@@ -46,6 +46,9 @@ namespace Gekko
     {
         public static void Browser()
         {
+            bool isSimple = false;
+            bool jsmFix = true;
+            bool isDanish = true;
 
             string settings_index_filename = null;
             string settings_list_filename = null;
@@ -63,10 +66,7 @@ namespace Gekko
             string settings_print_end = null;
             string settings_include_p_type = null;
             bool settings_show_source = true;
-            object[] settings_ekstrafiler = null;
-
-            bool jsmFix = true;
-            bool danish = true;
+            object[] settings_ekstrafiler = null;                        
 
             G.Writeln2("Starting html browser generation");
             DateTime dt0 = DateTime.Now;
@@ -75,7 +75,18 @@ namespace Gekko
             string jsonCode = null;
             if (!File.Exists(pathAndFile))
             {
+                isSimple = true;
+                isDanish = false;
                 new Note("A '" + pathAndFile + "' file does not seem to exist: because of this, a basic/default browser is generated");
+                settings_index_filename = "index.html";
+                settings_list_filename = "list.html";
+                settings_find_filename = "find.html";
+                settings_css_filename = "styles.css";
+                settings_vars_foldername = "vars";
+                settings_plot_start = Globals.globalPeriodStart.super.ToString();
+                settings_plot_end = Globals.globalPeriodEnd.super.ToString();
+                settings_print_start = Globals.globalPeriodStart.super.ToString();
+                settings_print_end = Globals.globalPeriodEnd.super.ToString();                
             }
             else
             {
@@ -109,7 +120,7 @@ namespace Gekko
                 try { settings_find_filename = (string)jsonTree["find_filename"]; } catch { }
                 if (settings_find_filename == null)
                 {
-                    new Error("Find_filename not found");
+                    new Error("JSON: Find_filename not found");
                 }
 
                 try { settings_css_filename = (string)jsonTree["css_filename"]; } catch { }
@@ -196,8 +207,16 @@ namespace Gekko
             // -------------------------------------------------------------
             // -------------------------------------------------------------
 
+            string ss1 = "Søg";
+            string ss2 = "Hjem";
+            if (!isDanish)
+            {
+                ss1 = "Search";
+                ss2 = "Home";
+            }
+
             string list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
-            if (!danish) list_title = "Variable list. Search in the browser with Ctrl + F(find)";
+            if (!isDanish) list_title = "Variable list. Search in the browser with Ctrl + F(find)";
 
             string browserFolder = "browser";
 
@@ -224,44 +243,54 @@ namespace Gekko
             string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_vars_foldername;
 
             BrowserCleanupFolders(rootFolder, subFolder);
-            
-            //index.html and styles.css is copied to root folder of browser system
-            List<string> filesToCopy = new List<string>();
-            filesToCopy.Add(settings_index_filename);
-            filesToCopy.Add(settings_css_filename);
-            filesToCopy.Add(settings_icon_filename);
-            foreach (object o in settings_ekstrafiler)
-            {
-                string s = null;
-                try
-                {
-                    s = (string)o;
-                }
-                catch (Exception e)
-                {
-                    new Error("JSON: ekstrafiler problem");
-                }
-                if (s != null) filesToCopy.Add(s);
-            }
 
-            foreach (string fileToCopy in filesToCopy)
+            if (!isSimple)
             {
-                string fileNameIndex = Program.options.folder_working + "\\" + fileToCopy;
-                string fileNameIndex2 = rootFolder + "\\" + fileToCopy;
-                if (!File.Exists(fileNameIndex))
-                {
-                    new Error("'" + fileNameIndex + "' was not found");
-                }
-                File.Copy(fileNameIndex, fileNameIndex2, true);
-            }
 
-            Program.RunGekkoCommands(settings_commands, "", 0, new P());
+                //index.html and styles.css is copied to root folder of browser system
+                List<string> filesToCopy = new List<string>();
+                filesToCopy.Add(settings_index_filename);
+                filesToCopy.Add(settings_css_filename);
+                filesToCopy.Add(settings_icon_filename);
+                if (settings_ekstrafiler != null)
+                {
+                    foreach (object o in settings_ekstrafiler)
+                    {
+                        string s = null;
+                        try
+                        {
+                            s = (string)o;
+                        }
+                        catch (Exception e)
+                        {
+                            new Error("JSON: ekstrafiler problem");
+                        }
+                        if (s != null) filesToCopy.Add(s);
+                    }
+                }
+
+                foreach (string fileToCopy in filesToCopy)
+                {
+                    if (fileToCopy == null) continue;
+                    string fileNameIndex = Program.options.folder_working + "\\" + fileToCopy;
+                    string fileNameIndex2 = rootFolder + "\\" + fileToCopy;
+                    if (!File.Exists(fileNameIndex))
+                    {
+                        new Error("'" + fileNameIndex + "' was not found");
+                    }
+                    File.Copy(fileNameIndex, fileNameIndex2, true);
+                }
+
+                Program.RunGekkoCommands(settings_commands, "", 0, new P());
+            }
 
             int gap = 20;
 
             GekkoTime plotStart = new GekkoTime(EFreq.A, G.IntParse(settings_plot_start), 1);
             GekkoTime plotEnd = new GekkoTime(EFreq.A, G.IntParse(settings_plot_end), 1);
-            GekkoTime plot_line = new GekkoTime(EFreq.A, G.IntParse(settings_plot_line), 1);
+            GekkoTime plot_line = GekkoTime.tNull;
+            if (isSimple) plot_line = plotStart.Add(-100); //-100 so it does not show up
+            else plot_line = new GekkoTime(EFreq.A, G.IntParse(settings_plot_line), 1).Add(-10);
             GekkoTime print_start = new GekkoTime(EFreq.A, G.IntParse(settings_print_start), 1);
             GekkoTime print_end = new GekkoTime(EFreq.A, G.IntParse(settings_print_end), 1);
 
@@ -291,14 +320,14 @@ namespace Gekko
 
             if (Globals.browserLimit)
             {
-                if (settings_index_filename.ToLower().Contains("mona"))
-                {
-                    vars = new List<string> { "FY", "FCB", "PCB_LA", "FCH", "PCH_LA", "FCQ", "PCQ_LA", "PCOV_LA", "FCOV", "PCOW_LA", "FCOW", "PIOV_LA", "FIOV", "FIPMXE", "PIPMXE_LA", "FIY", "PIY_LA", "FIEM", "PIEM_LA", "FIH", "PIH_LA", "FMY", "PMY_LA", "PY_LA" };
-                }
-                else if (settings_index_filename.ToLower().Contains("adam"))
+                if (isSimple || settings_index_filename.ToLower().Contains("adam"))
                 {
                     vars = new List<string> { "fy", "ul", "pcp", "tg" };
                 }
+                else if (settings_index_filename.ToLower().Contains("mona"))
+                {
+                    vars = new List<string> { "FY", "FCB", "PCB_LA", "FCH", "PCH_LA", "FCQ", "PCQ_LA", "PCOV_LA", "FCOV", "PCOW_LA", "FCOW", "PIOV_LA", "FIOV", "FIPMXE", "PIPMXE_LA", "FIY", "PIY_LA", "FIEM", "PIEM_LA", "FIH", "PIH_LA", "FMY", "PMY_LA", "PY_LA" };
+                }                
                 else
                 {
                     //smec
@@ -316,96 +345,182 @@ namespace Gekko
 
             vars.Sort(StringComparer.OrdinalIgnoreCase);
 
-            // -------------------------------------------
-            // Data generation
-            // -------------------------------------------
-
-            GekkoDictionary<string, List<string>> datagen = BrowserDataGenerationExtract();
-
-            // -------------------------------------------
-            // Html
-            // -------------------------------------------
-
-            //Fetches info on external documents that contain read-more info on particular variables
+            List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();
+            GekkoDictionary<string, List<string>> datagen = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, List<Tuple<string, string>>> doc = new GekkoDictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase);
-            string dokFileName = Program.options.folder_working + "\\" + settings_dok_filename;
-            string dok2 = Program.GetTextFromFileWithWait(dokFileName);
-            List<string> dok = Stringlist.ExtractLinesFromText(dok2);
-            for (int i = 0; i < dok.Count; i++)
-            {
-                string line = dok[i].Trim();
-                if (line.StartsWith("!")) continue;
-                string[] ss = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                if (ss.Length < 3) continue;
-                string varname = ss[0];
-                string path = ss[1];
-                string descr = null;
-                for (int ii = 2; ii < ss.Length; ii++)
-                {
-                    descr += ss[ii] + " ";
-                }
-                if (!doc.ContainsKey(varname))
-                {
-                    List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();
-                    doc.Add(varname, tuples);
-                }
-                doc[varname].Add(new Tuple<string, string>(path, descr));
-            }
-
-            List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();                        
-
-            //Fetches estimation output
             GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-            string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + settings_est_filename);
-            List<string> lines = Stringlist.ExtractLinesFromText(est);
 
-            for (int i = 0; i < lines.Count; i++)
+
+            if (isSimple)
             {
-                //must be first
-                if (lines[i].Trim().StartsWith(Globals.ols1))
+                string s = $@"
+<HTML><HEAD><TITLE>Equation browser</TITLE>
+<link rel = `stylesheet` href = `styles.css` type = `text/css`>
+</HEAD>
+<BODY>
+<P>Equation browser, among other things showing how equations link to each other.</p>
+<P><b><a href = find.html><FONT size = +1> {G.FirstCharToUpper(ss1)} </font></a></b></P>
+<P><b><a href = list.html><FONT size = +1> List </font></a></b></P>
+</BODY></HTML>
+";
+
+                string pathAndFilename = browserFolder + "\\" + "index.html";
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
-                    int fat = 5;
-                    var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-                    var tags2 = new List<string>() { "//" };
-                    string depLine = lines[i + 1].Trim();
-                    depLine = depLine.Replace(Globals.ols2, "").Trim();
-                    List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
-                    string varLine = BrowserGetVariable(a);
+                    sw.Write(s.Replace('`', '\"'));
+                }
 
-                    List<string> olsLines = new List<string>();
-                    for (int j = i; j < lines.Count; j++)
+                s = @"
+body, table {color: #000000;
+  font-family: Verdana;
+  font-size: 10pt;
+  font-style: normal;
+  font-variant: normal;
+  background-color: white;
+  padding:20px;
+}
+
+a {text-decoration: none;
+}
+
+a:link {color:#0645AD;
+}
+
+a:visited {color:#0645AD;
+}
+
+a:hover {color:#3366BB;
+}
+
+code {!background: hsl(220, 80%, 90%);
+}
+
+
+pre {height: auto;
+    /* max-height: 200px; */
+    max-width: 800px;
+    overflow: auto;
+    background-color: #f8f8f8;
+    word-break: normal !important;
+    word-wrap: normal !important;
+    white-space: pre !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+img {border-style: none;
+    max-width: 425px;
+    height: auto;
+}
+";
+
+
+
+
+
+                pathAndFilename = browserFolder + "\\" + "styles.css";
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(s.Replace('`', '\"'));
+                }
+            }
+            else 
+            {
+                
+
+                // -------------------------------------------
+                // Data generation
+                // -------------------------------------------
+
+                datagen = BrowserDataGenerationExtract();
+
+                // -------------------------------------------
+                // Html
+                // -------------------------------------------
+
+                //Fetches info on external documents that contain read-more info on particular variables
+
+                doc = new GekkoDictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase);
+                string dokFileName = Program.options.folder_working + "\\" + settings_dok_filename;
+                string dok2 = Program.GetTextFromFileWithWait(dokFileName);
+                List<string> dok = Stringlist.ExtractLinesFromText(dok2);
+                for (int i = 0; i < dok.Count; i++)
+                {
+                    string line = dok[i].Trim();
+                    if (line.StartsWith("!")) continue;
+                    string[] ss = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                    if (ss.Length < 3) continue;
+                    string varname = ss[0];
+                    string path = ss[1];
+                    string descr = null;
+                    for (int ii = 2; ii < ss.Length; ii++)
                     {
-                        olsLines.Add(lines[j]);
-                        if (lines[j].Contains(Globals.ols3a) && lines[j].Contains(Globals.ols3b) && lines[j].Contains(Globals.ols3c))
-                        {
-                            if (est2.ContainsKey(varLine))
-                            {
-                                List<string> lines2 = est2[varLine];
-                                lines2.Add("");
-                                lines2.AddRange(olsLines);
-                            }
-                            else
-                            {
-                                est2.Add(varLine, olsLines);
-                            }
+                        descr += ss[ii] + " ";
+                    }
+                    if (!doc.ContainsKey(varname))
+                    {
+                        List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();
+                        doc.Add(varname, tuples);
+                    }
+                    doc[varname].Add(new Tuple<string, string>(path, descr));
+                }
 
-                            i = j;  //then i will start at j+1 next time
-                            break;
+                //Fetches estimation output
+                est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + settings_est_filename);
+                List<string> lines = Stringlist.ExtractLinesFromText(est);
+
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    //must be first
+                    if (lines[i].Trim().StartsWith(Globals.ols1))
+                    {
+                        int fat = 5;
+                        var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                        var tags2 = new List<string>() { "//" };
+                        string depLine = lines[i + 1].Trim();
+                        depLine = depLine.Replace(Globals.ols2, "").Trim();
+                        List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
+                        string varLine = BrowserGetVariable(a);
+
+                        List<string> olsLines = new List<string>();
+                        for (int j = i; j < lines.Count; j++)
+                        {
+                            olsLines.Add(lines[j]);
+                            if (lines[j].Contains(Globals.ols3a) && lines[j].Contains(Globals.ols3b) && lines[j].Contains(Globals.ols3c))
+                            {
+                                if (est2.ContainsKey(varLine))
+                                {
+                                    List<string> lines2 = est2[varLine];
+                                    lines2.Add("");
+                                    lines2.AddRange(olsLines);
+                                }
+                                else
+                                {
+                                    est2.Add(varLine, olsLines);
+                                }
+
+                                i = j;  //then i will start at j+1 next time
+                                break;
+                            }
                         }
                     }
                 }
             }
-
 
             string modelFrequencyString = GetModelFreq(vars);
             Program.options.freq = G.ConvertFreq(modelFrequencyString); //sets global freq
 
             if (Globals.browserLimit)
             {
-                if (settings_index_filename.ToLower().Contains("mona"))
+                if (isSimple || settings_index_filename.ToLower().Contains("adam"))
                 {
                 }
-                else if (settings_index_filename.ToLower().Contains("adam"))
+                else if (settings_index_filename.ToLower().Contains("mona"))
                 {
                 }
                 else
@@ -417,15 +532,7 @@ namespace Gekko
             }
 
             int missingFirst = 0;
-            int missingRef = 0;
-
-            string ss1 = "Søg";
-            string ss2 = "Hjem";
-            if (!danish)
-            {
-                ss1 = "Search";
-                ss2 = "Home";
-            }
+            int missingRef = 0;            
 
             foreach (string varnameWithoutFreq in vars)
             {
@@ -437,12 +544,12 @@ namespace Gekko
 
                 if (ts1 != null && Globals.browserLimit)
                 {
-                    if (settings_index_filename.ToLower().Contains("mona"))
+                    if (isSimple || settings_index_filename.ToLower().Contains("adam"))
                     {
                     }
-                    else if (settings_index_filename.ToLower().Contains("adam"))
+                    else if (settings_index_filename.ToLower().Contains("mona"))
                     {
-                    }
+                    }                    
                     else
                     {
                         //smec
@@ -475,7 +582,7 @@ namespace Gekko
                 // --------------------------------
 
                 HtmlBrowserSettings htmlBrowserSettings = new HtmlBrowserSettings();
-                htmlBrowserSettings.isDanish = true;
+                htmlBrowserSettings.isDanish = isDanish;
                 htmlBrowserSettings.show_source = settings_show_source;
                 List<string> varExpl = Program.GetVariableExplanationAugmented(varnameWithFreq, htmlBrowserSettings);
                 foreach (string line in varExpl)
@@ -512,7 +619,7 @@ namespace Gekko
 
                 EEndoOrExo type1 = Program.VariableTypeEndoExo(varnameWithFreq);
                 string type = "";
-                if (danish)
+                if (isDanish)
                 {
                     if (type1 == EEndoOrExo.Exo) type = "Eksogen";
                     else if (type1 == EEndoOrExo.Endo) type = "Endogen";
@@ -530,7 +637,7 @@ namespace Gekko
                 if (ts1 != null)                
                 {
                     string freq = null;
-                    if (danish)
+                    if (isDanish)
                     {
                         freq = "[ukendt frekvens]";
                         if (ts1.freq == EFreq.A)
@@ -596,19 +703,19 @@ namespace Gekko
                     sb4.Append(type + ", ");
                     string stamp = null;
                     string ss3 = "opdateret";
-                    if (!danish) ss2 = "updated";
+                    if (!isDanish) ss2 = "updated";
                     if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (" + ss3 + ": " + ts1.meta.stamp + ")";
                     if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
                     {
                         if (noData || first.super == -12345 || last.super == -12345)
                         {
-                            if (danish) sb4.Append(freq + ", ingen dataperiode");
+                            if (isDanish) sb4.Append(freq + ", ingen dataperiode");
                             else sb4.Append(freq + ", no data period");
                         }
                         else
                         {
                             //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                            if (danish) sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
+                            if (isDanish) sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
                             else sb4.Append(freq + " data from " + first.super + " to " + last.super + stamp);
                         }
                     }
@@ -616,12 +723,12 @@ namespace Gekko
                     {
                         if (noData || first.super == -12345 || last.super == -12345)
                         {
-                            if (danish) sb4.Append(freq + ", ingen dataperiode");
+                            if (isDanish) sb4.Append(freq + ", ingen dataperiode");
                             else sb4.Append(freq + ", no data period");
                         }
                         else
                         {
-                            if(danish)sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp):
+                            if (isDanish) sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp);
                             else sb4.Append(freq + " data from " + first.super + ts1.freq.ToString() + first.sub + " to " + last.super + ts1.freq.ToString() + last.sub + stamp);
                         }
                     }
@@ -727,14 +834,14 @@ namespace Gekko
 
                     sb.AppendLine("<p>");
 
-                    if (danish) FoldingButtonStart(sb, "Vækst %");
+                    if (isDanish) FoldingButtonStart(sb, "Vækst %");
                     else FoldingButtonStart(sb, "Growth %");
                     sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + "___p.svg" + "`>");
                     FoldingButtonEnd(sb);
 
                     if (jName != null)
                     {
-                        if (danish) FoldingButtonStart(sb, "J-led");
+                        if (isDanish) FoldingButtonStart(sb, "J-led");
                         else FoldingButtonStart(sb, "J factor");
                         sb.AppendLine("<img src = `" + jName.ToLower() + ".svg" + "`>");
                         FoldingButtonEnd(sb);
@@ -782,7 +889,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (danish) WriteHtmlPreCode(sb, "+++ Note: variablens data kunne ikke indlæses");
+                    if (isDanish) WriteHtmlPreCode(sb, "+++ Note: variablens data kunne ikke indlæses");
                     else WriteHtmlPreCode(sb, "+++ Note: The variable data could not be read");
                 }
 
@@ -1028,17 +1135,17 @@ namespace Gekko
             x3.AppendLine("</script>");
             x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
             x3.AppendLine("<table width=`100 % `><tr><td>");
-            if (danish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
+            if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
             else x3.AppendLine("<p><b>Search phrase:</b></p>");            
             x3.AppendLine("");
-            if (danish) x3.AppendLine("Søgning efter variabelnavn:");
+            if (isDanish) x3.AppendLine("Søgning efter variabelnavn:");
             else x3.AppendLine("Search variable name:");
             x3.AppendLine("<FORM NAME = `form1` >");
             x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
             x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
             x3.AppendLine("</FORM>");
             x3.AppendLine("<p>&nbsp;</p>");
-            if (danish) x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
+            if (isDanish) x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
             else x3.AppendLine("Free text search in variable descriptions:");
             x3.AppendLine("<FORM NAME = `form2`>");
             x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
