@@ -2619,7 +2619,7 @@ namespace Gekko
                             //Same behavior as ESeriesMissing.Zero below
                             rv = new Series(ESeriesType.Timeless, this.freq, name2);
                             ((Series)rv).mmi = new MultidimItem(keys, this);
-                            ((Series)rv).SetTimelessData(0d);
+                            ((Series)rv).SetTimelessData(Globals.eps);
                         }
                         else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
                         {

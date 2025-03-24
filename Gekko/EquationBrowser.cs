@@ -46,145 +46,158 @@ namespace Gekko
     {
         public static void Browser()
         {
+
+            string settings_index_filename = null;
+            string settings_list_filename = null;
+            string settings_find_filename = null;
+            string settings_css_filename = null;
+            string settings_dok_filename = null;
+            string settings_est_filename = null;
+            string settings_icon_filename = null;
+            string settings_vars_foldername = null;
+            string settings_commands = null;
+            string settings_plot_start = null;
+            string settings_plot_end = null;
+            string settings_plot_line = null;
+            string settings_print_start = null;
+            string settings_print_end = null;
+            string settings_include_p_type = null;
+            bool settings_show_source = true;
+            object[] settings_ekstrafiler = null;
+
             bool jsmFix = true;
+            bool danish = true;
 
             G.Writeln2("Starting html browser generation");
             DateTime dt0 = DateTime.Now;
 
             string pathAndFile = Program.options.folder_working + "\\" + "browser.json";
-
-            string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(pathAndFile));
-            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            Dictionary<string, object> jsonTree = null;
-            try
+            string jsonCode = null;
+            if (!File.Exists(pathAndFile))
             {
-                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                new Note("A '" + pathAndFile + "' file does not seem to exist: because of this, a basic/default browser is generated");
             }
-            catch (Exception e)
+            else
             {
-                G.Warning("w4.1", "The .json file does not seem correctly formatted. " + e.Message);
+                jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(pathAndFile));
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                Dictionary<string, object> jsonTree = null;
+                try
+                {
+                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                }
+                catch (Exception e)
+                {
+                    G.Warning("w4.1", "The .json file does not seem correctly formatted. " + e.Message);
+                }
+
+                // -------------------------------------------------------------
+
+
+                try { settings_index_filename = (string)jsonTree["index_filename"]; } catch { }
+                if (settings_index_filename == null)
+                {
+                    new Error("JSON: index_filename not found");
+                }
+
+                try { settings_list_filename = (string)jsonTree["list_filename"]; } catch { }
+                if (settings_list_filename == null)
+                {
+                    new Error("JSON: list_filename not found");
+                }
+
+                try { settings_find_filename = (string)jsonTree["find_filename"]; } catch { }
+                if (settings_find_filename == null)
+                {
+                    new Error("Find_filename not found");
+                }
+
+                try { settings_css_filename = (string)jsonTree["css_filename"]; } catch { }
+                if (settings_css_filename == null)
+                {
+                    new Error("JSON: css_filename not found");
+                }
+
+                try { settings_dok_filename = (string)jsonTree["dok_filename"]; } catch { }
+                if (settings_dok_filename == null)
+                {
+                    new Error("JSON: dok_filename not found");
+                }
+
+                try { settings_est_filename = (string)jsonTree["est_filename"]; } catch { }
+                if (settings_est_filename == null)
+                {
+                    new Error("JSON: est_filename not found");
+                }
+
+                try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { }
+                if (settings_icon_filename == null)
+                {
+                    new Error("JSON: icon_filename not found");
+                }
+
+                try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
+                if (settings_vars_foldername == null)
+                {
+                    new Error("JSON: vars_foldername not found");
+                }
+
+                try { settings_commands = (string)jsonTree["commands"]; } catch { }
+                if (settings_commands == null)
+                {
+                    new Error("JSON: commands not found");
+                }
+
+                try { settings_plot_start = (string)jsonTree["plot_start"]; } catch { }
+                if (settings_plot_start == null)
+                {
+                    new Error("JSON: plot_start not found");
+                }
+
+                try { settings_plot_end = (string)jsonTree["plot_end"]; } catch { }
+                if (settings_plot_end == null)
+                {
+                    new Error("JSON: plot_end not found");
+                }
+
+                try { settings_plot_line = (string)jsonTree["plot_line"]; } catch { }
+                if (settings_plot_line == null)
+                {
+                    new Error("Plot_line not found");
+                }
+
+                try { settings_print_start = (string)jsonTree["print_start"]; } catch { }
+                if (settings_print_start == null)
+                {
+                    new Error("Print_start not found");
+                }
+
+                try { settings_print_end = (string)jsonTree["print_end"]; } catch { }
+                if (settings_print_end == null)
+                {
+                    new Error("Print_end not found");
+                }
+
+                try { settings_include_p_type = (string)jsonTree["include_p_type"]; } catch { }
+                if (settings_include_p_type == null)
+                {
+                    new Error("Include_p_type");
+                }
+
+                try { settings_show_source = (bool)jsonTree["show_source"]; } catch { }
+
+                try { settings_ekstrafiler = (object[])jsonTree["ekstrafiler"]; } catch { }
+                if (settings_ekstrafiler == null)
+                {
+                    new Error("JSON: ekstrafiler problem");
+                }
             }
 
             // -------------------------------------------------------------
-
-            string settings_index_filename = null;
-            try { settings_index_filename = (string)jsonTree["index_filename"]; } catch { }
-            if (settings_index_filename == null)
-            {
-                new Error("JSON: index_filename not found");
-            }
-
-            string settings_list_filename = null;
-            try { settings_list_filename = (string)jsonTree["list_filename"]; } catch { }
-            if (settings_list_filename == null)
-            {
-                new Error("JSON: list_filename not found");
-            }
-
-            string settings_find_filename = null;
-            try { settings_find_filename = (string)jsonTree["find_filename"]; } catch { }
-            if (settings_find_filename == null)
-            {
-                new Error("Find_filename not found");
-            }
-
-            string settings_css_filename = null;
-            try { settings_css_filename = (string)jsonTree["css_filename"]; } catch { }
-            if (settings_css_filename == null)
-            {
-                new Error("JSON: css_filename not found");
-            }
-
-            string settings_dok_filename = null;
-            try { settings_dok_filename = (string)jsonTree["dok_filename"]; } catch { }
-            if (settings_dok_filename == null)
-            {
-                new Error("JSON: dok_filename not found");
-            }
-
-            string settings_est_filename = null;
-            try { settings_est_filename = (string)jsonTree["est_filename"]; } catch { }
-            if (settings_est_filename == null)
-            {
-                new Error("JSON: est_filename not found");
-            }
-
-            string settings_icon_filename = null;
-            try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { }
-            if (settings_icon_filename == null)
-            {
-                new Error("JSON: icon_filename not found");
-            }
-
-            string settings_vars_foldername = null;
-            try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
-            if (settings_vars_foldername == null)
-            {
-                new Error("JSON: vars_foldername not found");
-            }
-
-            string settings_commands = null;
-            try { settings_commands = (string)jsonTree["commands"]; } catch { }
-            if (settings_commands == null)
-            {
-                new Error("JSON: commands not found");
-            }
-
-            string settings_plot_start = null;
-            try { settings_plot_start = (string)jsonTree["plot_start"]; } catch { }
-            if (settings_plot_start == null)
-            {
-                new Error("JSON: plot_start not found");
-            }
-
-            string settings_plot_end = null;
-            try { settings_plot_end = (string)jsonTree["plot_end"]; } catch { }
-            if (settings_plot_end == null)
-            {
-                new Error("JSON: plot_end not found");
-            }
-
-            string settings_plot_line = null;
-            try { settings_plot_line = (string)jsonTree["plot_line"]; } catch { }
-            if (settings_plot_line == null)
-            {
-                new Error("Plot_line not found");
-            }
-
-            string settings_print_start = null;
-            try { settings_print_start = (string)jsonTree["print_start"]; } catch { }
-            if (settings_print_start == null)
-            {
-                new Error("Print_start not found");
-            }
-
-            string settings_print_end = null;
-            try { settings_print_end = (string)jsonTree["print_end"]; } catch { }
-            if (settings_print_end == null)
-            {
-                new Error("Print_end not found");
-            }
-
-            string include_p_type = null;
-            try { include_p_type = (string)jsonTree["include_p_type"]; } catch { }
-            if (include_p_type == null)
-            {
-                new Error("Include_p_type");
-            }
-
-            bool settings_show_source = true;
-            try { settings_show_source = (bool)jsonTree["show_source"]; } catch { }
-
-            object[] settings_ekstrafiler = null;
-            try { settings_ekstrafiler = (object[])jsonTree["ekstrafiler"]; } catch { }
-            if (settings_ekstrafiler == null)
-            {
-                new Error("JSON: ekstrafiler problem");
-            }
-
             // -------------------------------------------------------------
 
             string list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
+            if (!danish) list_title = "Variable list. Search in the browser with Ctrl + F(find)";
 
             string browserFolder = "browser";
 
@@ -258,7 +271,7 @@ namespace Gekko
             List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
             List<string> vars = Stringlist.GetListOfStringsFromIVariable(ml);
 
-            if (G.Equal(include_p_type, "yes"))
+            if (G.Equal(settings_include_p_type, "yes"))
             {
                 GekkoDictionary<string, string> temp = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (string s in vars) temp.Add(s, null);
@@ -406,6 +419,14 @@ namespace Gekko
             int missingFirst = 0;
             int missingRef = 0;
 
+            string ss1 = "Søg";
+            string ss2 = "Hjem";
+            if (!danish)
+            {
+                ss1 = "Search";
+                ss2 = "Home";
+            }
+
             foreach (string varnameWithoutFreq in vars)
             {
                 string varnameWithFreq = varnameWithoutFreq + "!" + modelFrequencyString;
@@ -439,13 +460,13 @@ namespace Gekko
                 if (ts2 == null) missingRef++;
 
                 string jName = null;  //name of possible j-led
-                bool jNameAutoGen = false;
+                bool jNameAutoGen = false;                
 
                 sb.AppendLine("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
                 sb.AppendLine("<tr>");
                 sb.AppendLine("<td width = `80%`><big><b> " + varnameWithoutFreq + "</b></big></td>");
-                sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_find_filename + "`>Søg</a></td>");
-                sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_index_filename + "`>Hjem</a></td>");
+                sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_find_filename + "`>" + ss1 + "</a></td>");
+                sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_index_filename + "`>" + ss2 + "</a></td>");
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</table>");
 
@@ -491,40 +512,79 @@ namespace Gekko
 
                 EEndoOrExo type1 = Program.VariableTypeEndoExo(varnameWithFreq);
                 string type = "";
-                if (type1 == EEndoOrExo.Exo) type = "Eksogen";
-                else if (type1 == EEndoOrExo.Endo) type = "Endogen";
+                if (danish)
+                {
+                    if (type1 == EEndoOrExo.Exo) type = "Eksogen";
+                    else if (type1 == EEndoOrExo.Endo) type = "Endogen";
+                }
+                else
+                {
+                    if (type1 == EEndoOrExo.Exo) type = "Exogenous";
+                    else if (type1 == EEndoOrExo.Endo) type = "Endogenous";
+                }
 
                 //========================================================================================================
                 //                          FREQUENCY LOCATION, indicates where to implement more frequencies
                 //========================================================================================================
 
                 if (ts1 != null)                
-                { 
-
-                    string freq = "[ukendt frekvens]";
-                    if (ts1.freq == EFreq.A)
+                {
+                    string freq = null;
+                    if (danish)
                     {
-                        freq = "Årlig";
+                        freq = "[ukendt frekvens]";
+                        if (ts1.freq == EFreq.A)
+                        {
+                            freq = "Årlig";
+                        }
+                        else if (ts1.freq == EFreq.Q)
+                        {
+                            freq = "Kvartalsvis";
+                        }
+                        else if (ts1.freq == EFreq.M)
+                        {
+                            freq = "Månedlig";
+                        }
+                        else if (ts1.freq == EFreq.W)
+                        {
+                            freq = "Ugentlig";
+                        }
+                        else if (ts1.freq == EFreq.D)
+                        {
+                            freq = "Daglig";
+                        }
+                        else if (ts1.freq == EFreq.U)
+                        {
+                            freq = "Udateret";
+                        }
                     }
-                    else if (ts1.freq == EFreq.Q)
+                    else
                     {
-                        freq = "Kvartalsvis";
-                    }
-                    else if (ts1.freq == EFreq.M)
-                    {
-                        freq = "Månedlig";
-                    }
-                    else if (ts1.freq == EFreq.W)
-                    {
-                        freq = "Ugentlig";
-                    }
-                    else if (ts1.freq == EFreq.D)
-                    {
-                        freq = "Daglig";
-                    }
-                    else if (ts1.freq == EFreq.U)
-                    {
-                        freq = "Udateret";
+                        freq = "[unknown freq]";
+                        if (ts1.freq == EFreq.A)
+                        {
+                            freq = "Annual";
+                        }
+                        else if (ts1.freq == EFreq.Q)
+                        {
+                            freq = "Quarterly";
+                        }
+                        else if (ts1.freq == EFreq.M)
+                        {
+                            freq = "Monthly";
+                        }
+                        else if (ts1.freq == EFreq.W)
+                        {
+                            freq = "Weekly";
+                        }
+                        else if (ts1.freq == EFreq.D)
+                        {
+                            freq = "Daily";
+                        }
+                        else if (ts1.freq == EFreq.U)
+                        {
+                            freq = "Undated";
+                        }
                     }
 
                     bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data
@@ -535,28 +595,34 @@ namespace Gekko
                     StringBuilder sb4 = new StringBuilder();
                     sb4.Append(type + ", ");
                     string stamp = null;
-                    if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (opdateret: " + ts1.meta.stamp + ")";
+                    string ss3 = "opdateret";
+                    if (!danish) ss2 = "updated";
+                    if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (" + ss3 + ": " + ts1.meta.stamp + ")";
                     if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
                     {
                         if (noData || first.super == -12345 || last.super == -12345)
                         {
-                            sb4.Append(freq + ", ingen dataperiode");
+                            if (danish) sb4.Append(freq + ", ingen dataperiode");
+                            else sb4.Append(freq + ", no data period");
                         }
                         else
                         {
                             //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                            sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
+                            if (danish) sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
+                            else sb4.Append(freq + " data from " + first.super + " to " + last.super + stamp);
                         }
                     }
                     else
                     {
                         if (noData || first.super == -12345 || last.super == -12345)
                         {
-                            sb4.Append(freq + ", ingen dataperiode");
+                            if (danish) sb4.Append(freq + ", ingen dataperiode");
+                            else sb4.Append(freq + ", no data period");
                         }
                         else
                         {
-                            sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp);
+                            if(danish)sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp):
+                            else sb4.Append(freq + " data from " + first.super + ts1.freq.ToString() + first.sub + " to " + last.super + ts1.freq.ToString() + last.sub + stamp);
                         }
                     }
                     WriteHtml(sb, sb4.ToString());  //for instance: Endogen: Årlige data fra 1966 til 2030 (opdateret: 23-09-2021)
@@ -661,13 +727,15 @@ namespace Gekko
 
                     sb.AppendLine("<p>");
 
-                    FoldingButtonStart(sb, "Vækst %");
+                    if (danish) FoldingButtonStart(sb, "Vækst %");
+                    else FoldingButtonStart(sb, "Growth %");
                     sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + "___p.svg" + "`>");
                     FoldingButtonEnd(sb);
 
                     if (jName != null)
                     {
-                        FoldingButtonStart(sb, "J-led");
+                        if (danish) FoldingButtonStart(sb, "J-led");
+                        else FoldingButtonStart(sb, "J factor");
                         sb.AppendLine("<img src = `" + jName.ToLower() + ".svg" + "`>");
                         FoldingButtonEnd(sb);
                     }
@@ -714,7 +782,8 @@ namespace Gekko
                 }
                 else
                 {
-                    WriteHtmlPreCode(sb, "+++ Note: variablens data kunne ikke indlæses");
+                    if (danish) WriteHtmlPreCode(sb, "+++ Note: variablens data kunne ikke indlæses");
+                    else WriteHtmlPreCode(sb, "+++ Note: The variable data could not be read");
                 }
 
                 StringBuilder x = new StringBuilder();
@@ -770,8 +839,8 @@ namespace Gekko
             x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `1000px` border = `0`> ");
             x2.AppendLine("  <tr>");
             x2.AppendLine("  <td width = `70 %` ><b><big>" + list_title + "</big></b></td>");
-            x2.AppendLine("  <td width = `10 %` ><a href = `" + settings_find_filename + "` > Søg </a></td >");
-            x2.AppendLine("  <td width = `20 %` ><a href = `" + settings_index_filename + "` > Hjem </a></td >");
+            x2.AppendLine("  <td width = `10 %` ><a href = `" + settings_find_filename + "` > " + ss1 + " </a></td >");
+            x2.AppendLine("  <td width = `20 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
             x2.AppendLine("  </tr>");
             x2.AppendLine("  </table>");
 
@@ -959,17 +1028,18 @@ namespace Gekko
             x3.AppendLine("</script>");
             x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
             x3.AppendLine("<table width=`100 % `><tr><td>");
-            x3.AppendLine("<p><b>Indtast søgeord</b></p>");
-            //x3.AppendLine("<p>Angiv mnemoteknisk variabelnavn eller foretag fritekstsøgning i variabelbeskrivelserne</p>");
-            //x3.AppendLine("<p>&nbsp;</p>");
+            if (danish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
+            else x3.AppendLine("<p><b>Search phrase:</b></p>");            
             x3.AppendLine("");
-            x3.AppendLine("Søgning efter variabelnavn:");
+            if (danish) x3.AppendLine("Søgning efter variabelnavn:");
+            else x3.AppendLine("Search variable name:");
             x3.AppendLine("<FORM NAME = `form1` >");
             x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
             x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
             x3.AppendLine("</FORM>");
             x3.AppendLine("<p>&nbsp;</p>");
-            x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
+            if (danish) x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
+            else x3.AppendLine("Free text search in variable descriptions:");
             x3.AppendLine("<FORM NAME = `form2`>");
             x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
             x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findbeskriv()`>");

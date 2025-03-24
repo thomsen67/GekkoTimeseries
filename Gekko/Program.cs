@@ -2685,12 +2685,33 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {                
+            {
+                double Round(double x, double factor)
+                {
+                    return Math.Round(x / factor) * factor;
+                }
+
+                double eps = 1e-300;
+                double rounding = 1e-250;                                
+
+                double x0 = 0d;
+                double x1 = 0d + eps;
+                double x2 = 0d + eps + eps;
+
+                new Writeln("x0 = 0: " + x0);                                
+                new Writeln("x1 = 0 + eps: " + x1);                
+                new Writeln("x2 = 0 + eps + eps: " + x2);
+                new Writeln("Round(x0) " + Round(x0, rounding));
+                new Writeln("Round(x1) " + Round(x1, rounding));
+                new Writeln("Round(x2) " + Round(x2, rounding));
+
+                
+
                 Masks m = new Masks();
                 m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
                 m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
                 m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
-                                
+
                 bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
                 bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
                 bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
@@ -2704,7 +2725,7 @@ namespace Gekko
                 bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
                 bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
 
-                
+
             }
 
             if (Globals.runningOnTTComputer && (text == "d"))
@@ -3281,7 +3302,7 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }
+        }        
 
         private static double Sum_numbers()
         {
