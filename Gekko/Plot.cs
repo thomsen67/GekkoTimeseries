@@ -134,8 +134,8 @@ namespace Gekko
             {
                 //See above, similar code
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
-                double d = 1.1;  //overall size of canvas, relative to 600x480                
-                decompFontFactor = d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+                double d = 1.1;  //overall size of canvas, relative to 600x480                15-35, tæt på 35
+                decompFontFactor = d / 1.27d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
