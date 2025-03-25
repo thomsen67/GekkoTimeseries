@@ -66,7 +66,7 @@ namespace Gekko
             string settings_print_end = null;
             string settings_include_p_type = null;
             bool settings_show_source = true;
-            object[] settings_ekstrafiler = null;                        
+            object[] settings_ekstrafiler = null;
 
             G.Writeln2("Starting html browser generation");
             DateTime dt0 = DateTime.Now;
@@ -86,7 +86,7 @@ namespace Gekko
                 settings_plot_start = Globals.globalPeriodStart.super.ToString();
                 settings_plot_end = Globals.globalPeriodEnd.super.ToString();
                 settings_print_start = Globals.globalPeriodStart.super.ToString();
-                settings_print_end = Globals.globalPeriodEnd.super.ToString();                
+                settings_print_end = Globals.globalPeriodEnd.super.ToString();
             }
             else
             {
@@ -206,7 +206,7 @@ namespace Gekko
 
             // -------------------------------------------------------------
             // -------------------------------------------------------------
-
+                        
             string ss1 = "Søg";
             string ss2 = "Hjem";
             if (!isDanish)
@@ -215,8 +215,8 @@ namespace Gekko
                 ss2 = "Home";
             }
 
-            string list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
-            if (!isDanish) list_title = "Variable list. Search in the browser with Ctrl + F(find)";
+            string list_title = "Variabelliste (try Ctrl+F)";
+            if (!isDanish) list_title = "Variable list (try Ctrl+F)";
 
             string browserFolder = "browser";
 
@@ -290,7 +290,7 @@ namespace Gekko
             GekkoTime plotEnd = new GekkoTime(EFreq.A, G.IntParse(settings_plot_end), 1);
             GekkoTime plot_line = GekkoTime.tNull;
             if (isSimple) plot_line = plotStart.Add(-100); //-100 so it does not show up
-            else plot_line = new GekkoTime(EFreq.A, G.IntParse(settings_plot_line), 1).Add(-10);
+            else plot_line = new GekkoTime(EFreq.A, G.IntParse(settings_plot_line), 1);
             GekkoTime print_start = new GekkoTime(EFreq.A, G.IntParse(settings_print_start), 1);
             GekkoTime print_end = new GekkoTime(EFreq.A, G.IntParse(settings_print_end), 1);
 
@@ -327,7 +327,7 @@ namespace Gekko
                 else if (settings_index_filename.ToLower().Contains("mona"))
                 {
                     vars = new List<string> { "FY", "FCB", "PCB_LA", "FCH", "PCH_LA", "FCQ", "PCQ_LA", "PCOV_LA", "FCOV", "PCOW_LA", "FCOW", "PIOV_LA", "FIOV", "FIPMXE", "PIPMXE_LA", "FIY", "PIY_LA", "FIEM", "PIEM_LA", "FIH", "PIH_LA", "FMY", "PMY_LA", "PY_LA" };
-                }                
+                }
                 else
                 {
                     //smec
@@ -358,9 +358,10 @@ namespace Gekko
 <link rel = `stylesheet` href = `styles.css` type = `text/css`>
 </HEAD>
 <BODY>
-<P>Equation browser, among other things showing how equations link to each other.</p>
-<P><b><a href = find.html><FONT size = +1> {G.FirstCharToUpper(ss1)} </font></a></b></P>
-<P><b><a href = list.html><FONT size = +1> List </font></a></b></P>
+<P><b><FONT size = +2>Equation browser</font></a></b></P>
+<P>Among other things, the equation browser show how modle equations affect each other.</p>
+<P><b><a href = find.html><FONT size = +0.5> {G.FirstCharToUpper(ss1)} </font></a></b></P>
+<P><b><a href = list.html><FONT size = +0.5> List </font></a></b></P>
 </BODY></HTML>
 ";
 
@@ -428,9 +429,9 @@ img {border-style: none;
                     sw.Write(s.Replace('`', '\"'));
                 }
             }
-            else 
+            else
             {
-                
+
 
                 // -------------------------------------------
                 // Data generation
@@ -532,7 +533,7 @@ img {border-style: none;
             }
 
             int missingFirst = 0;
-            int missingRef = 0;            
+            int missingRef = 0;
 
             foreach (string varnameWithoutFreq in vars)
             {
@@ -540,7 +541,7 @@ img {border-style: none;
                 StringBuilder sb = new StringBuilder();
 
                 Series ts1 = Program.databanks.GetFirst().GetIVariable(varnameWithFreq) as Series;
-                if (ts1 == null) missingFirst++;               
+                if (ts1 == null) missingFirst++;
 
                 if (ts1 != null && Globals.browserLimit)
                 {
@@ -549,7 +550,7 @@ img {border-style: none;
                     }
                     else if (settings_index_filename.ToLower().Contains("mona"))
                     {
-                    }                    
+                    }
                     else
                     {
                         //smec
@@ -567,7 +568,7 @@ img {border-style: none;
                 if (ts2 == null) missingRef++;
 
                 string jName = null;  //name of possible j-led
-                bool jNameAutoGen = false;                
+                bool jNameAutoGen = false;
 
                 sb.AppendLine("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
                 sb.AppendLine("<tr>");
@@ -607,7 +608,7 @@ img {border-style: none;
                     }
                 }
                 EquationBrowserHelper ebh = new EquationBrowserHelper();
-                ebh.s1 = varnameWithoutFreq; 
+                ebh.s1 = varnameWithoutFreq;
                 if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
                 ebh.s2 = G.ReplaceWhitespaceWith1Blank(explanation);
                 if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
@@ -634,7 +635,7 @@ img {border-style: none;
                 //                          FREQUENCY LOCATION, indicates where to implement more frequencies
                 //========================================================================================================
 
-                if (ts1 != null)                
+                if (ts1 != null)
                 {
                     string freq = null;
                     if (isDanish)
@@ -703,7 +704,7 @@ img {border-style: none;
                     sb4.Append(type + ", ");
                     string stamp = null;
                     string ss3 = "opdateret";
-                    if (!isDanish) ss2 = "updated";
+                    if (!isDanish) ss3 = "updated";
                     if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (" + ss3 + ": " + ts1.meta.stamp + ")";
                     if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
                     {
@@ -765,7 +766,7 @@ img {border-style: none;
                 // html print dependents etc.
                 // --------------------------------
 
-                BrowserDependents(varnameWithFreq, sb, ref jName, ref jNameAutoGen);
+                BrowserDependents(varnameWithFreq, sb, isDanish, ref jName, ref jNameAutoGen);
 
                 // --------------------------------
                 // html print estimation output etc.
@@ -801,7 +802,7 @@ img {border-style: none;
                         s5 += s + G.NL;
                     }
                     WriteHtmlPreCode(sb, s5);
-                }                
+                }
 
                 bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
 
@@ -842,7 +843,7 @@ img {border-style: none;
                     if (jName != null)
                     {
                         if (isDanish) FoldingButtonStart(sb, "J-led");
-                        else FoldingButtonStart(sb, "J factor");
+                        else FoldingButtonStart(sb, "J-factor");
                         sb.AppendLine("<img src = `" + jName.ToLower() + ".svg" + "`>");
                         FoldingButtonEnd(sb);
                     }
@@ -943,11 +944,11 @@ img {border-style: none;
             x2.AppendLine("  <body>");
             //x2.AppendLine("  <p><big><b>SMECdok, take two. Søg i browseren med Ctrl+F (find)</b></big></p>");
 
-            x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `1000px` border = `0`> ");
+            x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`> ");
             x2.AppendLine("  <tr>");
-            x2.AppendLine("  <td width = `70 %` ><b><big>" + list_title + "</big></b></td>");
+            x2.AppendLine("  <td width = `80 %` ><b><big>" + list_title + "</big></b></td>");
             x2.AppendLine("  <td width = `10 %` ><a href = `" + settings_find_filename + "` > " + ss1 + " </a></td >");
-            x2.AppendLine("  <td width = `20 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
+            x2.AppendLine("  <td width = `10 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
             x2.AppendLine("  </tr>");
             x2.AppendLine("  </table>");
 
@@ -1002,13 +1003,13 @@ img {border-style: none;
             x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
             x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
             x3.AppendLine("</head>");
-                        
+
             x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
 
             string s1 = G.NL;
             string s2 = G.NL;
             foreach (EquationBrowserHelper s in sorted)
-            {                
+            {
                 s1 += "\"" + s.s1 + "\"" + ", " + G.NL;
                 s2 += "\"" + s.s2 + "\"" + ", " + G.NL;
             }
@@ -1023,7 +1024,7 @@ img {border-style: none;
             {
                 write = "content.push";
                 join = "document.body.innerHTML = content.join(``);";
-            }
+            }            
 
             string js = @"
 
@@ -1047,7 +1048,7 @@ img {border-style: none;
                 tekst = document.form1.tekst.value;
                 fundet = false;
 
-                " + write + @"(`Søgning efter variablen: '` + tekst + `'<br><br>`);
+                " + write + @"(`"+ Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + tekst + `'<br><br>`);
 
                 for (var i = 0; i < antal; i++)
                 {
@@ -1077,9 +1078,9 @@ img {border-style: none;
 
                 if (fundet == false)
                 {
-                    " + write + @"(`... gav intet resultat.<br>`);
+                    " + write + @"(`... "+ Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
                 } //endif
-                " + write + @"(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
+                " + write + @"(`<br><br><a href=" + settings_find_filename + @">"+ Language(isDanish, "Søg igen", "Search again") + @"</a> <br> <a href=" + settings_index_filename + @">"+ Language(isDanish, "Gå til hovedside", "Go to main page") + @"</a>`);
                 tekst1.free;
                 tekst.free;
                 " + join + @"
@@ -1100,7 +1101,7 @@ img {border-style: none;
             tekst2 = new String;
             tekst = document.form2.tekst.value;
 
-            " + write + @"(`Søgeresultat<br>Søgning efter teksten: '` + tekst + `' i variabelliste<br><br>`);
+            " + write + @"(`"+ Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + tekst + `' "+ Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
             fundet = false;
             for (var i = 0; i < antal; i++)
             {
@@ -1114,9 +1115,9 @@ img {border-style: none;
             } //endfor
             if (fundet == false)
             {
-                " + write + @"(`... gav intet resultat.<br>`);
-            } //endif
-            " + write + @"(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
+                " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
+            } //endif            
+            " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br> <a href=" + settings_index_filename + @">" + Language(isDanish, "Gå til hovedside", "Go to main page") + @"</a>`);
             tekst.free;
             tekst2.free;
 
@@ -1135,8 +1136,14 @@ img {border-style: none;
             x3.AppendLine("</script>");
             x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
             x3.AppendLine("<table width=`100 % `><tr><td>");
-            if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
-            else x3.AppendLine("<p><b>Search phrase:</b></p>");            
+            //if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
+            x3.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`> ");
+            x3.AppendLine("  <tr>");
+            x3.AppendLine("  <td width = `80 %` ><b><big>" + Language(isDanish, "Søg", "Search") + "</big></b></td>");
+            x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_list_filename + "` > " + "List" + " </a></td >");
+            x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
+            x3.AppendLine("  </tr>");
+            x3.AppendLine("  </table>");            
             x3.AppendLine("");
             if (isDanish) x3.AppendLine("Søgning efter variabelnavn:");
             else x3.AppendLine("Search variable name:");
@@ -1169,6 +1176,14 @@ img {border-style: none;
 
             new Writeln("End of html browser generation, " + G.Seconds(dt0));
 
+        }
+
+        public static string Language(bool isDanish, string q1, string q2)
+        {
+            string q;
+            if (isDanish) q = q1;
+            else q = q2;
+            return q;
         }
 
         public static void BrowserNew(bool limit, bool onlyHtml)
@@ -2036,7 +2051,7 @@ img {border-style: none;
             return allFreqs[maxIndex];
         }
 
-        private static void BrowserDependents(string varnameMaybeWithFreq, StringBuilder sb, ref string jName, ref bool jNameAutoGen)
+        private static void BrowserDependents(string varnameMaybeWithFreq, StringBuilder sb, bool isDanish, ref string jName, ref bool jNameAutoGen)
         {
             string varnameWithoutFreq = G.Chop_RemoveFreq(varnameMaybeWithFreq);
             if (G.GetModelSourceType() == EModelType.Gekko)
@@ -2111,7 +2126,8 @@ img {border-style: none;
                 }
 
                 StringBuilder sb5 = new StringBuilder();
-                sb5.Append("Påvirker: ");
+                if (isDanish) sb5.Append("Påvirker: ");
+                else sb5.Append("Influences: ");
                 if (list.Count == 0) sb5.Append("<none>");
                 else
                 {
@@ -2458,7 +2474,8 @@ img {border-style: none;
 
         public static void WriteHtmlColor(StringBuilder sb, string s)
         {
-            sb.AppendLine("<p style=`color:#993300; font-weight: bold`>" + s + "</p>");
+            //sb.AppendLine("<p style=`color:#993300; font-weight: bold`>" + s + "</p>");
+            sb.AppendLine("<p style=`color:#993300`>" + s + "</p>");
         }
 
         public static void SpanHtmlColor(StringBuilder sb, string s)
