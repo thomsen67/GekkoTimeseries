@@ -359,7 +359,7 @@ namespace Gekko
 </HEAD>
 <BODY>
 <P><b><FONT size = +2>Equation browser</font></a></b></P>
-<P>Among other things, the equation browser show how modle equations affect each other.</p>
+<P>Among other things, the equation browser shows how model equations affect each other. The browser also shows graphs and prints of variable values.</p>
 <P><b><a href = find.html><FONT size = +0.5> {G.FirstCharToUpper(ss1)} </font></a></b></P>
 <P><b><a href = list.html><FONT size = +0.5> List </font></a></b></P>
 </BODY></HTML>
@@ -814,21 +814,22 @@ img {border-style: none;
                 // --------------------------------
 
                 string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
-                string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
+                string l2 = null;
+                if (bank2 != null) l2 = bank2.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
 
                 if (ts1 != null)
                 {
                     if (ts2 == null)
                     {
                         //only plot the series from Work
-                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
-                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + varnameWithoutFreq + " '" + l1 + "' file='" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg';", "", 0, new P());
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + varnameWithoutFreq + " '" + l1 + "' file='" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg';", "", 0, new P());
                     }
                     else
                     {
                         //plot both
-                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
-                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file='" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg';", "", 0, new P());
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file='" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg';", "", 0, new P());
                     }
 
                     sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + ".svg" + "`>");
@@ -856,7 +857,18 @@ img {border-style: none;
                     string extra = ""; if (modelFrequencyString != "a") extra = "  ";  //for instance, 2020q3 is 6 chars, 2020 is only 4. Will not work good for months...
                     sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
                     sb3.AppendLine();
-                    sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
+                    if (ts1 == null && ts2 == null)
+                    {
+                        //do nothing
+                    }
+                    else if (ts1 == null || ts2 == null)
+                    {
+                        sb3.AppendLine("Period" + extra + "        value        %  ");
+                    }
+                    else
+                    {
+                        sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
+                    }
                     int counter6 = 0;
                     foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
                     {

@@ -20,9 +20,26 @@ namespace Gekko
     /// </summary>
     public partial class WindowPlot : Window
     {
-        public WindowPlot()
+        public GraphOptions graphOptions = null;
+        
+        public WindowPlot(GraphOptions graphOptions)
         {
+            this.graphOptions = graphOptions;
             InitializeComponent();
+            if (graphOptions.code != null)
+            {                
+                string codeWithoutR = G.Replace(graphOptions.code, "r", "", StringComparison.OrdinalIgnoreCase, 0);
+                bool isR = false; if (codeWithoutR.Length < graphOptions.code.Length) isR = true;
+                if (isR) CheckBox_ref.IsChecked = true;
+                if (G.Equal(codeWithoutR, "n")) radioButton_n1.IsChecked = true;
+                else if (G.Equal(codeWithoutR, "d")) radioButton_d.IsChecked = true;
+                else if (G.Equal(codeWithoutR, "p")) radioButton_p.IsChecked = true;
+                else if (G.Equal(codeWithoutR, "dp")) radioButton_dp.IsChecked = true;
+                else if (G.Equal(codeWithoutR, "m")) radioButton_m.IsChecked = true;
+                else if (G.Equal(codeWithoutR, "q")) radioButton_q.IsChecked = true;
+                else if (G.Equal(codeWithoutR, "mp")) radioButton_mp.IsChecked = true;                
+            }
+            webBrowser.Source = new Uri(graphOptions.emfName);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

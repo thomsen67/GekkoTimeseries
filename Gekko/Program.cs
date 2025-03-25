@@ -29044,58 +29044,6 @@ namespace Gekko
             return s;
         }
 
-        //public static DataTable GetDataTable(IVariable input)
-        //{
-        //    DataTable dt = new DataTable();
-
-        //    List m1 = input as List;
-        //    if (m1 == null) new Error("The variable is not a list");
-
-        //    int maxCols = 1;
-        //    int i = -1;
-        //    foreach (IVariable iv in m1.list)
-        //    {
-        //        i++;
-        //        List iv2 = iv as List;
-        //        if (iv2 == null) new Error("Sub-element #" + (i + 1) + " is not a (sub)list");
-        //        if (iv2.Count() > maxCols) maxCols = iv2.Count();
-        //    }
-
-        //    for (int ii = 0; ii < maxCols; ii++)
-        //    {
-        //        dt.Columns.Add("  dim" + (ii + 1) + "  ", typeof(string));
-        //    }
-
-        //    i = -1;
-        //    foreach (IVariable x2 in m1.list)
-        //    {
-        //        i++;
-        //        var dtRow = dt.NewRow();
-        //        List m2 = x2 as List;
-        //        int j = -1;
-        //        foreach (IVariable x3 in m2.list)
-        //        {
-        //            j++;
-        //            string s = null;
-        //            ScalarString ss = x3 as ScalarString;
-        //            s = ss.string2;
-        //            //try
-        //            //{
-        //            //    s = x3.ConvertToString();
-        //            //}
-        //            //catch
-        //            //{
-        //            //    new Error("Element " + (i + 1) + ", " + (j + 1) + "");
-        //            //}
-
-        //            dtRow[j] = "  " + s + "  ";
-        //        }
-        //        //add the row *after* populating it (else slow)
-        //        dt.Rows.Add(dtRow);
-        //    }
-        //    return dt;
-        //}
-
 
         public static void GraphThreadFunction(Object o)
         {
@@ -29127,7 +29075,7 @@ namespace Gekko
         public static void PlotThreadFunction(Object o)
         {
             GraphOptions graphOptions = (GraphOptions)o;
-            WindowPlot g = new WindowPlot();            
+            WindowPlot g = new WindowPlot(graphOptions);
             Globals.windowsPlot.Add(g);
             g.ShowDialog();
             graphOptions.windowIsShown = true;            

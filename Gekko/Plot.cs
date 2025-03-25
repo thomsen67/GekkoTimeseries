@@ -107,6 +107,7 @@ namespace Gekko
             string key2 = null;
             if (plotHelper.isDecompPlot)
             {
+                //See below, similar code
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 0.9;  //overall size of canvas, relative to 600x480                
                 decompFontFactor = d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
@@ -128,6 +129,17 @@ namespace Gekko
                 decompSvgOverallHeight = (int)(480d * d);
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
                 key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
+            }
+            else if (Program.options.bugfix_plot)
+            {
+                //See above, similar code
+                //Seems zoom can only be done "manually", altering the gnuplot svg file.         
+                double d = 1.1;  //overall size of canvas, relative to 600x480                
+                decompFontFactor = d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+                decompSvgOverallWidth = (int)(600d * d);
+                decompSvgOverallHeight = (int)(480d * d);
+                decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
+                //key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
@@ -930,6 +942,7 @@ namespace Gekko
                     graphOptions.graphVarsNames = labelsNonBroken;
                     graphOptions.title = null;
                     graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
+                    graphOptions.code = code;                    
 
                     Thread thread = new Thread(new ParameterizedThreadStart(Program.PlotThreadFunction));
                     thread.SetApartmentState(ApartmentState.STA);

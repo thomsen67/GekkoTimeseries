@@ -2,31 +2,21 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:jas="clr-namespace:Gekko"    
-    Title="Decomposition" HorizontalAlignment="Left" Height="710" Width="900" Left="100" Top="30" Closing="Window_Closing">
+    Title="Decomposition" HorizontalAlignment="Left" Height="500" Width="600" Left="0" Top="0" Closing="Window_Closing">
 
     <Window.InputBindings>
         <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
         <!--The following Window.CommandBindings (and its method) are necessary-->
-    </Window.InputBindings>    
-    
+    </Window.InputBindings>
+
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
     </Window.CommandBindings>
 
     <DockPanel>
-        <StatusBar Height="30" DockPanel.Dock="Bottom">
-            <StatusBarItem>
-                <TextBlock Name="windowDecompStatusBar" Foreground="Gray" />
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <StackPanel Orientation="Horizontal">
-                    <Image Height="10" Name="statusColor"  Margin="0, 0, 0, 0" VerticalAlignment="Center" />
-                    <TextBlock VerticalAlignment="Center" Text="-"></TextBlock>
-                    <TextBlock VerticalAlignment="Center" Text="     "></TextBlock>
-                </StackPanel>
-            </StatusBarItem>
-        </StatusBar>
-        <Grid Name="grid0" Height="153" Width="858" ShowGridLines="False" Margin="10,10,10,0" DockPanel.Dock="Top">
+        <StackPanel Orientation="Vertical">
+        <WebBrowser Name="webBrowser" DockPanel.Dock="Top"/>
+        <Grid Name="grid0" Height="153" Width="858" ShowGridLines="False" Margin="10,10,10,0" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="105" />
@@ -50,17 +40,17 @@
                 <RowDefinition Height="26" />
                 <RowDefinition Height="50" />
             </Grid.RowDefinitions>
-            
-            
+
+
             <DockPanel Grid.ColumnSpan="3" Grid.Row="1" Grid.Column="3">
                 <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" HorizontalAlignment="Left" Orientation="Horizontal">
-                
+
                 <TextBlock Name="textMerge" FontSize="11" Width="105" Foreground="Gray" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,1,0,0"/>
-            </StackPanel>           
-            
+            </StackPanel>
+
 
             <DockPanel Grid.Row="2" Grid.Column="1">
                 <Border BorderThickness="1,1,0,0" BorderBrush="LightGray" CornerRadius="10,0,0,0">
@@ -255,8 +245,21 @@
                     </Style>
                 </Button.Resources>
             </Button>
-        </Grid>        
-    </DockPanel>
+        </Grid>
+        </StackPanel>
+        <StatusBar Height="30" DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Name="windowDecompStatusBar" Foreground="Gray" />
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="10" Name="statusColor"  Margin="0, 0, 0, 0" VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center" Text="-"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="     "></TextBlock>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+    </DockPanel>    
 </Window>
     
     

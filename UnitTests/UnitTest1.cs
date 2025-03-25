@@ -7490,7 +7490,8 @@ namespace UnitTests
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser\ADAM_simple';");
             Globals.browserLimit = true;
-            I("model okt20; read kp23; read <ref> loft26; time 2010 2030;");
+            //I("model okt20; read kp23; read <ref> loft26; time 2010 2030;");
+            I("model okt20; read <first> kp23; time 2010 2030;");
             I("doc<browser>;");
             Globals.browserLimit = false;
         }
