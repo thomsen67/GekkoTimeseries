@@ -29053,14 +29053,20 @@ namespace Gekko
             if (true)
             {
                 //otherwise, setting them checked = true fires a redraw event
-                Globals.disableRationButtons = 1;
-                g.radioButton1.Checked = graphOptions.po.isLevel;
-                g.radioButton2.Checked = graphOptions.po.isLog;
-                g.radioButton5.Checked = graphOptions.po.isDiff;
-                g.radioButton3.Checked = graphOptions.po.isPch;
-                g.radioButton8.Checked = graphOptions.po.isDlog;
-                g.checkBox1.Checked = graphOptions.po.isMultiplier;
-                Globals.disableRationButtons = 0;
+                Globals.disableRadioButtons = 1;
+                try
+                {
+                    g.radioButton1.Checked = graphOptions.po.isLevel;
+                    g.radioButton2.Checked = graphOptions.po.isLog;
+                    g.radioButton5.Checked = graphOptions.po.isDiff;
+                    g.radioButton3.Checked = graphOptions.po.isPch;
+                    g.radioButton8.Checked = graphOptions.po.isDlog;
+                    g.checkBox1.Checked = graphOptions.po.isMultiplier;
+                }
+                finally
+                {
+                    Globals.disableRadioButtons = 0;
+                }
             }
 
             g.ShowDialog();
@@ -29073,12 +29079,12 @@ namespace Gekko
         }
 
         public static void PlotThreadFunction(Object o)
-        {
+        {            
             GraphOptions graphOptions = (GraphOptions)o;
             WindowPlot g = new WindowPlot(graphOptions);
             Globals.windowsPlot.Add(g);
             g.ShowDialog();
-            graphOptions.windowIsShown = true;            
+            graphOptions.windowIsShown = true;
         }
 
         private static void MaybeStartPipe2(string fileName)

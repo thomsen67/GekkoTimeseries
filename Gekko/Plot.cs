@@ -1081,7 +1081,7 @@ namespace Gekko
                 }
             }
 
-            string emfName = path + "\\" + file2;
+            string fileName = path + "\\" + file2;
             string exe = "wgnuplot51.exe";
 
             Process process = new Process();
@@ -1128,7 +1128,32 @@ namespace Gekko
 
             //resets current dir to previous location
             if (currentDir != null) Directory.SetCurrentDirectory(currentDir);
-            return emfName;
+
+            if (false && fileName.ToLower().EndsWith(".svg")) ScaleSvg(fileName, 0.95d / 16.82d, true);  //16.82 becomes 0.95em etc.            
+
+            return fileName;
+        }
+
+        /// <summary>
+        /// Scale a svg file. Example:
+        /// Some text font-size="16.82" and more text font-size="20" --> becomes scaled so that the first is scaleFactor*16.82,
+        /// and an "em" is added.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="scaleFactor"></param>
+        private static void ScaleSvg(string fileName, double scaleFactor, bool isEm)
+        {
+            string em = null;
+            if (isEm) em = "em";
+            string input = Program.GetTextFromFileWithWait(fileName);            
+            string pattern = @"font-size\s*=\s*""([\d\.]+)""";  // Capture any numeric font size                
+            string result = System.Text.RegularExpressions.Regex.Replace(input, pattern, match =>
+            {
+                double originalSize = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+                double newSize = originalSize * scaleFactor;
+                return $"font-size=\"{newSize.ToString("0.###", CultureInfo.InvariantCulture)}" + em + "\"";
+            });
+            Program.WriteFileWithWait(fileName, result);
         }
 
         private static string GetText(XmlNode x, string def)

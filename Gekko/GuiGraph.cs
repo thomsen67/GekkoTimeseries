@@ -40,6 +40,15 @@ namespace Gekko
 
     public class GraphHelper
     {
+        public GraphHelper()
+        {
+        }
+        public GraphHelper(string operator2, bool isRefreshing, bool isLogTransform)
+        {
+            this.operator2 = operator2;
+            this.isRefreshing = isRefreshing;
+            this.isLogTransform = isLogTransform;
+        }
         public string operator2 = null;
         public bool isRefreshing = false;
         public bool isLogTransform = false;
@@ -375,7 +384,7 @@ namespace Gekko
 
             if (radioButton1.Checked == true)
             {
-                if (Globals.disableRationButtons == 0) refresh();
+                if (Globals.disableRadioButtons == 0) refresh();
             }
         }
 
@@ -384,7 +393,7 @@ namespace Gekko
 
             if (radioButton2.Checked == true)
             {
-                if (Globals.disableRationButtons == 0) refresh();
+                if (Globals.disableRadioButtons == 0) refresh();
             }
         }
 
@@ -392,7 +401,7 @@ namespace Gekko
         {
             if (radioButton5.Checked == true)
             {
-                if (Globals.disableRationButtons == 0) refresh();
+                if (Globals.disableRadioButtons == 0) refresh();
             }
         }
 
@@ -400,7 +409,7 @@ namespace Gekko
         {
             if (radioButton3.Checked == true)
             {
-                if (Globals.disableRationButtons == 0) refresh();
+                if (Globals.disableRadioButtons == 0) refresh();
             }
         }
 
@@ -408,13 +417,13 @@ namespace Gekko
         {
             if (radioButton8.Checked == true)
             {
-                if (Globals.disableRationButtons == 0) refresh();
+                if (Globals.disableRadioButtons == 0) refresh();
             }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (Globals.disableRationButtons == 0) refresh();
+            if (Globals.disableRadioButtons == 0) refresh();
         }
 
         private void radioButton1_KeyDown(object sender, KeyEventArgs e)
@@ -464,7 +473,7 @@ namespace Gekko
 
         public void UpdateGraph()
         {
-            if (Globals.disableRationButtons == 0)
+            if (Globals.disableRadioButtons == 0)
             {
                 this.graphOptions.localBanks = null;  //clearing this, forcing window to use vales from Gekko databanks
                 try

@@ -390,7 +390,7 @@ namespace Gekko
 
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
-
+        
         public const string procedure = "procedure___";
 
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
@@ -743,7 +743,7 @@ namespace Gekko
         /// <summary>
         /// Used for kind of an internal hack
         /// </summary>
-        public static int disableRationButtons = 0;
+        public static int disableRadioButtons = 0;
 
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;

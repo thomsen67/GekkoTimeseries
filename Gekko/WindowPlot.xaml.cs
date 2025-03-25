@@ -25,19 +25,36 @@ namespace Gekko
         public WindowPlot(GraphOptions graphOptions)
         {
             this.graphOptions = graphOptions;
-            InitializeComponent();
+            Globals.disableRadioButtons = 1;
+            try
+            {
+                InitializeComponent();
+            }
+            finally
+            {
+                Globals.disableRadioButtons = 0;
+            }
             if (graphOptions.code != null)
-            {                
-                string codeWithoutR = G.Replace(graphOptions.code, "r", "", StringComparison.OrdinalIgnoreCase, 0);
-                bool isR = false; if (codeWithoutR.Length < graphOptions.code.Length) isR = true;
-                if (isR) CheckBox_ref.IsChecked = true;
-                if (G.Equal(codeWithoutR, "n")) radioButton_n1.IsChecked = true;
-                else if (G.Equal(codeWithoutR, "d")) radioButton_d.IsChecked = true;
-                else if (G.Equal(codeWithoutR, "p")) radioButton_p.IsChecked = true;
-                else if (G.Equal(codeWithoutR, "dp")) radioButton_dp.IsChecked = true;
-                else if (G.Equal(codeWithoutR, "m")) radioButton_m.IsChecked = true;
-                else if (G.Equal(codeWithoutR, "q")) radioButton_q.IsChecked = true;
-                else if (G.Equal(codeWithoutR, "mp")) radioButton_mp.IsChecked = true;                
+            {
+                Globals.disableRadioButtons = 1;
+                try
+                {
+
+                    string codeWithoutR = G.Replace(graphOptions.code, "r", "", StringComparison.OrdinalIgnoreCase, 0);
+                    bool isR = false; if (codeWithoutR.Length < graphOptions.code.Length) isR = true;
+                    if (isR) CheckBox_ref.IsChecked = true;
+                    if (G.Equal(codeWithoutR, "n")) radioButton_n1.IsChecked = true;
+                    else if (G.Equal(codeWithoutR, "d")) radioButton_d.IsChecked = true;
+                    else if (G.Equal(codeWithoutR, "p")) radioButton_p.IsChecked = true;
+                    else if (G.Equal(codeWithoutR, "dp")) radioButton_dp.IsChecked = true;
+                    else if (G.Equal(codeWithoutR, "m")) radioButton_m.IsChecked = true;
+                    else if (G.Equal(codeWithoutR, "q")) radioButton_q.IsChecked = true;
+                    else if (G.Equal(codeWithoutR, "mp")) radioButton_mp.IsChecked = true;
+                }
+                finally
+                {
+                    Globals.disableRadioButtons = 0;
+                }
             }
             webBrowser.Source = new Uri(graphOptions.emfName);
         }
@@ -56,107 +73,165 @@ namespace Gekko
 
         private void CheckBox_ref_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_ref_Unchecked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_shares_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_shares_Unchecked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_index_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_index_Unchecked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_log_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void CheckBox_log_Unchecked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+            }
         }
 
         private void radioButton_n1_Checked(object sender, RoutedEventArgs e)
         {
-            
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("n", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void radioButton_d_Checked(object sender, RoutedEventArgs e)
         {
-
-        }
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("d", true, CheckBox_log.IsChecked == true));
+            }
+        }        
 
         private void radioButton_p_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("p", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void radioButton_dp_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("dp", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void radioButton_n2_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("n", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void radioButton_m_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("m", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void radioButton_q_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("q", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void radioButton_mp_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh(new GraphHelper("mp", true, CheckBox_log.IsChecked == true));
+            }
         }
 
         private void Button_copy(object sender, RoutedEventArgs e)
         {
-
+            if (Globals.disableRadioButtons == 0)
+            {
+                
+            }
         }
 
         private void Button_save(object sender, RoutedEventArgs e)
         {
+            if (Globals.disableRadioButtons == 0)
+            {
 
+            }
         }
 
         private void Button_saveas(object sender, RoutedEventArgs e)
         {
+            if (Globals.disableRadioButtons == 0)
+            {
 
+            }
         }
 
         private void Button_refresh(object sender, RoutedEventArgs e)
         {
+            if (Globals.disableRadioButtons == 0)
+            {
 
+            }
         }
 
         private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Refresh(GraphHelper gh)
+        {
+            string emfName = Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh);
+            webBrowser.Source = new Uri(emfName);
         }
     }
 }
