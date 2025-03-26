@@ -99,6 +99,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh();
             }
         }
 
@@ -106,6 +107,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh();
             }
         }
 
@@ -113,6 +115,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh();
             }
         }
 
@@ -120,6 +123,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh();
             }
         }
 
@@ -127,6 +131,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh();
             }
         }
 
@@ -134,6 +139,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh();
             }
         }
 
@@ -141,17 +147,15 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {                
-                Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
-        }
-
-        
+        }        
 
         private void CheckBox_log_Unchecked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -159,7 +163,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("n", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -167,7 +171,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("d", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }        
 
@@ -175,7 +179,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("p", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -183,7 +187,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("dp", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -191,7 +195,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("n", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -199,7 +203,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("m", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -207,7 +211,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("q", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -215,7 +219,7 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-                Refresh(new GraphHelper("mp", true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+                Refresh();
             }
         }
 
@@ -247,13 +251,18 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
-
+                Refresh();
             }
         }
 
         private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Refresh()
+        {
+            Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
         }
 
         private void Refresh(GraphHelper gh)
