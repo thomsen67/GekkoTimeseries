@@ -21,10 +21,12 @@ namespace Gekko
     public partial class WindowPlot : Window
     {
         public GraphOptions graphOptions = null;
-        
+        public bool _shown;
+
         public WindowPlot(GraphOptions graphOptions)
-        {
-            this.graphOptions = graphOptions;
+        {            
+            this.graphOptions = graphOptions;            
+
             Globals.disableRadioButtons = 1;
             try
             {
@@ -34,6 +36,9 @@ namespace Gekko
             {
                 Globals.disableRadioButtons = 0;
             }
+            
+            this.Left = Globals.guiGraphWindowLeftDistance;
+            this.Top = Globals.guiGraphWindowTopDistance;
             if (graphOptions.code != null)
             {
                 Globals.disableRadioButtons = 1;
@@ -57,6 +62,14 @@ namespace Gekko
                 }
             }
             webBrowser.Source = new Uri(graphOptions.emfName);
+        }
+
+        protected override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
+            if (_shown) return;
+            _shown = true;
+            this.graphOptions.windowIsShown = true;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -91,13 +91,10 @@ namespace Gekko
                 {
                     maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
                 }
-
                 int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //heuristic not working good, 1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
                 if (plotHelper.decompPlotCallNumber == 1) columns = Math.Max(1, plotHelper.decompPlotNumberOfKeyColumns); //works better! And probably will never become 0.
-
                 double widthProxyNumberOfChars = columns * (14 + maxLength);  //14 is chars                    
                 double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
-
                 decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
                 if (plotHelper.decompPlotCallNumber == 0) decompSvgOverallWidth *= 100;  //room for lots of labels in cols...
                 decompSvgOverallHeight = (int)(480d * d);
@@ -107,13 +104,11 @@ namespace Gekko
             else if (Program.options.bugfix_plot)
             {
                 //See above, similar code
-                //Seems zoom can only be done "manually", altering the gnuplot svg file.         
-                double d = 1.1;  //overall size of canvas, relative to 600x480                15-35, tæt på 35
+                double d = 1.1;  //overall size of canvas, relative to 600x480
                 decompFontFactor = d / 1.27d * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
-                //key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
