@@ -368,7 +368,8 @@ namespace Gekko
 
             Program.StartPulse();  //regarding remote.gcm
 
-            if (true) {
+            if (true) 
+            {
                 int dpiXb = 0;
                 int dpiYb = 0;                
                 try

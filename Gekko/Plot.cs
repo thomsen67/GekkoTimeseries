@@ -23,39 +23,13 @@ namespace Gekko
     {
         public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, PlotHelper plotHelper, P p)
         {
-
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
+            double fontZoom = FontZoom();
+
             int decompSvgOverallWidth = 0;
             int decompSvgOverallHeight = 0;
-
-            //Problem with zoom etc. is that it appears that
-            //WPF Webbrowser does not scale svg image inside it
-            //according to Windows dpi settings (that are 150% on developer
-            //laptop, but can be 100% on a large screen).
-            //The decomp plot is optimized (developed) using 150% dpi scaling,
-            //so when dpi is for instance 100%, the svg plot becomes too large.
-            //To fix this, we both have to (a) alter physical size of svg inside the
-            //svg file, and (b) alter the font size.
-            //When this is done, the result is reasonable for dpi scaling <> 100%.
-            //It would be nice if the WPF Webbrowser could just know about dpi scaling,
-            //maybe in some newer .NET version? And maybe .NET 4.6.2 would just fix the issue?
-            //Or the Webbrowser could be put inside some other WPF component, and some size set??
-            //But the problem is that the width of the svg plot is very dynamic, so the height should
-            //be used. This might be the way to go, also for future svg-based PLOT window.
-            double windowsDpiScaling2 = Globals.screenDpiZoomY;
-            if (windowsDpiScaling2 == 0)
-            {
-                windowsDpiScaling2 = 150;  //sensible because not recognized
-            }
-            else
-            {
-                if (windowsDpiScaling2 < 50) windowsDpiScaling2 = 50;
-                else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
-            }
-            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.
-            double overallZoom = ((double)Program.options.decomp_plot_zoom / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -77,7 +51,7 @@ namespace Gekko
                     new Error("In PLOT, expected file type is emf, png, svg or pdf");
                 }
                 extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
-            }            
+            }
 
             //bool isInside = true;
             //bool test2 = false;
@@ -110,7 +84,7 @@ namespace Gekko
                 //See below, similar code
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 0.9;  //overall size of canvas, relative to 600x480                
-                decompFontFactor = d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
+                decompFontFactor = d * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
                 int n = containerExplode.Count;
                 int maxLength = 0;
                 foreach (var xx in containerExplode)
@@ -135,7 +109,7 @@ namespace Gekko
                 //See above, similar code
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 1.1;  //overall size of canvas, relative to 600x480                15-35, tæt på 35
-                decompFontFactor = d / 1.27d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+                decompFontFactor = d / 1.27d * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
@@ -148,7 +122,7 @@ namespace Gekko
             {
                 new Error("PLOT called with 0 variables");
             }
-            int numberOfObs = GekkoTime.Observations(o.t1, o.t2);            
+            int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
             int rr = Program.RandomInt();
             if (o.isBrowser) rr = Globals.browserPlotFiles.Count + 1;
             string file1 = "temp" + rr + ".dat";
@@ -817,9 +791,9 @@ namespace Gekko
             txt.AppendLine(plotline);
 
             using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter tw = G.GekkoStreamWriter(fs)) 
-            { 
-                tw.WriteLine(txt); tw.Flush(); tw.Close(); 
+            using (StreamWriter tw = G.GekkoStreamWriter(fs))
+            {
+                tw.WriteLine(txt); tw.Flush(); tw.Close();
             }
 
             string plotFileName = null;
@@ -836,10 +810,10 @@ namespace Gekko
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
                     {
-                        if (overallZoom < 0.999 || overallZoom > 1.001)
+                        if (fontZoom < 0.999 || fontZoom > 1.001)
                         {
-                            int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
-                            int h2 = (int)(((double)decompSvgOverallHeight) * overallZoom);
+                            int w2 = (int)(((double)decompSvgOverallWidth) * fontZoom); //
+                            int h2 = (int)(((double)decompSvgOverallHeight) * fontZoom);
                             string s = Program.GetTextFromFileWithWait(plotFileName);
                             //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
                             s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
@@ -859,6 +833,46 @@ namespace Gekko
                 }
             }
             return plotFileName;
+        }
+
+        /// <summary>
+        /// This scales the fonts of the WPF. Problem is that the C# control showing the svg is kind of
+        /// broken/old, so tweaking using screen dpi is necessary. This scaling is relative to 150 dpi screen,
+        /// so returns 1 on such a screen. To make neutral, use 1/1.50 instead of 1.
+        /// </summary>
+        /// <returns></returns>
+        private static double FontZoom()
+        {
+            //Problem with zoom etc. is that it appears that
+            //WPF Webbrowser does not scale svg image inside it
+            //according to Windows dpi settings (that are 150% on developer
+            //laptop, but can be 100% on a large screen).
+            //This is because it uses an old IE engine.
+            //The decomp plot is optimized (developed) using 150% dpi scaling,
+            //so when dpi is for instance 100%, the svg plot becomes too large.
+            //To fix this, we both have to (a) alter physical size of svg inside the
+            //svg file, and (b) alter the font size.
+            //When this is done, the result is reasonable for dpi scaling <> 100%.
+            //It would be nice if the WPF Webbrowser could just know about dpi scaling,
+            //maybe in some newer .NET version? And maybe .NET 4.6.2 would just fix the issue?
+            //Or the Webbrowser could be put inside some other WPF component, and some size set??
+            //But the problem is that the width of the svg plot is very dynamic, so the height should
+            //be used. This might be the way to go, also for future svg-based PLOT window.
+            //A solution would be to use WebWiew2, but it is not in-built, requires .NET 4.6.2, requires Win 10 (with installation) or Win 11.
+            //Also, bundling WebWview2 (besides the .dll's) would require around 100 MB, too much.
+            double windowsDpiScaling2 = Globals.screenDpiZoomY;
+            if (windowsDpiScaling2 == 0)
+            {
+                windowsDpiScaling2 = 150;  //sensible because not recognized
+            }
+            else
+            {
+                if (windowsDpiScaling2 < 50) windowsDpiScaling2 = 50;
+                else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
+            }
+            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.
+            double overallZoom = ((double)Program.options.decomp_plot_zoom / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
+            return overallZoom;
         }
 
         private static bool IsAOrUHighestFreq(EFreq highestFreq)
