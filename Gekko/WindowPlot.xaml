@@ -220,7 +220,7 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button Content="Copy" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Copies plot to clipboard as a .svg file, for pasting into e.g. Word." Click="Button_copy">
+                <Button Content="Copy" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Copies plot to clipboard as a .svg file, for pasting into e.g. Word." Click="Button_copy">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -228,7 +228,7 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Save" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. The name is gekkoplot[number].svg." Click="Button_save">
+                <Button Content="Save" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. The name is gekkoplot[number].svg." Click="Button_save">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -236,13 +236,17 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Save As" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
+                <Button Content="Save As" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
                 </Button>
+
+                <TextBlock Name="label1" TextWrapping="Wrap" Opacity="0.5" FontSize="12" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,10,0,0" ></TextBlock>
+                <TextBlock Name="label2" TextWrapping="Wrap" Opacity="0.5" FontSize="12" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ></TextBlock>
+
             </StackPanel>
         </StackPanel>
 

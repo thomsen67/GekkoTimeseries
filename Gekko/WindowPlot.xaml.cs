@@ -225,25 +225,41 @@ namespace Gekko
 
         private void Button_copy(object sender, RoutedEventArgs e)
         {
-            if (Globals.disableRadioButtons == 0)
-            {
-                
-            }
+            // Copy the .svg file to the clipboard for use in e.g. Word
+            //string[] ss = new string[1];
+            //ss[0] = this.graphOptions.emfName;
+            //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
+            //Clipboard.SetDataObject(iData, true);
+            Clipboard.SetText(this.graphOptions.emfName + " (use Insert --> Pictures...)");
         }
 
         private void Button_save(object sender, RoutedEventArgs e)
         {
-            if (Globals.disableRadioButtons == 0)
-            {
-
-            }
+            //Copy the .svg file to file for later use in e.g. Word
+            //File.
+            string input = "gekkoplot";
+            string inputLast = "svg";
+            string name2 = Program.Add1ToFileName(input, inputLast, Program.options.folder_working);
+            string enddir = Program.options.folder_working + "\\" + name2;
+            Program.WaitForFileCopy(this.graphOptions.emfName, enddir);
+            this.label1.Text = "File " + name2;
+            this.label2.Text = "saved in working folder";
         }
 
         private void Button_saveas(object sender, RoutedEventArgs e)
         {
-            if (Globals.disableRadioButtons == 0)
+            Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
             {
-
+                Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                InitialDirectory = Program.options.folder_working
+            };
+            if (saveFileDialog1.ShowDialog() == true)
+            {
+                Program.WaitForFileCopy(this.graphOptions.emfName, saveFileDialog1.FileName);
+                this.label1.Text = "File saved";
+                this.label2.Text = "";
             }
         }
 

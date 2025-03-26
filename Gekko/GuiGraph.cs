@@ -531,7 +531,7 @@ namespace Gekko
             {
                 Program.WaitForFileCopy(this.graphOptions.emfName, saveFileDialog1.FileName);
                 this.label1.Text = "File saved";
-            }
+            }            
         }
 
         //Close the graph with Escape key, no matter the focus
