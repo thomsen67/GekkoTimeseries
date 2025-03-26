@@ -27582,11 +27582,11 @@ namespace Gekko
                     double d = double.NaN;
                     if (isScalar)  //not series
                     {
-                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.guiGraphIsIndex, o.guiGraphIsShares, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
+                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.guiGraphIsIndex, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     else
                     {
-                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.guiGraphIsIndex, o.guiGraphIsShares, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
+                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.guiGraphIsIndex, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     i++;
 

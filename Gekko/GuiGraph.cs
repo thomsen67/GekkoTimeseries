@@ -43,21 +43,19 @@ namespace Gekko
         public GraphHelper()
         {
         }
-        public GraphHelper(string operator2, bool isRefreshing, bool isLogTransform, double fontScaling, bool isIndex, bool isShares)
+        public GraphHelper(string operator2, bool isRefreshing, bool isLogTransform, double fontScaling, bool isIndex)
         {
             this.operator2 = operator2;
             this.isRefreshing = isRefreshing;
             this.isLogTransform = isLogTransform;
             this.fontScaling = fontScaling;
             this.isIndex = isIndex;
-            this.isShares = isShares;
         }
         public string operator2 = null; 
         public bool isRefreshing = false;
         public bool isLogTransform = false;
         public double fontScaling = double.NaN;
         public bool isIndex = false;
-        public bool isShares = false;
     }
 
     public class Graph : Form

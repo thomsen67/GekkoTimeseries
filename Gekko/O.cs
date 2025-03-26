@@ -9767,7 +9767,6 @@ namespace Gekko
             public bool guiGraphIsLogTransform = false;
             public double guiGraphFontScaling = double.NaN;
             public bool guiGraphIsIndex = false;
-            public bool guiGraphIsShares = false;
 
             public string prtType = null; //PRT, MULPRT, GMULPRT, PLOT, SHEET, CLIP, 
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set

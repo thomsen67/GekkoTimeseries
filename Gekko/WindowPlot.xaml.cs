@@ -262,7 +262,7 @@ namespace Gekko
 
         private void Refresh()
         {
-            Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
+            Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true));
         }
 
         private void Refresh(GraphHelper gh)

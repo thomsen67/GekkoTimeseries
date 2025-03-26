@@ -192,16 +192,12 @@
             </DockPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
-                <CheckBox  x:Name="CheckBox_shares" Width="62" Margin="0,3.5,0,0" VerticalAlignment="Top" ToolTip="Show data shares in % of total sum" Checked="CheckBox_shares_Checked" Unchecked="CheckBox_shares_Unchecked"  Content="Shares" />
+                <CheckBox x:Name="CheckBox_log"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show data as logarithms"  Content="Log" Checked="CheckBox_log_Checked" Unchecked="CheckBox_log_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
                 <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="For a middle period t, adjusts data so that x[t]=100 (&lt;i> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
-            </StackPanel>
-
-            <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_log"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show data as logarithms"  Content="Log" Checked="CheckBox_log_Checked" Unchecked="CheckBox_log_Unchecked"/>
-            </StackPanel>
+            </StackPanel>            
 
             <TextBlock Grid.Column="11" Grid.Row="1" Name="textBlock1" FontWeight="Bold">Options</TextBlock>
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
