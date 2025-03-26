@@ -184,17 +184,17 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="1">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x(-1)">Abs. time-change</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x[-1]">Abs. time-change</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="4" Grid.Column="1">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x(-1)-1]*100">Growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x[-1]-1]*100">Growth rate</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="1">
                 <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [x(-1)/x(-2)-1]*100">Chng. growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [x[-1]/x[-2]-1]*100">Chng. growth rate</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -205,14 +205,14 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="2">
                 <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x(-1)">d</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x[-1]">d</TextBlock>
                 </Border>
             </DockPanel>
 
 
             <DockPanel Grid.Row="5" Grid.Column="2">
                 <Border BorderThickness="0,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [x(-1)/x(-2)-1]*100">dp</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [x[-1]/x[-2]-1]*100">dp</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -229,7 +229,7 @@
 
             <DockPanel Grid.Row="4" Grid.Column="2">
                 <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x(-1)-1]*100">p</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x[-1]-1]*100">p</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -301,7 +301,7 @@
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="6">
                 <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [@x/@x(-1)-1]*100">Mul. growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [@x/@x[-1]-1]*100">Mul. growth rate</TextBlock>
                 </Border>
 
             </DockPanel>
@@ -324,7 +324,7 @@
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="7">
                 <Border BorderThickness="0,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [@x/@x(-1)-1]*100">mp</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [@x/@x[-1]-1]*100">mp</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -388,7 +388,7 @@
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">Options</TextBlock>
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             <StackPanel Grid.Column="11" Grid.Row="1" Orientation="Horizontal">
-                <CheckBox Name="checkBoxShares" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBoxShares_Checked" Unchecked="CheckBoxShares_Unchecked" ToolTip="Show decomposition shares (&lt;shares> option), not meaningful for &quot;Raw&quot; options.">Shares</CheckBox>
+                <CheckBox Name="checkBoxShares" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBoxShares_Checked" Unchecked="CheckBoxShares_Unchecked" ToolTip="Show decomposition shares in % (&lt;shares> option), not meaningful for &quot;Raw&quot; options.">Shares</CheckBox>
                 <CheckBox Name="checkRef" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkBox2_Checked" Unchecked="checkBox2_Unchecked" ToolTip="Use data from reference databank (only for time-change options)" Content="Ref" Margin="3,3,6.333,3"></CheckBox>
                 <CheckBox x:Name="checkBoxDyn" Width="57" Margin="24,0,0,0" Content="Dyn" HorizontalAlignment="Left" VerticalAlignment="Center"  ToolTip="Resolve dynamic lagged/leaded variables (&lt;dyn option>). Beware that this is time-consuming if there are many time periods." Checked="CheckBoxDyn_Checked" Unchecked="CheckBoxDyn_Unchecked" />
             </StackPanel>

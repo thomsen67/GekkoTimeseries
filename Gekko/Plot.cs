@@ -21,6 +21,19 @@ namespace Gekko
 
     public static class Plot
     {
+        /// <summary>
+        /// Produces and shows plots, by producing files like emf or svg via gnuplot, and showing these.
+        /// Note: plots can also be generated from CallGnuplot2() 
+        /// or using Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh), which are
+        /// stored plots Func's.
+        /// </summary>
+        /// <param name="plotTable"></param>
+        /// <param name="o"></param>
+        /// <param name="containerExplode"></param>
+        /// <param name="highestFreq"></param>
+        /// <param name="plotHelper"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, PlotHelper plotHelper, P p)
         {
             //Måske en SYS gnuplot til at starte et vindue op.

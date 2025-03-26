@@ -54,17 +54,17 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="1">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x(-1)">Abs. time-change</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x[-1]">Abs. time-change</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="4" Grid.Column="1">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x(-1)-1]*100">Growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x[-1]-1]*100">Growth rate</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="1">
                 <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [x(-1)/x(-2)-1]*100">Chng. growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [x[-1]/x(-2)-1]*100">Chng. growth rate</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -75,14 +75,14 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="2">
                 <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x(-1)">d</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x[-1]">d</TextBlock>
                 </Border>
             </DockPanel>
 
 
             <DockPanel Grid.Row="5" Grid.Column="2">
                 <Border BorderThickness="0,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [x(-1)/x(-2)-1]*100">dp</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [x[-1]/x(-2)-1]*100">dp</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -99,7 +99,7 @@
 
             <DockPanel Grid.Row="4" Grid.Column="2">
                 <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x(-1)-1]*100">p</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x[-1]-1]*100">p</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -131,17 +131,17 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="6">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x(-1)">Abs. multiplier</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;m&gt; or MULPRT&lt;abs&gt;&#xa;x-@x">Abs. multiplier</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="4" Grid.Column="6">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x(-1)-1]*100">Relative multiplier</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;q&gt; or MULPRT&lt;pch&gt;&#xa;[x/@x-1]*100">Relative multiplier</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="6">
                 <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [x(-1)/x(-2)-1]*100">Mul. growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [@x/@x[-1]-1]*100">Mul. growth rate</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -152,14 +152,14 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="7">
                 <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;d&gt; or PRT&lt;dif&gt;&#xa;x-x(-1)">m</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;m&gt; or MULPRT&lt;abs&gt;&#xa;x-@x">m</TextBlock>
                 </Border>
             </DockPanel>
 
 
             <DockPanel Grid.Row="5" Grid.Column="7">
                 <Border BorderThickness="0,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x(-1)-1]*100 - [x(-1)/x(-2)-1]*100">mp</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [@x/@x[-1]-1]*100">mp</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -170,46 +170,46 @@
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="8">
                 <Border BorderThickness="3,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton_m" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton_m_Checked" ToolTip="Absolute time-change (differences)"></RadioButton>
+                    <RadioButton Name="radioButton_m" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0" GroupName="rb" Checked="radioButton_m_Checked" ToolTip="Absolute multiplier difference"></RadioButton>
                 </Border>
             </DockPanel>
 
             <DockPanel Grid.Row="4" Grid.Column="7">
                 <Border BorderThickness="0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x(-1)-1]*100">q</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" ToolTip="Corresponds to PRT&lt;q&gt; or MULPRT&lt;pch&gt;&#xa;[x/@x-1]*100">q</TextBlock>
                 </Border>
             </DockPanel>
 
             <DockPanel Grid.Row="4" Grid.Column="8">
                 <Border BorderThickness="3,0,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Name="radioButton_q" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_q_Checked" ToolTip="Percentage time growth rate"></RadioButton>
+                    <RadioButton Name="radioButton_q" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_q_Checked" ToolTip="Percentage multiplier difference"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="8">
                 <Border BorderThickness="3,0,3,3" BorderBrush="LightGray" CornerRadius="0,0,10,10">
-                    <RadioButton Name="radioButton_mp" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_mp_Checked" ToolTip="Absolute time-change in percentage time growth rate"></RadioButton>
+                    <RadioButton Name="radioButton_mp" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton_mp_Checked" ToolTip="Abs. multiplier in percentage time growth rate"></RadioButton>
                 </Border>
             </DockPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
-                <CheckBox  x:Name="CheckBox_shares" Width="62" Margin="0,3.5,0,0" VerticalAlignment="Top" ToolTip="Show count of elements (&lt;count> option)" Checked="CheckBox_shares_Checked" Unchecked="CheckBox_shares_Unchecked"  Content="Shares" />
+                <CheckBox  x:Name="CheckBox_shares" Width="62" Margin="0,3.5,0,0" VerticalAlignment="Top" ToolTip="Show data shares in % of total sum" Checked="CheckBox_shares_Checked" Unchecked="CheckBox_shares_Unchecked"  Content="Shares" />
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
+                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="For a middle period t, adjusts data so that x[t]=100 (&lt;i> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_log"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Log" Checked="CheckBox_log_Checked" Unchecked="CheckBox_log_Unchecked"/>
+                <CheckBox x:Name="CheckBox_log"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show data as logarithms"  Content="Log" Checked="CheckBox_log_Checked" Unchecked="CheckBox_log_Unchecked"/>
             </StackPanel>
 
             <TextBlock Grid.Column="11" Grid.Row="1" Name="textBlock1" FontWeight="Bold">Options</TextBlock>
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
-                <CheckBox Name="CheckBox_ref" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Show decomposition shares (&lt;shares> option), not meaningful for &quot;Raw&quot; options.">Ref</CheckBox>
+                <CheckBox Name="CheckBox_ref" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Use data from reference databank.">Ref</CheckBox>
             </StackPanel>
 
-            <Button Grid.Column="11" Grid.Row="2" Content="Copy" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_copy">
+            <Button Grid.Column="11" Grid.Row="2" Content="Copy" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Copies plot to clipboard as a .svg file, for pasting into e.g. Word." Click="Button_copy">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -217,7 +217,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button Grid.Column="11" Grid.Row="3" Content="Save" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_save">
+            <Button Grid.Column="11" Grid.Row="3" Content="Save" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. The name is gekkoplot[number].svg." Click="Button_save">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -225,7 +225,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button Grid.Column="11" Grid.Row="4" Content="Save As" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_saveas">
+            <Button Grid.Column="11" Grid.Row="4" Content="Save As" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -233,7 +233,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button Grid.Column="11" Grid.Row="5" Content="Refresh" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Refresh local DECOMP data from First/Ref databank values." Click="Button_refresh">
+            <Button Grid.Column="11" Grid.Row="5" Content="Refresh" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update graph with data from databanks (without changing any options)." Click="Button_refresh">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
