@@ -29486,11 +29486,12 @@ namespace Gekko
         /// <param name="isLogTransform"></param>
         /// <param name="isCalledFromTable"></param>
         /// <param name="sumOver"></param>
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, GekkoTime index, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
+        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             //TTH: index=100
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
 
+            double indexFactor = 100d;
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 
             if (isCalledFromTable && !G.Equal(Globals.tableOption, "n"))
@@ -29651,6 +29652,13 @@ namespace Gekko
                 }
             }
 
+            GekkoTime index = index2;
+            if (smpl != null && index.IsNotNull())
+            {
+                //<i>                                
+                index = smpl.t1.Add((smpl.Observations12() - 1) / 2);  //per1=2001-2005, observations=5 --> (5-1)/2 = 2 are added, so we get 2001+2 = 2003 as midpoint.
+            }
+
             GekkoTime tMinusOne = gt.Add(-1);
             var1 = 0;
             varPch = 0;
@@ -29663,7 +29671,8 @@ namespace Gekko
             double xLag2 = double.NaN;
             double y = double.NaN;
             double yLag = double.NaN;
-            double yLag2 = double.NaN;
+            double yLag2 = double.NaN;                
+
             if (tsWork != null)
             {
                 x = 0d;
@@ -29674,12 +29683,21 @@ namespace Gekko
 
                 for (int i = 0; i < sumOver; i++)
                 {
-                    //for instance if gt is 2020m3, we will add 2020m3+2020m2+2020m1.
-                    x += tsWork.GetDataSimple(gt.Add(-i)); //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
-                    //for instance if gt is 2020m3, we will add 2019m12+2019m11+2010m10.
-                    xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i));
-                    //for instance if gt is 2020m3, we will add 2019m9+2019m8+2010m7.
-                    xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i));
+                    if (index.IsNull())
+                    {
+                        //for instance if gt is 2020m3, we will add 2020m3+2020m2+2020m1.
+                        x += tsWork.GetDataSimple(gt.Add(-i)); //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
+                        //for instance if gt is 2020m3, we will add 2019m12+2019m11+2010m10.
+                        xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i));
+                        //for instance if gt is 2020m3, we will add 2019m9+2019m8+2010m7.
+                        xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i));
+                    }
+                    else
+                    {
+                        x += tsWork.GetDataSimple(gt.Add(-i)) / tsWork.GetDataSimple(index) * indexFactor;
+                        xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
+                        xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
+                    }
                 }
 
                 x = x / divide;
@@ -29702,9 +29720,18 @@ namespace Gekko
                 yLag2 = 0d;
                 for (int i = 0; i < sumOver; i++)
                 {
-                    y += tsRef.GetDataSimple(gt.Add(-i));
-                    yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i));
-                    yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i));
+                    if (index.IsNull())
+                    {
+                        y += tsRef.GetDataSimple(gt.Add(-i));
+                        yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i));
+                        yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i));
+                    }
+                    else
+                    {
+                        y += tsRef.GetDataSimple(gt.Add(-i)) / tsRef.GetDataSimple(index) * indexFactor;
+                        yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
+                        yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
+                    }
                 }
 
                 y = y / divide;

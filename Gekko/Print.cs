@@ -1892,7 +1892,7 @@ namespace Gekko
             //TODO filter and skip, see below
             double var1 = double.NaN;
             double varPch = double.NaN;
-            Program.ComputeValueForPrintPlotNew(out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, index, false, collapse, sumOver);
+            Program.ComputeValueForPrintPlotNew(smpl, out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, index, false, collapse, sumOver);
             return var1;
         }
 

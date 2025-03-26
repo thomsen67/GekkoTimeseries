@@ -312,6 +312,12 @@ namespace Gekko
             return false;
         }
 
+        public bool IsNotNull()
+        {
+            if (this.super == -23456) return true;
+            return false;
+        }
+
         public static int FromDateTimeToUnixDays(DateTime t)
         {
             //note this possibility for seconds: long unixSeconds = DateTimeOffset.Now.ToUnixTimeSeconds();
