@@ -2,7 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:jas="clr-namespace:Gekko"    
-    Title="Gekko plot" HorizontalAlignment="Left" Height="517" Width="710" Left="0" Top="0" Closing="Window_Closing">
+    Title="Gekko plot" HorizontalAlignment="Left" Height="517" Width="560" Left="0" Top="0" Closing="Window_Closing">
 
     <Window.InputBindings>
         <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
@@ -25,7 +25,7 @@
                 <ColumnDefinition Width="105" />
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="52" />
-                <ColumnDefinition Width="52" />
+                <ColumnDefinition Width="32" />
                 <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="230" />
             </Grid.ColumnDefinitions>
@@ -196,49 +196,55 @@
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="For a middle period t, adjusts data so that x[t]=100 (&lt;i> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
-            </StackPanel>            
+                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Indexes/adjusts data to 100 in the midpoint period (&lt;i> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
+            </StackPanel>
 
-            <TextBlock Grid.Column="11" Grid.Row="1" Name="textBlock1" FontWeight="Bold">Options</TextBlock>
+            <DockPanel Grid.ColumnSpan="1" Grid.Row="1" Grid.Column="11">
+                <TextBlock Name="textBlock1" FontWeight="Bold" VerticalAlignment="Center">Options</TextBlock>
+            </DockPanel>
+
+
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
                 <CheckBox Name="CheckBox_ref" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Use data from reference databank.">Ref</CheckBox>
-            </StackPanel>
-
-            <Button Grid.Column="11" Grid.Row="2" Content="Copy" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Copies plot to clipboard as a .svg file, for pasting into e.g. Word." Click="Button_copy">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-
-            <Button Grid.Column="11" Grid.Row="3" Content="Save" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. The name is gekkoplot[number].svg." Click="Button_save">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-
-            <Button Grid.Column="11" Grid.Row="4" Content="Save As" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-
-            <Button Grid.Column="11" Grid.Row="5" Content="Refresh" Margin="7,-3,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update graph with data from databanks (without changing any options)." Click="Button_refresh">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+            </StackPanel>            
         </Grid>
 
-        <WebBrowser Name="webBrowser" Height="360" Width="700" Margin="10,0,0,0"/>
+        <StackPanel Orientation="Horizontal">
+          <WebBrowser Name="webBrowser" Height="360" Width="450" HorizontalAlignment="Left" Margin="10,0,0,0"/>
+            <StackPanel Orientation="Vertical">
+                <Button Grid.Column="11" Grid.Row="5" Content="Refresh" Margin="7,10,0,0" HorizontalAlignment="Left" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update graph with data from databanks (without changing any options)." Click="Button_refresh">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+                <Button Content="Copy" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Copies plot to clipboard as a .svg file, for pasting into e.g. Word." Click="Button_copy">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="Save" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. The name is gekkoplot[number].svg." Click="Button_save">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="Save As" Margin="7,10,0,0" Width="50" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </StackPanel>
 
         <!--<StatusBar Height="30">
             <StatusBarItem>
