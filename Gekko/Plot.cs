@@ -25,7 +25,10 @@ namespace Gekko
         /// Produces and shows plots, by producing files like emf or svg via gnuplot, and showing these.
         /// Note: plots can also be generated from CallGnuplot2() 
         /// or using Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh), which are
-        /// stored plots Func's.
+        /// stored plots Func's, and are transmitted to 
+        /// O.Prt fields like .guiGraphOperator, .guiGraphIsLogTransform, .guiGraphFontScaling, 
+        /// .guiGraphIsIndex, .guiGraphIsShares.
+        /// 
         /// </summary>
         /// <param name="plotTable"></param>
         /// <param name="o"></param>

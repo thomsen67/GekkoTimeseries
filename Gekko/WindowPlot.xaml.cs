@@ -44,17 +44,28 @@ namespace Gekko
                 Globals.disableRadioButtons = 1;
                 try
                 {
-
-                    string codeWithoutR = G.Replace(graphOptions.code, "r", "", StringComparison.OrdinalIgnoreCase, 0);
-                    bool isR = false; if (codeWithoutR.Length < graphOptions.code.Length) isR = true;
+                    bool isR = false;
+                    bool isL = false;
+                    string opRawLower = graphOptions.code.ToLower();
+                    if (opRawLower.EndsWith("l"))
+                    {
+                        opRawLower = opRawLower.Substring(0, opRawLower.Length - 1);
+                        isL = true;
+                    }
+                    if (opRawLower.StartsWith("r"))
+                    {
+                        opRawLower = opRawLower.Substring(1);
+                        isR = true;
+                    }                    
                     if (isR) CheckBox_ref.IsChecked = true;
-                    if (G.Equal(codeWithoutR, "n")) radioButton_n1.IsChecked = true;
-                    else if (G.Equal(codeWithoutR, "d")) radioButton_d.IsChecked = true;
-                    else if (G.Equal(codeWithoutR, "p")) radioButton_p.IsChecked = true;
-                    else if (G.Equal(codeWithoutR, "dp")) radioButton_dp.IsChecked = true;
-                    else if (G.Equal(codeWithoutR, "m")) radioButton_m.IsChecked = true;
-                    else if (G.Equal(codeWithoutR, "q")) radioButton_q.IsChecked = true;
-                    else if (G.Equal(codeWithoutR, "mp")) radioButton_mp.IsChecked = true;
+                    if (isL) CheckBox_log.IsChecked = true;
+                    if (G.Equal(opRawLower, "n")) radioButton_n1.IsChecked = true;
+                    else if (G.Equal(opRawLower, "d")) radioButton_d.IsChecked = true;
+                    else if (G.Equal(opRawLower, "p")) radioButton_p.IsChecked = true;
+                    else if (G.Equal(opRawLower, "dp")) radioButton_dp.IsChecked = true;
+                    else if (G.Equal(opRawLower, "m")) radioButton_m.IsChecked = true;
+                    else if (G.Equal(opRawLower, "q")) radioButton_q.IsChecked = true;
+                    else if (G.Equal(opRawLower, "mp")) radioButton_mp.IsChecked = true;
                 }
                 finally
                 {
@@ -129,14 +140,18 @@ namespace Gekko
         private void CheckBox_log_Checked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
-            {
+            {                
+                Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
             }
         }
+
+        
 
         private void CheckBox_log_Unchecked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_shares.IsChecked == true));
             }
         }
 
@@ -245,6 +260,20 @@ namespace Gekko
         {
             string emfName = Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh);
             webBrowser.Source = new Uri(emfName);
+        }
+
+        private string GetOperator()
+        {
+            string op = "n";
+            if (radioButton_n1.IsChecked == true) op = "n";
+            else if (radioButton_n2.IsChecked == true) op = "n";
+            else if (radioButton_d.IsChecked == true) op = "d";
+            else if (radioButton_p.IsChecked == true) op = "p";
+            else if (radioButton_dp.IsChecked == true) op = "dp";
+            else if (radioButton_m.IsChecked == true) op = "m";
+            else if (radioButton_q.IsChecked == true) op = "q";
+            else if (radioButton_mp.IsChecked == true) op = "mp";
+            return op;
         }
     }
 }
