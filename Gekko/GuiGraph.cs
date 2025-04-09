@@ -54,7 +54,7 @@ namespace Gekko
         public string operator2 = null; 
         public bool isRefreshing = false;
         public bool isLogTransform = false;
-        public double fontScaling = double.NaN;
+        public double fontScaling = 1d;
         public bool isIndex = false;
     }
 

@@ -10509,6 +10509,9 @@ namespace Gekko
                     //will include array-series, which is ok here -- we look at all of them
                     if (kvp.Value.Type() != EVariableType.Series) continue;
                     Series ts = kvp.Value as Series;
+                    if (G.Equal(ts.name, "qbnp!a"))
+                    {
+                    }
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
                     ts.DeepTrace(th1);
@@ -10563,7 +10566,7 @@ namespace Gekko
                         string aname = TraceGetPrecedentsHelper2(bankname, pname);
                         if (aname != null)
                         {
-                            names.Add(G.Chop_AddBank(G.Chop_RemoveFreq(aname), "adambk"));
+                            names.Add(G.Chop_AddBank(G.Chop_RemoveFreq(aname), bankname));
                         }
                     }
                 }
@@ -10632,12 +10635,9 @@ namespace Gekko
         /// <returns></returns>
         public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname)
         {
-            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);            
 
-            string name = null;
-            if (ivName != null) name = O.ConvertToString(ivName);
-
-            if (name == null)
+            if (ivName == null)
             {
 
                 GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
@@ -10659,8 +10659,15 @@ namespace Gekko
             }
             else
             {
-
-                string nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(name), Program.options.freq);
+                string nameWithFreq = null;
+                if (ivName.Type() == EVariableType.String)
+                {
+                    nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(O.ConvertToString(ivName)), Program.options.freq);                    
+                }
+                else if (ivName.Type() == EVariableType.Series)
+                {
+                    nameWithFreq = (ivName as Series).GetName();
+                }
 
                 GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
                 foreach (KeyValuePair<string, IVariable> kvp in flat)

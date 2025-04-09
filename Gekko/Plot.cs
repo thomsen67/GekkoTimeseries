@@ -42,7 +42,7 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
-            double fontZoom = FontZoom();
+            double fontZoom = FontZoom(plotHelper.isDecompPlot);
 
             int decompSvgOverallWidth = 0;
             int decompSvgOverallHeight = 0;
@@ -120,7 +120,7 @@ namespace Gekko
             else if (Program.options.bugfix_plot)
             {
                 //See above, similar code
-                double d = 1.1;  //overall size of canvas, relative to 600x480
+                double d = 1.1d * o.guiGraphFontScaling;  //overall size of canvas, relative to 600x480
                 decompFontFactor = d / 1.27d * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
@@ -852,7 +852,7 @@ namespace Gekko
         /// so returns 1 on such a screen. To make neutral, use 1/1.50 instead of 1.
         /// </summary>
         /// <returns></returns>
-        private static double FontZoom()
+        private static double FontZoom(bool isDecomp)
         {
             //Problem with zoom etc. is that it appears that
             //WPF Webbrowser does not scale svg image inside it
@@ -882,7 +882,8 @@ namespace Gekko
                 else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
             }
             double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.
-            double overallZoom = ((double)Program.options.decomp_plot_zoom / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
+            double overallZoom = ((double)Program.options.plot_zoom_general / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
+            if (isDecomp) overallZoom *= ((double)Program.options.plot_zoom_decomp / 100d);
             return overallZoom;
         }
 
@@ -1152,34 +1153,32 @@ namespace Gekko
             process.Close();
 
             //resets current dir to previous location
-            if (currentDir != null) Directory.SetCurrentDirectory(currentDir);
-
-            if (false && fileName.ToLower().EndsWith(".svg")) ScaleSvg(fileName, 0.95d / 16.82d, true);  //16.82 becomes 0.95em etc.            
+            if (currentDir != null) Directory.SetCurrentDirectory(currentDir);            
 
             return fileName;
         }
 
-        /// <summary>
-        /// Scale a svg file. Example:
-        /// Some text font-size="16.82" and more text font-size="20" --> becomes scaled so that the first is scaleFactor*16.82,
-        /// and an "em" is added.
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="scaleFactor"></param>
-        private static void ScaleSvg(string fileName, double scaleFactor, bool isEm)
-        {
-            string em = null;
-            if (isEm) em = "em";
-            string input = Program.GetTextFromFileWithWait(fileName);            
-            string pattern = @"font-size\s*=\s*""([\d\.]+)""";  // Capture any numeric font size                
-            string result = System.Text.RegularExpressions.Regex.Replace(input, pattern, match =>
-            {
-                double originalSize = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-                double newSize = originalSize * scaleFactor;
-                return $"font-size=\"{newSize.ToString("0.###", CultureInfo.InvariantCulture)}" + em + "\"";
-            });
-            Program.WriteFileWithWait(fileName, result);
-        }
+        ///// <summary>
+        ///// Scale a svg file. Example:
+        ///// Some text font-size="16.82" and more text font-size="20" --> becomes scaled so that the first is scaleFactor*16.82,
+        ///// and an "em" is added.
+        ///// </summary>
+        ///// <param name="fileName"></param>
+        ///// <param name="scaleFactor"></param>
+        //private static void ScaleSvg(string fileName, double scaleFactor, bool isEm)
+        //{
+        //    string em = null;
+        //    if (isEm) em = "em";
+        //    string input = Program.GetTextFromFileWithWait(fileName);            
+        //    string pattern = @"font-size\s*=\s*""([\d\.]+)""";  // Capture any numeric font size                
+        //    string result = System.Text.RegularExpressions.Regex.Replace(input, pattern, match =>
+        //    {
+        //        double originalSize = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+        //        double newSize = originalSize * scaleFactor;
+        //        return $"font-size=\"{newSize.ToString("0.###", CultureInfo.InvariantCulture)}" + em + "\"";
+        //    });
+        //    Program.WriteFileWithWait(fileName, result);
+        //}
 
         private static string GetText(XmlNode x, string def)
         {

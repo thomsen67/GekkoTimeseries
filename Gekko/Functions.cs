@@ -6060,6 +6060,7 @@ namespace Gekko
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, bool> dublets = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             //precedents
             TraceBankHelpler helper = new TraceBankHelpler();
             found = Program.TraceGetPrecedents(null, "adambk", helper);
@@ -6069,11 +6070,13 @@ namespace Gekko
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     List<TraceBankHelpler2> temp = helper.elements.OrderBy(xx => xx.makroName).ToList();
-                    string start = "";
                     foreach (TraceBankHelpler2 element in temp)
                     {
+                        //if (G.Equal(element.makroName, "qbnp"))
+                        //{
+                        //}
                         string start2 = element.makroName + "//" + element.adamNames + "//" + element.period + "//" + element.code;
-                        if (start != start2)  //skip already seen (could use trace id, but never mind).
+                        if (!dublets.ContainsKey(start2))  //skip already seen (could use trace id, but never mind).
                         {
                             sw.WriteLine(element.makroName);
                             sw.WriteLine(element.adamNames);
@@ -6082,8 +6085,8 @@ namespace Gekko
                             sw.WriteLine();
                             sw.WriteLine("---------------------------");
                             sw.WriteLine();
-                        }
-                        start = start2;
+                            dublets.Add(start2, false);
+                        }                        
                     }                    
                     sw.Flush();
                     sw.Close();

@@ -897,7 +897,7 @@ namespace Gekko
             else if (G.Equal(s2, "folder_menu") || G.Equal(s2, "menu_startfile"))
             {
                 CrossThreadStuff.RestartMenuBrowser();
-            }
+            }                        
             else if (G.Equal(s2, "interface_zoom"))
             {
                 CrossThreadStuff.Zoom();
@@ -9765,7 +9765,7 @@ namespace Gekko
             public bool guiGraphIsRefreshing = false;
             public string guiGraphRefreshingFilename = null;
             public bool guiGraphIsLogTransform = false;
-            public double guiGraphFontScaling = double.NaN;
+            public double guiGraphFontScaling = 1d;
             public bool guiGraphIsIndex = false;
 
             public string prtType = null; //PRT, MULPRT, GMULPRT, PLOT, SHEET, CLIP, 

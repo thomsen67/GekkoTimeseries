@@ -5400,6 +5400,7 @@ ASTPLACEHOLDER [0]
 
             if (rv == null || rv[1] == null)
             {
+                if (G.Equal(ss7, "decomp plot zoom")) new Note("Renamed option: please use 'option plot zoom general' and/or 'option plot zoom decomp' instead");
                 new Error("The option: " + ss7 + " = ... does not exist");
             }
 
