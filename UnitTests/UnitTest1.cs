@@ -7552,10 +7552,10 @@ namespace UnitTests
             I("i2 = 2;");
             I("i3 = 3;");
             Helper_x1x4("-");
-            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
-            _AssertSeries(First(), "x2!a", 2001, -3d, 0d);
-            _AssertSeries(First(), "x3!a", 2001, 2d, 0d);
-            _AssertSeries(First(), "x4!a", 2001, -1d, 0d);
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d); //eps - eps
+            _AssertSeries(First(), "x2!a", 2001, -3d, 0d); //eps - 3
+            _AssertSeries(First(), "x3!a", 2001, 2d, 0d); //2 - eps
+            _AssertSeries(First(), "x4!a", 2001, -1d, 0d); //2 - 3
 
             // -------------------------------------------------------------------
             // -------------------------- x1 * x2 --------------------------------
@@ -7563,10 +7563,32 @@ namespace UnitTests
             I("i2 = 2;");
             I("i3 = 3;");
             Helper_x1x4("*");
-            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
-            _AssertSeries(First(), "x2!a", 2001, Globals.eps, 0d);
-            _AssertSeries(First(), "x3!a", 2001, Globals.eps, 0d);
-            _AssertSeries(First(), "x4!a", 2001, 6d, 0d);
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d); //eps * eps
+            _AssertSeries(First(), "x2!a", 2001, Globals.eps, 0d); //eps * 3
+            _AssertSeries(First(), "x3!a", 2001, Globals.eps, 0d); //2 * eps
+            _AssertSeries(First(), "x4!a", 2001, 6d, 0d); //2 * 3
+
+            // -------------------------------------------------------------------
+            // -------------------------- x1 / x2 --------------------------------
+            // -------------------------------------------------------------------
+            I("i2 = 2;");
+            I("i3 = 3;");
+            Helper_x1x4("/");
+            _AssertSeries(First(), "x1!a", 2001, double.NaN, 0d); //eps / eps
+            _AssertSeries(First(), "x2!a", 2001, Globals.eps, 0d); //eps / 3
+            _AssertSeries(First(), "x3!a", 2001, double.NaN, 0d); //2 / eps --> could in principle give plus or minus infinity, but we do not do that...
+            _AssertSeries(First(), "x4!a", 2001, 2d / 3d, 0d); //2 / 3
+
+            // -------------------------------------------------------------------
+            // -------------------------- x1^x2 ----------------------------------
+            // -------------------------------------------------------------------
+            I("i2 = 2;");
+            I("i3 = 3;");
+            Helper_x1x4("^");
+            _AssertSeries(First(), "x1!a", 2001, double.NaN, 0d); //eps ^ eps --> these are quite restrictive, more so than 0^0 etc., could be loosened at some point.
+            _AssertSeries(First(), "x2!a", 2001, double.NaN, 0d); //eps ^ 3
+            _AssertSeries(First(), "x3!a", 2001, double.NaN, 0d); //2 ^ eps
+            _AssertSeries(First(), "x4!a", 2001, 8d, 0d); //2 ^ 3
         }
 
         private static void Helper_x1x4(string op)

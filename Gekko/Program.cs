@@ -25081,9 +25081,35 @@ namespace Gekko
                 }
             };
             Globals.arithmentics[5] = (x1, x2) => x2 * x1;
-            Globals.arithmentics[6] = (x1, x2) => x1 / x2;
+            Globals.arithmentics[6] = (x1, x2) =>  //x1 / x2;
+            {
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return double.NaN; //eps / eps
+                    else return Globals.eps;  //eps / x2
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return double.NaN; //x1 / eps
+                    else return x1 / x2; //x1 / x2
+                }
+            };                
             Globals.arithmentics[7] = (x1, x2) => x2 / x1;
-            Globals.arithmentics[8] = (x1, x2) => Math.Pow(x1, x2);
+            Globals.arithmentics[8] = (x1, x2) => //Math.Pow(x1, x2);
+            {
+                //More restrictive here than using 0, to avoid surprises
+                //Could be loosened later on.
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return double.NaN; //eps ^ eps
+                    else return double.NaN; //eps ^ x2
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return double.NaN; //x1 ^ eps
+                    else return Math.Pow(x1, x2); //x1 ^ x2
+                }
+            };                
             Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
             Globals.arithmentics[10] = (x1, x2) => (x1 / x2 - 1d) * 100d;
             Globals.arithmentics[11] = (x1, x2) => Math.Log(x1 / x2);
