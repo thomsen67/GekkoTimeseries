@@ -25039,12 +25039,47 @@ namespace Gekko
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
             Program.libraries = new Libraries();
-
-            Globals.arithmentics[0] = (x1, x2) => x1 + x2;
+            Globals.arithmentics[0] = (x1, x2) => //x1 + x2
+            {
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return Globals.eps; //eps + eps
+                    else return x2;  //eps + x2
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return x1; //x1 + eps
+                    else return x1 + x2; //x1 + x2
+                }                
+            };
             Globals.arithmentics[1] = (x1, x2) => x2 + x1;
-            Globals.arithmentics[2] = (x1, x2) => x1 - x2;
+            Globals.arithmentics[2] = (x1, x2) => //x1 - x2
+            {
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return Globals.eps; //eps - eps
+                    else return -x2;  //eps - x2
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return x1; //x1 - eps
+                    else return x1 - x2; //x1 - x2
+                }
+            };
             Globals.arithmentics[3] = (x1, x2) => x2 - x1;
-            Globals.arithmentics[4] = (x1, x2) => x1 * x2;
+            Globals.arithmentics[4] = (x1, x2) => //x1 * x2
+            {
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return Globals.eps; //eps * eps
+                    else return Globals.eps;  //eps * x2
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return Globals.eps; //x1 * eps
+                    else return x1 * x2; //x1 * x2
+                }
+            };
             Globals.arithmentics[5] = (x1, x2) => x2 * x1;
             Globals.arithmentics[6] = (x1, x2) => x1 / x2;
             Globals.arithmentics[7] = (x1, x2) => x2 / x1;

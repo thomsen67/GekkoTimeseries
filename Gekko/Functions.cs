@@ -2149,6 +2149,10 @@ namespace Gekko
             else return Globals.scalarVal0;
         }
 
+        // ---------------------------------------------------------------------------------
+        // MISSING VALUE START
+        // ---------------------------------------------------------------------------------
+
         public static IVariable m(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             //alias
@@ -2220,6 +2224,77 @@ namespace Gekko
                 return Globals.scalarVal0;
             }
         }
+
+        // ---------------------------------------------------------------------------------
+        // MISSING VALUE END
+        // ---------------------------------------------------------------------------------
+
+        // ---------------------------------------------------------------------------------
+        // EPS START
+        // ---------------------------------------------------------------------------------
+                
+        public static IVariable eps(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal(Globals.eps);
+        }
+
+        public static IVariable eps(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            int n1 = O.ConvertToInt(x1);
+            int n2 = O.ConvertToInt(x2);
+            Matrix m = new Matrix(n1, n2, Globals.eps);
+            return m;
+        }
+
+        public static IVariable iseps(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            return iseps(smpl, _t1, _t2, x, null);
+        }
+
+        public static IVariable iseps(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable option)
+        {
+            if (x.Type() == EVariableType.Series)
+            {
+                Series x_series = x as Series;
+
+                GekkoTime t1 = GekkoTime.tNull;
+                GekkoTime t2 = GekkoTime.tNull;
+
+                if (option == null)
+                {
+                    t1 = x_series.GetRealDataPeriodFirst();
+                    t2 = x_series.GetRealDataPeriodLast();
+                }
+                else
+                {
+                    string option_string = O.ConvertToString(option);
+                    if (!G.Equal(option_string, "all"))
+                    {
+                        new Error("Expected 'all' option");
+                    }
+                    helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+                }
+
+                Series rv = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    bool b = x_series.GetDataSimple(t) == Globals.eps;
+                    if (b) rv.SetData(t, 1d);
+                    else rv.SetData(t, 0d);
+                }
+                return rv;
+            }
+            else
+            {
+                bool b = x.ConvertToVal() == Globals.eps;
+                if (b) return Globals.scalarVal1;
+                return Globals.scalarVal0;
+            }
+        }
+
+        // ---------------------------------------------------------------------------------
+        // EPS END
+        // ---------------------------------------------------------------------------------
 
         public static IVariable maxc(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
@@ -5964,12 +6039,7 @@ namespace Gekko
         public static void lhs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.GetDecompT(), Program.model);  //"Lhs"-score for each equation
-        }
-
-        public static IVariable eps(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {
-            return new ScalarVal(Globals.eps);
-        }
+        }       
 
         // ===============================================================================
         // ============================ eps start ========================================

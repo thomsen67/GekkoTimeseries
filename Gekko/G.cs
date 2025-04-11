@@ -3013,10 +3013,10 @@ namespace Gekko
             // m() <> 2 --> 1
             // 2 <> m() --> 1
             //
-            // So in Gekko, if there are missings, op = <, <=, >=, > are just kind of broke
+            // So in Gekko, if there are missings, op <, <=, >=, > are just kind of broke
             // but with missings, == and <> can be used.
             //
-            //                              d2
+            //                        d2
             //               |   NaN    normal
             //-------------------------------------
             //   d1  NaN     |   true   false

@@ -7496,6 +7496,87 @@ namespace UnitTests
             Globals.browserLimit = false;
         }
 
+
+        [TestMethod]
+        public void _Test_Eps()
+        {
+            I("reset; time 2001 2003;");
+            I("eps = eps();");
+            I("ii2 = 2;");
+            I("ii3 = 3;");
+            // -------------------------------------------------------------------
+            // -------------------------- x1 + x2 --------------------------------
+            // -------------------------------------------------------------------
+            I("i2 = 2;");
+            I("i3 = 3;");
+            Helper_x1x4("+");
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x2!a", 2001, 3d, 0d);
+            _AssertSeries(First(), "x3!a", 2001, 2d, 0d);
+            _AssertSeries(First(), "x4!a", 2001, 5d, 0d);
+            // -------- missing 1
+            I("i2 = m();");
+            I("i3 = 3;");
+            Helper_x1x4("+");
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x2!a", 2001, 3d, 0d);
+            _AssertSeries(First(), "x3!a", 2001, double.NaN, 0d);
+            _AssertSeries(First(), "x4!a", 2001, double.NaN, 0d);
+            // -------- missing 2
+            I("i2 = 2;");
+            I("i3 = m();");
+            Helper_x1x4("+");
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x2!a", 2001, double.NaN, 0d);
+            _AssertSeries(First(), "x3!a", 2001, 2d, 0d);
+            _AssertSeries(First(), "x4!a", 2001, double.NaN, 0d);
+            // -------- missing 3
+            I("i2 = m();");
+            I("i3 = m();");
+            Helper_x1x4("+");
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x2!a", 2001, double.NaN, 0d);
+            _AssertSeries(First(), "x3!a", 2001, double.NaN, 0d);
+            _AssertSeries(First(), "x4!a", 2001, double.NaN, 0d);
+            // -------- ifs
+            I("%y1 = iseps(eps());"); _AssertScalarVal(First(), "%y1", 1d);
+            I("y2 = iseps(eps);"); _AssertSeries(First(), "y2!a", 2001, 1d, 0d);
+            I("%y3 = iseps(m());"); _AssertScalarVal(First(), "%y3", 0d);
+            I("y4 = iseps(ii2);"); _AssertSeries(First(), "y4!a", 2001, 0d, 0d);
+            I("%y5 = iseps(2);"); _AssertScalarVal(First(), "%y5", 0d);
+            I("y6 = iseps(ii2);"); _AssertSeries(First(), "y6!a", 2001, 0d, 0d);
+
+            // -------------------------------------------------------------------
+            // -------------------------- x1 - x2 --------------------------------
+            // -------------------------------------------------------------------
+            I("i2 = 2;");
+            I("i3 = 3;");
+            Helper_x1x4("-");
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x2!a", 2001, -3d, 0d);
+            _AssertSeries(First(), "x3!a", 2001, 2d, 0d);
+            _AssertSeries(First(), "x4!a", 2001, -1d, 0d);
+
+            // -------------------------------------------------------------------
+            // -------------------------- x1 * x2 --------------------------------
+            // -------------------------------------------------------------------
+            I("i2 = 2;");
+            I("i3 = 3;");
+            Helper_x1x4("*");
+            _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x2!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x3!a", 2001, Globals.eps, 0d);
+            _AssertSeries(First(), "x4!a", 2001, 6d, 0d);
+        }
+
+        private static void Helper_x1x4(string op)
+        {
+            I("x1 = eps " + op + " eps;");
+            I("x2 = eps " + op + " i3;");
+            I("x3 = i2 " + op + " eps;");
+            I("x4 = i2 " + op + " i3;");
+        }
+
         [TestMethod]
         public void _Test_BitArray()
         {
