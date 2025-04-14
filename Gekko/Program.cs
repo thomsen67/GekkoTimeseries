@@ -25052,7 +25052,20 @@ namespace Gekko
                     else return x1 + x2; //x1 + x2
                 }                
             };
-            Globals.arithmentics[1] = (x1, x2) => x2 + x1;
+            Globals.arithmentics[1] = (x1, x2) => //x2 + x1
+            {
+                if (x2 == Globals.eps)
+                {
+                    if (x1 == Globals.eps) return Globals.eps; //eps + eps
+                    else return x1;  //eps + x1
+                }
+                else
+                {
+                    if (x1 == Globals.eps) return x2; //x2 + eps
+                    else return x2 + x1; //x2 + x1
+                }
+            };
+
             Globals.arithmentics[2] = (x1, x2) => //x1 - x2
             {
                 if (x1 == Globals.eps)
@@ -25066,7 +25079,21 @@ namespace Gekko
                     else return x1 - x2; //x1 - x2
                 }
             };
-            Globals.arithmentics[3] = (x1, x2) => x2 - x1;
+
+            Globals.arithmentics[3] = (x1, x2) => //x2 - x1
+            {
+                if (x2 == Globals.eps)
+                {
+                    if (x1 == Globals.eps) return Globals.eps; //eps - eps
+                    else return -x1;  //eps - x1
+                }
+                else
+                {
+                    if (x1 == Globals.eps) return x2; //x2 - eps
+                    else return x2 - x1; //x2 - x1
+                }
+            };
+
             Globals.arithmentics[4] = (x1, x2) => //x1 * x2
             {
                 if (x1 == Globals.eps)
@@ -25080,7 +25107,21 @@ namespace Gekko
                     else return x1 * x2; //x1 * x2
                 }
             };
-            Globals.arithmentics[5] = (x1, x2) => x2 * x1;
+
+            Globals.arithmentics[5] = (x1, x2) => //x2 * x1
+            {
+                if (x2 == Globals.eps)
+                {
+                    if (x1 == Globals.eps) return Globals.eps; //eps * eps
+                    else return Globals.eps;  //eps * x1
+                }
+                else
+                {
+                    if (x1 == Globals.eps) return Globals.eps; //x2 * eps
+                    else return x2 * x1; //x2 * x1
+                }
+            };
+
             Globals.arithmentics[6] = (x1, x2) =>  //x1 / x2;
             {
                 if (x1 == Globals.eps)
@@ -25093,8 +25134,22 @@ namespace Gekko
                     if (x2 == Globals.eps) return double.NaN; //x1 / eps
                     else return x1 / x2; //x1 / x2
                 }
-            };                
-            Globals.arithmentics[7] = (x1, x2) => x2 / x1;
+            };
+
+            Globals.arithmentics[7] = (x1, x2) =>  //x2 / x1;
+            {
+                if (x2 == Globals.eps)
+                {
+                    if (x1 == Globals.eps) return double.NaN; //eps / eps
+                    else return Globals.eps;  //eps / x1
+                }
+                else
+                {
+                    if (x1 == Globals.eps) return double.NaN; //x2 / eps
+                    else return x2 / x1; //x2 / x1
+                }
+            };
+
             Globals.arithmentics[8] = (x1, x2) => //Math.Pow(x1, x2);
             {
                 //More restrictive here than using 0, to avoid surprises
@@ -25110,7 +25165,21 @@ namespace Gekko
                     else return Math.Pow(x1, x2); //x1 ^ x2
                 }
             };                
-            Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
+
+            Globals.arithmentics[9] = (x1, x2) => //Math.Pow(x2, x1);
+            {                
+                if (x2 == Globals.eps)
+                {
+                    if (x1 == Globals.eps) return double.NaN; //eps ^ eps
+                    else return double.NaN; //eps ^ x1
+                }
+                else
+                {
+                    if (x1 == Globals.eps) return double.NaN; //x2 ^ eps
+                    else return Math.Pow(x2, x1); //x2 ^ x1
+                }
+            };
+
             Globals.arithmentics[10] = (x1, x2) =>  //(x1 / x2 - 1d) * 100d;
             {
                 if (x1 == Globals.eps)
