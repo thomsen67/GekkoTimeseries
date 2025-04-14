@@ -7588,18 +7588,7 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2001, double.NaN, 0d); //eps ^ eps --> these are quite restrictive, more so than 0^0 etc., could be loosened at some point.
             _AssertSeries(First(), "x2!a", 2001, double.NaN, 0d); //eps ^ 3
             _AssertSeries(First(), "x3!a", 2001, double.NaN, 0d); //2 ^ eps
-            _AssertSeries(First(), "x4!a", 2001, 8d, 0d); //2 ^ 3
-
-            // -------------------------------------------------------------------
-            // -------------------------- x1^x2 ----------------------------------
-            // -------------------------------------------------------------------
-            I("i2 = 2;");
-            I("i3 = 3;");
-            Helper_x1x4("^");
-            _AssertSeries(First(), "x1!a", 2001, double.NaN, 0d); //eps ^ eps --> these are quite restrictive, more so than 0^0 etc., could be loosened at some point.
-            _AssertSeries(First(), "x2!a", 2001, double.NaN, 0d); //eps ^ 3
-            _AssertSeries(First(), "x3!a", 2001, double.NaN, 0d); //2 ^ eps
-            _AssertSeries(First(), "x4!a", 2001, 8d, 0d); //2 ^ 3
+            _AssertSeries(First(), "x4!a", 2001, 8d, 0d); //2 ^ 3            
 
             // -------------------------------------------------------------------
             // -------------------------- pch(...) ----------------------------------
