@@ -25111,19 +25111,63 @@ namespace Gekko
                 }
             };                
             Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
-            Globals.arithmentics[10] = (x1, x2) => (x1 / x2 - 1d) * 100d;
-            Globals.arithmentics[11] = (x1, x2) => Math.Log(x1 / x2);
-            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2, MidpointRounding.AwayFromZero);
-
-            Globals.arithmentics1[0] = (x1) => -x1;
-            Globals.arithmentics1[1] = (x1) => Math.Abs(x1);
-            Globals.arithmentics1[2] = (x1) => Math.Log(x1);
-            Globals.arithmentics1[3] = (x1) => Math.Exp(x1);
-            Globals.arithmentics1[4] = (x1) => Math.Sqrt(x1);
-            Globals.arithmentics1[5] = (x1) => Math.Truncate(x1); //same as (int)x1, but handles larger numbers 
-            Globals.arithmentics1[6] = (x1) => Math.Floor(x1); //floor(-1.5) = -2, truncate(-1.5) = -1
-            Globals.arithmentics1[7] = (x1) => Math.Ceiling(x1); //see above.
-            Globals.arithmentics1[8] = (x1) => Math.Tanh(x1);  //hyperbolic tangens
+            Globals.arithmentics[10] = (x1, x2) =>  //(x1 / x2 - 1d) * 100d;
+            {
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return double.NaN; //(eps / eps - 1d) * 100d;
+                    else return -100d;  //(eps / x2 - 1d) * 100d;
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return double.NaN; //(x1 / eps - 1d) * 100d;
+                    else return (x1 / x2 - 1d) * 100d; //(x1 / x2 - 1d) * 100d;
+                }
+            };
+            Globals.arithmentics[11] = (x1, x2) => //Math.Log(x1 / x2);
+            {
+                if (x1 == Globals.eps)
+                {
+                    if (x2 == Globals.eps) return double.NaN; //log(eps / eps)
+                    else return double.NaN;  //log(eps / x2)
+                }
+                else
+                {
+                    if (x2 == Globals.eps) return double.NaN; //log(x1 / eps)
+                    else return Math.Log(x1 / x2); //log(x1 / x2)
+                }
+            };
+            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2, MidpointRounding.AwayFromZero); //no eps issues
+            // -----
+            Globals.arithmentics1[0] = (x1) => //-x1
+            {
+                if (x1 == Globals.eps) return Globals.eps;
+                else return -x1;
+            };
+            Globals.arithmentics1[1] = (x1) => Math.Abs(x1); //no eps issues
+            Globals.arithmentics1[2] = (x1) => //Math.Log(x1)
+            {
+                if (x1 == Globals.eps) return double.NaN;
+                else return Math.Log(x1);
+            };
+            Globals.arithmentics1[3] = (x1) => //Math.Exp(x1)
+            {
+                if (x1 == Globals.eps) return 1d;
+                else return Math.Exp(x1);
+            };
+            Globals.arithmentics1[4] = (x1) => //Math.Sqrt(x1)
+            {
+                if (x1 == Globals.eps) return Globals.eps;
+                else return Math.Sqrt(x1);
+            };
+            Globals.arithmentics1[5] = (x1) => Math.Truncate(x1); //same as (int)x1, but handles larger numbers, no eps issues 
+            Globals.arithmentics1[6] = (x1) => Math.Floor(x1); //floor(-1.5) = -2, truncate(-1.5) = -1, no eps issues 
+            Globals.arithmentics1[7] = (x1) => Math.Ceiling(x1); //see above, no eps issues 
+            Globals.arithmentics1[8] = (x1) => //Math.Tanh(x1), //hyperbolic tangens
+            {
+                if (x1 == Globals.eps) return Globals.eps;
+                else return Math.Tanh(x1);
+            };               
 
             Globals.timeStrings = new string[Globals.timeStringsEnd - Globals.timeStringsStart + 1];
             for (int i = Globals.timeStringsStart; i <= Globals.timeStringsEnd; i++)
