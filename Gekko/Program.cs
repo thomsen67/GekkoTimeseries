@@ -25123,26 +25123,22 @@ namespace Gekko
             Globals.arithmentics1[1] = (x1) => Math.Abs(x1); //no eps issues
             Globals.arithmentics1[2] = (x1) => //Math.Log(x1)
             {
-                if (x1 == Globals.eps) return double.NaN;
-                else return Math.Log(x1);
+                return G.ArithmeticsLog(x1);
             };
             Globals.arithmentics1[3] = (x1) => //Math.Exp(x1)
             {
-                if (x1 == Globals.eps) return 1d;
-                else return Math.Exp(x1);
+                return G.ArithmeticsExp(x1);
             };
             Globals.arithmentics1[4] = (x1) => //Math.Sqrt(x1)
             {
-                if (x1 == Globals.eps) return Globals.eps;
-                else return Math.Sqrt(x1);
+                return G.ArithmeticsSqrt(x1);
             };
             Globals.arithmentics1[5] = (x1) => Math.Truncate(x1); //same as (int)x1, but handles larger numbers, no eps issues 
             Globals.arithmentics1[6] = (x1) => Math.Floor(x1); //floor(-1.5) = -2, truncate(-1.5) = -1, no eps issues 
             Globals.arithmentics1[7] = (x1) => Math.Ceiling(x1); //see above, no eps issues 
             Globals.arithmentics1[8] = (x1) => //Math.Tanh(x1), //hyperbolic tangens
             {
-                if (x1 == Globals.eps) return Globals.eps;
-                else return Math.Tanh(x1);
+                return G.ArithmeticsTanh(x1);
             };               
 
             Globals.timeStrings = new string[Globals.timeStringsEnd - Globals.timeStringsStart + 1];

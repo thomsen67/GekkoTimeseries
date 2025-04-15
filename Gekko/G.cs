@@ -6310,5 +6310,29 @@ namespace Gekko
             else return -x1;
         }
 
+        public static double ArithmeticsTanh(double x1)
+        {
+            if (x1 == Globals.eps) return Globals.eps;
+            else return Math.Tanh(x1);
+        }
+
+        public static double ArithmeticsSqrt(double x1)
+        {
+            if (x1 == Globals.eps) return Globals.eps;
+            else return Math.Sqrt(x1);
+        }
+
+        public static double ArithmeticsExp(double x1)
+        {
+            if (x1 == Globals.eps) return 1d;
+            else return Math.Exp(x1);
+        }
+
+        public static double ArithmeticsLog(double x1)
+        {
+            if (x1 == Globals.eps) return double.NaN;
+            else return Math.Log(x1);
+        }
+
     }    
 }

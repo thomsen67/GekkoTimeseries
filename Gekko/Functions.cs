@@ -3543,7 +3543,7 @@ namespace Gekko
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
-                rv = new ScalarVal(Math.Log(x1.ConvertToVal()));
+                rv = new ScalarVal(G.ArithmeticsLog(x1.ConvertToVal()));
             }
             else if (x1.Type() == EVariableType.Series)
             {
@@ -3556,8 +3556,8 @@ namespace Gekko
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
-                    {
-                        m2.data[i, j] = Math.Log(m.data[i, j]);
+                    {                        
+                        m2.data[i, j] = G.ArithmeticsLog(m.data[i, j]);
                     }
                 }
                 rv = m2;
@@ -3577,7 +3577,7 @@ namespace Gekko
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
-                rv = new ScalarVal(Math.Tanh(x1.ConvertToVal()));
+                rv = new ScalarVal(G.ArithmeticsTanh(x1.ConvertToVal()));
             }
             else if (x1.Type() == EVariableType.Series)
             {
@@ -3591,7 +3591,7 @@ namespace Gekko
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
                     {
-                        m2.data[i, j] = Math.Tanh(m.data[i, j]);
+                        m2.data[i, j] = G.ArithmeticsTanh(m.data[i, j]);
                     }
                 }
                 rv = m2;
@@ -3611,8 +3611,8 @@ namespace Gekko
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
-                double d = O.ConvertToVal(x1);
-                rv = new ScalarVal(Math.Exp(d));
+                double d = O.ConvertToVal(x1);                
+                rv = new ScalarVal(G.ArithmeticsExp(d));
             }
             else if (x1.Type() == EVariableType.Series)
             {
@@ -3626,7 +3626,7 @@ namespace Gekko
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
                     {
-                        m2.data[i, j] = Math.Exp(m.data[i, j]);
+                        m2.data[i, j] = G.ArithmeticsExp(m.data[i, j]);
                     }
                 }
                 rv = m2;
@@ -3646,8 +3646,8 @@ namespace Gekko
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
-                double d = O.ConvertToVal(x1);
-                rv = new ScalarVal(Math.Sqrt(d));
+                double d = O.ConvertToVal(x1);                
+                rv = new ScalarVal(G.ArithmeticsSqrt(d));
             }
             else if (x1.Type() == EVariableType.Series)
             {
@@ -3661,7 +3661,7 @@ namespace Gekko
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
                     {
-                        ((Matrix)rv).data[i, j] = Math.Sqrt(m.data[i, j]);
+                        ((Matrix)rv).data[i, j] = G.ArithmeticsSqrt(m.data[i, j]);
                     }
                 }
             }

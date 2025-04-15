@@ -7696,7 +7696,14 @@ namespace UnitTests
             _AssertScalarVal(First(), "%y", 8d);
             I("%y = -%x2;");
             _AssertScalarVal(First(), "%y", -2d);
-
+            I("%y = log(%x2);");
+            _AssertScalarVal(First(), "%y", Math.Log(2d));
+            I("%y = exp(%x2);");
+            _AssertScalarVal(First(), "%y", Math.Exp(2d));
+            I("%y = sqrt(%x2);");
+            _AssertScalarVal(First(), "%y", Math.Sqrt(2d));
+            I("%y = tanh(%x2);");
+            _AssertScalarVal(First(), "%y", Math.Tanh(2d));
         }
 
         private static void Helper_x1x4(string op)
