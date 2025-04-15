@@ -7679,6 +7679,24 @@ namespace UnitTests
             I("x2 = tanh(i2);");
             _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
             _AssertSeries(First(), "x2!a", 2001, Math.Tanh(2d), 0d);
+
+            // ----------------- Sanity checks, scalars ---------------------
+            I("reset;");
+            I("%x2 = 2;");
+            I("%x3 = 3;");
+            I("%y = %x2 + %x3;");
+            _AssertScalarVal(First(), "%y", 5d);
+            I("%y = %x2 - %x3;");
+            _AssertScalarVal(First(), "%y", -1d);
+            I("%y = %x2 * %x3;");
+            _AssertScalarVal(First(), "%y", 6d);
+            I("%y = %x2 / %x3;");
+            _AssertScalarVal(First(), "%y", 2d/3d);
+            I("%y = %x2 ** %x3;");
+            _AssertScalarVal(First(), "%y", 8d);
+            I("%y = -%x2;");
+            _AssertScalarVal(First(), "%y", -2d);
+
         }
 
         private static void Helper_x1x4(string op)
@@ -7689,9 +7707,23 @@ namespace UnitTests
             I("x4 = i2 " + op + " i3;");
         }
 
+
+        //[TestMethod]
+        //public void _Test_Masks()
+        //{
+        //    I("reset;");
+        //    I("x = series(2);");
+        //    I("x[b, c] <2001 2001> = 3;");
+        //    I("x[b, d] <2001 2001> = 4;");
+        //    I("x[a, d] <2002 2002> = 6;");
+        //    I("x[b, d] <2002 2002> = 8;");
+        //    I("prt <n> x;");
+        //}
+
         [TestMethod]
         public void _Test_BitArray()
         {
+            //Not used at the moment
             Masks m = new Masks();
             for (int i = -300; i < 300; i++)
             {
@@ -23271,75 +23303,128 @@ print(df2)
         [TestMethod]
         public void _Test_Masks()
         {
-            //epsadd('x[a,d]')
-            //epsadd('x[a,d]', 2014)
-            //epsclone('x', 2014)
 
-            //
-            // In this test, epsclone() is run, but does not affect anything
-            //
-            I("reset;");
-            I("time 2001 2005;");
-            I("#i = a,;");
-            I("#j = b, c;");
-            I("x = series(2);");
-            I("x[a,b] <2001 2001> = 100;");  //Dataframe
-            I("x[a,c] <2001 2001> = 200;");  //Dataframe
-            I("epsclone('x', 2002);");
-            I("x[a,b] <2002 2002> = 110;");  //Dataframe
-            I("x[a,c] <2002 2002> = 120;");  //Dataframe
-            I("y <2001 2002> = sum((#i, #j), x[#i, #j]);");
-            _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2002, 230d, sharedDelta);
+            if (true)
+            {
+                I("reset; time 2001 2004;");
+                I("x = series(2);");
+                I("x[a, c] <2001 2001> = eps();");
+                I("x[a, c] <2002 2002> = eps();");
+                I("x[a, d] <2001 2001> = eps();");
+                I("x[a, d] <2002 2002> = 6;");
+                I("x[b, c] <2001 2001> = 3;");
+                I("x[b, c] <2002 2002> = eps();");
+                I("x[b, d] <2001 2001> = 4;");                
+                I("x[b, d] <2002 2002> = 8;");
 
-            //
-            // In this test, epsclone() is run, but does not affect x[a,c][2002] which stays missing.
-            // Therefore y[2002] is missing (find out why via tracing).
-            //
-            I("reset;");
-            I("time 2001 2005;");
-            I("#i = a,;");
-            I("#j = b, c;");
-            I("x = series(2);");
-            I("x[a,b] <2001 2001> = 100;");  //Dataframe
-            I("x[a,c] <2001 2001> = 200;");  //Dataframe
-            I("epsclone('x', 2002);");
-            I("x[a,b] <2002 2002> = 110;");  //Dataframe
-            I("y <2001 2002> = sum((#i, #j), x[#i, #j]);");
-            _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
+                if (true)
+                {
+                    I("sum1 = x[b, c];");
+                    I("sum2 = x[b, c]+x[b, c];");
+                    I("sum3 = x[b, c]+x[b, c]+x[b, c];");
+                    _AssertSeries(First(), "sum1!a", 2002, Globals.eps, 0d);
+                    _AssertSeries(First(), "sum2!a", 2002, Globals.eps, 0d);
+                    _AssertSeries(First(), "sum3!a", 2002, Globals.eps, 0d);
+                    I("%i1 = x[b, c][2002];");
+                    I("%i2 = x[b, c][2002]+x[b, c][2002];");
+                    I("%i3 = x[b, c][2002]+x[b, c][2002]+x[b, c][2002];");
+                    _AssertScalarVal(First(), "%i1", Globals.eps);
+                    _AssertScalarVal(First(), "%i2", Globals.eps);
+                    _AssertScalarVal(First(), "%i3", Globals.eps);
+                }
 
-            //
-            // In this test, epsclone() is run, and epsadd() is used for x[a,c][2002]. Therefore,
-            // y[2002] can be computed (with an epsadd()), and so can y[2003] (without an epsadd()).
-            // An epsadd() is done for x[a,d] too, for all periods, so that x[a,d] counts as zero.
-            //
+                I("prt <n> x;");
+                I("epsclone('x', 2003);");
+                I("prt <n> x;");
+                //                
+                //              x[a, c]        x[a, d]        x[b, c]        x[b, d]
+                // 2001         0.0000         0.0000         3.0000         4.0000
+                // 2002         0.0000         6.0000         0.0000         8.0000
+                // 2003              M              M              M              M
+                // 2004              M              M              M              M
+                //
+                //              x[a, c]        x[a, d]        x[b, c]        x[b, d]
+                // 2001         0.0000         0.0000         3.0000         4.0000
+                // 2002         0.0000         6.0000         0.0000         8.0000
+                // 2003         0.0000              M         0.0000              M
+                // 2004              M              M              M              M
+                //
+                // So x[a,c] and x[b,c] gets an eps in 2003. Setting x[a,c][2003] to something
+                // different than 0 or eps should give an error, must be done manually.
+            }
+            else
+            {
 
-            I("reset;");
-            I("time 2001 2004;");
-            I("#i = a,;");
-            I("#j = b, c, d;");
-            I("x = series(2);");                        
-            I("x[a,b] <2001 2001> = 100;");  //Dataframe
-            I("x[a,c] <2001 2001> = 200;");  //Dataframe                
-            I("epsadd('x[a,d]');");
-            // ---------------------------------------------------------
-            I("epsclone('x', 2002);");
-            I("x[a,b] <2002 2002> = 110;");  //Dataframe, combination [a,c][2002] is missing  
-            I("epsadd('x[a,c]', 2002);");
-            // ---------------------------------------------------------
-            I("epsclone('x', 2003);");
-            I("x[a,b] <2003 2003> = 120;");  //Dataframe, combination [a,c][2003] is missing. No epsadd() needed.                
-                                             // ---------------------------------------------------------
-            I("epsclone('x', 2004);");
-            I("x[a,b] <2004 2004> = 130;");  //Dataframe                
-            I("x[a,c] <2004 2004> = 230;");  //Dataframe                
-                                             // ---------------------------------------------------------
-            I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
-            _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2002, 110d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2003, 120d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2004, 360d, sharedDelta);
+                //epsadd('x[a,d]')
+                //epsadd('x[a,d]', 2014)
+                //epsclone('x', 2014)
+
+                //
+                // In this test, epsclone() is run, but does not affect anything
+                //
+                I("reset;");
+                I("time 2001 2005;");
+                I("#i = a,;");
+                I("#j = b, c;");
+                I("x = series(2);");
+                I("x[a,b] <2001 2001> = 100;");  //Dataframe
+                I("x[a,c] <2001 2001> = 200;");  //Dataframe
+                I("epsclone('x', 2002);");
+                I("x[a,b] <2002 2002> = 110;");  //Dataframe
+                I("x[a,c] <2002 2002> = 120;");  //Dataframe
+                I("y <2001 2002> = sum((#i, #j), x[#i, #j]);");
+                _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 230d, sharedDelta);
+
+                //
+                // In this test, epsclone() is run, but does not affect x[a,c][2002] which stays missing.
+                // Therefore y[2002] is missing (find out why via tracing).
+                //
+                I("reset;");
+                I("time 2001 2005;");
+                I("#i = a,;");
+                I("#j = b, c;");
+                I("x = series(2);");
+                I("x[a,b] <2001 2001> = 100;");  //Dataframe
+                I("x[a,c] <2001 2001> = 200;");  //Dataframe
+                I("epsclone('x', 2002);");
+                I("x[a,b] <2002 2002> = 110;");  //Dataframe
+                I("y <2001 2002> = sum((#i, #j), x[#i, #j]);");
+                _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
+
+                //
+                // In this test, epsclone() is run, and epsadd() is used for x[a,c][2002]. Therefore,
+                // y[2002] can be computed (with an epsadd()), and so can y[2003] (without an epsadd()).
+                // An epsadd() is done for x[a,d] too, for all periods, so that x[a,d] counts as zero.
+                //
+
+                I("reset;");
+                I("time 2001 2004;");
+                I("#i = a,;");
+                I("#j = b, c, d;");
+                I("x = series(2);");
+                I("x[a,b] <2001 2001> = 100;");  //Dataframe
+                I("x[a,c] <2001 2001> = 200;");  //Dataframe                
+                I("epsadd('x[a,d]');");
+                // ---------------------------------------------------------
+                I("epsclone('x', 2002);");
+                I("x[a,b] <2002 2002> = 110;");  //Dataframe, combination [a,c][2002] is missing  
+                I("epsadd('x[a,c]', 2002);");
+                // ---------------------------------------------------------
+                I("epsclone('x', 2003);");
+                I("x[a,b] <2003 2003> = 120;");  //Dataframe, combination [a,c][2003] is missing. No epsadd() needed.                
+                                                 // ---------------------------------------------------------
+                I("epsclone('x', 2004);");
+                I("x[a,b] <2004 2004> = 130;");  //Dataframe                
+                I("x[a,c] <2004 2004> = 230;");  //Dataframe                
+                                                 // ---------------------------------------------------------
+                I("y <2001 2004> = sum((#i, #j), x[#i, #j]);");
+                _AssertSeries(First(), "y!a", 2001, 300d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 110d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2003, 120d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2004, 360d, sharedDelta);
+            }
         }
 
         [TestMethod]

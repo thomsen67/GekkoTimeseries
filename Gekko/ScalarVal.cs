@@ -145,7 +145,8 @@ namespace Gekko
         
         public IVariable Negate(GekkoSmpl t)
         {            
-            return new ScalarVal(-this.val);
+            return new ScalarVal(G.ArithmeticsNegate(this.val));
+            //return new ScalarVal(-this.val);
         }    
         
         public IVariable Add(GekkoSmpl smpl, IVariable input)
@@ -158,8 +159,8 @@ namespace Gekko
                         //Strangely, using a simple object pool for these objects does not do any speedup (maybe from 14.5s to 14.4s on one case).
                         //Apparently, small scalar objects like these are quickly created and swept. They probably stay in
                         //the first generation memory, and not much fragmentation occurs.
-                        //All in all, it is pretty impressive from C#, and we avoid object pooling complexities and other horrors.                        
-                        return new ScalarVal(this.val + ((ScalarVal)input).val);
+                        //All in all, it is pretty impressive from C#, and we avoid object pooling complexities and other horrors.                                                
+                        return new ScalarVal(G.ArithmeticsAdd(this.val, ((ScalarVal)input).val));
 
                     }
                 case EVariableType.Series:
@@ -235,8 +236,9 @@ namespace Gekko
             switch (input.Type())
             {
                 case EVariableType.Val:
-                    {                        
-                        return new ScalarVal(this.val - ((ScalarVal)input).val);
+                    {
+                        return new ScalarVal(G.ArithmeticsSubtract(this.val, ((ScalarVal)input).val));
+                        //return new ScalarVal(this.val - ((ScalarVal)input).val);
                     }
                 case EVariableType.Series:
                     {
@@ -264,8 +266,9 @@ namespace Gekko
             switch (input.Type())
             {
                 case EVariableType.Val:
-                    {
-                        return new ScalarVal(this.val * ((ScalarVal)input).val);
+                    {                        
+                        return new ScalarVal(G.ArithmeticsMultiply(this.val, ((ScalarVal)input).val));
+                        //return new ScalarVal(this.val * ((ScalarVal)input).val);
                     }
                 case EVariableType.Series:
                     {
@@ -306,7 +309,8 @@ namespace Gekko
             {
                 case EVariableType.Val:
                     {
-                        return new ScalarVal(this.val / ((ScalarVal)input).val);
+                        return new ScalarVal(G.ArithmeticsDivide(this.val, ((ScalarVal)input).val));
+                        //return new ScalarVal(this.val / ((ScalarVal)input).val);
                     }
                 case EVariableType.Series:
                     {
@@ -335,7 +339,8 @@ namespace Gekko
             {
                 case EVariableType.Val:
                     {
-                        return new ScalarVal(Math.Pow(this.val, ((ScalarVal)input).val));
+                        return new ScalarVal(G.ArithmeticsPower(this.val, ((ScalarVal)input).val));
+                        //return new ScalarVal(Math.Pow(this.val, ((ScalarVal)input).val));
                     }
                 case EVariableType.Series:
                     {

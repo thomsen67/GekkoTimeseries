@@ -25041,143 +25041,51 @@ namespace Gekko
             Program.libraries = new Libraries();
             Globals.arithmentics[0] = (x1, x2) => //x1 + x2
             {
-                if (x1 == Globals.eps)
-                {
-                    if (x2 == Globals.eps) return Globals.eps; //eps + eps
-                    else return x2;  //eps + x2
-                }
-                else
-                {
-                    if (x2 == Globals.eps) return x1; //x1 + eps
-                    else return x1 + x2; //x1 + x2
-                }                
+                return G.ArithmeticsAdd(x1, x2);
             };
             Globals.arithmentics[1] = (x1, x2) => //x2 + x1
             {
-                if (x2 == Globals.eps)
-                {
-                    if (x1 == Globals.eps) return Globals.eps; //eps + eps
-                    else return x1;  //eps + x1
-                }
-                else
-                {
-                    if (x1 == Globals.eps) return x2; //x2 + eps
-                    else return x2 + x1; //x2 + x1
-                }
+                return G.ArithmeticsAdd2(x1, x2);
             };
 
             Globals.arithmentics[2] = (x1, x2) => //x1 - x2
             {
-                if (x1 == Globals.eps)
-                {
-                    if (x2 == Globals.eps) return Globals.eps; //eps - eps
-                    else return -x2;  //eps - x2
-                }
-                else
-                {
-                    if (x2 == Globals.eps) return x1; //x1 - eps
-                    else return x1 - x2; //x1 - x2
-                }
+                return G.ArithmeticsSubtract(x1, x2);
             };
 
             Globals.arithmentics[3] = (x1, x2) => //x2 - x1
             {
-                if (x2 == Globals.eps)
-                {
-                    if (x1 == Globals.eps) return Globals.eps; //eps - eps
-                    else return -x1;  //eps - x1
-                }
-                else
-                {
-                    if (x1 == Globals.eps) return x2; //x2 - eps
-                    else return x2 - x1; //x2 - x1
-                }
+                return G.ArithmeticsSubtract2(x1, x2);
             };
 
             Globals.arithmentics[4] = (x1, x2) => //x1 * x2
             {
-                if (x1 == Globals.eps)
-                {
-                    if (x2 == Globals.eps) return Globals.eps; //eps * eps
-                    else return Globals.eps;  //eps * x2
-                }
-                else
-                {
-                    if (x2 == Globals.eps) return Globals.eps; //x1 * eps
-                    else return x1 * x2; //x1 * x2
-                }
+                return G.ArithmeticsMultiply(x1, x2);
             };
 
             Globals.arithmentics[5] = (x1, x2) => //x2 * x1
             {
-                if (x2 == Globals.eps)
-                {
-                    if (x1 == Globals.eps) return Globals.eps; //eps * eps
-                    else return Globals.eps;  //eps * x1
-                }
-                else
-                {
-                    if (x1 == Globals.eps) return Globals.eps; //x2 * eps
-                    else return x2 * x1; //x2 * x1
-                }
+                return G.ArithmeticsMultiply2(x1, x2);
             };
 
             Globals.arithmentics[6] = (x1, x2) =>  //x1 / x2;
             {
-                if (x1 == Globals.eps)
-                {
-                    if (x2 == Globals.eps) return double.NaN; //eps / eps
-                    else return Globals.eps;  //eps / x2
-                }
-                else
-                {
-                    if (x2 == Globals.eps) return double.NaN; //x1 / eps
-                    else return x1 / x2; //x1 / x2
-                }
+                return G.ArithmeticsDivide(x1, x2);
             };
 
             Globals.arithmentics[7] = (x1, x2) =>  //x2 / x1;
             {
-                if (x2 == Globals.eps)
-                {
-                    if (x1 == Globals.eps) return double.NaN; //eps / eps
-                    else return Globals.eps;  //eps / x1
-                }
-                else
-                {
-                    if (x1 == Globals.eps) return double.NaN; //x2 / eps
-                    else return x2 / x1; //x2 / x1
-                }
+                return G.ArithmeticsDivide2(x1, x2);
             };
 
             Globals.arithmentics[8] = (x1, x2) => //Math.Pow(x1, x2);
             {
-                //More restrictive here than using 0, to avoid surprises
-                //Could be loosened later on.
-                if (x1 == Globals.eps)
-                {
-                    if (x2 == Globals.eps) return double.NaN; //eps ^ eps
-                    else return double.NaN; //eps ^ x2
-                }
-                else
-                {
-                    if (x2 == Globals.eps) return double.NaN; //x1 ^ eps
-                    else return Math.Pow(x1, x2); //x1 ^ x2
-                }
-            };                
+                return G.ArithmeticsPower(x1, x2);
+            };
 
             Globals.arithmentics[9] = (x1, x2) => //Math.Pow(x2, x1);
-            {                
-                if (x2 == Globals.eps)
-                {
-                    if (x1 == Globals.eps) return double.NaN; //eps ^ eps
-                    else return double.NaN; //eps ^ x1
-                }
-                else
-                {
-                    if (x1 == Globals.eps) return double.NaN; //x2 ^ eps
-                    else return Math.Pow(x2, x1); //x2 ^ x1
-                }
+            {
+                return G.ArithmeticsPower2(x1, x2);
             };
 
             Globals.arithmentics[10] = (x1, x2) =>  //(x1 / x2 - 1d) * 100d;
@@ -25210,8 +25118,7 @@ namespace Gekko
             // -----
             Globals.arithmentics1[0] = (x1) => //-x1
             {
-                if (x1 == Globals.eps) return Globals.eps;
-                else return -x1;
+                return G.ArithmeticsNegate(x1);
             };
             Globals.arithmentics1[1] = (x1) => Math.Abs(x1); //no eps issues
             Globals.arithmentics1[2] = (x1) => //Math.Log(x1)
@@ -25250,7 +25157,7 @@ namespace Gekko
                 Program.CreateTempFilesFolder2();
             }
             catch { }; //fail silently
-        }
+        }        
 
         public static List<string> Add2Lists(List<string> x1, List<string> x2)
         {

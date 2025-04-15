@@ -6161,5 +6161,154 @@ namespace Gekko
 
             return isPiping;
         }
+
+        public static double ArithmeticsPower2(double x1, double x2)
+        {
+            if (x2 == Globals.eps)
+            {
+                if (x1 == Globals.eps) return double.NaN; //eps ^ eps
+                else return double.NaN; //eps ^ x1
+            }
+            else
+            {
+                if (x1 == Globals.eps) return double.NaN; //x2 ^ eps
+                else return Math.Pow(x2, x1); //x2 ^ x1
+            }
+        }
+
+        public static double ArithmeticsPower(double x1, double x2)
+        {
+            //More restrictive here than using 0, to avoid surprises
+            //Could be loosened later on.
+            if (x1 == Globals.eps)
+            {
+                if (x2 == Globals.eps) return double.NaN; //eps ^ eps
+                else return double.NaN; //eps ^ x2
+            }
+            else
+            {
+                if (x2 == Globals.eps) return double.NaN; //x1 ^ eps
+                else return Math.Pow(x1, x2); //x1 ^ x2
+            }
+        }
+
+        public static double ArithmeticsDivide2(double x1, double x2)
+        {
+            if (x2 == Globals.eps)
+            {
+                if (x1 == Globals.eps) return double.NaN; //eps / eps
+                else return Globals.eps;  //eps / x1
+            }
+            else
+            {
+                if (x1 == Globals.eps) return double.NaN; //x2 / eps
+                else return x2 / x1; //x2 / x1
+            }
+        }
+
+        public static double ArithmeticsDivide(double x1, double x2)
+        {
+            if (x1 == Globals.eps)
+            {
+                if (x2 == Globals.eps) return double.NaN; //eps / eps
+                else return Globals.eps;  //eps / x2
+            }
+            else
+            {
+                if (x2 == Globals.eps) return double.NaN; //x1 / eps
+                else return x1 / x2; //x1 / x2
+            }
+        }
+
+        public static double ArithmeticsMultiply2(double x1, double x2)
+        {
+            if (x2 == Globals.eps)
+            {
+                if (x1 == Globals.eps) return Globals.eps; //eps * eps
+                else return Globals.eps;  //eps * x1
+            }
+            else
+            {
+                if (x1 == Globals.eps) return Globals.eps; //x2 * eps
+                else return x2 * x1; //x2 * x1
+            }
+        }
+
+        public static double ArithmeticsMultiply(double x1, double x2)
+        {
+            if (x1 == Globals.eps)
+            {
+                if (x2 == Globals.eps) return Globals.eps; //eps * eps
+                else return Globals.eps;  //eps * x2
+            }
+            else
+            {
+                if (x2 == Globals.eps) return Globals.eps; //x1 * eps
+                else return x1 * x2; //x1 * x2
+            }
+        }
+
+        public static double ArithmeticsSubtract2(double x1, double x2)
+        {
+            if (x2 == Globals.eps)
+            {
+                if (x1 == Globals.eps) return Globals.eps; //eps - eps
+                else return -x1;  //eps - x1
+            }
+            else
+            {
+                if (x1 == Globals.eps) return x2; //x2 - eps
+                else return x2 - x1; //x2 - x1
+            }
+        }
+
+        public static double ArithmeticsSubtract(double x1, double x2)
+        {
+            if (x1 == Globals.eps)
+            {
+                if (x2 == Globals.eps) return Globals.eps; //eps - eps
+                else return -x2;  //eps - x2
+            }
+            else
+            {
+                if (x2 == Globals.eps) return x1; //x1 - eps
+                else return x1 - x2; //x1 - x2
+            }
+        }
+
+        public static double ArithmeticsAdd2(double x1, double x2)
+        {
+            if (x2 == Globals.eps)
+            {
+                if (x1 == Globals.eps) return Globals.eps; //eps + eps
+                else return x1;  //eps + x1
+            }
+            else
+            {
+                if (x1 == Globals.eps) return x2; //x2 + eps
+                else return x2 + x1; //x2 + x1
+            }
+        }
+
+        public static double ArithmeticsAdd(double x1, double x2)
+        {
+            if (x1 == Globals.eps)
+            {
+                if (x2 == Globals.eps) return Globals.eps; //eps + eps
+                else return x2;  //eps + x2
+            }
+            else
+            {
+                if (x2 == Globals.eps) return x1; //x1 + eps
+                else return x1 + x2; //x1 + x2
+            }
+        }
+
+        public static double ArithmeticsNegate(double x1)
+        {
+            if (x1 == Globals.eps) return Globals.eps;
+            else return -x1;
+        }
+
     }    
 }
