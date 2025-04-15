@@ -1052,6 +1052,7 @@ namespace Gekko
         public static double skippedObservationArtificialNumber = 3e302d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
         public static double eps = 1e-300;
         public static bool useEps = true;
+        public static bool useEpsCheck = true;
 
         public static char pxInternalDelimiter = '¤';
 

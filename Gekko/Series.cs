@@ -1022,7 +1022,7 @@ namespace Gekko
                 index2 = ResizeDataArray(gt2); //this would never change index1, since slots are added at the end                            
             }
 
-            double[] temp = null;                                   
+            //double[] temp = this.data.GetDataArray_ONLY_INTERNAL_USE();
 
             if (hasSkips || replaceNaNWith0)
             {
@@ -1033,7 +1033,6 @@ namespace Gekko
                     if (z == Globals.skippedObservationArtificialNumber)
                     {
                         //do nothing, skip updating this observation so the lhs keeps its value
-                        //Globals.bugfixLhsDollar++;
                     }
                     else
                     {

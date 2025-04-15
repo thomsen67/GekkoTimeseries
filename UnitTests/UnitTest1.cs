@@ -7704,6 +7704,22 @@ namespace UnitTests
             _AssertScalarVal(First(), "%y", Math.Sqrt(2d));
             I("%y = tanh(%x2);");
             _AssertScalarVal(First(), "%y", Math.Tanh(2d));
+
+            //Sanity checks, series and scalar
+            I("reset; time 2001 2003;");
+            I("x = series(2); x[b, c] <2002 2002> = eps();");
+            I("sum1 = x[b, c];");
+            I("sum2 = x[b, c]+x[b, c];");
+            I("sum3 = x[b, c]+x[b, c]+x[b, c];");
+            _AssertSeries(First(), "sum1!a", 2002, Globals.eps, 0d);
+            _AssertSeries(First(), "sum2!a", 2002, Globals.eps, 0d);
+            _AssertSeries(First(), "sum3!a", 2002, Globals.eps, 0d);
+            I("%i1 = x[b, c][2002];");
+            I("%i2 = x[b, c][2002]+x[b, c][2002];");
+            I("%i3 = x[b, c][2002]+x[b, c][2002]+x[b, c][2002];");
+            _AssertScalarVal(First(), "%i1", Globals.eps);
+            _AssertScalarVal(First(), "%i2", Globals.eps);
+            _AssertScalarVal(First(), "%i3", Globals.eps);
         }
 
         private static void Helper_x1x4(string op)
@@ -23322,23 +23338,7 @@ print(df2)
                 I("x[b, c] <2001 2001> = 3;");
                 I("x[b, c] <2002 2002> = eps();");
                 I("x[b, d] <2001 2001> = 4;");                
-                I("x[b, d] <2002 2002> = 8;");
-
-                if (true)
-                {
-                    I("sum1 = x[b, c];");
-                    I("sum2 = x[b, c]+x[b, c];");
-                    I("sum3 = x[b, c]+x[b, c]+x[b, c];");
-                    _AssertSeries(First(), "sum1!a", 2002, Globals.eps, 0d);
-                    _AssertSeries(First(), "sum2!a", 2002, Globals.eps, 0d);
-                    _AssertSeries(First(), "sum3!a", 2002, Globals.eps, 0d);
-                    I("%i1 = x[b, c][2002];");
-                    I("%i2 = x[b, c][2002]+x[b, c][2002];");
-                    I("%i3 = x[b, c][2002]+x[b, c][2002]+x[b, c][2002];");
-                    _AssertScalarVal(First(), "%i1", Globals.eps);
-                    _AssertScalarVal(First(), "%i2", Globals.eps);
-                    _AssertScalarVal(First(), "%i3", Globals.eps);
-                }
+                I("x[b, d] <2002 2002> = 8;");                
 
                 I("prt <n> x;");
                 I("epsclone('x', 2003);");
@@ -23358,6 +23358,13 @@ print(df2)
                 //
                 // So x[a,c] and x[b,c] gets an eps in 2003. Setting x[a,c][2003] to something
                 // different than 0 or eps should give an error, must be done manually.
+
+                I("x[a, c] <2003 2003> = 10;");
+
+                if (true)
+                {
+                    
+                }
             }
             else
             {
