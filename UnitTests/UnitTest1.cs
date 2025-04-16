@@ -23359,7 +23359,10 @@ print(df2)
                 // So x[a,c] and x[b,c] gets an eps in 2003. Setting x[a,c][2003] to something
                 // different than 0 or eps should give an error, must be done manually.
 
-                I("x[a, c] <2003 2003> = 10;");
+                I("temp = 10;");
+                FAIL("x[a, c] <2003 2003> = temp;");
+                I("epsfree(x[a, c], 2003);");
+                I("x[a, c] <2003 2003> = temp;");
 
                 if (true)
                 {
@@ -23779,7 +23782,7 @@ print(df2)
             {
                 Assert.Fail("Missing: should be " + x.ToString() + ", but is " + y.ToString());
             }
-            else if (G.isNumericalError(x) && G.isNumericalError(y))
+            else if (G.IsNumericalError(x) && G.IsNumericalError(y))
             {
                 //both are NaN which is ok
             }
@@ -23799,7 +23802,7 @@ print(df2)
 
         private static bool NaNCheck(double x, double y)
         {
-            bool nanCheck = (G.isNumericalError(x) && !G.isNumericalError(y)) || (!G.isNumericalError(x) && G.isNumericalError(y));
+            bool nanCheck = (G.IsNumericalError(x) && !G.IsNumericalError(y)) || (!G.IsNumericalError(x) && G.IsNumericalError(y));
             return nanCheck;
         }
 

@@ -636,7 +636,7 @@ namespace Gekko
             GekkoTime realStart = GekkoTime.tNull;
             foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
             {
-                if (!G.isNumericalError(this.GetData(dt)))
+                if (!G.IsNumericalError(this.GetData(dt)))
                 {
                     //a real number, not missing or infinite
                     realStart = dt;
@@ -659,7 +659,7 @@ namespace Gekko
             GekkoTime realEnd = GekkoTime.tNull;
             foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
             {
-                if (!G.isNumericalError(this.GetData(dt)))
+                if (!G.IsNumericalError(this.GetData(dt)))
                 {
                     //a real number, not missing or infinite
                     realEnd = dt;

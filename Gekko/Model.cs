@@ -1517,7 +1517,7 @@ namespace Gekko
                     //
                     for (int t = 0; t < n; t++)
                     {
-                        if (G.isNumericalError(a[t][i])) a[t][i] = 0d;
+                        if (G.IsNumericalError(a[t][i])) a[t][i] = 0d;
                     }
                 }
             }

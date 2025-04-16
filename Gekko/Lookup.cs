@@ -1170,7 +1170,7 @@ namespace Gekko
                                         {
                                             int n = smpl.Observations12();
                                             double d = rhs_series.GetDataSequenceUnsafePointerAlterBEWARE()[0];
-                                            if (Series.MissingZero(rhs_series) && G.isNumericalError(d)) d = 0d;
+                                            if (Series.MissingZero(rhs_series) && G.IsNumericalError(d)) d = 0d;
                                             Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries
                                             if (isFunctionVariable)
                                             {
@@ -1578,7 +1578,7 @@ namespace Gekko
                                                 lhs_series = rhs_series_beware.DeepClone(0, null, null) as Series;  //so that it becomes timeless, too                                                
                                                 lhs_series.name = varnameWithFreq;
                                                 double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
-                                                if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
+                                                if (Series.MissingZero(rhs_series_beware) && G.IsNumericalError(temp[0]))
                                                 {
                                                     temp[0] = 0d;
                                                 }
@@ -1587,7 +1587,7 @@ namespace Gekko
                                             {
                                                 double d = double.NaN;
                                                 if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null) d = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0];
-                                                if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(d))
+                                                if (Series.MissingZero(rhs_series_beware) && G.IsNumericalError(d))
                                                 {
                                                     d = 0d;
                                                 }

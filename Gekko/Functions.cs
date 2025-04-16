@@ -2211,7 +2211,7 @@ namespace Gekko
                 Series rv = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                 {
-                    bool b = G.isNumericalError(x_series.GetDataSimple(t));
+                    bool b = G.IsNumericalError(x_series.GetDataSimple(t));
                     if (b) rv.SetData(t, 1d);
                     else rv.SetData(t, 0d);
                 }
@@ -2219,7 +2219,7 @@ namespace Gekko
             }
             else
             {
-                bool b = G.isNumericalError(x.ConvertToVal());
+                bool b = G.IsNumericalError(x.ConvertToVal());
                 if (b) return Globals.scalarVal1;
                 return Globals.scalarVal0;
             }
@@ -3900,7 +3900,7 @@ namespace Gekko
                 if (x_series.type == ESeriesType.Timeless)
                 {
                     double d = x_series.GetTimelessData();
-                    if (G.isNumericalError(d)) return Globals.scalarVal1;
+                    if (G.IsNumericalError(d)) return Globals.scalarVal1;
                     else return Globals.scalarVal0;
                 }
                 else if (x_series.type == ESeriesType.Normal || x_series.type == ESeriesType.Light)
@@ -5428,7 +5428,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Val)
             {
                 double v = ((ScalarVal)x).val;
-                if (G.isNumericalError(v)) s = "M";
+                if (G.IsNumericalError(v)) s = "M";
                 else s = v.ToString();
             }
             else if (x.Type() == EVariableType.Date)
@@ -6072,7 +6072,7 @@ namespace Gekko
                 GekkoTime gt = O.ConvertToDate(x[1]);
                 if (!ts.dimensionsStorage.storage.ContainsKey(mmi)) new Error("The series " + ts.GetName() + " does not contain the element/subseries [" + mmi.GetName() + "]");
                 Series subseries = ts.dimensionsStorage.storage[mmi] as Series;
-                if (G.isNumericalError(subseries.GetDataSimple(gt)))
+                if (G.IsNumericalError(subseries.GetDataSimple(gt)))
                 {
                     subseries.SetData(gt, Globals.eps);
                 }
@@ -6081,6 +6081,24 @@ namespace Gekko
             {
                 new Error("Function epsadd() has wrong number of arguments");
             }
+        }
+
+        public static void epsfree(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            if (x.Length == 0) new Error("Expected >= 1 arguments");
+            Series ts_series = x[0] as Series;
+            if (ts_series == null) new Error("Expected series argument");
+            if (ts_series.type == ESeriesType.ArraySuper) new Error("Expected normal series or array-subseries like x[a] or y[a, b].");
+            if (x.Length == 1)
+            {
+                ts_series.data.isCheckingForEps = false;  //switching the check off
+            }
+            else if (x.Length == 2)
+            {
+                GekkoTime gt = O.ConvertToDate(x[1]);
+                ts_series.SetData(gt, double.NaN);
+            }
+            else new Error("Expected <= 2 arguments");            
         }
 
         public static void epsclone(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
@@ -6094,13 +6112,14 @@ namespace Gekko
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
             {
                 MultidimItem item = kvp.Key;
-                Series subseries = kvp.Value as Series;                
-                if (G.isNumericalError(subseries.GetDataSimple(gt)))
+                Series subseries = kvp.Value as Series;                       
+                if (G.IsNumericalError(subseries.GetDataSimple(gt)))
                 {
                     double vlag = subseries.GetDataSimple(gt.Add(-1));
                     if (vlag == Globals.eps) subseries.SetData(gt, Globals.eps);
                 }
-            }
+                subseries.data.isCheckingForEps = true;
+            }            
         }        
 
         //public static void epsremove(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)

@@ -614,7 +614,7 @@ namespace Gekko
         End:
             if (MissingZero(this))
             {
-                if (G.isNumericalError(rv)) rv = 0d;
+                if (G.IsNumericalError(rv)) rv = 0d;
             }
             return rv;
         }
@@ -794,7 +794,7 @@ namespace Gekko
                 double d = this.data.GetDataArray_ONLY_INTERNAL_USE()[0];
                 if (MissingZero(this))
                 {
-                    if (G.isNumericalError(d)) d = 0d;
+                    if (G.IsNumericalError(d)) d = 0d;
                 }
                 for (int i = 0; i < n; i++) numbers[i] = d;
                 index1 = 0;
@@ -1022,20 +1022,30 @@ namespace Gekko
                 index2 = ResizeDataArray(gt2); //this would never change index1, since slots are added at the end                            
             }
 
-            //double[] temp = this.data.GetDataArray_ONLY_INTERNAL_USE();
+            //double[] temp = this.data.GetDataArray_ONLY_INTERNAL_USE();                        
 
-            if (hasSkips || replaceNaNWith0)
+            if (this.data.isCheckingForEps || hasSkips || replaceNaNWith0)
             {
                 for (int i = 0; i < index2 - index1 + 1; i++)
                 {
-                    double z = input[i + inputOffset];
-                    if (replaceNaNWith0 && G.isNumericalError(z)) z = 0;
+                    double z = input[i + inputOffset];                    
                     if (z == Globals.skippedObservationArtificialNumber)
                     {
                         //do nothing, skip updating this observation so the lhs keeps its value
                     }
                     else
                     {
+                        if (replaceNaNWith0 && G.IsNumericalError(z)) z = 0;
+                        if (this.data.isCheckingForEps && this.data.GetDataArray_ONLY_INTERNAL_USE()[i + index1] == Globals.eps && z != Globals.eps)
+                        {
+                            GekkoTime t = gt1.Add(i);
+                            using (Error txt = new Error())
+                            {
+                                txt.MainAdd("Eps error: the variable " + this.GetName() + "[" + t.ToString() + "] has value = eps and cannot");
+                                txt.MainAdd("be directly changed into the value " + z + ".");
+                                txt.MainAdd("To change the value, use the mask() function.");
+                            }
+                        }
                         this.data.GetDataArray_ONLY_INTERNAL_USE()[i + index1] = z;
                     }
                 }
@@ -1050,7 +1060,7 @@ namespace Gekko
             //{
             //    for (int i = index1; i <= index2; i++)  //=3, i<4, 
             //    {
-            //        if (G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i])) this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = 0d;
+            //        if (G.IsNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i])) this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = 0d;
             //    }
             //}
 
@@ -1129,7 +1139,7 @@ namespace Gekko
                 {
                     for (int i = 0; i < this.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
-                        if (!G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i]))
+                        if (!G.IsNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i]))
                         {
                             rv = GetPeriod(i);
                             break;
@@ -1159,7 +1169,7 @@ namespace Gekko
                 {
                     for (int i = this.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1; i >= 0; i--)
                     {
-                        if (!G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i]))
+                        if (!G.IsNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i]))
                         {
                             rv = GetPeriod(i);
                             break;
@@ -1516,7 +1526,7 @@ namespace Gekko
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
                         double d = arrayb[i + ib1];
-                        if (b && G.isNumericalError(d)) d = 0d;
+                        if (b && G.IsNumericalError(d)) d = 0d;
                         arraya[i + ia1] = a(d);
                     }
                 }
@@ -1535,7 +1545,7 @@ namespace Gekko
                 for (int i = 0; i < x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                 {
                     double d = x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i];
-                    if (b && G.isNumericalError(d)) d = 0d;
+                    if (b && G.IsNumericalError(d)) d = 0d;
                     x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = a(d);
                 }
                 rv_series = x1_series;
@@ -1584,8 +1594,8 @@ namespace Gekko
                         double d2 = arrayb[i + ib1 - lag];
                         if (b)
                         {
-                            if (G.isNumericalError(d1)) d1 = 0d;
-                            if (G.isNumericalError(d2)) d2 = 0d;
+                            if (G.IsNumericalError(d1)) d1 = 0d;
+                            if (G.IsNumericalError(d2)) d2 = 0d;
                         }
                         arraya[i + ia1] = a(d1, d2);
                     }
@@ -1615,8 +1625,8 @@ namespace Gekko
                     double d2 = x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i - lag];
                     if (b)
                     {
-                        if (G.isNumericalError(d1)) d1 = 0d;
-                        if (G.isNumericalError(d2)) d2 = 0d;
+                        if (G.IsNumericalError(d1)) d1 = 0d;
+                        if (G.IsNumericalError(d2)) d2 = 0d;
                     }
                     temp[i] = a(d1, d2);
                 }
@@ -1674,7 +1684,7 @@ namespace Gekko
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
                         double d = arrayb[i + ib1];
-                        if (b && G.isNumericalError(d)) d = 0d;
+                        if (b && G.IsNumericalError(d)) d = 0d;
                         arraya[i + ia1] = a(d, x2_val);
                     }
                 }
@@ -1766,11 +1776,11 @@ namespace Gekko
                         double d2 = arrayc[i + ic1];
                         if (b1)
                         {
-                            if (G.isNumericalError(d1)) d1 = 0d;
+                            if (G.IsNumericalError(d1)) d1 = 0d;
                         }
                         if (b2)
                         {                            
-                            if (G.isNumericalError(d2)) d2 = 0d;
+                            if (G.IsNumericalError(d2)) d2 = 0d;
                         }
                         arraya[i + ia1] = a(d1, d2);
                     }
@@ -2775,7 +2785,7 @@ namespace Gekko
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
                         double d = arrayc[i + ic1];
-                        if (b && G.isNumericalError(d)) d = 0d;
+                        if (b && G.IsNumericalError(d)) d = 0d;
                         arrayb[i + ib1] += d;  //what if lhs is NaN?
                     }
                 }
@@ -3081,7 +3091,7 @@ namespace Gekko
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
                 double d = this.GetDataSimple(t);
-                if (!G.isNumericalError(d) && d != 0d)
+                if (!G.IsNumericalError(d) && d != 0d)
                 {
                     sum += Math.Abs(d);
                     count++;
@@ -3244,6 +3254,9 @@ namespace Gekko
         [ProtoMember(3)]
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
         public int anchorPeriodPositionInArray = -123454321;
+
+        [ProtoMember(4)]
+        public bool isCheckingForEps = false; //set true by Gekko when a new period is added, that is, where an eps in x[t] is duplicated as an eps in x[t+1]
 
         public double[] GetDataArray_ONLY_INTERNAL_USE()
         {

@@ -232,7 +232,7 @@ namespace Gekko
         {
             for (int i = 0; i < temp.Length; i++)
             {
-                if (G.isNumericalError(temp[i])) temp[i] = 0d;
+                if (G.IsNumericalError(temp[i])) temp[i] = 0d;
             }
         }
 
@@ -247,7 +247,7 @@ namespace Gekko
             {
                 for (int j = 0; j < temp.GetLength(1); j++)
                 {
-                    if (G.isNumericalError(temp[i, j])) temp[i, j] = 0d;
+                    if (G.IsNumericalError(temp[i, j])) temp[i, j] = 0d;
                 }
             }
         }
@@ -1828,7 +1828,7 @@ namespace Gekko
         {
             string z = new string('0', decimals);
             string levelFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0." + z + "}", level1);
-            if (G.isNumericalError(level1))
+            if (G.IsNumericalError(level1))
             {
                 if (missFunction) levelFormatted = "m()";
                 else levelFormatted = "M";
@@ -3040,7 +3040,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsBothNumericalError(double d1, double d2)
         {
-            return G.isNumericalError(d1) && G.isNumericalError(d2);
+            return G.IsNumericalError(d1) && G.IsNumericalError(d2);
         }
 
         /// <summary>
@@ -4128,7 +4128,7 @@ namespace Gekko
         /// </summary>
         /// <param name="f">Input</param>
         /// <returns>True if the input is problematic</returns>
-        public static bool isNumericalError(double f)
+        public static bool IsNumericalError(double f)
         {
             if (Double.IsInfinity(f) || Double.IsNaN(f)) return true;
             else return false;
@@ -4674,7 +4674,7 @@ namespace Gekko
                 throw;  //will not happen
             }
             double decimals = value - rounded;
-            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            if (G.IsNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 flag = false;
             }
@@ -4701,7 +4701,7 @@ namespace Gekko
                 throw;  //will not happen
             }
             double decimals = value - rounded;
-            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            if (G.IsNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 new Error("Could not convert " + value + " into integer");
             }
@@ -4728,7 +4728,7 @@ namespace Gekko
                 throw;  //will not happen
             }
             double decimals = value - rounded;
-            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            if (G.IsNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 flag = false;
             }
@@ -4755,7 +4755,7 @@ namespace Gekko
                 throw;  //will not happen
             }
             double decimals = value - rounded;
-            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            if (G.IsNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 new Error("Could not convert " + value + " into 64-bit integer");
             }

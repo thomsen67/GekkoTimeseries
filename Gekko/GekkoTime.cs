@@ -1443,7 +1443,7 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            if (G.isNumericalError(FreqNumber(f1)) || G.isNumericalError(FreqNumber(f2))) return EFreq.None;
+            if (G.IsNumericalError(FreqNumber(f1)) || G.IsNumericalError(FreqNumber(f2))) return EFreq.None;
             if (FreqNumber(f1) >= FreqNumber(f2)) return f1;
             else return f2;
         }
@@ -1459,7 +1459,7 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            if (G.isNumericalError(FreqNumber(f1)) || G.isNumericalError(FreqNumber(f2))) return EFreq.None;
+            if (G.IsNumericalError(FreqNumber(f1)) || G.IsNumericalError(FreqNumber(f2))) return EFreq.None;
             if (FreqNumber(f1) <= FreqNumber(f2)) return f1;
             else return f2;
         }

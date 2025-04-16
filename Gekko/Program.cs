@@ -2686,45 +2686,76 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                double Round(double x, double factor)
+                if (false)
                 {
-                    return Math.Round(x / factor) * factor;
+                    int n = 100;
+                    double[] x = new double[n];
+                    for (int i = 0; i < x.Length; i++)
+                    {
+                        if (i % 10 == 0) x[i] = Globals.eps;
+                    }
+                    int k = 10000000;
+                    DateTime dt = DateTime.Now;
+                    for (int j = 0; j < k; j++)
+                    {
+                        //Array.Copy(x, x, n);
+                        //for (int i = 0; i < x.Length; i++)
+                        //{                        
+                        //    bool b = (Math.Abs(x[i]) <= 1e-300 && Math.Abs(x[i]) > 1e300);
+                        //    //x[i] = x[i];
+                        //}
+                        //bool hasOne = Array.Exists(x, z => z == 100d);
+                        foreach (double number in x.Skip(2))
+                        {
+                            if (number == 100d)
+                            {
+                                break; // Exit the loop as soon as the target is found
+                            }
+                        }
+                    }
+                    double milliseconds = (DateTime.Now - dt).TotalMilliseconds;
+                    G.Writeln2("Time = " + milliseconds + " ms");
                 }
-
-                double eps = 1e-300;
-                double rounding = 1e-250;                                
-
-                double x0 = 0d;
-                double x1 = 0d + eps;
-                double x2 = 0d + eps + eps;
-
-                new Writeln("x0 = 0: " + x0);                                
-                new Writeln("x1 = 0 + eps: " + x1);                
-                new Writeln("x2 = 0 + eps + eps: " + x2);
-                new Writeln("Round(x0) " + Round(x0, rounding));
-                new Writeln("Round(x1) " + Round(x1, rounding));
-                new Writeln("Round(x2) " + Round(x2, rounding));
-
                 
+                if (false)
+                {
+                    double Round(double x, double factor)
+                    {
+                        return Math.Round(x / factor) * factor;
+                    }
 
-                Masks m = new Masks();
-                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
-                m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
+                    double eps = 1e-300;
+                    double rounding = 1e-250;
 
-                bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
-                bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
+                    double x0 = 0d;
+                    double x1 = 0d + eps;
+                    double x2 = 0d + eps + eps;
 
-                bool b4 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                bool b5 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                    new Writeln("x0 = 0: " + x0);
+                    new Writeln("x1 = 0 + eps: " + x1);
+                    new Writeln("x2 = 0 + eps + eps: " + x2);
+                    new Writeln("Round(x0) " + Round(x0, rounding));
+                    new Writeln("Round(x1) " + Round(x1, rounding));
+                    new Writeln("Round(x2) " + Round(x2, rounding));
 
-                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                    Masks m = new Masks();
+                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
+                    m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
 
-                bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                    bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                    bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
+                    bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
 
+                    bool b4 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                    bool b5 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                    bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                    bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                }
 
             }
 
@@ -9832,7 +9863,7 @@ namespace Gekko
             {
                 double d = ts.GetDataSimple(t);
                 string s = d.ToString();
-                if (G.isNumericalError(d)) s = "m";
+                if (G.IsNumericalError(d)) s = "m";
                 sb.Append(s).Append(" ");
             }
             res.WriteLine(sb);
@@ -11530,7 +11561,7 @@ namespace Gekko
                         {
                             double[,] xx = m as double[,];
                             double d = xx[i, j];
-                            if (G.isNumericalError(d))
+                            if (G.IsNumericalError(d))
                                 s += "numpy.nan";
                             else
                                 s += m[i, j];
@@ -12095,7 +12126,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                 {
                     double v = ts.GetDataSimple(t);
-                    if (G.isNumericalError(v))
+                    if (G.IsNumericalError(v))
                     {
                         new Error("Missing value in '" + ts.name + "', period " + G.FromDateToString(t));
                     }
@@ -15784,7 +15815,7 @@ namespace Gekko
                     {
                         counter++;
                         double data = rhs.GetDataSimple(gt);
-                        if (G.isNumericalError(data))
+                        if (G.IsNumericalError(data))
                         {
                             missings.Add(counter);
                             missingsDates.Add(gt);
@@ -15823,7 +15854,7 @@ namespace Gekko
                     {
                         //realStart and realEnd can not be tNull here
                         double z = rhs.GetDataSimple(gt);
-                        if (G.isNumericalError(z))
+                        if (G.IsNumericalError(z))
                         {
                             if (!recording)
                             {
@@ -15892,7 +15923,7 @@ namespace Gekko
                         {
                             //realStart and realEnd can not be tNull here
                             double z = rhs.GetDataSimple(gt);
-                            if (G.isNumericalError(z))
+                            if (G.IsNumericalError(z))
                             {
                                 newSeriesTemp.SetData(gt, overlay.GetDataSimple(gt));
                             }
@@ -19657,7 +19688,7 @@ namespace Gekko
                 n++;
             }
 
-            if (G.isNumericalError(sum))
+            if (G.IsNumericalError(sum))
             {
                 new Error("Series " + ts.meta.parentDatabank.name + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
                 //throw new GekkoException();
@@ -20935,7 +20966,7 @@ namespace Gekko
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                     {
                         double value = l[i].GetDataSimple(t);
-                        if (G.isNumericalError(value))
+                        if (G.IsNumericalError(value))
                         {
                             if (replace)
                             {
@@ -22363,7 +22394,7 @@ namespace Gekko
             GekkoTime tStart_real = GekkoTime.tNull;
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
-                if (!G.isNumericalError(value.GetDataSimple(t)) && !G.isNumericalError(valueAtLaggedPrices.GetDataSimple(t)))
+                if (!G.IsNumericalError(value.GetDataSimple(t)) && !G.IsNumericalError(valueAtLaggedPrices.GetDataSimple(t)))
                 {
                     //if both are non-missing
                     tStart_real = t;
@@ -22431,7 +22462,7 @@ namespace Gekko
             for (int j = 0; j < n; j++)
             {
                 //In R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) we use current p and q and lagged p.
-                if (G.isNumericalError(aX[j, i]) || G.isNumericalError(aP[j, i]) || G.isNumericalError(aP[j, i - 1]))
+                if (G.IsNumericalError(aX[j, i]) || G.IsNumericalError(aP[j, i]) || G.IsNumericalError(aP[j, i - 1]))
                 {
                     return true;
                 }
@@ -23084,7 +23115,7 @@ namespace Gekko
                         eo.excelColumnLabels[0, periodCounter] = gt.ToString();
                         eo.excelColumnLabelsGekkoTime[0, periodCounter] = gt;
                         double var1 = ts.GetDataSimple(gt);
-                        if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                        if (G.IsNumericalError(var1)) var1 = 9.99999e+99;
                         eo.excelData[i, periodCounter] = var1;
                         periodCounter++;
                     }
@@ -24340,7 +24371,7 @@ namespace Gekko
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
                         double data = ts.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
-                        if (G.isNumericalError(data))
+                        if (G.IsNumericalError(data))
                         {
                             if (!Program.options.bugfix_csv_missing && (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd)))
                             {
@@ -24627,7 +24658,7 @@ namespace Gekko
                         Series ts = iv as Series;
 
                         double data = ts.GetDataSimple(t);
-                        if (G.isNumericalError(data))
+                        if (G.IsNumericalError(data))
                         {
                             file.Write("NaN");
                         }
@@ -26244,7 +26275,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq_adjusted, t2_highfreq_adjusted))
                 {
                     double data = ts_rhs.GetDataSimple(t);
-                    if (G.isNumericalError(data))
+                    if (G.IsNumericalError(data))
                     {
                         //Note: these are only holes *inside * real data blocks, not surrounding them
                         if (missingLower == "flex")
@@ -26766,11 +26797,11 @@ namespace Gekko
             if (dentonType == EDentonType.Denton)
             {
                 double crit = 2d;  //What should this be? There is a relativity problem here. Something like a sine curve fluctuating around 0 does not necessarily give bad results. But it will give a warning here. Still, with a factor = 2, a lot of bad stuff will be caught.
-                if (!G.isNumericalError(rMax) && rMax != double.MinValue && rMax >= crit)
+                if (!G.IsNumericalError(rMax) && rMax != double.MinValue && rMax >= crit)
                 {
                     G.Warning("w41.1", "At at least one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMax, 2) + " larger than the low-frequency input series. This may invalidate the Denton method results.");
                 }
-                if (!G.isNumericalError(rMin) && rMin != double.MaxValue && rMin <= 1d / crit)
+                if (!G.IsNumericalError(rMin) && rMin != double.MaxValue && rMin <= 1d / crit)
                 {
                     G.Warning("w41.1", "At at least one data point, the collapsed/aggregated high-frequency indicator series is a factor " + Math.Round(rMin, 2) + " smaller than the low-frequency input series. This may invalidate the Denton method results.");
                 }
@@ -27413,7 +27444,7 @@ namespace Gekko
 
                 foreach (double d in tsData)
                 {
-                    if (G.isNumericalError(d))
+                    if (G.IsNumericalError(d))
                     {
                         new Error("Correlation cannot be computed due to missing values");
                         //throw new GekkoException();
@@ -27615,7 +27646,7 @@ namespace Gekko
                 for (int j = 0; j < nj; j++)
                 {
                     double var1 = data[i, j];
-                    if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                    if (G.IsNumericalError(var1)) var1 = 9.99999e+99;
                     eo.excelData[i, j] = var1;
                 }
             }
@@ -27801,7 +27832,7 @@ namespace Gekko
                 {
                     PrintLabel(labelGiven);
                     double d = ((ScalarVal)x).val;
-                    if (G.isNumericalError(d))
+                    if (G.IsNumericalError(d))
                     {
                         G.Writeln(Globals.printNaNIndicator);
                     }
@@ -27877,7 +27908,7 @@ namespace Gekko
                     //We use same format as for normal PRT of series, but the width is truncated regarding blanks
                     double d = ((ScalarVal)x).val;
 
-                    if (G.isNumericalError(d))
+                    if (G.IsNumericalError(d))
                     {
                         s += Globals.printNaNIndicator;
                     }
@@ -28996,7 +29027,7 @@ namespace Gekko
                 s2 = s2.Replace(".", ",");
             }
             if (s2 == "9.99999E+99" || s2 == "9,99999E+99"  //I think this is funny number made in Excel printing routine, to signal missing value
-                || G.isNumericalError(d2) || d2 == Globals.missingVariableArtificialNumber)  //NumericalError is 'M', and the number Globals.missingVariableArtificialNumber is a signal from a table that variable is non-existing ('N')
+                || G.IsNumericalError(d2) || d2 == Globals.missingVariableArtificialNumber)  //NumericalError is 'M', and the number Globals.missingVariableArtificialNumber is a signal from a table that variable is non-existing ('N')
             {
                 s2 = "=" + NaForExcelInDifferentLanguages(0);
             }
@@ -31448,7 +31479,7 @@ namespace Gekko
                     {
                         for (int j = 0; j < data.GetLength(1); j++)
                         {
-                            if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
+                            if (data[i, j] == 9.99999e99d || G.IsNumericalError(data[i, j]))
                             {
                                 if (Program.options.interface_excel_ignoremissing)
                                 {
@@ -32735,7 +32766,7 @@ namespace Gekko
                 //there are some of these, most with all values = 0
             }
 
-            if (G.isNumericalError(d))
+            if (G.IsNumericalError(d))
             {
                 //seems there are none of these
             }
@@ -33589,10 +33620,10 @@ namespace Gekko
 
                         if (missingZero)
                         {
-                            if (G.isNumericalError(var1)) var1 = 0d;
-                            if (G.isNumericalError(var2)) var2 = 0d;
-                            if (G.isNumericalError(var2_lag1)) var2_lag1 = 0d;
-                            if (G.isNumericalError(var2_lag2)) var2_lag2 = 0d;
+                            if (G.IsNumericalError(var1)) var1 = 0d;
+                            if (G.IsNumericalError(var2)) var2 = 0d;
+                            if (G.IsNumericalError(var2_lag1)) var2_lag1 = 0d;
+                            if (G.IsNumericalError(var2_lag2)) var2_lag2 = 0d;
                         }
 
                         //we check first both 0, both M, one non-M && one M.
@@ -33608,7 +33639,7 @@ namespace Gekko
                             varPch = 0d;
                             varDelta = 0d;
                         }
-                        else if ((G.isNumericalError(var1) && !G.isNumericalError(var2)) || (!G.isNumericalError(var1) && G.isNumericalError(var2)))
+                        else if ((G.IsNumericalError(var1) && !G.IsNumericalError(var2)) || (!G.IsNumericalError(var1) && G.IsNumericalError(var2)))
                         {
                             //this is considered a problem
                             varPch = 1e+100d;
@@ -33636,14 +33667,14 @@ namespace Gekko
                         maxAbs = Math.Max(Math.Abs(varDelta), maxAbs);
                         maxRel = Math.Max(Math.Abs(varPch / 100d), maxRel);
 
-                        if (G.isNumericalError(max))
+                        if (G.IsNumericalError(max))
                         {
                             //this is igonred
                         }
                     }
 
 
-                    if (G.isNumericalError(max))
+                    if (G.IsNumericalError(max))
                     {
                         //This probably never happens... for safety...
                         max = 1e+100d;
@@ -33654,8 +33685,8 @@ namespace Gekko
                     //if (max == 0) continue;  //don't show vars if they are identical
                     //if no <abs=...> or <rel=...> are given, crit_abs and crit_rel are = 0.
 
-                    if (G.isNumericalError(crit_abs) || crit_abs < 0d) crit_abs = 0d; //can be called with NaN
-                    if (G.isNumericalError(crit_rel) || crit_rel < 0d) crit_rel = 0d; //can be called with NaN
+                    if (G.IsNumericalError(crit_abs) || crit_abs < 0d) crit_abs = 0d; //can be called with NaN
+                    if (G.IsNumericalError(crit_rel) || crit_rel < 0d) crit_rel = 0d; //can be called with NaN
 
                     if (maxRel > crit_rel && maxAbs > crit_abs)
                     {
@@ -33809,21 +33840,21 @@ namespace Gekko
 
                             if (history && tCounter == 0)
                             {
-                                if (G.isNumericalError(var2))
+                                if (G.IsNumericalError(var2))
                                 {
                                     //ok then
                                 }
                                 else
                                 {
-                                    if (G.isNumericalError(var2_lag1))
+                                    if (G.IsNumericalError(var2_lag1))
                                     {
                                         lag1Problem++;
                                     }
-                                    if (G.isNumericalError(var2_lag2))
+                                    if (G.IsNumericalError(var2_lag2))
                                     {
                                         lag2Problem++;
                                     }
-                                    if (G.isNumericalError(var2_lag1) || G.isNumericalError(var2_lag2))
+                                    if (G.IsNumericalError(var2_lag1) || G.IsNumericalError(var2_lag2))
                                     {
                                         lagProblem++;
                                     }
@@ -33901,9 +33932,9 @@ namespace Gekko
             {
                 //This corresponds perfectly with the way convergence is checked in gauss-seidel SIM (per default)
                 double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;
-                //if (G.isNumericalError(d)) d = 1e+100d;
+                //if (G.IsNumericalError(d)) d = 1e+100d;
                 varPch = Math.Abs(var1 - var2) / d * 100d;  //if d provides NaN, varPch = 0 almost, and only abs check is performed.
-                if (G.isNumericalError(varPch)) varPch = 1e+100d;
+                if (G.IsNumericalError(varPch)) varPch = 1e+100d;
             }
             else
             {

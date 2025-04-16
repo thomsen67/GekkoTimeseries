@@ -878,7 +878,7 @@ namespace Gekko
                         double d = 0d;
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
                     }
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
@@ -897,7 +897,7 @@ namespace Gekko
                         double d = 0d;
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
                     }
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }

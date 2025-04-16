@@ -3510,7 +3510,7 @@ namespace Gekko
         {
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                if (G.isNumericalError(lhs_series.GetDataSimple(t)))
+                if (G.IsNumericalError(lhs_series.GetDataSimple(t)))
                 {
                     using (Error e = new Error())
                     {
@@ -6051,7 +6051,7 @@ namespace Gekko
                 //try to see if x can be a constant value
                 Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
                 double x_val = O.ConvertToVal(x);
-                if (Series.MissingZero() && G.isNumericalError(x_val)) x_val = 0d;
+                if (Series.MissingZero() && G.IsNumericalError(x_val)) x_val = 0d;
                 double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
                 for (int i = 0; i < temp.Length; i++)
                 {
@@ -8050,7 +8050,7 @@ namespace Gekko
                         new Error("Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
                     }
                     double relative = avg1 / avg2;
-                    if (G.isNumericalError(relative))
+                    if (G.IsNumericalError(relative))
                     {
                         new Error("Seems there are missing data for common period " + t2a + "-" + t1b);
                     }
@@ -8071,7 +8071,7 @@ namespace Gekko
                         new Error("Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
                     }
                     double relative = avg1 / avg2;
-                    if (G.isNumericalError(relative))
+                    if (G.IsNumericalError(relative))
                     {
                         new Error("Seems there are missing data for common period " + t2a + "-" + t1b);
                     }
@@ -8400,7 +8400,7 @@ namespace Gekko
                 if (G.Equal(opt_first, "yes")) posCounter++;
                 if (G.Equal(opt_ref, "yes")) posCounter++;
                 if (G.Equal(opt_last, "yes")) posCounter++;
-                if (!G.isNumericalError(this.opt_pos)) posCounter++;
+                if (!G.IsNumericalError(this.opt_pos)) posCounter++;
 
                 if (posCounter > 1)
                 {
@@ -8432,7 +8432,7 @@ namespace Gekko
                 {
                     oRead.openType = EOpenType.Sec;
                 }
-                if (!G.isNumericalError(this.opt_pos))
+                if (!G.IsNumericalError(this.opt_pos))
                 {
                     oRead.openType = EOpenType.Pos;
                     if (G.ConvertToInt(out oRead.openTypePosition, opt_pos) == false)

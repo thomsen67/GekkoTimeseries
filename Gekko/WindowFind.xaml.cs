@@ -325,7 +325,7 @@ namespace Gekko
                     foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
                         double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.tSelected);
-                        if (G.isNumericalError(v)) v = 0d;
+                        if (G.IsNumericalError(v)) v = 0d;
                         else v = Math.Abs(v);
                         max = Math.Max(v, max);
                     }
@@ -391,7 +391,7 @@ namespace Gekko
                         foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                         {
                             double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.tSelected);
-                            if (G.isNumericalError(v)) v = 0d;
+                            if (G.IsNumericalError(v)) v = 0d;
                             else v = Math.Abs(v);
                             max = Math.Max(v, max);
                         }

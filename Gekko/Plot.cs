@@ -291,7 +291,7 @@ namespace Gekko
                     }
                     for (int j = 0; j < plotTable.values.Count; j++)
                     {
-                        if (i < plotTable.values[j].Count && !G.isNumericalError(plotTable.values[j][i]))
+                        if (i < plotTable.values[j].Count && !G.IsNumericalError(plotTable.values[j][i]))
                         {
                             tw.Write(plotTable.values[j][i].ToString() + " ");
                         }
@@ -326,7 +326,7 @@ namespace Gekko
             string title = GetText(null, o.opt_title, null, doc.SelectSingleNode("gekkoplot/title"), null);
             string subtitle = GetText(null, o.opt_subtitle, null, doc.SelectSingleNode("gekkoplot/subtitle"), null);
             string font = GetText(null, o.opt_font, null, doc.SelectSingleNode("gekkoplot/font"), "Verdana");
-            double fontsize = Program.ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_fontsize) ? null : o.opt_fontsize.ToString(), null, doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
+            double fontsize = Program.ParseIntoDouble(GetText(null, G.IsNumericalError(o.opt_fontsize) ? null : o.opt_fontsize.ToString(), null, doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
             string bold = GetText(null, o.opt_bold, null, doc.SelectSingleNode("gekkoplot/bold"), null);
             string italic = GetText(null, o.opt_italic, null, doc.SelectSingleNode("gekkoplot/italic"), null);
             string ticsInOut = GetText(null, o.opt_tics, null, doc.SelectSingleNode("gekkoplot/tics"), "out");
@@ -335,8 +335,8 @@ namespace Gekko
             string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse height 1");  //height 1 givers nicer vertical spacing
             string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
             string stack = GetText(null, o.opt_stack, null, doc.SelectSingleNode("gekkoplot/stack"), "no");  //default: no, #23475432985    
-            double boxwidth = Program.ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_boxwidth) ? null : o.opt_boxwidth.ToString(), null, doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
-            string boxgap = GetText(null, G.isNumericalError(o.opt_boxgap) ? null : o.opt_boxgap.ToString(), null, doc.SelectSingleNode("gekkoplot/boxgap"), "2");
+            double boxwidth = Program.ParseIntoDouble(GetText(null, G.IsNumericalError(o.opt_boxwidth) ? null : o.opt_boxwidth.ToString(), null, doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
+            string boxgap = GetText(null, G.IsNumericalError(o.opt_boxgap) ? null : o.opt_boxgap.ToString(), null, doc.SelectSingleNode("gekkoplot/boxgap"), "2");
             string separate = GetText(null, o.opt_separate, null, doc.SelectSingleNode("gekkoplot/separate"), "no"); //default: no, #23475432985                        
 
             if (key2 != null) key = key2;
@@ -352,9 +352,9 @@ namespace Gekko
             string ytitle = GetText(null, o.opt_ytitle, null, doc.SelectSingleNode("gekkoplot/ytitle"), null);
             string y2title = GetText(null, o.opt_y2title, null, doc.SelectSingleNode("gekkoplot/y2title"), null);
             List<string> ylines = GetText(doc.SelectNodes("gekkoplot/yline"));
-            if (!G.isNumericalError(o.opt_yline)) ylines.Add(o.opt_yline.ToString());
+            if (!G.IsNumericalError(o.opt_yline)) ylines.Add(o.opt_yline.ToString());
             List<string> y2lines = GetText(doc.SelectNodes("gekkoplot/y2line"));
-            if (!G.isNumericalError(o.opt_y2line)) y2lines.Add(o.opt_y2line.ToString());
+            if (!G.IsNumericalError(o.opt_y2line)) y2lines.Add(o.opt_y2line.ToString());
 
             string ymax = GetText(null, o.opt_ymax.ToString(), null, doc.SelectSingleNode("gekkoplot/ymax"), null);
             string ymaxsoft = GetText(null, o.opt_ymaxsoft.ToString(), null, doc.SelectSingleNode("gekkoplot/ymaxsoft"), null);
@@ -454,7 +454,7 @@ namespace Gekko
                 double max2 = double.MinValue;
                 foreach (double d in plotTable.values[j])
                 {
-                    if (!G.isNumericalError(d))
+                    if (!G.IsNumericalError(d))
                     {
                         min2 = Math.Min(min2, d);
                         max2 = Math.Max(max2, d);
@@ -711,7 +711,7 @@ namespace Gekko
             foreach (string s in ylines)
             {
                 double d = Program.ParseIntoDouble(s);
-                if (!G.isNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");
+                if (!G.IsNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");
             }
 
             foreach (string s in y2lines)
@@ -719,7 +719,7 @@ namespace Gekko
                 if (numberOfY2s > 0)  //theses lines are ignored if there is no y2 axis shown
                 {
                     double d = Program.ParseIntoDouble(s);
-                    if (!G.isNumericalError(d)) txt.AppendLine("set arrow from graph 0, second " + d + " to graph 1, second " + d + " nohead");
+                    if (!G.IsNumericalError(d)) txt.AppendLine("set arrow from graph 0, second " + d + " to graph 1, second " + d + " nohead");
                 }
             }
 
@@ -1431,10 +1431,10 @@ namespace Gekko
 
                 linetype = GetText(co[i].linetype, o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
                 dashtype = GetText(co[i].dashtype, o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
-                linewidth = GetText(G.isNumericalError(co[i].linewidth) ? null : co[i].linewidth.ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                linewidth = GetText(G.IsNumericalError(co[i].linewidth) ? null : co[i].linewidth.ToString(), G.IsNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
                 linecolor = GetText(co[i].linecolor, o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
                 pointtype = GetText(co[i].pointtype, o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                pointsize = GetText(G.isNumericalError(co[i].pointsize) ? null : co[i].pointsize.ToString(), G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                pointsize = GetText(G.IsNumericalError(co[i].pointsize) ? null : co[i].pointsize.ToString(), G.IsNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
                 fillstyle = GetText(co[i].fillstyle, o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
                 y2 = GetText(co[i].y2, null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
                 label = HandleLabel(line3, isExplicit, labelCleaned);

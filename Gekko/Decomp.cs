@@ -1586,7 +1586,7 @@ namespace Gekko
                     bool nan = false;
                     foreach (double d in mEndo)
                     {
-                        if (G.isNumericalError(d))
+                        if (G.IsNumericalError(d))
                         {
                             nan = true;
                             break;
@@ -1908,7 +1908,7 @@ namespace Gekko
                         bool nan = false;
                         foreach (double d in mEndo2)
                         {
-                            if (G.isNumericalError(d))
+                            if (G.IsNumericalError(d))
                             {
                                 nan = true;
                                 break;
@@ -1949,7 +1949,7 @@ namespace Gekko
                             bool nan = false;
                             foreach (double d in mEndo)
                             {
-                                if (G.isNumericalError(d))
+                                if (G.IsNumericalError(d))
                                 {
                                     nan = true;
                                     break;
@@ -2205,7 +2205,7 @@ namespace Gekko
             double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE();
             for (int i = 0; i < data.Length; i++)
             {
-                if (G.isNumericalError(data[i])) data[i] = 0d;
+                if (G.IsNumericalError(data[i])) data[i] = 0d;
             }
         }
 
@@ -2290,7 +2290,7 @@ namespace Gekko
             //        foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             //        {
             //            //the following if is probably not necessary
-            //            //The IF is dropped ... if (G.isNumericalError(tsStorage.GetDataSimple(t))) tsStorage.SetData(t, ts.GetDataSimple(t));
+            //            //The IF is dropped ... if (G.IsNumericalError(tsStorage.GetDataSimple(t))) tsStorage.SetData(t, ts.GetDataSimple(t));
             //            tsStorage.SetData(t, ts.GetDataSimple(t));
             //        }
             //    }
@@ -2318,7 +2318,7 @@ namespace Gekko
                     foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                     {
                         //the following if is probably not necessary
-                        if (G.isNumericalError(ts.GetDataSimple(t))) missings++;
+                        if (G.IsNumericalError(ts.GetDataSimple(t))) missings++;
                     }
                     string m = null;
                     if (missings > 0) m = ", !!!!! missings = " + missings;
@@ -2506,7 +2506,7 @@ namespace Gekko
             foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(Globals.decompPerLag), per2))
             {
                 double d = xx.GetDataSimple(t);
-                if (!G.isNumericalError(d) && Math.Abs(d) > eps)
+                if (!G.IsNumericalError(d) && Math.Abs(d) > eps)
                 {
                     isZero = false;
                     break;
@@ -3012,7 +3012,7 @@ namespace Gekko
                                                 double y1_double = y1_series.GetDataSimple(t2);
                                                 double grad = (y1_double - y0_double) / eps;
 
-                                                if (!G.isNumericalError(grad) && grad != 0d)
+                                                if (!G.IsNumericalError(grad) && grad != 0d)
                                                 {
                                                     //For the gradient to be a real number <> 0, the expression must evaluate
                                                     //before shock (y0) in the year considered (t2)
@@ -3258,9 +3258,9 @@ namespace Gekko
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                                 double grad = (y0_after - y0a) / eps;
 
-                                //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //if (!G.IsNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (Globals.decompFix || !G.isNumericalError(grad))
+                                if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
                                     if (Globals.decompFixTimelessProblem == 1 && modelGamsScalar.isTimeless[dp.variable])
@@ -3307,9 +3307,9 @@ namespace Gekko
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, true, tZero, ref funcCounter);
                                 double grad = (y0_after - y0b) / eps;
 
-                                //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //if (!G.IsNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (Globals.decompFix || !G.isNumericalError(grad))
+                                if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
                                     if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
@@ -3352,9 +3352,9 @@ namespace Gekko
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, true, tZero, ref funcCounter);
                                 double grad = (y0_after - y0c) / eps;
 
-                                //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //if (!G.IsNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (Globals.decompFix || !G.isNumericalError(grad))
+                                if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
                                     if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
@@ -4276,9 +4276,9 @@ namespace Gekko
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero)) 
                                 {
-                                    if (G.isNumericalError(dLevel)) dLevel = 0d;
-                                    if (G.isNumericalError(dLevelLag)) dLevelLag = 0d;
-                                    if (G.isNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
+                                    if (G.IsNumericalError(dLevel)) dLevel = 0d;
+                                    if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
+                                    if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
                                 }
                             }
                             Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
@@ -4289,9 +4289,9 @@ namespace Gekko
                                 dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
                                 {
-                                    if (G.isNumericalError(dLevelRef)) dLevelRef = 0d;
-                                    if (G.isNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
-                                    if (G.isNumericalError(dLevelRefLag2)) dLevelRefLag2 = 0d;
+                                    if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
+                                    if (G.IsNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
+                                    if (G.IsNumericalError(dLevelRefLag2)) dLevelRefLag2 = 0d;
                                 }
                             }
                         }
@@ -4311,9 +4311,9 @@ namespace Gekko
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
                                 {
-                                    if (G.isNumericalError(dLevel)) dLevel = 0d;
-                                    if (G.isNumericalError(dLevelLag)) dLevelLag = 0d;
-                                    if (G.isNumericalError(dLevelLag2)) dLevelLag2 = 0d;
+                                    if (G.IsNumericalError(dLevel)) dLevel = 0d;
+                                    if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
+                                    if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;
                                 }
                             }
 
@@ -4331,9 +4331,9 @@ namespace Gekko
                                 dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
                                 {
-                                    if (G.isNumericalError(dLevelRef)) dLevelRef = 0d;
-                                    if (G.isNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
-                                    if (G.isNumericalError(dLevelRefLag2)) dLevelRefLag2 = 0d;
+                                    if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
+                                    if (G.IsNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
+                                    if (G.IsNumericalError(dLevelRefLag2)) dLevelRefLag2 = 0d;
                                 }
                             }
                         }
@@ -4743,7 +4743,7 @@ namespace Gekko
                         double d = 0d;
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
                         if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
                     }
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
@@ -4765,7 +4765,7 @@ namespace Gekko
                         double d = 0d;
                         if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                         else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
+                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
                         if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
                     }
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
@@ -5699,7 +5699,7 @@ namespace Gekko
 
             if (missingAsZero && isScalarModel)
             {
-                if (G.isNumericalError(d))
+                if (G.IsNumericalError(d))
                 {
                     d = 0d;
                 }

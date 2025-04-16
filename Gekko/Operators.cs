@@ -34,7 +34,7 @@ namespace Gekko
             {
                 double dd = d.GetValOLD(null);
                 string i = null;
-                if (G.isNumericalError(dd))
+                if (G.IsNumericalError(dd))
                 {
                     i = "M";
                 }

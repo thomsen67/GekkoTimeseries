@@ -1077,7 +1077,7 @@ namespace Gekko
             int missingsAtStart = 0;
             for (int i = 0; i < y.Length; i++)
             {
-                if (G.isNumericalError(y[i]))
+                if (G.IsNumericalError(y[i]))
                 {
                     missingsAtStart++;
                     goto Label1;
@@ -1085,7 +1085,7 @@ namespace Gekko
                 int nn = xOriginal.GetLength(1);
                 for (int ii = 0; ii < nn; ii++)
                 {
-                    if (G.isNumericalError(xOriginal[i, ii]))
+                    if (G.IsNumericalError(xOriginal[i, ii]))
                     {
                         missingsAtStart++;
                         goto Label1;
@@ -1102,7 +1102,7 @@ namespace Gekko
             int missingsAtEnd = 0;
             for (int i = y.Length - 1; i >= 0; i--)
             {
-                if (G.isNumericalError(y[i]))
+                if (G.IsNumericalError(y[i]))
                 {
                     missingsAtEnd++;
                     goto Label1;
@@ -1110,7 +1110,7 @@ namespace Gekko
                 int nn = xOriginal.GetLength(1);
                 for (int ii = 0; ii < nn; ii++)
                 {
-                    if (G.isNumericalError(xOriginal[i, ii]))
+                    if (G.IsNumericalError(xOriginal[i, ii]))
                     {
                         missingsAtEnd++;
                         goto Label1;

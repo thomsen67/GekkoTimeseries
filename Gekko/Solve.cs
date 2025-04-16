@@ -52,7 +52,7 @@ namespace Gekko
                     double rel = double.NaN;
                     if (tInt - 2 >= 0) rel = alag / a[yy, tInt - 2];
                     val = alag;
-                    if (!G.isNumericalError(rel))
+                    if (!G.IsNumericalError(rel))
                     {
                         if (rel > 1 + Program.options.solve_data_init_growth_min && rel < 1 + Program.options.solve_data_init_growth_max) val = alag * rel;
                     }
@@ -286,7 +286,7 @@ namespace Gekko
                         int endo = Program.model.modelGekko.m2.sparseInfo[numericalProblem][iii];
                         b[endo] = endoValuesStart[iii] * ss;
                         SimulateResidual(b, Program.model.modelGekko.r, numericalProblem, assembly);
-                        if (!G.isNumericalError(Program.model.modelGekko.r[numericalProblem]))
+                        if (!G.IsNumericalError(Program.model.modelGekko.r[numericalProblem]))
                         {
                             return;
                         }
@@ -306,7 +306,7 @@ namespace Gekko
             for (int i = 0; i < residuals.Length; i++)
             {
                 double number = residuals.GetValue(i);
-                if (false && G.isNumericalError(number))
+                if (false && G.IsNumericalError(number))
                 {
                     G.Writeln("NUM ERROR ---> " + Program.model.modelGekko.varsBTypeInverted[Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[i]]);
                 }
@@ -371,7 +371,7 @@ namespace Gekko
 
             for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumber.Length; i++)
             {
-                if (G.isNumericalError(Program.model.modelGekko.r[i]))
+                if (G.IsNumericalError(Program.model.modelGekko.r[i]))
                 {
                     numericalProblem = i;
                 }
@@ -701,7 +701,7 @@ namespace Gekko
                                 {
                                     foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
                                     {
-                                        if (d_series.GetDataSimple(gt) == 1d && G.isNumericalError(z_series.GetDataSimple(gt)))
+                                        if (d_series.GetDataSimple(gt) == 1d && G.IsNumericalError(z_series.GetDataSimple(gt)))
                                         {
                                             if (!zvars.ContainsKey(zname)) zvars.Add(zname, null);
                                         }
@@ -802,7 +802,7 @@ namespace Gekko
                                 rss += d * d;
                             }
                             rss = Math.Sqrt(rss);
-                            if (testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
+                            if (testForZeroResiduals && (G.IsNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
                             rss = rss;
                         }
                     }
@@ -888,7 +888,7 @@ namespace Gekko
                                 if (t.StrictlyLargerThan(t2)) t2 = t;
                             }
                             double v = r[i];
-                            if (G.isNumericalError(v)) counterMissings++;
+                            if (G.IsNumericalError(v)) counterMissings++;
 
                             if (good)
                             {
@@ -1405,7 +1405,7 @@ namespace Gekko
                         //int bNumber = bNumberPointers[leadedVarsList[shock.varNumber]];
                         int bNumber = bNumberPointers[shock.varNumber];
                         nftDelta = Program.model.modelGekko.bVariance[bNumber] / 100d;
-                        if (nftDelta == 0d || G.isNumericalError(nftDelta)) nftDelta = 1d;  //could be refined, perhaps looking at the level of the variable
+                        if (nftDelta == 0d || G.IsNumericalError(nftDelta)) nftDelta = 1d;  //could be refined, perhaps looking at the level of the variable
                         aTemp[shock.varNumber, shock.gt.Subtract(tStart) - largestLag] += nftDelta;
                     }
 
@@ -2186,7 +2186,7 @@ namespace Gekko
                 //the smaller alfa is, the harder the damping
                 //if alfa were set to 0, there would be no progress at all
                 double bNew = alfa * b[bNumber] + (1 - alfa) * bOld[bNumber];
-                if (G.isNumericalError(bNew))
+                if (G.IsNumericalError(bNew))
                 {
                     //if this is so, should we keep the old value? or the new value?
                     //Console.WriteLine();
@@ -2249,7 +2249,7 @@ namespace Gekko
             }
             double absolute = Math.Abs(valNew - valOld) * dampingCorrection; //for damped variables, this gives the "true" non-damped difference between iterations
             double relative = absolute / histVar;  //denominator is always >= 0, or positive infinity or NaN
-            if (G.isNumericalError(relative))  //happens when historicalVariance = 0
+            if (G.IsNumericalError(relative))  //happens when historicalVariance = 0
             {
                 relative = double.MaxValue;  //same as saying relative crit MUST be met.
                 //if so, we have 0/0 = NaN or x/0 = inf.
@@ -2612,7 +2612,7 @@ namespace Gekko
                 double x = Math.Abs(bOldj);
                 double absolute = Math.Abs(bj - bOldj) * dampingCorrection; //for damped variables, this gives the "true" non-damped difference between iterations
                 double relative = absolute / x;
-                if (G.isNumericalError(relative))  //happens when historicalVariance = 0
+                if (G.IsNumericalError(relative))  //happens when historicalVariance = 0
                 {
                     if (Math.Abs(bOldj) == 0d) relative = 0d;  //  0/0
                     else relative = double.PositiveInfinity;     //  x/0

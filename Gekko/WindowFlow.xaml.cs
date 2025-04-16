@@ -63,7 +63,7 @@ namespace Gekko
                 InitializeComponent();
                 //this.ignoredNum.Text = decompFind.decompOptions2.ignore.ToString();
                 //this.depthNum.Text = Program.options.decomp_flowgraph_depth.ToString();
-                if (G.isNumericalError(decompFind.decompOptions2.ignore)) IgnoredNumValue = 0;
+                if (G.IsNumericalError(decompFind.decompOptions2.ignore)) IgnoredNumValue = 0;
                 else IgnoredNumValue = (int)decompFind.decompOptions2.ignore;
                 DepthNumValue = decompFind.decompOptions2.flowgraphDepth;
             }
@@ -196,7 +196,7 @@ namespace Gekko
                     if (G.StartsWith(flowChild.from, "Residual")) continue;
                     if (G.StartsWith(flowChild.from, "Ignored")) continue;
                 }
-                if (walkInfo.isGekkoModel && walkInfo.ignoreDJZ && (G.isNumericalError(share) || Math.Abs(share) <= 0.01d))
+                if (walkInfo.isGekkoModel && walkInfo.ignoreDJZ && (G.IsNumericalError(share) || Math.Abs(share) <= 0.01d))
                 {
                     if (G.Equal(flowChild.from, "d" + flowChild.to)) continue;
                     if (G.Equal(flowChild.from, "j" + flowChild.to)) continue;
@@ -251,7 +251,7 @@ namespace Gekko
         private static Color Color(double d3)
         {
             double d2 = d3;
-            if (G.isNumericalError(d3)) d2 = 0d;
+            if (G.IsNumericalError(d3)) d2 = 0d;
             double d = Math.Abs(d2);
             if (d > 1) d = 1;
             else if (d < 0.20) d = 0.20;
