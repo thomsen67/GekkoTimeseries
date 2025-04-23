@@ -1106,7 +1106,7 @@ namespace Gekko
             //# m2 = 3 --> ()-columns in each sub-equation
             //# m3 = 2 --> dimensions
             // e_x1    (tot, m)  (a, m)  (b, m)
-            // e_x1    (tot, n)  (a, n)  (b, n)9
+            // e_x1    (tot, n)  (a, n)  (b, n)
             // e_x1    (tot, k)  (a, k)  (b, k)
             // e_x2    (a)
             // e_x2    (b)  

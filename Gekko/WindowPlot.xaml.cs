@@ -248,7 +248,7 @@ namespace Gekko
 
         private void Button_saveas(object sender, RoutedEventArgs e)
         {
-            string plotName = Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d / 2d, CheckBox_index.IsChecked == true));
+            string plotName = Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d / 2d, CheckBox_index.IsChecked == true, CheckBox_ref.IsChecked == true));
             Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*",
@@ -279,7 +279,7 @@ namespace Gekko
 
         private string Refresh()
         {
-            return Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true));
+            return Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_ref.IsChecked == true));
         }
 
         private string Refresh(GraphHelper gh)

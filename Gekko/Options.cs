@@ -50,7 +50,7 @@ namespace Gekko
         public bool bugfix_decomp_jacobi = true;   //not mentioned in help, better matrix for inversion
         public bool bugfix_disp = true;            //See options.model_gams_scalar_disp, not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_disp_influences_equ = false;   //not mentioned in help, set false for old link generation for gekko models
-        public bool bugfix_plot = false;            //not mentioned in help, set false for old PLOT
+        public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT
         public bool bugfix_lhsscore = true;        //not mentioned in help
         // ---
         //method options could look like the 2 following:

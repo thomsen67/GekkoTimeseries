@@ -43,9 +43,10 @@ namespace Gekko
         public GraphHelper()
         {
         }
-        public GraphHelper(string operator2, bool isRefreshing, bool isLogTransform, double fontScaling, bool isIndex)
+        public GraphHelper(string operator2, bool isRefreshing, bool isLogTransform, double fontScaling, bool isIndex, bool isRef)
         {
             this.operator2 = operator2;
+            if (isRef) this.operator2 = "r" + this.operator2;
             this.isRefreshing = isRefreshing;
             this.isLogTransform = isLogTransform;
             this.fontScaling = fontScaling;
