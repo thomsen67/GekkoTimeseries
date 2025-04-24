@@ -1393,7 +1393,7 @@ img {border-style: none;
                     EquationBrowser.WriteHtmlBold(html1, "Related equations");
                     bool first2 = true;
                     string s8 = null;
-                    foreach (EqInfoSimple eqHelper in GetRelatedEquations(variableName, tUsedHere, model, modelGamsScalar))
+                    foreach (EqInfoSimple eqHelper in GetRelatedEquations(variableName, tUsedHere, model))
                     {
                         string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
                         string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
@@ -1668,7 +1668,7 @@ img {border-style: none;
 
         private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)
         {
-            List<EqInfoSimple> eqsNew = GetRelatedEquations(variableName, t1, model, modelGamsScalar);
+            List<EqInfoSimple> eqsNew = GetRelatedEquations(variableName, t1, model);
             StringBuilder html2 = new StringBuilder();
             html2.AppendLine("<div id = `no-hash` class=`content`>");            
             html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
@@ -1995,9 +1995,10 @@ img {border-style: none;
         /// <param name="model"></param>
         /// <param name="modelGamsScalar"></param>
         /// <returns></returns>
-        public static List<EqInfoSimple> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model, ModelGamsScalar modelGamsScalar)
+        public static List<EqInfoSimple> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model)
         {
             List<EqInfoSimple> eqsNew = new List<EqInfoSimple>();
+            ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345) return eqsNew;
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));

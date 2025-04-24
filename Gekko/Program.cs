@@ -16803,7 +16803,7 @@ namespace Gekko
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);                
 
-                List<EqInfoSimple> eqsContainingVariable = EquationBrowser.GetRelatedEquations(varnameWithoutFreq, tUsedHere, model, modelGamsScalar);
+                List<EqInfoSimple> eqsContainingVariable = EquationBrowser.GetRelatedEquations(varnameWithoutFreq, tUsedHere, model);
                 
                 if (eqsContainingVariable.Count == 0)
                 {
@@ -16972,6 +16972,8 @@ namespace Gekko
                         GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
                         foreach (string eq in eqNamesWithIndexesNoTimeList)
                         {
+                            //qwerty
+                            if (modelGamsScalar.lhsEquations2.Count() == 0) MessageBox.Show("DISP problem regarding scalar model");
                             EqHelper eh = modelGamsScalar.lhsEquations2.Get(eq);
                             if (eh != null)
                             {

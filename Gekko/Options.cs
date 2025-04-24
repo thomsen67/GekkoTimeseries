@@ -51,7 +51,8 @@ namespace Gekko
         public bool bugfix_disp = true;            //See options.model_gams_scalar_disp, not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_disp_influences_equ = false;   //not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT
-        public bool bugfix_lhsscore = false;        //not mentioned in help
+        public bool bugfix_lhsscore = true;        //not mentioned in help
+        public bool bugfix_residuals = true;        //not mentioned in help
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -381,6 +382,7 @@ namespace Gekko
             Add("BUGFIX DISP INFLUENCES EQU", Globals.xbool);
             Add("BUGFIX PLOT", Globals.xbool);
             Add("BUGFIX LHSSCORE", Globals.xbool);
+            Add("BUGFIX RESIDUALS", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

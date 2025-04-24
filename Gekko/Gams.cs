@@ -1523,62 +1523,65 @@ namespace Gekko
 
         /// <summary>
         /// From a model (modelGamsScalar primarily) and variableName (and time), the equations that the variable appears in
-        /// are ordered by "LHS relevance".
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="model"></param>
-        /// <param name="variableName"></param>
-        /// <param name="t"></param>
+        /// are ordered by "LHS relevance". You may set tHere = GekkoTime.tNull.
+        /// </summary>     
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, Model model, bool isFindWindow)
-        {
+        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool isFindWindow)
+        {            
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
+
+            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
             {
                 new Error(Decomp.NonFoundInModelError(variableName, modelGamsScalar));
-            }
-            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT()));
-            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-
-            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-            if (eqNumbers == null)
-            {
-                if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
-                {
-                    //Some variable has an "e_" prefixed, but the equation may not exist if it is an exogenous variable.
-                    return new List<EqInfoSimple>();
-                }
-                else
-                {
-                    if (isFindWindow)
-                    {
-                        string s = ". You may want to adjust the DECOMP time period.";
-                        bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
-                        if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";
-                        new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
-                    }
-                    else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
-                }
-            }
+            }         
 
             List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
-            foreach (KeyValuePair<string, EqHelper> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
+            if (Program.options.bugfix_residuals)
             {
-                string eqName = kvp1.Key;
-                foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.scores.GetDictionaryForIteration())
+                eqsNewA2 = EquationBrowser.GetRelatedEquations(variableName, tHere, model);
+                if (eqsNewA2.Count == 0)
                 {
-                    if (G.Equal(variableName, kvp2.Key))
+                    if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                     {
-                        double score = kvp2.Value;
-                        EqInfoSimple simple = new EqInfoSimple();
-                        simple.eqName = kvp1.Value.eqName;
-                        simple.eqNameWithLag = eqName;
-                        simple.score = score;
-                        simple.eqNumber = kvp1.Value.eqNumber;
-                        eqsNewA2.Add(simple);
+                        //Some variable has an "e_" prefixed, but the equation may not exist if it is an exogenous variable.
+                        return new List<EqInfoSimple>();
+                    }
+                    else
+                    {
+                        if (isFindWindow)
+                        {
+                            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
+                            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+                            string s = ". You may want to adjust the DECOMP time period.";
+                            bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
+                            if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";
+                            new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
+                        }
+                        else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
+                    }
+                }
+            }
+            else
+            {                
+                foreach (KeyValuePair<string, EqHelper> kvp1 in modelGamsScalar.lhsEquations2.GetDictionaryForIteration())
+                {
+                    string eqName = kvp1.Key;
+                    foreach (KeyValuePair<string, double> kvp2 in kvp1.Value.scores.GetDictionaryForIteration())
+                    {
+                        if (G.Equal(variableName, kvp2.Key))
+                        {
+                            double score = kvp2.Value;
+                            EqInfoSimple simple = new EqInfoSimple();
+                            simple.eqName = kvp1.Value.eqName;
+                            simple.eqNameWithLag = eqName;
+                            simple.score = score;
+                            simple.eqNumber = kvp1.Value.eqNumber;
+                            eqsNewA2.Add(simple);
+                        }
                     }
                 }
             }

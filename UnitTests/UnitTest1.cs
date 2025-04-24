@@ -7696,7 +7696,9 @@ namespace UnitTests
             I("%x = -%eps;");
             _AssertScalarVal(First(), "%x", Globals.eps);
             I("%x = log(%eps);");
-            _AssertScalarVal(First(), "%x", double.eps);
+            _AssertScalarVal(First(), "%x", double.NaN);
+            I("%x = exp(%eps);");
+            _AssertScalarVal(First(), "%x", 1d);
 
             // ----------------- Sanity checks, scalars ---------------------
             I("reset;");
