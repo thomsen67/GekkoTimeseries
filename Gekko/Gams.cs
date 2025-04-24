@@ -1542,16 +1542,14 @@ namespace Gekko
             List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
             if (Program.options.bugfix_residuals)
             {                
-                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tHere));
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
                 PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
                 List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
                 if (eqNumbers == null)
                 {
                     G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
                     eqNumbers = new List<int>();
-                }
-                //eqsNewA2 = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tHere, eqNumbers, model);
-
+                }                
                 List<EqInfoSimple> scalarEquations = new List<EqInfoSimple>();
                 foreach (int eqNumber in eqNumbers)
                 {

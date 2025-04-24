@@ -6136,32 +6136,32 @@ namespace Gekko
         //    }
         //}
 
-        /// <summary>
-        /// Get scalar equations in simple text form.
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="model"></param>
-        /// <param name="modelGamsScalar"></param>
-        /// <param name="vars"></param>
-        /// <param name="eqNumbers"></param>
-        /// <returns></returns>
-        public static List<EqInfoSimple> GetScalarEquations(string variableName, GekkoTime tSelected, List<int> eqNumbers, Model model)
-        {
-            //Get a list of helper objects corresponding to each scalar equation the variable is part of
-            List<EqInfoSimple> scalarEquations = new List<EqInfoSimple>();
-            foreach (int eqNumber in eqNumbers)
-            {
-                string eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                string eqNameWithLag = null;
-                eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(tSelected), false);
-                EqInfoSimple e = new EqInfoSimple();
-                e.eqName = eqName;
-                e.eqNameWithLag = eqNameWithLag;
-                e.eqNumber = eqNumber;
-                scalarEquations.Add(e);
-            }
-            return scalarEquations;
-        }
+        ///// <summary>
+        ///// Get scalar equations in simple text form.
+        ///// </summary>
+        ///// <param name="o"></param>
+        ///// <param name="model"></param>
+        ///// <param name="modelGamsScalar"></param>
+        ///// <param name="vars"></param>
+        ///// <param name="eqNumbers"></param>
+        ///// <returns></returns>
+        //public static List<EqInfoSimple> GetScalarEquations(string variableName, GekkoTime tSelected, List<int> eqNumbers, Model model)
+        //{
+        //    //Get a list of helper objects corresponding to each scalar equation the variable is part of
+        //    List<EqInfoSimple> scalarEquations = new List<EqInfoSimple>();
+        //    foreach (int eqNumber in eqNumbers)
+        //    {
+        //        string eqName = model.modelGamsScalar.GetEqName(eqNumber);
+        //        string eqNameWithLag = null;
+        //        eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(tSelected), false);
+        //        EqInfoSimple e = new EqInfoSimple();
+        //        e.eqName = eqName;
+        //        e.eqNameWithLag = eqNameWithLag;
+        //        e.eqNumber = eqNumber;
+        //        scalarEquations.Add(e);
+        //    }
+        //    return scalarEquations;
+        //}
 
         public static Rich GetColoredEquations(string s)
         {

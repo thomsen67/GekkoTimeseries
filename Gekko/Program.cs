@@ -19431,7 +19431,7 @@ namespace Gekko
                     Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                     if (false) GamsModel.GAMSParser();
                     if (false) GamsModel.GamsGMO();
-                    if (true)
+                    if (false)
                     {
                         try
                         {
