@@ -19429,32 +19429,35 @@ namespace Gekko
                     Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                     if (false) GamsModel.GAMSParser();
                     if (false) GamsModel.GamsGMO();
-                    try
+                    if (true)
                     {
-                        DateTime dt = DateTime.Now;
-                        model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
-                        if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt));
-                    }
-                    catch 
-                    {
-                        //No need to choke on this
-                        new Note("The module that identifies dependent variables from equation names failed to load");
-                    }
-                    try
-                    {
-                        //TODO TODO .Add(-1)
-                        if (Program.options.bugfix_lhsscore)
+                        try
                         {
-                            //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
                             DateTime dt = DateTime.Now;
-                            model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
-                            if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
+                            model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
+                            if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt));
                         }
-                    }
-                    catch
-                    {
-                        //No need to choke on this
-                        new Note("The module that identifies dependent variables from equation names failed to load");
+                        catch
+                        {
+                            //No need to choke on this
+                            new Note("The module that identifies dependent variables from equation names failed to load");
+                        }
+                        try
+                        {
+                            //TODO TODO .Add(-1)
+                            if (Program.options.bugfix_lhsscore)
+                            {
+                                //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
+                                DateTime dt = DateTime.Now;
+                                model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
+                                if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
+                            }
+                        }
+                        catch
+                        {
+                            //No need to choke on this
+                            new Note("The module that identifies dependent variables from equation names failed to load");
+                        }
                     }
                     Program.model = model;
                 }

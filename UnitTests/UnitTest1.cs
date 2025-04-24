@@ -7680,6 +7680,24 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2001, Globals.eps, 0d);
             _AssertSeries(First(), "x2!a", 2001, Math.Tanh(2d), 0d);
 
+            // ----------------- Scalars ------------------------------------
+            I("reset;");
+            I("%i = 2;");            
+            I("%x = %eps + %eps;");
+            _AssertScalarVal(First(), "%x", Globals.eps);
+            I("%x = %eps - %eps;");
+            _AssertScalarVal(First(), "%x", Globals.eps);
+            I("%x = %eps * %eps;");
+            _AssertScalarVal(First(), "%x", Globals.eps);
+            I("%x = %eps / %eps;");
+            _AssertScalarVal(First(), "%x", double.NaN);
+            I("%x = %eps ^ %eps;");
+            _AssertScalarVal(First(), "%x", double.NaN);
+            I("%x = -%eps;");
+            _AssertScalarVal(First(), "%x", Globals.eps);
+            I("%x = log(%eps);");
+            _AssertScalarVal(First(), "%x", double.eps);
+
             // ----------------- Sanity checks, scalars ---------------------
             I("reset;");
             I("%x2 = 2;");

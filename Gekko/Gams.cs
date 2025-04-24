@@ -643,9 +643,9 @@ namespace Gekko
             int end = input.Length - 1;
             if (input[end] != ']') return simple;
             if (input.Length < 7) return simple;  //if input has length 7, it is like '123456', where x[6] = x[end] = '6'. Here, x[end-6] = x[0] = '1' is legal.            
-            string s = G.Substring(input, end - 4, end - 1);            
-            int i9 = G.IntParse(s);
-            if (i9 == -12345 || char.IsDigit(input[end - 5])) return simple;
+            if (!(input[end - 5] == '[' || input[end - 5] == ',')) return simple;  //Must be x[2022] or x[...,2022].            
+            int i9 = G.IntParse(G.Substring(input, end - 4, end - 1));
+            if (i9 == -12345) return simple;
             helper.time = new GekkoTime(EFreq.A, i9, 1);
             if (input[end - 5] == '[')
             {
@@ -657,7 +657,7 @@ namespace Gekko
                 helper.name = helper.resultingFullName;
                 if (settings == EExtractTimeDimension.Full) helper.indexes = new List<string>();
             }
-            else
+            else  //has comma before 4 digits
             {
                 //input like "x[a,b,2022]"
                 //.resultingFullName --> "x[a,b]"
@@ -672,7 +672,6 @@ namespace Gekko
                     helper.indexes = s2.Split(',').ToList();
                 }
             }
-
             return simple;
         }
 
@@ -1763,21 +1762,25 @@ namespace Gekko
                     }
 
                     GekkoTime time = G.Chop_DimensionGetPeriod(eq);
-                    string noIndex = G.Chop_GetName(eq);
 
-                    if (!batches.ContainsKey(noIndex))
+                    if (time.IsNotNull())  //ignore for instance a timeless equation like E_tIOy_tBase[d,s]
                     {
-                        batches.Add(noIndex, new List<EquationHelper2>());
-                    }
+                        string noIndex = G.Chop_GetName(eq);
 
-                    EquationTextHelper helper = new EquationTextHelper();
-                    GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
-                    string scalar = helper22.s_scalarModel;
-                    EquationHelper2 eh = new EquationHelper2();
-                    eh.eqMathScalar = helper22.s_scalarModel;
-                    eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
-                    eh.eqName = G.Chop_DimensionRemoveLast(eq);
-                    batches[noIndex].Add(eh);
+                        if (!batches.ContainsKey(noIndex))
+                        {
+                            batches.Add(noIndex, new List<EquationHelper2>());
+                        }
+
+                        EquationTextHelper helper = new EquationTextHelper();
+                        GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
+                        string scalar = helper22.s_scalarModel;
+                        EquationHelper2 eh = new EquationHelper2();
+                        eh.eqMathScalar = helper22.s_scalarModel;
+                        eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
+                        eh.eqName = G.Chop_DimensionRemoveLast(eq);
+                        batches[noIndex].Add(eh);
+                    }
                 }
                 catch { }  //We live with a fail on this
             }
@@ -2018,6 +2021,9 @@ namespace Gekko
                     {
                         if (helper.t1.IsNull() || helper2.time.StrictlySmallerThan(helper.t1)) helper.t1 = helper2.time;
                         if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;
+                        //if (helper.t1.super < 1500)
+                        //{
+                        //}
                     }
                     helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(helper2.resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
 

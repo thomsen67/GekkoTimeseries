@@ -1508,7 +1508,7 @@ namespace Gekko
             List<string> ss = Chop_GetIndex(name);
             if (ss == null) new Error("No index found");
             string time = ss[ss.Count - 1];
-            GekkoTime t = GekkoTime.FromStringToGekkoTime(time);
+            GekkoTime t = GekkoTime.FromStringToGekkoTime(time, false, false);  //does not report error, for instance if an equation like E_tIOy_tBase[d,s] does not have a time index. In that case, GekkoTime.tNull is returned.            
             return t;
         }
 
