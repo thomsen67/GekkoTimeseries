@@ -2238,6 +2238,11 @@ namespace Gekko
             return new ScalarVal(Globals.eps);
         }
 
+        public static IVariable tiny(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal(Globals.tiny);
+        }
+
         public static IVariable eps(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             int n1 = O.ConvertToInt(x1);
