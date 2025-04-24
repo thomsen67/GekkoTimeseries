@@ -1550,8 +1550,22 @@ namespace Gekko
                     G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
                     eqNumbers = new List<int>();
                 }
-                eqsNewA2 = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tHere, eqNumbers, model);
-                
+                //eqsNewA2 = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tHere, eqNumbers, model);
+
+                List<EqInfoSimple> scalarEquations = new List<EqInfoSimple>();
+                foreach (int eqNumber in eqNumbers)
+                {
+                    string eqName = model.modelGamsScalar.GetEqName(eqNumber);
+                    string eqNameWithLag = null;
+                    eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, tHere, false);
+                    EqInfoSimple e = new EqInfoSimple();
+                    e.eqName = eqName;
+                    e.eqNameWithLag = eqNameWithLag;
+                    e.eqNumber = eqNumber;
+                    scalarEquations.Add(e);
+                }
+                eqsNewA2 = scalarEquations;
+
                 if (eqsNewA2.Count == 0)
                 {
                     if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)

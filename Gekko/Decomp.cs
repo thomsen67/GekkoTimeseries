@@ -6042,97 +6042,99 @@ namespace Gekko
             return b;
         }        
         
-        /// <summary>
-        /// Input is a list of equations (represented as integer values) that contain the variableName. This info, the integers, is part of the scalarModel object.
-        /// The equations are sorted after "relevance".
-        /// A list of EqHelper objects is returned: basically the equation names.
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="model"></param>
-        /// <param name="modelGamsScalar"></param>
-        /// <param name="vars"></param>
-        /// <param name="eqNumbers"></param>
-        /// <returns></returns>
-        public static List<EqInfoSimple> FindEquationsThatContainGivenVariableSorted(string variableName, GekkoTime tSelected, List<int> eqNumbers, Model model)
-        {
-            //Get a list of helper objects corresponding to each scalar equation the variable is part of
-            List<EqInfoSimple> scalarEquations = new List<EqInfoSimple>();
-            foreach (int eqNumber in eqNumbers)
-            {
-                string eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                string eqNameWithLag = null;
-                eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(tSelected), false);
-                EqInfoSimple e = new EqInfoSimple();
-                e.eqName = eqName;
-                e.eqNameWithLag = eqNameWithLag;
-                e.eqNumber = eqNumber;
-                scalarEquations.Add(e);
-            }
+        ///// <summary>
+        ///// Input is a list of equations (represented as integer values) that contain the variableName. This info, the integers, is part of the scalarModel object.
+        ///// The equations are sorted after "relevance".
+        ///// A list of EqHelper objects is returned: basically the equation names.
+        ///// </summary>
+        ///// <param name="o"></param>
+        ///// <param name="model"></param>
+        ///// <param name="modelGamsScalar"></param>
+        ///// <param name="vars"></param>
+        ///// <param name="eqNumbers"></param>
+        ///// <returns></returns>
+        //public static List<EqInfoSimple> FindEquationsThatContainGivenVariableSorted(string variableName, GekkoTime tSelected, List<int> eqNumbers, Model model)
+        //{
+        //    //Get a list of helper objects corresponding to each scalar equation the variable is part of
+        //    List<EqInfoSimple> scalarEquations = new List<EqInfoSimple>();
+        //    foreach (int eqNumber in eqNumbers)
+        //    {
+        //        string eqName = model.modelGamsScalar.GetEqName(eqNumber);
+        //        string eqNameWithLag = null;
+        //        eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, model.modelGamsScalar.Maybe2000GekkoTime(tSelected), false);
+        //        EqInfoSimple e = new EqInfoSimple();
+        //        e.eqName = eqName;
+        //        e.eqNameWithLag = eqNameWithLag;
+        //        e.eqNumber = eqNumber;
+        //        scalarEquations.Add(e);
+        //    }
 
-            List<EqInfoSimple> eqsNew = new List<EqInfoSimple>();
-            List<EqInfoSimple> eqsNew1 = new List<EqInfoSimple>();
-            List<EqInfoSimple> eqsNew2 = new List<EqInfoSimple>();
-            
-            string s2 = G.Chop_RemoveIndex(variableName);
+        //    if (true)
+        //    {
+        //        return scalarEquations;
+        //    }
+        //    else
+        //    {
 
-            List<string> eqNames = new List<string>();
+        //        List<EqInfoSimple> eqsNew = new List<EqInfoSimple>();
+        //        List<EqInfoSimple> eqsNew1 = new List<EqInfoSimple>();
+        //        List<EqInfoSimple> eqsNew2 = new List<EqInfoSimple>();
 
-            //foldedEquations 
-            //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
-            if (model.modelGekko != null)
-            {
-                //ModelGamsEquation e = null;
-                //int eqNumber = model.modelGamsScalar.dict_FromEqNameToEqNumber.Get("e_fy[2000]");
-                //GekkoTime gt = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
-                //eqNames.Add("e_" + s2 + "[" + gt.ToString() + "]");
-                eqNames.Add(Globals.decompGekkoEquationPrefix + s2);
-                // -------> do something so e_fy is first
-            }
-            else if (model.modelGams != null)
-            {
-                List<ModelGamsEquation> foldedEquations = null;
-                model.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
-                if (foldedEquations != null)
-                {
-                    foreach (ModelGamsEquation foldedEquation in foldedEquations)
-                    {
-                        eqNames.Add(foldedEquation.nameGams);
-                    }
-                }
-            }
+        //        string s2 = G.Chop_RemoveIndex(variableName);
 
-            // For instance, when doing FIND vtBund in MAKRO model, we have these:
-            // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
-            // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
-            // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.                                
+        //        List<string> eqNames = new List<string>();
 
-            foreach (EqInfoSimple scalarEquation in scalarEquations)
-            {
-                foreach (string eq in eqNames)
-                {
-                    if (G.Equal(scalarEquation.eqNameWithLag, eq))
-                    {
-                        scalarEquation.best = true;
-                    }
-                }
-            }
+        //        if (model.modelGekko != null)
+        //        {
+        //            eqNames.Add(Globals.decompGekkoEquationPrefix + s2);
+        //            // -------> do something so e_fy is first
+        //        }
+        //        else if (model.modelGams != null)
+        //        {
+        //            List<ModelGamsEquation> foldedEquations = null;
+        //            model.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
+        //            if (foldedEquations != null)
+        //            {
+        //                foreach (ModelGamsEquation foldedEquation in foldedEquations)
+        //                {
+        //                    eqNames.Add(foldedEquation.nameGams);
+        //                }
+        //            }
+        //        }
 
-            foreach (EqInfoSimple helper in scalarEquations)
-            {
-                if (helper.best) eqsNew1.Add(helper);
-            }
+        //        // For instance, when doing FIND vtBund in MAKRO model, we have these:
+        //        // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
+        //        // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
+        //        // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.                                
 
-            foreach (EqInfoSimple helper in scalarEquations)
-            {
-                if (!helper.best) eqsNew2.Add(helper);
-            }
+        //        foreach (EqInfoSimple scalarEquation in scalarEquations)
+        //        {
+        //            foreach (string eq in eqNames)
+        //            {
+        //                if (G.Equal(scalarEquation.eqNameWithLag, eq))
+        //                {
+        //                    scalarEquation.best = true;
+        //                }
+        //            }
+        //        }
 
-            var eqsNew1a = eqsNew1.OrderBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default));
-            var eqsNew2a = eqsNew2.OrderBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default));
-            eqsNew.AddRange(eqsNew1a);
-            eqsNew.AddRange(eqsNew2a);
-            return eqsNew;
-        }
+        //        foreach (EqInfoSimple helper in scalarEquations)
+        //        {
+        //            if (helper.best) eqsNew1.Add(helper);
+        //        }
+
+        //        foreach (EqInfoSimple helper in scalarEquations)
+        //        {
+        //            if (!helper.best) eqsNew2.Add(helper);
+        //        }
+
+        //        var eqsNew1a = eqsNew1.OrderBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default));
+        //        var eqsNew2a = eqsNew2.OrderBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default));
+        //        eqsNew.AddRange(eqsNew1a);
+        //        eqsNew.AddRange(eqsNew2a);
+        //        return eqsNew;
+        //    }
+        //}
 
         /// <summary>
         /// Get scalar equations in simple text form.
