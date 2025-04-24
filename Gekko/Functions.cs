@@ -6036,11 +6036,6 @@ namespace Gekko
             return tracebank(smpl, _t1, _t2, temp);
         }
 
-        public static void lhs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
-        {
-            Program.model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(Program.model.modelGamsScalar.GetDecompT(), Program.model);  //"Lhs"-score for each equation
-        }       
-
         // ===============================================================================
         // ============================ eps start ========================================
         // ===============================================================================

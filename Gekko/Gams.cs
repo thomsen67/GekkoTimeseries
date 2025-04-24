@@ -2020,13 +2020,9 @@ namespace Gekko
                     else
                     {
                         if (helper.t1.IsNull() || helper2.time.StrictlySmallerThan(helper.t1)) helper.t1 = helper2.time;
-                        if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;
-                        //if (helper.t1.super < 1500)
-                        //{
-                        //}
+                        if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;                        
                     }
                     helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(helper2.resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
-
                 }
             }
         }
