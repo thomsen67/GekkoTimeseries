@@ -19436,7 +19436,7 @@ namespace Gekko
                         try
                         {
                             DateTime dt = DateTime.Now;
-                            model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
+                            //model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
                             if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt));
                         }
                         catch
@@ -19451,7 +19451,7 @@ namespace Gekko
                             {
                                 //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
                                 DateTime dt = DateTime.Now;
-                                model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
+                                //model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
                                 if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
                             }
                         }
