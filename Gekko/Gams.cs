@@ -1526,7 +1526,7 @@ namespace Gekko
         /// are ordered by "LHS relevance". You may set tHere = GekkoTime.tNull.
         /// </summary>     
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool isFindWindow)
+        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool abortIfError)
         {            
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
@@ -1541,8 +1541,17 @@ namespace Gekko
 
             List<EqInfoSimple> eqsNewA2 = new List<EqInfoSimple>();
             if (Program.options.bugfix_residuals)
-            {
-                eqsNewA2 = EquationBrowser.GetRelatedEquations(variableName, tHere, model);
+            {                
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tHere));
+                PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+                List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+                if (eqNumbers == null)
+                {
+                    G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
+                    eqNumbers = new List<int>();
+                }
+                eqsNewA2 = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tHere, eqNumbers, model);
+                
                 if (eqsNewA2.Count == 0)
                 {
                     if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
@@ -1552,10 +1561,8 @@ namespace Gekko
                     }
                     else
                     {
-                        if (isFindWindow)
-                        {
-                            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
-                            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+                        if (abortIfError)
+                        {                            
                             string s = ". You may want to adjust the DECOMP time period.";
                             bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
                             if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";

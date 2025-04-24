@@ -16803,7 +16803,7 @@ namespace Gekko
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                 GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);                
 
-                List<EqInfoSimple> eqsContainingVariable = EquationBrowser.GetRelatedEquations(varnameWithoutFreq, tUsedHere, model);
+                List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(varnameWithoutFreq, tUsedHere, model, false);
                 
                 if (eqsContainingVariable.Count == 0)
                 {
