@@ -65,7 +65,7 @@
                         </GridViewColumn>
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="40" DisplayMemberBinding="{Binding Name}" >
                             <GridViewColumn.Header>
-                                <TextBlock Text="Name   " ToolTip="Shows checkmark if the variable name fits with the equation name (including dimensions)"/>
+                                <TextBlock Text="Dep   " ToolTip="Shows checkmark if the variable name fits with the equation name (including dimensions)"/>
                             </GridViewColumn.Header>
                         </GridViewColumn>
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Width="40" DisplayMemberBinding="{Binding Lhs}" >

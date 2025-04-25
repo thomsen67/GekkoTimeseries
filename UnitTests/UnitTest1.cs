@@ -17188,67 +17188,7 @@ namespace UnitTests
             // e1 $ (...) .. y = x;
             // y $ (...) = x;
             // y = sum(i $ (...), x(i))
-        }
-
-        [TestMethod]
-        public void _Test_Decomp_Lhs()
-        {
-            //To create this file, go here: #tbjjjdf7hdsfas            
-
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // Remove flush() at some point
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            //            
-
-            I("reset; flush();");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-            I("read makro_20241011;");  // --> will actually also pass without reading that databank first
-            I("model <gms> makro_20241011.zip;");      
-            
-            GekkoDictionary<string, string> lhsEquations2 = Program.model.modelGamsScalar.lhsEquations;            
-            GekkoDictionary<string, string> lhsEquations1 = Program.ProtobufRead<GekkoDictionary<string, string>>(Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data"); //See #tbjjjdf7hdsfas
-            GekkoDictionary<string, bool> dict1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, string> kvp in lhsEquations1) 
-            {
-                dict1.Add(kvp.Key + " --> " + kvp.Value, false);
-            }
-            GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, string> kvp in lhsEquations2)
-            {
-                dict2.Add(kvp.Key + " --> " + kvp.Value, false);
-            }
-            List<string> in1NotIn2 = new List<string>();
-            List<string> in2NotIn1 = new List<string>();
-            List<string> inBoth = new List<string>();
-            foreach (string s1 in dict1.Keys)
-            {
-                if (dict2.ContainsKey(s1)) inBoth.Add(s1);
-                else in1NotIn2.Add(s1);
-            }
-            foreach (string s2 in dict2.Keys)
-            {
-                if (!dict1.ContainsKey(s2)) in2NotIn1.Add(s2);
-            }
-
-            Assert.AreEqual(0, Globals.unitTestLhsNotFoundInModel.Count);
-            Assert.AreEqual(482, Globals.unitTestLhsNotFoundInEq.Count);
-            if (true)
-            {
-                Globals.unitTestLhsNotFoundInEq.Sort();
-                string s2 = null;
-                foreach (string s in Globals.unitTestLhsNotFoundInEq)
-                {
-                    s2 += s + G.NL;
-                }
-                Program.WriteFileWithWait("c:\\tools\\lhs.txt", s2);
-            }
-            Assert.AreEqual(19110, lhsEquations1.Count());
-            Assert.AreEqual(0, in1NotIn2.Count);
-            Assert.AreEqual(0, in2NotIn1.Count);
-            Assert.AreEqual(19110, inBoth.Count);
-        }
+        }        
 
         [TestMethod]
         public void _Test_Decomp_GAMSRaw_AgeLead()

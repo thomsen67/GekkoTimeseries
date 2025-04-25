@@ -981,13 +981,7 @@ namespace Gekko
         public int fakeEqCounts = -12345;
 
         [ProtoMember(31)]
-        public int fakeVarCounts = -12345;        
-
-        [ProtoMember(33)]
-        public GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //keys and values must be without blanks
-
-        [ProtoMember(34)]
-        public GekkoDictionaryBlanks<EqHelper> lhsEquations2 = new GekkoDictionaryBlanks<EqHelper>();
+        public int fakeVarCounts = -12345;
 
         // =============================================
         // =============================================
@@ -1270,36 +1264,7 @@ namespace Gekko
             {
                 G.SetNaN(this.r_ref);
             }
-        }
-
-        /// <summary>
-        /// For a variable (possibly with indexes excluding time), it returns equation names (possibly with indexes) where
-        /// the variable is considered dependent (from the eq name). For a Gekko model, the variable name is returned with
-        /// prefix "e_".
-        /// </summary>
-        /// <param name="variableName"></param>
-        /// <param name="isModelGekko"></param>
-        /// <returns></returns>
-        public List<string> GetDependentEquations(string variableName, bool isModelGekko)
-        {
-            List<string> lhsEqs = new List<string>();
-            if (isModelGekko)
-            {
-                lhsEqs.Add("e_" + variableName);
-            }
-            else
-            {
-                foreach (KeyValuePair<string, string> kvp in this.lhsEquations)
-                {
-                    if (G.Equal(kvp.Value, variableName))
-                    {
-                        lhsEqs.Add(kvp.Key);
-                    }
-                }
-            }
-            return lhsEqs;
-        }
-
+        }        
 
         /// <summary>
         /// For any eval of GAMS scalar model, we must consider loading

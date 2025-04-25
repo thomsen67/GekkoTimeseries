@@ -16973,8 +16973,9 @@ namespace Gekko
                         foreach (string eq in eqNamesWithIndexesNoTimeList)
                         {
                             //qwerty
-                            if (modelGamsScalar.lhsEquations2.Count() == 0) MessageBox.Show("DISP problem regarding scalar model");
-                            EqHelper eh = modelGamsScalar.lhsEquations2.Get(eq);
+                            //if (modelGamsScalar.lhsEquations2.Count() == 0) MessageBox.Show("DISP problem regarding scalar model");
+                            //EqHelper eh = modelGamsScalar.lhsEquations2.Get(eq);
+                            EqHelper eh = null;
                             if (eh != null)
                             {
                                 double max = double.MinValue;
@@ -19430,37 +19431,7 @@ namespace Gekko
                 {
                     Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                     if (false) GamsModel.GAMSParser();
-                    if (false) GamsModel.GamsGMO();
-                    if (false)
-                    {
-                        try
-                        {
-                            DateTime dt = DateTime.Now;
-                            //model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
-                            if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt));
-                        }
-                        catch
-                        {
-                            //No need to choke on this
-                            new Note("The module that identifies dependent variables from equation names failed to load");
-                        }
-                        try
-                        {
-                            //TODO TODO .Add(-1)
-                            if (Program.options.bugfix_lhsscore)
-                            {
-                                //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
-                                DateTime dt = DateTime.Now;
-                                //model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
-                                if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
-                            }
-                        }
-                        catch
-                        {
-                            //No need to choke on this
-                            new Note("The module that identifies dependent variables from equation names failed to load");
-                        }
-                    }
+                    if (false) GamsModel.GamsGMO();                    
                     Program.model = model;
                 }
                 else new Error("No model defined");
