@@ -1560,6 +1560,21 @@ namespace Gekko
                     e.eqName = eqName;
                     e.eqNameWithLag = eqNameWithLag;
                     e.eqNumber = eqNumber;
+
+                    foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                    {
+                        //foreach precedent variable
+                        string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                        if (G.StartsWith(varName, Globals.decompResidualPrefix))
+                        {
+                            string name2 = varName.Substring(Globals.decompResidualPrefix.Length);
+                            if (G.EqualHandleBlanks(variableName, name2))
+                            {
+                                e.score += Globals.lhsScore2;
+                            }                            
+                        }
+                    }
+
                     scalarEquations.Add(e);
                 }
                 eqsNewA2 = scalarEquations;

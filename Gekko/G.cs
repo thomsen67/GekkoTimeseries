@@ -182,12 +182,12 @@ namespace Gekko
         /// <returns></returns>
         public static bool StartsWithCaseSensitiveFast(string s1, string s2)
         {
-            //This is like 10x faster than s1.StartsWith(s2), which looks for current culture first. Here we are just comparing bytes, not worrying if "ae" is same as "æ".
+            //This is like 10x faster than s1.StartsWith(s2), which looks for current culture first (which is slow). Here we are just comparing bytes, not worrying if "ae" is same as "æ".
             return s1.StartsWith(s2, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// Like 5x slower than G.StartsWithCaseSensitive(), but still ok fast because it uses Ordinal comparison.
+        /// Ignores case. Like 5x slower than G.StartsWithCaseSensitiveFast(), but still ok fast, not looking for current culture.
         /// </summary>
         /// <param name="s1"></param>
         /// <param name="s2"></param>
