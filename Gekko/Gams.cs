@@ -1036,21 +1036,21 @@ namespace Gekko
             CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
             if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
 
-            if (false && Globals.runningOnTTComputer)
-            {
-                foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)
-                {
-                    string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
-                    GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
-                    string s7 = varName + "[" + t.ToString() + "] = ";
-                    foreach (int i in kvp.Value)
-                    {
-                        string eqName = modelGamsScalar.GetEqName(i);
-                        s7 += eqName + ", ";
-                    }
-                    new Writeln(s7);
-                }
-            }                        
+            //if (false && Globals.runningOnTTComputer)
+            //{
+            //    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)
+            //    {
+            //        string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
+            //        GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
+            //        string s7 = varName + "[" + t.ToString() + "] = ";
+            //        foreach (int i in kvp.Value)
+            //        {
+            //            string eqName = modelGamsScalar.GetEqName(i);
+            //            s7 += eqName + ", ";
+            //        }
+            //        new Writeln(s7);
+            //    }
+            //}                        
 
             if (Globals.runningOnTTComputer)
             {
@@ -1061,17 +1061,20 @@ namespace Gekko
             }            
 
             return model;
-        }        
+        }
 
         /// <summary>
         /// From a model (modelGamsScalar primarily) and variableName (and time), the equations that the variable appears in
-        /// are ordered by "LHS relevance". You may set tHere = GekkoTime.tNull.
+        /// are found, and the "best" one is shown first (the one that has "res_[variableName]"). You may set tHere = GekkoTime.tNull,
+        /// in which case the method uses t-1, where t is the end period of the scalar model. The method uses .modelGamsScalar.dependents,
+        /// which returns a list of eq numbers. For instance, with intput qBNP, the method returns E_qBNP, E_pBNP, E_qBNP_via_rpBNP, where
+        /// E_qBNP is shown first because the equation contains the variable res_qBNP. The rest of the eqs are alphabetically sorted.
         /// </summary>     
         /// <returns></returns>
         public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool abortIfError)
-        {            
+        {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-            ModelGams modelGams = model.modelGams;            
+            ModelGams modelGams = model.modelGams;
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
@@ -1079,82 +1082,108 @@ namespace Gekko
             if (aNumber == -12345)
             {
                 new Error(Decomp.NonFoundInModelError(variableName, modelGamsScalar));
-            }         
+            }
 
             List<EqInfoSimple> rv = new List<EqInfoSimple>();
-            
-            if (Program.options.bugfix_residuals)
-            {                
-                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
-                PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-                List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-                if (eqNumbers == null)
+
+            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
+            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+            if (eqNumbers == null)
+            {
+                G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
+                eqNumbers = new List<int>();
+            }
+
+            foreach (int eqNumber in eqNumbers)
+            {
+                string eqName = model.modelGamsScalar.GetEqName(eqNumber);
+                string eqNameWithLag = null;
+                eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, tHere, false);
+
+                string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);
+                List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
+
+                EqInfoSimple e = new EqInfoSimple();
+                e.eqName = eqName;
+                e.eqNameWithLag = eqNameWithLag;
+                e.eqNumber = eqNumber;
+
+                bool hit2 = false;
+                foreach (string s in lhsVars)
                 {
-                    G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
-                    eqNumbers = new List<int>();
-                }                
+                    if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
+                }
+                if (hit2) e.score += Globals.lhsScore1; //0.5
+
+                string dep = GetDependentVariable(eqNumber, modelGamsScalar);
+                if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;
                 
-                foreach (int eqNumber in eqNumbers)
+                rv.Add(e);
+            }
+
+            if (rv.Count == 0)
+            {
+                if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                 {
-                    string eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                    string eqNameWithLag = null;
-                    eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, tHere, false);
-
-                    string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);
-                    List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
-
-                    EqInfoSimple e = new EqInfoSimple();
-                    e.eqName = eqName;
-                    e.eqNameWithLag = eqNameWithLag;
-                    e.eqNumber = eqNumber;
-
-                    bool hit2 = false;
-                    foreach (string s in lhsVars)
-                    {
-                        if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-                    }
-                    if (hit2) e.score += Globals.lhsScore1; //0.5
-
-                    foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
-                    {
-                        //foreach precedent variable
-                        string varName = modelGamsScalar.GetVarNameA(dp.variable);
-                        if (G.StartsWith(varName, Globals.decompResidualPrefix))
-                        {
-                            string name2 = varName.Substring(Globals.decompResidualPrefix.Length);
-                            if (G.EqualHandleBlanks(variableName, name2))
-                            {
-                                e.score += Globals.lhsScore2;
-                            }                            
-                        }
-                    }
-                    rv.Add(e);
-                }                
-
-                if (rv.Count == 0)
+                    //Some variable has an "e_" prefixed, but the equation may not exist if it is an exogenous variable.
+                    return new List<EqInfoSimple>();
+                }
+                else
                 {
-                    if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                    if (abortIfError)
                     {
-                        //Some variable has an "e_" prefixed, but the equation may not exist if it is an exogenous variable.
-                        return new List<EqInfoSimple>();
+                        string s = ". You may want to adjust the DECOMP time period.";
+                        bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
+                        if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";
+                        new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
                     }
-                    else
-                    {
-                        if (abortIfError)
-                        {                            
-                            string s = ". You may want to adjust the DECOMP time period.";
-                            bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
-                            if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";
-                            new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
-                        }
-                        else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
-                    }
+                    else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
                 }
             }
-            
+
             List<EqInfoSimple> eqsNewA = rv.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
             return eqsNewA;
+        }
+
+        /// <summary>
+        /// Overload, input name like "E_qBNP". May use tHere == GekkoTime.Tnull.
+        /// </summary>
+        /// <param name="eqName"></param>
+        /// <param name="tHere"></param>
+        /// <param name="modelGamsScalar"></param>
+        /// <returns></returns>
+        public static string GetDependentVariable(string eqName, GekkoTime tHere, ModelGamsScalar modelGamsScalar)
+        {
+            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
+            string s2 = G.Chop_DimensionAddLast(eqName, tHere.ToString(), null);
+            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s2);
+            if (eqNumber == -12345) new Error("Could not find equation name '" + eqName + "'");
+            return GetDependentVariable(eqNumber, modelGamsScalar);
+        }
+
+
+        /// <summary>
+        /// For an equation number (in a scalar model), the dependent variable name is returned. May return null.
+        /// </summary>
+        /// <param name="eqNumber"></param>
+        /// <param name="modelGamsScalar"></param>
+        /// <returns></returns>
+        public static string GetDependentVariable(int eqNumber, ModelGamsScalar modelGamsScalar)
+        {
+            string dep = null;
+            //Look for the special "res_..." variable name in the equation variables
+            foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+            {
+                //foreach precedent variable
+                string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                if (G.StartsWith(varName, Globals.decompResidualPrefix))
+                {
+                    dep = varName.Substring(Globals.decompResidualPrefix.Length);
+                }
+            }
+            return dep;
         }
 
         /// <summary>

@@ -942,9 +942,9 @@ namespace Gekko
         public List<string> csCodeLines = null; //C# source code
         
         /// <summary>
-        /// Points a period-and-variable to the unfolded equations it is part of. This could
+        /// Points a period-and-variable to the unfolded equations (equation numbers) it is part of. This could
         /// be a bit faster and use a bit less ram if PeriodAndVariable was a long and by using
-        /// modulo.
+        /// modulo. 
         /// </summary>
         [ProtoMember(25)]
         public GekkoDictionary<PeriodAndVariable, List<int>> dependents = null;

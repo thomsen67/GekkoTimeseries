@@ -16970,48 +16970,15 @@ namespace Gekko
                         string vars = null;
                         string dependentVars = null;
                         GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
-                        foreach (string eq in eqNamesWithIndexesNoTimeList)
-                        {
-                            //qwerty
-                            //if (modelGamsScalar.lhsEquations2.Count() == 0) MessageBox.Show("DISP problem regarding scalar model");
-                            //EqHelper eh = modelGamsScalar.lhsEquations2.Get(eq);
-                            EqHelper eh = null;
-                            if (eh != null)
-                            {
-                                double max = double.MinValue;
-                                string best = null;
-                                foreach (KeyValuePair<string, double> kvp2 in eh.scores.GetDictionaryForIteration())
-                                {
-                                    if (kvp2.Value > max)
-                                    {
-                                        max = kvp2.Value;
-                                        best = kvp2.Key;
-                                    }
-                                }
-                                if (!dependentVarsDict.ContainsKey(best))
-                                {
-                                    if (false && max <= Globals.lhsScore0)
-                                    {
-                                        // Switched off for now
-                                        //
-                                        //The variable is not recognized from eq name and is not on LHS
-                                        //Will this ever happen? Rarely probably, no variable on LHS...
-                                        dependentVarsDict.Add(eq1 + G.Chop_DimensionRemoveLast_FASTER(eh.eqName), 0);
-                                    }
-                                    else
-                                    {
-                                        dependentVarsDict.Add(best, 0);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (!dependentVarsDict.ContainsKey("<unknown>")) dependentVarsDict.Add("<unknown>", 0);
-                            }
-                        }
 
-                        List<string> dependentVarsList = dependentVarsDict.GetKeys();                        
-                        G.HandleBlanksRemove(dependentVarsList, varnameWithoutFreq); //do not show own name
+                        GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                        foreach (EqInfoSimple eq in eqsContainingVariable)
+                        {
+                            string dep = GamsModel.GetDependentVariable(eq.eqNumber, modelGamsScalar);
+                            if (!G.EqualHandleBlanks(dep, varnameWithoutFreq) && !deps.ContainsKey(dep)) deps.Add(dep, false);
+                        }                        
+                        
+                        List<string> dependentVarsList = deps.Keys.ToList();
                         dependentVarsList.Sort(G.CompareNaturalIgnoreCase);
                         dependentVars = Stringlist.GetListWithCommas(dependentVarsList);
                         List<string> dependentVarsList2 = new List<string>();
