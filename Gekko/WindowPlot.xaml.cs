@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Gekko
 {
+        
+    public class Refresh 
+    {
+        public string op="";
+        public bool? isLog = false;
+        public bool? isIndex = false;
+        public bool? isRef = false;
+        public double fontScaling = 1d;
+        public bool isRefreshing = false;
+    }
+    
     /// <summary>
     /// Interaction logic for WindowPlot.xaml
     /// </summary>
@@ -22,6 +21,7 @@ namespace Gekko
     {
         public GraphOptions graphOptions = null;
         public bool _shown;
+        public Refresh _refresh = null;
 
         public WindowPlot(GraphOptions graphOptions)
         {            
@@ -31,6 +31,14 @@ namespace Gekko
             try
             {
                 InitializeComponent();
+                radioButton_n1.IsChecked = true;
+                radioButton_n2.IsChecked = false;
+                radioButton_d.IsChecked = false;
+                radioButton_p.IsChecked = false;
+                radioButton_dp.IsChecked = false;
+                radioButton_m.IsChecked = false;
+                radioButton_q.IsChecked = false;
+                radioButton_mp.IsChecked = false;
             }
             finally
             {
@@ -248,7 +256,14 @@ namespace Gekko
 
         private void Button_saveas(object sender, RoutedEventArgs e)
         {
-            string plotName = Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d / 2d, CheckBox_index.IsChecked == true, CheckBox_ref.IsChecked == true));
+            Refresh refresh = new Refresh();
+            refresh.op = GetOperator();
+            refresh.isLog = CheckBox_log.IsChecked == true;
+            refresh.isIndex = CheckBox_index.IsChecked == true;
+            refresh.isRef = CheckBox_ref.IsChecked == true;
+            refresh.fontScaling = 1d / 2d;
+            refresh.isRefreshing = false;
+            string plotName = Refresh(new GraphHelper(refresh));
             Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*",
@@ -279,7 +294,19 @@ namespace Gekko
 
         private string Refresh()
         {
-            return Refresh(new GraphHelper(GetOperator(), true, CheckBox_log.IsChecked == true, 1d, CheckBox_index.IsChecked == true, CheckBox_ref.IsChecked == true));
+            string s = null;
+            Refresh refresh = new Refresh();
+            refresh.op = GetOperator();
+            refresh.isLog = CheckBox_log.IsChecked;
+            refresh.isRef = CheckBox_ref.IsChecked;
+            refresh.isIndex= CheckBox_index.IsChecked;
+            refresh.isRefreshing = true;  //so we do not get a new plot window
+            try
+            {
+                Refresh(new GraphHelper(refresh));
+            }
+            catch (Exception ex) { };
+            return s;
         }
 
         private string Refresh(GraphHelper gh)

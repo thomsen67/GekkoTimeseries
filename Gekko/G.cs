@@ -2071,7 +2071,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsDecompOrFindThread()
         {
-            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp";
+            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp" || Thread.CurrentThread.Name == "Plot";
         }
 
         
@@ -2098,6 +2098,7 @@ namespace Gekko
         /// <returns></returns>
         private static string HandleBlanks(string s, bool inverse)
         {
+            if (s == null) return null;
             if (!inverse)
             {
                 bool hit = false; //maybe using this is a bit faster?

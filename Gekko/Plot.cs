@@ -968,9 +968,10 @@ namespace Gekko
                     graphOptions.graphVarsNames = labelsNonBroken;
                     graphOptions.title = null;
                     graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
-                    graphOptions.code = code;                    
+                    graphOptions.code = code;
 
                     Thread thread = new Thread(new ParameterizedThreadStart(Program.PlotThreadFunction));
+                    thread.Name = "Plot";
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = CultureInfo.InvariantCulture;
                     //thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
