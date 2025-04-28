@@ -46,7 +46,7 @@ namespace Gekko
         public GraphHelper(Refresh refresh)
         {
             this.operator2 = refresh.op;
-            if (refresh.isRefreshing) this.operator2 = "r" + refresh.op;
+            //if (refresh.isRefreshing) this.operator2 = "r" + refresh.op;            
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.fontScaling = refresh.fontScaling;
@@ -582,7 +582,7 @@ namespace Gekko
         public GekkoTime tEnd;
         public LocalBanks localBanks = new LocalBanks();
         public string title;
-        public string code = null;  //if there is 1 code like plot<m>
+        public string code = "";  //if there is 1 code like plot<m>
         
         public bool windowIsShown = false;
         public long counter = -12345;

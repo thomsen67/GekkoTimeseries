@@ -3,15 +3,27 @@ using System.Windows;
 
 namespace Gekko
 {
-        
-    public class Refresh 
+
+    public class Refresh
     {
-        public string op="";
+        public string op = "";
         public bool? isLog = false;
         public bool? isIndex = false;
         public bool? isRef = false;
         public double fontScaling = 1d;
         public bool isRefreshing = false;
+
+        public Refresh Clone()
+        {
+            Refresh r = new Refresh();
+            r.op = this.op;
+            r.isLog = this.isLog;
+            r.isIndex = this.isIndex;
+            r.isRef = this.isRef;
+            r.fontScaling = this.fontScaling;
+            r.isRefreshing = this.isRefreshing;
+            return r;
+        }
     }
     
     /// <summary>
@@ -19,13 +31,13 @@ namespace Gekko
     /// </summary>
     public partial class WindowPlot : Window
     {
-        public GraphOptions graphOptions = null;
+        public GraphOptions _graphOptions = null;
         public bool _shown;
-        public Refresh _refresh = null;
+        public Refresh _refresh = new Gekko.Refresh();
 
         public WindowPlot(GraphOptions graphOptions)
         {            
-            this.graphOptions = graphOptions;            
+            this._graphOptions = graphOptions;            
 
             Globals.disableRadioButtons = 1;
             try
@@ -52,28 +64,7 @@ namespace Gekko
                 Globals.disableRadioButtons = 1;
                 try
                 {
-                    bool isR = false;
-                    bool isL = false;
-                    string opRawLower = graphOptions.code.ToLower();
-                    if (opRawLower.EndsWith("l"))
-                    {
-                        opRawLower = opRawLower.Substring(0, opRawLower.Length - 1);
-                        isL = true;
-                    }
-                    if (opRawLower.StartsWith("r"))
-                    {
-                        opRawLower = opRawLower.Substring(1);
-                        isR = true;
-                    }                    
-                    if (isR) CheckBox_ref.IsChecked = true;
-                    if (isL) CheckBox_log.IsChecked = true;
-                    if (G.Equal(opRawLower, "n")) radioButton_n1.IsChecked = true;
-                    else if (G.Equal(opRawLower, "d")) radioButton_d.IsChecked = true;
-                    else if (G.Equal(opRawLower, "p")) radioButton_p.IsChecked = true;
-                    else if (G.Equal(opRawLower, "dp")) radioButton_dp.IsChecked = true;
-                    else if (G.Equal(opRawLower, "m")) radioButton_m.IsChecked = true;
-                    else if (G.Equal(opRawLower, "q")) radioButton_q.IsChecked = true;
-                    else if (G.Equal(opRawLower, "mp")) radioButton_mp.IsChecked = true;
+                    SetControls(graphOptions);
                 }
                 finally
                 {
@@ -83,12 +74,39 @@ namespace Gekko
             webBrowser.Source = new Uri(graphOptions.emfName);
         }
 
+        private void SetControls(GraphOptions graphOptions)
+        {
+            bool isR = false;
+            bool isL = false;
+            string opRawLower = "";
+            if (graphOptions.code != null) opRawLower = graphOptions.code.ToLower();
+            if (opRawLower.EndsWith("l"))
+            {
+                opRawLower = opRawLower.Substring(0, opRawLower.Length - 1);
+                isL = true;
+            }
+            if (opRawLower.StartsWith("r"))
+            {
+                opRawLower = opRawLower.Substring(1);
+                isR = true;
+            }
+            if (isR) CheckBox_ref.IsChecked = true;
+            if (isL) CheckBox_log.IsChecked = true;
+            if (G.Equal(opRawLower, "") || G.Equal(opRawLower, "n")) radioButton_n1.IsChecked = true;
+            else if (G.Equal(opRawLower, "d")) radioButton_d.IsChecked = true;
+            else if (G.Equal(opRawLower, "p")) radioButton_p.IsChecked = true;
+            else if (G.Equal(opRawLower, "dp")) radioButton_dp.IsChecked = true;
+            else if (G.Equal(opRawLower, "m")) radioButton_m.IsChecked = true;
+            else if (G.Equal(opRawLower, "q")) radioButton_q.IsChecked = true;
+            else if (G.Equal(opRawLower, "mp")) radioButton_mp.IsChecked = true;
+        }
+
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
             if (_shown) return;
             _shown = true;
-            this.graphOptions.windowIsShown = true;
+            this._graphOptions.windowIsShown = true;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -238,7 +256,7 @@ namespace Gekko
             //ss[0] = this.graphOptions.emfName;
             //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
             //Clipboard.SetDataObject(iData, true);
-            Clipboard.SetText(this.graphOptions.emfName + " (use Insert --> Pictures...)");
+            Clipboard.SetText(this._graphOptions.emfName + " (use Insert --> Pictures...)");
         }
 
         private void Button_save(object sender, RoutedEventArgs e)
@@ -249,7 +267,7 @@ namespace Gekko
             string inputLast = "svg";
             string name2 = Program.Add1ToFileName(input, inputLast, Program.options.folder_working);
             string enddir = Program.options.folder_working + "\\" + name2;
-            Program.WaitForFileCopy(this.graphOptions.emfName, enddir);
+            Program.WaitForFileCopy(this._graphOptions.emfName, enddir);
             this.label1.Text = "File " + name2;
             this.label2.Text = "saved in working folder";
         }
@@ -292,26 +310,36 @@ namespace Gekko
             this.Close();
         }
 
-        private string Refresh()
-        {
-            string s = null;
+        private void Refresh()
+        {            
             Refresh refresh = new Refresh();
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
             refresh.isIndex= CheckBox_index.IsChecked;
-            refresh.isRefreshing = true;  //so we do not get a new plot window
+            refresh.isRefreshing = true;  //so we do not get a new plot window            
+            if (refresh.isLog == true) refresh.op = refresh.op + "l";
+            if (refresh.isRef == true) refresh.op = "r" + refresh.op;
+
             try
             {
+                refresh.isRefreshing = true;
                 Refresh(new GraphHelper(refresh));
+                _refresh = refresh.Clone();  //store it, so we can revert if it fails
             }
-            catch (Exception ex) { };
-            return s;
+            catch
+            {
+                refresh = _refresh.Clone();
+                refresh.isRefreshing = true;
+                Refresh(new GraphHelper(refresh));  //using the old refresh object that should work.
+                _graphOptions.code = refresh.op;
+            };
+            SetControls(_graphOptions);
         }
 
         private string Refresh(GraphHelper gh)
         {
-            string emfName = Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh);
+            string emfName = Globals.printStorageAsFunc[this._graphOptions.printStorageAsFuncCounter](gh);
             webBrowser.Source = new Uri(emfName);
             return emfName;
         }
