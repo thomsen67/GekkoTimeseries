@@ -45,7 +45,9 @@ namespace Gekko
         }
         public GraphHelper(RefreshHelper refresh)
         {
-            this.operator2 = refresh.op;            
+            this.operator2 = refresh.op;
+            if (G.Equal(this.operator2, "n1")) this.operator2 = "n";
+            if (G.Equal(this.operator2, "n2")) this.operator2 = "n";
             if (refresh.isRef == true) this.operator2 = "r" + refresh.op;            
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;

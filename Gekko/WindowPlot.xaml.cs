@@ -6,7 +6,7 @@ namespace Gekko
 
     public class RefreshHelper
     {
-        public string op = "";
+        public string op = "";  //can also be n1/n2 (left or right n)
         public bool? isLog = false;
         public bool? isIndex = false;
         public bool? isRef = false;
@@ -79,6 +79,7 @@ namespace Gekko
             string opRawLowerStart = "";            
             if (graphOptions.code != null) opRawLowerStart = graphOptions.code.ToLower();
             string opHere = opRawLowerStart;
+            //if (G.Equal(opHere, "n1") || G.Equal(opHere, "n2")) opHere = "n";
 
             bool isR = false;
             bool isL = false;
@@ -110,6 +111,8 @@ namespace Gekko
             if (isL) CheckBox_log.IsChecked = true;
             if (isI) CheckBox_index.IsChecked = true;
             if (G.Equal(opHere, "") || G.Equal(opHere, "n")) radioButton_n1.IsChecked = true;
+            else if (G.Equal(opHere, "n1")) radioButton_n1.IsChecked = true;
+            else if (G.Equal(opHere, "n2")) radioButton_n2.IsChecked = true;
             else if (G.Equal(opHere, "d")) radioButton_d.IsChecked = true;
             else if (G.Equal(opHere, "p")) radioButton_p.IsChecked = true;
             else if (G.Equal(opHere, "dp")) radioButton_dp.IsChecked = true;
@@ -372,8 +375,8 @@ namespace Gekko
         private string GetOperator()
         {
             string op = "n";
-            if (radioButton_n1.IsChecked == true) op = "n";
-            else if (radioButton_n2.IsChecked == true) op = "n";
+            if (radioButton_n1.IsChecked == true) op = "n1";
+            else if (radioButton_n2.IsChecked == true) op = "n2";
             else if (radioButton_d.IsChecked == true) op = "d";
             else if (radioButton_p.IsChecked == true) op = "p";
             else if (radioButton_dp.IsChecked == true) op = "dp";
