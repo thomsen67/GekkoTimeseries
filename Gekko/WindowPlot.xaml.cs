@@ -64,7 +64,7 @@ namespace Gekko
                 Globals.disableRadioButtons = 1;
                 try
                 {
-                    SetControls(graphOptions);
+                    SetControls(graphOptions, null);
                 }
                 finally
                 {
@@ -74,31 +74,48 @@ namespace Gekko
             webBrowser.Source = new Uri(graphOptions.emfName);
         }
 
-        private void SetControls(GraphOptions graphOptions)
+        private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
         {
+            string opRawLowerStart = "";            
+            if (graphOptions.code != null) opRawLowerStart = graphOptions.code.ToLower();
+            string opHere = opRawLowerStart;
+
             bool isR = false;
             bool isL = false;
-            string opRawLower = "";
-            if (graphOptions.code != null) opRawLower = graphOptions.code.ToLower();
-            if (opRawLower.EndsWith("l"))
+            bool isI = false;
+
+            if (refresh != null)
             {
-                opRawLower = opRawLower.Substring(0, opRawLower.Length - 1);
-                isL = true;
+                isR = refresh.isRef == true;
+                isL = refresh.isLog == true;
+                isI = refresh.isIndex == true;
+                opHere = refresh.op.ToLower();
             }
-            if (opRawLower.StartsWith("r"))
+            else
             {
-                opRawLower = opRawLower.Substring(1);
-                isR = true;
+                if (opRawLowerStart.EndsWith("l")) isL = true;
+                if (opRawLowerStart.StartsWith("r")) isR = true;
             }
+
+            if (opRawLowerStart.EndsWith("l"))
+            {
+                opHere = opRawLowerStart.Substring(0, opRawLowerStart.Length - 1);                
+            }
+            if (opRawLowerStart.StartsWith("r"))
+            {
+                opHere = opRawLowerStart.Substring(1);
+            }
+            
             if (isR) CheckBox_ref.IsChecked = true;
             if (isL) CheckBox_log.IsChecked = true;
-            if (G.Equal(opRawLower, "") || G.Equal(opRawLower, "n")) radioButton_n1.IsChecked = true;
-            else if (G.Equal(opRawLower, "d")) radioButton_d.IsChecked = true;
-            else if (G.Equal(opRawLower, "p")) radioButton_p.IsChecked = true;
-            else if (G.Equal(opRawLower, "dp")) radioButton_dp.IsChecked = true;
-            else if (G.Equal(opRawLower, "m")) radioButton_m.IsChecked = true;
-            else if (G.Equal(opRawLower, "q")) radioButton_q.IsChecked = true;
-            else if (G.Equal(opRawLower, "mp")) radioButton_mp.IsChecked = true;
+            if (isI) CheckBox_index.IsChecked = true;
+            if (G.Equal(opHere, "") || G.Equal(opHere, "n")) radioButton_n1.IsChecked = true;
+            else if (G.Equal(opHere, "d")) radioButton_d.IsChecked = true;
+            else if (G.Equal(opHere, "p")) radioButton_p.IsChecked = true;
+            else if (G.Equal(opHere, "dp")) radioButton_dp.IsChecked = true;
+            else if (G.Equal(opHere, "m")) radioButton_m.IsChecked = true;
+            else if (G.Equal(opHere, "q")) radioButton_q.IsChecked = true;
+            else if (G.Equal(opHere, "mp")) radioButton_mp.IsChecked = true;
         }
 
         protected override void OnContentRendered(EventArgs e)
@@ -318,8 +335,8 @@ namespace Gekko
             refresh.isRef = CheckBox_ref.IsChecked;
             refresh.isIndex= CheckBox_index.IsChecked;
             refresh.isRefreshing = true;  //so we do not get a new plot window            
-            if (refresh.isLog == true) refresh.op = refresh.op + "l";
-            if (refresh.isRef == true) refresh.op = "r" + refresh.op;
+            //if (refresh.isLog == true) refresh.op = refresh.op + "l";
+            //if (refresh.isRef == true) refresh.op = "r" + refresh.op;
 
             try
             {
@@ -337,7 +354,7 @@ namespace Gekko
             Globals.disableRadioButtons = 1;
             try
             {
-                SetControls(_graphOptions);
+                SetControls(_graphOptions, refresh);
             }
             finally
             {

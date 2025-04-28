@@ -45,8 +45,8 @@ namespace Gekko
         }
         public GraphHelper(RefreshHelper refresh)
         {
-            this.operator2 = refresh.op;
-            //if (refresh.isRefreshing) this.operator2 = "r" + refresh.op;            
+            this.operator2 = refresh.op;            
+            if (refresh.isRef == true) this.operator2 = "r" + refresh.op;            
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.fontScaling = refresh.fontScaling;
