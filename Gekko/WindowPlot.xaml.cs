@@ -4,7 +4,7 @@ using System.Windows;
 namespace Gekko
 {
 
-    public class Refresh
+    public class RefreshHelper
     {
         public string op = "";
         public bool? isLog = false;
@@ -13,9 +13,9 @@ namespace Gekko
         public double fontScaling = 1d;
         public bool isRefreshing = false;
 
-        public Refresh Clone()
+        public RefreshHelper Clone()
         {
-            Refresh r = new Refresh();
+            RefreshHelper r = new RefreshHelper();
             r.op = this.op;
             r.isLog = this.isLog;
             r.isIndex = this.isIndex;
@@ -33,7 +33,7 @@ namespace Gekko
     {
         public GraphOptions _graphOptions = null;
         public bool _shown;
-        public Refresh _refresh = new Gekko.Refresh();
+        public RefreshHelper _refresh = new Gekko.RefreshHelper();
 
         public WindowPlot(GraphOptions graphOptions)
         {            
@@ -274,7 +274,7 @@ namespace Gekko
 
         private void Button_saveas(object sender, RoutedEventArgs e)
         {
-            Refresh refresh = new Refresh();
+            RefreshHelper refresh = new RefreshHelper();
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked == true;
             refresh.isIndex = CheckBox_index.IsChecked == true;
@@ -312,7 +312,7 @@ namespace Gekko
 
         private void Refresh()
         {            
-            Refresh refresh = new Refresh();
+            RefreshHelper refresh = new RefreshHelper();
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
@@ -334,7 +334,15 @@ namespace Gekko
                 Refresh(new GraphHelper(refresh));  //using the old refresh object that should work.
                 _graphOptions.code = refresh.op;
             };
-            SetControls(_graphOptions);
+            Globals.disableRadioButtons = 1;
+            try
+            {
+                SetControls(_graphOptions);
+            }
+            finally
+            {
+                Globals.disableRadioButtons = 0;
+            }
         }
 
         private string Refresh(GraphHelper gh)

@@ -43,7 +43,7 @@ namespace Gekko
         public GraphHelper()
         {
         }
-        public GraphHelper(Refresh refresh)
+        public GraphHelper(RefreshHelper refresh)
         {
             this.operator2 = refresh.op;
             //if (refresh.isRefreshing) this.operator2 = "r" + refresh.op;            
