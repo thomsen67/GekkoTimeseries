@@ -76,6 +76,18 @@ namespace Gekko
 
         private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
         {
+            CheckBox_ref.IsChecked = false;
+            CheckBox_log.IsChecked = false;
+            CheckBox_index.IsChecked = false;            
+            radioButton_n1.IsChecked = false;
+            radioButton_n2.IsChecked = false;
+            radioButton_d.IsChecked = false;
+            radioButton_p.IsChecked = false;
+            radioButton_dp.IsChecked = false;
+            radioButton_m.IsChecked = false;
+            radioButton_q.IsChecked = false;
+            radioButton_mp.IsChecked = false;
+
             string opRawLowerStart = "";            
             if (graphOptions.code != null) opRawLowerStart = graphOptions.code.ToLower();
             string opHere = opRawLowerStart;

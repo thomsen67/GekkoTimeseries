@@ -48,7 +48,7 @@ namespace Gekko
             this.operator2 = refresh.op;
             if (G.Equal(this.operator2, "n1")) this.operator2 = "n";
             if (G.Equal(this.operator2, "n2")) this.operator2 = "n";
-            if (refresh.isRef == true) this.operator2 = "r" + refresh.op;            
+            if (refresh.isRef == true) this.operator2 = "r" + this.operator2;
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.fontScaling = refresh.fontScaling;
