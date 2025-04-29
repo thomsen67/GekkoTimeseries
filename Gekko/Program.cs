@@ -29729,10 +29729,14 @@ namespace Gekko
             double xLag2 = double.NaN;
             double y = double.NaN;
             double yLag = double.NaN;
-            double yLag2 = double.NaN;                
+            double yLag2 = double.NaN;
+
+            bool yoy = false;            
 
             if (tsWork != null)
             {
+                int factor1, factor2; Yoy(yoy, sumOver, tsWork, out factor1, out factor2);
+
                 x = 0d;
                 xLag = 0d;
                 xLag2 = 0d;
@@ -29746,15 +29750,15 @@ namespace Gekko
                         //for instance if gt is 2020m3, we will add 2020m3+2020m2+2020m1.
                         x += tsWork.GetDataSimple(gt.Add(-i)); //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
                         //for instance if gt is 2020m3, we will add 2019m12+2019m11+2010m10.
-                        xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i));
+                        xLag += tsWork.GetDataSimple(gt.Add(-factor1 * sumOver - i));
                         //for instance if gt is 2020m3, we will add 2019m9+2019m8+2010m7.
-                        xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i));
+                        xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i));
                     }
                     else
                     {
                         x += tsWork.GetDataSimple(gt.Add(-i)) / tsWork.GetDataSimple(index) * indexFactor;
-                        xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
-                        xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
+                        xLag += tsWork.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
+                        xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
                     }
                 }
 
@@ -29773,6 +29777,8 @@ namespace Gekko
             }
             if (tsRef != null)
             {
+                int factor1, factor2; Yoy(yoy, sumOver, tsRef, out factor1, out factor2);
+
                 y = 0d;
                 yLag = 0d;
                 yLag2 = 0d;
@@ -29781,14 +29787,14 @@ namespace Gekko
                     if (index.IsNull())
                     {
                         y += tsRef.GetDataSimple(gt.Add(-i));
-                        yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i));
-                        yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i));
+                        yLag += tsRef.GetDataSimple(gt.Add(-factor1 * sumOver - i));
+                        yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i));
                     }
                     else
                     {
                         y += tsRef.GetDataSimple(gt.Add(-i)) / tsRef.GetDataSimple(index) * indexFactor;
-                        yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
-                        yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
+                        yLag += tsRef.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
+                        yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
                     }
                 }
 
@@ -29884,9 +29890,29 @@ namespace Gekko
             else
             {
                 new Error("Internal error: unrecognized print code: '" + operator3 + "'");
-                //throw new GekkoException();
             }
             return;
+        }
+
+        private static void Yoy(bool yoy, int sumOver, Series tsWork, out int factor1, out int factor2)
+        {
+            factor1 = 1;
+            factor2 = 2;
+            if (sumOver == 1 && yoy)
+            {
+                //If sumOver is for instance 4, we are collapsing quarters, and then the factors are just 1,
+                //because after collapsing we are already having annual data.
+                if (tsWork.freq == EFreq.Q)
+                {
+                    factor1 = GekkoTimeStuff.numberOfQuarters;
+                    factor2 = 2 * GekkoTimeStuff.numberOfQuarters;
+                }
+                else if (tsWork.freq == EFreq.M)
+                {
+                    factor1 = GekkoTimeStuff.numberOfMonths;
+                    factor2 = 2 * GekkoTimeStuff.numberOfMonths;
+                }
+            }
         }
 
         private static double PchFunction(double x, double x0)
