@@ -228,7 +228,8 @@ namespace Gekko
             //ss[0] = this.graphOptions.emfName;
             //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
             //Clipboard.SetDataObject(iData, true);
-            Clipboard.SetText("Insert this picture file ... " + this._graphOptions.emfName);
+            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
+            Clipboard.SetText(plotName);
         }
 
         private void Button_save(object sender, RoutedEventArgs e)
@@ -240,8 +241,9 @@ namespace Gekko
             string enddir = Program.options.folder_working + "\\" + name2;
             string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
             Program.WaitForFileCopy(plotName, enddir);
-            this.label1.Text = "File " + name2;
-            this.label2.Text = "saved in working folder";
+            this.label1.Text = name2;
+            Program.DelayAction(4000, new Action(() => { try { if (this.label1.Text == name2) this.label1.Text = ""; } catch { } }));
+            //this.label2.Text = "saved in working folder";
         }
 
         private void Button_saveas(object sender, RoutedEventArgs e)
@@ -258,8 +260,8 @@ namespace Gekko
             if (saveFileDialog1.ShowDialog() == true)
             {
                 Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);
-                this.label1.Text = "File saved";
-                this.label2.Text = "";
+                //this.label1.Text = "File saved";
+                //this.label2.Text = "";
             }
         }
 
