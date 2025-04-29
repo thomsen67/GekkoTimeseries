@@ -2859,8 +2859,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".guiGraphOperator = gh.operator2;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                             node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
                             node.Code.A("o" + Num(node) + ".guiGraphFontScaling = gh.fontScaling;" + G.NL);  //to produce a svg suitable for Word, Web.
-                            //node.Code.A("o" + Num(node) + ".guiGraphIsIndex = gh.isIndex;" + G.NL);
-
+                            
                             node.Code.A(node[0].Code);  //type (prt, plot, ...)                          
                             GetCodeFromAllChildren(node, node[1]);  //options
                             GetCodeFromAllChildren(node, node[2]);  //option                                                                    //
@@ -2872,7 +2871,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("  else {");
                             node.Code.A("    o" + Num(node) + ".opt_i = GekkoTime.tNull;");
                             node.Code.A("  }");
-                            node.Code.A("}");
+                            node.Code.A("}" + G.NL);                            
 
                             node.Code.A(LocalCode3(Num(node)));
 
