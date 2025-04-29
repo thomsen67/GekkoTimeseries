@@ -4507,6 +4507,10 @@ ASTPLACEHOLDER [0]
 
                         node.Code.A("" + Globals.smpl + " = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); " + Globals.smpl + ".t0 = " + Globals.smpl + ".t0.Add(-2);" + G.NL);
 
+                        //If there is <yoy>, we set t0 13 periods before (also ok for months)
+                        //See metadata for pchy() and pcha() functions. For some reason, G.Equal() does not work here...
+                        node.Code.A("if (o" + Num(node) + ".opt_yoy != null && o" + Num(node) + ".opt_yoy.ToLower() == Globals.yes) {" + Globals.smpl + ".t0 = " + Globals.smpl + ".t0.Add(-13);}" + G.NL);
+                                                
                         ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                         if (child != null) node.Code.A(child.Code);
 

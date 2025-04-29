@@ -564,6 +564,7 @@ namespace Gekko
         public static readonly ScalarString scalarStringStar = new ScalarString("*");
         public static readonly ScalarString scalarStringYes = new ScalarString("yes");
         public static readonly ScalarString scalarStringNo = new ScalarString("no");
+        public static readonly string yes = "yes";
 
         public static bool useMAsDefaultOperatorInFindWindow = true;  //use <m> as default      
 
