@@ -1745,7 +1745,7 @@ namespace Gekko
             return table;
         }
 
-        private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, bool isIndexTransform, GekkoTime index, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter, O.Prt.Element cc)
+        private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, string isYoy, GekkoTime index, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {            
             string format = "f" + cc.widthFinal + "." + cc.decFinal;
 
@@ -1766,13 +1766,13 @@ namespace Gekko
             double? d = null;
             if (tsWork == null && tsRef == null)  //not series
             {
-                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, isIndexTransform, index, collapse, sumOver, skipCounter);
+                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, isYoy, index, collapse, sumOver, skipCounter);
             }
             else
             {
                 if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn))
                 {
-                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, isIndexTransform, index, collapse, sumOver, skipCounter);
+                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, isYoy, index, collapse, sumOver, skipCounter);
                 }                    
             }
             if (d != null)
@@ -1887,7 +1887,7 @@ namespace Gekko
             }
         }
 
-        public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, bool isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
+        public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, string isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
         {
             //TODO filter and skip, see below
             double var1 = double.NaN;
@@ -1896,7 +1896,7 @@ namespace Gekko
             return var1;
         }
 
-        public static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, bool isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
+        public static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, string isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
         {
             if (!index.IsNull())
             {                

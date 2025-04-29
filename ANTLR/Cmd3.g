@@ -65,6 +65,7 @@ tokens {
 	ASTOPT_STRING_VARIABLECODE;
 	ASTOPT_STRING_NOCR;
     ASTOPT_STRING_TRACE;
+    ASTOPT_STRING_YOY;
 	ASTL0;
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
@@ -390,6 +391,7 @@ ASTCOMPARE2;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
     ASTFINDMISSINGDATA;	
+    ASTYOY;
 	ASTPREDICT;
     ASTFIND;
     ASTFLAT;
@@ -1167,6 +1169,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+    YOY      = 'YOY'     ;
 	EXPAND = 'EXPAND';
 	VARIABLECODE = 'VARIABLECODE';
 	VIEW = 'VIEW';
@@ -1821,6 +1824,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );										
+                                        d.Add("yoy"               , YOY  );		
 										d.Add("expand"   , EXPAND     );
 										d.Add("view", VIEW);
 										d.Add("keeptypes"               , KEEPTYPES  );
@@ -2634,8 +2638,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | count                SEMICOLON!
 						  | create               SEMICOLON!
 						  | cut                  SEMICOLON!
-						  | decomp               SEMICOLON!						  
-						  | decomp2              SEMICOLON!						  						  
+						  | decomp               SEMICOLON!							  						  
 						  | eval                 SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
@@ -3576,6 +3579,7 @@ prtOpt1Helper:              filter
 						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
 						  | I (EQUAL expression)? -> ^(ASTOPT_DATE_I expression?)
+                          | YOY (EQUAL yesNo)? -> ^(ASTOPT_STRING_YOY yesNo?)
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -4330,6 +4334,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  YOY|
   CLOSEALL|
   VIEW|
   LIBRARY|

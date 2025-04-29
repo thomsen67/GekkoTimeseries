@@ -29544,7 +29544,7 @@ namespace Gekko
         /// <param name="isLogTransform"></param>
         /// <param name="isCalledFromTable"></param>
         /// <param name="sumOver"></param>
-        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isYoy, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
+        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, string isYoy, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             //TTH: index=100
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
@@ -29733,7 +29733,7 @@ namespace Gekko
 
             if (tsWork != null)
             {
-                int factor1, factor2; Yoy(isYoy, sumOver, tsWork, out factor1, out factor2);
+                int factor1, factor2; Yoy(G.Equal(isYoy, "yes"), sumOver, tsWork, out factor1, out factor2);
 
                 x = 0d;
                 xLag = 0d;
@@ -29775,7 +29775,7 @@ namespace Gekko
             }
             if (tsRef != null)
             {
-                int factor1, factor2; Yoy(isYoy, sumOver, tsRef, out factor1, out factor2);
+                int factor1, factor2; Yoy(G.Equal(isYoy, "yes"), sumOver, tsRef, out factor1, out factor2);
 
                 y = 0d;
                 yLag = 0d;

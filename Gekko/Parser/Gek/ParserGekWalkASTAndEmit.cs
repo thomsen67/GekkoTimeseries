@@ -2858,7 +2858,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
                             node.Code.A("o" + Num(node) + ".guiGraphOperator = gh.operator2;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                             node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
-                            node.Code.A("o" + Num(node) + ".guiGraphIsYoy = gh.isYoy;" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".guiGraphIsYoy = gh.isYoy;" + G.NL);
                             node.Code.A("o" + Num(node) + ".guiGraphFontScaling = gh.fontScaling;" + G.NL);  //to produce a svg suitable for Word, Web.
                             node.Code.A("o" + Num(node) + ".guiGraphSizeScaling = gh.sizeScaling;" + G.NL);  //to produce a svg suitable for Word, Web.
 
@@ -2876,10 +2876,10 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A("if (gh.isYoy != null) {");
                             node.Code.A("  if (gh.isYoy == true) {");
-                            node.Code.A("    o" + Num(node) + ".opt_yoy = true;");
+                            node.Code.A("    o" + Num(node) + ".opt_yoy = `yes`;");
                             node.Code.A("  }");
                             node.Code.A("  else {");
-                            node.Code.A("    o" + Num(node) + ".opt_yoy = false;");
+                            node.Code.A("    o" + Num(node) + ".opt_yoy = `no`;");
                             node.Code.A("  }");
                             node.Code.A("}" + G.NL);
                             node.Code.A("}" + G.NL);                            

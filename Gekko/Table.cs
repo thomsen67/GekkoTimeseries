@@ -1349,7 +1349,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    Program.ComputeValueForPrintPlotNew(null, out var1, out varPch, printcode, t, tsWork, tsBase, false, false, GekkoTime.tNull, true, EPrtCollapseTypes.None, 1);
+                    Program.ComputeValueForPrintPlotNew(null, out var1, out varPch, printcode, t, tsWork, tsBase, false, "no", GekkoTime.tNull, true, EPrtCollapseTypes.None, 1);
                 }                             
 
                 this.SetNumber(row, col + counter, scale * var1, format);
