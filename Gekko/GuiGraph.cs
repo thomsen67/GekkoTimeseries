@@ -52,12 +52,14 @@ namespace Gekko
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.fontScaling = refresh.fontScaling;
+            this.sizeScaling=refresh.sizeScaling;
             this.isIndex = refresh.isIndex;
         }
         public string operator2 = null; 
         public bool isRefreshing = false;
         public bool isLogTransform = false;
         public double fontScaling = 1d;
+        public double sizeScaling = 1d;
         public bool? isIndex = null;
     }
 

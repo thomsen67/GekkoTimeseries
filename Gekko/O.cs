@@ -9766,6 +9766,7 @@ namespace Gekko
             public string guiGraphRefreshingFilename = null;
             public bool guiGraphIsLogTransform = false;
             public double guiGraphFontScaling = 1d;
+            public double guiGraphSizeScaling = 1d;
             public bool guiGraphIsIndex = false;  //not actually used
 
             public string prtType = null; //PRT, MULPRT, GMULPRT, PLOT, SHEET, CLIP, 

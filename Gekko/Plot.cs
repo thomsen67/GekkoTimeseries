@@ -120,11 +120,15 @@ namespace Gekko
             else if (Program.options.bugfix_plot)
             {
                 //See above, similar code
-                double d = 1.1d * o.guiGraphFontScaling;  //overall size of canvas, relative to 600x480
-                decompFontFactor = d / 1.27d * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+                double d = 1.1d * o.guiGraphSizeScaling;  //overall size of canvas, relative to 600x480
+                decompFontFactor = d / 1.27d * o.guiGraphFontScaling * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
-                decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
+                if (o.guiGraphFontScaling == 1d && o.guiGraphSizeScaling == 1d)
+                {
+                    //When shown in WindowPlot, we need to set the size
+                    decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
+                }
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)

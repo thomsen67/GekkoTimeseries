@@ -11,6 +11,7 @@ namespace Gekko
         public bool? isIndex = null;
         public bool? isRef = false;
         public double fontScaling = 1d;
+        public double sizeScaling = 1d;
         public bool isRefreshing = false;
 
         public RefreshHelper Clone()
@@ -218,6 +219,129 @@ namespace Gekko
                 if (Globals.windowsPlot != null && this != null) Globals.windowsPlot.Remove(this);
             }
             catch { }
+        }        
+
+        private void Button_copy(object sender, RoutedEventArgs e)
+        {
+            // Copy the .svg file to the clipboard for use in e.g. Word
+            //string[] ss = new string[1];
+            //ss[0] = this.graphOptions.emfName;
+            //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
+            //Clipboard.SetDataObject(iData, true);
+            Clipboard.SetText("Insert this picture file ... " + this._graphOptions.emfName);
+        }
+
+        private void Button_save(object sender, RoutedEventArgs e)
+        {
+            //Copy the .svg file to file for later use in e.g. Word
+            string input = "gekkoplot";
+            string inputLast = "svg";
+            string name2 = Program.Add1ToFileName(input, inputLast, Program.options.folder_working);
+            string enddir = Program.options.folder_working + "\\" + name2;
+            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
+            Program.WaitForFileCopy(plotName, enddir);
+            this.label1.Text = "File " + name2;
+            this.label2.Text = "saved in working folder";
+        }
+
+        private void Button_saveas(object sender, RoutedEventArgs e)
+        {
+            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
+
+            Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                InitialDirectory = Program.options.folder_working
+            };
+            if (saveFileDialog1.ShowDialog() == true)
+            {
+                Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);
+                this.label1.Text = "File saved";
+                this.label2.Text = "";
+            }
+        }
+
+        private string CreatePlotFileInBackground(double fontScaling, double sizeScaling)
+        {
+            RefreshHelper refresh = new RefreshHelper();
+            refresh.op = GetOperator();
+            refresh.isLog = CheckBox_log.IsChecked;
+            refresh.isRef = CheckBox_ref.IsChecked;
+            refresh.isIndex = CheckBox_index.IsChecked;
+            refresh.fontScaling = fontScaling;
+            refresh.sizeScaling = sizeScaling;
+            refresh.isRefreshing = true;  //so we do not get a new plot window
+            string plotName = Refresh(new GraphHelper(refresh), false);
+            return plotName;
+        }
+
+        private void Button_refresh(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
+        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Refresh()
+        {            
+            RefreshHelper refresh = new RefreshHelper();
+            refresh.op = GetOperator();
+            refresh.isLog = CheckBox_log.IsChecked;
+            refresh.isRef = CheckBox_ref.IsChecked;
+            refresh.isIndex= CheckBox_index.IsChecked;
+            refresh.isRefreshing = true;  //so we do not get a new plot window                        
+
+            try
+            {
+                refresh.isRefreshing = true;
+                Refresh(new GraphHelper(refresh), true);
+                _refresh = refresh.Clone();  //store it, so we can revert if it fails
+            }
+            catch
+            {
+                refresh = _refresh.Clone();
+                refresh.isRefreshing = true;
+                Refresh(new GraphHelper(refresh), true);  //using the old refresh object that should work.
+                _graphOptions.code = refresh.op;
+            };
+            Globals.disableRadioButtons = 1;
+            try
+            {
+                SetControls(_graphOptions, refresh);
+            }
+            finally
+            {
+                Globals.disableRadioButtons = 0;
+            }
+        }
+
+        private string Refresh(GraphHelper gh, bool updatePlotWindow)
+        {
+            string fileName = Globals.printStorageAsFunc[this._graphOptions.printStorageAsFuncCounter](gh);
+            if(updatePlotWindow) webBrowser.Source = new Uri(fileName);
+            return fileName;
+        }
+
+        private string GetOperator()
+        {
+            string op = "n";
+            if (radioButton_n1.IsChecked == true) op = "n1";
+            else if (radioButton_n2.IsChecked == true) op = "n2";
+            else if (radioButton_d.IsChecked == true) op = "d";
+            else if (radioButton_p.IsChecked == true) op = "p";
+            else if (radioButton_dp.IsChecked == true) op = "dp";
+            else if (radioButton_m.IsChecked == true) op = "m";
+            else if (radioButton_q.IsChecked == true) op = "q";
+            else if (radioButton_mp.IsChecked == true) op = "mp";
+            return op;
         }
 
         private void CheckBox_ref_Checked(object sender, RoutedEventArgs e)
@@ -271,10 +395,10 @@ namespace Gekko
         private void CheckBox_log_Checked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
-            {                
+            {
                 Refresh();
             }
-        }        
+        }
 
         private void CheckBox_log_Unchecked(object sender, RoutedEventArgs e)
         {
@@ -298,7 +422,7 @@ namespace Gekko
             {
                 Refresh();
             }
-        }        
+        }
 
         private void radioButton_p_Checked(object sender, RoutedEventArgs e)
         {
@@ -346,121 +470,6 @@ namespace Gekko
             {
                 Refresh();
             }
-        }
-
-        private void Button_copy(object sender, RoutedEventArgs e)
-        {
-            // Copy the .svg file to the clipboard for use in e.g. Word
-            //string[] ss = new string[1];
-            //ss[0] = this.graphOptions.emfName;
-            //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
-            //Clipboard.SetDataObject(iData, true);
-            Clipboard.SetText(this._graphOptions.emfName + " (use Insert --> Pictures...)");
-        }
-
-        private void Button_save(object sender, RoutedEventArgs e)
-        {
-            //Copy the .svg file to file for later use in e.g. Word
-            //File.
-            string input = "gekkoplot";
-            string inputLast = "svg";
-            string name2 = Program.Add1ToFileName(input, inputLast, Program.options.folder_working);
-            string enddir = Program.options.folder_working + "\\" + name2;
-            Program.WaitForFileCopy(this._graphOptions.emfName, enddir);
-            this.label1.Text = "File " + name2;
-            this.label2.Text = "saved in working folder";
-        }
-
-        private void Button_saveas(object sender, RoutedEventArgs e)
-        {
-            RefreshHelper refresh = new RefreshHelper();
-            refresh.op = GetOperator();
-            refresh.isLog = CheckBox_log.IsChecked == true;
-            refresh.isIndex = CheckBox_index.IsChecked == true;
-            refresh.isRef = CheckBox_ref.IsChecked == true;
-            refresh.fontScaling = 1d / 2d;
-            refresh.isRefreshing = false;
-            string plotName = Refresh(new GraphHelper(refresh));
-            Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
-            {
-                Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*",
-                FilterIndex = 1,
-                RestoreDirectory = true,
-                InitialDirectory = Program.options.folder_working
-            };
-            if (saveFileDialog1.ShowDialog() == true)
-            {
-                Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);
-                this.label1.Text = "File saved";
-                this.label2.Text = "";
-            }
-        }
-
-        private void Button_refresh(object sender, RoutedEventArgs e)
-        {
-            if (Globals.disableRadioButtons == 0)
-            {
-                Refresh();
-            }
-        }
-
-        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void Refresh()
-        {            
-            RefreshHelper refresh = new RefreshHelper();
-            refresh.op = GetOperator();
-            refresh.isLog = CheckBox_log.IsChecked;
-            refresh.isRef = CheckBox_ref.IsChecked;
-            refresh.isIndex= CheckBox_index.IsChecked;
-            refresh.isRefreshing = true;  //so we do not get a new plot window                        
-
-            try
-            {
-                refresh.isRefreshing = true;
-                Refresh(new GraphHelper(refresh));
-                _refresh = refresh.Clone();  //store it, so we can revert if it fails
-            }
-            catch
-            {
-                refresh = _refresh.Clone();
-                refresh.isRefreshing = true;
-                Refresh(new GraphHelper(refresh));  //using the old refresh object that should work.
-                _graphOptions.code = refresh.op;
-            };
-            Globals.disableRadioButtons = 1;
-            try
-            {
-                SetControls(_graphOptions, refresh);
-            }
-            finally
-            {
-                Globals.disableRadioButtons = 0;
-            }
-        }
-
-        private string Refresh(GraphHelper gh)
-        {
-            string emfName = Globals.printStorageAsFunc[this._graphOptions.printStorageAsFuncCounter](gh);
-            webBrowser.Source = new Uri(emfName);
-            return emfName;
-        }
-
-        private string GetOperator()
-        {
-            string op = "n";
-            if (radioButton_n1.IsChecked == true) op = "n1";
-            else if (radioButton_n2.IsChecked == true) op = "n2";
-            else if (radioButton_d.IsChecked == true) op = "d";
-            else if (radioButton_p.IsChecked == true) op = "p";
-            else if (radioButton_dp.IsChecked == true) op = "dp";
-            else if (radioButton_m.IsChecked == true) op = "m";
-            else if (radioButton_q.IsChecked == true) op = "q";
-            else if (radioButton_mp.IsChecked == true) op = "mp";
-            return op;
         }
     }
 }
