@@ -585,6 +585,7 @@ namespace Gekko
         public LocalBanks localBanks = new LocalBanks();
         public string title;
         public string code = "";  //if there is 1 code like plot<m>
+        public GekkoTime index = GekkoTime.tNull;
         
         public bool windowIsShown = false;
         public long counter = -12345;

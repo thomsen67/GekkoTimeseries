@@ -59,7 +59,7 @@ namespace Gekko
             
             this.Left = Globals.guiGraphWindowLeftDistance;
             this.Top = Globals.guiGraphWindowTopDistance;
-            if (graphOptions.code != null)
+            if (graphOptions.code != null || !graphOptions.index.IsNull())
             {
                 Globals.disableRadioButtons = 1;
                 try
@@ -77,16 +77,48 @@ namespace Gekko
         private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
         {
             CheckBox_ref.IsChecked = false;
+            CheckBox_ref.IsEnabled = true;
+            CheckBox_ref.Opacity = 1d;
+
             CheckBox_log.IsChecked = false;
-            CheckBox_index.IsChecked = false;            
+            CheckBox_log.IsEnabled = true;
+            CheckBox_log.Opacity = 1d;
+
+            CheckBox_index.IsChecked = false;
+            CheckBox_index.IsEnabled = true;
+            CheckBox_index.Opacity = 1d;
+
             radioButton_n1.IsChecked = false;
+            radioButton_n1.IsEnabled = true;
+            radioButton_n1.Opacity = 1d;
+
             radioButton_n2.IsChecked = false;
+            radioButton_n2.IsEnabled = true;
+            radioButton_n2.Opacity = 1d;
+
             radioButton_d.IsChecked = false;
+            radioButton_d.IsEnabled = true;
+            radioButton_d.Opacity = 1d;
+
             radioButton_p.IsChecked = false;
+            radioButton_p.IsEnabled = true;
+            radioButton_p.Opacity = 1d;
+
             radioButton_dp.IsChecked = false;
+            radioButton_dp.IsEnabled = true;
+            radioButton_dp.Opacity = 1d;
+
             radioButton_m.IsChecked = false;
+            radioButton_m.IsEnabled = true;
+            radioButton_m.Opacity = 1d;
+
             radioButton_q.IsChecked = false;
+            radioButton_q.IsEnabled = true;
+            radioButton_q.Opacity = 1d;
+
             radioButton_mp.IsChecked = false;
+            radioButton_mp.IsEnabled = true;
+            radioButton_mp.Opacity = 1d;
 
             string opRawLowerStart = "";            
             if (graphOptions.code != null) opRawLowerStart = graphOptions.code.ToLower();
@@ -108,6 +140,7 @@ namespace Gekko
             {
                 if (opRawLowerStart.EndsWith("l")) isL = true;
                 if (opRawLowerStart.StartsWith("r")) isR = true;
+                if (!graphOptions.index.IsNull()) isI = true;  //also true for <i=...>.
             }
 
             if (opRawLowerStart.EndsWith("l"))
@@ -131,6 +164,23 @@ namespace Gekko
             else if (G.Equal(opHere, "m")) radioButton_m.IsChecked = true;
             else if (G.Equal(opHere, "q")) radioButton_q.IsChecked = true;
             else if (G.Equal(opHere, "mp")) radioButton_mp.IsChecked = true;
+
+            if (CheckBox_ref.IsChecked == true)
+            {
+                radioButton_m.IsEnabled = false;
+                radioButton_m.Opacity = 0.5;
+                radioButton_q.IsEnabled = false;
+                radioButton_q.Opacity = 0.5;
+                radioButton_mp.IsEnabled = false;
+                radioButton_mp.Opacity = 0.5;
+            }
+
+            if (radioButton_m.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
+            {
+                CheckBox_ref.IsEnabled = false;
+                CheckBox_ref.Opacity = 0.5;
+            }
+
         }
 
         protected override void OnContentRendered(EventArgs e)

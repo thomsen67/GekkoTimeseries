@@ -189,12 +189,12 @@
             </DockPanel>
             <DockPanel Grid.Row="4" Grid.Column="1">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;[x/x[-1]-1]*100">Growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;p&gt; or PRT&lt;pch&gt;&#xa;(x/x[-1]-1)*100">Growth rate</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="1">
                 <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [x[-1]/x[-2]-1]*100">Chng. growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;dp&gt; or PRT&lt;gdif&gt;&#xa;(x/x[-1]-1)*100 - (x[-1]/x[-2]-1)*100">Chng. growth rate</TextBlock>
                 </Border>
             </DockPanel>
 
@@ -296,12 +296,12 @@
 
             <DockPanel Grid.Row="4" Grid.Column="6">
                 <Border BorderThickness="1,0,0,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;q&gt; or MULPRT&lt;pch&gt;&#xa;[x/@x-1]*100">Relative multiplier</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;q&gt; or MULPRT&lt;pch&gt;&#xa;(x/@x-1)*100">Relative multiplier</TextBlock>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="5" Grid.Column="6">
                 <Border BorderThickness="1,0,0,1" BorderBrush="LightGray" CornerRadius="0,0,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;[x/x[-1]-1]*100 - [@x/@x[-1]-1]*100">Mul. growth rate</TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" ToolTip="Corresponds to PRT&lt;mp&gt; or MULPRT&lt;gdif&gt;&#xa;(x/x[-1]-1)*100 - (@x/@x[-1]-1)*100">Mul. growth rate</TextBlock>
                 </Border>
 
             </DockPanel>

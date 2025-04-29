@@ -969,6 +969,7 @@ namespace Gekko
                     graphOptions.title = null;
                     graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
                     graphOptions.code = code;
+                    graphOptions.index = o.opt_i;
 
                     Thread thread = new Thread(new ParameterizedThreadStart(Program.PlotThreadFunction));
                     thread.Name = "Plot";
