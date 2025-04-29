@@ -2873,6 +2873,15 @@ namespace Gekko.Parser.Gek
                             node.Code.A("  else {");
                             node.Code.A("    o" + Num(node) + ".opt_i = GekkoTime.tNull;");
                             node.Code.A("  }");
+
+                            node.Code.A("if (gh.isYoy != null) {");
+                            node.Code.A("  if (gh.isYoy == true) {");
+                            node.Code.A("    o" + Num(node) + ".opt_yoy = true;");
+                            node.Code.A("  }");
+                            node.Code.A("  else {");
+                            node.Code.A("    o" + Num(node) + ".opt_yoy = false;");
+                            node.Code.A("  }");
+                            node.Code.A("}" + G.NL);
                             node.Code.A("}" + G.NL);                            
 
                             node.Code.A(LocalCode3(Num(node)));

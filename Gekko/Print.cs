@@ -1897,7 +1897,7 @@ namespace Gekko
                 //The index radio button is clicked, any <i> or <i=...> are ignored
                 index = GekkoTime.tNotNull;  //signals <i>
             }
-            Program.ComputeValueForPrintPlotNew(smpl, out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, index, false, collapse, sumOver);
+            Program.ComputeValueForPrintPlotNew(smpl, out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, isIndexTransform, index, false, collapse, sumOver);
             return var1;
         }
 

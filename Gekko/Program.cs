@@ -29544,7 +29544,7 @@ namespace Gekko
         /// <param name="isLogTransform"></param>
         /// <param name="isCalledFromTable"></param>
         /// <param name="sumOver"></param>
-        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
+        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isIndexTransform, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             //TTH: index=100
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
@@ -29731,7 +29731,7 @@ namespace Gekko
             double yLag = double.NaN;
             double yLag2 = double.NaN;
 
-            bool yoy = false;            
+            bool yoy = isIndexTransform;      
 
             if (tsWork != null)
             {

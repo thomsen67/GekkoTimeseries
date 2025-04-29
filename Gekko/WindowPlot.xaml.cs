@@ -86,6 +86,10 @@ namespace Gekko
             CheckBox_log.IsEnabled = true;
             CheckBox_log.Opacity = 1d;
 
+            CheckBox_yoy.IsChecked = false;
+            CheckBox_yoy.IsEnabled = true;
+            CheckBox_yoy.Opacity = 1d;
+
             CheckBox_index.IsChecked = false;
             CheckBox_index.IsEnabled = true;
             CheckBox_index.Opacity = 1d;
@@ -129,12 +133,14 @@ namespace Gekko
             bool isR = false;
             bool isL = false;
             bool isI = false;
+            bool isYoy = false;
 
             if (refresh != null)
             {
                 isR = refresh.isRef == true;
                 isL = refresh.isLog == true;
                 isI = refresh.isIndex == true;
+                isYoy = refresh.isYoy == true;
                 opHere = refresh.op.ToLower();
             }
             else
@@ -156,6 +162,7 @@ namespace Gekko
             if (isR) CheckBox_ref.IsChecked = true;
             if (isL) CheckBox_log.IsChecked = true;
             if (isI) CheckBox_index.IsChecked = true;
+            if (isYoy) CheckBox_yoy.IsChecked = true;
             if (G.Equal(opHere, "") || G.Equal(opHere, "n")) radioButton_n1.IsChecked = true;
             else if (G.Equal(opHere, "n1")) radioButton_n1.IsChecked = true;
             else if (G.Equal(opHere, "n2")) radioButton_n2.IsChecked = true;
@@ -274,6 +281,7 @@ namespace Gekko
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
             refresh.isIndex = CheckBox_index.IsChecked;
+            refresh.isYoy= CheckBox_yoy.IsChecked;
             refresh.fontScaling = fontScaling;
             refresh.sizeScaling = sizeScaling;
             refresh.isRefreshing = true;  //so we do not get a new plot window
@@ -301,6 +309,7 @@ namespace Gekko
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
             refresh.isIndex= CheckBox_index.IsChecked;
+            refresh.isYoy = CheckBox_yoy.IsChecked;
             refresh.isRefreshing = true;  //so we do not get a new plot window                        
 
             try
