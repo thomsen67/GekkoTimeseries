@@ -52,13 +52,13 @@ namespace Gekko
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.fontScaling = refresh.fontScaling;
-            this.isIndex = refresh.isIndex == true;
+            this.isIndex = refresh.isIndex;
         }
         public string operator2 = null; 
         public bool isRefreshing = false;
         public bool isLogTransform = false;
         public double fontScaling = 1d;
-        public bool isIndex = false;
+        public bool? isIndex = null;
     }
 
     public class Graph : Form

@@ -8,7 +8,7 @@ namespace Gekko
     {
         public string op = "";  //can also be n1/n2 (left or right n)
         public bool? isLog = false;
-        public bool? isIndex = false;
+        public bool? isIndex = null;
         public bool? isRef = false;
         public double fontScaling = 1d;
         public bool isRefreshing = false;
