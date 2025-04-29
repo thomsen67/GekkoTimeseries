@@ -36,8 +36,8 @@ namespace Gekko
         public RefreshHelper _refresh = new Gekko.RefreshHelper();
 
         public WindowPlot(GraphOptions graphOptions)
-        {            
-            this._graphOptions = graphOptions;            
+        {
+            this._graphOptions = graphOptions;
 
             Globals.disableRadioButtons = 1;
             try
@@ -56,21 +56,20 @@ namespace Gekko
             {
                 Globals.disableRadioButtons = 0;
             }
-            
+
             this.Left = Globals.guiGraphWindowLeftDistance;
             this.Top = Globals.guiGraphWindowTopDistance;
-            if (graphOptions.code != null || !graphOptions.index.IsNull())
+
+            Globals.disableRadioButtons = 1;
+            try
             {
-                Globals.disableRadioButtons = 1;
-                try
-                {
-                    SetControls(graphOptions, null);
-                }
-                finally
-                {
-                    Globals.disableRadioButtons = 0;
-                }
+                SetControls(graphOptions, null);
             }
+            finally
+            {
+                Globals.disableRadioButtons = 0;
+            }
+
             webBrowser.Source = new Uri(graphOptions.emfName);
         }
 
@@ -123,7 +122,6 @@ namespace Gekko
             string opRawLowerStart = "";            
             if (graphOptions.code != null) opRawLowerStart = graphOptions.code.ToLower();
             string opHere = opRawLowerStart;
-            //if (G.Equal(opHere, "n1") || G.Equal(opHere, "n2")) opHere = "n";
 
             bool isR = false;
             bool isL = false;
@@ -399,9 +397,7 @@ namespace Gekko
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
             refresh.isIndex= CheckBox_index.IsChecked;
-            refresh.isRefreshing = true;  //so we do not get a new plot window            
-            //if (refresh.isLog == true) refresh.op = refresh.op + "l";
-            //if (refresh.isRef == true) refresh.op = "r" + refresh.op;
+            refresh.isRefreshing = true;  //so we do not get a new plot window                        
 
             try
             {
