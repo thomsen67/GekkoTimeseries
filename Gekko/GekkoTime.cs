@@ -893,6 +893,19 @@ namespace Gekko
             return Observations(t, this) - 1;
         }
 
+        public static GekkoTime Average(GekkoTime t1, GekkoTime t2)
+        {
+            //t1 = 2001, t2 = 2001 --> n = 1, 0/2 = 0, t12 = 2001.
+            // -----
+            //t1 = 2001, t2 = 2004 --> n = 4, 3/2 = 1, t12 = 2002.
+            //t1 = 2001, t2 = 2005 --> n = 5, 4/2 = 2, t12 = 2003.
+            //t1 = 2001, t2 = 2006 --> n = 6, 5/2 = 2, t12 = 2003.
+            //t1 = 2001, t2 = 2007 --> n = 7, 6/2 = 3, t12 = 2004.
+            int n = GekkoTime.Observations(t1, t2);
+            GekkoTime t12 = t1.Add((n - 1) / 2);
+            return t12;
+        }
+
         /// <summary>
         /// Finds the number of observations that a time range t1 to t2 spans. If t1 = 2020 and t2 = 2022, it will return 3. So note that it is the difference + 1.
         /// The method *can* return 0 or a negative number! If both GekkoTimes are null, 0 is returned. If one but not the other is null, an error is issued.

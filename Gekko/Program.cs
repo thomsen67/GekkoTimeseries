@@ -29753,10 +29753,12 @@ namespace Gekko
                         xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i));
                     }
                     else
-                    {
-                        x += tsWork.GetDataSimple(gt.Add(-i)) / tsWork.GetDataSimple(index) * indexFactor;
-                        xLag += tsWork.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
-                        xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / tsWork.GetDataSimple(index) * indexFactor;
+                    {                        
+                        GekkoTime t12 = GekkoTime.Average(GekkoTime.ConvertFreqsFirst(tsWork.freq, index, null), GekkoTime.ConvertFreqsLast(tsWork.freq, index));
+                        double ix = tsWork.GetDataSimple(t12);
+                        x += tsWork.GetDataSimple(gt.Add(-i)) / ix * indexFactor;
+                        xLag += tsWork.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / ix * indexFactor;
+                        xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / ix * indexFactor;
                     }
                 }
 
@@ -29789,10 +29791,12 @@ namespace Gekko
                         yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i));
                     }
                     else
-                    {
-                        y += tsRef.GetDataSimple(gt.Add(-i)) / tsRef.GetDataSimple(index) * indexFactor;
-                        yLag += tsRef.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
-                        yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / tsRef.GetDataSimple(index) * indexFactor;
+                    {                        
+                        GekkoTime t12 = GekkoTime.Average(GekkoTime.ConvertFreqsFirst(tsRef.freq, index, null), GekkoTime.ConvertFreqsLast(tsRef.freq, index));
+                        double ix = tsRef.GetDataSimple(t12);
+                        y += tsRef.GetDataSimple(gt.Add(-i)) / ix * indexFactor;
+                        yLag += tsRef.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / ix * indexFactor;
+                        yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / ix * indexFactor;
                     }
                 }
 
