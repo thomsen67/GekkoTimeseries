@@ -200,7 +200,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_yoy"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Uses year-over-year for time-changes: 4 lags for quarterly series, and 12 lags for monthly series (&lt;yoy> option)"  Content="Yoy" Checked="CheckBox_yoy_Checked" Unchecked="CheckBox_yoy_Unchecked"/>
+                <CheckBox x:Name="CheckBox_yoy"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Year-over-year for time-changes: 4 lags for quarterly series, and 12 lags for monthly series (&lt;yoy> option)"  Content="Yoy" Checked="CheckBox_yoy_Checked" Unchecked="CheckBox_yoy_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">

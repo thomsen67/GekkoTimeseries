@@ -188,6 +188,20 @@ namespace Gekko
                 radioButton_mp.Opacity = 0.5;                
             }
 
+            if (CheckBox_yoy.IsChecked == true)
+            {
+                radioButton_n1.IsEnabled = false;
+                radioButton_n1.Opacity = 0.5;
+                radioButton_n2.IsEnabled = false;
+                radioButton_n2.Opacity = 0.5;
+                radioButton_m.IsEnabled = false;
+                radioButton_m.Opacity = 0.5;
+                radioButton_q.IsEnabled = false;
+                radioButton_q.Opacity = 0.5;
+                radioButton_mp.IsEnabled = false;
+                radioButton_mp.Opacity = 0.5;
+            }
+
             if (CheckBox_ref.IsChecked == true)
             {
                 radioButton_m.IsEnabled = false;
@@ -202,6 +216,12 @@ namespace Gekko
             {
                 CheckBox_ref.IsEnabled = false;
                 CheckBox_ref.Opacity = 0.5;
+            }
+
+            if (radioButton_n1.IsChecked == true || radioButton_n2.IsChecked == true || radioButton_m.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
+            {
+                CheckBox_yoy.IsEnabled = false;
+                CheckBox_yoy.Opacity = 0.5;
             }
 
             if (radioButton_p.IsChecked == true || radioButton_dp.IsChecked == true || radioButton_m.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
