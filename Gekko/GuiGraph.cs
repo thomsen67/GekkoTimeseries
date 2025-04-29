@@ -590,6 +590,7 @@ namespace Gekko
         public string title;
         public string code = "";  //if there is 1 code like plot<m>
         public GekkoTime index = GekkoTime.tNull;
+        public bool yoy = false;
         
         public bool windowIsShown = false;
         public long counter = -12345;

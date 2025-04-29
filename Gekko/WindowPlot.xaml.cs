@@ -148,6 +148,7 @@ namespace Gekko
                 if (opRawLowerStart.EndsWith("l")) isL = true;
                 if (opRawLowerStart.StartsWith("r")) isR = true;
                 if (!graphOptions.index.IsNull()) isI = true;  //also true for <i=...>.
+                if (graphOptions.yoy) isYoy = true;  //also true for <i=...>.
             }
 
             if (opRawLowerStart.EndsWith("l"))

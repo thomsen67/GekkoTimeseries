@@ -27640,11 +27640,11 @@ namespace Gekko
                     double d = double.NaN;
                     if (isScalar)  //not series
                     {
-                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.guiGraphIsYoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
+                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_yoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     else
                     {
-                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.guiGraphIsYoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
+                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_yoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     i++;
 
@@ -29544,7 +29544,7 @@ namespace Gekko
         /// <param name="isLogTransform"></param>
         /// <param name="isCalledFromTable"></param>
         /// <param name="sumOver"></param>
-        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isIndexTransform, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
+        public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isYoy, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             //TTH: index=100
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
@@ -29729,13 +29729,11 @@ namespace Gekko
             double xLag2 = double.NaN;
             double y = double.NaN;
             double yLag = double.NaN;
-            double yLag2 = double.NaN;
-
-            bool yoy = isIndexTransform;      
+            double yLag2 = double.NaN;            
 
             if (tsWork != null)
             {
-                int factor1, factor2; Yoy(yoy, sumOver, tsWork, out factor1, out factor2);
+                int factor1, factor2; Yoy(isYoy, sumOver, tsWork, out factor1, out factor2);
 
                 x = 0d;
                 xLag = 0d;
@@ -29777,7 +29775,7 @@ namespace Gekko
             }
             if (tsRef != null)
             {
-                int factor1, factor2; Yoy(yoy, sumOver, tsRef, out factor1, out factor2);
+                int factor1, factor2; Yoy(isYoy, sumOver, tsRef, out factor1, out factor2);
 
                 y = 0d;
                 yLag = 0d;
