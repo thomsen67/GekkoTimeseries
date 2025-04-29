@@ -51,6 +51,7 @@ namespace Gekko
             if (refresh.isRef == true) this.operator2 = "r" + this.operator2;
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
+            this.isYoy = refresh.isYoy == true;
             this.fontScaling = refresh.fontScaling;
             this.sizeScaling=refresh.sizeScaling;
             this.isIndex = refresh.isIndex;
@@ -58,6 +59,7 @@ namespace Gekko
         public string operator2 = null; 
         public bool isRefreshing = false;
         public bool isLogTransform = false;
+        public bool isYoy = false;
         public double fontScaling = 1d;
         public double sizeScaling = 1d;
         public bool? isIndex = null;

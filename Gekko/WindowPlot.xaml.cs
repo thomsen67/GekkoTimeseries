@@ -8,6 +8,7 @@ namespace Gekko
     {
         public string op = "";  //can also be n1/n2 (left or right n)
         public bool? isLog = false;
+        public bool? isYoy = false;
         public bool? isIndex = null;
         public bool? isRef = false;
         public double fontScaling = 1d;
@@ -19,6 +20,7 @@ namespace Gekko
             RefreshHelper r = new RefreshHelper();
             r.op = this.op;
             r.isLog = this.isLog;
+            r.isYoy = this.isYoy;
             r.isIndex = this.isIndex;
             r.isRef = this.isRef;
             r.fontScaling = this.fontScaling;
@@ -387,6 +389,22 @@ namespace Gekko
         }
 
         private void CheckBox_index_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
+        private void CheckBox_yoy_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
+        private void CheckBox_yoy_Unchecked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
             {

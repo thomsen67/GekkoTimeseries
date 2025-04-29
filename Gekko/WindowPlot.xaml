@@ -199,8 +199,12 @@
                 <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Indexes/adjusts data to 100 in the midpoint period (&lt;i> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
             </StackPanel>
 
-            <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">                
-                <TextBlock Name="label1" TextWrapping="Wrap" Opacity="0.5" FontSize="12" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-22,10,0,0" ></TextBlock>                              
+            <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
+                <CheckBox x:Name="CheckBox_yoy"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Uses year-over-year for time-changes: 4 lags for quarterly series, and 12 lags for monthly series (&lt;yoy> option)"  Content="Yoy" Checked="CheckBox_yoy_Checked" Unchecked="CheckBox_yoy_Unchecked"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                <TextBlock Name="label1" TextWrapping="Wrap" Foreground="Blue" FontSize="12" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,-6,0,0" ></TextBlock>
             </StackPanel>
 
             <DockPanel Grid.ColumnSpan="1" Grid.Row="1" Grid.Column="11">

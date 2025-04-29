@@ -27,7 +27,7 @@ namespace Gekko
         /// or using Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh), which are
         /// stored plots Func's, and are transmitted to 
         /// O.Prt fields like .guiGraphOperator, .guiGraphIsLogTransform, .guiGraphFontScaling, 
-        /// .guiGraphIsIndex
+        /// .guiGraphIsYoy
         /// 
         /// </summary>
         /// <param name="plotTable"></param>
