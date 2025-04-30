@@ -9,6 +9,7 @@ namespace Gekko
         public string op = "";  //can also be n1/n2 (left or right n)
         public bool? isLog = false;
         public bool? isYoy = false;
+        public string period = "";
         public bool? isIndex = null;
         public bool? isRef = false;
         public double fontScaling = 1d;
@@ -21,6 +22,7 @@ namespace Gekko
             r.op = this.op;
             r.isLog = this.isLog;
             r.isYoy = this.isYoy;
+            r.period = this.period;
             r.isIndex = this.isIndex;
             r.isRef = this.isRef;
             r.fontScaling = this.fontScaling;
@@ -89,6 +91,8 @@ namespace Gekko
             CheckBox_yoy.IsChecked = false;
             CheckBox_yoy.IsEnabled = true;
             CheckBox_yoy.Opacity = 1d;
+
+            TextBox_period.Text = graphOptions.tStart.ToString() + " " + graphOptions.tEnd.ToString();
 
             CheckBox_index.IsChecked = false;
             CheckBox_index.IsEnabled = true;
@@ -332,6 +336,7 @@ namespace Gekko
             refresh.isIndex= CheckBox_index.IsChecked;
             refresh.isYoy = CheckBox_yoy.IsChecked;
             refresh.isRefreshing = true;  //so we do not get a new plot window                        
+            refresh.period = TextBox_period.Text;
 
             try
             {

@@ -29922,7 +29922,7 @@ namespace Gekko
             double z = ((x / x0) - 1d) * 100d;
             if (x == x0) z = 0d;    //0 and 0 gives 0%
             return z;
-        }
+        }        
 
         private static void ComputeValueForPrintPlot(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt, Series tsWork, Series tsBase)
         {

@@ -3533,6 +3533,33 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Used in PLOT, dynamic code.
+        /// </summary>
+        /// <param name="s"></param>
+        public static void GetPeriods(EFreq freq, string s, out GekkoTime t1, out GekkoTime t2)
+        {
+            t1 = GekkoTime.tNull;
+            t2 = GekkoTime.tNull;
+            string s2 = System.Text.RegularExpressions.Regex.Replace(s.Trim(), @"\s+", " "); //more than 1 blanks inside replaced with 1 blank 
+            string[] ss = s2.Split(' ');
+            if (ss.Length == 2)
+            {                
+                t1 = GekkoTime.ConvertFreqsFirst(freq, GekkoTime.FromStringToGekkoTime(ss[0]), null);                
+                t2 = GekkoTime.ConvertFreqsLast(freq, GekkoTime.FromStringToGekkoTime(ss[1]));
+            }            
+        }
+
+        public static void GetPeriods2(O.Prt o0, GraphHelper gh)
+        {
+            string s = gh.period;
+            if (G.NullOrBlanks(s)) return;
+            GekkoTime t1_temp = GekkoTime.tNull; GekkoTime t2_temp = GekkoTime.tNull;            
+            try { O.GetPeriods(o0.t1.freq, s, out t1_temp, out t2_temp); } catch { }
+            if (!t1_temp.IsNull() && !t2_temp.IsNull()) { o0.t1 = t1_temp; o0.t2 = t2_temp; }
+            else new Error("Could not parse the period '" + s + "'");
+        }
+
+        /// <summary>
         /// Write a #(listfile m) kind of "variable", if it is on the left-hand side (LHS).
         /// </summary>
         /// <param name="varnameWithFreq"></param>

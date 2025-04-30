@@ -2873,6 +2873,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("  else {");
                             node.Code.A("    o" + Num(node) + ".opt_i = GekkoTime.tNull;");
                             node.Code.A("  }");
+                            node.Code.A("}" + G.NL);
 
                             node.Code.A("if (gh.isYoy != null) {");
                             node.Code.A("  if (gh.isYoy == true) {");
@@ -2882,7 +2883,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A("    o" + Num(node) + ".opt_yoy = `no`;");
                             node.Code.A("  }");
                             node.Code.A("}" + G.NL);
-                            node.Code.A("}" + G.NL);                            
+
+                            node.Code.A("O.GetPeriods2(o" + Num(node) + ", gh);" + G.NL);
 
                             node.Code.A(LocalCode3(Num(node)));
 
