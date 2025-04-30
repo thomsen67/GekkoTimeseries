@@ -228,7 +228,7 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button Content="Copy link" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="File link to .svg file: in Word, use Insert --> Pictures. Unfortunately, the Windows clipboard does not support .svg files." Click="Button_copy">
+                <Button Content="Copy link" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="File link to .svg file: in Word, use Insert --> Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." Click="Button_copy">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -236,7 +236,7 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Save" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. The name is gekkoplot[number].svg." Click="Button_save">
+                <Button Content="Save" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg." Click="Button_save">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
