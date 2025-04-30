@@ -1961,8 +1961,16 @@ namespace Gekko
             string sEq = null;
             if (helper.showEq)
             {
-                sEq = "/* " + name + " */ ";
-                sEq = name + " .. ";
+                string name2 = name;
+                if (helper.showTime)
+                {
+                    //do nothing, time is already there
+                }
+                else
+                {
+                    name2 = name.Replace("," + t0.ToString() + "]", "]");
+                }
+                sEq = name2 + " .. ";
             }
             return sEq + sb.ToString().Trim();
         }

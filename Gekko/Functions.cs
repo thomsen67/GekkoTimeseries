@@ -4160,7 +4160,6 @@ namespace Gekko
             return lhs;
         }
 
-
         public static IVariable rebase(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
@@ -6306,16 +6305,13 @@ namespace Gekko
             //See _Test_GAMSScalar1()+2() unit tests
             if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");
             string input1 = O.ConvertToString(input[0]);
-            if (G.Equal(input1, "pack") || G.Equal(input1, "packmanual"))
-            {
-                bool isManual = G.Equal(input1, "packmanual");
-                GamsScalarHelper settings = new GamsScalarHelper();
-                Program.GamsScalar(0, 0, settings);
-            }
-            else if (G.Equal(input1, "info"))
+            if (G.Equal(input1, "info"))
             {
                 if (Program.model.modelGamsScalar == null) new Error("No scalar model loaded: did you forget a MODEL statement?");
-                GekkoTime t = new GekkoTime(EFreq.A, 2030, 1);
+                //
+                // NB NB NB NB
+                //
+                GekkoTime t = new GekkoTime(EFreq.A, 2024, 1);
                 GekkoTime t1 = Program.model.modelGamsScalar.absoluteT1;
                 GekkoTime t2 = Program.model.modelGamsScalar.absoluteT2;
                 Zipper zipper = new Zipper("info.zip");
@@ -6325,6 +6321,9 @@ namespace Gekko
                 {
                     foreach (string s in x)
                     {
+                        if (G.StartsWith(s, "res_")) continue;  //do not show residuals
+                        if (s.StartsWith("x_temp1")) continue;  //cf. gekko_equations.py
+                        if (s.StartsWith("x_temp2")) continue;  //cf. gekko_equations.py
                         sw.WriteLine(s);
                     }
                 }
@@ -6336,7 +6335,9 @@ namespace Gekko
                 {
                     foreach (string eq in Program.model.modelGamsScalar.dict_FromEqNumberToEqName)
                     {
-                        if (!eq.Contains(t.ToString())) continue;
+                        if (!eq.Contains(t.ToString() + "]")) continue;
+                        if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
+                        if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
                         string eqText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, t);
                         sw.WriteLine(eqText);
                         sw.WriteLine();
