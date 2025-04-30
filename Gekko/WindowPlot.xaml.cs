@@ -307,6 +307,7 @@ namespace Gekko
             refresh.isRef = CheckBox_ref.IsChecked;
             refresh.isIndex = CheckBox_index.IsChecked;
             refresh.isYoy= CheckBox_yoy.IsChecked;
+            refresh.period = TextBox_period.Text;
             refresh.fontScaling = fontScaling;
             refresh.sizeScaling = sizeScaling;
             refresh.isRefreshing = true;  //so we do not get a new plot window
@@ -351,6 +352,8 @@ namespace Gekko
                 Refresh(new GraphHelper(refresh), true);  //using the old refresh object that should work.
                 _graphOptions.code = refresh.op;
             };
+
+            O.GetPeriods(_graphOptions.tStart.freq, refresh.period, out _graphOptions.tStart, out _graphOptions.tEnd);
             Globals.disableRadioButtons = 1;
             try
             {

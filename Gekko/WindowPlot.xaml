@@ -222,7 +222,7 @@
           <WebBrowser Name="webBrowser" Height="360" Width="450" HorizontalAlignment="Left" Margin="10,0,0,0"/>
             <StackPanel Orientation="Vertical">
 
-                <TextBox Name="TextBox_period" Width="75" Height="17" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Change plot period (press the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
+                <TextBox Name="TextBox_period" Width="75" Height="17" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Change time period (press the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
                 
                 <Button Content="Refresh" Margin="7,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (also use when changing time period)." Click="Button_refresh">
                     <Button.Resources>
