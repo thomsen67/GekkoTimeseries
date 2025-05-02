@@ -128,14 +128,7 @@ namespace Gekko
             }            
 
             SvgScaling(o, containerExplode, plotHelper, zoomDpi, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor);
-
-            //if (type == EPlotType.PlotStatement)
-            //{
-            //    decompSvgOverallWidth = 660;  //440
-            //    decompSvgOverallHeight = 528;  //352
-            //    decompSvgFontFactor = 1.068;   //1.068
-            //}
-
+                        
             if (type == EPlotType.PlotStatement || type == EPlotType.Decomp)
             {                
                 //Must set this, because of .NET component
@@ -918,6 +911,7 @@ namespace Gekko
                 {
                     decompSvgOverallWidth = 600d * d * zoomDpi;
                     decompSvgOverallHeight = 480d * d * zoomDpi;
+                    decompSvgFontFactor = 1d;
                 }
             }
         }
