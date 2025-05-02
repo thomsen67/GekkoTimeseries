@@ -19,6 +19,15 @@ namespace Gekko
         public int decompPlotNumberOfKeyColumns = -12345;
     }
 
+    public enum EPlotType
+    {
+        PlotStatement,
+        PlotStatementWithFile,
+        SaveButtons,
+        Decomp,
+        Emf
+    }
+
     public static class Plot
     {
         /// <summary>
@@ -90,66 +99,39 @@ namespace Gekko
 
             double zoom = 1d;
 
-            double decompFontFactor = 1d;
+            double decompSvgFontFactor = 1d;
             string decompSvgSize = " ";
             string decompMargin = null;
             double decompXZoom = 1d;
             string key2 = null;
+
+            EPlotType type = EPlotType.Emf;
             if (plotHelper.isDecompPlot)
             {
-                //See below, similar code
-                //Seems zoom can only be done "manually", altering the gnuplot svg file.         
-                double d = 0.9;  //overall size of canvas, relative to 600x480                
-                decompFontFactor = d * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
-                int n = containerExplode.Count;
-                int maxLength = 0;
-                foreach (var xx in containerExplode)
-                {
-                    maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
-                }
-                int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //heuristic not working good, 1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
-                if (plotHelper.decompPlotCallNumber == 1) columns = Math.Max(1, plotHelper.decompPlotNumberOfKeyColumns); //works better! And probably will never become 0.
-                double widthProxyNumberOfChars = columns * (14 + maxLength);  //14 is chars                    
-                double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
-                decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
-                if (plotHelper.decompPlotCallNumber == 0) decompSvgOverallWidth *= 100;  //room for lots of labels in cols...
-                decompSvgOverallHeight = (int)(480d * d);
-                decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
-                key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
+                type = EPlotType.Decomp;
             }
-            else if (Program.options.bugfix_plot)  //using svg for PLOT
+            else if (Program.options.bugfix_plot)
             {
-                //See above, similar code
-
-                double x1 = o.guiGraphSizeScaling;
-                double x2 = o.guiGraphFontScaling;
-
-                if (o.opt_filename != null)
-                {
-                    //PLOT ... FILE=...;
-                    x1 = Globals.guiPlotFontScaling;
-                    x2 = Globals.guiPlotSizeScaling;
-                }
-
-                double d = 1.1d * x1;  //overall size of canvas, relative to 600x480
-                decompFontFactor = d / 1.27d * x2 * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
-                decompSvgOverallWidth = (int)(600d * d);
-                decompSvgOverallHeight = (int)(480d * d);
-
                 if (o.guiGraphIsButton)
                 {
-                    //Do nothing, 3 Save+Copy buttons
+                    type = EPlotType.SaveButtons;
+
                 }
                 else if (o.opt_filename != null)
                 {
-                    //Do nothing, PLOT ... FILE=...;
+                    type = EPlotType.PlotStatementWithFile;
                 }
                 else
                 {
-                    //PLOT ...;
-                    //When shown in WindowPlot, we need to set the size
-                    decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
+                    type = EPlotType.PlotStatement;
                 }
+            }
+                        
+            SvgScaling(o, containerExplode, plotHelper, zoomDpi, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor, ref key2);
+
+            if (type == EPlotType.PlotStatement || type == EPlotType.Decomp)
+            {
+                decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
@@ -545,7 +527,7 @@ namespace Gekko
             }
             else if (G.Equal(extension, "svg"))
             {
-                fontfactor = 1.4d / 1.2d * decompFontFactor;
+                fontfactor = 1.4d / 1.2d * decompSvgFontFactor;
             }
             else if (G.Equal(extension, "png"))
             {
@@ -869,6 +851,47 @@ namespace Gekko
                 }
             }
             return plotFileName;
+        }
+
+        private static void SvgScaling(O.Prt o, List<O.Prt.Element> containerExplode, PlotHelper plotHelper, double zoomDpi, double fontScaling, double sizeScaling, EPlotType type, ref int decompSvgOverallWidth, ref int decompSvgOverallHeight, ref double decompSvgFontFactor, ref string key2)
+        {
+            if (type == EPlotType.Decomp)
+            {
+                //See below, similar code
+                //Seems zoom can only be done "manually", altering the gnuplot svg file.         
+                double d = 0.9;  //overall size of canvas, relative to 600x480                
+                decompSvgFontFactor = d * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
+                int n = containerExplode.Count;
+                int maxLength = 0;
+                foreach (var xx in containerExplode)
+                {
+                    maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
+                }
+                int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //heuristic not working good, 1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
+                if (plotHelper.decompPlotCallNumber == 1) columns = Math.Max(1, plotHelper.decompPlotNumberOfKeyColumns); //works better! And probably will never become 0.
+                double widthProxyNumberOfChars = columns * (14 + maxLength);  //14 is chars                    
+                double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
+                decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
+                if (plotHelper.decompPlotCallNumber == 0) decompSvgOverallWidth *= 100;  //room for lots of labels in cols...
+                decompSvgOverallHeight = (int)(480d * d);
+                key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
+            }
+            else if (type == EPlotType.PlotStatement || type == EPlotType.PlotStatementWithFile || type == EPlotType.SaveButtons)  //using svg for PLOT
+            {
+                //See above, similar code                
+
+                if (type == EPlotType.PlotStatementWithFile)
+                {
+                    //PLOT ... FILE=...;  --> like this it ends up like type == EPlotType.SaveButtons
+                    fontScaling = Globals.guiPlotFontScaling;
+                    sizeScaling = Globals.guiPlotSizeScaling;
+                }
+
+                double d = 1.1d * fontScaling;  //overall size of canvas, relative to 600x480                
+                decompSvgFontFactor = d / 1.27d * sizeScaling * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+                decompSvgOverallWidth = (int)(600d * d * zoomDpi);
+                decompSvgOverallHeight = (int)(480d * d * zoomDpi);
+            }
         }
 
         /// <summary>
