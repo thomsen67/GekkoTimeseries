@@ -15,6 +15,7 @@ namespace Gekko
         public double fontScaling = 1d;
         public double sizeScaling = 1d;
         public bool isRefreshing = false;
+        public bool isButton = false;
 
         public RefreshHelper Clone()
         {
@@ -311,6 +312,7 @@ namespace Gekko
             refresh.fontScaling = fontScaling;
             refresh.sizeScaling = sizeScaling;
             refresh.isRefreshing = true;  //so we do not get a new plot window
+            refresh.isButton = true;
             string plotName = Refresh(new GraphHelper(refresh), false);
             return plotName;
         }

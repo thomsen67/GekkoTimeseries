@@ -249,7 +249,7 @@ namespace Gekko
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
         public static string localTempFilesLocationGnuplot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot";
         public static double guiPlotFontScaling = 0.694d;
-        public static double guiPlotSizeScaling = 0.9d;
+        public static double guiPlotSizeScaling = 0.9d;        
 
         public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
         public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter

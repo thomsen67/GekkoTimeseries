@@ -48,6 +48,7 @@ namespace Gekko
         public double fontScaling = 1d;
         public double sizeScaling = 1d;
         public bool? isIndex = null;
+        public bool isButton = false;
         public GraphHelper()
         {
         }
@@ -64,6 +65,7 @@ namespace Gekko
             this.fontScaling = refresh.fontScaling;
             this.sizeScaling=refresh.sizeScaling;
             this.isIndex = refresh.isIndex;
+            this.isButton = refresh.isButton;
         }        
     }
 

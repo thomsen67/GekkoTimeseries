@@ -120,12 +120,33 @@ namespace Gekko
             else if (Program.options.bugfix_plot)  //using svg for PLOT
             {
                 //See above, similar code
-                double d = 1.1d * o.guiGraphSizeScaling;  //overall size of canvas, relative to 600x480
-                decompFontFactor = d / 1.27d * o.guiGraphFontScaling * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+
+                double x1 = o.guiGraphSizeScaling;
+                double x2 = o.guiGraphFontScaling;
+
+                if (o.opt_filename != null)
+                {
+                    //PLOT ... FILE=...;
+                    x1 = Globals.guiPlotFontScaling;
+                    x2 = Globals.guiPlotSizeScaling;
+                }
+
+                double d = 1.1d * x1;  //overall size of canvas, relative to 600x480
+                decompFontFactor = d / 1.27d * x2 * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
-                if (o.guiGraphFontScaling == 1d && o.guiGraphSizeScaling == 1d)
+
+                if (o.guiGraphIsButton)
                 {
+                    //Do nothing, 3 Save+Copy buttons
+                }
+                else if (o.opt_filename != null)
+                {
+                    //Do nothing, PLOT ... FILE=...;
+                }
+                else
+                {
+                    //PLOT ...;
                     //When shown in WindowPlot, we need to set the size
                     decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
                 }
