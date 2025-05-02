@@ -53,8 +53,8 @@ namespace Gekko
 
             double zoomDpi = ZoomDpi(plotHelper.isDecompPlot);
 
-            int decompSvgOverallWidth = 0;
-            int decompSvgOverallHeight = 0;
+            double decompSvgOverallWidth = 0;
+            double decompSvgOverallHeight = 0;
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -129,17 +129,17 @@ namespace Gekko
 
             SvgScaling(o, containerExplode, plotHelper, zoomDpi, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor);
 
-            if (type == EPlotType.PlotStatement)
-            {
-                decompSvgOverallWidth = 660;  //440
-                decompSvgOverallHeight = 528;  //352
-                decompSvgFontFactor = 1.068;   //1.068
-            }
+            //if (type == EPlotType.PlotStatement)
+            //{
+            //    decompSvgOverallWidth = 660;  //440
+            //    decompSvgOverallHeight = 528;  //352
+            //    decompSvgFontFactor = 1.068;   //1.068
+            //}
 
             if (type == EPlotType.PlotStatement || type == EPlotType.Decomp)
             {                
                 //Must set this, because of .NET component
-                decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
+                decompSvgSize = " size " + (int)decompSvgOverallWidth + ", " + (int)decompSvgOverallHeight;
                 if (type == EPlotType.Decomp) key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
             else
@@ -855,16 +855,16 @@ namespace Gekko
             return plotFileName;
         }
 
-        private static void SvgFix(double zoomDpi, int decompSvgOverallWidth, int decompSvgOverallHeight, string plotFileName)
+        private static void SvgFix(double zoomDpi, double decompSvgOverallWidth, double decompSvgOverallHeight, string plotFileName)
         {
             if (zoomDpi < 0.999 || zoomDpi > 1.001)
             {
-                int w2 = (int)(((double)decompSvgOverallWidth) * zoomDpi); //
-                int h2 = (int)(((double)decompSvgOverallHeight) * zoomDpi);
+                double w2 = decompSvgOverallWidth * zoomDpi; //
+                double h2 = decompSvgOverallHeight * zoomDpi;
                 string s = Program.GetTextFromFileWithWait(plotFileName);
                 //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
-                s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
-                s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
+                s = G.ReplaceFirstOccurrence(s, "width=\"" + (int)decompSvgOverallWidth + "\"", "width=\"" + (int)w2 + "\"");
+                s = G.ReplaceFirstOccurrence(s, "height=\"" + (int)decompSvgOverallHeight + "\"", "height=\"" + (int)h2 + "\"");
                 using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
@@ -874,7 +874,7 @@ namespace Gekko
             }
         }
 
-        private static void SvgScaling(O.Prt o, List<O.Prt.Element> containerExplode, PlotHelper plotHelper, double zoomDpi, double fontScaling, double sizeScaling, EPlotType type, ref int decompSvgOverallWidth, ref int decompSvgOverallHeight, ref double decompSvgFontFactor)
+        private static void SvgScaling(O.Prt o, List<O.Prt.Element> containerExplode, PlotHelper plotHelper, double zoomDpi, double fontScaling, double sizeScaling, EPlotType type, ref double decompSvgOverallWidth, ref double decompSvgOverallHeight, ref double decompSvgFontFactor)
         {
             if (type == EPlotType.Decomp)
             {
@@ -892,9 +892,9 @@ namespace Gekko
                 if (plotHelper.decompPlotCallNumber == 1) columns = Math.Max(1, plotHelper.decompPlotNumberOfKeyColumns); //works better! And probably will never become 0.
                 double widthProxyNumberOfChars = columns * (14 + maxLength);  //14 is chars                    
                 double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
-                decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
+                decompSvgOverallWidth = 600d * d * widthAdjFactor;
                 if (plotHelper.decompPlotCallNumber == 0) decompSvgOverallWidth *= 100;  //room for lots of labels in cols...
-                decompSvgOverallHeight = (int)(480d * d);                
+                decompSvgOverallHeight = 480d * d;                
             }
             else if (type == EPlotType.PlotStatement || type == EPlotType.PlotStatementWithFile || type == EPlotType.SaveButtons)  //using svg for PLOT
             {
@@ -909,8 +909,16 @@ namespace Gekko
 
                 double d = 1.1d * fontScaling;  //overall size of canvas, relative to 600x480                
                 decompSvgFontFactor = d / 1.27d * sizeScaling * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
-                decompSvgOverallWidth = (int)(600d * d * zoomDpi);
-                decompSvgOverallHeight = (int)(480d * d * zoomDpi);
+                if (type == EPlotType.PlotStatement)
+                {
+                    decompSvgOverallWidth = 600d * d;
+                    decompSvgOverallHeight = 480d * d;
+                }
+                else
+                {
+                    decompSvgOverallWidth = 600d * d * zoomDpi;
+                    decompSvgOverallHeight = 480d * d * zoomDpi;
+                }
             }
         }
 
