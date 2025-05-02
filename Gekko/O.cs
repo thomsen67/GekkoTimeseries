@@ -9777,6 +9777,7 @@ namespace Gekko
                 public double scale = 1d;
                 public string format = null;
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
+                public string opt_yoy = "no";
                 public void Exe() {
                     G.CheckLegalPeriod(this.t1, this.t2);
                     O.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.operator2, this.scale, this.format);

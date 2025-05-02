@@ -6324,7 +6324,8 @@ namespace Gekko
                         if (G.StartsWith(s, "res_")) continue;  //do not show residuals
                         if (s.StartsWith("x_temp1")) continue;  //cf. gekko_equations.py
                         if (s.StartsWith("x_temp2")) continue;  //cf. gekko_equations.py
-                        sw.WriteLine(s);
+                        string label = "'" + Helper_GetLabel(s) + "'";
+                        sw.WriteLine(s + G.Blanks(50 - s.Length) + " " + label);
                     }
                 }
 
@@ -6338,15 +6339,34 @@ namespace Gekko
                         if (!eq.Contains(t.ToString() + "]")) continue;
                         if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
                         if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
-                        string eqText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, t);
-                        sw.WriteLine(eqText);
+                        Tuple<string, string, string> two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, t);
+                        string eqText = two.Item1 + " .. " + two.Item2;                                                
+                        string lhs = "[unknown]";
+                        if (two.Item3 != null) lhs = G.Replace(two.Item3, "res_", "", StringComparison.OrdinalIgnoreCase, 1);
+                        string label = null;
+                        if (lhs != "[unknown]") label = "'" + Helper_GetLabel(lhs) + "'";
                         sw.WriteLine();
+                        string s2 = lhs + " from " + two.Item1;
+                        sw.WriteLine(s2);
+                        sw.WriteLine(label);
+                        sw.WriteLine();
+                        sw.WriteLine(two.Item2);
+                        sw.WriteLine();
+                        sw.WriteLine(" ------------------------------------------------------------------------------- ");                        
                     }
                 }
                 zipper.ZipAndCleanup();
                 new Writeln("Created info.zip with vars.txt and eqs.txt inside. Equations are from the year " + t.ToString());
             }
             else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");
+        }
+
+        private static string Helper_GetLabel(string s)
+        {
+            Series ts = O.GetIVariableFromString(G.Chop_AddFreq(s, Program.options.freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+            string label = null;
+            if (ts != null) label = ts.MetaGetLabel();
+            return label;
         }
 
         //3 problems: "eval" is used in old decomp that overrides. Function works, but does not pass P object in the right way.

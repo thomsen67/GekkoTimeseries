@@ -328,7 +328,7 @@ namespace Gekko
     public class EquationTextHelper
     {
         public bool showTime = false;
-        public bool showEq = true;
+        public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.
     }
 
     /// <summary>

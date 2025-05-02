@@ -15,66 +15,50 @@ namespace Gekko
             //[[commandStart]]0
             p.SetStack(@"¤1"); O.InitSmpl(smpl, p);
 
-            Func<GraphHelper, string> print0 = (gh) =>
+            O.Table.SetValues o0 = new O.Table.SetValues();
+            o0.name = O.ConvertToString((new ScalarString("xx")));
+            o0.col = O.ConvertToInt(i12);
+            o0.t1 = O.ConvertToDate(i13, O.GetDateChoices.Strict);
+            o0.t2 = O.ConvertToDate(i14, O.GetDateChoices.Strict);
+            o0.operator2 = O.ConvertToString(O.HandleString(new ScalarString(@"n")));
+            o0.scale = O.ConvertToVal(d15);
+            o0.format = O.ConvertToString(O.HandleString(new ScalarString(@"f10.3")));
+            try
             {
-                O.Prt o0 = new O.Prt();
-                labelCounter = 0; o0.guiGraphIsRefreshing = gh.isRefreshing;
-                o0.guiGraphOperator = gh.operator2;
-                o0.guiGraphIsLogTransform = gh.isLogTransform;
-                o0.guiGraphFontScaling = gh.fontScaling;
-                o0.guiGraphSizeScaling = gh.sizeScaling;
-                o0.prtType = "plot";
-                o0.opt_yoy = "yes";
-
-                o0.operators.Add(new OptString("p", O.ConvertToString(new ScalarString("yes"))));
-
-
-
-                if (gh.isIndex != null)
+                O.isTableCall = true;
                 {
-                    if (gh.isIndex == true) { o0.opt_i = GekkoTime.tNotNull; } else { o0.opt_i = GekkoTime.tNull; }
-                }
+                    List<int> bankNumbers = O.Prt.CreateBankHelper(1);
+                    O.Prt.Element ope0 = new O.Prt.Element();
+                    ope0.labelGiven = new List<string>() { "" };
+                    smpl = new GekkoSmpl(o0.t1, o0.t2); smpl.t0 = smpl.t0.Add(-2);
+                    if (o0.opt_yoy != null && o0.opt_yoy.ToLower() == Globals.yes) { smpl.t0 = smpl.t0.Add(-13); }
+                    bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>() { o0.operator2 });
 
-                if (gh.isYoy != null) { if (gh.isYoy == true) { o0.opt_yoy = "yes"; } else { o0.opt_yoy = "no"; } }
-
-                gh.period = "2001q1 2003";
-                O.GetPeriods2(o0, gh);
-
-                ESeriesMissing r1_0 = Program.options.series_array_print_missing; ESeriesMissing r2_0 = Program.options.series_array_calc_missing; ESeriesMissing r3_0 = Program.options.series_data_missing; try
-                {
-                    O.HandleOptionBankRef1(o0.opt_bank, o0.opt_ref); O.HandleMissing1(o0.opt_missing);
+                    for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
                     {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope0 = new O.Prt.Element();
-                        ope0.labelGiven = new List<string>() { "sir|[@6,13:15='sir',<1432>,1:13]|[@6,13:15='sir',<1432>,1:13]" };
-                        smpl = new GekkoSmpl(o0.t1, o0.t2); smpl.t0 = smpl.t0.Add(-2);
-                        if (o0.opt_yoy.ToLower() == Globals.yes) { smpl.t0 = smpl.t0.Add(-13); }
-                        ope0.operatorsFinal = Program.GetElementOperators(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.operatorsFinal);
-                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber = bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope0.variable[bankNumber] = O.Lookup(smpl, null, null, "sir", null, null, new LookupSettings(), EVariableType.Var, null);
-                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
-                        }
-                        smpl.bankNumber = 0;
-                        o0.prtElements.Add(ope0);
+                        int bankNumber = bankNumbers[bankNumberI];
+                        smpl.bankNumber = bankNumber;
+                        ope0.variable[bankNumber] = O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null);
+                        if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
                     }
-
-                    o0.printStorageAsFuncCounter = Globals.printStorageAsFunc.Count - 1;
-                    o0.Exe();
+                    smpl.bankNumber = 0;
+                    o0.prtElements.Add(ope0);
                 }
-                finally
-                {
-                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_0, r2_0, r3_0);
-                }
-                return o0.emfName;
-            };
-            Globals.printStorageAsFunc.Add(Globals.printStorageAsFunc.Count, print0);
-            print0(new GraphHelper());
+            }
+            finally
+            {
+                O.isTableCall = false;
+            }
+            o0.Exe();
 
             //[[commandEnd]]0
-        }        
+        }
+
+
+        public static readonly ScalarVal i12 = new ScalarVal(1d, 0);
+        public static readonly ScalarVal i13 = new ScalarVal(2000d, 0);
+        public static readonly ScalarVal i14 = new ScalarVal(2003d, 0);
+        public static readonly ScalarVal d15 = new ScalarVal(0.001d);
 
         public static void CodeLines(P p)
         {

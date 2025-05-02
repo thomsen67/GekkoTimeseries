@@ -253,10 +253,8 @@ namespace Gekko
                 if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
                 {
-                    string unfolded = this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0);
-                    int idx = unfolded.IndexOf("..");
-                    if (idx > -1) unfolded = unfolded.Substring(idx + "..".Length).Trim();
-                    rv.s_scalarModel += unfolded + G.NL;                    
+                    Tuple<string, string, string> two2 = this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0);                                       
+                    rv.s_scalarModel += two2.Item2 + G.NL;                    
                     if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else
@@ -1814,7 +1812,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public string GetEquationTextUnfolded(string name, EquationTextHelper helper, GekkoTime t0)
+        public Tuple<string, string, string> GetEquationTextUnfolded(string name, EquationTextHelper helper, GekkoTime t0)
         {
             //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
@@ -1832,7 +1830,7 @@ namespace Gekko
             int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
             if (eq == -12345)
             {
-                return "...equation '" + name + "' " + Globals.eqs6;
+                return new Tuple<string, string, string>(null, "...equation '" + name + "' " + Globals.eqs6, null);
             }
 
             //Beware of this: for a scalar-2000 model, time basis is always 2000.
@@ -1898,8 +1896,9 @@ namespace Gekko
                     }
                 }
             Lbl1b:;
-            }        
+            }
 
+            string resName = null;
             bool start = false;
             for (int i = 0; i < tokens.Count() - more; i++)
             {
@@ -1924,7 +1923,8 @@ namespace Gekko
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
                     if ((Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2) && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
                     string varname = this.GetVarNameA(i2);
-                    string varname2 = null;
+                    string varname2;
+                    if (G.StartsWith(varname, "res_")) resName = varname;
                     if (helper.showTime)
                     {
                         varname2 = G.Chop_DimensionAddLast(varname, gt.ToString());
@@ -1958,21 +1958,21 @@ namespace Gekko
                     sb.Append(tokens[i].ToString());
                 }                
             }
-            string sEq = null;
+
+            string rv1 = null;
             if (helper.showEq)
-            {
-                string name2 = name;
+            {                
                 if (helper.showTime)
                 {
                     //do nothing, time is already there
+                    rv1 = name;
                 }
                 else
                 {
-                    name2 = name.Replace("," + t0.ToString() + "]", "]");
+                    rv1 = name.Replace("," + t0.ToString() + "]", "]").Replace("[" + t0.ToString() + "]", "");
                 }
-                sEq = name2 + " .. ";
             }
-            return sEq + sb.ToString().Trim();
+            return new Tuple<string, string, string>(rv1, sb.ToString().Trim(), resName);
         }
 
         public string GamsModelDefinedString()

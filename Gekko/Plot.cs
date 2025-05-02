@@ -42,7 +42,7 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
-            double fontZoom = FontZoom(plotHelper.isDecompPlot);
+            double zoomDpi = ZoomDpi(plotHelper.isDecompPlot);
 
             int decompSvgOverallWidth = 0;
             int decompSvgOverallHeight = 0;
@@ -100,7 +100,7 @@ namespace Gekko
                 //See below, similar code
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 0.9;  //overall size of canvas, relative to 600x480                
-                decompFontFactor = d * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
+                decompFontFactor = d * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
                 int n = containerExplode.Count;
                 int maxLength = 0;
                 foreach (var xx in containerExplode)
@@ -117,11 +117,11 @@ namespace Gekko
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
                 key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
-            else if (Program.options.bugfix_plot)
+            else if (Program.options.bugfix_plot)  //using svg for PLOT
             {
                 //See above, similar code
                 double d = 1.1d * o.guiGraphSizeScaling;  //overall size of canvas, relative to 600x480
-                decompFontFactor = d / 1.27d * o.guiGraphFontScaling * Globals.guiDecompPlotFontSize * fontZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
+                decompFontFactor = d / 1.27d * o.guiGraphFontScaling * Globals.guiDecompPlotFontSize * zoomDpi; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!                
                 decompSvgOverallWidth = (int)(600d * d);
                 decompSvgOverallHeight = (int)(480d * d);
                 if (o.guiGraphFontScaling == 1d && o.guiGraphSizeScaling == 1d)
@@ -825,10 +825,10 @@ namespace Gekko
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
                     {
-                        if (fontZoom < 0.999 || fontZoom > 1.001)
+                        if (zoomDpi < 0.999 || zoomDpi > 1.001)
                         {
-                            int w2 = (int)(((double)decompSvgOverallWidth) * fontZoom); //
-                            int h2 = (int)(((double)decompSvgOverallHeight) * fontZoom);
+                            int w2 = (int)(((double)decompSvgOverallWidth) * zoomDpi); //
+                            int h2 = (int)(((double)decompSvgOverallHeight) * zoomDpi);
                             string s = Program.GetTextFromFileWithWait(plotFileName);
                             //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
                             s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
@@ -853,10 +853,11 @@ namespace Gekko
         /// <summary>
         /// This scales the fonts of the WPF. Problem is that the C# control showing the svg is kind of
         /// broken/old, so tweaking using screen dpi is necessary. This scaling is relative to 150 dpi screen,
-        /// so returns 1 on such a screen. To make neutral, use 1/1.50 instead of 1.
-        /// </summary>
-        /// <returns></returns>
-        private static double FontZoom(bool isDecomp)
+        /// so returns 1 on such a screen.
+        /// Here, options.plot_zoom_general affects this, and on top, options.plot_zoom_decomp is relative to that (if decomp).
+        /// If both of these options are 100, the metod always returns 1 for a 150 dpi screen.        
+        /// </summary>        
+        private static double ZoomDpi(bool isDecomp)
         {
             //Problem with zoom etc. is that it appears that
             //WPF Webbrowser does not scale svg image inside it
@@ -885,7 +886,7 @@ namespace Gekko
                 if (windowsDpiScaling2 < 50) windowsDpiScaling2 = 50;
                 else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
             }
-            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.
+            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.            
             double overallZoom = ((double)Program.options.plot_zoom_general / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
             if (isDecomp) overallZoom *= ((double)Program.options.plot_zoom_decomp / 100d);
             return overallZoom;
