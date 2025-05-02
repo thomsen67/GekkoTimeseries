@@ -127,13 +127,28 @@ namespace Gekko
                 }
             }
                         
-            SvgScaling(o, containerExplode, plotHelper, zoomDpi, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor, ref key2);
+            SvgScaling(o, containerExplode, plotHelper, zoomDpi, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor);
+
+            //if (type == EPlotType.PlotStatement)
+            //{
+            //    decompSvgOverallWidth = 903;
+            //    decompSvgOverallHeight = 432;
+            //    decompSvgFontFactor = 1.11;
+            //}
 
             if (type == EPlotType.PlotStatement || type == EPlotType.Decomp)
-            {
+            {                
+                //Must set this, because of .NET component
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
+                if (type == EPlotType.Decomp) key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
-
+            else
+            {
+                //Just to signal they are not used
+                decompSvgOverallWidth = -12345;
+                decompSvgOverallHeight = -12345;
+            }
+             
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
             if (count == 0)
@@ -824,36 +839,42 @@ namespace Gekko
             {
                 plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, 1);  //1 minute before abort
 
-                if (plotHelper.isDecompPlot)
+                if (type == EPlotType.Decomp)
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
                     {
-                        if (zoomDpi < 0.999 || zoomDpi > 1.001)
-                        {
-                            int w2 = (int)(((double)decompSvgOverallWidth) * zoomDpi); //
-                            int h2 = (int)(((double)decompSvgOverallHeight) * zoomDpi);
-                            string s = Program.GetTextFromFileWithWait(plotFileName);
-                            //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
-                            s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
-                            s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
-                            using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
-                            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                            {
-                                sw.Write(s);
-                                sw.Flush();
-                            }
-                        }
+                        SvgFix(zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     }
                 }
                 else
                 {
+                    SvgFix(zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
                 }
             }
             return plotFileName;
         }
 
-        private static void SvgScaling(O.Prt o, List<O.Prt.Element> containerExplode, PlotHelper plotHelper, double zoomDpi, double fontScaling, double sizeScaling, EPlotType type, ref int decompSvgOverallWidth, ref int decompSvgOverallHeight, ref double decompSvgFontFactor, ref string key2)
+        private static void SvgFix(double zoomDpi, int decompSvgOverallWidth, int decompSvgOverallHeight, string plotFileName)
+        {
+            if (zoomDpi < 0.999 || zoomDpi > 1.001)
+            {
+                int w2 = (int)(((double)decompSvgOverallWidth) * zoomDpi); //
+                int h2 = (int)(((double)decompSvgOverallHeight) * zoomDpi);
+                string s = Program.GetTextFromFileWithWait(plotFileName);
+                //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
+                s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
+                s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
+                using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(s);
+                    sw.Flush();
+                }
+            }
+        }
+
+        private static void SvgScaling(O.Prt o, List<O.Prt.Element> containerExplode, PlotHelper plotHelper, double zoomDpi, double fontScaling, double sizeScaling, EPlotType type, ref int decompSvgOverallWidth, ref int decompSvgOverallHeight, ref double decompSvgFontFactor)
         {
             if (type == EPlotType.Decomp)
             {
@@ -873,8 +894,7 @@ namespace Gekko
                 double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
                 decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
                 if (plotHelper.decompPlotCallNumber == 0) decompSvgOverallWidth *= 100;  //room for lots of labels in cols...
-                decompSvgOverallHeight = (int)(480d * d);
-                key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
+                decompSvgOverallHeight = (int)(480d * d);                
             }
             else if (type == EPlotType.PlotStatement || type == EPlotType.PlotStatementWithFile || type == EPlotType.SaveButtons)  //using svg for PLOT
             {
