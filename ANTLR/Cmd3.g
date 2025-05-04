@@ -320,6 +320,14 @@ ASTCOMPARE2;
     ASTCREATEQUESTION;
     ASTCURLY;
     ASTCURLYSIMPLE;
+    ASTAN;
+    ASTAD;
+    ASTAP;
+    ASTADP;
+    ASTA3N;
+    ASTA3D;
+    ASTA3P;
+    ASTA3DP;
     ASTD;
     ASTDATA;
     ASTDATAADVANCED;
@@ -1168,7 +1176,14 @@ Y2                    = 'Y2'                       ;
     FILE             = 'FILE'            ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
-    FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+    FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    A3DP = 'A3DP';
+    A3 = 'A3';
+    ADP = 'ADP';
+    A3P = 'A3P';
+    AD = 'AD';
+    AP = 'AP';
+    A3D = 'A3D';
     YOY      = 'YOY'     ;
 	EXPAND = 'EXPAND';
 	VARIABLECODE = 'VARIABLECODE';
@@ -1823,7 +1838,14 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
-										d.Add("findmissingdata"               , FINDMISSINGDATA  );										
+										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("A3DP", A3DP);
+                                        d.Add("A3", A3);
+                                        d.Add("ADP", ADP);
+                                        d.Add("A3P", A3P);
+                                        d.Add("AD", AD);
+                                        d.Add("AP", AP);
+                                        d.Add("A3D", A3D);
                                         d.Add("yoy"               , YOY  );		
 										d.Add("expand"   , EXPAND     );
 										d.Add("view", VIEW);
@@ -3604,22 +3626,29 @@ prtOptCollapseHelper:       AVG -> ASTAVG
 						  | expression -> expression						
 						    ;
 opt2:                       optNew | optOld;							
-optOld:                     N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES))
-                   
+optOld:                     N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES))                   
 						  | D    ('=' yesNo -> ^(ASTD yesNo) | -> ^(ASTD  ASTYES))
-						  | P    ('=' yesNo -> ^(ASTP yesNo) | -> ^(ASTP  ASTYES))
-					
+						  | P    ('=' yesNo -> ^(ASTP yesNo) | -> ^(ASTP  ASTYES))					
 						  | DP    ('=' yesNo -> ^(ASTDP yesNo) | -> ^(ASTDP  ASTYES))
 						  | R    ('=' yesNo -> ^(ASTS yesNo) | -> ^(ASTS  ASTYES))
-						  | RN    ('=' yesNo -> ^(ASTSN yesNo) | -> ^(ASTSN  ASTYES))
-					
+						  | RN    ('=' yesNo -> ^(ASTSN yesNo) | -> ^(ASTSN  ASTYES))					
 						  | RD    ('=' yesNo -> ^(ASTSD yesNo) | -> ^(ASTSD  ASTYES))
-						  | RP    ('=' yesNo -> ^(ASTSP yesNo) | -> ^(ASTSP  ASTYES))
-					
+						  | RP    ('=' yesNo -> ^(ASTSP yesNo) | -> ^(ASTSP  ASTYES))					
 						  | RDP    ('=' yesNo -> ^(ASTSDP yesNo) | -> ^(ASTSDP  ASTYES))
 						  | M    ('=' yesNo -> ^(ASTM yesNo) | -> ^(ASTM  ASTYES))
 						  | Q    ('=' yesNo -> ^(ASTQ yesNo) | -> ^(ASTQ  ASTYES))
 						  | MP    ('=' yesNo -> ^(ASTMP yesNo) | -> ^(ASTMP  ASTYES))
+
+                          | A    ('=' yesNo -> ^(ASTAN yesNo) | -> ^(ASTAN ASTYES))
+                          | AD    ('=' yesNo -> ^(ASTAD yesNo) | -> ^(ASTAD  ASTYES))
+                          | AP    ('=' yesNo -> ^(ASTAP yesNo) | -> ^(ASTAP  ASTYES))
+                          | ADP    ('=' yesNo -> ^(ASTADP yesNo) | -> ^(ASTADP  ASTYES))
+
+                          | A3    ('=' yesNo -> ^(ASTA3N yesNo) | -> ^(ASTA3N ASTYES))
+                          | A3D    ('=' yesNo -> ^(ASTA3D yesNo) | -> ^(ASTA3D  ASTYES))
+                          | A3P    ('=' yesNo -> ^(ASTA3P yesNo) | -> ^(ASTA3P  ASTYES))
+                          | A3DP    ('=' yesNo -> ^(ASTA3DP yesNo) | -> ^(ASTA3DP  ASTYES))
+
 						  ;
 
 
@@ -4334,6 +4363,13 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  A3DP|
+  A3|
+  ADP|
+  A3P|
+  AD|
+  AP|
+  A3D|
   YOY|
   CLOSEALL|
   VIEW|

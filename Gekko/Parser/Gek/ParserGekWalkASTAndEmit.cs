@@ -3402,6 +3402,56 @@ namespace Gekko.Parser.Gek
                     }
                     break;
 
+
+
+
+
+                case "ASTAN":
+                    {
+                        node.Code.A(AddOperator("an", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTAD":
+                    {
+                        node.Code.A(AddOperator("ad", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTAP":
+                    {
+                        node.Code.A(AddOperator("ap", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTADP":
+                    {
+                        node.Code.A(AddOperator("adp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTA3N":
+                    {
+                        node.Code.A(AddOperator("a3n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTA3D":
+                    {
+                        node.Code.A(AddOperator("a3d", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTA3P":
+                    {
+                        node.Code.A(AddOperator("a3p", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTA3DP":
+                    {
+                        node.Code.A(AddOperator("a3dp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+
+
+
+
+
+
                 case "ASTASSIGNMENT":
                     {
                         if (node[0].Text == "ASTASSIGNMENTQUESTION")
@@ -4519,7 +4569,7 @@ ASTPLACEHOLDER [0]
 
                         if (node.Text == "ASTPRTELEMENT")
                         {
-                            node.Code.A("ope" + Num(node) + ".operatorsFinal = Program.GetElementOperators(o" + Num(node) + ", ope" + Num(node) + ");");
+                            node.Code.A("Program.GetElementOperators(o" + Num(node) + ", ope" + Num(node) + ", out ope" + Num(node) + ".operatorsFinal, out ope" + Num(node) + ".operatorsFinalAll);");
                             node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, ope" + Num(node) + ".operatorsFinal);");
                         }
                         else if (node.Text == "ASTTABLESETVALUESELEMENT")

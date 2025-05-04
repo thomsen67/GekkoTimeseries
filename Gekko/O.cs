@@ -10451,6 +10451,7 @@ namespace Gekko
                 //-- layout
                 public List<OptString> operators = new List<OptString>();
                 public List<string> operatorsFinal = null;
+                public List<int> operatorsFinalAll = null;
                 public string operatorFinal = null;
                 public int width = -12345;
                 public int dec = -12345;

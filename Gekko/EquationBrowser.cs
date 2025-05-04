@@ -1640,7 +1640,7 @@ img {border-style: none;
                         O.Prt.Element ope0 = new O.Prt.Element();
                         ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
                         ope0.labelRecordedPieces = new List<O.RecordedPieces>();
-                        ope0.operatorsFinal = Program.GetElementOperators(o0, ope0);
+                        Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
                         ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
                         o0.prtElements.Add(ope0);
                         o0.Exe();

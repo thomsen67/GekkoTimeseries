@@ -27733,25 +27733,7 @@ namespace Gekko
             else if (((Series)iv).freq == EFreq.Q) freqs["Q"] = true;
             else if (((Series)iv).freq == EFreq.M) freqs["M"] = true;
         }
-
-
-        private static bool HasIdenticalCodes(O.Prt o)
-        {
-            //a bit costly method, and the loop here is looped again later on, but this is not speed critical.
-            bool identicalCodes = false;
-            GekkoDictionary<string, string> temp = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
-            {
-                List<string> operators = GetElementOperators(o, pe);
-                foreach (string s in operators)
-                {
-                    if (!temp.ContainsKey(s)) temp.Add(s, "");
-                }
-            }
-            if (temp.Count == 1) identicalCodes = true;
-            return identicalCodes;
-        }
-
+        
 
         private static double CalculateAveragesForPrint(string operator2, List<double> filterMemoryValues, EPrtCollapseTypes collapse, int n)
         {
@@ -27823,9 +27805,10 @@ namespace Gekko
             return rv;
         }
 
-        public static List<string> GetElementOperators(O.Prt o, O.Prt.Element ope)
+        public static void GetElementOperators(O.Prt o, O.Prt.Element ope, out List<string> operators, out List<int>operatorsAll)
         {
-            List<string> operators = new List<string>();
+            operators = new List<string>();
+            operatorsAll = new List<int>();
             if (o.guiGraphOperator != null)
             {
                 operators.Add(o.guiGraphOperator);
@@ -27875,7 +27858,19 @@ namespace Gekko
                 }
                 operators = PrintGetOperatorsOLD(isMulprt, operators, isGraph, isSheet);
             }
-            return operators;
+            for (int i = 0; i < operators.Count; i++)
+            {
+                string[] ss = operators[i].Split('¤');
+                if (ss.Length > 1)
+                {
+                    operators[i] = ss[1];
+                    operatorsAll.Add(int.Parse(ss[0])); //<a> type
+                }
+                else
+                {
+                    operatorsAll.Add(0); //normal
+                }
+            }
         }
 
         private static List<string> GetSuperOperators(O.Prt o)
@@ -28065,6 +28060,11 @@ namespace Gekko
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             mul_gdif = false;
                         }
+                        else if (Globals.operators_a.Contains(operator2))
+                        {
+                            new Error("You cannot combine MULPRT with operators " + Stringlist.GetListWithCommas(Globals.operators_a, " "));
+                        }
+
                     }
                     else  //normal PRT
                     {
@@ -28107,7 +28107,7 @@ namespace Gekko
                         {
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             gdif = false;
-                        }
+                        }                        
                     }
                 }
                 if (isMulprt)
@@ -28141,7 +28141,53 @@ namespace Gekko
                 }
                 else
                 {
-                    operatorsNew = operators;  //point to same object
+                    operatorsNew = new List<string>();
+                    foreach (string operator2 in operators)
+                    {
+                        if (Globals.operators_a.Contains(operator2))
+                        {
+                            if (operator2 == Globals.operator_an)
+                            {
+                                operatorsNew.Add("1¤n");
+                                operatorsNew.Add("2¤rn");
+                            }
+                            else if (operator2 == Globals.operator_ad)
+                            {
+                                operatorsNew.Add("1¤d");
+                                operatorsNew.Add("2¤rd");
+                            }
+                            else if (operator2 == Globals.operator_ap)
+                            {
+                                operatorsNew.Add("1¤p");
+                                operatorsNew.Add("2¤rp");
+                            }
+                            else if (operator2 == Globals.operator_adp)
+                            {
+                                operatorsNew.Add("1¤dp");
+                                operatorsNew.Add("2¤rdp");
+                            }
+                            else if (operator2 == Globals.operator_a3n)
+                            {
+                                new Error("Operators a3... not implemented yet");
+                            }
+                            else if (operator2 == Globals.operator_a3d)
+                            {
+                                new Error("Operators a3... not implemented yet");
+                            }
+                            else if (operator2 == Globals.operator_a3p)
+                            {
+                                new Error("Operators a3... not implemented yet");
+                            }
+                            else if (operator2 == Globals.operator_a3dp)
+                            {
+                                new Error("Operators a3... not implemented yet");
+                            }
+                        }
+                        else
+                        {                            
+                            operatorsNew.Add(operator2);
+                        }
+                    }
                 }
             }
             return operatorsNew;
@@ -28258,29 +28304,6 @@ namespace Gekko
             }
         }
 
-
-
-        private static bool HasIdenticalCodes(List<string> graphVars, PrtHelper ph)
-        {
-            bool identicalCodes = true;
-            for (int varI = 0; varI < graphVars.Count; varI++)  //varI 0-based
-            {
-                if (ph.elementOptions[varI] != null)
-                {
-                    identicalCodes = false;
-                    break;
-                }
-            }
-            if (ph.operators.Count > 1) identicalCodes = false;
-            if (ph.operators.Count == 1)
-            {
-                string s = ph.operators[0];
-                if (IsOperatorLongAppend(s)) identicalCodes = false;
-                if (IsOperatorLongNo(s)) identicalCodes = false;
-            }
-            return identicalCodes;
-        }
-
         private static bool HasIdenticalCodesNew(List<Series> graphVars, PrtHelper ph)
         {
             bool identicalCodes = true;
@@ -28379,7 +28402,10 @@ namespace Gekko
 
         public static bool IsOperatorShort(string operator2)
         {
-            return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp") || G.Equal(operator2, Globals.operator_l) || G.Equal(operator2, Globals.operator_dl) || G.Equal(operator2, Globals.operator_rl) || G.Equal(operator2, Globals.operator_rdl);
+            return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp") || G.Equal(operator2, Globals.operator_l) || G.Equal(operator2, Globals.operator_dl) || G.Equal(operator2, Globals.operator_rl) || G.Equal(operator2, Globals.operator_rdl)
+                || G.Equal(operator2, Globals.operator_an) || G.Equal(operator2, Globals.operator_ad) || G.Equal(operator2, Globals.operator_ap) || G.Equal(operator2, Globals.operator_adp)
+                || G.Equal(operator2, Globals.operator_a3n) || G.Equal(operator2, Globals.operator_a3d) || G.Equal(operator2, Globals.operator_a3p) || G.Equal(operator2, Globals.operator_a3dp)
+                ;
         }
 
         public static bool IsOperatorShortMultiplier(string operator2)
