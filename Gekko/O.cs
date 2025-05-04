@@ -10453,6 +10453,7 @@ namespace Gekko
                 public List<string> operatorsFinal = null;
                 public List<int> operatorsFinalAll = null;
                 public string operatorFinal = null;
+                public int operatorFinalAll = -12345;
                 public int width = -12345;
                 public int dec = -12345;
                 public int nwidth = -12345;

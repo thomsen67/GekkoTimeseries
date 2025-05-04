@@ -234,6 +234,7 @@ namespace Gekko
                         }
 
                         explodeElement.operatorFinal = operator2;
+                        explodeElement.operatorFinalAll = element.operatorsFinalAll[iOperator];
 
                         // ----------------------------------------------------
                         // Labels start
