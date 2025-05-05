@@ -2,7 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:jas="clr-namespace:Gekko"    
-    Title="Gekko plot" HorizontalAlignment="Left" Height="517" Width="560" Left="0" Top="0" Closing="Window_Closing">
+    Title="Gekko plot" HorizontalAlignment="Left" Height="542" Width="590" Left="0" Top="0" Closing="Window_Closing">
 
     <Window.InputBindings>
         <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
@@ -14,7 +14,7 @@
     </Window.CommandBindings>
 
     <StackPanel Orientation="Vertical">        
-        <Grid Name="grid0" Height="122" Width="700" ShowGridLines="False" Margin="0,5,0,0"  DockPanel.Dock="Top">
+        <Grid Name="grid0" Height="122" Width="700" ShowGridLines="False" Margin="10,10,0,0"  DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="105" />
@@ -44,7 +44,7 @@
             </StackPanel>
             
             <DockPanel Grid.ColumnSpan="3" Grid.Row="1" Grid.Column="3">
-                <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="-20,0,0,0" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>            
 
             <DockPanel Grid.Row="2" Grid.Column="1">
@@ -115,7 +115,7 @@
             </DockPanel>
 
             <DockPanel Grid.ColumnSpan="2" Grid.Row="1" Grid.Column="8">
-                <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Multiplier</TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="-5,0,0,0" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Multiplier</TextBlock>
             </DockPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="3" HorizontalAlignment="Left" Orientation="Horizontal">
@@ -220,10 +220,10 @@
 
         <StackPanel Orientation="Horizontal">
             <Border Height="360" Width="450">
-            <WebBrowser Name="webBrowser"  HorizontalAlignment="Left" Margin="10,0,0,0"/>
+            <WebBrowser Name="webBrowser"  HorizontalAlignment="Left" Margin="10,5,0,0"/>
             </Border>
 
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
 
                 <TextBox Name="TextBox_period" Width="75" Height="17" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Change time period (press the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
                 
