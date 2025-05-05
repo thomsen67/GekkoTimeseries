@@ -28175,6 +28175,16 @@ namespace Gekko
                         operatorsNew.Add("1¤dp");
                         operatorsNew.Add("2¤rdp");
                     }
+                    else if (operator2 == Globals.operator_al)
+                    {
+                        operatorsNew.Add("1¤l");
+                        operatorsNew.Add("2¤rl");
+                    }
+                    else if (operator2 == Globals.operator_adl)
+                    {
+                        operatorsNew.Add("1¤dl");
+                        operatorsNew.Add("2¤rdl");
+                    }
                     else if (operator2 == Globals.operator_a3n)
                     {
                         new Error("Operators a3... not implemented yet");
@@ -28413,6 +28423,10 @@ namespace Gekko
             return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp") || G.Equal(operator2, Globals.operator_l) || G.Equal(operator2, Globals.operator_dl) || G.Equal(operator2, Globals.operator_rl) || G.Equal(operator2, Globals.operator_rdl)
                 || G.Equal(operator2, Globals.operator_an) || G.Equal(operator2, Globals.operator_ad) || G.Equal(operator2, Globals.operator_ap) || G.Equal(operator2, Globals.operator_adp)
                 || G.Equal(operator2, Globals.operator_a3n) || G.Equal(operator2, Globals.operator_a3d) || G.Equal(operator2, Globals.operator_a3p) || G.Equal(operator2, Globals.operator_a3dp)
+
+                || G.Equal(operator2, Globals.operator_al) || G.Equal(operator2, Globals.operator_adl) || G.Equal(operator2, Globals.operator_a3l) || G.Equal(operator2, Globals.operator_a3dl)
+
+
                 ;
         }
 

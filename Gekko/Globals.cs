@@ -467,11 +467,16 @@ namespace Gekko
         public const string operator_ad = "ad";
         public const string operator_ap = "ap";
         public const string operator_adp = "adp";
+        public const string operator_al = "al";
+        public const string operator_adl = "adl";
         public const string operator_a3n = "a3n";
         public const string operator_a3d = "a3d";
         public const string operator_a3p = "a3p";
-        public const string operator_a3dp = "a3dp";
-        public static List<string> operators_a = new List<string>() { operator_an, operator_ad, operator_ap, operator_adp, operator_a3n, operator_a3d, operator_a3p, operator_a3dp };
+        public const string operator_a3dp = "a3dp";        
+        public const string operator_a3l = "a3l";
+        public const string operator_a3dl = "a3dl";
+
+        public static List<string> operators_a = new List<string>() { operator_an, operator_ad, operator_ap, operator_adp, operator_a3n, operator_a3d, operator_a3p, operator_a3dp, operator_al, operator_adl, operator_a3l, operator_a3dl };
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";

@@ -3401,11 +3401,6 @@ namespace Gekko.Parser.Gek
                         node.Code.A(AddOperator("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                     }
                     break;
-
-
-
-
-
                 case "ASTAN":
                     {
                         node.Code.A(AddOperator("an", node[0].Code.ToString(), node.Parent.Parent.Text, node));
@@ -3447,8 +3442,29 @@ namespace Gekko.Parser.Gek
                     }
                     break;
 
-
-
+                
+                
+                
+                case "ASTAL":
+                    {
+                        node.Code.A(AddOperator("al", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTADL":
+                    {
+                        node.Code.A(AddOperator("adl", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTA3L":
+                    {
+                        node.Code.A(AddOperator("a3l", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
+                case "ASTA3DL":
+                    {
+                        node.Code.A(AddOperator("a3dl", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                    }
+                    break;
 
 
 

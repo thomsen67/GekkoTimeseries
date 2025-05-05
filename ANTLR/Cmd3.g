@@ -324,10 +324,14 @@ ASTCOMPARE2;
     ASTAD;
     ASTAP;
     ASTADP;
+    ASTAL;
+    ASTADL;
     ASTA3N;
     ASTA3D;
     ASTA3P;
     ASTA3DP;
+    ASTA3L;
+    ASTA3DL;
     ASTD;
     ASTDATA;
     ASTDATAADVANCED;
@@ -1180,10 +1184,14 @@ Y2                    = 'Y2'                       ;
     A3DP = 'A3DP';
     A3 = 'A3';
     ADP = 'ADP';
+    AL = 'AL';
+    ADL = 'ADL';
     A3P = 'A3P';
     AD = 'AD';
     AP = 'AP';
     A3D = 'A3D';
+    A3L = 'A3L';
+    A3DL = 'A3DL';
     YOY      = 'YOY'     ;
 	EXPAND = 'EXPAND';
 	VARIABLECODE = 'VARIABLECODE';
@@ -1842,10 +1850,14 @@ d.Add("Y" ,Y);
                                         d.Add("A3DP", A3DP);
                                         d.Add("A3", A3);
                                         d.Add("ADP", ADP);
+                                        d.Add("AL", AL);
+                                        d.Add("ADL", ADL);
                                         d.Add("A3P", A3P);
                                         d.Add("AD", AD);
                                         d.Add("AP", AP);
                                         d.Add("A3D", A3D);
+                                        d.Add("A3L", A3L);
+                                        d.Add("A3DL", A3DL);
                                         d.Add("yoy"               , YOY  );		
 										d.Add("expand"   , EXPAND     );
 										d.Add("view", VIEW);
@@ -3643,11 +3655,15 @@ optOld:                     N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES)
                           | AD    ('=' yesNo -> ^(ASTAD yesNo) | -> ^(ASTAD  ASTYES))
                           | AP    ('=' yesNo -> ^(ASTAP yesNo) | -> ^(ASTAP  ASTYES))
                           | ADP    ('=' yesNo -> ^(ASTADP yesNo) | -> ^(ASTADP  ASTYES))
+                          | AL    ('=' yesNo -> ^(ASTAL yesNo) | -> ^(ASTAL  ASTYES))
+                          | ADL    ('=' yesNo -> ^(ASTADL yesNo) | -> ^(ASTADL  ASTYES))
 
                           | A3    ('=' yesNo -> ^(ASTA3N yesNo) | -> ^(ASTA3N ASTYES))
                           | A3D    ('=' yesNo -> ^(ASTA3D yesNo) | -> ^(ASTA3D  ASTYES))
                           | A3P    ('=' yesNo -> ^(ASTA3P yesNo) | -> ^(ASTA3P  ASTYES))
                           | A3DP    ('=' yesNo -> ^(ASTA3DP yesNo) | -> ^(ASTA3DP  ASTYES))
+                          | A3L    ('=' yesNo -> ^(ASTA3L yesNo) | -> ^(ASTA3L  ASTYES))
+                          | A3DL    ('=' yesNo -> ^(ASTA3DL yesNo) | -> ^(ASTA3DL  ASTYES))
 
 						  ;
 
@@ -4366,10 +4382,14 @@ ident2: 					Ident |
   A3DP|
   A3|
   ADP|
+  AL|
+  ADL|
   A3P|
   AD|
   AP|
   A3D|
+  A3L|
+  A3DL|
   YOY|
   CLOSEALL|
   VIEW|

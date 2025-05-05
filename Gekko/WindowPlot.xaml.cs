@@ -83,6 +83,9 @@ namespace Gekko
 
         private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
         {
+            bool isQOrM = false;
+            if (graphOptions.o != null && (graphOptions.o.t1.freq == EFreq.Q || graphOptions.o.t1.freq == EFreq.M)) isQOrM = true;
+
             CheckBox_ref.IsChecked = false;
             CheckBox_ref.IsEnabled = true;
             CheckBox_ref.Opacity = 1d;
@@ -99,7 +102,7 @@ namespace Gekko
             CheckBox_yoy.IsEnabled = true;
             CheckBox_yoy.Opacity = 1d;
 
-            TextBox_period.Text = graphOptions.tStart.ToString() + " " + graphOptions.tEnd.ToString();
+            TextBox_period.Text = StringPeriod(graphOptions);
 
             CheckBox_index.IsChecked = false;
             CheckBox_index.IsEnabled = true;
@@ -137,7 +140,7 @@ namespace Gekko
             radioButton_mp.IsEnabled = true;
             radioButton_mp.Opacity = 1d;
 
-            string opRawLowerStart = "";            
+            string opRawLowerStart = "";
             if (graphOptions.code != null) opRawLowerStart = graphOptions.code.ToLower();
             string opHere = opRawLowerStart;
 
@@ -165,14 +168,14 @@ namespace Gekko
                 if (graphOptions.yoy) isYoy = true;  //also true for <i=...>.
             }
 
-            if (opRawLowerStart.EndsWith("l"))
+            if (opHere.EndsWith("l"))
             {
-                opHere = opRawLowerStart.Substring(0, opRawLowerStart.Length - 1);                
+                opHere = opHere.Substring(0, opHere.Length - 1);
             }
-            if (opRawLowerStart.StartsWith("r") || opRawLowerStart.StartsWith("a"))
+            if (opHere.StartsWith("r") || opHere.StartsWith("a"))
             {
-                opHere = opRawLowerStart.Substring(1);
-            }            
+                opHere = opHere.Substring(1);
+            }
 
             if (isR) CheckBox_ref.IsChecked = true;
             if (isA) CheckBox_all.IsChecked = true;
@@ -200,7 +203,7 @@ namespace Gekko
                 radioButton_q.IsEnabled = false;
                 radioButton_q.Opacity = 0.5;
                 radioButton_mp.IsEnabled = false;
-                radioButton_mp.Opacity = 0.5;                
+                radioButton_mp.Opacity = 0.5;
             }
 
             if (CheckBox_index.IsChecked == true)
@@ -208,7 +211,7 @@ namespace Gekko
                 radioButton_p.IsEnabled = false;
                 radioButton_p.Opacity = 0.5;
                 radioButton_dp.IsEnabled = false;
-                radioButton_dp.Opacity = 0.5;                
+                radioButton_dp.Opacity = 0.5;
                 radioButton_q.IsEnabled = false;
                 radioButton_q.Opacity = 0.5;
                 radioButton_mp.IsEnabled = false;
@@ -274,6 +277,18 @@ namespace Gekko
                 CheckBox_log.IsEnabled = false;
                 CheckBox_log.Opacity = 0.5;
             }
+
+            if (CheckBox_yoy.IsChecked == false && !isQOrM)
+            {
+                //Deactivate it if not chosen with <yoy> and only annual freq is shown
+                CheckBox_yoy.IsEnabled = false;
+                CheckBox_yoy.Opacity = 0.5;
+            }
+        }
+
+        private string StringPeriod(GraphOptions graphOptions)
+        {
+            return graphOptions.tStart.ToString() + " " + graphOptions.tEnd.ToString();
         }
 
         protected override void OnContentRendered(EventArgs e)
@@ -391,6 +406,7 @@ namespace Gekko
             {
                 refresh = _refresh.Clone();
                 refresh.isRefreshing = true;
+                refresh.period = StringPeriod(_graphOptions);
                 Refresh(new GraphHelper(refresh), true);  //using the old refresh object that should work.
                 _graphOptions.code = refresh.op;
             };
