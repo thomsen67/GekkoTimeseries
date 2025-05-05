@@ -27812,6 +27812,7 @@ namespace Gekko
             if (o.guiGraphOperator != null)
             {
                 operators.Add(o.guiGraphOperator);
+                operators = HandleOperatorA(operators);
             }
             else
             {
@@ -28141,55 +28142,62 @@ namespace Gekko
                 }
                 else
                 {
-                    operatorsNew = new List<string>();
-                    foreach (string operator2 in operators)
-                    {
-                        if (Globals.operators_a.Contains(operator2))
-                        {
-                            if (operator2 == Globals.operator_an)
-                            {
-                                operatorsNew.Add("1孓");
-                                operatorsNew.Add("2尸n");
-                            }
-                            else if (operator2 == Globals.operator_ad)
-                            {
-                                operatorsNew.Add("1千");
-                                operatorsNew.Add("2尸d");
-                            }
-                            else if (operator2 == Globals.operator_ap)
-                            {
-                                operatorsNew.Add("1小");
-                                operatorsNew.Add("2尸p");
-                            }
-                            else if (operator2 == Globals.operator_adp)
-                            {
-                                operatorsNew.Add("1千p");
-                                operatorsNew.Add("2尸dp");
-                            }
-                            else if (operator2 == Globals.operator_a3n)
-                            {
-                                new Error("Operators a3... not implemented yet");
-                            }
-                            else if (operator2 == Globals.operator_a3d)
-                            {
-                                new Error("Operators a3... not implemented yet");
-                            }
-                            else if (operator2 == Globals.operator_a3p)
-                            {
-                                new Error("Operators a3... not implemented yet");
-                            }
-                            else if (operator2 == Globals.operator_a3dp)
-                            {
-                                new Error("Operators a3... not implemented yet");
-                            }
-                        }
-                        else
-                        {                            
-                            operatorsNew.Add(operator2);
-                        }
-                    }
+                    operatorsNew = HandleOperatorA(operators);
                 }
             }
+            return operatorsNew;
+        }
+
+        private static List<string> HandleOperatorA(List<string> operators)
+        {
+            List<string> operatorsNew = new List<string>();
+            foreach (string operator2 in operators)
+            {
+                if (Globals.operators_a.Contains(operator2))
+                {
+                    if (operator2 == Globals.operator_an)
+                    {
+                        operatorsNew.Add("1孓");
+                        operatorsNew.Add("2尸n");
+                    }
+                    else if (operator2 == Globals.operator_ad)
+                    {
+                        operatorsNew.Add("1千");
+                        operatorsNew.Add("2尸d");
+                    }
+                    else if (operator2 == Globals.operator_ap)
+                    {
+                        operatorsNew.Add("1小");
+                        operatorsNew.Add("2尸p");
+                    }
+                    else if (operator2 == Globals.operator_adp)
+                    {
+                        operatorsNew.Add("1千p");
+                        operatorsNew.Add("2尸dp");
+                    }
+                    else if (operator2 == Globals.operator_a3n)
+                    {
+                        new Error("Operators a3... not implemented yet");
+                    }
+                    else if (operator2 == Globals.operator_a3d)
+                    {
+                        new Error("Operators a3... not implemented yet");
+                    }
+                    else if (operator2 == Globals.operator_a3p)
+                    {
+                        new Error("Operators a3... not implemented yet");
+                    }
+                    else if (operator2 == Globals.operator_a3dp)
+                    {
+                        new Error("Operators a3... not implemented yet");
+                    }
+                }
+                else
+                {
+                    operatorsNew.Add(operator2);
+                }
+            }
+
             return operatorsNew;
         }
 

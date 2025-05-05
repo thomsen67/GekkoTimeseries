@@ -12,6 +12,7 @@ namespace Gekko
         public string period = "";
         public bool? isIndex = null;
         public bool? isRef = false;
+        public bool? isAll = false;
         public double fontScaling = 1d;
         public double sizeScaling = 1d;
         public bool isRefreshing = false;
@@ -26,6 +27,7 @@ namespace Gekko
             r.period = this.period;
             r.isIndex = this.isIndex;
             r.isRef = this.isRef;
+            r.isAll = this.isAll;
             r.fontScaling = this.fontScaling;
             r.isRefreshing = this.isRefreshing;
             return r;
@@ -85,6 +87,10 @@ namespace Gekko
             CheckBox_ref.IsEnabled = true;
             CheckBox_ref.Opacity = 1d;
 
+            CheckBox_all.IsChecked = false;
+            CheckBox_all.IsEnabled = true;
+            CheckBox_all.Opacity = 1d;
+
             CheckBox_log.IsChecked = false;
             CheckBox_log.IsEnabled = true;
             CheckBox_log.Opacity = 1d;
@@ -136,6 +142,7 @@ namespace Gekko
             string opHere = opRawLowerStart;
 
             bool isR = false;
+            bool isA = false;
             bool isL = false;
             bool isI = false;
             bool isYoy = false;
@@ -143,6 +150,7 @@ namespace Gekko
             if (refresh != null)
             {
                 isR = refresh.isRef == true;
+                isA = refresh.isAll == true;
                 isL = refresh.isLog == true;
                 isI = refresh.isIndex == true;
                 isYoy = refresh.isYoy == true;
@@ -152,6 +160,7 @@ namespace Gekko
             {
                 if (opRawLowerStart.EndsWith("l")) isL = true;
                 if (opRawLowerStart.StartsWith("r")) isR = true;
+                if (opRawLowerStart.StartsWith("a")) isA = true;
                 if (!graphOptions.index.IsNull()) isI = true;  //also true for <i=...>.
                 if (graphOptions.yoy) isYoy = true;  //also true for <i=...>.
             }
@@ -160,12 +169,13 @@ namespace Gekko
             {
                 opHere = opRawLowerStart.Substring(0, opRawLowerStart.Length - 1);                
             }
-            if (opRawLowerStart.StartsWith("r"))
+            if (opRawLowerStart.StartsWith("r") || opRawLowerStart.StartsWith("a"))
             {
                 opHere = opRawLowerStart.Substring(1);
-            }
-            
+            }            
+
             if (isR) CheckBox_ref.IsChecked = true;
+            if (isA) CheckBox_all.IsChecked = true;
             if (isL) CheckBox_log.IsChecked = true;
             if (isI) CheckBox_index.IsChecked = true;
             if (isYoy) CheckBox_yoy.IsChecked = true;
@@ -229,10 +239,22 @@ namespace Gekko
                 radioButton_mp.Opacity = 0.5;
             }
 
+            if (CheckBox_all.IsChecked == true)
+            {
+                radioButton_m.IsEnabled = false;
+                radioButton_m.Opacity = 0.5;
+                radioButton_q.IsEnabled = false;
+                radioButton_q.Opacity = 0.5;
+                radioButton_mp.IsEnabled = false;
+                radioButton_mp.Opacity = 0.5;
+            }
+
             if (radioButton_m.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
             {
                 CheckBox_ref.IsEnabled = false;
                 CheckBox_ref.Opacity = 0.5;
+                CheckBox_all.IsEnabled = false;
+                CheckBox_all.Opacity = 0.5;
             }
 
             if (radioButton_p.IsChecked == true || radioButton_dp.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
@@ -312,9 +334,7 @@ namespace Gekko
             };
             if (saveFileDialog1.ShowDialog() == true)
             {
-                Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);
-                //this.label1.Text = "File saved";
-                //this.label2.Text = "";
+                Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);                
             }
         }
 
@@ -324,6 +344,7 @@ namespace Gekko
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
+            refresh.isAll = CheckBox_all.IsChecked;
             refresh.isIndex = CheckBox_index.IsChecked;
             refresh.isYoy= CheckBox_yoy.IsChecked;
             refresh.period = TextBox_period.Text;
@@ -354,6 +375,7 @@ namespace Gekko
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked;
             refresh.isRef = CheckBox_ref.IsChecked;
+            refresh.isAll = CheckBox_all.IsChecked;
             refresh.isIndex= CheckBox_index.IsChecked;
             refresh.isYoy = CheckBox_yoy.IsChecked;
             refresh.isRefreshing = true;  //so we do not get a new plot window                        
@@ -410,11 +432,45 @@ namespace Gekko
         {
             if (Globals.disableRadioButtons == 0)
             {
+                Globals.disableRadioButtons = 1;
+                try
+                {
+                    CheckBox_all.IsChecked = false;
+                }
+                finally
+                {
+                    Globals.disableRadioButtons = 0;
+                }
                 Refresh();
             }
         }
 
         private void CheckBox_ref_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
+        private void CheckBox_all_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Globals.disableRadioButtons = 1;
+                try
+                {
+                    CheckBox_ref.IsChecked = false;
+                }
+                finally
+                {
+                    Globals.disableRadioButtons = 0;
+                }
+                Refresh();
+            }
+        }
+
+        private void CheckBox_all_Unchecked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
             {

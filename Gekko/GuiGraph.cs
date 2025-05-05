@@ -58,6 +58,7 @@ namespace Gekko
             if (G.Equal(this.operator2, "n1")) this.operator2 = "n";
             if (G.Equal(this.operator2, "n2")) this.operator2 = "n";
             if (refresh.isRef == true) this.operator2 = "r" + this.operator2;
+            if (refresh.isAll == true) this.operator2 = "a" + this.operator2;
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.isYoy = refresh.isYoy == true;

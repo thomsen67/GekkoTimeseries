@@ -21,11 +21,11 @@
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="52" />
                 <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="35" />
+                <ColumnDefinition Width="25" />
                 <ColumnDefinition Width="105" />
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="52" />
-                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="25" />
                 <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="230" />
             </Grid.ColumnDefinitions>
@@ -211,10 +211,10 @@
                 <TextBlock Name="textBlock1" FontWeight="Bold" VerticalAlignment="Center">Options</TextBlock>
             </DockPanel>
 
-
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
-            <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
-                <CheckBox Name="CheckBox_ref" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Use data from reference databank.">Ref</CheckBox>
+            <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">                
+                <CheckBox Name="CheckBox_ref" Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Show data from reference databank.">Ref</CheckBox>
+                <CheckBox Name="CheckBox_all" Width="62" Margin="7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_all_Checked" Unchecked="CheckBox_all_Unchecked" ToolTip="Show data from both first-position and reference databanks.">All</CheckBox>                    
             </StackPanel>            
         </Grid>
 
