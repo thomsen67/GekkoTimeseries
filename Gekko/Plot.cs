@@ -835,13 +835,19 @@ namespace Gekko
                 if (type == EPlotType.Decomp)
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
-                    {
-                        SvgFix(zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    {                        
+                        SvgFix(Program.options.plot_zoom_decomp / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                        o.guiGraphScaleDecomp = Program.options.plot_zoom_decomp / 100d * zoomDpi;
                     }
                 }
                 else
                 {
-                    SvgFix(zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    //if svgFile border in wpf is adjusted with size, we can adjust zoomDpi *= ...,
+                    //and we also need to adjust to overall window dimensions. But then it should work
+                    //as a setting... !!
+
+                    SvgFix(Program.options.plot_zoom_general / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    o.guiGraphScaleGeneral = Program.options.plot_zoom_general / 100d * zoomDpi;
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
                 }
             }
@@ -952,10 +958,8 @@ namespace Gekko
                 if (windowsDpiScaling2 < 50) windowsDpiScaling2 = 50;
                 else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
             }
-            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.            
-            double overallZoom = ((double)Program.options.plot_zoom_general / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
-            if (isDecomp) overallZoom *= ((double)Program.options.plot_zoom_decomp / 100d);
-            return overallZoom;
+            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.                                   
+            return windowsDpiScaling;
         }
 
         private static bool IsAOrUHighestFreq(EFreq highestFreq)
@@ -1042,6 +1046,8 @@ namespace Gekko
                     graphOptions.code = code;
                     graphOptions.index = o.opt_i;
                     graphOptions.yoy = G.Equal(o.opt_yoy, "yes");
+                    graphOptions.scaleDecomp = o.guiGraphScaleDecomp;
+                    graphOptions.scaleGeneral = o.guiGraphScaleGeneral;
 
                     Thread thread = new Thread(new ParameterizedThreadStart(Program.PlotThreadFunction));
                     thread.Name = "Plot";

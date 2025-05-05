@@ -9797,7 +9797,8 @@ namespace Gekko
             public double guiGraphFontScaling = 1d;
             public double guiGraphSizeScaling = 1d;
             public bool guiGraphIsButton = false;
-
+            public double guiGraphScaleDecomp = 1d;
+            public double guiGraphScaleGeneral = 1d;
 
             public string prtType = null; //PRT, MULPRT, GMULPRT, PLOT, SHEET, CLIP, 
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set

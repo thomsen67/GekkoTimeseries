@@ -51,6 +51,13 @@ namespace Gekko
             try
             {
                 InitializeComponent();
+                if (graphOptions.scaleGeneral < 0.99d || graphOptions.scaleGeneral > 1.01d)
+                {                                       
+                    this.svgfile.Width = graphOptions.scaleGeneral * Globals.guiPlotSvgWidth;
+                    this.svgfile.Height = graphOptions.scaleGeneral * Globals.guiPlotSvgHeight;
+                    this.PlotMain.Width = this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth;
+                    this.PlotMain.Height = this.svgfile.Height + Globals.guiPlotWindowHeight - Globals.guiPlotSvgHeight;
+                }
                 radioButton_n1.IsChecked = true;
                 radioButton_n2.IsChecked = false;
                 radioButton_d.IsChecked = false;

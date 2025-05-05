@@ -596,7 +596,9 @@ namespace Gekko
         public string code = "";  //if there is 1 code like plot<m>
         public GekkoTime index = GekkoTime.tNull;
         public bool yoy = false;
-        
+        public double scaleDecomp = 1d;
+        public double scaleGeneral = 1d;
+
         public bool windowIsShown = false;
         public long counter = -12345;
         public int printStorageAsFuncCounter = -12345;

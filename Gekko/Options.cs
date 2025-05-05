@@ -178,8 +178,8 @@ namespace Gekko
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
-        public int plot_zoom_general = 100;
-        public int plot_zoom_decomp = 100; //Will act relative to plot_zoom_general, for instance (120/100 * 130/100) * 100.
+        public int plot_zoom_general = 100; //Relative size
+        public int plot_zoom_decomp = 100; //Relative size
         // ---
         public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
