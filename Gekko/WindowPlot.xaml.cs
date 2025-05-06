@@ -87,8 +87,9 @@ namespace Gekko
 
         private void ScaleWindow(double scale)
         {
-            this.svgfile.Width = scale * Globals.guiPlotSvgWidth + Globals.guiPlotExtraWidth;
-            this.svgfile.Height = scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight;
+            double dpi = 2d/3d;  //150% = 1d, 100% = 0.67d.
+            this.svgfile.Width = (scale * Globals.guiPlotSvgWidth + Globals.guiPlotExtraWidth) / dpi;
+            this.svgfile.Height = (scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight) / dpi;
             this.PlotMain.Width = Math.Max(this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth, Globals.guiPlotExtraMinimumWidth);
             this.PlotMain.Height = Math.Max(this.svgfile.Height + Globals.guiPlotWindowHeight - Globals.guiPlotSvgHeight, Globals.guiPlotExtraMinimumHeigth);
         }
