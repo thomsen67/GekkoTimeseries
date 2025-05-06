@@ -255,6 +255,10 @@ namespace Gekko
         public static double guiPlotSvgHeight = 360d;        
         public static double guiPlotWindowWidth = 590d;
         public static double guiPlotWindowHeight = 542d;
+        public static double guiPlotExtraWidth = 10d;
+        public static double guiPlotExtraHeight = 5d;
+        public static double guiPlotExtraMinimumWidth = 580d;
+        public static double guiPlotExtraMinimumHeigth = 350d;
 
         public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
         public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter

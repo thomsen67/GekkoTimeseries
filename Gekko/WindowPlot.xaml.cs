@@ -52,11 +52,8 @@ namespace Gekko
             {
                 InitializeComponent();
                 if (graphOptions.scaleGeneral < 0.99d || graphOptions.scaleGeneral > 1.01d)
-                {                                       
-                    this.svgfile.Width = graphOptions.scaleGeneral * Globals.guiPlotSvgWidth;
-                    this.svgfile.Height = graphOptions.scaleGeneral * Globals.guiPlotSvgHeight;
-                    this.PlotMain.Width = this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth;
-                    this.PlotMain.Height = this.svgfile.Height + Globals.guiPlotWindowHeight - Globals.guiPlotSvgHeight;
+                {                    
+                    ScaleWindow(graphOptions.scaleGeneral);
                 }
                 radioButton_n1.IsChecked = true;
                 radioButton_n2.IsChecked = false;
@@ -86,6 +83,14 @@ namespace Gekko
             }
 
             webBrowser.Source = new Uri(graphOptions.emfName);
+        }
+
+        private void ScaleWindow(double scale)
+        {
+            this.svgfile.Width = scale * Globals.guiPlotSvgWidth + Globals.guiPlotExtraWidth;
+            this.svgfile.Height = scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight;
+            this.PlotMain.Width = Math.Max(this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth, Globals.guiPlotExtraMinimumWidth);
+            this.PlotMain.Height = Math.Max(this.svgfile.Height + Globals.guiPlotWindowHeight - Globals.guiPlotSvgHeight, Globals.guiPlotExtraMinimumHeigth);
         }
 
         private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
@@ -357,6 +362,18 @@ namespace Gekko
             if (saveFileDialog1.ShowDialog() == true)
             {
                 Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);                
+            }
+        }
+
+        private void Button_zoom(object sender, RoutedEventArgs e)
+        {
+            double z = double.NaN;
+            double.TryParse(this.TextBox_zoom.Text, out z);
+            if (!double.IsNaN(z))
+            {
+                int z2 = (int)z;
+                Program.options.plot_zoom_general = z2;
+                Refresh();
             }
         }
 
