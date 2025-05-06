@@ -17,7 +17,6 @@ namespace Gekko
         public double sizeScaling = 1d;
         public bool isRefreshing = false;
         public bool isButton = false;
-        public double zoom = 100d;
 
         public RefreshHelper Clone()
         {
