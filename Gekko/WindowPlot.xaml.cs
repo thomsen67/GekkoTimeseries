@@ -50,11 +50,8 @@ namespace Gekko
             Globals.disableRadioButtons = 1;
             try
             {
-                InitializeComponent();
-                if (graphOptions.scaleGeneral < 0.99d || graphOptions.scaleGeneral > 1.01d)
-                {                    
-                    ScaleWindow(graphOptions.scaleGeneral);
-                }
+                InitializeComponent();                                  
+                ScaleWindow(graphOptions.scaleGeneral);                
                 radioButton_n1.IsChecked = true;
                 radioButton_n2.IsChecked = false;
                 radioButton_d.IsChecked = false;
@@ -87,9 +84,9 @@ namespace Gekko
 
         private void ScaleWindow(double scale)
         {
-            double dpi = 2d/3d;  //150% = 1d, 100% = 0.67d.
-            this.svgfile.Width = (scale * Globals.guiPlotSvgWidth + Globals.guiPlotExtraWidth) / dpi;
-            this.svgfile.Height = (scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight) / dpi;
+            //double dpi = 2d/3d;  //150% = 1d, 100% = 0.67d.
+            this.svgfile.Width = (scale * Globals.guiPlotSvgWidth + Globals.guiPlotExtraWidth);
+            this.svgfile.Height = (scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight);
             this.PlotMain.Width = Math.Max(this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth, Globals.guiPlotExtraMinimumWidth);
             this.PlotMain.Height = Math.Max(this.svgfile.Height + Globals.guiPlotWindowHeight - Globals.guiPlotSvgHeight, Globals.guiPlotExtraMinimumHeigth);
         }

@@ -838,7 +838,7 @@ namespace Gekko
                     {
                         double z = Program.options.decomp_plot_zoom / 100d * zoomDpi;
                         SvgFix(z, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
-                        o.guiGraphScaleDecomp = z;
+                        //o.guiGraphScaleDecomp = z / zoomDpi;
                     }
                 }
                 else
@@ -849,7 +849,7 @@ namespace Gekko
 
                     double z = Program.options.plot_zoom / 100d * zoomDpi;
                     SvgFix(z, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
-                    o.guiGraphScaleGeneral = z;
+                    o.guiGraphScaleGeneral = z / zoomDpi;  //odd, but makes the wpf component size ok for PLOT
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
                 }
             }

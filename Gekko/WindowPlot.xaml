@@ -219,7 +219,7 @@
         </Grid>
 
         <StackPanel Orientation="Horizontal">
-            <Border Name="svgfile" Height="360" Width="450" BorderThickness="2" BorderBrush="Black">
+            <Border Name="svgfile" Height="360" Width="450">
               <WebBrowser Name="webBrowser"  HorizontalAlignment="Left" Margin="10,5,0,0"/>
             </Border>
 
