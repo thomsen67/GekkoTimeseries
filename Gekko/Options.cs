@@ -72,7 +72,8 @@ namespace Gekko
         // ---
         public int decomp_flowgraph_depth = 2;
         public int decomp_maxlag = 10;
-        public int decomp_maxlead = 10;        
+        public int decomp_maxlead = 10;
+        public int decomp_plot_zoom = 100; //Relative size
         // ---
         public int fit_ols_rekur_dfmin = 10;        
         // ---
@@ -178,8 +179,7 @@ namespace Gekko
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
-        public int plot_zoom_general = 100; //Relative size
-        public int plot_zoom_decomp = 100; //Relative size
+        public int plot_zoom = 100; //Relative size        
         // ---
         public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
@@ -396,7 +396,8 @@ namespace Gekko
                         
             Add("DECOMP FLOWGRAPH DEPTH", Globals.xint);
             Add("DECOMP MAXLAG", Globals.xint);
-            Add("DECOMP MAXLEAD", Globals.xint);            
+            Add("DECOMP MAXLEAD", Globals.xint);
+            Add("DECOMP PLOT ZOOM", Globals.xint);
             Add("FIT OLS REKUR DFMIN", Globals.xint);
             Add("FOLDER", Globals.xbool);
             Add("FOLDER BANK", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
@@ -488,8 +489,7 @@ namespace Gekko
             Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
             Add("PLOT XLABELS DIGITS", Globals.xint);
             Add("PLOT XLABELS NONANNUAL", Globals.xnameOrString, "at", "between");    //#hsfsksgsdfg
-            Add("PLOT ZOOM GENERAL", Globals.xint);
-            Add("PLOT ZOOM DECOMP", Globals.xint);
+            Add("PLOT ZOOM", Globals.xint);            
             Add("PRINT COLLAPSE", Globals.xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
             Add("PRINT DISP MAXLINES", Globals.xsint);
             Add("PRINT DISP MODEL GAMS SCALAR", Globals.xnameOrString, "standard", "modern");

@@ -835,9 +835,10 @@ namespace Gekko
                 if (type == EPlotType.Decomp)
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
-                    {                        
-                        SvgFix(Program.options.plot_zoom_decomp / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
-                        o.guiGraphScaleDecomp = Program.options.plot_zoom_decomp / 100d * zoomDpi;
+                    {
+                        double z = Program.options.decomp_plot_zoom / 100d * zoomDpi;
+                        SvgFix(z, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                        o.guiGraphScaleDecomp = z;
                     }
                 }
                 else
@@ -846,8 +847,9 @@ namespace Gekko
                     //and we also need to adjust to overall window dimensions. But then it should work
                     //as a setting... !!
 
-                    SvgFix(Program.options.plot_zoom_general / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
-                    o.guiGraphScaleGeneral = Program.options.plot_zoom_general / 100d * zoomDpi;
+                    double z = Program.options.plot_zoom / 100d * zoomDpi;
+                    SvgFix(z, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    o.guiGraphScaleGeneral = z;
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
                 }
             }

@@ -17,6 +17,7 @@ namespace Gekko
         public double sizeScaling = 1d;
         public bool isRefreshing = false;
         public bool isButton = false;
+        public double zoom = 100d;
 
         public RefreshHelper Clone()
         {
@@ -365,17 +366,16 @@ namespace Gekko
             }
         }
 
-        private void Button_zoom(object sender, RoutedEventArgs e)
-        {
-            double z = double.NaN;
-            double.TryParse(this.TextBox_zoom.Text, out z);
-            if (!double.IsNaN(z))
-            {
-                int z2 = (int)z;
-                Program.options.plot_zoom_general = z2;
-                Refresh();
-            }
-        }
+        //private void Button_zoom(object sender, RoutedEventArgs e)
+        //{
+        //    double z = double.NaN;
+        //    double.TryParse(this.TextBox_zoom.Text, out z);
+        //    if (!double.IsNaN(z))
+        //    {
+        //        int z2 = (int)z;
+        //        Program.options.plot_zoom_general = z2;                
+        //    }
+        //}
 
         private string CreatePlotFileInBackground(double fontScaling, double sizeScaling)
         {
