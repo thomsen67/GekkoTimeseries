@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Gekko
 {
@@ -640,6 +642,46 @@ namespace Gekko
             if (Globals.disableRadioButtons == 0)
             {
                 Refresh();
+            }
+        }
+
+        private void ZoomComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ZoomComboBox.IsDropDownOpen && ZoomComboBox.SelectedItem is ComboBoxItem item)
+            {
+                ApplyZoomFromText(item.Content.ToString());
+            }
+        }
+
+        // Called when Enter is pressed in the editable box
+        private void ZoomComboBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                string input = ZoomComboBox.Text;
+                ApplyZoomFromText(input);
+            }
+        }
+
+        private void ApplyZoomFromText(string text)
+        {
+            // Remove percent sign if present
+            string numericPart = text.Replace("%", "").Trim();
+
+            if (double.TryParse(numericPart, out double zoomValue))
+            {
+                if (zoomValue >= 10 && zoomValue <= 1000)
+                {
+                    int zoom = (int)zoomValue;
+                }
+                else
+                {
+                    MessageBox.Show("Zoom must be between 10% and 1000%");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Invalid zoom format");
             }
         }
     }

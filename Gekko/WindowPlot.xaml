@@ -258,6 +258,20 @@
                     </Button.Resources>
                 </Button>
 
+                <ComboBox Name="ZoomComboBox"
+                  IsEditable="True"
+                  HorizontalAlignment="Left"
+                  Margin="10,10,0,0"
+                  StaysOpenOnEdit="True"
+                  KeyDown="ZoomComboBox_KeyDown"
+                  SelectionChanged="ZoomComboBox_SelectionChanged">
+                    <ComboBoxItem>50%</ComboBoxItem>
+                    <ComboBoxItem>70%</ComboBoxItem>
+                    <ComboBoxItem>100%</ComboBoxItem>
+                    <ComboBoxItem>150%</ComboBoxItem>
+                    <ComboBoxItem>200%</ComboBoxItem>
+                </ComboBox>
+
                 <!--<StackPanel Orientation="Horizontal" Margin="10,10,0,0">                    
                     <TextBox Name="TextBox_zoom" Width="35" Height="15" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Zoom the plot size (default is 100%)">100</TextBox>
                     <TextBlock FontSize="10" Opacity="0.7" Margin="-10,0,0,0" >%</TextBlock>
