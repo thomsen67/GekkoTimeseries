@@ -16597,7 +16597,10 @@ namespace Gekko
                         foreach (EqInfoSimple eq in eqsContainingVariable)
                         {
                             string dep = GamsModel.GetDependentVariable(eq.eqNumber, modelGamsScalar);
-                            if (!G.EqualHandleBlanks(dep, varnameWithoutFreq) && !deps.ContainsKey(dep)) deps.Add(dep, false);
+                            if (dep != null)
+                            {
+                                if (!G.EqualHandleBlanks(dep, varnameWithoutFreq) && !deps.ContainsKey(dep)) deps.Add(dep, false);
+                            }
                         }                        
                         
                         List<string> dependentVarsList = deps.Keys.ToList();
