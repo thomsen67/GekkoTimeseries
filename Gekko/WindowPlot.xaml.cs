@@ -662,7 +662,7 @@ namespace Gekko
             if (e.Key == Key.Enter)
             {
                 string input = ZoomComboBox.Text;
-                ApplyZoomFromText(input);
+                ApplyZoomFromText(input);                
             }
         }
 
@@ -677,7 +677,8 @@ namespace Gekko
                 {
                     Program.options.plot_zoom = (int)zoom;
                     Refresh();
-                    ScaleWindow(Program.options.plot_zoom / 100d);                    
+                    ScaleWindow(Program.options.plot_zoom / 100d);
+                    ZoomComboBox.Text = Program.options.plot_zoom + "%";
                 }
                 else
                 {

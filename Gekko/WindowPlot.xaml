@@ -227,22 +227,14 @@
 
                 <TextBox Name="TextBox_period" Width="75" Height="17" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Change time period (press the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
                 
-                <Button Content="Refresh" Margin="7,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (also use when changing time period)." Click="Button_refresh">
+                <Button Content="Refresh" Margin="2,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (also use when changing time period)." Click="Button_refresh">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button Content="Copy link" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="File link to .svg file: in Word, use Insert --> Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." Click="Button_copy">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-
-                <Button Content="Save" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg." Click="Button_save">
+                <Button Content="Copy link" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="File link to .svg file: in Word, use Insert --> Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." Click="Button_copy">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -250,7 +242,15 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Save As" Margin="7,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
+                <Button Content="Save" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg." Click="Button_save">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="Save As" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -260,29 +260,24 @@
 
                 <ComboBox Name="ZoomComboBox"
                   IsEditable="True"
+                  Opacity="0.7" FontFamily="Courier New" FontSize="9"
                   HorizontalAlignment="Left"
-                  Margin="10,10,0,0"
+                  Margin="2,10,0,0"
                   StaysOpenOnEdit="True"
+                  Text="100%"
                   KeyDown="ZoomComboBox_KeyDown"
+                  ToolTip="Plot zoom level. The zoom level is stored on the computer (same place as window positions/sizes, etc.)."
                   SelectionChanged="ZoomComboBox_SelectionChanged">
+                    <ComboBoxItem>40%</ComboBoxItem>
                     <ComboBoxItem>50%</ComboBoxItem>
-                    <ComboBoxItem>70%</ComboBoxItem>
+                    <ComboBoxItem>67%</ComboBoxItem>
+                    <ComboBoxItem>80%</ComboBoxItem>
                     <ComboBoxItem>100%</ComboBoxItem>
+                    <ComboBoxItem>125%</ComboBoxItem>
                     <ComboBoxItem>150%</ComboBoxItem>
                     <ComboBoxItem>200%</ComboBoxItem>
-                </ComboBox>
-
-                <!--<StackPanel Orientation="Horizontal" Margin="10,10,0,0">                    
-                    <TextBox Name="TextBox_zoom" Width="35" Height="15" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Zoom the plot size (default is 100%)">100</TextBox>
-                    <TextBlock FontSize="10" Opacity="0.7" Margin="-10,0,0,0" >%</TextBlock>
-                    <Button Content="Ok" Margin="5,0,0,0" Width="25" FontSize="9" Height="15" Padding="0,0,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Set plot zoom size" Click="Button_zoom">                        
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                    </Button>                    
-                </StackPanel>-->
+                    <ComboBoxItem>250%</ComboBoxItem>
+                </ComboBox>                
             </StackPanel>
         </StackPanel>
 
