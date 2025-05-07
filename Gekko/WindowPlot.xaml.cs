@@ -53,7 +53,7 @@ namespace Gekko
             try
             {
                 InitializeComponent();                                  
-                ScaleWindow(graphOptions.scaleGeneral);                
+                ScaleWindow(graphOptions.scaleGeneral);
                 radioButton_n1.IsChecked = true;
                 radioButton_n2.IsChecked = false;
                 radioButton_d.IsChecked = false;
@@ -84,9 +84,12 @@ namespace Gekko
             webBrowser.Source = new Uri(graphOptions.emfName);
         }
 
+        /// <summary>
+        /// Use 1 for 100%, etc.
+        /// </summary>
+        /// <param name="scale"></param>
         private void ScaleWindow(double scale)
-        {
-            //double dpi = 2d/3d;  //150% = 1d, 100% = 0.67d.
+        {            
             this.svgfile.Width = (scale * Globals.guiPlotSvgWidth + Globals.guiPlotExtraWidth);
             this.svgfile.Height = (scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight);
             this.PlotMain.Width = Math.Max(this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth, Globals.guiPlotExtraMinimumWidth);
@@ -668,11 +671,13 @@ namespace Gekko
             // Remove percent sign if present
             string numericPart = text.Replace("%", "").Trim();
 
-            if (double.TryParse(numericPart, out double zoomValue))
+            if (double.TryParse(numericPart, out double zoom))
             {
-                if (zoomValue >= 10 && zoomValue <= 1000)
+                if (zoom >= 10 && zoom <= 1000)
                 {
-                    int zoom = (int)zoomValue;
+                    Program.options.plot_zoom = (int)zoom;
+                    Refresh();
+                    ScaleWindow(Program.options.plot_zoom / 100d);                    
                 }
                 else
                 {
