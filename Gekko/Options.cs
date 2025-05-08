@@ -178,9 +178,8 @@ namespace Gekko
         public string plot_using = ""; //a global template
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
-        public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
-        public int plot_zoom = 100; //Relative size        
-        // ---
+        public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type
+        public int plot_zoom_dpiscale = 0; // zooming of fonts. If 0 it is ignored.                                            
         public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public string print_disp_model_gams_scalar = "modern";  //standard|modern --> with "modern" uses DECOMP logic for precedents/dependents
@@ -489,7 +488,8 @@ namespace Gekko
             Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
             Add("PLOT XLABELS DIGITS", Globals.xint);
             Add("PLOT XLABELS NONANNUAL", Globals.xnameOrString, "at", "between");    //#hsfsksgsdfg
-            Add("PLOT ZOOM", Globals.xint);            
+            Add("PLOT ZOOM DPISCALE", Globals.xint);
+            //Add("PLOT ZOOM", Globals.xint);            
             Add("PRINT COLLAPSE", Globals.xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
             Add("PRINT DISP MAXLINES", Globals.xsint);
             Add("PRINT DISP MODEL GAMS SCALAR", Globals.xnameOrString, "standard", "modern");

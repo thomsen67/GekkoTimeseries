@@ -421,6 +421,19 @@ namespace Gekko
                 this["GraphWindowLeftDistance"] = (int)value;
             }
         }
+        [DefaultSettingValue("100")]
+        [UserScopedSetting()]
+        public int GraphWindowZoom
+        {
+            get
+            {
+                return ((int)this["GraphWindowZoom"]);
+            }
+            set
+            {
+                this["GraphWindowZoom"] = (int)value;
+            }
+        }
         [DefaultSettingValue("50")]
         [UserScopedSetting()]
         public int DecompWindowTopDistance

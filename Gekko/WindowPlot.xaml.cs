@@ -53,7 +53,7 @@ namespace Gekko
             try
             {
                 InitializeComponent();                                  
-                ScaleWindow(graphOptions.scaleGeneral);
+                ScaleWindow(graphOptions.scaleGeneral);                
                 radioButton_n1.IsChecked = true;
                 radioButton_n2.IsChecked = false;
                 radioButton_d.IsChecked = false;
@@ -85,7 +85,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use 1 for 100%, etc.
+        /// Use 1 for 100%, 1 is what the PLOT design is built around, but other sizes work ok, too.
         /// </summary>
         /// <param name="scale"></param>
         private void ScaleWindow(double scale)
@@ -94,6 +94,7 @@ namespace Gekko
             this.svgfile.Height = (scale * Globals.guiPlotSvgHeight + Globals.guiPlotExtraHeight);
             this.PlotMain.Width = Math.Max(this.svgfile.Width + Globals.guiPlotWindowWidth - Globals.guiPlotSvgWidth, Globals.guiPlotExtraMinimumWidth);
             this.PlotMain.Height = Math.Max(this.svgfile.Height + Globals.guiPlotWindowHeight - Globals.guiPlotSvgHeight, Globals.guiPlotExtraMinimumHeigth);
+            SetZoomText();
         }
 
         private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
@@ -675,10 +676,9 @@ namespace Gekko
             {
                 if (zoom >= 10 && zoom <= 1000)
                 {
-                    Program.options.plot_zoom = (int)zoom;
+                    Globals.guiGraphZoom = (int)zoom;
                     Refresh();
-                    ScaleWindow(Program.options.plot_zoom / 100d);
-                    ZoomComboBox.Text = Program.options.plot_zoom + "%";
+                    ScaleWindow(Globals.guiGraphZoom / 100d);                    
                 }
                 else
                 {
@@ -689,6 +689,11 @@ namespace Gekko
             {
                 MessageBox.Show("Invalid zoom format");
             }
+        }
+
+        private void SetZoomText()
+        {
+            ZoomComboBox.Text = Globals.guiGraphZoom + "%";
         }
     }
 }

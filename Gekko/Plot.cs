@@ -845,8 +845,8 @@ namespace Gekko
                     //and we also need to adjust to overall window dimensions. But then it should work
                     //as a setting... !!
                                         
-                    SvgFix(Program.options.plot_zoom / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
-                    o.guiGraphScaleGeneral = Program.options.plot_zoom / 100d;  //Makes the wpf component size ok for PLOT
+                    SvgFix(Globals.guiGraphZoom / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    o.guiGraphScaleGeneral = Globals.guiGraphZoom / 100d;  //Makes the wpf component size ok for PLOT
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
                 }
             }
@@ -947,7 +947,8 @@ namespace Gekko
             //be used. This might be the way to go, also for future svg-based PLOT window.
             //A solution would be to use WebWiew2, but it is not in-built, requires .NET 4.6.2, requires Win 10 (with installation) or Win 11.
             //Also, bundling WebWview2 (besides the .dll's) would require around 100 MB, too much.
-            double windowsDpiScaling2 = Globals.screenDpiZoomY;
+            double windowsDpiScaling2 = Globals.screenDpiZoomY;            
+
             if (windowsDpiScaling2 == 0)
             {
                 windowsDpiScaling2 = 150;  //sensible because not recognized
@@ -958,6 +959,9 @@ namespace Gekko
                 else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
             }
             double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.                                   
+
+            if (Program.options.plot_zoom_dpiscale > 0) windowsDpiScaling = Program.options.plot_zoom_dpiscale / 100d;
+
             return windowsDpiScaling;
         }
 

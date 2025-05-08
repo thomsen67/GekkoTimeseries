@@ -942,6 +942,7 @@ namespace Gekko
         public static Program.Cache guiRecentFoldersCache = new Program.Cache(typeof(string));
         public static int guiGraphWindowTopDistance = 50;
         public static int guiGraphWindowLeftDistance = 100;
+        public static int guiGraphZoom = 100;
 
         public static int guiDecompWindowTopDistance = 50;
         public static int guiDecompWindowLeftDistance = 100;

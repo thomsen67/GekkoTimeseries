@@ -386,9 +386,7 @@ namespace Gekko
                     Globals.screenDpiZoomX = 150;  //seems pretty normal these days
                     Globals.screenDpiZoomY = 150;
                 }
-            }
-
-            //Globals.dependencyTracking = new DependencyTracking();
+            }            
         }
 
         private void StartupExeAndIniStuff()
@@ -877,6 +875,7 @@ namespace Gekko
             Point pGraph = HandleMonitor(us.GraphWindowTopDistance, us.GraphWindowLeftDistance);
             Globals.guiGraphWindowTopDistance = pGraph.X;
             Globals.guiGraphWindowLeftDistance = pGraph.Y;
+            Globals.guiGraphZoom = us.GraphWindowZoom;
 
             Point pDecomp = HandleMonitor(us.DecompWindowTopDistance, us.DecompWindowLeftDistance);
             Globals.guiDecompWindowTopDistance = pDecomp.X;
@@ -992,6 +991,7 @@ namespace Gekko
             us.WorkingFolder = Program.options.folder_working;
             us.GraphWindowTopDistance = Globals.guiGraphWindowTopDistance;
             us.GraphWindowLeftDistance = Globals.guiGraphWindowLeftDistance;
+            us.GraphWindowZoom = Globals.guiGraphZoom;
             us.DecompWindowTopDistance = Globals.guiDecompWindowTopDistance;
             us.DecompWindowLeftDistance = Globals.guiDecompWindowLeftDistance;
             us.DecompWindowHeightDistance = Globals.guiDecompWindowHeightDistance;
