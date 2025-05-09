@@ -51,7 +51,7 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
-            double zoomDpi = ZoomDpi(plotHelper.isDecompPlot);
+            double dpiScale = DpiScale(plotHelper.isDecompPlot);
 
             double decompSvgOverallWidth = 0;
             double decompSvgOverallHeight = 0;
@@ -125,9 +125,9 @@ namespace Gekko
                 {
                     type = EPlotType.PlotStatement;
                 }
-            }            
+            }
 
-            SvgScaling(o, containerExplode, plotHelper, zoomDpi, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor);
+            SvgScaling(o, containerExplode, plotHelper, dpiScale / 150d, o.guiGraphSizeScaling, o.guiGraphFontScaling, type, ref decompSvgOverallWidth, ref decompSvgOverallHeight, ref decompSvgFontFactor);
                         
             if (type == EPlotType.PlotStatement || type == EPlotType.Decomp)
             {                
@@ -836,7 +836,7 @@ namespace Gekko
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
                     {                        
-                        SvgFix(Program.options.decomp_plot_zoom / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                        SvgFix(Program.options.decomp_plot_zoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     }
                 }
                 else
@@ -845,7 +845,7 @@ namespace Gekko
                     //and we also need to adjust to overall window dimensions. But then it should work
                     //as a setting... !!
                                         
-                    SvgFix(Globals.guiGraphZoom / 100d * zoomDpi, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    SvgFix(Globals.guiGraphZoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     o.guiGraphScaleGeneral = Globals.guiGraphZoom / 100d;  //Makes the wpf component size ok for PLOT
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
                 }
@@ -928,7 +928,7 @@ namespace Gekko
         /// Here, options.plot_zoom_general affects this, and on top, options.plot_zoom_decomp is relative to that (if decomp).
         /// If both of these options are 100, the metod always returns 1 for a 150 dpi screen.        
         /// </summary>        
-        private static double ZoomDpi(bool isDecomp)
+        private static double DpiScale(bool isDecomp)
         {
             //Problem with zoom etc. is that it appears that
             //WPF Webbrowser does not scale svg image inside it
@@ -947,22 +947,21 @@ namespace Gekko
             //be used. This might be the way to go, also for future svg-based PLOT window.
             //A solution would be to use WebWiew2, but it is not in-built, requires .NET 4.6.2, requires Win 10 (with installation) or Win 11.
             //Also, bundling WebWview2 (besides the .dll's) would require around 100 MB, too much.
-            double windowsDpiScaling2 = Globals.screenDpiZoomY;            
+            double dpiScale = Globals.screenDpiScaleY;            
 
-            if (windowsDpiScaling2 == 0)
+            if (dpiScale == 0)
             {
-                windowsDpiScaling2 = 150;  //sensible because not recognized
+                dpiScale = 150;  //sensible because not recognized
             }
             else
             {
-                if (windowsDpiScaling2 < 50) windowsDpiScaling2 = 50;
-                else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
+                if (dpiScale < 50) dpiScale = 50;
+                else if (dpiScale > 400) dpiScale = 400;
             }
-            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.                                   
 
-            if (Program.options.plot_zoom_dpiscale > 0) windowsDpiScaling = Program.options.plot_zoom_dpiscale / 100d;
-
-            return windowsDpiScaling;
+            double rv = dpiScale;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.
+            if (Program.options.plot_zoom_dpiscale > 0) rv = Program.options.plot_zoom_dpiscale;
+            return rv;
         }
 
         private static bool IsAOrUHighestFreq(EFreq highestFreq)

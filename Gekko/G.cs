@@ -3841,7 +3841,7 @@ namespace Gekko
                         coreCount += int.Parse(item["NumberOfCores"].ToString());
                     }
                     sb.AppendLine(" Number of cores: " + coreCount);
-                    sb.AppendLine(" Screen dpi scale x = " + Globals.screenDpiZoomX + "%, y = " + Globals.screenDpiZoomY + "%");
+                    sb.AppendLine(" Screen dpi scale x = " + Globals.screenDpiScaleX + "%, y = " + Globals.screenDpiScaleY + "%");
                     long size = Program.CacheFilesSize();
                     double pct = (double)size / (double)Globals.cacheFileMax * 100d;
                     sb.AppendLine(" Cache files size: " + G.UpdprtFormat((double)size / 1000000000d, 2, false) + " GB (" + G.UpdprtFormat(pct, 2, false) + "% of allocated " + G.UpdprtFormat((double)Globals.cacheFileMax / 1000000000d, 2, false) + " GB)");

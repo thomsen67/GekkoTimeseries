@@ -378,13 +378,13 @@ namespace Gekko
                     var dpiYProperty = typeof(System.Windows.SystemParameters).GetProperty("Dpi", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
                     dpiXb = (int)dpiXProperty.GetValue(null, null);
                     dpiYb = (int)dpiYProperty.GetValue(null, null);
-                    Globals.screenDpiZoomX = (int)((dpiXb / 96d) * 100d);
-                    Globals.screenDpiZoomY = (int)((dpiYb / 96d) * 100d);
+                    Globals.screenDpiScaleX = (int)((dpiXb / 96d) * 100d);
+                    Globals.screenDpiScaleY = (int)((dpiYb / 96d) * 100d);
                 }
                 catch
                 {
-                    Globals.screenDpiZoomX = 150;  //seems pretty normal these days
-                    Globals.screenDpiZoomY = 150;
+                    Globals.screenDpiScaleX = 150;  //seems pretty normal these days
+                    Globals.screenDpiScaleY = 150;
                 }
             }            
         }

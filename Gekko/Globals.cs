@@ -1099,8 +1099,8 @@ namespace Gekko
 
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
 
-        public static int screenDpiZoomX = 0;
-        public static int screenDpiZoomY = 0;
+        public static int screenDpiScaleX = 0;
+        public static int screenDpiScaleY = 0;
 
         public static bool isAutoExec = true;
         public static string sessionMemorySnapshot = null;
