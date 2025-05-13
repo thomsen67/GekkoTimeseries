@@ -1118,8 +1118,18 @@ namespace Gekko
                 }
                 if (hit2) e.score += Globals.lhsScore1; //0.5
 
-                string dep = GetDependentVariable(eqNumber, modelGamsScalar);
-                if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;
+                if (modelGamsScalar.isPerpetualModel)
+                {
+                    if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, eqNameWithoutIndex))
+                    {
+                        e.score += Globals.lhsScore2;
+                    }
+                }
+                else
+                {
+                    string dep = GetDependentVariable(eqNumber, modelGamsScalar);
+                    if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;
+                }
                 
                 rv.Add(e);
             }
