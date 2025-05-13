@@ -718,20 +718,21 @@ namespace Gekko
             int varCounts2 = -12345;
             int fakeEqCounts2 = 0;
             int fakeVarCounts2 = 0;
+            bool hasResVariables = false;  //if there are any res_... variables in model
             Dictionary<int, int> timeless = new Dictionary<int, int>();  //records timeless vars for later use in .isTimeless array.
 
             //read dictionary                        
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
                 }
             }
 
@@ -1058,7 +1059,9 @@ namespace Gekko
                 {                    
                     txt.MainAdd("TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");                    
                 }
-            }            
+            }
+
+            modelGamsScalar.hasResVariables = hasResVariables;
 
             return model;
         }
@@ -1075,16 +1078,15 @@ namespace Gekko
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
+            List<EqInfoSimple> rv = new List<EqInfoSimple>();
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
             {
-                new Error(Decomp.NonFoundInModelError(variableName, modelGamsScalar));
-            }
-
-            List<EqInfoSimple> rv = new List<EqInfoSimple>();
+                return rv;
+            }            
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
@@ -1507,8 +1509,8 @@ namespace Gekko
         /// <param name="fakeEqCounts2"></param>
         /// <param name="fakeVarCounts2"></param>
         /// <param name="sr"></param>
-        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
-        {
+        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref bool res_variables, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
+        {            
             bool b = false;
             string line = null;
             while ((line = sr.ReadLine()) != null)
@@ -1603,6 +1605,8 @@ namespace Gekko
                         new Error("Could not parse integer part of the string '" + ss[0] + "'");
                     }
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+
+                    if (!res_variables && G.StartsWith(ss2, Globals.decompResidualPrefix)) res_variables = true;
 
                     if (G.Contains(ss2, Globals.scalarModelExtraVariable))
                     {

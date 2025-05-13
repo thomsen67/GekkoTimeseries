@@ -981,6 +981,9 @@ namespace Gekko
         [ProtoMember(31)]
         public int fakeVarCounts = -12345;
 
+        [ProtoMember(33)]  //(32) is above
+        public bool hasResVariables = false;  //if a variable res_... is encountered
+
         // =============================================
         // =============================================
         // =============================================
