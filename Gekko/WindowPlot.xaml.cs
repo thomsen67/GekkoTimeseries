@@ -84,6 +84,15 @@ namespace Gekko
             }
 
             webBrowser.Source = new Uri(graphOptions.emfName);
+
+            try
+            {
+                GetRefreshValuesFromControls(_refresh);  //To get some sensible values into this, so that if the PLOT window crashes now, it can be restored to a sensible state.
+            }
+            catch
+            {
+                //Should normally not crash
+            }
         }
 
         /// <summary>
@@ -424,17 +433,9 @@ namespace Gekko
         }
 
         private void Refresh()
-        {            
+        {
             RefreshHelper refresh = new RefreshHelper();
-            refresh.op = GetOperator();
-            refresh.isLog = CheckBox_log.IsChecked;
-            refresh.isRef = CheckBox_ref.IsChecked;
-            refresh.isAll = CheckBox_all.IsChecked;
-            refresh.isIndex= CheckBox_index.IsChecked;
-            refresh.isYoy = CheckBox_yoy.IsChecked;
-            refresh.isPoints = CheckBox_points.IsChecked;
-            refresh.isRefreshing = true;  //so we do not get a new plot window                        
-            refresh.period = TextBox_period.Text;
+            GetRefreshValuesFromControls(refresh);
 
             try
             {
@@ -461,6 +462,19 @@ namespace Gekko
             {
                 Globals.disableRadioButtons = 0;
             }
+        }
+
+        private void GetRefreshValuesFromControls(RefreshHelper refresh)
+        {
+            refresh.op = GetOperator();
+            refresh.isLog = CheckBox_log.IsChecked;
+            refresh.isRef = CheckBox_ref.IsChecked;
+            refresh.isAll = CheckBox_all.IsChecked;
+            refresh.isIndex = CheckBox_index.IsChecked;
+            refresh.isYoy = CheckBox_yoy.IsChecked;
+            refresh.isPoints = CheckBox_points.IsChecked;
+            refresh.isRefreshing = true;  //so we do not get a new plot window                        
+            refresh.period = TextBox_period.Text;
         }
 
         private string Refresh(GraphHelper gh, bool updatePlotWindow)
