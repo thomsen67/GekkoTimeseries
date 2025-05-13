@@ -29221,8 +29221,7 @@ namespace Gekko
         {
             //TTH: index=100
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
-
-            double indexFactor = 100d;
+                        
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 
             if (isCalledFromTable && !G.Equal(Globals.tableOption, "n"))
@@ -29384,10 +29383,19 @@ namespace Gekko
             }
 
             GekkoTime index = index2;
-            if (smpl != null && index.IsNotNull())
+            if (smpl != null && index.IsNotNull())  //.IsNotNull <> !.IsNull !!!
             {
-                //<i>                                
-                index = smpl.t1.Add((smpl.Observations12() - 1) / 2);  //per1=2001-2005, observations=5 --> (5-1)/2 = 2 are added, so we get 2001+2 = 2003 as midpoint.
+                //<i>, not <i=...>
+                if (!G.NullOrBlanks(Program.options.print_index_date))
+                {
+                    index = GekkoTime.FromStringToGekkoTime(Program.options.print_index_date, false, false, false);                    
+                    if (index.IsNull()) new Error("Could not convert 'option print index date = '" + Program.options.print_index_date + "' into a Gekko date.");
+                    index = GekkoTime.ConvertFreqsFirst(smpl.t1.freq, index, null);
+                }
+                else
+                {
+                    index = smpl.t1.Add((smpl.Observations12() - 1) / 2);  //per1=2001-2005, observations=5 --> (5-1)/2 = 2 are added, so we get 2001+2 = 2003 as midpoint.
+                }
             }
 
             GekkoTime tMinusOne = gt.Add(-1);
@@ -29429,9 +29437,9 @@ namespace Gekko
                     {                        
                         GekkoTime t12 = GekkoTime.Average(GekkoTime.ConvertFreqsFirst(tsWork.freq, index, null), GekkoTime.ConvertFreqsLast(tsWork.freq, index));
                         double ix = tsWork.GetDataSimple(t12);
-                        x += tsWork.GetDataSimple(gt.Add(-i)) / ix * indexFactor;
-                        xLag += tsWork.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / ix * indexFactor;
-                        xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / ix * indexFactor;
+                        x += tsWork.GetDataSimple(gt.Add(-i)) / ix * Program.options.print_index_value;
+                        xLag += tsWork.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / ix * Program.options.print_index_value;
+                        xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / ix * Program.options.print_index_value;
                     }
                 }
 
@@ -29467,9 +29475,9 @@ namespace Gekko
                     {                        
                         GekkoTime t12 = GekkoTime.Average(GekkoTime.ConvertFreqsFirst(tsRef.freq, index, null), GekkoTime.ConvertFreqsLast(tsRef.freq, index));
                         double ix = tsRef.GetDataSimple(t12);
-                        y += tsRef.GetDataSimple(gt.Add(-i)) / ix * indexFactor;
-                        yLag += tsRef.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / ix * indexFactor;
-                        yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / ix * indexFactor;
+                        y += tsRef.GetDataSimple(gt.Add(-i)) / ix * Program.options.print_index_value;
+                        yLag += tsRef.GetDataSimple(gt.Add(-factor1 * sumOver - i)) / ix * Program.options.print_index_value;
+                        yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i)) / ix * Program.options.print_index_value;
                     }
                 }
 

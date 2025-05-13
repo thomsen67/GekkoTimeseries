@@ -11,6 +11,7 @@ namespace Gekko
         public string op = "";  //can also be n1/n2 (left or right n)
         public bool? isLog = false;
         public bool? isYoy = false;
+        public bool? isPoints = null;
         public string period = "";
         public bool? isIndex = null;
         public bool? isRef = false;
@@ -26,6 +27,7 @@ namespace Gekko
             r.op = this.op;
             r.isLog = this.isLog;
             r.isYoy = this.isYoy;
+            r.isPoints = this.isPoints;
             r.period = this.period;
             r.isIndex = this.isIndex;
             r.isRef = this.isRef;
@@ -100,7 +102,8 @@ namespace Gekko
         private void SetControls(GraphOptions graphOptions, RefreshHelper refresh)
         {
             bool isQOrM = false;
-            if (graphOptions.o != null && (graphOptions.o.t1.freq == EFreq.Q || graphOptions.o.t1.freq == EFreq.M)) isQOrM = true;
+            if (graphOptions == null) isQOrM = true;  //We must assume so to activate YoY
+            else if (graphOptions.tStart.freq == EFreq.Q || graphOptions.tStart.freq == EFreq.M) isQOrM = true;
 
             CheckBox_ref.IsChecked = false;
             CheckBox_ref.IsEnabled = true;
@@ -117,6 +120,10 @@ namespace Gekko
             CheckBox_yoy.IsChecked = false;
             CheckBox_yoy.IsEnabled = true;
             CheckBox_yoy.Opacity = 1d;
+
+            CheckBox_points.IsChecked = false;
+            CheckBox_points.IsEnabled = true;
+            CheckBox_points.Opacity = 1d;
 
             TextBox_period.Text = StringPeriod(graphOptions);
 
@@ -165,6 +172,7 @@ namespace Gekko
             bool isL = false;
             bool isI = false;
             bool isYoy = false;
+            bool? isPoints = null;
 
             if (refresh != null)
             {
@@ -173,6 +181,7 @@ namespace Gekko
                 isL = refresh.isLog == true;
                 isI = refresh.isIndex == true;
                 isYoy = refresh.isYoy == true;
+                isPoints = refresh.isPoints;
                 opHere = refresh.op.ToLower();
             }
             else
@@ -182,6 +191,7 @@ namespace Gekko
                 if (opRawLowerStart.StartsWith("a")) isA = true;
                 if (!graphOptions.index.IsNull()) isI = true;  //also true for <i=...>.
                 if (graphOptions.yoy) isYoy = true;  //also true for <i=...>.
+                isPoints = graphOptions.points;
             }
 
             if (opHere.EndsWith("l"))
@@ -198,6 +208,7 @@ namespace Gekko
             if (isL) CheckBox_log.IsChecked = true;
             if (isI) CheckBox_index.IsChecked = true;
             if (isYoy) CheckBox_yoy.IsChecked = true;
+            if (isPoints != false) CheckBox_points.IsChecked = true;
             if (G.Equal(opHere, "") || G.Equal(opHere, "n")) radioButton_n1.IsChecked = true;
             else if (G.Equal(opHere, "n1")) radioButton_n1.IsChecked = true;
             else if (G.Equal(opHere, "n2")) radioButton_n2.IsChecked = true;
@@ -389,6 +400,7 @@ namespace Gekko
             refresh.isAll = CheckBox_all.IsChecked;
             refresh.isIndex = CheckBox_index.IsChecked;
             refresh.isYoy= CheckBox_yoy.IsChecked;
+            refresh.isPoints= CheckBox_points.IsChecked;
             refresh.period = TextBox_period.Text;
             refresh.fontScaling = fontScaling;
             refresh.sizeScaling = sizeScaling;
@@ -420,6 +432,7 @@ namespace Gekko
             refresh.isAll = CheckBox_all.IsChecked;
             refresh.isIndex= CheckBox_index.IsChecked;
             refresh.isYoy = CheckBox_yoy.IsChecked;
+            refresh.isPoints = CheckBox_points.IsChecked;
             refresh.isRefreshing = true;  //so we do not get a new plot window                        
             refresh.period = TextBox_period.Text;
 
@@ -471,6 +484,22 @@ namespace Gekko
             return op;
         }
 
+        private void CheckBox_points_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
+        private void CheckBox_points_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
         private void CheckBox_ref_Checked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
@@ -514,22 +543,6 @@ namespace Gekko
         }
 
         private void CheckBox_all_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (Globals.disableRadioButtons == 0)
-            {
-                Refresh();
-            }
-        }
-
-        private void CheckBox_shares_Checked(object sender, RoutedEventArgs e)
-        {
-            if (Globals.disableRadioButtons == 0)
-            {
-                Refresh();
-            }
-        }
-
-        private void CheckBox_shares_Unchecked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
             {
@@ -644,6 +657,16 @@ namespace Gekko
         private void radioButton_mp_Checked(object sender, RoutedEventArgs e)
         {
             if (Globals.disableRadioButtons == 0)
+            {
+                Refresh();
+            }
+        }
+
+
+        // Called when Enter is pressed in the editable box
+        private void TextBox_period_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
             {
                 Refresh();
             }

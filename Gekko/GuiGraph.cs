@@ -43,7 +43,8 @@ namespace Gekko
         public string operator2 = null;
         public bool isRefreshing = false;
         public bool isLogTransform = false;
-        public bool isYoy = false;
+        public bool? isYoy = null;
+        public bool? isPoints = null;
         public string period = "";
         public double fontScaling = 1d;
         public double sizeScaling = 1d;
@@ -62,6 +63,7 @@ namespace Gekko
             this.isRefreshing = refresh.isRefreshing;
             this.isLogTransform = refresh.isLog == true;
             this.isYoy = refresh.isYoy == true;
+            this.isPoints = refresh.isPoints == true;
             this.period = refresh.period;
             this.fontScaling = refresh.fontScaling;
             this.sizeScaling=refresh.sizeScaling;
@@ -596,6 +598,7 @@ namespace Gekko
         public string code = "";  //if there is 1 code like plot<m>
         public GekkoTime index = GekkoTime.tNull;
         public bool yoy = false;
+        public bool? points = null;
         public double scaleDecomp = 1d;
         public double scaleGeneral = 1d;
 

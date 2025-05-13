@@ -9794,6 +9794,7 @@ namespace Gekko
             public string guiGraphRefreshingFilename = null;
             public bool guiGraphIsLogTransform = false;
             public bool guiGraphIsYoy = false;
+            public bool? guiGraphIsPoints = null;
             public double guiGraphFontScaling = 1d;
             public double guiGraphSizeScaling = 1d;
             public bool guiGraphIsButton = false;

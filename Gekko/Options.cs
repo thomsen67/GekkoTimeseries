@@ -172,14 +172,17 @@ namespace Gekko
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //default | gams
         // ---
+        public int plot_all_dash_order = 1; //1 = default, //0=none | 1=1,3,2 | 2=1,2,3 | 3=3,1,2 | 4=2,1,3 | 5=3,2,1 | 6=2,3,1
         public string plot_decimalseparator = "period";  //comma|period
-        public int plot_elements_max = 200;
+        public int plot_elements_max = 200;        
         public bool plot_lines_points = true;
+        public string plot_palette = "gekko";  //gekko | dream
         public string plot_using = ""; //a global template
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type
-        public int plot_zoom_dpiscale = 0; // zooming of fonts. If 0 it is ignored.                                            
+        public int plot_zoom_dpiscale = 0; // zooming of fonts. If 0 it is ignored.
+        // ---
         public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public string print_disp_model_gams_scalar = "modern";  //standard|modern --> with "modern" uses DECOMP logic for precedents/dependents
@@ -189,6 +192,8 @@ namespace Gekko
         public int print_fields_pdec = 2;
         public int print_fields_pwidth = 8;  //to make more room for labels
         public string print_freq = "pretty";  //pretty or simple
+        public string print_index_date = "";  //a date like "2020" or "2020q3".
+        public double print_index_value = 100d;  //Could be 1 instead of 100...
         public bool print_mulprt_lev = false;  //n
         public bool print_mulprt_abs = true;  //m
         public bool print_mulprt_pch = true;  //q
@@ -482,13 +487,16 @@ namespace Gekko
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
             Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");
             Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
-            Add("PLOT ELEMENTS MAX", Globals.xint);
+            Add("PLOT ELEMENTS MAX", Globals.xint);            
             Add("PLOT LINES POINTS", Globals.xbool);
+            Add("PLOT PALETTE", Globals.xnameOrString, "gekko", "dream");
             Add("PLOT USING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
             Add("PLOT XLABELS DIGITS", Globals.xint);
             Add("PLOT XLABELS NONANNUAL", Globals.xnameOrString, "at", "between");    //#hsfsksgsdfg
-            Add("PLOT ZOOM DPISCALE", Globals.xint);
+            Add("PLOT ZOOM DPISCALE", Globals.xint);            
+            Add("PLOT ALL DASH ORDER", Globals.xint);
+
             //Add("PLOT ZOOM", Globals.xint);            
             Add("PRINT COLLAPSE", Globals.xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
             Add("PRINT DISP MAXLINES", Globals.xsint);
@@ -499,6 +507,8 @@ namespace Gekko
             Add("PRINT FIELDS PDEC", Globals.xint);
             Add("PRINT FIELDS PWIDTH", Globals.xint);
             Add("PRINT FREQ", Globals.xnameOrString, "simple", "pretty");
+            Add("PRINT INDEX DATE", Globals.xstring);
+            Add("PRINT INDEX VALUE", Globals.xval);
             Add("PRINT MULPRT ABS", Globals.xbool);
             {
                 Add("PRINT MULPRT GDIF", Globals.xbool);

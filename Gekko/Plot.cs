@@ -337,6 +337,17 @@ namespace Gekko
                 plotcode = plotcode1 + plotcode2;  //result may be empty string
             }
 
+            string defaultPalette = null;
+            if (G.Equal(Program.options.plot_palette, "gekko"))
+            {
+                defaultPalette = "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black";
+            }
+            else if (G.Equal(Program.options.plot_palette, "dream"))
+            {
+                defaultPalette = "#F55252, #14AFA6, #FF9B4B, #5CD272, #42B4E0, #BCADDD, #005F97, #893070, #46464C, #E6E6E8, #cab2d6, #ffff99";
+            }
+            else new Error("Expected 'option plot palette' to have value 'gekko' or 'dream'");
+
             string size2 = GetText(null, o.opt_size, null, doc.SelectSingleNode("gekkoplot/size"), null);
             string title = GetText(null, o.opt_title, null, doc.SelectSingleNode("gekkoplot/title"), null);
             string subtitle = GetText(null, o.opt_subtitle, null, doc.SelectSingleNode("gekkoplot/subtitle"), null);
@@ -348,7 +359,7 @@ namespace Gekko
             string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "yes");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
             string gridstyle = GetText(null, o.opt_gridstyle, null, doc.SelectSingleNode("gekkoplot/gridstyle"), "linecolor rgb \"#d3d3d3\" dashtype 3 linewidth 1.5");
             string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse height 1");  //height 1 givers nicer vertical spacing
-            string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
+            string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), defaultPalette);
             string stack = GetText(null, o.opt_stack, null, doc.SelectSingleNode("gekkoplot/stack"), "no");  //default: no, #23475432985    
             double boxwidth = Program.ParseIntoDouble(GetText(null, G.IsNumericalError(o.opt_boxwidth) ? null : o.opt_boxwidth.ToString(), null, doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
             string boxgap = GetText(null, G.IsNumericalError(o.opt_boxgap) ? null : o.opt_boxgap.ToString(), null, doc.SelectSingleNode("gekkoplot/boxgap"), "2");
@@ -1048,6 +1059,8 @@ namespace Gekko
                     graphOptions.code = code;
                     graphOptions.index = o.opt_i;
                     graphOptions.yoy = G.Equal(o.opt_yoy, "yes");
+                    graphOptions.points = false;
+                    if (o.opt_linetype == null || G.Equal(o.opt_linetype, "linespoints")) graphOptions.points = true;
                     graphOptions.scaleDecomp = o.guiGraphScaleDecomp;
                     graphOptions.scaleGeneral = o.guiGraphScaleGeneral;
 
@@ -1464,9 +1477,21 @@ namespace Gekko
 
         private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside, EFreq highestFreq)
         {
-            int manyXValues = 0;  //0 or 1            
-
             string plotline = "plot ";
+
+            if (Program.options.plot_all_dash_order > 0)  //duplicating colors for <a>
+            {
+                List<string> colors = new List<string>();
+                int add = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    int allType = GetAllType(co[i]);
+                    if (allType == 2) add++;
+                    else if (allType == 3) add++;
+                    colors.Add(palette2[Math.Max(i - add, 0) % palette2.Count]);  //i - add should not be able to become < 0, but Max() just in case
+                }
+                palette2 = colors;
+            }
 
             int boxesYCounter = 0;
             int boxesY2Counter = 0;
@@ -1475,6 +1500,8 @@ namespace Gekko
             int iii = 0;
             for (int i = 0; i < count; i++)
             {
+                int allType = GetAllType(co[i]);
+
                 iii = i;
                 XmlNode line3 = lines3[i];
 
@@ -1483,7 +1510,9 @@ namespace Gekko
                 if (Program.options.plot_lines_points) dlinetype = "linespoints";
                 string ddashtype = "1";
                 string dlinewidth = "3";
-                string dlinecolor = palette2[i % palette2.Count].Trim();
+
+                string dlinecolor = dlinecolor = palette2[i % palette2.Count].Trim();
+
                 string dpointtype = "7";
                 string dpointsize = "0.5";
                 string dfillstyle = "solid";
@@ -1578,9 +1607,23 @@ namespace Gekko
                 }
                 catch { };
 
-                int allType = 0; try { allType = co[i].operatorFinalAll; } catch { }
+                bool dashDone = false;
+                if (Program.options.plot_all_dash_order > 0)  //0=none | 1=1,3,2 | 2=1,2,3 | 3=3,1,2 | 4=2,1,3 | 5=3,2,1 | 6=2,3,1
+                {
+                    List<int> dash = new List<int>();
+                    if (Program.options.plot_all_dash_order == 1) dash = new List<int> { 1, 3, 2 };
+                    else if (Program.options.plot_all_dash_order == 2) dash = new List<int> { 1, 2, 3 };
+                    else if (Program.options.plot_all_dash_order == 3) dash = new List<int> { 3, 1, 2 };
+                    else if (Program.options.plot_all_dash_order == 4) dash = new List<int> { 2, 1, 3 };
+                    else if (Program.options.plot_all_dash_order == 5) dash = new List<int> { 3, 2, 1 };
+                    else if (Program.options.plot_all_dash_order == 6) dash = new List<int> { 2, 3, 1 };
+                    if (allType == 1) { s += " dashtype " + dash[0].ToString(); dashDone = true; }
+                    else if (allType == 2) { s += " dashtype " + dash[1].ToString(); dashDone = true; }
+                    else if (allType == 3) { s += " dashtype " + dash[2].ToString(); dashDone = true; }
+                }
 
-                if (!G.NullOrBlanks(dashtype)) s += " dashtype " + dashtype;
+                if (!dashDone && !G.NullOrBlanks(dashtype)) s += " dashtype " + dashtype;
+
                 if (!G.NullOrBlanks(linewidth)) s += " linewidth " + linewidth;
                 if (!G.NullOrBlanks(linecolor)) s += " linecolor rgb \"" + linecolor.ToLower() + "\"";  //in gnuplot, the linecolor must be lower-case
                 if (!G.NullOrBlanks(pointtype)) s += " pointtype " + pointtype;
@@ -1755,6 +1798,12 @@ namespace Gekko
             }
 
             return plotline;
+        }
+
+        private static int GetAllType(O.Prt.Element coi)
+        {
+            int allType = 0; try { allType = coi.operatorFinalAll; } catch { }  //0 no nothing, 1 for <a> first-position-bank, 2 for <a> ref-bank.
+            return allType;
         }
 
         private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)

@@ -196,11 +196,11 @@
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Indexes/adjusts data to 100 in the midpoint period (&lt;i> option)"  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
+                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Indexes/adjusts data to 100 in the midpoint period (&lt;i> option).&#x0a;See also 'option print index date' and 'option print index value'."  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_yoy"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Year-over-year for time-changes: 4 lags for quarterly series, and 12 lags for monthly series (&lt;yoy> option)"  Content="Yoy" Checked="CheckBox_yoy_Checked" Unchecked="CheckBox_yoy_Unchecked"/>
+                <CheckBox x:Name="CheckBox_yoy"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Year-over-year for time-changes: 4 lags for quarterly series, and 12 lags for monthly series (&lt;yoy> option)"  Content="YoY" Checked="CheckBox_yoy_Checked" Unchecked="CheckBox_yoy_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
@@ -225,8 +225,28 @@
 
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
 
-                <TextBox Name="TextBox_period" Width="75" Height="17" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ToolTip="Change time period (press the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
-                
+                <TextBox Name="TextBox_period" Width="75" Height="17" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
+
+                <ComboBox Name="ZoomComboBox"
+                  IsEditable="True"
+                  Opacity="0.7" FontFamily="Courier New" FontSize="9"
+                  HorizontalAlignment="Left"
+                  Margin="2,10,0,0"
+                  StaysOpenOnEdit="True"
+                  Text="100%"
+                  KeyDown="ZoomComboBox_KeyDown"
+                  ToolTip="Plot zoom level. The zoom level is stored on the computer (same place as window positions/sizes, etc.)."
+                  SelectionChanged="ZoomComboBox_SelectionChanged">
+                    <ComboBoxItem>50%</ComboBoxItem>
+                    <ComboBoxItem>67%</ComboBoxItem>
+                    <ComboBoxItem>80%</ComboBoxItem>
+                    <ComboBoxItem>100%</ComboBoxItem>
+                    <ComboBoxItem>125%</ComboBoxItem>
+                    <ComboBoxItem>150%</ComboBoxItem>
+                    <ComboBoxItem>200%</ComboBoxItem>
+                </ComboBox>
+
+
                 <Button Content="Refresh" Margin="2,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (also use when changing time period)." Click="Button_refresh">
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -258,26 +278,10 @@
                     </Button.Resources>
                 </Button>
 
-                <ComboBox Name="ZoomComboBox"
-                  IsEditable="True"
-                  Opacity="0.7" FontFamily="Courier New" FontSize="9"
-                  HorizontalAlignment="Left"
-                  Margin="2,10,0,0"
-                  StaysOpenOnEdit="True"
-                  Text="100%"
-                  KeyDown="ZoomComboBox_KeyDown"
-                  ToolTip="Plot zoom level. The zoom level is stored on the computer (same place as window positions/sizes, etc.)."
-                  SelectionChanged="ZoomComboBox_SelectionChanged">
-                    <ComboBoxItem>40%</ComboBoxItem>
-                    <ComboBoxItem>50%</ComboBoxItem>
-                    <ComboBoxItem>67%</ComboBoxItem>
-                    <ComboBoxItem>80%</ComboBoxItem>
-                    <ComboBoxItem>100%</ComboBoxItem>
-                    <ComboBoxItem>125%</ComboBoxItem>
-                    <ComboBoxItem>150%</ComboBoxItem>
-                    <ComboBoxItem>200%</ComboBoxItem>
-                    <ComboBoxItem>250%</ComboBoxItem>
-                </ComboBox>                
+                
+                <StackPanel>
+                    <CheckBox x:Name="CheckBox_points"  Width="57" Margin="2,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show line 'points' for each period (typically small circles). &#x0a;Selected corresponds to &lt;type=linespoints> and unselected corresponds to &lt;type=lines>"  Content="Points" Checked="CheckBox_points_Checked" Unchecked="CheckBox_points_Unchecked"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 

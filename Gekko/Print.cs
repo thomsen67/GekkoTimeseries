@@ -510,8 +510,7 @@ namespace Gekko
 
             if (type == EPrintTypes.Plot)
             {
-                PlotHelper plotHelper = new PlotHelper();
-                //if (Program.options.bugfix_plot) plotHelper.isDecompPlot = true;
+                PlotHelper plotHelper = new PlotHelper();                
                 string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, plotHelper, smpl.p);
                 if (Globals.browserPlotFiles != null) Globals.browserPlotFiles.Add(fileName);
             }
