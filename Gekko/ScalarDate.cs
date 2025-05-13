@@ -39,7 +39,7 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            new Error("Could not convert the date " + this.date + " directly into a string (try the string() function)."); return null;
+            new Error("Could not convert the date " + this.date + " directly into a string (try the string() function or use quotes)."); return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)

@@ -27225,6 +27225,7 @@ namespace Gekko
         /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
         {
+            bool hasAtLeast1RealNumber = false;
             PlotTable plotTable = new PlotTable();
             plotTable.dates = new List<List<double>>();
             plotTable.values = new List<List<double>>();
@@ -27284,8 +27285,11 @@ namespace Gekko
                     plotTable.dates[j - 2].Add(tt);
                     plotTable.values[j - 2].Add(d);
 
+                    if (!G.IsNumericalError(d)) hasAtLeast1RealNumber = true;
                 }
             }
+
+            if (!hasAtLeast1RealNumber) new Error("The plot contains all missing values and therefore cannot be drawn.");
 
             return plotTable;
         }
@@ -29389,7 +29393,7 @@ namespace Gekko
                 if (!G.NullOrBlanks(Program.options.print_index_date))
                 {
                     index = GekkoTime.FromStringToGekkoTime(Program.options.print_index_date, false, false, false);                    
-                    if (index.IsNull()) new Error("Could not convert 'option print index date = '" + Program.options.print_index_date + "' into a Gekko date.");
+                    if (index.IsNull()) new Error("Could not convert: option print index date = '" + Program.options.print_index_date + "' into a Gekko date.");
                     index = GekkoTime.ConvertFreqsFirst(smpl.t1.freq, index, null);
                 }
                 else

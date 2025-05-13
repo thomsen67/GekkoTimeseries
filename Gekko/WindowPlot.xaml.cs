@@ -11,7 +11,7 @@ namespace Gekko
         public string op = "";  //can also be n1/n2 (left or right n)
         public bool? isLog = false;
         public bool? isYoy = false;
-        public bool? isPoints = null;
+        public bool? isPoints = true;  //This is default
         public string period = "";
         public bool? isIndex = null;
         public bool? isRef = false;

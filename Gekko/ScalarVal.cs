@@ -48,7 +48,7 @@ namespace Gekko
 
         public string ConvertToString()
         {            
-            G.Writeln2(EWrapType.Error, "Could not convert the value " + this.val + " directly into a string (try the string() function).");            
+            G.Writeln2(EWrapType.Error, "Could not convert the value " + this.val + " directly into a string (try the string() function or use quotes).");            
             return null;
         }
 
