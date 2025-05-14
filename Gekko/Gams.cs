@@ -2174,7 +2174,7 @@ namespace Gekko
             mi.countVars3 = model.modelGamsScalar.CountVars(3);
 
             model.modelGamsScalar.modelInfoGamsScalar = mi;
-            model.modelGamsScalar.modelInfoGamsScalar.Print(false, t);
+            model.modelGamsScalar.modelInfoGamsScalar.Print(false, model.modelGamsScalar.hasResVariables, t);
 
             return model;
 

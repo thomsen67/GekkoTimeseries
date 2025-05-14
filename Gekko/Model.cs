@@ -654,7 +654,7 @@ namespace Gekko
         [ProtoMember(9)]
         public int countVars3 = -12345;
 
-        public void Print(bool loadedFromCacheFile, DateTime t)
+        public void Print(bool loadedFromCacheFile, bool hasResVariables, DateTime t)
         {
             Table tab = new Table();
 
@@ -708,6 +708,12 @@ namespace Gekko
                         txt.MainAdd("Extracting from files, time: " + G.Seconds(t));
                     }
                     txt.MainNewLineTight();
+                    if (!hasResVariables)
+                    {
+                        txt.MainAdd("NOTE: The model contains no res_... variables to identify dependent variables, affecting the quality of DISP, DECOMP etc.");
+                        G.ResErrorMessage(txt);
+                        txt.MainNewLineTight();
+                    }
                 }
             }
             finally
@@ -715,9 +721,7 @@ namespace Gekko
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
             }
-        }
-
-
+        }        
     }
 
     [ProtoContract]

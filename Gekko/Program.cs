@@ -16436,11 +16436,12 @@ namespace Gekko
                         using (var txt = new Note())
                         {
                             txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd("The scalar model does not contain any res_... variables.");
-                            txt.MoreAdd("Because the scalar model does not contain any res_... variables, the relevant determining equation etc. cannot be identified. You may try 'option print disp model gams scalar = standard;' for the old DISP functionality.");
-                            txt.MoreAdd("The res_... functionality operates with equations like 'x + y = res_y + z' to identify y as the variable that is determined (is dependent). This identification used to be accomplished via equation names, but requires res_... variables now.");
+                            txt.MainAdd("The scalar model does not contain any res_... variables.");                                                        
+                            G.ResErrorMessage(txt);
                             txt.MoreNewLine();
-                            txt.MoreAdd("You may alternatively try 'DECOMP " + varnameWithoutFreq + ";' to see the equations that contain the variable.");
+                            txt.MoreAdd("In this Gekko version, as a work-around, instead of DISP you may try 'DECOMP " + varnameWithoutFreq + ";' to see the list of equations that contain the variable. Beware that this list will not be particularly well ordered regarding relevance.");                            
+                            txt.MoreNewLine();
+                            txt.MoreAdd("As another work-around, you may try 'option print disp model gams scalar = standard;', using an older way of showing equations in DISP. This older way uses raw (non-unfolded) equations rather than scalar equations.");
                         }
                     }
                     else
@@ -18974,7 +18975,7 @@ namespace Gekko
                             GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
                             if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
                             {
-                                if (model.modelGamsScalar?.modelInfoGamsScalar != null) model.modelGamsScalar.modelInfoGamsScalar.Print(true, t0);
+                                if (model.modelGamsScalar?.modelInfoGamsScalar != null) model.modelGamsScalar.modelInfoGamsScalar.Print(true, model.modelGamsScalar.hasResVariables, t0);
                             }
                         }
                         else if (model.modelGekko != null)
