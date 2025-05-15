@@ -618,6 +618,7 @@ namespace Gekko
 
         public void DeepTrace(TraceHelper th, int depth)
         {
+            if (th.depthLimit != -12345 && depth >= th.depthLimit) return;
             if (th.type == ETraceHelper.GetAllMetasAndTraces)  //0 corresponds to direct effect from bank variable (e.g. "adambk:"), not indirect effect.
             {                
                 th.unittestTraceCountIncludeInvisible++; //only for testing
@@ -1648,9 +1649,14 @@ namespace Gekko
         {
             //The .stamp is in UTC time, so needs to be converted for printing
             stamp = id.StampInLocalTime().ToString("d", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
-            stampDetailed = id.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;
-            //stamp = id.stamp.ToString("d", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));  //This is SLOOOW!
-            //stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ", #" + id.counter;  //This is SLOOOW!
+            try
+            {
+                stampDetailed = id.StampInLocalTime().ToString("HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;  //7 digits is 100 ns, which is limit anyway
+            }
+            catch
+            {
+                stampDetailed = id.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;
+            }
         }
 
         public static void GetActivePeriodsAsString(GekkoTimeSpansSimple periods, ref string active, ref string activeDetailed)
@@ -1839,6 +1845,7 @@ namespace Gekko
         public double scramble = double.NaN;  //for scramble() function
         public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
+        public int depthLimit = -12345;
         
         // --- the following is for stats etc. ("real" traces)        
         public int unittestTraceCountIncludeInvisible = 0; //will include combinations, traces will not

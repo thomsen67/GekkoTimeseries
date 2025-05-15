@@ -6151,7 +6151,7 @@ namespace Gekko
             GekkoDictionary<string, bool> dublets = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             //precedents
             TraceBankHelpler helper = new TraceBankHelpler();
-            found = Program.TraceGetPrecedents(null, "adambk", helper);
+            found = Program.TraceGetPrecedents(null, "adambk", false, helper);
             if (true)
             {
                 using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "traceadam2.txt", null, Program.GekkoFileReadOrWrite.Write))
@@ -6191,6 +6191,8 @@ namespace Gekko
             //bankname is always string.
             //name is normally string but can optionally be a series object, when calling with "precedents".
 
+            bool direct = false;  //normally
+
             if (x.Length == 0) new Error("Expected > 0 arguments to tracebank() function");
             List<string> names = new List<string>();
             
@@ -6213,21 +6215,37 @@ namespace Gekko
                 }
 
                 ETraceBank type = ETraceBank.None;
-                if (G.Equal(precOrDep, "precedents")) type = ETraceBank.Precedents;
-                else if (G.Equal(precOrDep, "dependents")) type = ETraceBank.Dependents;
-                else new Error("Tracebank(): the type must be 'precedents' or 'dependents'");
+                if (G.Equal(precOrDep, "precedents"))
+                {
+                    type = ETraceBank.Precedents;
+                }
+                else if (G.Equal(precOrDep, "precedents1"))
+                {
+                    type = ETraceBank.Precedents;
+                    direct = true;
+                }
+                else if (G.Equal(precOrDep, "dependents"))
+                {
+                    type = ETraceBank.Dependents;
+                }
+                else if (G.Equal(precOrDep, "dependents1"))
+                {
+                    type = ETraceBank.Dependents;
+                    direct = true;
+                }
+                else new Error("Tracebank(): the type must be 'precedents', 'precedents1', 'dependents' or 'dependents1'");
 
                 GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                 
                 if (type == ETraceBank.Precedents)
                 {
                     //precedents                                  
-                    found = Program.TraceGetPrecedents(ivName, bankname, null);                    
+                    found = Program.TraceGetPrecedents(ivName, bankname, direct, null);                    
                 }
                 else
                 {
                     //dependents                    
-                    found = Program.TraceGetDependents(ivName, bankname);
+                    found = Program.TraceGetDependents(ivName, bankname, direct);
                 }                
 
                 names = found.Keys.ToList();

@@ -1374,7 +1374,7 @@ namespace Gekko
 
                     GekkoTime time = G.Chop_DimensionGetPeriod(eq);
 
-                    if (time.IsNotNull())  //ignore for instance a timeless equation like E_tIOy_tBase[d,s]
+                    if (time.IsSimilarToNull())  //ignore for instance a timeless equation like E_tIOy_tBase[d,s]
                     {
                         string noIndex = G.Chop_GetName(eq);
 

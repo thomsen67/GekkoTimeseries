@@ -142,9 +142,9 @@ namespace Gekko
         [ProtoMember(4)]
         public readonly EFreq freq;
 
-        //For Gekko 4.0: use EFreq.None for tNull and tNotNull, so they will not be accepted for any time iterator!
+        //For Gekko 4.0: use EFreq.None for tNull and tSimilarToNull, so they will not be accepted for any time iterator!
         public static GekkoTime tNull = new GekkoTime(EFreq.A, -12345, 1);  //DO NOT CHANGE NAME! Think of it as a 'null' object (but it is a struct)
-        public static GekkoTime tNotNull = new GekkoTime(EFreq.A, -23456, 1);  //DO NOT CHANGE NAME! Think of it as 'yes' (for instance in PRT <i>... which is different from PRT <i=2010q3>).
+        public static GekkoTime tSimilarToNull = new GekkoTime(EFreq.A, -23456, 1);  //DO NOT CHANGE NAME! Think of it as 'yes' (for instance in PRT <i>... which is different from PRT <i=2010q3>).
         public static DateTime unixTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
         private static List<HolidayNames> holidayNames = null;  //use HolidayNames!!
@@ -312,7 +312,7 @@ namespace Gekko
             return false;
         }
 
-        public bool IsNotNull()
+        public bool IsSimilarToNull()
         {
             if (this.super == -23456) return true;
             return false;

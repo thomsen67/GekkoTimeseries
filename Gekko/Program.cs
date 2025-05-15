@@ -2684,6 +2684,42 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (Globals.runningOnTTComputer && (text == "trace"))
+            {
+                if (true)
+                {
+                    Dictionary<string, bool> found1 = Program.TraceGetPrecedents(null, "adambk", false, null);
+                    List<string> adamvars = found1.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    int n = 0;
+                    foreach (string adamvar in adamvars)
+                    {
+                        n++;
+                        //if (n > 100) break;
+                        Dictionary<string, bool> found2 = Program.TraceGetDependents(new ScalarString(adamvar), "adambk", true);
+                        List<string> makrovars = found2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                        if (makrovars.Count > 0)
+                        {
+                            for (int i = 0; i < makrovars.Count; i++)
+                            {
+                                makrovars[i] = G.Chop_RemoveFreq(makrovars[i]);
+                                makrovars[i] = makrovars[i].Replace(" ", "");
+                            }
+                            using (var txt = new Writeln())
+                            {
+                                txt.MainOmitVeryFirstNewLine();
+                                txt.lineWidth = 1000000;
+                                string adamvarNoFreq = G.Chop_RemoveFreq(adamvar);
+                                txt.MainAdd(adamvarNoFreq + G.Blanks(15 - adamvarNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
+                            }
+                        }
+                        else
+                        {
+                            //WHY??
+                        }
+                    }
+                }
+            }
+
             if (Globals.runningOnTTComputer)
             {
                 if (false)
@@ -10529,7 +10565,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, TraceBankHelpler helper)
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, bool direct, TraceBankHelpler helper)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -10545,6 +10581,7 @@ namespace Gekko
                     }
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
+                    if (direct) th1.depthLimit = 1;
                     ts.DeepTrace(th1);
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
@@ -10568,6 +10605,7 @@ namespace Gekko
                 if (ts == null) new Error("Expected input name to be a series name");
                 TraceHelper th1 = new TraceHelper();
                 th1.type = ETraceHelper.GetAllMetasAndTraces;
+                if (direct) th1.depthLimit = 1;
                 ts.DeepTrace(th1);
                 foreach (Trace2 trace in th1.traces.Keys)
                 {
@@ -10664,7 +10702,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname)
+        public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname, bool direct)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);            
 
@@ -10680,7 +10718,8 @@ namespace Gekko
 
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
-                    ts.DeepTrace(th1);
+                    if (direct) th1.depthLimit = 1;
+                    ts.DeepTrace(th1);                    
 
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
@@ -10709,6 +10748,7 @@ namespace Gekko
 
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
+                    if (direct) th1.depthLimit = 1;
                     ts.DeepTrace(th1);
 
                     foreach (Trace2 trace in th1.traces.Keys)
@@ -27302,7 +27342,12 @@ namespace Gekko
                 }
             }
 
-            if (!hasAtLeast1RealNumber) new Error("The plot contains all missing values and therefore cannot be drawn.");
+            if (!hasAtLeast1RealNumber)
+            {
+                string s = "";
+                if (!o.opt_i.IsNull()) s = "It seems option <i> is used. For a series x, if x[ti] is a missing value (where ti is the index date, for instance the start of the time period), the whole indexed series 100*x/x[ti] will have missing values. You may want to adjust the time period.";
+                new Error("The plot contains all missing values and therefore cannot be drawn. " + s);
+            }
 
             return plotTable;
         }
@@ -29400,18 +29445,26 @@ namespace Gekko
             }
 
             GekkoTime index = index2;
-            if (smpl != null && index.IsNotNull())  //.IsNotNull <> !.IsNull !!!
+            if (smpl != null && index.IsSimilarToNull())
             {
-                //<i>, not <i=...>
-                if (!G.NullOrBlanks(Program.options.print_index_date))
+                //<i>, not <i=...>                
+                if (G.Equal(Program.options.print_index_date, "start"))
                 {
-                    index = GekkoTime.FromStringToGekkoTime(Program.options.print_index_date, false, false, false);                    
-                    if (index.IsNull()) new Error("Could not convert: option print index date = '" + Program.options.print_index_date + "' into a Gekko date.");
-                    index = GekkoTime.ConvertFreqsFirst(smpl.t1.freq, index, null);
+                    index = smpl.t1;
+                }
+                else if (G.Equal(Program.options.print_index_date, "middle"))
+                {
+                    index = smpl.t1.Add((smpl.Observations12() - 1) / 2);  //per1=2001-2005, observations=5 --> (5-1)/2 = 2 are added, so we get 2001+2 = 2003 as midpoint.
+                }
+                else if (G.Equal(Program.options.print_index_date, "end"))
+                {
+                    index = smpl.t2;
                 }
                 else
                 {
-                    index = smpl.t1.Add((smpl.Observations12() - 1) / 2);  //per1=2001-2005, observations=5 --> (5-1)/2 = 2 are added, so we get 2001+2 = 2003 as midpoint.
+                    index = GekkoTime.FromStringToGekkoTime(Program.options.print_index_date, false, false, false);
+                    if (index.IsNull()) new Error("Could not convert: option print index date = '" + Program.options.print_index_date + "' into a Gekko date. Expected 'option print index date' to be 'start', 'middle', 'end' or a date inside quotes.");
+                    index = GekkoTime.ConvertFreqsFirst(smpl.t1.freq, index, null);
                 }
             }
 

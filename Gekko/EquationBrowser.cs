@@ -1493,7 +1493,7 @@ img {border-style: none;
                     GekkoDictionary<string, bool> found = null;
                     try
                     {
-                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk", null);
+                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk", false, null);
                     }
                     catch { };
                     if (found != null && found.Count > 0)

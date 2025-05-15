@@ -25,7 +25,7 @@ namespace Gekko
                 o0.guiGraphSizeScaling = gh.sizeScaling;
                 o0.guiGraphIsButton = gh.isButton;
                 o0.prtType = "plot";
-                if (gh.isIndex != null) { if (gh.isIndex == true) { o0.opt_i = GekkoTime.tNotNull; } else { o0.opt_i = GekkoTime.tNull; } }
+                if (gh.isIndex != null) { if (gh.isIndex == true) { o0.opt_i = GekkoTime.tSimilarToNull; } else { o0.opt_i = GekkoTime.tNull; } }
                 if (gh.isYoy != null) { if (gh.isYoy == true) { o0.opt_yoy = "yes"; } else { o0.opt_yoy = "no"; } }
                 if (gh.isPoints != null) { if (gh.isPoints == true) { o0.opt_linetype = "linespoints"; } else { o0.opt_linetype = "lines"; } }
                 O.GetPeriods2(o0, gh);

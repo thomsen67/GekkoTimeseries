@@ -639,7 +639,7 @@ namespace Gekko.Parser.Gek
             else if (node.Text != null && node.Text.StartsWith("ASTOPT_DATE_"))
             {
                 string s2 = node.Text.Substring(12);
-                if (node.ChildrenCount() == 0) node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = GekkoTime.tNotNull;" + G.NL);
+                if (node.ChildrenCount() == 0) node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = GekkoTime.tSimilarToNull;" + G.NL);
                 else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
             }
             else if (node.Text != null && node.Text.StartsWith("ASTOPT_LIST_"))
@@ -2868,7 +2868,7 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A("if (gh.isIndex != null) {");
                             node.Code.A("  if (gh.isIndex == true) {");
-                            node.Code.A("    o" + Num(node) + ".opt_i = GekkoTime.tNotNull;");
+                            node.Code.A("    o" + Num(node) + ".opt_i = GekkoTime.tSimilarToNull;");
                             node.Code.A("  }");
                             node.Code.A("  else {");
                             node.Code.A("    o" + Num(node) + ".opt_i = GekkoTime.tNull;");

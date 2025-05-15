@@ -192,7 +192,7 @@ namespace Gekko
         public int print_fields_pdec = 2;
         public int print_fields_pwidth = 8;  //to make more room for labels
         public string print_freq = "pretty";  //pretty or simple
-        public string print_index_date = "";  //a date like "2020" or "2020q3".
+        public string print_index_date = "start";  //a date like "2020" or "2020q3". Can also be "start", "middle" or "end".
         public double print_index_value = 100d;  //Could be 1 instead of 100...
         public bool print_mulprt_lev = false;  //n
         public bool print_mulprt_abs = true;  //m
