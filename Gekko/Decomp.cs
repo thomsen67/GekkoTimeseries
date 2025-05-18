@@ -3198,13 +3198,13 @@ namespace Gekko
                 //foreach precedent variable
                 int i = -1;
                 foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
-                {
+                {                                        
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
 
                     i++;
-                    string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                    string varName = modelGamsScalar.GetVarNameA(dp.variable);                    
 
                     if (op.isRaw)
                     {
@@ -3783,6 +3783,10 @@ namespace Gekko
         {
             List<string> rownames3 = rownames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             List<string> colnames3 = colnames2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+
+            MoveResToEnd(rownames3);
+            MoveResToEnd(colnames3);
+
             rownames = new List<string>();
             colnames = new List<string>();
             rownamesWithResiduals = new List<string>();
@@ -3815,6 +3819,29 @@ namespace Gekko
             if (colnames3.Count != colnames.Count + colResiduals) new Error("Decomp pivot: count problem (lhs variable)");
             if (rownames3.Count != rownamesWithResiduals.Count) new Error("Decomp pivot: count problem (lhs variable)");
             if (colnames3.Count != colnamesWithResiduals.Count) new Error("Decomp pivot: count problem (lhs variable)");
+        }
+
+        private static void MoveResToEnd(List<string> m)
+        {
+            List<string> temp = new List<string>();
+            for (int i = m.Count - 1; i >= 0; i--)
+            {
+                if (G.StartsWith(m[i], Globals.decompResidualPrefix))
+                {
+                    temp.Add(m[i]);
+                    m.RemoveAt(i); // Remove from the original list
+                }
+            }
+            int ii = -12345;
+            for (int i = 0; i < m.Count; i++)
+            {
+                if (m[i].StartsWith(Globals.decompResidualName))
+                {
+                    ii = i; break;
+                }
+            }
+            if (ii != -12345) m.InsertRange(ii, temp);
+            else m.AddRange(temp);
         }
 
         public static string GetNumberFormat(DecompOptions2 decompOptions2)
