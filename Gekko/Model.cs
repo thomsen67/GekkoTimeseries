@@ -989,7 +989,7 @@ namespace Gekko
         public bool hasResVariables = false;  //if a variable res_... is encountered
 
         [ProtoMember(34)]  //Only used when there are no res_... and 
-        public GekkoDictionary<string, string> lhsEquations = null;
+        public GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         // =============================================
         // =============================================
@@ -1994,6 +1994,35 @@ namespace Gekko
         {
             return this.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
         }
+
+        /// <summary>
+        /// For a variable (possibly with indexes excluding time), it returns equation names (possibly with indexes) where
+        /// the variable is considered dependent (from the eq name). For a Gekko model, the variable name is returned with
+        /// prefix "e_".
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <param name="isModelGekko"></param>
+        /// <returns></returns>
+        public List<string> GetDependentEquations(string variableName, bool isModelGekko)
+        {
+            List<string> lhsEqs = new List<string>();
+            if (isModelGekko)
+            {
+                lhsEqs.Add("e_" + variableName);
+            }
+            else
+            {
+                foreach (KeyValuePair<string, string> kvp in this.lhsEquations)
+                {
+                    if (G.EqualHandleBlanks(kvp.Value, variableName))
+                    {
+                        lhsEqs.Add(kvp.Key);
+                    }
+                }
+            }
+            return lhsEqs;
+        }
+
 
     }
 

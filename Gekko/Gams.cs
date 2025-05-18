@@ -1102,21 +1102,12 @@ namespace Gekko
                 string eqName = model.modelGamsScalar.GetEqName(eqNumber);
                 string eqNameWithLag = null;
                 eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, tHere, false);
-
-                string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);
-                List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
+                string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);                
 
                 EqInfoSimple e = new EqInfoSimple();
                 e.eqName = eqName;
                 e.eqNameWithLag = eqNameWithLag;
                 e.eqNumber = eqNumber;
-
-                bool hit2 = false;
-                foreach (string s in lhsVars)
-                {
-                    if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-                }
-                if (hit2) e.score += Globals.lhsScore1; //0.5
 
                 if (modelGamsScalar.isPerpetualModel)
                 {
@@ -1127,8 +1118,38 @@ namespace Gekko
                 }
                 else
                 {
-                    string dep = GetDependentVariable(eqNumber, modelGamsScalar);
-                    if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;
+                    List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
+                    bool hit2 = false;
+                    foreach (string s in lhsVars)
+                    {
+                        if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
+                    }
+                    if (hit2) e.score += Globals.lhsScore1; //0.5                    
+
+                    if (modelGamsScalar.hasResVariables)
+                    {
+                        //res_... variables
+                        string dep = GetDependentVariable(eqNumber, modelGamsScalar);
+                        if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;                        
+                    }
+                    else
+                    {
+                        //if (G.Equal(Program.options.model_gams_scalar_dep_method, "res"))
+                        //{
+
+                        //}
+
+                        //eq names
+                        double d = double.MaxValue;
+                        string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(e.eqName);  //Note: what about lagged/leaded equation???
+                        bool hit1 = false;
+                        List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
+                        foreach (string s in lhsEqs)
+                        {
+                            if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+                        }
+                        if (hit1) e.score += Globals.lhsScore2; //100                        
+                    }
                 }
                 
                 rv.Add(e);

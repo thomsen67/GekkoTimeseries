@@ -16435,15 +16435,15 @@ namespace Gekko
                 }
                 else
                 {
-                    if (!modelGamsScalar.hasResVariables)
+                    if (!modelGamsScalar.hasResVariables && G.Equal(Program.options.model_gams_scalar_dep_method, "res"))
                     {
                         using (var txt = new Note())
                         {
                             txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd("The scalar model does not contain any res_... variables.");                                                        
+                            txt.MainAdd("The scalar model does not contain any res_... variables.");
                             G.ResErrorMessage(txt);
                             txt.MoreNewLine();
-                            txt.MoreAdd("In this Gekko version, as a work-around, instead of DISP you may try 'DECOMP " + varnameWithoutFreq + ";' to see the list of equations that contain the variable. Beware that this list will not be particularly well ordered regarding relevance.");                            
+                            txt.MoreAdd("As a work-around, instead of DISP you may try 'DECOMP " + varnameWithoutFreq + ";' to see the list of equations that contain the variable. Beware that this list will not be particularly well ordered regarding relevance.");
                             txt.MoreNewLine();
                             txt.MoreAdd("As another work-around, you may try 'option print disp model gams scalar = standard;', using an older way of showing equations in DISP. This older way uses raw (non-unfolded) equations rather than scalar equations.");
                         }
@@ -18969,7 +18969,7 @@ namespace Gekko
                     cacheParameters.option_model_gams_dep_current = Program.options.model_gams_dep_current;
                     cacheParameters.option_model_gams_dep_method = Program.options.model_gams_dep_method;
 
-                    if (modelTemp != null && modelTemp.modelCommon.cacheParameters.IsSame(cacheParameters))
+                    if (modelTemp != null && modelTemp.modelCommon != null && modelTemp.modelCommon.cacheParameters != null && modelTemp.modelCommon.cacheParameters.IsSame(cacheParameters))
                     {
                         model = modelTemp;
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));

@@ -4333,11 +4333,23 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Print()
         {
+            Gekko.Table table = null;
+
+            //Testing <yoy>
+            I("reset; option freq q; time 2001 2002;");
+            I("x = 2, 3, 4, 5, 12, 13, 14, 15;");
+            I("prt <p> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(7, 2).number, (13d / 12d - 1d) * 100d, sharedDelta);
+            I("prt <p yoy> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(7, 2).number, (13d / 3d - 1d) * 100d, sharedDelta);
+
             //Testing <i>
             I("reset; time 2001 2005;");
             I("x = 2, 3, 4, 5, 6;");
             I("prt <i> x;");
-            Gekko.Table table = Globals.lastPrtOrMulprtTable;
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);
             Assert.AreEqual(table.Get(4, 2).number, 4d / 2d * 100d, sharedDelta);
             Assert.AreEqual(table.Get(6, 2).number, 6d / 2d * 100d, sharedDelta);
