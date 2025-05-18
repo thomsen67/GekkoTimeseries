@@ -3694,12 +3694,10 @@ namespace Gekko
         }
         public static void ResErrorMessage(Wrap txt)
         {            
-            txt.MoreAdd("Gekko versions < 3.2.23 used GAMS equation names to identify the dependent variable of each GAMS equation.");
-            txt.MoreAdd("This way of determining dependent variables is discontinued, relying instead upon so-called res_... variables.");
-            txt.MoreAdd("For instance, in an equation like x + y = res_y + z, the res_y variable designates the dependent variable of the equation,");
-            txt.MoreAdd("in this case y. Without res_... variables, Gekko cannot know which variable is dependent in a given equation, and hence will not display a corresponding");
-            txt.MoreAdd("equation when using DISP. Also, when using DECOMP, the equation ordering will be imprecise, so the first equation in the list of equations may not");
-            txt.MoreAdd("be the relevant one, and DECOMP flowgraphs will not work at all. To fix this problem, use a GAMS model that contains such res... variables, or use a Gekko version < 3.2.23.");
+            txt.MoreAdd("With 'option model gams scalar dep method = res', Gekko relies upon so-called res_... variables inside the model equations.");
+            txt.MoreAdd("For instance, in an equation like x + y =e= res_y + z, the res_y variable designates the dependent variable of the equation,");
+            txt.MoreAdd("in this case y. With the option set to 'res' and without res_... variables, Gekko cannot know which variable is dependent in a given equation, and hence will not display a corresponding");
+            txt.MoreAdd("equation when using DISP (and flowgraphs will not work at all). Instead, if equation names provide hints regarding the dependent variable of an equation, you may use 'option model gams scalar dep method = auto'.");            
         }
 
         /// <summary>

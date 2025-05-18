@@ -4333,6 +4333,80 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Print()
         {
+            //Testing <i>
+            I("reset; time 2001 2005;");
+            I("x = 2, 3, 4, 5, 6;");
+            I("prt <i> x;");
+            Gekko.Table table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 4d / 2d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 6d / 2d * 100d, sharedDelta);
+            I("option print index date = 'middle';");
+            I("x = 2, 3, 4, 5, 6;");
+            I("prt <i> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 2d / 4d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 100d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 6d / 4d * 100d, sharedDelta);
+            I("option print index date = 'end';");
+            I("x = 2, 3, 4, 5, 6;");
+            I("prt <i> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 2d / 6d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 4d / 6d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 100d, sharedDelta);
+            I("option print index date = '2002';");
+            I("x = 2, 3, 4, 5, 6;");
+            I("prt <i> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 2d / 3d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 4d / 3d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 6d / 3d * 100d, sharedDelta);            
+            I("x = 2, 3, 4, 5, 6;");
+            I("prt <i=2004> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 2d / 5d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 4d / 5d * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 6d / 5d * 100d, sharedDelta);
+            I("option print index value = 1;");
+            I("prt <i=2004> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 2d / 5d * 1d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 4d / 5d * 1d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 6d / 5d * 1d, sharedDelta);
+
+            //Testing <a>
+            I("reset; time 2001 2005;");
+            I("x = 12, 13, 14, 15, 16;");
+            I("@x = 2, 3, 4, 5, 6;");
+            I("prt <a> x;");
+            Assert.Fail("Beware the PLOT does not do <n p rn rp>!! What about SHEET?");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 12d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 14d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 16d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 3).number, (14d / 13d - 1d) * 100d, sharedDelta);  //Just testing %
+            Assert.AreEqual(table.Get(2, 4).number, 2d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 4).number, 4d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 4).number, 6d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 5).number, (4d / 3d - 1d) * 100d, sharedDelta);  //Just testing %
+            I("prt <an> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 12d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 14d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 16d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 2d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 3).number, 4d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 3).number, 6d, sharedDelta);
+            I("prt <ad> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 1d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 1d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 1d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 3).number, 1d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 3).number, 1d, sharedDelta);
+
             G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
             //bank/ref
@@ -4349,7 +4423,7 @@ namespace UnitTests
             I("x = 200, 205;");
             I("ref:x = 100, 102;");
             I("prt <m> x;");
-            Gekko.Table table = Globals.lastPrtOrMulprtTable;
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);
             I("prt <bank=b1 ref=b2 m> x;");
             table = Globals.lastPrtOrMulprtTable;

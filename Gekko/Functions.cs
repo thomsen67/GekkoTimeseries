@@ -6181,7 +6181,41 @@ namespace Gekko
                 }
             }
         }
-        
+
+        public static void traceadam3(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            int FIFTEEN = 15;
+            Dictionary<string, bool> found1 = Program.TraceGetPrecedents(null, "adambk", false, null);
+            List<string> adamvars = found1.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            if (adamvars.Count == 0) new Error("No variables found: did you READ a databank with data traces?");
+            int n = 0;
+
+            using (FileStream fs = Program.WaitForFileStream("traceadam3.txt", null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                foreach (string adamvar in adamvars)
+                {
+                    n++;
+                    //if (n > 100) break;
+                    Dictionary<string, bool> found2 = Program.TraceGetDependents(new ScalarString(adamvar), "adambk", true);
+                    List<string> makrovars = found2.Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    string adamvarNoFreq = G.Chop_RemoveFreq(adamvar);
+                    if (makrovars.Count > 0)
+                    {
+                        for (int i = 0; i < makrovars.Count; i++)
+                        {
+                            makrovars[i] = G.Chop_RemoveFreq(makrovars[i]);
+                            makrovars[i] = makrovars[i].Replace(" ", "");
+                        }
+                        sw.WriteLine(adamvarNoFreq + G.Blanks(FIFTEEN - adamvarNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
+                    }
+                    else
+                    {
+                        sw.WriteLine(adamvarNoFreq + G.Blanks(FIFTEEN - adamvarNoFreq.Length) + "--- no direct effect ---");
+                    }
+                }
+            }
+        }
 
         public static IVariable tracebank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {

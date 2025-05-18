@@ -2684,42 +2684,6 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (Globals.runningOnTTComputer && (text == "trace"))
-            {
-                if (true)
-                {
-                    Dictionary<string, bool> found1 = Program.TraceGetPrecedents(null, "adambk", false, null);
-                    List<string> adamvars = found1.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                    int n = 0;
-                    foreach (string adamvar in adamvars)
-                    {
-                        n++;
-                        //if (n > 100) break;
-                        Dictionary<string, bool> found2 = Program.TraceGetDependents(new ScalarString(adamvar), "adambk", true);
-                        List<string> makrovars = found2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                        if (makrovars.Count > 0)
-                        {
-                            for (int i = 0; i < makrovars.Count; i++)
-                            {
-                                makrovars[i] = G.Chop_RemoveFreq(makrovars[i]);
-                                makrovars[i] = makrovars[i].Replace(" ", "");
-                            }
-                            using (var txt = new Writeln())
-                            {
-                                txt.MainOmitVeryFirstNewLine();
-                                txt.lineWidth = 1000000;
-                                string adamvarNoFreq = G.Chop_RemoveFreq(adamvar);
-                                txt.MainAdd(adamvarNoFreq + G.Blanks(15 - adamvarNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
-                            }
-                        }
-                        else
-                        {
-                            //WHY??
-                        }
-                    }
-                }
-            }
-
             if (Globals.runningOnTTComputer)
             {
                 if (false)
@@ -19074,9 +19038,39 @@ namespace Gekko
                 }
                 else if (modelType == EModelType.GAMSScalar)
                 {
-                    Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+                    Model model = null;
+                    model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+
+                    try
+                    {
+                        DateTime dt = DateTime.Now;
+                        model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
+                        if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt) + " with " + model.modelGamsScalar.lhsEquations.Count + " items");
+                    }
+                    catch
+                    {
+                        //No need to choke on this
+                        new Note("The module that identifies dependent variables from equation names failed to load");
+                    }
+                    //try
+                    //{
+                    //    //TODO TODO .Add(-1)
+
+                    //    //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
+                    //    DateTime dt = DateTime.Now;
+                    //    //model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
+                    //    if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
+
+                    //}
+                    //catch
+                    //{
+                    //    //No need to choke on this
+                    //    new Note("The module that identifies dependent variables from equation names failed to load");
+                    //}
+
+
                     if (false) GamsModel.GAMSParser();
-                    if (false) GamsModel.GamsGMO();                    
+                    if (false) GamsModel.GamsGMO();
                     Program.model = model;
                 }
                 else new Error("No model defined");
@@ -29281,7 +29275,6 @@ namespace Gekko
         /// <param name="sumOver"></param>
         public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, string isYoy, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
-            //TTH: index=100
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
                         
             string operator3 = operator2.Trim();  //when it comes from for instance a table

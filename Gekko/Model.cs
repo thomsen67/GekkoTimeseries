@@ -708,7 +708,7 @@ namespace Gekko
                         txt.MainAdd("Extracting from files, time: " + G.Seconds(t));
                     }
                     txt.MainNewLineTight();
-                    if (!hasResVariables)
+                    if (!hasResVariables && G.Equal(Program.options.model_gams_scalar_dep_method, "res"))
                     {
                         txt.MainAdd("NOTE: The model contains no res_... variables to identify dependent variables, affecting the quality of DISP, DECOMP etc.");
                         G.ResErrorMessage(txt);
@@ -987,6 +987,9 @@ namespace Gekko
 
         [ProtoMember(33)]  //(32) is above
         public bool hasResVariables = false;  //if a variable res_... is encountered
+
+        [ProtoMember(34)]  //Only used when there are no res_... and 
+        public GekkoDictionary<string, string> lhsEquations = null;
 
         // =============================================
         // =============================================
