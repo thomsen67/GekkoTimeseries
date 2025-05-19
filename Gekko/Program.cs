@@ -2660,12 +2660,10 @@ namespace Gekko
             }
             else
             {
-                foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
+                List<ModelGamsEquation> x = null;  modelGams.equationsByEqname.TryGetValue(eqName, out x);
+                if (x != null)
                 {
-                    //Why is this not a simple dict lookup? Then modelGams.equationsByEqname should be a blank-dict??
-                    //Oh well, this is probably pretty fast, because it is the raw model.
-                    if (!G.EqualHandleBlanks(eqName, kvp.Key)) continue;
-                    foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
+                    foreach (ModelGamsEquation equation in x)  //Actually only 1 in these lists!
                     {
                         foreach (string s in equation.lhsVars)
                         {
@@ -2673,6 +2671,20 @@ namespace Gekko
                         }
                     }
                 }
+
+                //foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
+                //{
+                //    //Why is this not a simple dict lookup? Then modelGams.equationsByEqname should be a blank-dict??
+                //    //Oh well, this is probably pretty fast, because it is the raw model.
+                //    if (!G.EqualHandleBlanks(eqName, kvp.Key)) continue;
+                //    foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
+                //    {
+                //        foreach (string s in equation.lhsVars)
+                //        {
+                //            rv.Add(s.Split('(')[0]);  //Indexes here look like x(i, j), not x[i, j].
+                //        }
+                //    }
+                //}
             }
             return rv;
         }
@@ -19041,34 +19053,21 @@ namespace Gekko
                     Model model = null;
                     model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
 
-                    try
+                    if (!model.modelGamsScalar.hasResVariables)
                     {
-                        DateTime dt = DateTime.Now;
-                        model.modelGamsScalar.lhsEquations = GamsModel.Lhs(model);  //Finding out which variables are dependent, from eq naming conventions.
-                        if (Globals.runningOnTTComputer) new Writeln("TTH: Lhs() took: " + G.Seconds(dt) + " with " + model.modelGamsScalar.lhsEquations.Count + " items");
+                        try
+                        {
+                            DateTime dt = DateTime.Now;
+                            model.modelGamsScalar.depNames = GamsModel.DepNames(model);  //Finding out which variables are dependent, from eq naming conventions.
+                            if (Globals.runningOnTTComputer) new Writeln("TTH: DepNames() took: " + G.Seconds(dt) + " with " + model.modelGamsScalar.depNames.Count + " items");
+                        }
+                        catch
+                        {
+                            //No need to choke on this
+                            new Note("The module that identifies dependent variables from equation names failed to load");
+                        }
                     }
-                    catch
-                    {
-                        //No need to choke on this
-                        new Note("The module that identifies dependent variables from equation names failed to load");
-                    }
-                    //try
-                    //{
-                    //    //TODO TODO .Add(-1)
-
-                    //    //new Writeln("LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  LHS SCORE  ");
-                    //    DateTime dt = DateTime.Now;
-                    //    //model.modelGamsScalar.lhsEquations2 = GamsModel.LhsScore(model.modelGamsScalar.GetDecompT(), model);  //"Lhs"-score for each equation
-                    //    if (Globals.runningOnTTComputer) new Writeln("TTH: LhsScore() took: " + G.Seconds(dt));
-
-                    //}
-                    //catch
-                    //{
-                    //    //No need to choke on this
-                    //    new Note("The module that identifies dependent variables from equation names failed to load");
-                    //}
-
-
+                    
                     if (false) GamsModel.GAMSParser();
                     if (false) GamsModel.GamsGMO();
                     Program.model = model;

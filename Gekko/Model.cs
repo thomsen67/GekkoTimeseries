@@ -989,7 +989,7 @@ namespace Gekko
         public bool hasResVariables = false;  //if a variable res_... is encountered
 
         [ProtoMember(34)]  //Only used when there are no res_... and 
-        public GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, string> depNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         // =============================================
         // =============================================
@@ -2010,7 +2010,7 @@ namespace Gekko
             }
             else
             {
-                foreach (KeyValuePair<string, string> kvp in this.lhsEquations)
+                foreach (KeyValuePair<string, string> kvp in this.depNames)
                 {
                     if (G.EqualHandleBlanks(kvp.Value, variableName))
                     {

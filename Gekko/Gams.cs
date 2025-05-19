@@ -1247,7 +1247,7 @@ namespace Gekko
         /// if analyzing the equations gets more advanced).
         /// </summary>
         /// <param name="modelGamsScalar"></param>
-        public static GekkoDictionary<string, string> Lhs(Model model)
+        public static GekkoDictionary<string, string> DepNames(Model model)
         {
 
             //Is called with MODEL statement, used for GetSortedEquations() point system.
@@ -1622,80 +1622,7 @@ namespace Gekko
             }
 
             return lhsEquations;
-        }
-
-        //public static GekkoDictionaryBlanks<EqHelper> LhsScore(GekkoTime t, Model model)
-        //{
-        //    ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-        //    ModelGams modelGams = model.modelGams;
-
-        //    GekkoDictionaryBlanks<EqHelper> scores = new GekkoDictionaryBlanks<EqHelper>();
-
-        //    if (true)
-        //    {
-        //        for (int i = 0; i < modelGamsScalar.dict_FromANumberToVarName.Length; i++)
-        //        {
-        //            int aNumber = i;
-        //            string variableName = modelGamsScalar.dict_FromANumberToVarName[i];
-        //            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(t));
-        //            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-        //            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-        //            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);  //Made by Lhs() method
-
-        //            List<EqInfoSimple> eqsNew2 = new List<EqInfoSimple>();
-        //            if (eqNumbers != null)
-        //            {
-        //                foreach (int eqNumber in eqNumbers)
-        //                {
-        //                    EqInfoSimple es = new EqInfoSimple();
-        //                    string eqName777 = modelGamsScalar.dict_FromEqNumberToEqName[eqNumber];
-        //                    string withLag = G.Chop_DimensionConvertToLag(eqName777, model.modelGamsScalar.Maybe2000GekkoTime(t), false);
-        //                    es.eqNameWithLag = withLag;
-        //                    es.eqNumber = eqNumber;
-        //                    es.eqName = eqName777;
-        //                    eqsNew2.Add(es);
-        //                }
-        //            }
-
-        //            //List<EqInfoSimple> eqsNew2 = Decomp.GetScalarEquations(variableName, t, eqNumbers, model);
-        //            foreach (EqInfoSimple eqHelper in eqsNew2)
-        //            {
-        //                double d = double.MaxValue;
-        //                string[] ss = eqHelper.eqName.Split('[');
-        //                string eqNameWithoutIndex = ss[0];
-        //                string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);  //Note: what about lagged/leaded equation???
-        //                bool hit1 = false;
-        //                foreach (string s in lhsEqs)
-        //                {
-        //                    if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
-        //                }
-        //                if (hit1) eqHelper.score += Globals.lhsScore2; //100
-        //                List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
-        //                bool hit2 = false;
-        //                foreach (string s in lhsVars)
-        //                {
-        //                    if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-        //                }
-        //                if (hit2) eqHelper.score += Globals.lhsScore1; //0.5
-        //                if (scores.ContainsKey(eqHelper.eqNameWithLag))
-        //                {
-        //                    scores.Get(eqHelper.eqNameWithLag).scores.Add(variableName, eqHelper.score);
-        //                }
-        //                else
-        //                {
-        //                    //GekkoDictionaryBlanks<double> scores2 = new GekkoDictionaryBlanks<double>();
-        //                    EqHelper scores2 = new EqHelper();
-        //                    scores2.eqNumber = eqHelper.eqNumber;
-        //                    scores2.eqName = eqHelper.eqName;
-        //                    scores2.scores.Add(variableName, eqHelper.score);
-        //                    scores.Add(eqHelper.eqNameWithLag, scores2);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return scores;
-        //}
+        }        
 
         private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, List<string> writer)
         {

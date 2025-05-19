@@ -79,15 +79,87 @@ namespace Gekko
         /// <summary>
         /// /// Compares two strings, ignoring case (so "aBc" == "Abc"). If one but not the other
         /// is null, it returns false. If both are null, it returns true. Blanks are ignored,
-        /// so for instance "x[a, b]" will match "x[a,b]" ... and "X[A,B]".
+        /// so for instance "x[a, b]" will match "x[a,b]" ... and "X[A,B]". But blanks in quotes are not ignored.
         /// </summary>
-        /// <param name="s1"></param>
-        /// <param name="s2"></param>
-        /// <returns></returns>
-        public static bool EqualHandleBlanks(string s1, string s2)
+        public static bool EqualHandleBlanks(string str1, string str2)
         {
-            //s1 or s2 may be null
-            return (string.Compare(G.HandleBlanksRemove(s1), G.HandleBlanksRemove(s2), true) == 0);  //true for ignoreCase            
+            if (str1 == null || str2 == null)
+            {
+                return str1 == null && str2 == null;
+            }
+
+            int len1 = str1.Length;
+            int len2 = str2.Length;
+            int i = 0;
+            int j = 0;
+            bool inSingleQuotes1 = false;
+            bool inSingleQuotes2 = false;
+
+            while (i < len1 && j < len2)
+            {
+                char char1 = str1[i];
+                char char2 = str2[j];
+
+                // Handle single quotes for str1
+                if (char1 == '\'')
+                {
+                    inSingleQuotes1 = !inSingleQuotes1;
+                    i++;
+                    continue;
+                }
+
+                // Handle single quotes for str2
+                if (char2 == '\'')
+                {
+                    inSingleQuotes2 = !inSingleQuotes2;
+                    j++;
+                    continue;
+                }
+
+                // Skip blanks if not inside single quotes for str1
+                if (!inSingleQuotes1 && char1 == ' ')
+                {
+                    i++;
+                    continue;
+                }
+
+                // Skip blanks if not inside single quotes for str2
+                if (!inSingleQuotes2 && char2 == ' ')
+                {
+                    j++;
+                    continue;
+                }
+
+                // Compare characters (non-case sensitive)
+                if (char.ToUpperInvariant(char1) != char.ToUpperInvariant(char2))
+                {
+                    return false;
+                }
+
+                i++;
+                j++;
+            }
+
+            // Handle trailing blanks (outside quotes)
+            while (i < len1)
+            {
+                if (str1[i] != ' ')
+                {
+                    return false;
+                }
+                i++;
+            }
+
+            while (j < len2)
+            {
+                if (str2[i] != ' ')
+                {
+                    return false;
+                }
+                j++;
+            }
+
+            return true;
         }
 
         /// <summary>
