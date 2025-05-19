@@ -1393,7 +1393,7 @@ img {border-style: none;
                     EquationBrowser.WriteHtmlBold(html1, "Related equations");
                     bool first2 = true;
                     string s8 = null;
-                    foreach (EqInfoSimple eqHelper in GamsModel.GetSortedEquations(variableName, tUsedHere, model, false))
+                    foreach (EqInfoSimple eqHelper in GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false))
                     {
                         string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
                         string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
@@ -1668,7 +1668,7 @@ img {border-style: none;
 
         private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)
         {
-            List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false);
+            List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false);
             StringBuilder html2 = new StringBuilder();
             html2.AppendLine("<div id = `no-hash` class=`content`>");            
             html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.

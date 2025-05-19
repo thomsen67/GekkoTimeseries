@@ -1074,7 +1074,7 @@ namespace Gekko
         /// E_qBNP is shown first because the equation contains the variable res_qBNP. The rest of the eqs are alphabetically sorted.
         /// </summary>     
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool abortIfError)
+        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool onlySortFirstItem, bool abortIfError)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
@@ -1130,19 +1130,17 @@ namespace Gekko
                     {
                         //res_... variables
                         string dep = GetDependentVariable(eqNumber, modelGamsScalar);
-                        if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;                        
+                        if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;  //100                        
                     }
                     else
                     {
-                        //if (G.Equal(Program.options.model_gams_scalar_dep_method, "res"))
-                        //{
-
-                        //}
-
                         //eq names
                         double d = double.MaxValue;
                         string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(e.eqName);  //Note: what about lagged/leaded equation???
                         bool hit1 = false;
+                        //SLACK SLACK SLACK
+                        //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
+                        //SLACK SLACK SLACK
                         List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
                         foreach (string s in lhsEqs)
                         {
@@ -1175,7 +1173,26 @@ namespace Gekko
                 }
             }
 
-            List<EqInfoSimple> eqsNewA = rv.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            List<EqInfoSimple> eqsNewA = null;
+            if (onlySortFirstItem)
+            {
+                //Flowgraph at deeper depths
+                for (int i = 0; i < rv.Count; i++)
+                {
+                    if (rv[i].score >= Globals.lhsScore2)
+                    {
+                        EqInfoSimple temp = rv[0];
+                        rv[0] = rv[i];
+                        rv[i] = temp;
+                        break;  //No need to do further work: only rv[0] is ever used.
+                    }
+                }
+                eqsNewA = rv;
+            }
+            else
+            {
+                eqsNewA = rv.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            }
 
             return eqsNewA;
         }

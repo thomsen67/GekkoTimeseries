@@ -122,7 +122,7 @@ namespace Gekko
 
                 string varName = this.decompFind.decompOptions2.new_select[0];
                 int depth = 0;
-                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false);
+                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false);
                 string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
 
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
@@ -226,8 +226,8 @@ namespace Gekko
                 }                
                 
                 string varNameChild = flowChild.from;
-                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varNameChild, GekkoTime.tNull, Program.model, false);
-                if (temp.Count > 0 && temp[0].score >= 100d)  //Only eqs that are found with checkbox "Name" in FIND window.
+                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varNameChild, GekkoTime.tNull, Program.model, true, false);
+                if (temp.Count > 0 && temp[0].score >= Globals.lhsScore2)  //Only eqs that are found with checkbox "Name" in FIND window.
                 {
                     string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
                     WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);

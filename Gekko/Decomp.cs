@@ -5974,7 +5974,7 @@ namespace Gekko
 
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 
-                List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, GekkoTime.tNull, model, true);
+                List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, GekkoTime.tNull, model, false, true);
 
                 List<string> firstList = new List<string>();
 
