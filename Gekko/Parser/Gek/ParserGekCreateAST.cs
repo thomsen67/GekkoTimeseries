@@ -1658,6 +1658,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTINDEXERELEMENTNAME" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
                     else if (ast.Text.StartsWith("ASTCOMPARE2" + Globals.parserExpressionSeparator))
                     {
                         flag = true;

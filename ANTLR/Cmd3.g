@@ -149,6 +149,7 @@ tokens {
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
+    ASTINDEXERELEMENTNAME;
 	ASTHAT2;
 	ASTSEQITEMMINUS;
 	ASTPRINT;
@@ -2379,7 +2380,8 @@ dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITI
 //bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^({token("ASTCOMPARE2¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCOMPARE2, 0)} bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!
 					
 indexerExpressionHelper:    function //else the stupid parser stumbles on f() etc.
-						  | ident -> ^({token("ASTINDEXERELEMENTIDENT¤"+($ident.text)+"¤"+($ident.start)+"¤"+($ident.stop), ASTINDEXERELEMENTIDENT, 0)} ident)
+						  | name -> ^({token("ASTINDEXERELEMENTNAME¤"+($name.text)+"¤"+($name.start)+"¤"+($name.stop), ASTINDEXERELEMENTNAME, 0)} name)
+                          // ident -> ^({token("ASTINDEXERELEMENTIDENT¤"+($ident.text)+"¤"+($ident.start)+"¤"+($ident.stop), ASTINDEXERELEMENTIDENT, 0)} ident)
 						  | expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^({token("ASTINDEXERELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTINDEXERELEMENT, 0)} expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1

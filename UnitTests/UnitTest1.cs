@@ -1166,6 +1166,35 @@ namespace UnitTests
         {
             // ------------------------------------
 
+            //Without plings
+            I("reset; time 2001 2001;");
+            I("%i = 'z';");
+            I("x = series(1);");
+            I("x[a{%i+%i}b] = 100;");
+            _AssertSeries(First(), "x!a", new string[] { "azzb" }, 2001, 100d, sharedDelta);
+            I("x[{%i+%i}a{%i+%i}] = 200;");
+            _AssertSeries(First(), "x!a", new string[] { "zzazz" }, 2001, 200d, sharedDelta);
+            I("x[{%i+%i}] = 300;");
+            _AssertSeries(First(), "x!a", new string[] { "zz" }, 2001, 300d, sharedDelta);
+
+            //With plings
+            I("reset; time 2001 2001;");
+            I("%i = 'z';");
+            I("x = series(1);");
+            I("x['a{%i+%i}b'] = 100;");
+            _AssertSeries(First(), "x!a", new string[] { "azzb" }, 2001, 100d, sharedDelta);
+            I("x['{%i+%i}a{%i+%i}'] = 200;");
+            _AssertSeries(First(), "x!a", new string[] { "zzazz" }, 2001, 200d, sharedDelta);
+            I("x['{%i+%i}'] = 300;");
+            _AssertSeries(First(), "x!a", new string[] { "zz" }, 2001, 300d, sharedDelta);
+
+            //The following will not work as x[{#i}] or x['{#i}'], probably too confusing anyway
+            I("reset; time 2001 2001;");
+            I("#i = z,;");
+            I("x = series(1);");            
+            I("x[#i] = 300;");
+            _AssertSeries(First(), "x!a", new string[] { "z" }, 2001, 300d, sharedDelta);
+
             I("RESET; TIME 2001 2003;");
             I("xx2 = series(2);");
             I("xx2['a', 'b'] = (1, 2, 3);");

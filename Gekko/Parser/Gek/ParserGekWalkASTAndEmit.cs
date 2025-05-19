@@ -3205,6 +3205,11 @@ namespace Gekko.Parser.Gek
 
                     }
                     break;
+                case "ASTINDEXERELEMENTNAME":
+                    {                        
+                        node.Code.A(node[0].Code);
+                    }
+                    break;
                 case "ASTINDEXERELEMENT":
                 case "ASTINDEXERELEMENTPLUS":
                     {
