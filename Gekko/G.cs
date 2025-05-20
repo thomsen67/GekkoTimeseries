@@ -3764,14 +3764,7 @@ namespace Gekko
             result.Add(currentStr.ToString());
             return result;
         }
-        public static void ResErrorMessage(Wrap txt)
-        {            
-            txt.MoreAdd("With 'option model gams scalar dep method = res', Gekko relies upon so-called res_... variables inside the model equations.");
-            txt.MoreAdd("For instance, in an equation like x + y =e= res_y + z, the res_y variable designates the dependent variable of the equation,");
-            txt.MoreAdd("in this case y. With the option set to 'res' and without res_... variables, Gekko cannot know which variable is dependent in a given equation, and hence will not display a corresponding");
-            txt.MoreAdd("equation when using DISP (and flowgraphs will not work at all). Instead, if equation names provide hints regarding the dependent variable of an equation, you may use 'option model gams scalar dep method = auto'.");            
-        }
-
+        
         /// <summary>
         /// Method for printing out "service messages" in the Gekko GUI,
         /// for instance when assigning z = x + y;

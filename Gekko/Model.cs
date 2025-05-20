@@ -707,13 +707,7 @@ namespace Gekko
                     {
                         txt.MainAdd("Extracting from files, time: " + G.Seconds(t));
                     }
-                    txt.MainNewLineTight();
-                    if (!hasResVariables && G.Equal(Program.options.model_gams_scalar_dep_method, "res"))
-                    {
-                        txt.MainAdd("NOTE: The model contains no res_... variables to identify dependent variables, affecting the quality of DISP, DECOMP etc.");
-                        G.ResErrorMessage(txt);
-                        txt.MainNewLineTight();
-                    }
+                    txt.MainNewLineTight();                    
                 }
             }
             finally

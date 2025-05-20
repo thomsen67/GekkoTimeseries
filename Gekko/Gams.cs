@@ -1076,6 +1076,21 @@ namespace Gekko
         /// <returns></returns>
         public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool onlySortFirstItem, bool abortIfError)
         {
+            //            x1     x2     x3     x4    res_x1   res_x2   res_x3   res_x4
+            // --------------------------------------------------------------------------
+            //   e1       +      x      x              x
+            //   e2       x      +                              x
+            //   e3              x      +                                x
+            //   e4       x             x      +                                   x
+            // --------------------------------------------------------------------------
+            //
+            // For at given variable, say x1, we look vertically at its equations, say e1, e2 and e4 to see which one is best.
+            // They get scored with ScoreEquationGivenVariable(), from 0.5 to 100+ (the '+' are best).
+            // An ordered list of the equations is returned.
+            //
+            // In DISP x1, we know that x1 is in e2 and e4 too, but would like these to appear as x2 and x4. To do this
+            // we loop over the e2 variables to find the one that has max score.
+            //
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
             ModelGams modelGams = model.modelGams;
             List<EqInfoSimple> rv = new List<EqInfoSimple>();
@@ -1099,58 +1114,12 @@ namespace Gekko
 
             foreach (int eqNumber in eqNumbers)
             {
-                string eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                string eqNameWithLag = null;
-                eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, tHere, false);
-                string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);                
-
-                EqInfoSimple e = new EqInfoSimple();
-                e.eqName = eqName;
-                e.eqNameWithLag = eqNameWithLag;
-                e.eqNumber = eqNumber;
-
-                if (modelGamsScalar.isPerpetualModel)
-                {
-                    if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, eqNameWithoutIndex))
-                    {
-                        e.score += Globals.lhsScore2;
-                    }
-                }
-                else
-                {
-                    List<string> lhsVars = Program.BeforeEqualSign(eqNameWithoutIndex, modelGams);
-                    bool hit2 = false;
-                    foreach (string s in lhsVars)
-                    {
-                        if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
-                    }
-                    if (hit2) e.score += Globals.lhsScore1; //0.5                    
-
-                    if (modelGamsScalar.hasResVariables)
-                    {
-                        //res_... variables
-                        string dep = GetDependentVariable(eqNumber, modelGamsScalar);
-                        if (G.EqualHandleBlanks(variableName, dep)) e.score += Globals.lhsScore2;  //100                        
-                    }
-                    else
-                    {
-                        //eq names
-                        double d = double.MaxValue;
-                        string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(e.eqName);  //Note: what about lagged/leaded equation???
-                        bool hit1 = false;
-                        //SLACK SLACK SLACK
-                        //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
-                        //SLACK SLACK SLACK
-                        List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
-                        foreach (string s in lhsEqs)
-                        {
-                            if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
-                        }
-                        if (hit1) e.score += Globals.lhsScore2; //100                        
-                    }
-                }
-                
-                rv.Add(e);
+                EqInfoSimple eqInfo = new EqInfoSimple();
+                eqInfo.eqName = model.modelGamsScalar.GetEqName(eqNumber);
+                eqInfo.eqNameWithLag = G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false); ;
+                eqInfo.eqNumber = eqNumber;
+                ScoreEquationGivenVariable(eqInfo, variableName, model, modelGams, modelGamsScalar);
+                rv.Add(eqInfo);
             }
 
             if (rv.Count == 0)
@@ -1197,22 +1166,66 @@ namespace Gekko
             return eqsNewA;
         }
 
-        /// <summary>
-        /// Overload, input name like "E_qBNP". May use tHere == GekkoTime.Tnull.
-        /// </summary>
-        /// <param name="eqName"></param>
-        /// <param name="tHere"></param>
-        /// <param name="modelGamsScalar"></param>
-        /// <returns></returns>
-        public static string GetDependentVariable(string eqName, GekkoTime tHere, ModelGamsScalar modelGamsScalar)
+        public static void ScoreEquationGivenVariable(EqInfoSimple eqInfo, string variableName, Model model, ModelGams modelGams, ModelGamsScalar modelGamsScalar)
         {
-            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
-            string s2 = G.Chop_DimensionAddLast(eqName, tHere.ToString(), null);
-            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s2);
-            if (eqNumber == -12345) new Error("Could not find equation name '" + eqName + "'");
-            return GetDependentVariable(eqNumber, modelGamsScalar);
+            if (modelGamsScalar.isPerpetualModel)
+            {
+                if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, G.Chop_RemoveIndex(eqInfo.eqName)))
+                {
+                    eqInfo.score += Globals.lhsScore2;
+                }
+            }
+            else
+            {
+                List<string> lhsVars = Program.BeforeEqualSign(G.Chop_RemoveIndex(eqInfo.eqName), modelGams);
+                bool hit2 = false;
+                foreach (string s in lhsVars)
+                {
+                    if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
+                }
+                if (hit2) eqInfo.score += Globals.lhsScore1; //0.5                    
+
+                double extra = 0d;
+                if (modelGamsScalar.hasResVariables)
+                {
+                    //res_... variables, trying those first, then eq names as backup
+                    extra = GetSortedEquationsByResVariable(eqInfo.eqNumber, variableName, modelGamsScalar);
+                    if (extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
+                }
+                else
+                {
+                    //eq names
+                    extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
+                }
+                eqInfo.score += extra;
+            }
         }
 
+        private static double GetSortedEquationsByResVariable(int eqNumber, string variableName, ModelGamsScalar modelGamsScalar)
+        {
+            string dep = GetDependentVariable(eqNumber, modelGamsScalar);
+            double extra = 0d;
+            if (G.EqualHandleBlanks(variableName, dep)) extra = Globals.lhsScore3;  //101
+            return extra;
+        }
+
+        private static double GetSortedEquationsByEqName(string eqName, string variableName, Model model, ModelGamsScalar modelGamsScalar)
+        {
+            double d = double.MaxValue;
+            string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName);  //Note: what about lagged/leaded equation???
+            bool hit1 = false;
+            //SLACK SLACK SLACK
+            //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
+            //SLACK SLACK SLACK
+            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
+            foreach (string s in lhsEqs)
+            {
+                if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+            }
+            double extra = 0d;
+            if (hit1) extra = Globals.lhsScore2; //100
+            return extra;
+        }
 
         /// <summary>
         /// For an equation number (in a scalar model), the dependent variable name is returned. May return null.
