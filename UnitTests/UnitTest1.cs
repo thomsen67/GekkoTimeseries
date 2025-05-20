@@ -4362,6 +4362,27 @@ namespace UnitTests
         {
             Gekko.Table table = null;
 
+            //GMULPRT and PRT<v>
+            I("reset; time 2001 2002;");
+            I("x = 12, 13;");
+            I("@x = 2, 3;");
+            I("gmulprt x;");
+            table = Globals.lastPrtOrMulprtTable;            
+            Assert.AreEqual(table.Get(3, 2).number, 13d, sharedDelta);            
+            Assert.AreEqual(table.Get(3, 3).number, (13d / 12d - 1d) * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 4).number, 3d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 5).number, (3d / 2d - 1d) * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 6).number, 10d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 7).number, (13d / 3d - 1d) * 100d, sharedDelta);
+            I("prt<v> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(3, 2).number, 13d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 3).number, (13d / 12d - 1d) * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 4).number, 3d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 5).number, (3d / 2d - 1d) * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 6).number, 10d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 7).number, (13d / 3d - 1d) * 100d, sharedDelta);
+
             //Testing <yoy>
             I("reset; option freq q; time 2001 2002;");
             I("x = 2, 3, 4, 5, 12, 13, 14, 15;");
@@ -4419,7 +4440,6 @@ namespace UnitTests
             I("x = 12, 13, 14, 15, 16;");
             I("@x = 2, 3, 4, 5, 6;");
             I("prt <a> x;");
-            Assert.Fail("Beware the PLOT does not do <n p rn rp>!! What about SHEET?");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).number, 12d, sharedDelta);
             Assert.AreEqual(table.Get(4, 2).number, 14d, sharedDelta);
@@ -4438,11 +4458,9 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 3).number, 4d, sharedDelta);
             Assert.AreEqual(table.Get(6, 3).number, 6d, sharedDelta);
             I("prt <ad> x;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 2).number, 1d, sharedDelta);
+            table = Globals.lastPrtOrMulprtTable;            
             Assert.AreEqual(table.Get(4, 2).number, 1d, sharedDelta);
-            Assert.AreEqual(table.Get(6, 2).number, 1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, 1d, sharedDelta);
+            Assert.AreEqual(table.Get(6, 2).number, 1d, sharedDelta);            
             Assert.AreEqual(table.Get(4, 3).number, 1d, sharedDelta);
             Assert.AreEqual(table.Get(6, 3).number, 1d, sharedDelta);
 

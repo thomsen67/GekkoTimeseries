@@ -26,6 +26,7 @@ namespace Gekko
                 for (int i = 0; i < o.prtElements.Count; i++)
                 {
                     o.prtElements[i].operatorsFinal = new List<string> { "n", "p", "rn", "rp", "m", "q" };
+                    o.prtElements[i].operatorsFinalAll = new List<int> { 0, 0, 0, 0, 0, 0 };
                 }
             }
 

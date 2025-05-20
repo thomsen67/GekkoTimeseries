@@ -27870,7 +27870,7 @@ namespace Gekko
             if (o.guiGraphOperator != null)
             {
                 operators.Add(o.guiGraphOperator);
-                operators = HandleOperatorA(operators);
+                operators = HandleOperatorA(operators, true);
             }
             else
             {
@@ -28196,7 +28196,7 @@ namespace Gekko
                 }
                 else
                 {
-                    operatorsNew = HandleOperatorA(operators);
+                    operatorsNew = HandleOperatorA(operators, isGraph || isSheet);
                 }
             }
             return operatorsNew;
@@ -28207,7 +28207,7 @@ namespace Gekko
         /// </summary>
         /// <param name="operators"></param>
         /// <returns></returns>
-        private static List<string> HandleOperatorA(List<string> operators)
+        private static List<string> HandleOperatorA(List<string> operators, bool isGraphOrSheet)
         {
             List<string> operatorsNew = new List<string>();
             foreach (string operator2 in operators)
@@ -28216,10 +28216,18 @@ namespace Gekko
                 {
                     if (operator2 == Globals.operator_a)
                     {
-                        operatorsNew.Add("1¤n");
-                        operatorsNew.Add("1¤p");
-                        operatorsNew.Add("2¤rn");
-                        operatorsNew.Add("2¤rp");
+                        if (isGraphOrSheet || !Program.options.print_prt_pch)
+                        {
+                            operatorsNew.Add("1¤n");                            
+                            operatorsNew.Add("2¤rn");                            
+                        }
+                        else
+                        {
+                            operatorsNew.Add("1¤n");
+                            operatorsNew.Add("1¤p");
+                            operatorsNew.Add("2¤rn");
+                            operatorsNew.Add("2¤rp");
+                        }
                     }
                     else if (operator2 == Globals.operator_an)
                     {
