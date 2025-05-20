@@ -1172,7 +1172,7 @@ namespace Gekko
             {
                 if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, G.Chop_RemoveIndex(eqInfo.eqName)))
                 {
-                    eqInfo.score += Globals.lhsScore2;
+                    eqInfo.score += Globals.lhsScore1 + Globals.lhsScore2;
                 }
             }
             else
