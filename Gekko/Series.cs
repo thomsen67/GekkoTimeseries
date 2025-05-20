@@ -1971,7 +1971,6 @@ namespace Gekko
                 if (!mm1.Equals(mm2))
                 {
                     new Error("Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
-                    //throw new GekkoException();
                 }
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
                 Series sub2 = x2_series.dimensionsStorage.storage[mm2] as Series;
@@ -2839,13 +2838,11 @@ namespace Gekko
 
         public string ConvertToString()        {
             new Error("Cannot convert series to string (series name: '" + this.GetName() + "')"); return null;
-            //throw new GekkoException();
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             new Error("Cannot convert series to date (series name: '" + this.GetName() + "')"); return GekkoTime.tNull;
-            //throw new GekkoException();
         }
 
         public List<IVariable> ConvertToList()
@@ -3462,9 +3459,9 @@ namespace Gekko
             string first = null;
             foreach (string s in this.storage) 
             {
-                first += s + ", ";
+                first += s + ",";
             }
-            if (this.storage.Length > 0) first = first.Substring(0, first.Length - ", ".Length);
+            if (this.storage.Length > 0) first = first.Substring(0, first.Length - ",".Length);
             return first;
         }
 
