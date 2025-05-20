@@ -1108,7 +1108,7 @@ namespace Gekko
             List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
             if (eqNumbers == null)
             {
-                G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
+                //G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers"); --> seems ok, occurs for exogenous vars it seems.
                 eqNumbers = new List<int>();
             }
 

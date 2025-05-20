@@ -5978,18 +5978,17 @@ namespace Gekko
 
                 List<string> firstList = new List<string>();
 
-                //This seems to just gather material for the GUI representation
-                double lastScore = double.MinValue;
-                double scoreCounter = 0;
+                double maxScore = double.MinValue;
+                foreach (EqInfoSimple eqHelper in eqsNew)
+                {
+                    if (eqHelper.score > maxScore) maxScore = eqHelper.score;
+                }
+
+                //This seems to just gather material for the GUI representation                
                 int lineCounter = -1;
                 foreach (EqInfoSimple eqHelper in eqsNew)
                 {
-                    lineCounter++;
-                    if (eqHelper.score != lastScore)
-                    {
-                        scoreCounter++;
-                        lastScore = eqHelper.score;
-                    }
+                    lineCounter++;                    
                     string eqName = eqHelper.eqName;
                     string eqName3 = eqHelper.eqNameWithLag;
                     EquationTextHelper helper2 = new EquationTextHelper();
@@ -5999,8 +5998,7 @@ namespace Gekko
                     if (eqHelper.score % 1 == 0) boolLhs = Globals.protectSymbol;
                     string boolName = "";  //name
                     boolName = "";
-                    if (eqHelper.score >= 100d) boolName = Globals.protectSymbol;
-                    //if (Globals.runningOnTTComputer) boolName += " : " + eqHelper.score.ToString();
+                    if (eqHelper.score >= 100d && eqHelper.score == maxScore) boolName = Globals.protectSymbol;  //We may get two eqs where the first has score 101 and the second 102, and in that case we show the second as "Name" (based on res_... variable).                    
                     string tt = "tx0";
                     int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
                     string textColor = "Black";

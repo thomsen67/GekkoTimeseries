@@ -195,6 +195,7 @@ namespace Gekko
                     if (G.StartsWith(flowChild.from, "Error")) continue;
                     if (G.StartsWith(flowChild.from, "Residual")) continue;
                     if (G.StartsWith(flowChild.from, "Ignored")) continue;
+                    if (G.StartsWith(flowChild.from, Globals.decompResidualPrefix)) continue;
                 }
                 if (walkInfo.isGekkoModel && walkInfo.ignoreDJZ && (G.IsNumericalError(share) || Math.Abs(share) <= 0.01d))
                 {
@@ -227,7 +228,7 @@ namespace Gekko
                 
                 string varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varNameChild, GekkoTime.tNull, Program.model, true, false);
-                if (temp.Count > 0 && temp[0].score >= Globals.lhsScore2)  //Only eqs that are found with checkbox "Name" in FIND window.
+                if (temp.Count > 0 && temp[0].score >= Globals.lhsScore2)  //Only eqs that are found with checkbox "Name" in FIND window. We also do not show res_... nodes
                 {
                     string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
                     WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);
