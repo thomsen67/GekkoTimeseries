@@ -16337,36 +16337,29 @@ namespace Gekko
                 Program.options.print_width = int.MaxValue;
                 try
                 {
-                    if (false && Program.options.bugfix_disp)
+                    //check for endo (but really not necessary, exo just does not exist)
+                    //G.Writeln(found.equationFormula);
+                    string strSplit = found.equationText;
+                    strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
+                    char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
+                    List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
+                    foreach (string s in alWork)
                     {
-                        //Show links in a more modern way here, if the variable can be identified.
-                    }
-                    else
-                    {
-                        //check for endo (but really not necessary, exo just does not exist)
-                        //G.Writeln(found.equationFormula);
-                        string strSplit = found.equationText;
-                        strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
-                        char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
-                        List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
-                        foreach (string s in alWork)
+                        if (s == "£") G.Writeln();
+                        else
                         {
-                            if (s == "£") G.Writeln();
+                            if (Program.model.modelGekko.varsAType.ContainsKey(s))
+                            {
+                                //seems the word exists as variable
+                                G.WriteLink(s, "disp:" + s);
+                            }
                             else
                             {
-                                if (Program.model.modelGekko.varsAType.ContainsKey(s))
-                                {
-                                    //seems the word exists as variable
-                                    G.WriteLink(s, "disp:" + s);
-                                }
-                                else
-                                {
-                                    G.Write(s);
-                                }
+                                G.Write(s);
                             }
                         }
-                        G.Writeln();
                     }
+                    G.Writeln();
                 }
                 finally
                 {
@@ -16496,16 +16489,16 @@ namespace Gekko
                     }
 
                     //Gets the equation text (raw)
-                    EquationTextHelper helper = new EquationTextHelper();
-                    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helper, tUsedHere);
-                    string eqText = helper22.s_gekkoSyntax;
+                    EquationTextHelper helperA = new EquationTextHelper();
+                    GetEquationTextHelper helperAA = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helperA, tUsedHere);
+                    string eqTextA = helperAA.s_gekkoSyntax;
 
                     if (true)
                     {
                         //Make raw equation text with links
                         //GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
                         string resulting = null;
-                        TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqText);
+                        TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqTextA);
                         for (int i = 0; i < tokens.storage.Count; i++)
                         {
                             bool done = false;
@@ -16650,6 +16643,25 @@ namespace Gekko
                             txt.MainOmitVeryFirstNewLine();
                             txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2).Replace(eq1, eq2));
                         }
+                    }
+
+                    G.Writeln("------------------------------------------------------------------------------------------");
+                    if (showDetailed)
+                    {
+                        //Gets the equation text (raw)
+                        EquationTextHelper helperB = new EquationTextHelper();
+                        GetEquationTextHelper helperBB = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helperB, tUsedHere);
+                        string eqTextB = helperBB.s_scalarModel;                        
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.MainOmitVeryFirstNewLine();                            
+                            txt.MainAdd(eqTextB);
+                        }
+                    }
+                    else
+                    {                        
+                        G.WriteLink("Show detailed equation", "disp2:" + varnameWithoutFreq);
+                        G.Writeln();                        
                     }
                 }
                 if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);

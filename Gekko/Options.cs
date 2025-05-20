@@ -48,7 +48,7 @@ namespace Gekko
         public bool bugfix_nullseries = true;      //not mentioned in help, fixes create x; x <dyn> = x[-1] + 1, and the like.
         public bool bugfix_speed = true;           //not mentioned in help, faster series statements
         public bool bugfix_decomp_jacobi = true;   //not mentioned in help, better matrix for inversion
-        public bool bugfix_disp = true;            //See options.model_gams_scalar_disp, not mentioned in help, set false for old link generation for gekko models
+        //public bool bugfix_disp = true;            //See options.model_gams_scalar_disp, not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_disp_influences_equ = false;   //not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         // ---
@@ -380,7 +380,7 @@ namespace Gekko
             Add("BUGFIX NULLSERIES", Globals.xbool);
             Add("BUGFIX SPEED", Globals.xbool);
             Add("BUGFIX DECOMP JACOBI", Globals.xbool);
-            Add("BUGFIX DISP", Globals.xbool);
+            //Add("BUGFIX DISP", Globals.xbool);
             Add("BUGFIX DISP INFLUENCES EQU", Globals.xbool);
             Add("BUGFIX PLOT", Globals.xbool);            
 
