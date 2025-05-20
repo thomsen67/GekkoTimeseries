@@ -321,12 +321,14 @@ ASTCOMPARE2;
     ASTCREATEQUESTION;
     ASTCURLY;
     ASTCURLYSIMPLE;
+    ASTA;
     ASTAN;
     ASTAD;
     ASTAP;
     ASTADP;
     ASTAL;
     ASTADL;
+    ASTA3;
     ASTA3N;
     ASTA3D;
     ASTA3P;
@@ -1184,10 +1186,12 @@ Y2                    = 'Y2'                       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
     A3DP = 'A3DP';
     A3 = 'A3';
+    A3N = 'A3N';
     ADP = 'ADP';
     AL = 'AL';
     ADL = 'ADL';
     A3P = 'A3P';
+    AN = 'AN';
     AD = 'AD';
     AP = 'AP';
     A3D = 'A3D';
@@ -1850,10 +1854,12 @@ d.Add("Y" ,Y);
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
                                         d.Add("A3DP", A3DP);
                                         d.Add("A3", A3);
+                                        d.Add("A3N", A3N);
                                         d.Add("ADP", ADP);
                                         d.Add("AL", AL);
                                         d.Add("ADL", ADL);
                                         d.Add("A3P", A3P);
+                                        d.Add("AN", AN);
                                         d.Add("AD", AD);
                                         d.Add("AP", AP);
                                         d.Add("A3D", A3D);
@@ -3653,14 +3659,16 @@ optOld:                     N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES)
 						  | Q    ('=' yesNo -> ^(ASTQ yesNo) | -> ^(ASTQ  ASTYES))
 						  | MP    ('=' yesNo -> ^(ASTMP yesNo) | -> ^(ASTMP  ASTYES))
 
-                          | A    ('=' yesNo -> ^(ASTAN yesNo) | -> ^(ASTAN ASTYES))
+                          | A    ('=' yesNo -> ^(ASTA yesNo) | -> ^(ASTA ASTYES))
+                          | AN    ('=' yesNo -> ^(ASTAN yesNo) | -> ^(ASTAN ASTYES))
                           | AD    ('=' yesNo -> ^(ASTAD yesNo) | -> ^(ASTAD  ASTYES))
                           | AP    ('=' yesNo -> ^(ASTAP yesNo) | -> ^(ASTAP  ASTYES))
                           | ADP    ('=' yesNo -> ^(ASTADP yesNo) | -> ^(ASTADP  ASTYES))
                           | AL    ('=' yesNo -> ^(ASTAL yesNo) | -> ^(ASTAL  ASTYES))
                           | ADL    ('=' yesNo -> ^(ASTADL yesNo) | -> ^(ASTADL  ASTYES))
 
-                          | A3    ('=' yesNo -> ^(ASTA3N yesNo) | -> ^(ASTA3N ASTYES))
+                          | A3    ('=' yesNo -> ^(ASTA3 yesNo) | -> ^(ASTA3 ASTYES))
+                          | A3N    ('=' yesNo -> ^(ASTA3N yesNo) | -> ^(ASTA3N ASTYES))
                           | A3D    ('=' yesNo -> ^(ASTA3D yesNo) | -> ^(ASTA3D  ASTYES))
                           | A3P    ('=' yesNo -> ^(ASTA3P yesNo) | -> ^(ASTA3P  ASTYES))
                           | A3DP    ('=' yesNo -> ^(ASTA3DP yesNo) | -> ^(ASTA3DP  ASTYES))

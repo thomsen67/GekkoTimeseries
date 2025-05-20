@@ -24,7 +24,14 @@ namespace Gekko
                 o0.guiGraphFontScaling = gh.fontScaling;
                 o0.guiGraphSizeScaling = gh.sizeScaling;
                 o0.guiGraphIsButton = gh.isButton;
-                o0.prtType = "plot";
+                o0.prtType = "p";
+                o0.t1 = Globals.globalPeriodStart;
+                o0.t2 = Globals.globalPeriodEnd;
+
+                o0.operators.Add(new OptString("an", O.ConvertToString(new ScalarString("yes"))));
+
+
+
                 if (gh.isIndex != null) { if (gh.isIndex == true) { o0.opt_i = GekkoTime.tSimilarToNull; } else { o0.opt_i = GekkoTime.tNull; } }
                 if (gh.isYoy != null) { if (gh.isYoy == true) { o0.opt_yoy = "yes"; } else { o0.opt_yoy = "no"; } }
                 if (gh.isPoints != null) { if (gh.isPoints == true) { o0.opt_linetype = "linespoints"; } else { o0.opt_linetype = "lines"; } }
@@ -35,7 +42,7 @@ namespace Gekko
                     {
                         List<int> bankNumbers = null;
                         O.Prt.Element ope0 = new O.Prt.Element();
-                        ope0.labelGiven = new List<string>() { "q|[@2,5:5='q',<1239>,1:5]|[@2,5:5='q',<1239>,1:5]" };
+                        ope0.labelGiven = new List<string>() { "x|[@4,5:5='x',<900>,1:5]|[@4,5:5='x',<900>,1:5]" };
                         smpl = new GekkoSmpl(o0.t1, o0.t2); smpl.t0 = smpl.t0.Add(-2);
                         if (o0.opt_yoy != null && o0.opt_yoy.ToLower() == Globals.yes) { smpl.t0 = smpl.t0.Add(-13); }
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll); bankNumbers = O.Prt.GetBankNumbers(null, ope0.operatorsFinal);
@@ -43,7 +50,7 @@ namespace Gekko
                         {
                             int bankNumber = bankNumbers[bankNumberI];
                             smpl.bankNumber = bankNumber;
-                            ope0.variable[bankNumber] = O.Lookup(smpl, null, null, "q", null, null, new LookupSettings(), EVariableType.Var, null);
+                            ope0.variable[bankNumber] = O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null);
                             if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
                         }
                         smpl.bankNumber = 0;

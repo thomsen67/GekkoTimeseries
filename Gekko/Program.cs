@@ -27887,13 +27887,11 @@ namespace Gekko
                 if (!isMulprt && operators.Count == 1 && G.Equal(operators[0], "lev"))
                 {
                     new Error("PRT<lev> is not legal: use PRT<abs> to print absolute levels");
-                    //throw new GekkoException();
                 }
 
                 if (isMulprt && operators.Count == 1 && (G.Equal(operators[0], "dif") || G.Equal(operators[0], "diff")))
                 {
                     new Error("MULPRT<dif> is not legal: use MULPRT<abs> to print multiplier differences");
-                    //throw new GekkoException();
                 }
 
                 if (ope != null && ope.operators != null && ope.operators.Count > 0)
@@ -27911,7 +27909,6 @@ namespace Gekko
                         else
                         {
                             new Error("Operator = '" + ts.s2 + "' should be 'yes' or 'no'");
-                            //throw new GekkoException();
                         }
                     }
                 }
@@ -27953,7 +27950,6 @@ namespace Gekko
                 else
                 {
                     new Error("Operator = '" + ts.s2 + "' should be 'yes' or 'no' or 'append'");
-                    //throw new GekkoException();
                 }
             }
             return operatorsGlobal;
@@ -28206,6 +28202,11 @@ namespace Gekko
             return operatorsNew;
         }
 
+        /// <summary>
+        /// Integers: 1 for option 'a' first-position-bank, 2 for option 'a' ref-bank.
+        /// </summary>
+        /// <param name="operators"></param>
+        /// <returns></returns>
         private static List<string> HandleOperatorA(List<string> operators)
         {
             List<string> operatorsNew = new List<string>();
@@ -28213,7 +28214,14 @@ namespace Gekko
             {
                 if (Globals.operators_a.Contains(operator2))
                 {
-                    if (operator2 == Globals.operator_an)
+                    if (operator2 == Globals.operator_a)
+                    {
+                        operatorsNew.Add("1¤n");
+                        operatorsNew.Add("1¤p");
+                        operatorsNew.Add("2¤rn");
+                        operatorsNew.Add("2¤rp");
+                    }
+                    else if (operator2 == Globals.operator_an)
                     {
                         operatorsNew.Add("1¤n");
                         operatorsNew.Add("2¤rn");
@@ -28242,6 +28250,10 @@ namespace Gekko
                     {
                         operatorsNew.Add("1¤dl");
                         operatorsNew.Add("2¤rdl");
+                    }
+                    else if (operator2 == Globals.operator_a3)
+                    {
+                        new Error("Operators a3... not implemented yet");
                     }
                     else if (operator2 == Globals.operator_a3n)
                     {
@@ -28479,12 +28491,9 @@ namespace Gekko
         public static bool IsOperatorShort(string operator2)
         {
             return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp") || G.Equal(operator2, Globals.operator_l) || G.Equal(operator2, Globals.operator_dl) || G.Equal(operator2, Globals.operator_rl) || G.Equal(operator2, Globals.operator_rdl)
-                || G.Equal(operator2, Globals.operator_an) || G.Equal(operator2, Globals.operator_ad) || G.Equal(operator2, Globals.operator_ap) || G.Equal(operator2, Globals.operator_adp)
-                || G.Equal(operator2, Globals.operator_a3n) || G.Equal(operator2, Globals.operator_a3d) || G.Equal(operator2, Globals.operator_a3p) || G.Equal(operator2, Globals.operator_a3dp)
-
+                || G.Equal(operator2, Globals.operator_a) || G.Equal(operator2, Globals.operator_an) || G.Equal(operator2, Globals.operator_ad) || G.Equal(operator2, Globals.operator_ap) || G.Equal(operator2, Globals.operator_adp)
+                || G.Equal(operator2, Globals.operator_a3) || G.Equal(operator2, Globals.operator_a3n) || G.Equal(operator2, Globals.operator_a3d) || G.Equal(operator2, Globals.operator_a3p) || G.Equal(operator2, Globals.operator_a3dp)
                 || G.Equal(operator2, Globals.operator_al) || G.Equal(operator2, Globals.operator_adl) || G.Equal(operator2, Globals.operator_a3l) || G.Equal(operator2, Globals.operator_a3dl)
-
-
                 ;
         }
 
