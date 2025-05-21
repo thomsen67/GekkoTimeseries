@@ -20,6 +20,7 @@ namespace Gekko
         public double sizeScaling = 1d;
         public bool isRefreshing = false;
         public bool isButton = false;
+        public string fileName = null;  //svg, emf, png, pdf
 
         public RefreshHelper Clone()
         {
@@ -34,6 +35,7 @@ namespace Gekko
             r.isAll = this.isAll;
             r.fontScaling = this.fontScaling;
             r.isRefreshing = this.isRefreshing;
+            r.fileName = this.fileName;
             return r;
         }
     }
@@ -354,7 +356,7 @@ namespace Gekko
             //ss[0] = this.graphOptions.emfName;
             //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
             //Clipboard.SetDataObject(iData, true);
-            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
+            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
             Clipboard.SetText(plotName);
         }
 
@@ -365,7 +367,7 @@ namespace Gekko
             string inputLast = "svg";
             string name2 = Program.Add1ToFileName(input, inputLast, Program.options.folder_working);
             string enddir = Program.options.folder_working + "\\" + name2;
-            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
+            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
             Program.WaitForFileCopy(plotName, enddir);
             this.label1.Text = name2;
             Program.DelayAction(4000, new Action(() => { try { if (this.label1.Text == name2) this.label1.Text = ""; } catch { } }));
@@ -373,19 +375,18 @@ namespace Gekko
         }
 
         private void Button_saveas(object sender, RoutedEventArgs e)
-        {
-            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling);
-
+        {            
             Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
             {
-                Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*",
+                Filter = "svg files (*.svg)|*.svg|emf files (*.emf)|*.emf|png files (*.png)|*.png|pdf files (*.pdf)|*.pdf|All files (*.*)|*.*",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 InitialDirectory = Program.options.folder_working
             };
             if (saveFileDialog1.ShowDialog() == true)
-            {
-                Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);                
+            {                
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, saveFileDialog1.FileName);
+                //Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);                
             }
         }
 
@@ -400,8 +401,10 @@ namespace Gekko
         //    }
         //}
 
-        private string CreatePlotFileInBackground(double fontScaling, double sizeScaling)
+        private string CreatePlotFileInBackground(double fontScaling, double sizeScaling, string fileName)
         {
+            string extension = System.IO.Path.GetExtension(fileName);
+            if (!(G.Equal(extension, ".svg") || G.Equal(extension, ".emf") || G.Equal(extension, ".png") || G.Equal(extension, ".pdf"))) new Error("Expected file type to be svg, emf, png or pdf");
             RefreshHelper refresh = new RefreshHelper();
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked;
@@ -414,7 +417,8 @@ namespace Gekko
             refresh.fontScaling = fontScaling;
             refresh.sizeScaling = sizeScaling;
             refresh.isRefreshing = true;  //so we do not get a new plot window
-            refresh.isButton = true;
+            refresh.isButton = true; 
+            refresh.fileName = fileName;
             string plotName = Refresh(new GraphHelper(refresh), false);
             return plotName;
         }

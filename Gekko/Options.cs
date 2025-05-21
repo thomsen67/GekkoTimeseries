@@ -176,7 +176,7 @@ namespace Gekko
         public string plot_decimalseparator = "period";  //comma|period
         public int plot_elements_max = 200;        
         public bool plot_lines_points = true;
-        public string plot_palette = "gekko";  //gekko | dream
+        public string plot_palette = "gekko";  //gekko | dream | excel
         public string plot_using = ""; //a global template
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
@@ -203,8 +203,8 @@ namespace Gekko
         public bool print_prt_dif = false;  //d
         public bool print_prt_pch = true;  //p
         public bool print_prt_gdif = false;  //dp        
-        public int print_width = 100;  //so that eqs look ok in DISP
         public bool print_split = false;  //splits PRT x, y; into PRT x; PRT y;
+        public int print_width = 100;  //so that eqs look ok in DISP        
         // ---
         public string python_exe_folder = "";  //there will probably be more Python options later on
         // ---
@@ -489,7 +489,7 @@ namespace Gekko
             Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
             Add("PLOT ELEMENTS MAX", Globals.xint);            
             Add("PLOT LINES POINTS", Globals.xbool);
-            Add("PLOT PALETTE", Globals.xnameOrString, "gekko", "dream");
+            Add("PLOT PALETTE", Globals.xnameOrString, "gekko", "excel", "dream");
             Add("PLOT USING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
             Add("PLOT XLABELS DIGITS", Globals.xint);

@@ -50,6 +50,7 @@ namespace Gekko
         public double sizeScaling = 1d;
         public bool? isIndex = null;
         public bool isButton = false;
+        public string fileName = null;
         public GraphHelper()
         {
         }
@@ -69,6 +70,7 @@ namespace Gekko
             this.sizeScaling=refresh.sizeScaling;
             this.isIndex = refresh.isIndex;
             this.isButton = refresh.isButton;
+            this.fileName = refresh.fileName;
         }        
     }
 

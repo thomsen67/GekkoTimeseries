@@ -346,6 +346,10 @@ namespace Gekko
             {
                 defaultPalette = "#F55252, #14AFA6, #FF9B4B, #5CD272, #42B4E0, #BCADDD, #005F97, #893070, #46464C, #E6E6E8, #cab2d6, #ffff99";
             }
+            else if (G.Equal(Program.options.plot_palette, "excel"))
+            {
+                defaultPalette = "#4472C4, #ED7D31, #A5A5A5, #FFC000, #5B9BD5, #70AD47, #264478, #9E480E, #636363, #997300, #255E91, #43682B";
+            }
             else new Error("Expected 'option plot palette' to have value 'gekko' or 'dream'");
 
             string size2 = GetText(null, o.opt_size, null, doc.SelectSingleNode("gekkoplot/size"), null);

@@ -2891,7 +2891,9 @@ namespace Gekko.Parser.Gek
                             node.Code.A("  else {");
                             node.Code.A("    o" + Num(node) + ".opt_linetype = `lines`;");
                             node.Code.A("  }");
-                            node.Code.A("}" + G.NL);                                                        
+                            node.Code.A("}" + G.NL);
+
+                            node.Code.A("if (gh.fileName != null) { o" + Num(node) + ".opt_filename = gh.fileName; }");                            
 
                             node.Code.A("O.GetPeriods2(o" + Num(node) + ", gh);" + G.NL);
 
