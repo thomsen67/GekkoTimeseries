@@ -196,7 +196,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
-                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Indexes/adjusts data to 100 in the midpoint period (&lt;i> option).&#x0a;See also 'option print index date' and 'option print index value'."  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
+                <CheckBox x:Name="CheckBox_index"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Indexes/adjusts data to 100 in the start of the period (&lt;i> option).&#x0a;See also 'option print index date' and 'option print index value'."  Content="Index" Checked="CheckBox_index_Checked" Unchecked="CheckBox_index_Unchecked"/>
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
@@ -247,7 +247,7 @@
                 </ComboBox>
 
 
-                <Button Content="Refresh" Margin="2,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (also use when changing time period)." Click="Button_refresh">
+                <Button Content="Refresh" Margin="2,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (may also be used when changing time period)." Click="Button_refresh">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -270,7 +270,7 @@
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Save As" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
+                <Button Content="Save As" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a svg/emf/png/pdf file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>

@@ -384,9 +384,14 @@ namespace Gekko
                 InitialDirectory = Program.options.folder_working
             };
             if (saveFileDialog1.ShowDialog() == true)
-            {                
+            {
+                string extension = System.IO.Path.GetExtension(saveFileDialog1.FileName);
+                if (!(G.Equal(extension, ".svg") || G.Equal(extension, ".emf") || G.Equal(extension, ".png") || G.Equal(extension, ".pdf")))
+                {
+                    MessageBox.Show("Expected file type to be '.svg', '.emf', '.png' or '.pdf' -- not '" + extension + "'. No file produced.");
+                    return;
+                }
                 string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, saveFileDialog1.FileName);
-                //Program.WaitForFileCopy(plotName, saveFileDialog1.FileName);                
             }
         }
 
@@ -402,9 +407,7 @@ namespace Gekko
         //}
 
         private string CreatePlotFileInBackground(double fontScaling, double sizeScaling, string fileName)
-        {
-            string extension = System.IO.Path.GetExtension(fileName);
-            if (!(G.Equal(extension, ".svg") || G.Equal(extension, ".emf") || G.Equal(extension, ".png") || G.Equal(extension, ".pdf"))) new Error("Expected file type to be svg, emf, png or pdf");
+        {            
             RefreshHelper refresh = new RefreshHelper();
             refresh.op = GetOperator();
             refresh.isLog = CheckBox_log.IsChecked;
