@@ -1449,7 +1449,7 @@ namespace Gekko.Parser.Gek
                     break;
                 case "ASTTELL":
                     {
-                        node.Code.A("O.Tell o" + Num(node) + " = new O.Tell();" + G.NL);                        
+                        node.Code.A("O.Tell o" + Num(node) + " = new O.Tell();" + G.NL);
                         if (node[0][0] != null) node.Code.A("o" + Num(node) + ".s = " + node[0][0].Code + ";" + G.NL);
                         GetCodeFromAllChildren(node, node[1]);  //options
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);

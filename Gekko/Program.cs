@@ -14810,8 +14810,8 @@ namespace Gekko
                     int remember = Program.options.print_width;
                     Program.options.print_width = int.MaxValue;
                     try
-                    {
-                        G.Writeln("[line " + lineCounter + "]   " + lineNewVersion, Color.DarkOrange);  //Would be rare
+                    {                        
+                        G.Writeln("Internal syntax error triggered by line " + lineCounter + ": " + lineNewVersion, Color.DarkOrange);  //Would be rare
                     }
                     finally
                     {

@@ -149,6 +149,70 @@ namespace Gekko.Parser.Gek
 
             if (cr.Errors.HasErrors)
             {
+                try
+                {
+                    if (cr.Errors.Count > 0)
+                    {
+                        List<int> gekkoLines = new List<int>();
+                        List<string> codeLines = Stringlist.ExtractLinesFromText(code);
+                        foreach (CompilerError error in cr.Errors)
+                        {
+                            int errorLineNumber0Based = error.Line - 1;                            
+                            int lastGekkoLineMentioned = -12345;
+                            for (int i = 0; i < codeLines.Count; i++)
+                            {
+                                string line = codeLines[i].Trim();
+                                int i2 = line.IndexOf("p.SetStack(");
+                                if (i2 >= 0)
+                                {
+                                    int i3 = line.IndexOf("¤", i2 + 1);
+                                    if (i3 > 0)
+                                    {
+                                        int end = -12345;
+                                        for (int i4 = i3 + 1; i4 < line.Length; i4++)
+                                        {
+                                            if (!G.IsInteger(line.Substring(i4, 1)))
+                                            {
+                                                end = i4 - 1;
+                                                break;
+                                            }
+                                        }
+                                        if (end != -12345)
+                                        {
+                                            string sInt = G.Substring(line, i3 + 1, end);
+                                            int gekkoLine = G.IntParse(sInt);
+                                            if (gekkoLine != -12345)
+                                            {
+                                                lastGekkoLineMentioned = gekkoLine;                                                
+                                            }
+                                        }
+                                    }
+                                }
+                                if (i == errorLineNumber0Based)
+                                {
+                                    gekkoLines.Add(lastGekkoLineMentioned);
+                                }
+                            }
+                        }
+                        if (gekkoLines.Count > 0)
+                        {
+                            if (gekkoLines.Count == 1)
+                            {
+                                G.Writeln();                                
+                                G.Writeln("Internal syntax error triggered by line " + gekkoLines[0], Color.DarkOrange);
+                            }
+                            else
+                            {
+                                G.Writeln();
+                                G.Writeln("Internal syntax error triggered by lines " + string.Join(", ", gekkoLines), Color.DarkOrange);
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    //Do not choke on this
+                }
                 HandleCommandCompileErrors(p, cr);
             }
             return cr;
