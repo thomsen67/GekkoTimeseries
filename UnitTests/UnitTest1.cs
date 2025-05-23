@@ -7882,19 +7882,6 @@ namespace UnitTests
             I("x4 = i2 " + op + " i3;");
         }
 
-
-        //[TestMethod]
-        //public void _Test_Masks()
-        //{
-        //    I("reset;");
-        //    I("x = series(2);");
-        //    I("x[b, c] <2001 2001> = 3;");
-        //    I("x[b, d] <2001 2001> = 4;");
-        //    I("x[a, d] <2002 2002> = 6;");
-        //    I("x[b, d] <2002 2002> = 8;");
-        //    I("prt <n> x;");
-        //}
-
         [TestMethod]
         public void _Test_BitArray()
         {
@@ -33762,50 +33749,7 @@ print(df2)
 
             Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.source, "2000-2001: series extra2 = 1/extra1 + 0.1*extra1[-1]");
             Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
-        }
-
-        //[TestMethod]
-        //public void Test__TranslateExaug15()
-        //{
-        //    I("RESET;");
-        //    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\gekko18\exaug15';");
-        //    I("RUN REGRES;");
-        //    for (int i = 2014; i <= 2023; i++)
-        //    {
-        //        UData u = Data("fy", i, "a"); Assert.AreEqual(u.m, 0d, 1e-8d);  //almost exact reproduction!
-        //    }
-        //}
-
-        //[TestMethod]
-        //public void Test__TranslateAREMOS1()
-        //{
-        //    I("RESET;");
-        //    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\aremos\aremos1';");
-        //    I("sys'del t1." + Globals.extensionCommand + "';");
-        //    I("translate <aremos> t1;");
-        //    I("run t1;");
-        //    _AssertScalarString(First(), "%s", "abc");
-        //    _AssertScalarString(First(), "%n", "bce");
-        //    _AssertScalarDate(First(), "%d1", EFreq.A, 2002, 1);
-        //    _AssertScalarDate(First(), "%d2", EFreq.A, 1995, 1);
-        //    _AssertScalarDate(First(), "%d3", EFreq.Q, 1990, 3);
-        //    _AssertScalarVal(First(), "%v1", 1.2345);
-        //    _AssertScalarVal(First(), "%v2", -1.23e-5);
-        //    _AssertSeries(First(), "bce", 2000, double.NaN, 0d);
-        //    _AssertSeries(First(), "bce", 2001, 5d, 0d);
-        //    _AssertSeries(First(), "bce", 2002, 6d, 0d);
-        //    _AssertSeries(First(), "bce", 2003, 7d, 0d);
-        //    _AssertSeries(First(), "bce", 2004, double.NaN, 0d);
-        //    _AssertScalarVal(First(), "%v3", 1.2345 * 6d);
-        //    _AssertScalarString(First(), "%s2", "value:abc");
-        //    _AssertSeries(First(), "bce2", EFreq.Q, 1990, 2, double.NaN, 0d);
-        //    _AssertSeries(First(), "bce2", EFreq.Q, 1990, 3, 5d, 0d);
-        //    _AssertSeries(First(), "bce2", EFreq.Q, 1990, 4, 6d, 0d);
-        //    _AssertSeries(First(), "bce2", EFreq.Q, 1991, 1, 7d, 0d);
-        //    _AssertSeries(First(), "bce2", EFreq.Q, 1991, 2, double.NaN, 0d);
-        //    _AssertScalarVal(First(), "%v4", 1.2345 * 6d);
-
-        //}
+        }        
 
         [TestMethod]
         public void _Test_ReplaceTimeseries()

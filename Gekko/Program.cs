@@ -2500,10 +2500,15 @@ namespace Gekko
 
                 if (FindException(e2, "GekkoException"))
                 {
-                    if (!p.stopCommandEncountered) G.Write("*** ERROR: The statement failed");  //do not show this after STOP command.
+                    if (!p.stopCommandEncountered)
+                    {
+                        G.Writeln();
+                        G.Write("*** ERROR: The statement failed due to internal Gekko error");  //do not show this after STOP command.
+                    }
                 }
                 else
                 {
+                    G.Writeln();
                     G.Write("*** ERROR: The statement failed due to internal Gekko error");
                 }
                 string s = "";
@@ -14416,7 +14421,7 @@ namespace Gekko
         /// <param name="start"></param>
         /// <returns></returns>
         private static bool Has2IdentsFollowing(string lineNewVersion, int start)
-        {
+        {            
             //The method looks for two idents like "a1 b2 " or "a1 b2>". Any spaces before, in middle or after are ok.
             //A '=' right after the second token is ok too.
             int j = G.SkipSpaces(lineNewVersion, start);
@@ -14435,6 +14440,7 @@ namespace Gekko
                     return false;
                 }
             }
+            if (blank == -12345) return false;
             j = G.SkipSpaces(lineNewVersion, blank);
             if (j == -12345) return false;
             if (!G.IsLetterOrUnderscore(lineNewVersion[j])) return false;
@@ -14481,320 +14487,339 @@ namespace Gekko
             {
                 lineCounter++;
                 string lineNewVersion = line;
-
-                if (lineNewVersion == Globals.iniFileSecretName)  //this strange name is made in GuiAutoExecStuff()
+                
+                try
                 {
-                    //lineNewVersion = "run '" + Globals.autoExecCmdFileName + "';";
-                    lineNewVersion = "ini;";
-                }
-                else if (lineNewVersion == "RunGekkoTabToTextStuff")
-                {
-                    ConvertTabToText2(Globals.RunGekkoTabToTextStuff_folder);
-                    lineNewVersion = "";  //deleting it, has been handled above
-                }
-
-                string lineComment = lineNewVersion.Trim();
-
-
-                // Special rule to make sure PRT<m d> is not interpreted as time period, so in that case we get
-                // PRT<m d> --> PRT <¨<m d>
-                //
-                // Else: (ldu is letterDigitUnderscore)
-                // For every ldu, '(', '[', '{', '%', '#'
-                //   see if preceding char is ldu, ')', ']', '}', '%' or '#'.
-                //   if so, put a glue in between.
-                //   EXCEPTION: ldu before ldu gets no glue (of course)!
-                // For '|' there is glue before, UNLESS there is a blank before OR after the '|'
-                // For '.' ...
-                //
-                // For "<m d>" kind of options, we use a special kind of marker ('<<<' instead of '<') to indicate that it is
-                // an "<ident ident..." type.
-                List<char> glued3 = new List<char> { '|', '\\' };  //note special rules for '.', see glued3a
-                List<char> glued3a = new List<char> { '=', '+', '-', '/', '*', '^', '(', '{', '[', '<', '>', ',', ':', ' ' };  // "=.12", "+.12", "-.12" etc.
-                List<char> glued4 = new List<char> { '@' };  //only checked if no blank right of this
-                List<char> glued5 = new List<char> { '.' };  //only checked if no blank right of this
-                List<char> glued6 = new List<char> { '*', '?' };  //wildcards: a*b and a?b cannot have blanks.
-                List<char> glued7 = new List<char> { Globals.freqIndicator };
-
-                //=========== note =========================
-                // [c1] [c2] [c3], where c2 is the char analyzed.
-                //==========================================
-
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < lineNewVersion.Length; i++)  //ignore if first on line
-                {
-                    char c1 = '\n';
-                    if (i > 0) c1 = lineNewVersion[i - 1];
-                    char c2 = lineNewVersion[i];
-                    char c3 = '\n';
-                    if (i < lineNewVersion.Length - 1) c3 = lineNewVersion[i + 1];
-                    char c4 = '\n';
-                    if (i < lineNewVersion.Length - 2) c4 = lineNewVersion[i + 2];
-
-                    // -------------------------------------------------------------
-                    // Handle PRT<m d> etc.
-                    // -------------------------------------------------------------
-                    if (c2 == '<')
+                    if (lineNewVersion == Globals.iniFileSecretName)  //this strange name is made in GuiAutoExecStuff()
                     {
-                        //Special rule to make sure the first two tokens inside <> in PRT<m d> or PRT<stamp row=yes> are not interpreted as time period
-                        //If we have for instance "<m d>", the below will return true, and it will be transformed
-                        //into "<¨<m d>". This makes it easier to identify such cases in the parser. We would not like
-                        //to try to interpret <m d> as a time period, so two raw idents will never be thought of as a
-                        //period. That way, missspellings like "<m dd>" will be caught in syntax, and it will not try
-                        //to understand <filter row> as dates either. But <%t1 %t2> will be just fine as dates, as will
-                        //<2010 2012>. Expressions can also be used for dates.
-                        //So all in there is special treatment of the first two items in <>, since this is the only place
-                        //a date is allowed.
-                        if (Has2IdentsFollowing(lineNewVersion, i + 1))
-                        {
-                            sb.Append(Globals.symbolGlueChar5);
-                            continue;
-                        }
+                        //lineNewVersion = "run '" + Globals.autoExecCmdFileName + "';";
+                        lineNewVersion = "ini;";
+                    }
+                    else if (lineNewVersion == "RunGekkoTabToTextStuff")
+                    {
+                        ConvertTabToText2(Globals.RunGekkoTabToTextStuff_folder);
+                        lineNewVersion = "";  //deleting it, has been handled above
                     }
 
-                    // -------------------------------------------------------------
-                    // Handle x(, x[, x{, %x, #x
-                    // c2 is current char, c1 is previous
-                    // -------------------------------------------------------------
-                    if (c1 != '\n')
+                    string lineComment = lineNewVersion.Trim();
+
+
+                    // Special rule to make sure PRT<m d> is not interpreted as time period, so in that case we get
+                    // PRT<m d> --> PRT <¨<m d>
+                    //
+                    // Else: (ldu is letterDigitUnderscore)
+                    // For every ldu, '(', '[', '{', '%', '#'
+                    //   see if preceding char is ldu, ')', ']', '}', '%' or '#'.
+                    //   if so, put a glue in between.
+                    //   EXCEPTION: ldu before ldu gets no glue (of course)!
+                    // For '|' there is glue before, UNLESS there is a blank before OR after the '|'
+                    // For '.' ...
+                    //
+                    // For "<m d>" kind of options, we use a special kind of marker ('<<<' instead of '<') to indicate that it is
+                    // an "<ident ident..." type.
+                    List<char> glued3 = new List<char> { '|', '\\' };  //note special rules for '.', see glued3a
+                    List<char> glued3a = new List<char> { '=', '+', '-', '/', '*', '^', '(', '{', '[', '<', '>', ',', ':', ' ' };  // "=.12", "+.12", "-.12" etc.
+                    List<char> glued4 = new List<char> { '@' };  //only checked if no blank right of this
+                    List<char> glued5 = new List<char> { '.' };  //only checked if no blank right of this
+                    List<char> glued6 = new List<char> { '*', '?' };  //wildcards: a*b and a?b cannot have blanks.
+                    List<char> glued7 = new List<char> { Globals.freqIndicator };
+
+                    //=========== note =========================
+                    // [c1] [c2] [c3], where c2 is the char analyzed.
+                    //==========================================
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < lineNewVersion.Length; i++)  //ignore if first on line
                     {
-                        /*
-                               a(      --->   a¨(     and same for the others
-                               a[      --->   special [_[ symbol
-                               a{
-                               a%  //part of name
-                               a#  //part of name
-
-                               )a  //for instance a%(%b)c, not need for glue here like this: a%(%b)|c as in a%d|c.
-                               ){  //same logic
-                               )%  //same logic
-                               )#  //same logic
-                               )[  //for instance #(list%i)[2] --> special [_[ symbol
-
-                               }a
-                               }{
-                               }%
-                               }#
-                               }[  //for instance {%a}[2000] or {a}[2000], --> special [_[ symbol
-
-                               %a
-                               %(
-                               %{
-
-                               ][  //for instance #m[3][2001q3], --> special [_[ symbol
-
-                               #(
-                               #{
-
-
-
-                               ...#a --> what is that??
-
-
-
-                        */
-                        bool glue = false;
-                        bool glue2 = false;
-
-                        if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '(') glue = true;
-                        else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '[') glue2 = true;
-                        else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '{') glue = true;
-                        else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolScalar) glue = true;
-                        else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolCollection) glue = true;
-
-                        else if (c1 == ')' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                        else if (c1 == ')' && c2 == '{') glue = true;
-                        else if (c1 == ')' && c2 == Globals.symbolScalar) glue = true;
-                        else if (c1 == ')' && c2 == Globals.symbolCollection) glue = true;
-                        else if (c1 == ')' && c2 == '[') glue2 = true;
-
-                        else if (c1 == '}' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                        else if (c1 == '}' && c2 == '{') glue = true;
-                        else if (c1 == '}' && c2 == Globals.symbolScalar) glue = true;
-                        else if (c1 == '}' && c2 == Globals.symbolCollection) glue = true;
-                        else if (c1 == '}' && c2 == '[') glue2 = true;
-
-                        else if (c1 == Globals.symbolScalar && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                        else if (c1 == Globals.symbolScalar && c2 == '(') glue = true;
-                        else if (c1 == Globals.symbolScalar && c2 == '{') glue = true;
-
-                        else if (c1 == Globals.symbolCollection && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                        else if (c1 == Globals.symbolCollection && c2 == '(') glue = true;
-                        else if (c1 == Globals.symbolCollection && c2 == '{') glue = true;
-
-                        else if (c1 == ']' && c2 == '[') glue2 = true;
-
-                        if (glue)
-                        {
-                            sb.Append(Globals.symbolGlueChar1);
-                            sb.Append(c2);
-                            continue;
-                        }
-                        else if (glue2)
-                        {
-                            sb.Append(Globals.symbolGlueChar6);
-                            continue;
-                        }
+                        char c1 = '\n';
+                        if (i > 0) c1 = lineNewVersion[i - 1];
+                        char c2 = lineNewVersion[i];
+                        char c3 = '\n';
+                        if (i < lineNewVersion.Length - 1) c3 = lineNewVersion[i + 1];
+                        char c4 = '\n';
+                        if (i < lineNewVersion.Length - 2) c4 = lineNewVersion[i + 2];
 
                         // -------------------------------------------------------------
-                        // Handle x|x, x\\x
-                        // c2 is current char, c1 is previous
+                        // Handle PRT<m d> etc.
                         // -------------------------------------------------------------
-                        //glued3: '|', '\\'
-                        else if (glued3.Contains(c2)) //add glue if "xx|yy", but not "xx| yy" or "xx |yy" or "xx | yy", and same regarding "\\"
+                        if (c2 == '<')
                         {
-                            //Handling '|' and '\\'
-                            if (c3 != '\n')
+                            //Special rule to make sure the first two tokens inside <> in PRT<m d> or PRT<stamp row=yes> are not interpreted as time period
+                            //If we have for instance "<m d>", the below will return true, and it will be transformed
+                            //into "<¨<m d>". This makes it easier to identify such cases in the parser. We would not like
+                            //to try to interpret <m d> as a time period, so two raw idents will never be thought of as a
+                            //period. That way, missspellings like "<m dd>" will be caught in syntax, and it will not try
+                            //to understand <filter row> as dates either. But <%t1 %t2> will be just fine as dates, as will
+                            //<2010 2012>. Expressions can also be used for dates.
+                            //So all in there is special treatment of the first two items in <>, since this is the only place
+                            //a date is allowed.
+                            if (Has2IdentsFollowing(lineNewVersion, i + 1))
                             {
-                                if (c1 != ' ' && c3 != ' ')
-                                {
-                                    sb.Append(Globals.symbolGlueChar1); //12|34 --> 12¨|34, and 12\\34 --> 12¨\\34
-                                    sb.Append(c2);
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-
-
-                    // -------------------------------------------------------------
-                    // Handle @
-                    // -------------------------------------------------------------
-                    if (glued4.Contains(c2))
-                    {
-                        //handling '@'
-                        if (c3 != '\n')
-                        {
-                            if (c3 == ' ')
-                            {
-                                //ignore
-                            }
-                            else
-                            {
-                                //PRT @x --> PRT @¨x, but PRT @ x --> PRT @ x.
-                                //Note that the glue is AFTER the @.
-                                sb.Append(c2);
-                                sb.Append(Globals.symbolGlueChar1);
+                                sb.Append(Globals.symbolGlueChar5);
                                 continue;
                             }
                         }
-                    }
 
-                    // -------------------------------------------------------------
-                    // Handle wildcards a*b, a?b -> a½*½b, a½?½b, also {'a'}*{'b'} will become {'a'}½*½{'b'}
-                    // A * will get glue (½) to the left if there is ldu to the left. a* -> a½*
-                    // A * will get glue (½) to the right if there is ldu the right.  *b -> *½b
-                    // -------------------------------------------------------------
-                    if (glued6.Contains(c2))
-                    {
-                        if (G.IsLetterOrDigitOrUnderscore(c1) || c1 == '}')
+                        // -------------------------------------------------------------
+                        // Handle x(, x[, x{, %x, #x
+                        // c2 is current char, c1 is previous
+                        // -------------------------------------------------------------
+                        if (c1 != '\n')
                         {
-                            sb.Append(Globals.symbolGlueChar4);
-                        }
-                        sb.Append(c2);
-                        if (G.IsLetterOrDigitOrUnderscore(c3) || c3 == '{')
-                        {
-                            sb.Append(Globals.symbolGlueChar4);
-                        }
-                        continue;
-                    }
+                            /*
+                                   a(      --->   a¨(     and same for the others
+                                   a[      --->   special [_[ symbol
+                                   a{
+                                   a%  //part of name
+                                   a#  //part of name
 
-                    // -------------------------------------------------------------
-                    // Handle dots (.)
-                    // -------------------------------------------------------------
-                    if (glued5.Contains(c2))
-                    {
-                        //c2 is a '.'
-                        if (c1 != '\n' && c3 != '\n')
-                        {
+                                   )a  //for instance a%(%b)c, not need for glue here like this: a%(%b)|c as in a%d|c.
+                                   ){  //same logic
+                                   )%  //same logic
+                                   )#  //same logic
+                                   )[  //for instance #(list%i)[2] --> special [_[ symbol
 
-                            if (c3 == ' ')
+                                   }a
+                                   }{
+                                   }%
+                                   }#
+                                   }[  //for instance {%a}[2000] or {a}[2000], --> special [_[ symbol
+
+                                   %a
+                                   %(
+                                   %{
+
+                                   ][  //for instance #m[3][2001q3], --> special [_[ symbol
+
+                                   #(
+                                   #{
+
+
+
+                                   ...#a --> what is that??
+
+
+
+                            */
+                            bool glue = false;
+                            bool glue2 = false;
+
+                            if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '(') glue = true;
+                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '[') glue2 = true;
+                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '{') glue = true;
+                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolScalar) glue = true;
+                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolCollection) glue = true;
+
+                            else if (c1 == ')' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            else if (c1 == ')' && c2 == '{') glue = true;
+                            else if (c1 == ')' && c2 == Globals.symbolScalar) glue = true;
+                            else if (c1 == ')' && c2 == Globals.symbolCollection) glue = true;
+                            else if (c1 == ')' && c2 == '[') glue2 = true;
+
+                            else if (c1 == '}' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            else if (c1 == '}' && c2 == '{') glue = true;
+                            else if (c1 == '}' && c2 == Globals.symbolScalar) glue = true;
+                            else if (c1 == '}' && c2 == Globals.symbolCollection) glue = true;
+                            else if (c1 == '}' && c2 == '[') glue2 = true;
+
+                            else if (c1 == Globals.symbolScalar && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            else if (c1 == Globals.symbolScalar && c2 == '(') glue = true;
+                            else if (c1 == Globals.symbolScalar && c2 == '{') glue = true;
+
+                            else if (c1 == Globals.symbolCollection && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            else if (c1 == Globals.symbolCollection && c2 == '(') glue = true;
+                            else if (c1 == Globals.symbolCollection && c2 == '{') glue = true;
+
+                            else if (c1 == ']' && c2 == '[') glue2 = true;
+
+                            if (glue)
                             {
-                                //do nothing, normal dot, for instance 12. 34
+                                sb.Append(Globals.symbolGlueChar1);
+                                sb.Append(c2);
+                                continue;
                             }
-                            else if (char.IsDigit(c3))
+                            else if (glue2)
                             {
-                                if (glued3a.Contains(c1))
+                                sb.Append(Globals.symbolGlueChar6);
+                                continue;
+                            }
+
+                            // -------------------------------------------------------------
+                            // Handle x|x, x\\x
+                            // c2 is current char, c1 is previous
+                            // -------------------------------------------------------------
+                            //glued3: '|', '\\'
+                            else if (glued3.Contains(c2)) //add glue if "xx|yy", but not "xx| yy" or "xx |yy" or "xx | yy", and same regarding "\\"
+                            {
+                                //Handling '|' and '\\'
+                                if (c3 != '\n')
                                 {
-                                    //  +.12, **.12, >.12, (.12, etc.
-                                    sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
+                                    if (c1 != ' ' && c3 != ' ')
+                                    {
+                                        sb.Append(Globals.symbolGlueChar1); //12|34 --> 12¨|34, and 12\\34 --> 12¨\\34
+                                        sb.Append(c2);
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+
+
+                        // -------------------------------------------------------------
+                        // Handle @
+                        // -------------------------------------------------------------
+                        if (glued4.Contains(c2))
+                        {
+                            //handling '@'
+                            if (c3 != '\n')
+                            {
+                                if (c3 == ' ')
+                                {
+                                    //ignore
+                                }
+                                else
+                                {
+                                    //PRT @x --> PRT @¨x, but PRT @ x --> PRT @ x.
+                                    //Note that the glue is AFTER the @.
                                     sb.Append(c2);
+                                    sb.Append(Globals.symbolGlueChar1);
                                     continue;
                                 }
-                                else if (char.IsDigit(c1))
+                            }
+                        }
+
+                        // -------------------------------------------------------------
+                        // Handle wildcards a*b, a?b -> a½*½b, a½?½b, also {'a'}*{'b'} will become {'a'}½*½{'b'}
+                        // A * will get glue (½) to the left if there is ldu to the left. a* -> a½*
+                        // A * will get glue (½) to the right if there is ldu the right.  *b -> *½b
+                        // -------------------------------------------------------------
+                        if (glued6.Contains(c2))
+                        {
+                            if (G.IsLetterOrDigitOrUnderscore(c1) || c1 == '}')
+                            {
+                                sb.Append(Globals.symbolGlueChar4);
+                            }
+                            sb.Append(c2);
+                            if (G.IsLetterOrDigitOrUnderscore(c3) || c3 == '{')
+                            {
+                                sb.Append(Globals.symbolGlueChar4);
+                            }
+                            continue;
+                        }
+
+                        // -------------------------------------------------------------
+                        // Handle dots (.)
+                        // -------------------------------------------------------------
+                        if (glued5.Contains(c2))
+                        {
+                            //c2 is a '.'
+                            if (c1 != '\n' && c3 != '\n')
+                            {
+
+                                if (c3 == ' ')
                                 {
-                                    //in stuff like 12.34 the dot becomes a GLUEDOTNUMBER
-                                    //but only if stuff before 12 is not ident, for instance
-                                    //x12.34. We could have hgn2.1, and that is not a number.
-                                    bool number = true;
-                                    for (int ii = i - 1 - 1; ii >= 0; ii--)
+                                    //do nothing, normal dot, for instance 12. 34
+                                }
+                                else if (char.IsDigit(c3))
+                                {
+                                    if (glued3a.Contains(c1))
                                     {
-                                        //.... +123.45 loops through pure digits until + is met. Here number would be true.
-                                        if (glued3a.Contains(lineNewVersion[ii]) || lineNewVersion[ii] == ';') break;  //for instance a "," or "+" to delimit the number ('token'), or the ';' in #m = [1.2;2.3]
-                                        if (!char.IsDigit(lineNewVersion[ii]))
-                                        {
-                                            number = false;
-                                            break;
-                                        }
-                                    }
-                                    if (number)
-                                    {
+                                        //  +.12, **.12, >.12, (.12, etc.
                                         sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
                                         sb.Append(c2);
                                         continue;
                                     }
-                                    else
+                                    else if (char.IsDigit(c1))
                                     {
-                                        sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
-                                        sb.Append(c2);
+                                        //in stuff like 12.34 the dot becomes a GLUEDOTNUMBER
+                                        //but only if stuff before 12 is not ident, for instance
+                                        //x12.34. We could have hgn2.1, and that is not a number.
+                                        bool number = true;
+                                        for (int ii = i - 1 - 1; ii >= 0; ii--)
+                                        {
+                                            //.... +123.45 loops through pure digits until + is met. Here number would be true.
+                                            if (glued3a.Contains(lineNewVersion[ii]) || lineNewVersion[ii] == ';') break;  //for instance a "," or "+" to delimit the number ('token'), or the ';' in #m = [1.2;2.3]
+                                            if (!char.IsDigit(lineNewVersion[ii]))
+                                            {
+                                                number = false;
+                                                break;
+                                            }
+                                        }
+                                        if (number)
+                                        {
+                                            sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
+                                            sb.Append(c2);
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
+                                            sb.Append(c2);
+                                            continue;
+                                        }
+                                    }
+                                }
+                                if (c1 != ' ' && c3 != ' ')
+                                {
+                                    sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
+                                    sb.Append(c2);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                if (c3 != '\n')
+                                {
+                                    if (char.IsDigit(c3))
+                                    {
+                                        //if line starts with .1, the dot is a GLUEDOTNUMBER
+                                        sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
                                         continue;
                                     }
                                 }
                             }
-                            if (c1 != ' ' && c3 != ' ')
-                            {
-                                sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
-                                sb.Append(c2);
-                                continue;
-                            }
                         }
-                        else
+
+                        // -------------------------------------------------------------
+                        // Handle exclamation (!)  --> if no spaces --> ¨!¨
+                        // -------------------------------------------------------------
+                        if (glued7.Contains(c2))
                         {
-                            if (c3 != '\n')
+                            //c2 is a '!'
+                            if (c1 != '\n' && c3 != '\n')
                             {
-                                if (char.IsDigit(c3))
+                                if (c1 != ' ' && c3 != ' ')
                                 {
-                                    //if line starts with .1, the dot is a GLUEDOTNUMBER
-                                    sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
+                                    sb.Append(Globals.symbolGlueChar1);
+                                    sb.Append(c2);
+                                    sb.Append(Globals.symbolGlueChar1);
                                     continue;
                                 }
                             }
                         }
-                    }
 
-                    // -------------------------------------------------------------
-                    // Handle exclamation (!)  --> if no spaces --> ¨!¨
-                    // -------------------------------------------------------------
-                    if (glued7.Contains(c2))
-                    {
-                        //c2 is a '!'
-                        if (c1 != '\n' && c3 != '\n')
-                        {
-                            if (c1 != ' ' && c3 != ' ')
-                            {
-                                sb.Append(Globals.symbolGlueChar1);
-                                sb.Append(c2);
-                                sb.Append(Globals.symbolGlueChar1);
-                                continue;
-                            }
-                        }
+                        sb.Append(c2);
                     }
+                    lineNewVersion = sb.ToString();
 
-                    sb.Append(c2);
+                    inputFileLines2.Add(lineNewVersion);
                 }
-                lineNewVersion = sb.ToString();
-
-                inputFileLines2.Add(lineNewVersion);
+                catch
+                {
+                    G.Writeln();
+                    int remember = Program.options.print_width;
+                    Program.options.print_width = int.MaxValue;
+                    try
+                    {
+                        G.Writeln("[line " + lineCounter + "]   " + lineNewVersion, Color.DarkOrange);  //Would be rare
+                    }
+                    finally
+                    {
+                        Program.options.print_width = remember;
+                    }
+                    G.Writeln();
+                    throw;
+                }
             }
             if (inputFileLines.Count != inputFileLines2.Count) throw new GekkoException();
 

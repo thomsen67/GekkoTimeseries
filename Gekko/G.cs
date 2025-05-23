@@ -3423,16 +3423,16 @@ namespace Gekko
         /// <summary>
         /// In a string, skip to next non-space (tabs counted as spaces)
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="s"></param>
         /// <param name="ii"></param>
         /// <returns></returns>
-        public static int SkipSpaces(string c, int ii)
-        {
-            int i;
+        public static int SkipSpaces(string s, int ii)
+        {            
+            if (ii < 0) return -12345;  //should not happen, but just in case...                        
             //skip spaces (tab is included counted)
-            for (i = ii; i < c.Length; i++)
+            for (int i = ii; i < s.Length; i++)
             {
-                if (c[i] == ' ' || c[i] == '\t')     //'\t' is tab
+                if (s[i] == ' ' || s[i] == '\t')     //'\t' is tab
                 {
                     //do nothing
                 }
