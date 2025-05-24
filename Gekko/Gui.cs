@@ -142,6 +142,7 @@ namespace Gekko
             this.textBoxMainTabUpper.Text = "";
             this.textBoxMainTabUpper.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyDown);
             this.textBoxMainTabUpper.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);
+            this.textBoxMainTabUpper.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBoxUpper_MouseDown);
 
             Panel panelMainTabUpper = new Panel();
             panelMainTabUpper.BackColor = System.Drawing.SystemColors.Window;

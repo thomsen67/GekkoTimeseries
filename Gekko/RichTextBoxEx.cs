@@ -270,10 +270,11 @@ namespace Gekko
         /// <param name="position">Insert position</param>
         public void InsertLink(string text, string hyperlink, int position)
         {            
-            this.SelectionStart = position;
-            this.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + hyperlink + @"\v0}";
-            this.Select(position, text.Length + hyperlink.Length + 1);
-            this.SetSelectionLink(true);
+            this.SelectionStart = position;            
+            //This is apparently a hack
+            this.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + hyperlink + @"\v0}";                        
+            this.Select(position, text.Length + hyperlink.Length + 1);            
+            this.SetSelectionLink(true);            
             this.Select(position + text.Length + hyperlink.Length + 1, 0);            
         }
 

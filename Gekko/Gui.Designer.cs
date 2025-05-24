@@ -245,7 +245,7 @@ namespace Gekko
             this.textBoxMainTabLower.VisibleChanged += new System.EventHandler(this.textBox2_VisibleChanged);
             this.textBoxMainTabLower.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
             this.textBoxMainTabLower.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox2_KeyPress);
-            this.textBoxMainTabLower.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);            
+            this.textBoxMainTabLower.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);
 
             // 
             // contextMenuStrip1
@@ -1881,6 +1881,10 @@ namespace Gekko
             lineNumberInTextField = textBoxMainTabLower.GetLineFromCharIndex(textBoxMainTabLower.GetFirstCharIndexOfCurrentLine());
             positionInAllLinesInTotalFile = textBoxMainTabLower.GetFirstCharIndexFromLine(lineNumberInTextField);
             positionInLine = textBoxMainTabLower.SelectionStart - positionInAllLinesInTotalFile;
+        }
+
+        private void richTextBoxUpper_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {            
         }
 
         private void richTextBox1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)

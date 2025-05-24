@@ -6175,9 +6175,10 @@ namespace Gekko
                     {
                         RichTextBoxEx textBoxEx = textBox as RichTextBoxEx;
                         if (textBoxEx == null) MessageBox.Show("*** ERROR: Cannot use links in this RichTextBox");
-                        int position = textBoxEx.SelectionStart;
-                        textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";
-                        textBoxEx.Select(position, s.Length + link.Length + 1);
+                        int position = textBoxEx.SelectionStart;                        
+                        //This is apparently a hack
+                        textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";                        
+                        textBoxEx.Select(position, s.Length + link.Length + 1);                        
                         textBoxEx.SetSelectionLink(true);
                         textBoxEx.Select(position + s.Length + link.Length + 1, 0);
                     }
