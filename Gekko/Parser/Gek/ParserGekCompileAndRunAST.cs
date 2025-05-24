@@ -190,7 +190,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 if (i == errorLineNumber0Based)
                                 {
-                                    gekkoLines.Add(lastGekkoLineMentioned);
+                                    if (lastGekkoLineMentioned != -12345) gekkoLines.Add(lastGekkoLineMentioned);
                                 }
                             }
                         }

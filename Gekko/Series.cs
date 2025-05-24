@@ -1043,7 +1043,7 @@ namespace Gekko
                             {
                                 txt.MainAdd("Eps error: the variable " + this.GetName() + "[" + t.ToString() + "] has value = eps and cannot");
                                 txt.MainAdd("be directly changed into the value " + z + ".");
-                                txt.MainAdd("To change the value, use the mask() function.");
+                                txt.MainAdd("To change, use an eps...() function..");
                             }
                         }
                         this.data.GetDataArray_ONLY_INTERNAL_USE()[i + index1] = z;
