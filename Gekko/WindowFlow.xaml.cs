@@ -341,9 +341,26 @@ namespace Gekko
         }
 
         void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
-        {
-            statusTextBox.Text = "Flowgraph clicked...";
-            //statusTextBox.Text = "";
+        {            
+            string s = (sender as GraphViewer).ObjectUnderMouseCursor.DrawingObject.ToString();
+            int i = s.IndexOf('"', 1);
+            string s2 = G.Substring(s, 1, i - 1);
+            //statusTextBox.Text = s2 + " clicked...";
+
+            if (!isInitializing)
+            {
+                DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
+                this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+                this.decompFind.decompOptions2.new_select = new List<string>() { s2 };
+                this.decompFind.decompOptions2.new_from = new List<string>();
+                this.decompFind.decompOptions2.new_endo = new List<string>();
+
+                WindowFlow w = new WindowFlow(this.decompFind);
+                Globals.windowsFlow.Add(w);
+                w.Title = "Gekko flowgraph";
+                w.ShowDialog();
+                this.decompFind.decompOptions2 = decompOptions2Remember;
+            }
         }
 
         private void SetViewMenu(Menu mainMenu)

@@ -3104,8 +3104,7 @@ namespace Gekko
         private void ButtonFlow_Click(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
-                //WindowFlow w = new WindowFlow(decompFind);                
+            {                
                 DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
                 this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
                 WindowFlow w = new WindowFlow(this.decompFind);

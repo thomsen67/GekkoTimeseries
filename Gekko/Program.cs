@@ -49,6 +49,7 @@ using System.Linq;
 using OfficeOpenXml;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using AngouriMath;
 
 namespace Gekko
 {
@@ -2711,6 +2712,18 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                if (true)
+                {
+                    //Entity expr = "x + sin(y x)";
+                    //string s1 = expr.ToString();
+                    //string s2 = expr.Differentiate("x").ToString();
+
+                    Entity expr = "2 x^2 * y + z = 200";
+                    Entity.Variable x = "x";
+                    string s3 = expr.Solve(x).Simplify().ToString();
+
+                }
+                
                 if (false)
                 {
                     int n = 100;
