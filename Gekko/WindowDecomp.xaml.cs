@@ -3105,12 +3105,16 @@ namespace Gekko
         {
             if (!isInitializing)
             {
+                DecompFind decompFindHere = this.decompFind;
+                DecompOptions2 decompOptions2Remember = decompFindHere.decompOptions2;
+                decompFindHere.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
                 Thread thread = new Thread(new ParameterizedThreadStart(WindowFlow.CreateWindowFlow));
                 thread.Name = "Flow";
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                 thread.IsBackground = true;
-                thread.Start(this.decompFind);
+                thread.Start(decompFindHere);
+                decompFindHere.decompOptions2 = decompOptions2Remember;
             }
         }        
 

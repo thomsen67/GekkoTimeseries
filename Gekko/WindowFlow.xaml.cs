@@ -100,14 +100,6 @@ namespace Gekko
             {
                 Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph();
                 graphViewer.Graph = graph;
-                //graph.LayoutAlgorithmSettings = new Microsoft.Msagl.Layout.MDS.MdsLayoutSettings();
-                //double factor = 0.02;
-
-                //GekkoDictionary<string, bool> alreadySeen = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-                //a varName points to --> an eqName
-                //The eqName creates arrowsFromTo, (varName -> varName1), (varName -> varName2), ...
-
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = this.decompFind.decompOptions2.t1;
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
@@ -120,24 +112,16 @@ namespace Gekko
                 walkInfo.removeSelfReferences = true;  //lags??
                 walkInfo.removeResidualIgnoredError = true;
                 walkInfo.ignoreLags = true;
-
                 string varName = this.decompFind.decompOptions2.new_select[0];
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false);
                 string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
-                if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
-
-                //if (rotate) graph.Attr.LayerDirection = LayerDirection.TB;
-                //else graph.Attr.LayerDirection = LayerDirection.RL;
+                if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;                
                 if (rotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;
-
                 graphViewer.Graph = graph;
-
                 SetStatusBar();
-
             }
             catch (Exception ex)
             {
@@ -343,14 +327,11 @@ namespace Gekko
 
         public static void CreateWindowFlow(object o2)
         {
-            DecompFind decompFind = o2 as DecompFind;
-            DecompOptions2 decompOptions2Remember = decompFind.decompOptions2;
-            decompFind.decompOptions2 = decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
-            WindowFlow w = new WindowFlow(decompFind);
+            DecompFind decompFindHere = o2 as DecompFind;            
+            WindowFlow w = new WindowFlow(decompFindHere);
             Globals.windowsFlow.Add(w);
-            w.Title = decompFind.decompOptions2.new_select[0] + " - Gekko flowgraph";
-            w.ShowDialog();
-            decompFind.decompOptions2 = decompOptions2Remember;
+            w.Title = decompFindHere.decompOptions2.new_select[0] + " - Gekko flowgraph";
+            w.ShowDialog();            
         }
 
         void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
@@ -366,24 +347,19 @@ namespace Gekko
 
                 if (!isInitializing)
                 {
+                    DecompFind decompFindHere = this.decompFind;
                     DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
-                    this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
-                    this.decompFind.decompOptions2.new_select = new List<string>() { s2 };
-                    this.decompFind.decompOptions2.new_from = new List<string>();
-                    this.decompFind.decompOptions2.new_endo = new List<string>();
-
+                    decompFindHere.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+                    decompFindHere.decompOptions2.new_select = new List<string>() { s2 };
+                    decompFindHere.decompOptions2.new_from = new List<string>();
+                    decompFindHere.decompOptions2.new_endo = new List<string>();
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
                     thread.Name = "Flow";
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
-                    thread.Start(this.decompFind);
-
-                    //WindowFlow w = new WindowFlow(this.decompFind);
-                    //Globals.windowsFlow.Add(w);
-                    //w.Title = "Gekko flowgraph";
-                    //w.ShowDialog();
-                    //this.decompFind.decompOptions2 = decompOptions2Remember;
+                    thread.Start(decompFindHere);
+                    decompFindHere.decompOptions2 = decompOptions2Remember;
                 }
             }
             catch { }
