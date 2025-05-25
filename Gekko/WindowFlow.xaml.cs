@@ -11,6 +11,7 @@ using Microsoft.Msagl.WpfGraphControl;
 using System.Windows.Media;
 using Color = Microsoft.Msagl.Drawing.Color;
 using ModifierKeys = System.Windows.Input.ModifierKeys;
+using System.Threading;
 
 namespace Gekko
 {
@@ -340,27 +341,52 @@ namespace Gekko
             if (Globals.windowsFlow != null && this != null) Globals.windowsFlow.Remove(this);
         }
 
+        public static void CreateWindowFlow(object o2)
+        {
+            DecompFind decompFind = o2 as DecompFind;
+            DecompOptions2 decompOptions2Remember = decompFind.decompOptions2;
+            decompFind.decompOptions2 = decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+            WindowFlow w = new WindowFlow(decompFind);
+            Globals.windowsFlow.Add(w);
+            w.Title = decompFind.decompOptions2.new_select[0] + " - Gekko flowgraph";
+            w.ShowDialog();
+            decompFind.decompOptions2 = decompOptions2Remember;
+        }
+
         void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
-        {            
-            string s = (sender as GraphViewer).ObjectUnderMouseCursor.DrawingObject.ToString();
-            int i = s.IndexOf('"', 1);
-            string s2 = G.Substring(s, 1, i - 1);
-            //statusTextBox.Text = s2 + " clicked...";
-
-            if (!isInitializing)
+        {
+            GraphViewer gv = sender as GraphViewer;
+            if (gv == null) return;
+            if (gv.ObjectUnderMouseCursor == null) return;
+            try
             {
-                DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
-                this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
-                this.decompFind.decompOptions2.new_select = new List<string>() { s2 };
-                this.decompFind.decompOptions2.new_from = new List<string>();
-                this.decompFind.decompOptions2.new_endo = new List<string>();
+                string s = gv.ObjectUnderMouseCursor.DrawingObject.ToString();
+                int i = s.IndexOf('"', 1);
+                string s2 = G.Substring(s, 1, i - 1);
 
-                WindowFlow w = new WindowFlow(this.decompFind);
-                Globals.windowsFlow.Add(w);
-                w.Title = "Gekko flowgraph";
-                w.ShowDialog();
-                this.decompFind.decompOptions2 = decompOptions2Remember;
+                if (!isInitializing)
+                {
+                    DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
+                    this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+                    this.decompFind.decompOptions2.new_select = new List<string>() { s2 };
+                    this.decompFind.decompOptions2.new_from = new List<string>();
+                    this.decompFind.decompOptions2.new_endo = new List<string>();
+
+                    Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
+                    thread.Name = "Flow";
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                    thread.IsBackground = true;
+                    thread.Start(this.decompFind);
+
+                    //WindowFlow w = new WindowFlow(this.decompFind);
+                    //Globals.windowsFlow.Add(w);
+                    //w.Title = "Gekko flowgraph";
+                    //w.ShowDialog();
+                    //this.decompFind.decompOptions2 = decompOptions2Remember;
+                }
             }
+            catch { }
         }
 
         private void SetViewMenu(Menu mainMenu)

@@ -2604,8 +2604,7 @@ namespace Gekko
                     CreateDecompWindow(decompFind);
                 }
                 else
-                {
-                    //if(Globals.python) MessageBox.Show("decomp 7");
+                {                    
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
                     thread.Name = "Decomp";
                     thread.SetApartmentState(ApartmentState.STA);
@@ -2675,10 +2674,8 @@ namespace Gekko
                         if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
                     }
                     else
-                    {
-                        //if (Globals.python) MessageBox.Show("decomp 77");
-                        windowDecomp.ShowDialog();
-                        //if(Globals.python) MessageBox.Show("decomp 777");
+                    {                        
+                        windowDecomp.ShowDialog();                     
                         if (Globals.showDecompTable)
                         {
                             Globals.showDecompTable = false;

@@ -3104,16 +3104,15 @@ namespace Gekko
         private void ButtonFlow_Click(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {                
-                DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
-                this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
-                WindowFlow w = new WindowFlow(this.decompFind);
-                Globals.windowsFlow.Add(w);
-                w.Title = "Gekko flowgraph";
-                w.ShowDialog();
-                this.decompFind.decompOptions2 = decompOptions2Remember;
+            {
+                Thread thread = new Thread(new ParameterizedThreadStart(WindowFlow.CreateWindowFlow));
+                thread.Name = "Flow";
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                thread.IsBackground = true;
+                thread.Start(this.decompFind);
             }
-        }
+        }        
 
         private void Style_Click(object sender, RoutedEventArgs e)
         {
