@@ -61,43 +61,32 @@ namespace Gekko
             this.isInitializing = true;
             if (true)
             {
-                InitializeComponent();
-                //this.ignoredNum.Text = decompFind.decompOptions2.ignore.ToString();
-                //this.depthNum.Text = Program.options.decomp_flowgraph_depth.ToString();
+                InitializeComponent();                
                 if (G.IsNumericalError(decompFind.decompOptions2.ignore)) IgnoredNumValue = 0;
                 else IgnoredNumValue = (int)decompFind.decompOptions2.ignore;
                 DepthNumValue = decompFind.decompOptions2.flowgraphDepth;
             }
             this.isInitializing = false;
             this.decompFind = decompFind;
-            //this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Closing += Window_Closing;
             SetupToolbar();
             graphViewerPanel.ClipToBounds = true;
-            //mainGrid.Children.Add(toolBar);
-            //toolBar.VerticalAlignment = VerticalAlignment.Top;
-            graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;
-            //graphViewer.MouseDown += WpfApplicationSample_MouseDown;
-
-            //mainGrid.Children.Add(graphViewerPanel);
-            graphViewer.BindToPanel(graphViewerPanel);
-            
+            graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;            
+            graphViewer.BindToPanel(graphViewerPanel);            
             graphViewer.MouseDown += WpfApplicationSample_MouseDown;
-
             Loaded += CreateAndLayoutAndDisplayGraph; // Event handler on Loaded event
             Title = "Gekko flowgraph";
-            Content = mainGrid;
-            
+            Content = mainGrid;            
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            WindowState = WindowState.Normal;
-
-            //SetupCommands();            
+            WindowState = WindowState.Normal;            
         }
 
         private void CreateAndLayoutAndDisplayGraph(object sender, RoutedEventArgs ee)
         {
+            DecompOptions2 remember = this.decompFind.decompOptions2;
             try
-            {
+            {                
+                this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();
                 Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph();
                 graphViewer.Graph = graph;
                 WalkInfo walkInfo = new WalkInfo();
@@ -105,19 +94,19 @@ namespace Gekko
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
                 walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
                 walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
-                walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
+                walkInfo.maxDepth = Program.options.decomp_flowgraph_depth;
                 walkInfo.ignoreDJZ = true;
                 walkInfo.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
                 walkInfo.decompFind = this.decompFind;
                 walkInfo.removeSelfReferences = true;  //lags??
                 walkInfo.removeResidualIgnoredError = true;
                 walkInfo.ignoreLags = true;
-                string varName = this.decompFind.decompOptions2.new_select[0];
+                string varName = this.decompFind.decompOptions2.guiFlowName;
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false);
                 string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
-                if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;                
+                if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
                 if (rotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;
                 graphViewer.Graph = graph;
@@ -126,6 +115,10 @@ namespace Gekko
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString(), "Loading of Gekko flowgraph Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                this.decompFind.decompOptions2 = remember;
             }
         }
 
@@ -330,7 +323,7 @@ namespace Gekko
             DecompFind decompFindHere = o2 as DecompFind;            
             WindowFlow w = new WindowFlow(decompFindHere);
             Globals.windowsFlow.Add(w);
-            w.Title = decompFindHere.decompOptions2.new_select[0] + " - Gekko flowgraph";
+            w.Title = decompFindHere.decompOptions2.guiFlowName + " - Gekko flowgraph";
             w.ShowDialog();            
         }
 
@@ -348,18 +341,13 @@ namespace Gekko
                 if (!isInitializing)
                 {
                     DecompFind decompFindHere = this.decompFind;
-                    DecompOptions2 decompOptions2Remember = this.decompFind.decompOptions2;
-                    decompFindHere.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
-                    decompFindHere.decompOptions2.new_select = new List<string>() { s2 };
-                    decompFindHere.decompOptions2.new_from = new List<string>();
-                    decompFindHere.decompOptions2.new_endo = new List<string>();
+                    decompFindHere.decompOptions2.guiFlowName = s2;
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
                     thread.Name = "Flow";
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
                     thread.Start(decompFindHere);
-                    decompFindHere.decompOptions2 = decompOptions2Remember;
                 }
             }
             catch { }
@@ -403,7 +391,7 @@ namespace Gekko
         private void CheckBoxRotate_Unchecked(object sender, RoutedEventArgs e)
         {
             this.rotate = false;
-            CreateAndLayoutAndDisplayGraph(sender, e);
+            CreateAndLayoutAndDisplayGraph(sender, e);            
         }
 
         private void depthNum_TextChanged(object sender, TextChangedEventArgs e)

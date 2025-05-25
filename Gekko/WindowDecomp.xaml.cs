@@ -2832,10 +2832,8 @@ namespace Gekko
         }
 
         private void Merge(DecompFind dfParentDecomp)
-        {
-            //dfParentDecomp.decompOptions2Previous = dfParentDecomp.decompOptions2.Clone();
-            DecompOptions2 remember = dfParentDecomp.decompOptions2.Clone();
-            
+        {            
+            DecompOptions2 remember = dfParentDecomp.decompOptions2.Clone();            
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;
             dfParentDecomp.decompOptions2.new_from.AddRange(thisFrom);
@@ -3106,15 +3104,13 @@ namespace Gekko
             if (!isInitializing)
             {
                 DecompFind decompFindHere = this.decompFind;
-                DecompOptions2 decompOptions2Remember = decompFindHere.decompOptions2;
-                decompFindHere.decompOptions2 = this.decompFind.decompOptions2.Clone();  //HACK HACK HACK: what to do in general about DecompFind object??
+                decompFindHere.decompOptions2.guiFlowName = this.decompFind.decompOptions2.new_select[0];
                 Thread thread = new Thread(new ParameterizedThreadStart(WindowFlow.CreateWindowFlow));
                 thread.Name = "Flow";
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                 thread.IsBackground = true;
                 thread.Start(decompFindHere);
-                decompFindHere.decompOptions2 = decompOptions2Remember;
             }
         }        
 
@@ -3227,6 +3223,7 @@ namespace Gekko
         public Table guiDecompValues = new Table();
         public LocalBanks localBanks = null;  //Seems to be unused, remove in Gekko 4.0
         public string modelHash = null;
+        public string guiFlowName = null;
         //-------- GUI stuff end ----------------        
         
         /// <summary>
@@ -3343,6 +3340,7 @@ namespace Gekko
             d.dream = this.dream;
 
             d.flowgraphDepth = this.flowgraphDepth;
+            d.guiFlowName = this.guiFlowName;
 
             foreach (string s in this.subst)
             {

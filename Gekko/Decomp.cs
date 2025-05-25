@@ -6430,7 +6430,7 @@ namespace Gekko
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
             decompOptions2.expand = true;
-            decompOptions2.ignore= decompFind.decompOptions2.ignore;
+            decompOptions2.ignore = decompFind.decompOptions2.ignore;
             GekkoSmpl smpl = new GekkoSmpl(t1, t2);
             DecompDatas decompDatas = new DecompDatas();
             GekkoTime gt1, gt2;
