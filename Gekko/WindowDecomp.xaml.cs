@@ -70,8 +70,7 @@ namespace Gekko
         public int frozenCols=0;
         
         public bool isClosing = false;
-        public bool isInitializing = false; //a bit hacky, to handle radiobutton1 firing a clicked event when initializing
-        public int errors = 0;
+        public bool isInitializing = false; //a bit hacky, to handle radiobutton1 firing a clicked event when initializing       
 
         public Grid _grid = null;
         public string _activeVariable = null;
@@ -162,11 +161,8 @@ namespace Gekko
                 //                                
 
                 List<string> selectedOld = null;
-
-
-                //if (G.Equal(G.HandleInternalIdentifyer1(ff.name), task.Pivot_Text))
+                                
                 {
-
                     selectedOld = task.pivot_filterSelected;
                     bool equal = true;
                     foreach (string s in selectedOld)
@@ -208,9 +204,7 @@ namespace Gekko
         }
 
         public static void Walk(FooViewModel node, List<string>selected, int d)
-        {
-            //pivotfix
-            //G.Writeln(G.Blanks(2 * d) + node.Name + "   " + node.IsInitiallySelected + " --> " + node.IsChecked);
+        {            
             if (node == null) return;
             if (node.Children == null || node.Children.Count == 0)
             {
@@ -2094,7 +2088,7 @@ namespace Gekko
                 }
                 else
                 {
-                    this.isClosing = true;
+                    this.isClosing = true;  //Too aggressive?
                 }
             }
             finally

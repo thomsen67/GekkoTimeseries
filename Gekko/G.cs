@@ -2143,10 +2143,8 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsDecompOrFindThread()
         {
-            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp" || Thread.CurrentThread.Name == "Plot";
-        }
-
-        
+            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp" || Thread.CurrentThread.Name == "Flow" || Thread.CurrentThread.Name == "Plot";
+        }        
 
         /// <summary>
         /// Thin wrapper on RemoveLagOrLead(), see that.

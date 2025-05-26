@@ -109,7 +109,9 @@ namespace Gekko
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "Loading of Gekko flowgraph Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                string s = null;
+                if (Globals.runningOnTTComputer) s = ". TTH --> " + ex.ToString();
+                MessageBox.Show("Loading of Gekko flowgraph failed" + s, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -238,8 +240,8 @@ namespace Gekko
         {
             var statusBar = new StatusBar();
             string s = null;
-            if (this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered) s = "Note: lags or leads were encountered and ignored";
-            statusTextBox = new TextBox { Text = "Hover over boxes to see labels. " + s };  //{ Text = "No object" };            
+            if (this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered) s = "Lags/leads encountered and ignored";
+            statusTextBox = new TextBox { Text = "Hover: see labels, click: new flowgraph, Ctrl+click: decomp. " + s };  //{ Text = "No object" };            
             statusBar.Items.Add(statusTextBox);
             mainGrid.Children.Add(statusBar);
             statusBar.VerticalAlignment = VerticalAlignment.Bottom;
@@ -290,14 +292,6 @@ namespace Gekko
 
         }
 
-        //private void CloseOnEscape(object sender, KeyEventArgs e)
-        //{
-        //    if (e.Key == Key.Escape)
-        //    {
-        //        Close();
-        //    }
-        //}
-
         private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             this.Close();
@@ -320,26 +314,42 @@ namespace Gekko
 
         void WpfApplicationSample_MouseDown(object sender, MsaglMouseEventArgs e)
         {
-            GraphViewer gv = sender as GraphViewer;
-            if (gv == null) return;
-            if (gv.ObjectUnderMouseCursor == null) return;
             try
             {
+                GraphViewer gv = sender as GraphViewer;
+                if (gv == null) return;
+                if (gv.ObjectUnderMouseCursor == null) return;
                 string s = gv.ObjectUnderMouseCursor.DrawingObject.ToString();
                 int i = s.IndexOf('"', 1);
-                string s2 = G.Substring(s, 1, i - 1);
+                string name = G.Substring(s, 1, i - 1);
 
-                if (!isInitializing)
-                {                    
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
                     DecompFind decompFindHere = this.decompFind;
-                    DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);                    
-                    decompFindHereChild.decompOptions2.guiFlowName = s2;
-                    Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
-                    thread.Name = "Flow";
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                    thread.IsBackground = true;
-                    thread.Start(decompFindHereChild);
+                    DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
+                    decompFindHereChild.children.Clear(); //This and the next line so we are sure to get a blank state DECOMP window: not much sense in linking via flowgraphs...
+                    decompFindHereChild.parent = null;
+                    List<EqInfoSimple> temp = GamsModel.GetSortedEquations(name, GekkoTime.tNull, this.decompFind.model, false, false);
+                    string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                    decompFindHereChild.decompOptions2.new_select = new List<string> { name };                                        
+                    decompFindHereChild.decompOptions2.new_from = new List<string>() { eqName };
+                    decompFindHereChild.decompOptions2.new_endo = new List<string>() { name };
+                    Decomp.DecompGetFuncExpressionsAndRecalc(decompFindHereChild, null);
+                }
+                else
+                {
+                    if (!isInitializing)
+                    {
+                        DecompFind decompFindHere = this.decompFind;
+                        DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
+                        decompFindHereChild.decompOptions2.guiFlowName = name;
+                        Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
+                        thread.Name = "Flow";
+                        thread.SetApartmentState(ApartmentState.STA);
+                        thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                        thread.IsBackground = true;
+                        thread.Start(decompFindHereChild);
+                    }
                 }
             }
             catch { }

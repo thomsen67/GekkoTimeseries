@@ -246,14 +246,15 @@ namespace Gekko
 
             if (CheckBox_index.IsChecked == true)
             {
-                radioButton_p.IsEnabled = false;
-                radioButton_p.Opacity = 0.5;
-                radioButton_dp.IsEnabled = false;
-                radioButton_dp.Opacity = 0.5;
-                radioButton_q.IsEnabled = false;
-                radioButton_q.Opacity = 0.5;
-                radioButton_mp.IsEnabled = false;
-                radioButton_mp.Opacity = 0.5;
+                //Too pedantic
+                //radioButton_p.IsEnabled = false;
+                //radioButton_p.Opacity = 0.5;
+                //radioButton_dp.IsEnabled = false;
+                //radioButton_dp.Opacity = 0.5;
+                //radioButton_q.IsEnabled = false;
+                //radioButton_q.Opacity = 0.5;
+                //radioButton_mp.IsEnabled = false;
+                //radioButton_mp.Opacity = 0.5;
             }
 
             if (CheckBox_yoy.IsChecked == true)
@@ -300,8 +301,9 @@ namespace Gekko
 
             if (radioButton_p.IsChecked == true || radioButton_dp.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
             {
-                CheckBox_index.IsEnabled = false;
-                CheckBox_index.Opacity = 0.5;
+                //Too pedantic
+                //CheckBox_index.IsEnabled = false;
+                //CheckBox_index.Opacity = 0.5;
             }
 
             if (radioButton_n1.IsChecked == true || radioButton_n2.IsChecked == true || radioButton_m.IsChecked == true || radioButton_q.IsChecked == true || radioButton_mp.IsChecked == true)
@@ -394,17 +396,6 @@ namespace Gekko
                 string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, saveFileDialog1.FileName);
             }
         }
-
-        //private void Button_zoom(object sender, RoutedEventArgs e)
-        //{
-        //    double z = double.NaN;
-        //    double.TryParse(this.TextBox_zoom.Text, out z);
-        //    if (!double.IsNaN(z))
-        //    {
-        //        int z2 = (int)z;
-        //        Program.options.plot_zoom_general = z2;                
-        //    }
-        //}
 
         private string CreatePlotFileInBackground(double fontScaling, double sizeScaling, string fileName)
         {            

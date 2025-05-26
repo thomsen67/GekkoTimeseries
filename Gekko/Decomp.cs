@@ -6405,7 +6405,7 @@ namespace Gekko
         /// <param name="variableName"></param>
         /// <returns></returns>
         public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, DecompFind decompFind, WalkInfo walkInfo)
-        {
+        {                        
             bool useRealNames = true;
             
             FlowInfo flowInfo = new FlowInfo();

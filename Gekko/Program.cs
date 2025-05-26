@@ -16379,7 +16379,8 @@ namespace Gekko
                     //G.Writeln(found.equationFormula);
                     string strSplit = found.equationText;
                     strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
-                    char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
+                    //Lags can be x(-1) or x[-1]
+                    char[] arrDelimiters = new char[] { ' ', '(', ')', '[', ']', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
                     List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
                     foreach (string s in alWork)
                     {
