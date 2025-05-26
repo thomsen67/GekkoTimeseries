@@ -71,7 +71,8 @@ namespace Gekko
         
         public bool isClosing = false;
         public bool isInitializing = false; //a bit hacky, to handle radiobutton1 firing a clicked event when initializing
-        
+        public int errors = 0;
+
         public Grid _grid = null;
         public string _activeVariable = null;
 
@@ -2080,8 +2081,8 @@ namespace Gekko
                 return;
             }
             catch (Exception e)
-            {
-                if (G.IsUnitTesting()) throw;                
+            {                
+                if (G.IsUnitTesting()) throw;
                 if (this.decompFind.decompOptions2Previous != null)
                 {
                     this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;
@@ -2090,6 +2091,10 @@ namespace Gekko
                     this.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                     this.SetRadioButtons();  //revert buttons
                     this.isInitializing = false;
+                }
+                else
+                {
+                    this.isClosing = true;
                 }
             }
             finally
@@ -3189,7 +3194,7 @@ namespace Gekko
         public Rich code = null;
         public bool ageHierarchy = false;        
         public bool isNew = false;
-        public int numberOfRecalcs = 0;  //is not cloned --> used to pause main thread until the DECOMP window has calculated.
+        public int numberOfRecalcs = 0;  //is not cloned --> used to pause main thread until the DECOMP window has calculated.        
         public string variable = null;        
         public string expressionOld = null;  //only != null for expressions
         public Func<GekkoSmpl, IVariable> expression = null;        
@@ -3223,9 +3228,12 @@ namespace Gekko
         public Table guiDecompValues = new Table();
         public LocalBanks localBanks = null;  //Seems to be unused, remove in Gekko 4.0
         public string modelHash = null;
+        // ---
         public string guiFlowName = null;
+        public bool guiFlowRotate = false;        
+        public bool guiFlowLagsOrLeadsWereEncountered = false;
         //-------- GUI stuff end ----------------        
-        
+
         /// <summary>
         /// Obtain the object as code like "decomp &lt;2010 2020> x from e1 endo x;"
         /// </summary>

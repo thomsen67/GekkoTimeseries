@@ -4,9 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
-using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Drawing;
-using Microsoft.Msagl.Layout.Layered;
 using Microsoft.Msagl.WpfGraphControl;
 using System.Windows.Media;
 using Color = Microsoft.Msagl.Drawing.Color;
@@ -20,11 +18,9 @@ namespace Gekko
     /// </summary>
     public partial class WindowFlow : Window
     {
-
         public DecompFind decompFind = null;
-        public bool rotate = false;
+
         public bool isInitializing = false;
-        public bool lagsOrLeadsWereEncountered = false;
 
         int _depthNumValue = 0;
         public int DepthNumValue
@@ -83,10 +79,9 @@ namespace Gekko
 
         private void CreateAndLayoutAndDisplayGraph(object sender, RoutedEventArgs ee)
         {
-            DecompOptions2 remember = this.decompFind.decompOptions2;
             try
-            {                
-                this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();
+            {
+                this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = false;  //resetting
                 Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph();
                 graphViewer.Graph = graph;
                 WalkInfo walkInfo = new WalkInfo();
@@ -94,7 +89,7 @@ namespace Gekko
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
                 walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
                 walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
-                walkInfo.maxDepth = Program.options.decomp_flowgraph_depth;
+                walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 walkInfo.ignoreDJZ = true;
                 walkInfo.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
                 walkInfo.decompFind = this.decompFind;
@@ -106,8 +101,8 @@ namespace Gekko
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false);
                 string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
-                if (walkInfo.lagsOrLeadsWereEncountered) this.lagsOrLeadsWereEncountered = true;
-                if (rotate) graph.Attr.LayerDirection = LayerDirection.RL;
+                if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
+                if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;
                 graphViewer.Graph = graph;
                 SetStatusBar();
@@ -116,12 +111,7 @@ namespace Gekko
             {
                 MessageBox.Show(ex.ToString(), "Loading of Gekko flowgraph Failed", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            finally
-            {
-                this.decompFind.decompOptions2 = remember;
-            }
         }
-
 
         private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
@@ -248,7 +238,7 @@ namespace Gekko
         {
             var statusBar = new StatusBar();
             string s = null;
-            if (this.lagsOrLeadsWereEncountered) s = "Note: lags or leads were encountered and ignored";
+            if (this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered) s = "Note: lags or leads were encountered and ignored";
             statusTextBox = new TextBox { Text = "Hover over boxes to see labels. " + s };  //{ Text = "No object" };            
             statusBar.Items.Add(statusTextBox);
             mainGrid.Children.Add(statusBar);
@@ -320,8 +310,9 @@ namespace Gekko
 
         public static void CreateWindowFlow(object o2)
         {
-            DecompFind decompFindHere = o2 as DecompFind;            
-            WindowFlow w = new WindowFlow(decompFindHere);
+            DecompFind decompFindHere = o2 as DecompFind;
+            DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
+            WindowFlow w = new WindowFlow(decompFindHereChild);
             Globals.windowsFlow.Add(w);
             w.Title = decompFindHere.decompOptions2.guiFlowName + " - Gekko flowgraph";
             w.ShowDialog();            
@@ -339,15 +330,16 @@ namespace Gekko
                 string s2 = G.Substring(s, 1, i - 1);
 
                 if (!isInitializing)
-                {
+                {                    
                     DecompFind decompFindHere = this.decompFind;
-                    decompFindHere.decompOptions2.guiFlowName = s2;
+                    DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);                    
+                    decompFindHereChild.decompOptions2.guiFlowName = s2;
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
                     thread.Name = "Flow";
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
-                    thread.Start(decompFindHere);
+                    thread.Start(decompFindHereChild);
                 }
             }
             catch { }
@@ -384,13 +376,13 @@ namespace Gekko
 
         private void CheckBoxRotate_Checked(object sender, RoutedEventArgs e)
         {
-            this.rotate = true;
+            this.decompFind.decompOptions2.guiFlowRotate = true;
             CreateAndLayoutAndDisplayGraph(sender, e);
         }
 
         private void CheckBoxRotate_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.rotate = false;
+            this.decompFind.decompOptions2.guiFlowRotate = false;
             CreateAndLayoutAndDisplayGraph(sender, e);            
         }
 
@@ -401,18 +393,19 @@ namespace Gekko
             if (b && i >= 0 && i <= 100)
             {
                 if (!this.isInitializing)
-                {
-                    //BEWARE: CLONE
-                    //BEWARE: CLONE
-                    //BEWARE: CLONE
-                    //this.decompFind.decompOptions2.ignore = i;
+                {                    
                     _depthNumValue = i;
-                    //HACK
-                    //HACK
-                    //HACK
-                    //Program.options.decomp_flowgraph_depth = i;
-                    this.decompFind.decompOptions2.flowgraphDepth = i;
-                    CreateAndLayoutAndDisplayGraph(sender, e);
+                    //DecompOptions2 remember = this.decompFind.decompOptions2;
+                    try
+                    {
+                        //this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();
+                        this.decompFind.decompOptions2.flowgraphDepth = i;
+                        CreateAndLayoutAndDisplayGraph(sender, e);
+                    }
+                    finally
+                    {
+                        //this.decompFind.decompOptions2 = remember;
+                    }
                 }
             }
             else
@@ -428,13 +421,19 @@ namespace Gekko
             if (b && i >= 0 && i <= 100)
             {
                 if (!this.isInitializing)
-                {
-                    //BEWARE: CLONE
-                    //BEWARE: CLONE
-                    //BEWARE: CLONE                    
+                {                                
                     _ignoredNumValue = i;
-                    this.decompFind.decompOptions2.ignore = i;
-                    CreateAndLayoutAndDisplayGraph(sender, e);
+                    //DecompOptions2 remember = this.decompFind.decompOptions2;
+                    try
+                    {
+                        //this.decompFind.decompOptions2 = this.decompFind.decompOptions2.Clone();
+                        this.decompFind.decompOptions2.ignore = i;
+                        CreateAndLayoutAndDisplayGraph(sender, e);
+                    }
+                    finally
+                    {
+                        //this.decompFind.decompOptions2 = remember;
+                    }
                 }
             }
             else

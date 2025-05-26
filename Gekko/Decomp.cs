@@ -697,7 +697,6 @@ namespace Gekko
             else
             {
                 decompOptions2 = new DecompOptions2();
-                //decompOptions2.modelType = G.GetModelType();
                 decompOptions2.showErrors = false; //
                 decompOptions2.t1 = o.t1;
                 decompOptions2.t2 = o.t2;
@@ -999,8 +998,8 @@ namespace Gekko
                     }
                     catch { }
                     if (showErrors)
-                    {
-                        new Error("Could not find the equation '" + s2 + "'." + s3);
+                    {                        
+                        new Error("Could not find the equation '" + s2 + "'." + s3);                        
                     }
                 }
                 //int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[s2];
@@ -2656,9 +2655,10 @@ namespace Gekko
                 Globals.windowsDecomp2.Add(windowDecomp);
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
-                windowDecomp.isInitializing = false;
-
-                windowDecomp.RecalcCellsWithNewType(decompFind.model);
+                windowDecomp.isInitializing = false;                
+                
+                windowDecomp.RecalcCellsWithNewType(decompFind.model);  //With fail, we get                 
+                
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
                 if (!Globals.python && G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
