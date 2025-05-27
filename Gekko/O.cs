@@ -7557,7 +7557,7 @@ namespace Gekko
                 if (!double.IsNaN(opt_obs))
                 {                    
                     obsMax = G.ConvertToInt(opt_obs);  //will fail with error if not int
-                    if (obsMax < 0) new Error("INTERPOLATE<obs=...> expects the integer to be >= 0");  //Can probably never happen
+                    if (obsMax < 0) new Error("SPLICE<obs=...> expects the integer to be >= 0");  //Can probably never happen
                     if (obsMax == 0) obsMax = int.MaxValue;                    
                 }
                 if (count > 1)

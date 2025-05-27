@@ -9159,7 +9159,7 @@ namespace UnitTests
             double factor = double.NaN;
             I("reset; time 2001 2013;");
             I("x1 <2001 2010> = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;");
-            I("x2 <2008 2013> = 21, 22, 23, 24, 25, 26;");
+            I("x2 <2008 2013> = 21, 22, 23, 24, 25, 26;");            
             I("splice y = x1 x2;");            
             factor = (21d + 22d + 23d) / (8d + 9d + 10d);
             _AssertSeries(First(), "y!a", 2001, 1d * factor, sharedDelta);
@@ -9174,7 +9174,7 @@ namespace UnitTests
             _AssertSeries(First(), "y!a", 2010, 23d, sharedDelta);
             _AssertSeries(First(), "y!a", 2011, 24d, sharedDelta);
             _AssertSeries(First(), "y!a", 2012, 25d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2013, 26d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2013, 26d, sharedDelta);            
 
             I("reset; time 2001 2013;");
             I("x1 <2001 2009> = 1, 2, 3, 4, 5, 6, 7, 8, 9;"); //1 less year in non-primary
