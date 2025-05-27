@@ -1183,7 +1183,7 @@ namespace Gekko
         }
 
         public static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData, int maxMinutesBeforeAbort)
-        {
+        {            
             if (G.Equal(o.opt_dump, "yes"))
             {
                 try

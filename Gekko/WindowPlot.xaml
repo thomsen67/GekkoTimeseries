@@ -282,6 +282,14 @@
                 <StackPanel>
                     <CheckBox x:Name="CheckBox_points"  Width="57" Margin="2,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show line 'points' for each period (typically small circles). &#x0a;Selected corresponds to &lt;type=linespoints> and unselected corresponds to &lt;type=lines>"  Content="Points" Checked="CheckBox_points_Checked" Unchecked="CheckBox_points_Unchecked"/>
                 </StackPanel>
+
+                <Button Name="button_search" Content="! Search" Visibility="Collapsed" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" Background="#fcf38b" ToolTip="Data was fetched in databank position '2' or lower (click for more info)." Click="Button_search">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="0"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
             </StackPanel>
         </StackPanel>
 

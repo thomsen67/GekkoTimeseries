@@ -645,6 +645,9 @@ namespace Gekko
 
         public static StreamWriter screenOutput = null;
 
+        public static int databankSearchHitBelowFirstPosition0 = 0;
+        public static int databankSearchHitBelowFirstPosition = 0;
+
         public static StringBuilder unitTestScreenOutput = new StringBuilder();
 
         public static bool pipe = false;

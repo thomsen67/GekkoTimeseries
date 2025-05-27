@@ -968,6 +968,17 @@ namespace Gekko
             return m;
         }
 
+        public static void DatabankSearchHelper1()
+        {
+            Globals.databankSearchHitBelowFirstPosition0 = Globals.databankSearchHitBelowFirstPosition;
+        }
+
+        public static void DatabankSearchHelper2(WindowPlot g)
+        {
+            if (Globals.databankSearchHitBelowFirstPosition - Globals.databankSearchHitBelowFirstPosition0 > 0) g.button_search.Visibility = System.Windows.Visibility.Visible;
+            else g.button_search.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
         /// <summary>
         /// Flatten IVariables (if these are lists). Will also handle naked lists.
         /// </summary>

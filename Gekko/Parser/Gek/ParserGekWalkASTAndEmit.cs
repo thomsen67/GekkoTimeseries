@@ -2850,8 +2850,9 @@ namespace Gekko.Parser.Gek
                             //      a recursive way.
                             node.Code.A("Func<GraphHelper, string> print" + Num(node) + " = (gh) =>" + G.NL);
                             node.Code.A("{" + G.NL);  //start Action
-
+                                                        
                             node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
+                            node.Code.A("O.DatabankSearchHelper1();" + G.NL);
 
                             node.Code.A("" + Globals.labelCounter + " = 0;");
 
@@ -2908,13 +2909,13 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                             node.Code.A(LocalCode4(Num(node)));
-
+                            
                             node.Code.A("return o" + Num(node) + ".emfName;" + G.NL);
 
                             node.Code.A("};" + G.NL);  //end Action
 
                             node.Code.A("Globals.printStorageAsFunc.Add(Globals.printStorageAsFunc.Count, print" + Num(node) + "); " + G.NL);
-
+                            
                             node.Code.A("print" + Num(node) + "(new GraphHelper());" + G.NL); //end Action
 
                         }

@@ -28937,13 +28937,13 @@ namespace Gekko
         }
 
         public static void PlotThreadFunction(Object o)
-        {            
+        {
             GraphOptions graphOptions = (GraphOptions)o;
             WindowPlot g = new WindowPlot(graphOptions);
             Globals.windowsPlot.Add(g);
             g.ShowDialog();
-            graphOptions.windowIsShown = true;
-        }
+            graphOptions.windowIsShown = true;            
+        }        
 
         private static void MaybeStartPipe2(string fileName)
         {

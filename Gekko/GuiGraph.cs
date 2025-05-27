@@ -392,7 +392,7 @@ namespace Gekko
             gh.operator2 = s;
             if (isDlog || isLog) gh.isLogTransform = true;
             gh.isRefreshing = true;
-
+                        
             string emfName = Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh);
                                
             this.graphOptions.emfName = emfName;

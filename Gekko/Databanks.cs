@@ -61,7 +61,8 @@ namespace Gekko
                 Databank db2 = this.storage[i];
                 rv = db2.GetIVariable(varName);
                 if (rv != null)
-                {                    
+                {
+                    if (i >= 2) Globals.databankSearchHitBelowFirstPosition++;  //Used as a warning in PLOT
                     return rv;
                 }
             }            

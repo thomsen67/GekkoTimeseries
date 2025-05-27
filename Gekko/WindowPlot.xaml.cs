@@ -95,6 +95,7 @@ namespace Gekko
             {
                 //Should normally not crash
             }
+            O.DatabankSearchHelper2(this);
         }
 
         /// <summary>
@@ -376,6 +377,11 @@ namespace Gekko
             //this.label2.Text = "saved in working folder";
         }
 
+        private void Button_search(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("One or more variables were found in a databank in position 2 or lower in the databank list (cf. the F2 window). This happens because databank searching is active: to switch databank searching off, use 'option databank search = no', in which case an error would have been issued instead. Beware of missing variables in the first-position databank.");
+        }
+
         private void Button_saveas(object sender, RoutedEventArgs e)
         {            
             Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
@@ -476,9 +482,13 @@ namespace Gekko
         }
 
         private string Refresh(GraphHelper gh, bool updatePlotWindow)
-        {
+        {            
             string fileName = Globals.printStorageAsFunc[this._graphOptions.printStorageAsFuncCounter](gh);
-            if(updatePlotWindow) webBrowser.Source = new Uri(fileName);
+            if (updatePlotWindow)
+            {
+                webBrowser.Source = new Uri(fileName);                
+                O.DatabankSearchHelper2(this);
+            }
             return fileName;
         }
 
