@@ -310,14 +310,16 @@ namespace Gekko
                 //OPEN <edit/create> b, where b does not exist as a file, and where b is not opened already
                 rv = new Databank(name);
             }
-
-            //default logic                                
+                                        
             if (openType == EOpenType.Sec)
             {
-                new Error("OPEN <sec> not allowed.");
-                //throw new GekkoException();                
+                //open<sec> == open<pos=2>
+                openType = EOpenType.Pos;
+                openPosition = 2;                
             }
-            else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
+
+            //default logic    
+            if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
             {                
                 m.Add(rv);         //first
                 m.Add(this.storage[1]);  //ref
@@ -343,8 +345,7 @@ namespace Gekko
                 //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
                 if (openPosition < 1)
                 {
-                    new Error("OPEN <pos = ...> cannot be 0 or negative");
-                    //throw new GekkoException();
+                    new Error("OPEN <pos = ...> cannot be 0 or negative");                    
                 }
                 m.Add(this.storage[0]);  //first
                 m.Add(this.storage[1]);  //ref

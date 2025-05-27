@@ -2406,7 +2406,6 @@ namespace Gekko
                 string output = translatedText;
                 if (semi != null) output = G.ReplaceLastOccurrence(output, ";", "");
                 output = output.Replace(dotsText, "").Replace(lhsText2, "").Trim();
-                //Clipboard.SetText(c2 + "   |||   " + s + "   |||   " + s2);
                 Clipboard.SetText(output);
                 SendKeys.SendWait("^v");
             }
