@@ -34,7 +34,7 @@ namespace Gekko
 			InitializeComponent();
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Loaded += WindowOpenDatabanks_Loaded;
-            yellow.Text = "You may use READ<first> or READ<ref> to put databanks into '1' and 'REF' positions.";
+            yellow.Text = "Position '1': use read<first> or open<first>. Position 'REF': use read<ref>. Drag to swap two databanks.";
 		}
 
 		#region Window1_Loaded
@@ -96,7 +96,7 @@ namespace Gekko
                         i = -12345;
                         continue;
                     }
-                    else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;  //Ref not shown if it is in its normal position and has count 0
+                    //else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;  //Ref not shown if it is in its normal position and has count 0
                 }
 
                 string c = "";
@@ -150,7 +150,13 @@ namespace Gekko
 
             string aliasFromOld = t_from.AliasName;
             string aliasToOld = t_to.AliasName;
-            
+
+            if (G.Equal(aliasFromOld, Globals.Local) || G.Equal(aliasFromOld, Globals.Global) || G.Equal(aliasToOld, Globals.Local) || G.Equal(aliasToOld, Globals.Global))
+            {
+                MessageBox.Show("You cannot swap from/to the Local or Global databank");
+                return;
+            }
+
             string s = null;
 
 			if( lowerIdx < 0 )
@@ -315,6 +321,7 @@ namespace Gekko
         {
             Program.Unswap(false);
             RefreshList();
+            yellow.Text = "Unswap: databank 'Work' put in '1' position, and databank 'Ref' put in 'REF' position.";
             //string s = Program.UnswapMessageLong();
             //yellow.Text = s;
             //Program.ShowPeriodInStatusField("");
