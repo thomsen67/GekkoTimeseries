@@ -1,17 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-//using WPF.JoshSmith.ServiceProviders.UI;
 
 namespace Gekko
 {
@@ -42,7 +34,7 @@ namespace Gekko
 			InitializeComponent();
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Loaded += WindowOpenDatabanks_Loaded;
-            yellow.Text = "You may use READ<first> or READ<ref> to put databanks into these positions.";
+            yellow.Text = "You may use READ<first> or READ<ref> to put databanks into '1' and 'REF' positions.";
 		}
 
 		#region Window1_Loaded
@@ -77,21 +69,21 @@ namespace Gekko
 
         private void RefreshList()
         {
-            list.Clear();            
-            List<string> banks2 = new List<string>();
-            banks2.Add("Local");
+            list.Clear();                        
+
+            List<Databank> banks = new List<Databank>();
+            banks.Add(Program.databanks.GetLocal());
             foreach (Databank db in Program.databanks.storage)
-            {                
-                banks2.Add(db.name);            
-            }
-            banks2.Add("Global");
-
-            for (int ii = 0; ii < banks2.Count; ii++)
             {
-                string s = banks2[ii];
-                int i = ii - 1;                
-                Databank databank = Program.databanks.GetDatabank(s);
+                banks.Add(db);
+            }
+            banks.Add(Program.databanks.GetGlobal());            
 
+            for (int ii = 0; ii < banks.Count; ii++)
+            {                
+                Databank databank = banks[ii];
+                string s = databank.GetName();
+                int i = ii - 1;  //Normally 0 for Work
                 if (databank.storage.Count == 0)
                 {
                     if (G.Equal(s, Globals.Local))
@@ -104,7 +96,7 @@ namespace Gekko
                         i = -12345;
                         continue;
                     }
-                    else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;
+                    else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;  //Ref not shown if it is in its normal position and has count 0
                 }
 
                 string c = "";
@@ -112,7 +104,6 @@ namespace Gekko
                 string i1, i2; Program.GetYearPeriod(databank.yearStart, databank.yearEnd, out i1, out i2);
 
                 string period = i1 + "-" + i2;
-
 
                 if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
                 string prot = null;
@@ -146,8 +137,8 @@ namespace Gekko
 			// This shows how to customize the behavior of a drop.
 			// Here we perform a swap, instead of just moving the dropped item.
             
-            MessageBox.Show("*** ERROR: Manual databank swapping not allowed anymore");
-            return;            
+            //MessageBox.Show("*** ERROR: Manual databank swapping not allowed anymore");
+            //return;            
 
             string text = "";
 
@@ -211,14 +202,12 @@ namespace Gekko
                     }                    
                 }
 
-                int counter = 0;
-                foreach (var x in e.ItemsSource)
-                {
-                    counter++;
-                    x.Number = counter.ToString();
-                    //if (x.Number == "2") x.LineColor = "Black";  //these numbers are 1-based and are strings!
-                    //else x.LineColor = "LightGray";
-                }
+                //int counter = 0;
+                //foreach (var x in e.ItemsSource)
+                //{
+                //    counter++;
+                //    x.Number = counter.ToString();                    
+                //}
 			}
 
 			// Set this to 'Move' so that the OnListViewDrop knows to
@@ -227,8 +216,10 @@ namespace Gekko
             //unswap.IsEnabled = Program.AreDatabanksSwapped();
             //unswap.IsEnabled = true;  //fixme
 
-            yellow.Text = "Databanks were swapped. " + s;
-            //Program.ShowPeriodInStatusField("");            
+            yellow.Text = "Two databanks were swapped. " + s;
+            
+            Program.ShowPeriodInStatusField("");
+            RefreshList();
 		}
 
         private static string MaybeAddStuffToAliasDatabankName(string s)

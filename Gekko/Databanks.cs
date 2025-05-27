@@ -311,9 +311,8 @@ namespace Gekko
                 rv = new Databank(name);
             }
                                         
-            if (openType == EOpenType.Sec)
-            {
-                //open<sec> == open<pos=2>
+            if (openType == EOpenType.Sec)  //open<sec> == open<pos=2>
+            {                
                 openType = EOpenType.Pos;
                 openPosition = 2;                
             }

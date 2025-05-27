@@ -10425,9 +10425,8 @@ namespace Gekko
                 {
                     banks1 = Path.GetFileName(banks1);
                 }
-                catch { }
-                if (banks1.EndsWith(".tsd", StringComparison.OrdinalIgnoreCase)) banks1 = banks1.Substring(0, banks1.Length - ".tsd".Length);
-                if (banks1.EndsWith("." + Globals.extensionDatabank, StringComparison.OrdinalIgnoreCase)) banks1 = banks1.Substring(0, banks1.Length - Globals.extensionDatabank.Length - 1);
+                catch { }                
+                //if (banks1.EndsWith("." + Globals.extensionDatabank, StringComparison.OrdinalIgnoreCase)) banks1 = banks1.Substring(0, banks1.Length - Globals.extensionDatabank.Length - 1);
                 //TODO: make a smart trim procedure
 
                 if (banks1.Length > 30)
@@ -10441,9 +10440,8 @@ namespace Gekko
                 {
                     banks2 = Path.GetFileName(banks2);
                 }
-                catch { }
-                if (banks2.EndsWith(".tsd", StringComparison.OrdinalIgnoreCase)) banks2 = banks2.Substring(0, banks2.Length - 4);
-                if (banks2.EndsWith("." + Globals.extensionDatabank, StringComparison.OrdinalIgnoreCase)) banks2 = banks2.Substring(0, banks2.Length - Globals.extensionDatabank.Length - 1);
+                catch { }                
+                //if (banks2.EndsWith("." + Globals.extensionDatabank, StringComparison.OrdinalIgnoreCase)) banks2 = banks2.Substring(0, banks2.Length - Globals.extensionDatabank.Length - 1);
                 if (banks2.Length > 30)
                 {
                     string ss1 = banks2.Substring(0, 17);
