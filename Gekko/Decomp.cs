@@ -6034,7 +6034,7 @@ namespace Gekko
                 //we ignore the exception here, so that Gekko and other windows are not crashing.
                 if (Globals.runningOnTTComputer)
                 {
-                    MessageBox.Show(e.Message + " --findtrace-> " + e.StackTrace);
+                    MessageBox.Show("TTH: " + e.Message + " --findtrace-> " + e.StackTrace);
                 }
             }
         }        
