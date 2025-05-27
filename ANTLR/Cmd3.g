@@ -733,6 +733,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_VAL_WIDTH;
 	ASTOPT_VAL_DEC;
 	ASTOPT_VAL_N;
+    ASTOPT_VAL_OBS;
 	ASTOPT_VAL_NWIDTH;
 	ASTOPT_VAL_PWIDTH;
 	ASTOPT_VAL_NDEC;
@@ -1184,6 +1185,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    OBS = 'OBS';
     A3DP = 'A3DP';
     A3 = 'A3';
     A3N = 'A3N';
@@ -1852,6 +1854,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("obs"               , OBS  );
                                         d.Add("A3DP", A3DP);
                                         d.Add("A3", A3);
                                         d.Add("A3N", A3N);
@@ -3928,6 +3931,7 @@ spliceOpt1:                 ISNOTQUAL
 spliceOpt1h:                FIRST -> ^(ASTOPT_STRING_FIRST ASTYES)
                           | LAST -> ^(ASTOPT_STRING_LAST ASTYES)
 						  | N EQUAL expression -> ^(ASTOPT_VAL_N expression)
+                          | OBS EQUAL expression -> ^(ASTOPT_VAL_OBS expression)
 						  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)  //rel1, rel2, rel3, abs
 							;
 
@@ -4389,6 +4393,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  OBS|
   A3DP|
   A3|
   ADP|

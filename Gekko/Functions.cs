@@ -4375,7 +4375,7 @@ namespace Gekko
                 rhs.Add(x[i]);
             }
 
-            Series tsNew = O.Splice.SpliceHelper(null, rhs, opt_type, opt_first, opt_last, opt_n, true);
+            Series tsNew = O.Splice.SpliceHelper(null, rhs, opt_type, opt_first, opt_last, opt_n, double.NaN, true);
             return tsNew;
         }
 

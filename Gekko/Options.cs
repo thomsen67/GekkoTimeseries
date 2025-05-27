@@ -294,6 +294,8 @@ namespace Gekko
         public bool solve_static = false;
         // ---
         public string string_interpolate_format_val = ""; //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used. //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
+        // ---
+        public int splice_obs = 0; //max number of overlapping observations.
         //
         public int system_code_split = 20; //20 seems good
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
@@ -615,6 +617,8 @@ namespace Gekko
             Add("SOLVE PRINT DETAILS", Globals.xbool);
             Add("SOLVE PRINT ITER", Globals.xbool);
             Add("SOLVE STATIC", Globals.xbool);
+
+            Add("SPLICE OBS", Globals.xint);
 
             Add("STRING INTERPOLATE FORMAT VAL", Globals.xstring);
             

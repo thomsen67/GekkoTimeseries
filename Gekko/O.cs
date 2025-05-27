@@ -7430,6 +7430,7 @@ namespace Gekko
             public string opt_first = null; //pos 1
             public string opt_last = null; //pos n --> default
             public double opt_n = double.NaN; //specific n
+            public double opt_obs = double.NaN; //specific obs
             public string opt_type = null;  //rel1, rel2, rel3, abs
 
             public GekkoTime date = GekkoTime.tNull; //old remove
@@ -7437,13 +7438,7 @@ namespace Gekko
 
             public void Exe()
             {
-                if (false)
-                {
-                    Splice_OLDREMOVE();
-                    return;
-                }
-
-                Series ts_lhs = SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);
+                Series ts_lhs = SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, this.opt_obs, false);
 
                 if (Program.options.databank_trace)
                 {
@@ -7486,7 +7481,7 @@ namespace Gekko
             /// <param name="opt_n"></param>
             /// <param name="isFunction"></param>
             /// <returns></returns>
-            public static Series SpliceHelper(List lhs, List rhs, string opt_type, string opt_first, string opt_last, double opt_n, bool isFunction)
+            public static Series SpliceHelper(List lhs, List rhs, string opt_type, string opt_first, string opt_last, double opt_n, double opt_obs, bool isFunction)
             {
                 //
                 // rel1: R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3)
@@ -7501,6 +7496,7 @@ namespace Gekko
 
                 bool isLog = false;
                 int n = int.MaxValue; //0-based. Default indicates 'last'
+                int obsMax = int.MaxValue; if (Program.options.splice_obs > 0) obsMax = Program.options.splice_obs;
                 ESpliceType type = ESpliceType.Rel1;  //default
 
                 if (opt_type == null)
@@ -7557,6 +7553,12 @@ namespace Gekko
                     count++;
                     int ii = G.ConvertToInt(opt_n);  //will fail with error if not int
                     n = ii - 1;  //n is 0-based.
+                }
+                if (!double.IsNaN(opt_obs))
+                {                    
+                    obsMax = G.ConvertToInt(opt_obs);  //will fail with error if not int
+                    if (obsMax < 0) new Error("INTERPOLATE<obs=...> expects the integer to be >= 0");  //Can probably never happen
+                    if (obsMax == 0) obsMax = int.MaxValue;                    
                 }
                 if (count > 1)
                 {
@@ -7733,7 +7735,7 @@ namespace Gekko
                 for (int i = n; i < data.Count - 1; i++)  //note -1
                 {
                     //right
-                    factorRight = SpliceAdjust(data, i, freq, type, factorRight, false, isLog);
+                    factorRight = SpliceAdjust(data, i, freq, type, factorRight, false, isLog, obsMax);
                 }
 
                 double factorLeft = 1d;
@@ -7741,7 +7743,7 @@ namespace Gekko
                 for (int i = n; i >= 1; i--)  //note 1
                 {
                     //left
-                    factorLeft = SpliceAdjust(data, i, freq, type, factorLeft, true, isLog);
+                    factorLeft = SpliceAdjust(data, i, freq, type, factorLeft, true, isLog, obsMax);
                 }
 
                 // ---------------------------------------------
@@ -7847,7 +7849,7 @@ namespace Gekko
             /// <param name="factor"></param>
             /// <param name="moveLeft"></param>
             /// <returns></returns>
-            private static double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft, bool isLog)
+            private static double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft, bool isLog, int obsMax)
             {
                 //NOTE: "rel3" is not performed here: it is done by taking log(), then "abs", and then exp().
                 SpliceHelper left = null;
@@ -7895,6 +7897,13 @@ namespace Gekko
                 double sum_alternative = 0d;
                 double sum_correction = 0d;
                 int obs = GekkoTime.Observations(overlapStart, overlapEnd);
+                if (obs > obsMax)
+                {
+                    if (moveLeft) overlapEnd = overlapEnd.Add(obsMax - obs);
+                    else overlapStart = overlapStart.Add(obs - obsMax);
+                    obs = GekkoTime.Observations(overlapStart, overlapEnd);
+                    if (obs > obsMax) new Error("Unexpected error in SPLICE<obs=...>");
+                }
                 foreach (GekkoTime gt in new GekkoTimeIterator(overlapStart, overlapEnd))
                 {
                     if (type == ESpliceType.Abs || type == ESpliceType.Rel1)
@@ -7990,133 +7999,7 @@ namespace Gekko
                 alternativeEnd = (data[i + 1].x as Series).GetRealDataPeriodLast();
                 try { alternativeStart = data[i].t[1].Add(1); } catch { };
                 try { alternativeEnd = data[i + 1].t[1]; } catch { };
-            }
-
-
-            private void Splice_OLDREMOVE()
-            {
-                List<string> listItems0 = Restrict(names0, true, false, true, true);
-                List<string> listItems1 = Restrict(names1, true, false, true, true);
-                List<string> listItems2 = Restrict(names2, true, false, true, true);
-
-                bool useSecondPartLevels = true;  //like aremos
-
-                if (listItems0.Count != 1 || listItems1.Count != 1 || listItems2.Count != 1)
-                {
-                    new Error("SPLICE only supports one variable at a time, not lists (for now)");
-                }
-
-                IVariable iv1 = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError, true);
-                IVariable iv2 = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true);
-                IVariable iv3 = O.GetIVariableFromString(listItems0[0], ECreatePossibilities.Can);  //left side
-
-                Series ts1 = O.ConvertToSeries(iv1) as Series;
-                Series ts2 = O.ConvertToSeries(iv2) as Series;
-                Series ts3 = O.ConvertToSeries(iv3) as Series;
-
-                if (ts1.freq != ts2.freq)
-                {
-                    new Error("Different freq for the two timerseries");
-                }
-                GekkoTime t1a = ts1.GetRealDataPeriodFirst();
-                if (t1a.IsNull())
-                {
-                    new Error("No data in first timeseries");
-                }
-                GekkoTime t1b = ts1.GetRealDataPeriodLast();
-                GekkoTime t2a = ts2.GetRealDataPeriodFirst();
-                if (t2a.IsNull())
-                {
-                    new Error("No data in second timeseries");
-                }
-                GekkoTime t2b = ts2.GetRealDataPeriodLast();
-                if (!date.IsNull())
-                {
-                    if (date.freq != ts1.freq || date.freq != ts2.freq)
-                    {
-                        new Error("Wrong freq for indicated period");
-                    }
-                    t1b = date;
-                    t2a = date;
-                }
-                int obs = GekkoTime.Observations(t2a, t1b);
-                if (obs < 1)
-                {
-                    new Error("No overlapping periods for SPLICE");
-                }
-
-
-                //          ts1        ts2
-                //2002      2.000000                 t1a = 2002
-                //2003      3.000000              
-                //2004      4.000000   41.000000     t2a = 2004
-                //2005      5.000000   42.000000  
-                //2006      6.000000   43.000000     t1b = 2006
-                //2007                 44.000000  
-                //2008                 45.000000  
-                //2009                 46.000000  
-                //2010                 46.000000     t2b = 2010
-
-                double count = 0d;
-                double sum1 = 0d;
-                double sum2 = 0d;
-                foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t1b))
-                {
-                    count++;
-                    sum1 += ts1.GetDataSimple(gt);
-                    sum2 += ts2.GetDataSimple(gt);
-                }
-                double avg1 = sum1 / count;
-                double avg2 = sum2 / count;
-
-                if (useSecondPartLevels)
-                {
-
-                    if (avg2 == 0d)
-                    {
-                        new Error("Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
-                    }
-                    double relative = avg1 / avg2;
-                    if (G.IsNumericalError(relative))
-                    {
-                        new Error("Seems there are missing data for common period " + t2a + "-" + t1b);
-                    }
-                    foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t2a.Add(-1)))
-                    {
-                        ts3.SetData(gt, ts1.GetDataSimple(gt) / relative);
-                    }
-                    foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t2b))
-                    {
-                        ts3.SetData(gt, ts2.GetDataSimple(gt));
-                    }
-                }
-                else
-                {
-
-                    if (avg2 == 0d)
-                    {
-                        new Error("Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
-                    }
-                    double relative = avg1 / avg2;
-                    if (G.IsNumericalError(relative))
-                    {
-                        new Error("Seems there are missing data for common period " + t2a + "-" + t1b);
-                    }
-                    foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t1b))
-                    {
-                        ts3.SetData(gt, ts1.GetDataSimple(gt));
-                    }
-                    foreach (GekkoTime gt in new GekkoTimeIterator(t1b.Add(1), t2b))
-                    {
-                        ts3.SetData(gt, ts2.GetDataSimple(gt) * relative);
-                    }
-                }
-
-                ts3.Stamp();
-                ts3.SetDirty(true);
-
-                G.ServiceMessage("Spliced " + ts3.GetName() + " by means of " + obs + " common observations", p);
-            }
+            }            
         }
 
         public class LibraryClose
