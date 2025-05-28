@@ -214,7 +214,7 @@
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
                 <CheckBox Name="CheckBox_ref" Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Shows variables from the 'REF' databank (cf. the F2 window).">Ref</CheckBox>
-                <CheckBox Name="CheckBox_all" Width="62" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_all_Checked" Unchecked="CheckBox_all_Unchecked" ToolTip="Shows (a) variables searched for in numbered databanks (cf. the F2 window),&#x0a;together with (b) variables from the 'REF' databank (cf. the F2 window).">All</CheckBox>                    
+                <CheckBox Name="CheckBox_all" Width="62" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_all_Checked" Unchecked="CheckBox_all_Unchecked" ToolTip="Shows variables searched for in numbered databanks (cf. the F2 window),&#x0a;together with variables from the 'REF' databank (cf. the F2 window).">All</CheckBox>                    
             </StackPanel>            
         </Grid>
 
@@ -283,7 +283,7 @@
                     <CheckBox x:Name="CheckBox_points"  Width="57" Margin="2,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show line 'points' for each period (typically small circles). &#x0a;Selected corresponds to &lt;type=linespoints> and unselected corresponds to &lt;type=lines>"  Content="Points" Checked="CheckBox_points_Checked" Unchecked="CheckBox_points_Unchecked"/>
                 </StackPanel>
 
-                <Button Name="button_search" Content="! Search" Visibility="Collapsed" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" Background="#fff9b8" ToolTip="Data was fetched in databank position 2+ (click for more info)." Click="Button_search">
+                <Button Name="button_search" Content="! Search" Visibility="Collapsed" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" Background="#fff9b8" ToolTip="Variables used from a databank in position 2 or lower in the F2 window (click for more info)." Click="Button_search">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="0"/>

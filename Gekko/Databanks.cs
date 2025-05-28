@@ -54,15 +54,17 @@ namespace Gekko
                 return this.optionBank.GetIVariable(varName);
             }
 
+            int firstCount = 0;
             for (int i = 0; i < this.storage.Count; i++)
             {
                 if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
                 if (canSearch == false && i > 1) break;  //without seach, we never search normal OPENed databanks
                 Databank db2 = this.storage[i];
+                if (i == 0) firstCount = db2.storage.Count;
                 rv = db2.GetIVariable(varName);
                 if (rv != null)
                 {
-                    if (i >= 2) Globals.databankSearchHitBelowFirstPosition++;  //Used as a warning in PLOT
+                    if (i >= 2 && firstCount > 0) Globals.databankSearchHitBelowFirstPosition++;  //Used as a warning in PLOT
                     return rv;
                 }
             }            
@@ -502,7 +504,7 @@ namespace Gekko
                 dbList.Add(databank);
             }
             Program.databanks.storage = dbList;
-            new Writeln("Moved Work and Ref back to their normal positions in the databank list (F2)");                     
+            new Writeln("Moved Work and Ref back to their normal positions in the databank list (F2 window)");                     
         }            
     }
 }
