@@ -2,9 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:jas="clr-namespace:Gekko"
-    Title="Databanks" Height="260" Width="982"
+    Title="Databanks" 
     FontSize="12"
-    WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    WindowStartupLocation="Manual" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="ItemContStyle" TargetType="ListViewItem">
             <Style.Resources>

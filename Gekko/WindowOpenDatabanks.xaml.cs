@@ -31,7 +31,11 @@ namespace Gekko
 
         public WindowOpenDatabanks()
 		{
-			InitializeComponent();            
+            this.Top = Globals.guiF2WindowTopDistance;
+            this.Left = Globals.guiF2WindowLeftDistance;
+            this.Height = Globals.guiF2WindowHeight;
+            this.Width = Globals.guiF2WindowWidth;
+            InitializeComponent();            
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Loaded += WindowOpenDatabanks_Loaded;
             yellow.Text = "Position '1': use read<first> or open<first>. Position 'REF': use read<ref>. Drag to swap two databanks.";                             
@@ -65,12 +69,7 @@ namespace Gekko
 			// Hook up events on both ListViews to that we can drag-drop
 			// items between them.
 			this.listView.DragEnter += OnListViewDragEnter;			
-			this.listView.Drop += OnListViewDrop;
-
-            this.Top = Globals.guiF2WindowTopDistance;
-            this.Left = Globals.guiF2WindowLeftDistance;
-            this.Height = Globals.guiF2WindowHeight;
-            this.Width = Globals.guiF2WindowWidth;
+			this.listView.Drop += OnListViewDrop;            
         }
 
         private void RefreshList()
