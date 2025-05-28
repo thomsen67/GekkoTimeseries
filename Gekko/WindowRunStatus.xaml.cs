@@ -25,7 +25,7 @@ namespace Gekko
     {
         public WindowRunStatus()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -55,7 +55,9 @@ namespace Gekko
             if (Gui.gui.p == null) return;
             Gui.gui.p.ReportToRunStatus(true);
         }
-    }
 
-    
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {            
+        }
+    }    
 }

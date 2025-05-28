@@ -109,6 +109,58 @@ namespace Gekko
                 this["MainWindowHeight"] = (int)value;
             }
         }
+        [DefaultSettingValue("982")]
+        [UserScopedSetting()]
+        public int F2WindowWidth
+        {
+            get
+            {
+                return ((int)this["F2WindowWidth"]);
+            }
+            set
+            {
+                this["F2WindowWidth"] = (int)value;
+            }
+        }
+        [DefaultSettingValue("50")]
+        [UserScopedSetting()]
+        public int F2WindowTopDistance
+        {
+            get
+            {
+                return ((int)this["F2WindowTopDistance"]);
+            }
+            set
+            {
+                this["F2WindowTopDistance"] = (int)value;
+            }
+        }
+        [DefaultSettingValue("100")]
+        [UserScopedSetting()]
+        public int F2WindowLeftDistance
+        {
+            get
+            {
+                return ((int)this["F2WindowLeftDistance"]);
+            }
+            set
+            {
+                this["F2WindowLeftDistance"] = (int)value;
+            }
+        }        
+        [DefaultSettingValue("260")]
+        [UserScopedSetting()]
+        public int F2WindowHeight
+        {
+            get
+            {
+                return ((int)this["F2WindowHeight"]);
+            }
+            set
+            {
+                this["F2WindowHeight"] = (int)value;
+            }
+        }
         [DefaultSettingValue("")]
         [UserScopedSetting()]        
         public String TspUtilityPath

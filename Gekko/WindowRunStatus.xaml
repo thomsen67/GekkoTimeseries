@@ -4,7 +4,7 @@
     xmlns:jas="clr-namespace:Gekko"
     Title="Run status" Height="250" Width="980"
     FontSize="12"
-    WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed">
+    WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="ItemContStyle" TargetType="ListViewItem">            
             <Setter Property="Height" Value="25" />

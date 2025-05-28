@@ -890,6 +890,12 @@ namespace Gekko
             Globals.guiErrorWindowTopDistance = pError.X;
             Globals.guiErrorWindowLeftDistance = pError.Y;
 
+            Point pF2 = HandleMonitor(us.F2WindowTopDistance, us.F2WindowLeftDistance);
+            Globals.guiF2WindowTopDistance = pF2.X;
+            Globals.guiF2WindowLeftDistance = pF2.Y;
+            Globals.guiF2WindowHeight = us.F2WindowHeight;
+            Globals.guiF2WindowWidth = us.F2WindowWidth;
+
             return us;
         }
 
@@ -1001,6 +1007,10 @@ namespace Gekko
             us.DecompWindowSplitterVertical = Globals.guiDecompWindowSplitterVertical;
             us.ErrorWindowTopDistance = Globals.guiErrorWindowTopDistance;
             us.ErrorWindowLeftDistance = Globals.guiErrorWindowLeftDistance;
+            us.F2WindowTopDistance = Globals.guiF2WindowTopDistance;
+            us.F2WindowLeftDistance = Globals.guiF2WindowLeftDistance;
+            us.F2WindowHeight = Globals.guiF2WindowHeight;
+            us.F2WindowWidth = Globals.guiF2WindowWidth;
 
             try
             {

@@ -962,6 +962,11 @@ namespace Gekko
         public static int guiItershowWindowTopDistance = 50;
         public static int guiItershowWindowLeftDistance = 100;
 
+        public static int guiF2WindowTopDistance = 50;
+        public static int guiF2WindowLeftDistance = 100;
+        public static int guiF2WindowHeight = 260;
+        public static int guiF2WindowWidth = 982;
+
         public const string linkActionStart = "{a{";  //these links take up chars, so both Wrap and Table may not be precise, if the link url is too long.
         public const string linkActionEnd = "}a}";    //this could be remedied by adjusting "real" length of line, but perhaps not worth the effort right now?
         public const char linkActionDelimiter = '¤';

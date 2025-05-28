@@ -31,21 +31,22 @@ namespace Gekko
 
         public WindowOpenDatabanks()
 		{
-			InitializeComponent();
+			InitializeComponent();            
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Loaded += WindowOpenDatabanks_Loaded;
-            yellow.Text = "Position '1': use read<first> or open<first>. Position 'REF': use read<ref>. Drag to swap two databanks.";
-		}
+            yellow.Text = "Position '1': use read<first> or open<first>. Position 'REF': use read<ref>. Drag to swap two databanks.";                             
+        }
 
 		#region Window1_Loaded
 
         void WindowOpenDatabanks_Loaded(object sender, RoutedEventArgs e)
 		{
-			// Give the ListView an ObservableCollection of Task
-			// as a data source.  Note, the ListViewDragManager MUST
-			// be bound to an ObservableCollection, where the collection's
-			// type parameter matches the ListViewDragManager's type
-			// parameter (in this case, both have a type parameter of Task).
+            // Give the ListView an ObservableCollection of Task
+            // as a data source.  Note, the ListViewDragManager MUST
+            // be bound to an ObservableCollection, where the collection's
+            // type parameter matches the ListViewDragManager's type
+            // parameter (in this case, both have a type parameter of Task).
+            //             
 
             list = new ObservableCollection<GekkoTask>();
             RefreshList();
@@ -64,8 +65,13 @@ namespace Gekko
 			// Hook up events on both ListViews to that we can drag-drop
 			// items between them.
 			this.listView.DragEnter += OnListViewDragEnter;			
-			this.listView.Drop += OnListViewDrop;			
-		}
+			this.listView.Drop += OnListViewDrop;
+
+            this.Top = Globals.guiF2WindowTopDistance;
+            this.Left = Globals.guiF2WindowLeftDistance;
+            this.Height = Globals.guiF2WindowHeight;
+            this.Width = Globals.guiF2WindowWidth;
+        }
 
         private void RefreshList()
         {
@@ -308,8 +314,12 @@ namespace Gekko
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {            
+        {
             //Program.ShowPeriodInStatusField("");
+            Globals.guiF2WindowTopDistance = Math.Max(1, (int)this.Top);
+            Globals.guiF2WindowLeftDistance = Math.Max(1, (int)this.Left);
+            Globals.guiF2WindowHeight = Math.Max(1, (int)this.ActualHeight);
+            Globals.guiF2WindowWidth = Math.Max(1, (int)this.ActualWidth);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
