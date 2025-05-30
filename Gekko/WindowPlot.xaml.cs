@@ -359,8 +359,15 @@ namespace Gekko
             //ss[0] = this.graphOptions.emfName;
             //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
             //Clipboard.SetDataObject(iData, true);
-            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
-            Clipboard.SetText(plotName);
+            try
+            {
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
+                Clipboard.SetText(plotName);
+            }
+            catch
+            {
+                MessageBox.Show("Due to errors, the plot could not be copied.");
+            }            
         }
 
         private void Button_save(object sender, RoutedEventArgs e)
@@ -370,11 +377,17 @@ namespace Gekko
             string inputLast = "svg";
             string name2 = Program.Add1ToFileName(input, inputLast, Program.options.folder_working);
             string enddir = Program.options.folder_working + "\\" + name2;
-            string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
-            Program.WaitForFileCopy(plotName, enddir);
-            this.label1.Text = name2;
-            Program.DelayAction(4000, new Action(() => { try { if (this.label1.Text == name2) this.label1.Text = ""; } catch { } }));
-            //this.label2.Text = "saved in working folder";
+            try
+            {
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
+                Program.WaitForFileCopy(plotName, enddir);
+                this.label1.Text = name2;
+                Program.DelayAction(4000, new Action(() => { try { if (this.label1.Text == name2) this.label1.Text = ""; } catch { } }));
+            }
+            catch
+            {
+                MessageBox.Show("Due to errors, the plot could not be saved.");
+            }            
         }
 
         private void Button_search(object sender, RoutedEventArgs e)
@@ -399,7 +412,14 @@ namespace Gekko
                     MessageBox.Show("Expected file type to be '.svg', '.emf', '.png' or '.pdf' -- not '" + extension + "'. No file produced.");
                     return;
                 }
-                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, saveFileDialog1.FileName);
+                try
+                {
+                    string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, saveFileDialog1.FileName);
+                }
+                catch
+                {
+                    MessageBox.Show("Due to errors, the plot could not be saved.");
+                }
             }
         }
 
@@ -418,9 +438,9 @@ namespace Gekko
             refresh.sizeScaling = sizeScaling;
             refresh.isRefreshing = true;  //so we do not get a new plot window
             refresh.isButton = true; 
-            refresh.fileName = fileName;
-            string plotName = Refresh(new GraphHelper(refresh), false);
-            return plotName;
+            refresh.fileName = fileName;            
+            string plotName = Refresh(new GraphHelper(refresh), false);            
+            return plotName;            
         }
 
         private void Button_refresh(object sender, RoutedEventArgs e)
