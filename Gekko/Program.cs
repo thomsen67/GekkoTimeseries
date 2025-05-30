@@ -2502,9 +2502,8 @@ namespace Gekko
                 if (FindException(e2, "GekkoException"))
                 {
                     if (!p.stopCommandEncountered)
-                    {
-                        G.Writeln();
-                        G.Write("*** ERROR: The statement failed due to internal Gekko error");  //do not show this after STOP command.
+                    {                        
+                        G.Write("*** ERROR: The statement failed");  //do not show this after STOP command.
                     }
                 }
                 else
