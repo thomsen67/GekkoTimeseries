@@ -44,10 +44,7 @@ namespace Gekko
         {
             //check local bank
             IVariable rv = this.GetLocal().GetIVariable(varName);
-            if (rv != null)
-            {                
-                return rv;
-            }
+            if (rv != null) return rv;            
 
             if (this.optionBank != null)
             {                
@@ -64,7 +61,7 @@ namespace Gekko
                 rv = db2.GetIVariable(varName);
                 if (rv != null)
                 {
-                    if (i >= 2 && firstCount > 0) Globals.databankSearchHitBelowFirstPosition++;  //Used as a warning in PLOT
+                    if (i >= 2 && firstCount > 0) Globals.databankSearchHitBelowFirstPosition++;  //Used as a warning in PLOT                    
                     return rv;
                 }
             }            

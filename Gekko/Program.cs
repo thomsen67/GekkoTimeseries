@@ -24308,7 +24308,6 @@ namespace Gekko
                     if (ts == null)
                     {
                         new Error("Variable '" + var.s1 + "' is of wrong type");
-                        //throw new GekkoException();
                     }
                     file.Write(G.varFormat(G.Chop_GetName(var.s2), prnWidth));  //prn and gnuplot
                 }

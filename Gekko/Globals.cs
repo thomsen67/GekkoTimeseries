@@ -646,7 +646,7 @@ namespace Gekko
         public static StreamWriter screenOutput = null;
 
         public static int databankSearchHitBelowFirstPosition0 = 0;
-        public static int databankSearchHitBelowFirstPosition = 0; //Used for a warning in PLOT, when the first-position databank has > 0 variables but a variable was found in position 2 or lower in the F2 window.
+        public static int databankSearchHitBelowFirstPosition = 0; //Used for a warning in PLOT, when the first-position databank has > 0 variables but a variable was found in position 2 or lower in the F2 window. Does not consider the Local or Global databank.
 
         public static StringBuilder unitTestScreenOutput = new StringBuilder();
 

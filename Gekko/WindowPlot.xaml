@@ -283,7 +283,7 @@
                     <CheckBox x:Name="CheckBox_points"  Width="57" Margin="2,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show line 'points' for each period (typically small circles). &#x0a;Selected corresponds to &lt;type=linespoints> and unselected corresponds to &lt;type=lines>"  Content="Points" Checked="CheckBox_points_Checked" Unchecked="CheckBox_points_Unchecked"/>
                 </StackPanel>
 
-                <Button Name="button_search" Content="! Search" Visibility="Collapsed" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" Background="#fff9b8" ToolTip="Variables used from a databank in position 2 or lower in the F2 window (click for more info)." Click="Button_search">
+                <Button Name="button_search" Content="!Search" Visibility="Collapsed" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" Background="#fff9b8" ToolTip="One or more variables in the plot were found in a databank in position 2 or lower&#x0A;in the databank list (F2 window). Click for more info)." Click="Button_search">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="0"/>

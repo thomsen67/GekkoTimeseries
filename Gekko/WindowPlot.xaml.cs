@@ -379,7 +379,7 @@ namespace Gekko
 
         private void Button_search(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("The first-position databank is non-empty, but but one or more variables were found in a databank in position 2 or lower in the F2 window. This happens because databank searching is active: to switch databank searching off, use 'option databank search = no', in which case an error would have been issued instead. Beware of unintended missing variables in the first-position databank. (Reference variables are never searched for, but are always taken from the databank corresponding to the 'REF' position in the F2 window).");
+            MessageBox.Show("One or more variables in the plot were found in a databank in position 2 or lower in the databank list (F2 window). To switch databank searching off, use 'option databank search = no', in which case an error would have been issued instead. Beware of unintended missing variables in the first-position databank, which in this case is not empty. (Note that 'Ref' variables are never searched for, but are always taken from the databank corresponding to the 'REF' position in the F2 databank list).");
         }
 
         private void Button_saveas(object sender, RoutedEventArgs e)
