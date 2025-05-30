@@ -449,10 +449,12 @@ namespace Gekko
             }
             catch
             {
+                //When we get here Refresh(GraphHelper, bool) has crashed, and if so, no new  webBrowser.Source will
+                //have been set. So there is no need for a new Refresh(GraphHelper, bool) here, because the svg file
+                //and the window will not have been changed.
                 refresh = _refresh.Clone();
                 refresh.isRefreshing = true;
-                refresh.period = StringPeriod(_graphOptions);
-                Refresh(new GraphHelper(refresh), true);  //using the old refresh object that should work.
+                refresh.period = StringPeriod(_graphOptions);                                
                 _graphOptions.code = refresh.op;
             };
 
