@@ -19,7 +19,7 @@
         <!--<ToolBar x:Name="toolBar" VerticalAlignment="Top" DockPanel.Dock="Top"/>-->
         <DockPanel x:Name="graphViewerPanel" ClipToBounds="True">
         </DockPanel>
-        <StackPanel Margin="0,0,0,0" Background="WhiteSmoke" Opacity="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" >
+        <StackPanel Height="120" Margin="0,0,0,0" Background="WhiteSmoke" Opacity="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" >
             <StackPanel Margin="3,5,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" >                
                 <Grid Margin="0,0,0,0" Height="23"  VerticalAlignment="Top">                    
                     <Button x:Name="depthUp" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▲" Height="10" Width="15" Click="depthUp_Click" Margin="35,2,1,13" Foreground="Gray" ToolTip="Increase depth" />
@@ -34,11 +34,39 @@
                     <Button x:Name="ignoredUp" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▲" Height="10" Width="15" Click="ignoredUp_Click" Margin="35,2,1,13" Foreground="Gray" ToolTip="Increase ignore threshold" />
                     <Button x:Name="ignoredDown" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▼" Height="10" Width="15" Click="ignoredDown_Click" Margin="35,12,1,3" Foreground="Gray"  ToolTip="Decrease ignore threshold" />                    
                     <TextBox Width="30" HorizontalAlignment="Left" Height="15" FontSize="10" x:Name="ignoredNum" x:FieldModifier="private" Text="0" Padding="0,-0.6,0,0" TextChanged="ignoredNum_TextChanged" Margin="3,2,13,3"  ToolTip="Ignore contributions smaller than this" />
-                    <TextBlock Text="%" Width="10" HorizontalAlignment="Left" FontSize="10" Margin="22,4,0,0" />
+                    <TextBlock Text="%" Width="10" HorizontalAlignment="Left" FontSize="10" Margin="22,4,0,0" />                    
                 </Grid>
                 <TextBlock Text="Ignore" Margin="5,2,0,0" Grid.RowSpan="2" ToolTip="Ignore contributions smaller than this" />
             </StackPanel>
             <CheckBox x:Name="checkBoxRotate" Width="95" Margin="5,2,0,5" ToolTip="Rotate (orientation)" Content="Rotate" Checked="CheckBoxRotate_Checked" Unchecked="CheckBoxRotate_Unchecked"/>
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <Button Width="15" Height="15" Margin="6,0,0,0"
+                BorderBrush="DarkGray" BorderThickness="1"
+                Padding="0" 
+                ToolTip="Zoom in"
+                Click="MinusButton_Click">
+                    <TextBlock Text="&#x2212;"
+                       FontSize="20"
+                       Foreground="Gray"
+                       FontWeight="Bold"                       
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Margin="0,-4,0,0"/>                    
+                </Button>
+                <Button Width="15" Height="15" Margin="3,0,0,0"
+                BorderBrush="DarkGray" BorderThickness="1"                
+                Padding="0" 
+                ToolTip="Zoom out"
+                Click="PlusButton_Click">
+                    <TextBlock Text="+"
+                       FontSize="20"
+                       FontWeight="Bold"                       
+                       Foreground="Gray"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Margin="0,-4,0,0"/>
+                </Button>
+            </StackPanel>            
         </StackPanel>
         <StatusBar VerticalAlignment="Bottom">
             <TextBox x:Name="statusTextBox" Text="" />

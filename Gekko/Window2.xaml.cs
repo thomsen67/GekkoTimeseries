@@ -45,7 +45,7 @@ namespace Gekko
         public Window2()
         {            
             InitializeComponent();
-            textBox1.Background=new SolidColorBrush(Globals.LightGray);            
+            textBox1.Background = new SolidColorBrush(Globals.LightGray);
             this.Top = Globals.guiErrorWindowTopDistance;
             this.Left = Globals.guiErrorWindowLeftDistance;
         }        

@@ -23,6 +23,7 @@ namespace Gekko
         public bool isInitializing = false;
 
         int _depthNumValue = 0;
+
         public int DepthNumValue
         {
             get { return _depthNumValue; }
@@ -69,7 +70,7 @@ namespace Gekko
             graphViewerPanel.ClipToBounds = true;
             graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;            
             graphViewer.BindToPanel(graphViewerPanel);            
-            graphViewer.MouseDown += WpfApplicationSample_MouseDown;
+            graphViewer.MouseDown += WpfApplicationSample_MouseDown;            
             Loaded += CreateAndLayoutAndDisplayGraph; // Event handler on Loaded event
             Title = "Gekko flowgraph";
             Content = mainGrid;            
@@ -192,7 +193,7 @@ namespace Gekko
                     if (depth == 0)
                     {
                         nodeTo.Attr.Color = Color(1.0);
-                        nodeTo.Attr.FillColor = new Color(204, 213, 240);
+                        nodeTo.Attr.FillColor = new Color(250, 242, 174);  //Same yellow as mode mixed
                     }
                 }                
                 
@@ -241,20 +242,23 @@ namespace Gekko
             var statusBar = new StatusBar();
             string s = null;
             if (this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered) s = "Lags/leads encountered and ignored";
-            statusTextBox = new TextBox { Text = "Hover: see labels, click: new flowgraph, Ctrl+click: decomp. " + s };  //{ Text = "No object" };            
+            statusTextBox = new TextBox { Text = Globals.flowGraphTextInfo + s };  //{ Text = "No object" };            
+            statusTextBox.BorderThickness = new Thickness(0);
+            statusTextBox.Opacity = 0.65;
             statusBar.Items.Add(statusTextBox);
             mainGrid.Children.Add(statusBar);
-            statusBar.VerticalAlignment = VerticalAlignment.Bottom;
-            //statusTextBox.Background = new System.Windows.Media.SolidColorBrush(Globals.GekkoModeYellow);
-            statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
+            statusBar.VerticalAlignment = VerticalAlignment.Bottom;            
+            statusTextBox.Background = null;
         }
-
+        
         void graphViewer_ObjectUnderMouseCursorChanged(object sender, ObjectUnderMouseCursorChangedEventArgs e)
         {
-            var node = graphViewer.ObjectUnderMouseCursor as IViewerNode;
+            var o = graphViewer.ObjectUnderMouseCursor;
+            var node = o as IViewerNode;
             if (node != null)
             {
-                statusTextBox.Visibility = Visibility.Visible;
+                statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
+                statusTextBox.Opacity = 1.0;
                 var drawingNode = (Node)node.DrawingObject;
                 string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);
                 statusTextBox.Text = label;
@@ -263,14 +267,16 @@ namespace Gekko
             {
                 var edge = graphViewer.ObjectUnderMouseCursor as IViewerEdge;
                 if (edge != null)
-                {
-                    statusTextBox.Visibility = Visibility.Visible;
+                {                    
+                    statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
+                    statusTextBox.Opacity = 1.0;
                     statusTextBox.Text = ((Edge)edge.DrawingObject).SourceNode.Label.Text + " --> " + ((Edge)edge.DrawingObject).TargetNode.Label.Text;
                 }
                 else
-                {
-                    statusTextBox.Visibility = Visibility.Hidden;
-                    statusTextBox.Text = "";  // "No object";                    
+                {                                    
+                    statusTextBox.Text = Globals.flowGraphTextInfo;  // "No object";                    
+                    statusTextBox.Background = null;
+                    statusTextBox.Opacity = 0.65;
                 }
             }
         }
@@ -320,36 +326,39 @@ namespace Gekko
                 if (gv == null) return;
                 if (gv.ObjectUnderMouseCursor == null) return;
                 string s = gv.ObjectUnderMouseCursor.DrawingObject.ToString();
-                int i = s.IndexOf('"', 1);
-                string name = G.Substring(s, 1, i - 1);
-
-                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                if (!s.Contains(" -> "))
                 {
-                    DecompFind decompFindHere = this.decompFind;
-                    DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
-                    decompFindHereChild.children.Clear(); //This and the next line so we are sure to get a blank state DECOMP window: not much sense in linking via flowgraphs...
-                    decompFindHereChild.parent = null;
-                    List<EqInfoSimple> temp = GamsModel.GetSortedEquations(name, GekkoTime.tNull, this.decompFind.model, false, false);
-                    string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                    decompFindHereChild.decompOptions2.new_select = new List<string> { name };                                        
-                    decompFindHereChild.decompOptions2.new_from = new List<string>() { eqName };
-                    decompFindHereChild.decompOptions2.new_endo = new List<string>() { name };
-                    Decomp.DecompGetFuncExpressionsAndRecalc(decompFindHereChild, null);
-                }
-                else
-                {
-                    if (!isInitializing)
+                    int i = s.IndexOf('"', 1);
+                    string name = G.Substring(s, 1, i - 1);
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
                         DecompFind decompFindHere = this.decompFind;
                         DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
-                        decompFindHereChild.decompOptions2.guiFlowName = name;
-                        Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
-                        thread.Name = "Flow";
-                        thread.SetApartmentState(ApartmentState.STA);
-                        thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                        thread.IsBackground = true;
-                        thread.Start(decompFindHereChild);
+                        decompFindHereChild.children.Clear(); //This and the next line so we are sure to get a blank state DECOMP window: not much sense in linking via flowgraphs...
+                        decompFindHereChild.parent = null;
+                        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(name, GekkoTime.tNull, this.decompFind.model, false, false);
+                        string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                        decompFindHereChild.decompOptions2.new_select = new List<string> { name };
+                        decompFindHereChild.decompOptions2.new_from = new List<string>() { eqName };
+                        decompFindHereChild.decompOptions2.new_endo = new List<string>() { name };
+                        Decomp.DecompGetFuncExpressionsAndRecalc(decompFindHereChild, null);
                     }
+                    else
+                    {
+                        if (!isInitializing)
+                        {
+                            DecompFind decompFindHere = this.decompFind;
+                            DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
+                            decompFindHereChild.decompOptions2.guiFlowName = name;
+                            Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
+                            thread.Name = "Flow";
+                            thread.SetApartmentState(ApartmentState.STA);
+                            thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                            thread.IsBackground = true;
+                            thread.Start(decompFindHereChild);
+                        }
+                    }
+                    e.Handled = true;
                 }
             }
             catch { }
@@ -471,6 +480,29 @@ namespace Gekko
         private void ignoredDown_Click(object sender, RoutedEventArgs e)
         {
             if (IgnoredNumValue > 0) IgnoredNumValue--;
+        }
+
+        private void MinusButton_Click(object sender, RoutedEventArgs e)
+        {
+            Zoom(1d/1.2d);
+        }
+
+        private void PlusButton_Click(object sender, RoutedEventArgs e)
+        {
+            Zoom(1.2d);
+        }
+
+        private void Zoom(double z)
+        {
+            var canvas = graphViewer.GraphCanvas;
+            if (canvas.RenderTransform is MatrixTransform matrixTransform)
+            {
+                var matrix = matrixTransform.Matrix;
+                double centerX = canvas.ActualWidth / 2;
+                double centerY = canvas.ActualHeight / 2;
+                matrix.ScaleAt(z, z, centerX, centerY);
+                canvas.RenderTransform = new MatrixTransform(matrix);
+            }
         }
     }
 
