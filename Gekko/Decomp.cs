@@ -4233,7 +4233,8 @@ namespace Gekko
             {
                 if (!ChopFullVariableName(lhs2, fullVariableName).isLhs) orderedNames.Add(fullVariableName);
             }
-            if (hit != 1 && Globals.runningOnTTComputer) MessageBox.Show("LHS problem: " + hit);
+            if (hit != 1 && Globals.runningOnTTComputer) 
+                MessageBox.Show("LHS problem: " + hit);
 
             // ------------------------------------------------------------------------------
             // Loop over PERIODS

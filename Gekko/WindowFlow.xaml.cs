@@ -338,9 +338,9 @@ namespace Gekko
                         decompFindHereChild.parent = null;
                         List<EqInfoSimple> temp = GamsModel.GetSortedEquations(name, GekkoTime.tNull, this.decompFind.model, false, false);
                         string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                        decompFindHereChild.decompOptions2.new_select = new List<string> { name };
-                        decompFindHereChild.decompOptions2.new_from = new List<string>() { eqName };
-                        decompFindHereChild.decompOptions2.new_endo = new List<string>() { name };
+                        decompFindHereChild.decompOptions2.new_select = new List<string> { G.HandleBlanksRemove(name) };
+                        decompFindHereChild.decompOptions2.new_from = new List<string>() { G.HandleBlanksRemove(eqName) };
+                        decompFindHereChild.decompOptions2.new_endo = new List<string>() { G.HandleBlanksRemove(name) };
                         Decomp.DecompGetFuncExpressionsAndRecalc(decompFindHereChild, null);
                     }
                     else
@@ -349,7 +349,7 @@ namespace Gekko
                         {
                             DecompFind decompFindHere = this.decompFind;
                             DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
-                            decompFindHereChild.decompOptions2.guiFlowName = name;
+                            decompFindHereChild.decompOptions2.guiFlowName = G.HandleBlanksRemove(name);
                             Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
                             thread.Name = "Flow";
                             thread.SetApartmentState(ApartmentState.STA);
