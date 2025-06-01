@@ -10213,9 +10213,7 @@ namespace Gekko
                         }
                         else
                         {
-                            new Error("Strange error in gcm file -- please report this to the developer");
-                            //throw new GekkoException();
-                            //throw;
+                            new Error("Strange error in gcm file -- please report this to the developer");                            
                         }
                     }
                     else
@@ -10271,7 +10269,6 @@ namespace Gekko
             //after the statement is done -- even if an error occurs
             //by recording these files after the statement, * in "read *" or "model *" will have been
             //replaced with real filenames.
-
 
             try
             {

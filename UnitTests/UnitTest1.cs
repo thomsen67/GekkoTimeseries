@@ -9064,6 +9064,7 @@ namespace UnitTests
 
             for (int i = 1; i <= 6; i++)
             {
+                I("tell 'i = " + i + "';");
                 string code = null;
                 if (i == 1)
                 {

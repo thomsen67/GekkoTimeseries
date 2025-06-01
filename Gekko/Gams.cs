@@ -1820,7 +1820,7 @@ namespace Gekko
                         }
 
                         EquationTextHelper helper = new EquationTextHelper();
-                        GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
+                        GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, null, helper, time);
                         string scalar = helper22.s_scalarModel;
                         EquationHelper2 eh = new EquationHelper2();
                         eh.eqMathScalar = helper22.s_scalarModel;
