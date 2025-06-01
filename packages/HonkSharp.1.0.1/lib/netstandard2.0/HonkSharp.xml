@@ -1,0 +1,708 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HonkSharp</name>
+    </assembly>
+    <members>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Pipe``2(``0,System.Func{``0,``1})">
+            <summary>
+            Performs a transformation from the current
+            object to a new object with the given mapping
+            function.
+            </summary>
+            <param name="transformation">
+            Function which transforms the object
+            (which is passed as the only reference)
+            and returns something else 
+            </param>
+            <typeparam name="TFrom">
+            The type of the flow end
+            (current object)
+            </typeparam>
+            <typeparam name="TTo">
+            Arbitrary type to transform to
+            </typeparam>
+            <returns>
+            An instance of TTo
+            </returns>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Pipe``3(``0,System.Func{``0,``1},System.Func{``1,``2})">
+            <summary>
+            Same as <see cref="M:HonkSharp.Fluency.ControlExtensions.Pipe``2(``0,System.Func{``0,``1})"/>, but for
+            2 sequential transformations
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Pipe``4(``0,System.Func{``0,``1},System.Func{``1,``2},System.Func{``2,``3})">
+            <summary>
+            Same as <see cref="M:HonkSharp.Fluency.ControlExtensions.Pipe``2(``0,System.Func{``0,``1})"/>, but for
+            3 sequential transformations
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Pipe``3(System.ValueTuple{``0,``1},System.Func{``0,``1,``2})">
+            <summary>
+            Performs a transformation from the current
+            object AND injected object to a new object
+            with the given mapping function.
+            </summary>
+            <param name="transformation">
+            Function which transforms the object AND
+            injected object which are passed as two
+            variables and returns something else 
+            </param>
+            <typeparam name="TFrom1">
+            The type of the flow end
+            (current object)
+            </typeparam>
+            <typeparam name="TFrom2">
+            The type of the injected object
+            </typeparam>
+            <typeparam name="TTo">
+            Arbitrary type to transform to
+            </typeparam>
+            <returns>
+            An instance of TTo
+            </returns>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Pipe``1(``0,System.Action{``0})">
+            <summary>
+            Pipes the given flow into a unit,
+            performing an operation
+            (with possibly side-effect or mutations)
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Inject``2(``0,``1)">
+            <summary>
+            Injects an object as a second
+            element of a tuple generated as a result.
+            Useful to avoid variable capturing.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.NullIf``1(``0,System.Func{``0,System.Boolean})">
+            <summary>
+            Nullifies the given type in case the condition
+            is true.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.NullIf``1(``0,System.Boolean)">
+            <summary>
+            Nullifies the given type in case the condition
+            is true.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Alias``1(``0,``0@)">
+            <summary>
+            Assigns the current
+            flow end to a variable
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Let``2(``0,``1@,``1)">
+            <summary>
+            Assigns arbitrary expression to a variable
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Let``2(``0,``1@,``1@)">
+            <summary>
+            Assigns arbitrary expression to a variable
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.LetLazy``2(``0,HonkSharp.Fluency.ControlExtensions.LazyEval{``0,``1}@,System.Func{``0,``1})">
+            <summary>
+            Assigns arbitrary expression to a variable lazily
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Fluency.ControlExtensions.LazyEval`2">
+            <summary>
+            This type is a lazily-evaluated value
+            </summary>
+        </member>
+        <member name="P:HonkSharp.Fluency.ControlExtensions.LazyEval`2.Value">
+            <summary>
+            The value of the type.
+            Is guaranteed to be evaluated once
+            for single-threaded use.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.LazyEval`2.#ctor(System.Func{`0,`1},`0)">
+            <summary>
+            Creates an instance of the type.
+            Use LetLazy as syntax for creating it.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.ReplaceWith``2(``0,``1)">
+            <summary>
+            Replaces the flow end
+            with the given object
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.ReplaceWith``2(``0,``1@)">
+            <summary>
+            Replaces the flow end
+            with the ref of given object by ref
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Fluency.ControlExtensions.DangerousCode`1">
+            <summary>
+            Flow end object for exception-prone code
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.DangerousCode`1.#ctor(`0)">
+            <summary>
+            Starts a block of "dangerous",
+            exception-prone code.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.DangerousCode`1.Try``2(System.Func{`0,``1})">
+            <summary>
+            Tries executing code or returns failure of the exception
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Dangerous``1(``0)">
+            <summary>
+            Starts an exception-prone block
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Throw``1(``0,System.Exception)">
+            <summary>
+            Unconditionally throws an exception
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ControlExtensions.Discard``1(``0)">
+            <summary>
+            Discards the current flow end
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.ConvertExtensions.Downcast``1(System.Object)">
+            <summary>
+            Downcasts the given instance to the specified type,
+            that is, casts to its derived type, if can. Otherwise,
+            an exception is thrown.
+            </summary>
+            <exception cref="T:System.InvalidCastException">
+            Is thrown if downcasting is not possible.
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.ConvertExtensions.Upcast``1(System.Object)">
+            <summary>
+            Upcasts the given instance to the specified type,
+            that is, casts to its parent type.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Pipe``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1})">
+            <summary>
+            Lets all elements of a sequence through a map,
+            returning a sequence of mapped elements. Unlike Select,
+            works non-lazily.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Pipe``1(System.Collections.Generic.IEnumerable{``0},System.Action{``0})">
+            <summary>
+            Lets all elements of a sequence through an action.
+            Returns a Unit, since nothing else makes sense to be returned.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Zip``2(System.ValueTuple{System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1}})">
+            <summary>
+            Zips two sequences of a tuple. Returns
+            a sequence of tuples.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when the lengths of tuples does not match
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Cartesian``2(System.ValueTuple{System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1}})">
+            <summary>
+            Returns a sequence of tuples in the
+            each for each format. The length of
+            the sequence is the product of
+            the lengths of the two given
+            sequences.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Cartesian``2(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1})">
+            <summary>
+            Returns a sequence of tuples in the
+            each for each format. The length of
+            the sequence is the product of
+            the lengths of the two given
+            sequences.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.AsRange(System.Range)">
+            <summary>
+            Interprets range as a sequence of integers
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.GetEnumerator(System.Range)">
+            <summary>
+            Gets a enumerator. Useful for
+            foreach loops
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Select``1(System.Range,System.Func{System.Int32,``0})">
+            <summary>
+            Analogue of Linq's Select for range
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Where(System.Range,System.Func{System.Int32,System.Boolean})">
+            <summary>
+            Analogue of Linq's Where for range
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Take(System.Range,System.Int32)">
+            <summary>
+            Analogue of Linq's Take
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.TakeWhile(System.Range,System.Func{System.Int32,System.Boolean})">
+            <summary>
+            Analogue of Linq's TakeWhile
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Reverse(System.Range)">
+            <summary>
+            Analogue of Linq's Reverse
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.SeqsExtensions.Enumerate``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Maps the given sequence into a sequence of
+            pairs of index and corresponding element.
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Fluency.WorstHappenedException">
+            <summary>
+            Happens when assuming the best case,
+            and it doesn't happen.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.IsFalse(System.Boolean)">
+            <summary>
+            Returns an inverted boolean
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.AssumeBest``1(HonkSharp.Functional.Either{``0,HonkSharp.Functional.Failure})">
+            <summary>
+            Unconditionally casts an either to T.
+            If it cannot, it throws an exception
+            </summary>
+            <exception cref="T:HonkSharp.Fluency.WorstHappenedException">
+            Is thrown when either is failure.
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.AssumeBest``1(HonkSharp.Functional.Either{HonkSharp.Functional.Failure,``0})">
+            <summary>
+            Unconditionally casts an either to T.
+            If it cannot, it throws an exception
+            </summary>
+            <exception cref="T:HonkSharp.Fluency.WorstHappenedException">
+            Is thrown when either is failure.
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.AssumeBest``2(HonkSharp.Functional.Either{``0,HonkSharp.Functional.Failure{``1}})">
+            <summary>
+            Unconditionally casts an either to T.
+            If it cannot, it throws an exception
+            </summary>
+            <exception cref="T:HonkSharp.Fluency.WorstHappenedException">
+            Is thrown when either is failure.
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.AssumeBest``2(HonkSharp.Functional.Either{HonkSharp.Functional.Failure{``1},``0})">
+            <summary>
+            Unconditionally casts an either to T.
+            If it cannot, it throws an exception
+            </summary>
+            <exception cref="T:HonkSharp.Fluency.WorstHappenedException">
+            Is thrown when either is failure.
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.AssumeBest``1(``0)">
+            <summary>
+            Unconditionally casts a nullable to non-nullable.
+            If it cannot, it throws an exception
+            </summary>
+            <exception cref="T:HonkSharp.Fluency.WorstHappenedException">
+            Is thrown when the instance is null.
+            </exception>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.Parse``1(System.String,System.Globalization.NumberStyles,System.IFormatProvider)">
+            <summary>
+            Parses a string into one of numeric types
+            </summary>
+            <returns>
+            An either of the result and failure.
+            Does not throw an exception.
+            </returns>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.Parse``1(System.String)">
+            <summary>
+            Parses a string into one of numeric types
+            </summary>
+            <returns>
+            An either of the result and failure.
+            Does not throw an exception.
+            </returns>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.Join``1(System.String,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Performs joining over the current
+            flow-end object as a delimiter
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Fluency.TypesExtensions.AsString(System.Collections.Generic.IEnumerable{System.Char})">
+            <summary>
+            Joins all chars into a string
+            from a sequence of characters
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.Either`2">
+            <summary>
+            Represents an anonymous type union.
+            All types must be different.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.Switch``2(System.Func{`0,``0,``1},System.Func{`1,``0,``1},``0)">
+            <summary>
+            Switchers over the given types
+            in the same order as they are declared
+            in type args. Use this version when you
+            want to avoid capture: just pass the variables
+            as the last argument, and it will be passed as the second argument
+            of each case.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.Switch``1(System.Func{`0,``0},System.Func{`1,``0})">
+            <summary>
+            Switchers over the given types
+            in the same order as they are declared
+            in type args.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.#ctor(`0)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T1.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.#ctor(`1)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T2.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.Is``1(``0@)">
+            <summary>
+            Checks if either has the type of T.
+            If it is not, the value of res
+            is undefined.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.ToObject">
+            <summary>
+            Upcasts the current value of
+            an either instance to object.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`2.As``1">
+            <summary>
+            Casts an either to T. Returns
+            a failure if cannot cast
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.Either`3">
+            <summary>
+            Represents an anonymous type union.
+            All types must be different.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.Switch``2(System.Func{`0,``0,``1},System.Func{`1,``0,``1},System.Func{`2,``0,``1},``0)">
+            <summary>
+            Switchers over the given types
+            in the same order as they are declared
+            in type args. Use this version when you
+            want to avoid capture: just pass the variables
+            as the last argument, and it will be passed as the second argument
+            of each case.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.Switch``1(System.Func{`0,``0},System.Func{`1,``0},System.Func{`2,``0})">
+            <summary>
+            Switchers over the given types
+            in the same order as they are declared
+            in type args.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.#ctor(`0)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T1.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.#ctor(`1)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T2.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.#ctor(`2)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T3.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.Is``1(``0@)">
+            <summary>
+            Checks if either has the type of T.
+            If it is not, the value of res
+            is undefined.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.ToObject">
+            <summary>
+            Upcasts the current value of
+            an either instance to object.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`3.As``1">
+            <summary>
+            Casts an either to T. Returns
+            a failure if cannot cast
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.Either`4">
+            <summary>
+            Represents an anonymous type union.
+            All types must be different.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.Switch``2(System.Func{`0,``0,``1},System.Func{`1,``0,``1},System.Func{`2,``0,``1},System.Func{`3,``0,``1},``0)">
+            <summary>
+            Switchers over the given types
+            in the same order as they are declared
+            in type args. Use this version when you
+            want to avoid capture: just pass the variables
+            as the last argument, and it will be passed as the second argument
+            of each case.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.Switch``1(System.Func{`0,``0},System.Func{`1,``0},System.Func{`2,``0},System.Func{`3,``0})">
+            <summary>
+            Switchers over the given types
+            in the same order as they are declared
+            in type args.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.#ctor(`0)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T1.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.#ctor(`1)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T2.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.#ctor(`2)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T3.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.#ctor(`3)">
+            <summary>
+            Constructor, which initializes the
+            Either with the type of T4.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.Is``1(``0@)">
+            <summary>
+            Checks if either has the type of T.
+            If it is not, the value of res
+            is undefined.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.ToObject">
+            <summary>
+            Upcasts the current value of
+            an either instance to object.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.Either`4.As``1">
+            <summary>
+            Casts an either to T. Returns
+            a failure if cannot cast
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.Failure">
+            <summary>
+            A type representing failure with
+            no visible reason.
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.Failure`1">
+            <summary>
+            A type representing failure with
+            a specified reason
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.IEither">
+            <summary>
+            This interface unites all Either types
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.IEither.As``1">
+            <summary>
+            Casts an either to T. Returns
+            a failure if cannot cast
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.IEither.Is``1(``0@)">
+            <summary>
+            Checks if either has the type of T.
+            If it is not, the value of res
+            is undefined.
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Functional.IEither.ToObject">
+            <summary>
+            Upcasts the current value of
+            an either instance to object.
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Functional.Unit">
+            <summary>
+            The most basic type, extendable
+            replacement for C#'s void.
+            </summary>
+        </member>
+        <member name="F:HonkSharp.Functional.Unit.Flow">
+            <summary>
+            Same as new Unit(). Starts a flow
+            </summary>
+        </member>
+        <member name="F:HonkSharp.Functional.Unit.Void">
+            <summary>
+            Return this when nothing needs to be returned.
+            </summary>
+        </member>
+        <member name="T:HonkSharp.Laziness.LazyPropertyA`1">
+            <summary>
+            Provides lazy initialization experience. Is better than the Lazy class as:
+            1) Is a struct
+            2) Does not affect record's Equals in a bad way Lazy does
+            <code>
+            public int MyProperty => myProperty.GetValue(static @this => @this.SomeComplexMethod(), @this);
+            public FieldCache int myProperty;
+            </code>
+            </summary>
+            <typeparam name="T">
+            The type to store inside
+            </typeparam>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyA`1.Equals(HonkSharp.Laziness.LazyPropertyA{`0})">
+            <summary>
+            So that when records get compared, this field will not affect the result
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyA`1.Equals(System.Object)">
+            <summary>
+            So that when records get compared, this field will not affect the result
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyA`1.GetHashCode">
+            <summary>
+            So that when records get compared, this field will not affect the result
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyA`1.GetValue``1(System.Func{``0,`0},``0)">
+            <summary>
+            Return the value, returned by the factory you passed into the constructor. The factory
+            will never run more than once. The method is thread-safe.
+            </summary>
+            <param name="this">
+            To avoid reallocation, your method must be static (that is, not reading any outside variables from the instance),
+            and instead of addressing your fields by normal this, pass this argument and address via this one
+            (see examples on the readme)
+            </param>
+            <param name="factory">
+            The only argument of the factory is the object passed into GetValue method.
+            Unlike Lazy, where you are supposed to catch variables from outside, here
+            you need to pass your reference object (usually, you want to pass the holder,
+            that is, "this) and then, in the lambda itself, you can address its fields
+            without limitations.
+            </param>
+            <returns>The value returned by factory</returns>
+        </member>
+        <member name="T:HonkSharp.Laziness.LazyPropertyB`2">
+            <summary>
+            Provides lazy initialization experience. Is better than the Lazy class as:
+            1) Is a struct
+            2) Does not affect record's Equals in a bad way Lazy does
+            <code>
+            public int MyProperty => myProperty.GetValue(static @this => @this.SomeComplexMethod(), @this);
+            public LazyPropertyB int myProperty;
+            </code>
+            </summary>
+            <typeparam name="TThis">
+            The type of the holder. The holder
+            is the type inside which you are creating a lazy property. Must be a reference type.
+            </typeparam>
+            <typeparam name="T">
+            The type to store inside
+            </typeparam>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyB`2.#ctor(System.Func{`0,`1})">
+            <summary>
+            Loads the static factory into the field cache on creation.
+            It is the preferred way and might give a performance boost
+            from 2ns to 0.5ns (so that GetValue will be as fast as Lazy.Value).
+            </summary>
+            <param name="factory">
+            The only argument of the factory is the object passed into GetValue method.
+            Unlike Lazy, where you are supposed to catch variables from outside, here
+            you need to pass your reference object (usually, you want to pass the holder,
+            that is, "this) and then, in the lambda itself, you can address its fields
+            without limitations.
+            </param>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyB`2.Equals(HonkSharp.Laziness.LazyPropertyB{`0,`1})">
+            <summary>
+            So that when records get compared, this field will not affect the result
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyB`2.Equals(System.Object)">
+            <summary>
+            So that when records get compared, this field will not affect the result
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyB`2.GetHashCode">
+            <summary>
+            So that when records get compared, this field will not affect the result
+            </summary>
+        </member>
+        <member name="M:HonkSharp.Laziness.LazyPropertyB`2.GetValue(`0)">
+            <summary>
+            Return the value, returned by the factory you passed into the constructor. The factory
+            will never run more than once. The method is thread-safe.
+            </summary>
+            <param name="this">
+            To avoid reallocation, your method must be static (that is, not reading any outside variables from the instance),
+            and instead of addressing your fields by normal this, pass this argument and address via this one
+            (see examples on the readme)
+            </param>
+            <returns>The value returned by factory</returns>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+                Reserved to be used by the compiler for tracking metadata.
+                This class should not be used by developers in source code.
+            </summary>
+            <remarks>
+                This definition is provided by the <i>IsExternalInit</i> NuGet package (https://www.nuget.org/packages/IsExternalInit).
+                Please see https://github.com/manuelroemer/IsExternalInit for more information.
+            </remarks>
+        </member>
+    </members>
+</doc>

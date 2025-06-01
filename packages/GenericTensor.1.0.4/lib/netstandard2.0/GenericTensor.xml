@@ -1,0 +1,911 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GenericTensor</name>
+    </assembly>
+    <members>
+        <member name="T:GenericTensor.Core.InvalidShapeException">
+            <summary>
+            Occurs when an axis mismatch happens
+            </summary>
+        </member>
+        <member name="T:GenericTensor.Core.InvalidDeterminantException">
+            <summary>
+            Thrown when a wrong determinant tensor was provided
+            </summary>
+        </member>
+        <member name="T:GenericTensor.Core.IOperations`1">
+            <summary>
+            This the structure responsible for operations on the
+            elements on your tensor
+            </summary>
+            <typeparam name="T">
+            The type of primitive in your tensor.
+            </typeparam>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Add(`0,`0)">
+            <summary>
+            Rules of adding elements. Must return a new one.
+            Should not modify the old ones.
+            </summary>
+            <returns>
+            A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Subtract(`0,`0)">
+            <summary>
+            Rules of subtracting elements. Must return a new one.
+            Should not modify the old ones.
+            </summary>
+            <returns>
+            A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Multiply(`0,`0)">
+            <summary>
+            Rules of multiplying elements. Must return a new one.
+            Should not modify the old ones.
+            </summary>
+            <returns>
+            A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Negate(`0)">
+            <summary>
+            Rules of multiplying an element by -1. Must return a new one.
+            Should not modify the old ones.
+            </summary>
+            <returns>
+            A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Divide(`0,`0)">
+            <summary>
+            Rules of dividing elements. Must return a new one.
+            Should not modify the old ones.
+            </summary>
+            <returns>
+            A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.CreateOne">
+            <returns>
+            1 (one). A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.CreateZero">
+            <returns>
+            0 (zero). A primitive of the same type
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Copy(`0)">
+            <returns>
+            If your elements are mutable, it
+            might be useful to be able to copy
+            them as well.
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.AreEqual(`0,`0)">
+            <summary>
+            Determines whether the instances
+            of your objects are equal
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.IsZero(`0)">
+            <summary>
+            Whether the given instance is zero
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.ToString(`0)">
+            <summary>
+            Get the string representation of the instance
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Serialize(`0)">
+            <summary>
+            Rules of serialization of one instance
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.IOperations`1.Deserialize(System.Byte[])">
+            <summary>
+            Rules of deserialization of one instance
+            </summary>
+        </member>
+        <member name="T:GenericTensor.Core.GenTensor`2">
+            <summary>
+            The main class of tensor.
+            </summary>
+            <typeparam name="T">The primitive to be an element in the tensor</typeparam>
+            <typeparam name="TWrapper">The set of rules for working with primitives</typeparam>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.IsMatrix">
+            <summary>
+            A tensor is a matrix if has two dimensions, e. g. [3 x 4]
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.IsVector">
+            <summary>
+            A tensor is a vector if has one dimension
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.IsSquareMatrix">
+            <summary>
+            Determines wether one is a matrix AND its width and height are equal
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Equals(System.Object)">
+            <summary>
+            Calls your default(TWrapper).Equals
+            Be sure to override it when using this function or ==, != operators
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Equals(GenericTensor.Core.GenTensor{`0,`1})">
+            <summary>
+            Calls your default(TWrapper).Equals
+            Be sure to override it when using this function or ==, != operators
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Shape">
+            <summary>
+            Shape represents axes' lengths of the tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Transpose(System.Int32,System.Int32)">
+            <summary>
+            Swaps axes in tensor.
+            0 - the first dimension
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TransposeMatrix">
+            <summary>
+            Swaps two last axes or throws InvalidShapeException if a tensor is too low-dimensional
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Iterate">
+            <summary>
+            Iterate over array of indices and a value in TPrimitive
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Item(System.Int32,System.Int32,System.Int32,System.Int32[])">
+            <summary>
+            Element-wise indexing,
+            for example suppose you have a t = Tensor[2 x 3 x 4] of int-s
+            A correct way to index it would be
+            t[0, 0, 1] or t[1, 2, 3],
+            but neither of t[0, 1] (Use GetSubtensor for this) and t[4, 5, 6] (IndexOutOfRange)
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Item(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Element-wise indexing,
+            for example suppose you have a t = Tensor[2 x 3 x 4] of int-s
+            A correct way to index it would be
+            t[0, 0, 1] or t[1, 2, 3],
+            but neither of t[0, 1] (Use GetSubtensor for this) and t[4, 5, 6] (IndexOutOfRange)
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Item(System.Int32,System.Int32)">
+            <summary>
+            Element-wise indexing,
+            for example suppose you have a t = Tensor[2 x 3 x 4] of int-s
+            A correct way to index it would be
+            t[0, 0, 1] or t[1, 2, 3],
+            but neither of t[0, 1] (Use GetSubtensor for this) and t[4, 5, 6] (IndexOutOfRange)
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Item(System.Int32)">
+            <summary>
+            Element-wise indexing,
+            for example suppose you have a t = Tensor[2 x 3 x 4] of int-s
+            A correct way to index it would be
+            t[0, 0, 1] or t[1, 2, 3],
+            but neither of t[0, 1] (Use GetSubtensor for this) and t[4, 5, 6] (IndexOutOfRange)
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Item(System.Int32[])">
+            <summary>
+            Gets the value by an array of indices.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetValueNoCheck(System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetValueNoCheck(System.Int32,System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetValueNoCheck(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetValueNoCheck(System.Int32,System.Int32,System.Int32,System.Int32[])">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetValueNoCheck(System.Int32[])">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(`0,System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(`0,System.Int32,System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(`0,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(`0,System.Int32,System.Int32,System.Int32,System.Int32[])">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(`0,System.Int32[])">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(System.Func{`0},System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(System.Func{`0},System.Int32,System.Int32)">
+            <summary>
+            Gets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(System.Func{`0},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Sets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(System.Func{`0},System.Int32,System.Int32,System.Int32,System.Int32[])">
+            <summary>
+            Sets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetValueNoCheck(System.Func{`0},System.Int32[])">
+            <summary>
+            Sets the value without checking and without throwing an exception
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetCell(`0,System.Int32[])">
+            <summary>
+            If you need to set your wrapper to the tensor directly, use this function
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetCell(System.Int32[])">
+            <summary>
+            Get a pointer to the wrapper in your tensor
+            You can call its methods or set its fields, so that it will be applied to the tensor's element
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.IterateOver(System.Int32)">
+            <summary>
+            Allows to iterate on lower-dimensions,
+            so that, for example, in tensor of [2 x 3 x 4]
+            and offsetFromLeft = 1
+            while iterating you will get the following arrays:
+            {0, 0}
+            {0, 1}
+            {0, 2}
+            {1, 0}
+            {1, 1}
+            {1, 2}
+            </summary>
+            <param name="offsetFromLeft"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.IterateOverCopy(System.Int32)">
+            <summary>
+            Allows to iterate on lower-dimensions,
+            so that, for example, in tensor of [2 x 3 x 4]
+            and offsetFromLeft = 1
+            while iterating you will get the following arrays:
+            {0, 0}
+            {0, 1}
+            {0, 2}
+            {1, 0}
+            {1, 1}
+            {1, 2}
+            </summary>
+            <param name="offsetFromLeft"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.IterateOverMatrices">
+            <summary>
+            IterateOver where yourTensor[index] is always a matrix
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.IterateOverVectors">
+            <summary>
+            IterateOver where yourTensor[index] is always a vector
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.IterateOverElements">
+            <summary>
+            IterateOver where yourTensor[index] is always an element
+            </summary>
+        </member>
+        <member name="F:GenericTensor.Core.GenTensor`2.LinOffset">
+            <summary>
+            Linear offset (as in offset in the initial array)
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Slice(System.Int32,System.Int32)">
+             <summary>
+             Slice with data sharing like in python
+             A[3:5] in python
+             same as
+             A.Slice(3, 5) in GT
+            
+             O(N)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetSubtensor(System.Int32[])">
+             <summary>
+             This Subtensor is sequential Subtensor(int)
+            
+             O(1)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetSubtensor(System.Int32)">
+             <summary>
+             Get a subtensor of a tensor
+             If you have a t = Tensor[2 x 3 x 4],
+             t.GetSubtensor(0) will return the proper matrix [3 x 4]
+            
+             O(1)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.SetSubtensor(GenericTensor.Core.GenTensor{`0,`1},System.Int32[])">
+             <summary>
+             Suppose you have t = tensor [2 x 3 x 4]
+             and m = matrix[3 x 4]
+             You need to set this matrix to t's second matrix
+             t.SetSubtensor(m, 1);
+            
+             O(V)
+             </summary>
+        </member>
+        <member name="P:GenericTensor.Core.GenTensor`2.Volume">
+            <summary>
+            Number of elements in tensor overall
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Clone">
+            <summary>
+            Clones with copying the elements
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.#ctor(GenericTensor.Core.TensorShape)">
+            <summary>
+            Creates a tensor from the given shape
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.#ctor(System.Int32[])">
+            <summary>
+            Creates a tensor from the given dimensions
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Stack(GenericTensor.Core.GenTensor{`0,`1}[])">
+             <summary>
+             Creates a new axis that is put backward
+             and then sets all elements as children
+             e. g.
+             say you have a bunch of tensors {t1, t2, t3} with shape of [2 x 4]
+             Stack(t1, t2, t3) => T
+             where T is a tensor of shape of [3 x 2 x 4]
+            
+             O(V)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Concat(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+            <summary>
+            Concatenates two tensors over the first axis,
+            for example, if you had a tensor of
+            [4 x 3 x 5] and a tensor of [9 x 3 x 5], their concat's
+            result will be of shape [13 x 3 x 5]
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateIdentityTensor(System.Int32[],System.Int32)">
+            <summary>
+            Creates a tensor whose all matrices are identity matrices
+            <para>1 is achieved with <see cref="M:GenericTensor.Core.IOperations`1.CreateOne"/></para>
+            <para>0 is achieved with <see cref="M:GenericTensor.Core.IOperations`1.CreateZero"/></para>
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateIdentityMatrix(System.Int32)">
+            <summary>
+            Creates an indentity matrix whose width and height are equal to diag
+            <para>1 is achieved with <see cref="M:GenericTensor.Core.IOperations`1.CreateOne"/></para>
+            <para>0 is achieved with <see cref="M:GenericTensor.Core.IOperations`1.CreateZero"/></para>
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateVector(`0[])">
+            <summary>
+            Creates a vector from an array of primitives
+            Its length will be equal to elements.Length
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateVector(System.Int32)">
+            <summary>
+            Creates a vector from an array of primitives
+            Its length will be equal to elements.Length
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateMatrix(`0[0:,0:])">
+            <summary>
+            Creates a matrix from a two-dimensional array of primitives
+            for example
+            <code>
+            var M = Tensor.CreateMatrix(new[,]
+            {
+                {1, 2},
+                {3, 4}
+            });
+            </code>
+            where yourData.GetLength(0) is Shape[0] and
+            yourData.GetLength(1) is Shape[1]
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateSquareMatrix(System.Int32)">
+            <summary>
+            Creates an uninitialized square matrix
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateMatrix(System.Int32,System.Int32,System.Func{System.Int32,System.Int32,`0})">
+            <summary>
+            Creates a matrix of width and height size
+            and iterator for each pair of coordinate
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateMatrix(System.Int32,System.Int32)">
+            <summary>
+            Creates a matrix of width and height size
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateTensor(GenericTensor.Core.TensorShape,System.Func{System.Int32[],`0},GenericTensor.Core.Threading)">
+            <summary>
+            Creates a tensor of given size with iterator over its indices
+            (its only argument is an array of integers which are indices of the tensor)
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateTensor(`0[])">
+            <summary>
+            Creates a tensor from an array
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateTensor(`0[0:,0:])">
+            <summary>
+            Creates a tensor from a two-dimensional array
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateTensor(`0[0:,0:,0:])">
+            <summary>
+            Creates a tensor from a three-dimensional array
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.CreateTensor(System.Array)">
+            <summary>
+            Creates a tensor from an n-dimensional array
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowEchelonFormSimple">
+            <summary>
+            Decomposes a matrix into a triangular one.
+            Is of the Row Echelon Form (leading elements might be differ from ones).
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowEchelonFormSafeDivision">
+            <summary>
+            Decomposes a matrix into a triangular one.
+            Is of the Row Echelon Form (leading elements might be differ from ones).
+            Uses safe division, i. e. perform division only when computing the final result.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowEchelonFormLeadingOnesSimple">
+            <summary>
+            Decomposes a matrix into a triangular one.
+            Is of the Row Echelon Form (leading elements are ones).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowEchelonFormLeadingOnesSafeDivision">
+            <summary>
+            Decomposes a matrix into a triangular one.
+            Is of the Row Echelon Form (leading elements are ones).
+            Uses safe division, i. e. perform division only when computing the final result.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.ReducedRowEchelonFormSimple">
+            <summary>
+            Finds the reduced echelon form of a matrix.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.ReducedRowEchelonFormSafeDivision">
+            <summary>
+            Finds the reduced echelon form of a matrix.
+            Uses safe division, i. e. perform division only when computing the final result.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.DeterminantLaplace">
+             <summary>
+             Finds Determinant with the 100% precision for O(N!) where
+             N is your matrix' width
+             The matrix should be square
+             Borrowed from here: https://www.geeksforgeeks.org/adjoint-inverse-matrix/
+            
+             O(N!)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.DeterminantGaussianSafeDivision">
+             <summary>
+             Finds Determinant with possible overflow
+             because it uses fractions for avoiding division
+            
+             O(N^3)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.DeterminantGaussianSimple">
+             <summary>
+             Performs simple Gaussian elimination method on a tensor
+            
+             O(N^3)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorDeterminantLaplace">
+            <summary>
+            Computers Laplace's Determinant for all
+            matrices in the tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorDeterminantGaussianSafeDivision">
+            <summary>
+            Computers Determinant via Guassian elimination and safe division
+            for all matrices in the tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorDeterminantGaussianSimple">
+            <summary>
+            Computers Determinant via Guassian elimination
+            for all matrices in the tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Adjoint">
+             <summary>
+             Returns adjugate matrix
+            
+             O(N^5)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.InvertMatrix">
+             <summary>
+             Inverts a matrix A to B so that A * B = I
+             Borrowed from here: https://www.geeksforgeeks.org/adjoint-inverse-matrix/
+            
+             O(N^5)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorMatrixInvert">
+            <summary>
+            Inverts all matrices in a tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowMultiply(System.Int32,`0)">
+            <summary>
+            Multiples the given row by the given coefficient.
+            Modifies the matrix.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowAdd(System.Int32,System.Int32,`0)">
+            <summary>
+            To the first row adds the second row multiplied by the coef.
+            Modifies the matrix.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowSubtract(System.Int32,System.Int32,`0)">
+            <summary>
+            From the first row subtracts the second row multiplied by the coef.
+            Modifies the matrix.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowSwap(System.Int32,System.Int32)">
+            <summary>
+            Swaps the given two rows.
+            Modifies the matrix.
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.RowGetLeadingElement(System.Int32)">
+            <summary>
+            Finds the leading element of the row (the first non-zero element).
+            </summary>
+            <returns>
+            Null if all elements are zero,
+            Tuple of index and value of the first non-zero element otherwise
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.MatrixDivide(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+             <summary>
+             A / B
+             Finds such C = A / B that A = C * B
+            
+             O(N^5)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorMatrixDivide(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+            <summary>
+            Divides all matrices from tensor a over tensor b and returns a new
+            tensor with them divided
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.MatrixMultiply(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+             <summary>
+             Finds matrix multiplication result
+             a and b are matrices
+             a.Shape[1] should be equal to b.Shape[0]
+             the resulting matrix is [a.Shape[0] x b.Shape[1]] shape
+            
+             O(N^3)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorMatrixMultiply(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+             <summary>
+             Applies matrix dot product operation for
+             all matrices in tensors
+            
+             O(N^3)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseAdd(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+            <summary>
+            T1 + T2
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseSubtract(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+            <summary>
+            T1 - T2
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseMultiply(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+            <summary>
+            T1 * T2
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseDivide(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+            <summary>
+            T1 / T2
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseAdd(GenericTensor.Core.GenTensor{`0,`1},`0,GenericTensor.Core.Threading)">
+            <summary>
+            T1 + const
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseSubtract(GenericTensor.Core.GenTensor{`0,`1},`0,GenericTensor.Core.Threading)">
+            <summary>
+            T1 - const
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseSubtract(`0,GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+            <summary>
+            const - T1
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseMultiply(GenericTensor.Core.GenTensor{`0,`1},`0,GenericTensor.Core.Threading)">
+            <summary>
+            T1 * const
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseDivide(GenericTensor.Core.GenTensor{`0,`1},`0,GenericTensor.Core.Threading)">
+            <summary>
+            T1 / const
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.PiecewiseDivide(`0,GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.Threading)">
+            <summary>
+            const / T1
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.MatrixPower(System.Int32,GenericTensor.Core.Threading)">
+             <summary>
+             Binary power
+             
+             n positive:
+             A ^ n = A * A * ... * A
+            
+             n negative:
+             A ^ n = (A^(-1) * A^(-1) * ... * A^(-1))
+            
+             n == 0:
+             A ^ n = I
+            
+             O(log(power) * N^3)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorMatrixPower(System.Int32,GenericTensor.Core.Threading)">
+            <summary>
+            Performs MatrixPower operation on all matrices from this tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.VectorCrossProduct(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+            <summary>
+            Finds a perpendicular vector to two given
+            TODO: So far only implemented for 3D vectors
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorVectorCrossProduct(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+            <summary>
+            Calls VectorCrossProduct for every vector in the tensor
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.VectorDotProduct(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+             <summary>
+             Finds the scalar product of two vectors
+            
+             O(N)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.TensorVectorDotProduct(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1})">
+             <summary>
+             Applies scalar product to every vector in a tensor so that
+             you will get a one-reduced dimensional tensor
+             (e. g. TensorVectorDotProduct([4 x 3 x 2], [4 x 3 x 2]) -> [4 x 3]
+            
+             O(V)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Copy(System.Boolean)">
+             <summary>
+             Copies a tensor calling each cell with a .Copy()
+            
+             O(V)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Forward">
+             <summary>
+             You might need it to make sure you don't copy
+             your data but recreate a wrapper (if have one)
+            
+             O(V)
+             </summary>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Serialize">
+            <summary>
+            Serializes this to a byte array so it can be easily
+            transmitted or stored
+            </summary>
+            <returns>
+            Byte array with the serialized object in the serialization protocol
+            </returns>
+        </member>
+        <member name="M:GenericTensor.Core.GenTensor`2.Deserialize(System.Byte[])">
+            <summary>
+            Deserializes data into a tensor
+            </summary>
+            <param name="data">
+            Byte array which must follow the serialization protocol
+            </param>
+            <returns>
+            A tensor with the same data as stored before serialization
+            (if serialization and deserialization in TWrapper work correctly)
+            </returns>
+        </member>
+        <member name="T:GenericTensor.Core.TensorShape">
+            <summary>
+            This structure represents a shape of a tensor
+            </summary>
+        </member>
+        <member name="F:GenericTensor.Core.TensorShape.shape">
+            <summary>
+            Internal variable. Not recommended to change
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.TensorShape.Length">
+            <summary>
+            Length of a shape is basically number of dimensions
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.TensorShape.DimensionCount">
+            <summary>
+            Synonym for Length
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.TensorShape.Count">
+            <summary>
+            Synonym for Length
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.TensorShape.#ctor(System.Int32[])">
+            <summary>
+            Create a TensorShape for further operations
+            just listing necessary dimensions
+            </summary>
+            <param name="shape"></param>
+        </member>
+        <member name="M:GenericTensor.Core.TensorShape.SubShape(System.Int32,System.Int32)">
+            <summary>
+            Gets a subshape as a subsequence with the given
+            left and right offsets
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.TensorShape.Copy">
+            <summary>
+            Copies the shape, including the internal array
+            </summary>
+        </member>
+        <member name="P:GenericTensor.Core.TensorShape.Item(System.Int32)">
+            <summary>
+            You can only read some dimensions,
+            otherwise it will cause unintended behaviour
+            </summary>
+            <param name="axisId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GenericTensor.Core.TensorShape.ToArray">
+            <summary>
+            Returns the shape's internal array's copy
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Core.TensorShape.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:GenericTensor.Core.Threading">
+            <summary>
+            Use this enum to set the mode of execution
+            </summary>
+        </member>
+        <member name="F:GenericTensor.Core.Threading.Single">
+            <summary>
+            Will guarantee the single-thread execution
+            </summary>
+        </member>
+        <member name="F:GenericTensor.Core.Threading.Multi">
+            <summary>
+            Will unconditionally run in multithreading mode,
+            using as many cores as possible (in normal priority)
+            </summary>
+        </member>
+        <member name="F:GenericTensor.Core.Threading.Auto">
+            <summary>
+            Will select the necessary mode depending on the input.
+            Is recommended for cases where the performance is
+            needed, but you do not want to manage it manually
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Functions.Constructors`2.CreateIdentityTensor(System.Int32[],System.Int32)">
+            <summary>
+            Creates a tensor whose all matrices are identity matrices
+            <para>1 is achieved with <see cref="M:GenericTensor.Core.IOperations`1.CreateOne"/></para>
+            <para>0 is achieved with <see cref="M:GenericTensor.Core.IOperations`1.CreateZero"/></para>
+            </summary>
+        </member>
+        <member name="M:GenericTensor.Functions.Inversion`2.GetCofactorMatrix(GenericTensor.Core.GenTensor{`0,`1},GenericTensor.Core.GenTensor{`0,`1},System.Int32,System.Int32,System.Int32)">
+             <summary>
+             Borrowed from here: https://www.geeksforgeeks.org/adjoint-inverse-matrix/
+            
+             O(N^2)
+             </summary>
+        </member>
+    </members>
+</doc>
