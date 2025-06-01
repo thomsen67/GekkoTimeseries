@@ -49,7 +49,7 @@ using System.Linq;
 using OfficeOpenXml;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using AngouriMath;
+//using AngouriMath;
 
 namespace Gekko
 {
@@ -2711,661 +2711,659 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                if (true)
+                if (Globals.runningOnTTComputer)
                 {
-                    Entity expr = "2 x^2 * y + z = 200";
-                    Entity.Variable x = "x";
-                    string s3 = expr.Solve(x).Simplify().ToString();
-                }
-                
-                if (false)
-                {
-                    int n = 100;
-                    double[] x = new double[n];
-                    for (int i = 0; i < x.Length; i++)
+                    if (true)
                     {
-                        if (i % 10 == 0) x[i] = Globals.eps;
+                        //Entity expr = "2 x^2 * y + z = 200";
+                        //Entity.Variable x = "x";
+                        //string s3 = expr.Solve(x).Simplify().ToString();
                     }
-                    int k = 10000000;
+
+                    if (false)
+                    {
+                        int n = 100;
+                        double[] x = new double[n];
+                        for (int i = 0; i < x.Length; i++)
+                        {
+                            if (i % 10 == 0) x[i] = Globals.eps;
+                        }
+                        int k = 10000000;
+                        DateTime dt = DateTime.Now;
+                        for (int j = 0; j < k; j++)
+                        {
+                            //Array.Copy(x, x, n);
+                            //for (int i = 0; i < x.Length; i++)
+                            //{                        
+                            //    bool b = (Math.Abs(x[i]) <= 1e-300 && Math.Abs(x[i]) > 1e300);
+                            //    //x[i] = x[i];
+                            //}
+                            //bool hasOne = Array.Exists(x, z => z == 100d);
+                            foreach (double number in x.Skip(2))
+                            {
+                                if (number == 100d)
+                                {
+                                    break; // Exit the loop as soon as the target is found
+                                }
+                            }
+                        }
+                        double milliseconds = (DateTime.Now - dt).TotalMilliseconds;
+                        G.Writeln2("Time = " + milliseconds + " ms");
+                    }
+
+                    if (false)
+                    {
+                        double Round(double x, double factor)
+                        {
+                            return Math.Round(x / factor) * factor;
+                        }
+
+                        double eps = 1e-300;
+                        double rounding = 1e-250;
+
+                        double x0 = 0d;
+                        double x1 = 0d + eps;
+                        double x2 = 0d + eps + eps;
+
+                        new Writeln("x0 = 0: " + x0);
+                        new Writeln("x1 = 0 + eps: " + x1);
+                        new Writeln("x2 = 0 + eps + eps: " + x2);
+                        new Writeln("Round(x0) " + Round(x0, rounding));
+                        new Writeln("Round(x1) " + Round(x1, rounding));
+                        new Writeln("Round(x2) " + Round(x2, rounding));
+
+                        Masks m = new Masks();
+                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
+                        m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
+
+                        bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                        bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
+                        bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
+
+                        bool b4 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                        bool b5 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                        bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                        bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                    }
+
+                }
+
+                if (Globals.runningOnTTComputer && (text == "d"))
+                {
+                    //GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
                     DateTime dt = DateTime.Now;
-                    for (int j = 0; j < k; j++)
-                    {
-                        //Array.Copy(x, x, n);
-                        //for (int i = 0; i < x.Length; i++)
-                        //{                        
-                        //    bool b = (Math.Abs(x[i]) <= 1e-300 && Math.Abs(x[i]) > 1e300);
-                        //    //x[i] = x[i];
-                        //}
-                        //bool hasOne = Array.Exists(x, z => z == 100d);
-                        foreach (double number in x.Skip(2))
-                        {
-                            if (number == 100d)
-                            {
-                                break; // Exit the loop as soon as the target is found
-                            }
-                        }
-                    }
-                    double milliseconds = (DateTime.Now - dt).TotalMilliseconds;
-                    G.Writeln2("Time = " + milliseconds + " ms");
+                    double sum = Sum_numbers();
+                    new Writeln("" + sum);
+                    new Writeln(G.Seconds(dt));
+                    return;
                 }
-                
-                if (false)
+
+                if (Globals.runningOnTTComputer && (text == "d2"))
                 {
-                    double Round(double x, double factor)
+
+                    ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                    List<string> eqs = modelGamsScalar.GetEqs(2);
+                    List<string> relevant = new List<string>();
+                    GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    int n = 0;
+                    int nfix = 0;
+
+                    GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" })
                     {
-                        return Math.Round(x / factor) * factor;
+                        d.Add(s, false);
                     }
 
-                    double eps = 1e-300;
-                    double rounding = 1e-250;
-
-                    double x0 = 0d;
-                    double x1 = 0d + eps;
-                    double x2 = 0d + eps + eps;
-
-                    new Writeln("x0 = 0: " + x0);
-                    new Writeln("x1 = 0 + eps: " + x1);
-                    new Writeln("x2 = 0 + eps + eps: " + x2);
-                    new Writeln("Round(x0) " + Round(x0, rounding));
-                    new Writeln("Round(x1) " + Round(x1, rounding));
-                    new Writeln("Round(x2) " + Round(x2, rounding));
-
-                    Masks m = new Masks();
-                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
-                    m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
-
-                    bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                    bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
-                    bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
-
-                    bool b4 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                    bool b5 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
-
-                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                    m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
-
-                    bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                    bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
-                }
-
-            }
-
-            if (Globals.runningOnTTComputer && (text == "d"))
-            {
-                //GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
-                DateTime dt = DateTime.Now;
-                double sum = Sum_numbers();
-                new Writeln("" + sum);
-                new Writeln(G.Seconds(dt));
-                return;
-            }
-
-            if (Globals.runningOnTTComputer && (text == "d2"))
-            {
-
-                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                List<string> eqs = modelGamsScalar.GetEqs(2);
-                List<string> relevant = new List<string>();
-                GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                int n = 0;
-                int nfix = 0;
-
-                GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" })
-                {
-                    d.Add(s, false);
-                }
-
-                GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
-                {
-                    portf.Add(s, false);
-                }
-
-                GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
-                {
-                    ovf.Add(s, false);
-                }               
-
-
-                //ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                //List<string> vars = modelGamsScalar.GetVars(2);
-                //List<string> relevant = new List<string>();
-                //GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                //int n = 0;
-                //int nfix = 0;
-
-                //GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                //foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" }) 
-                //{
-                //    d.Add(s, false);
-                //}
-
-                //GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                //foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
-                //{
-                //    portf.Add(s, false);
-                //}
-
-                //GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                //foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
-                //{
-                //    ovf.Add(s, false);
-                //}                
-
-                //foreach (string varNameWithIndexes in vars)
-                //{
-                //    n++;
-                //    List<GekkoTime> fixVars = modelGamsScalar.GetFixedPeriods(varNameWithIndexes);
-                //    if (fixVars.Contains(new GekkoTime(EFreq.A, 2030, 1)))
-                //    {
-                //        nfix++;
-                //    }
-                //    else
-                //    {
-                //        relevant.Add(varNameWithIndexes);
-                //        string dbName, varName, freq; string[] indexes;
-                //        O.Chop(varNameWithIndexes, out dbName, out varName, out freq, out indexes);
-
-                //        if (indexes != null)
-                //        {
-                //            for (int pos = 0; pos < indexes.Length; pos++)
-                //            {
-                //                int i;
-                //                if (int.TryParse(indexes[pos], out i))
-                //                {
-                //                    if (i >= 0 && i <= 120)
-                //                    {
-                //                        indexes[pos] = "40";
-                //                    }
-                //                }
-                //                else
-                //                {
-                //                    if (d.ContainsKey(indexes[pos])) indexes[pos] = "tje";
-                //                    else if (portf.ContainsKey(indexes[pos])) indexes[pos] = "Obl";
-                //                    else if (ovf.ContainsKey(indexes[pos])) indexes[pos] = "orlov";
-                //                }
-                //            }
-                //        }
-                //        string varNameWithIndexes2 = O.UnChop(dbName, varName, freq, indexes);
-                //        if (indexes != null && !relevant2.ContainsKey(varNameWithIndexes2)) relevant2.Add(varNameWithIndexes2, false);
-                //    }
-                //}
-                //List<string> important = relevant2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                //foreach (string s in important)
-                //{
-                //    G.Writeln(s);
-                //}
-                //new Writeln("n = " + n + " nfix = " + nfix + " ratio = " + (double)nfix / (double)n + "   " + relevant2.Count);
-                //return;
-            }
-
-            if (Globals.runningOnTTComputer && (text == "d3"))
-            {
-                EquationBrowser.BrowserNew(false, false);
-                return;
-            }
-
-            if (Globals.runningOnTTComputer && (text == "d2"))
-            {
-                EquationBrowser.BrowserNew(false, true);
-                return;
-            }
-
-            if (Globals.runningOnTTComputer && (text == "dd"))
-            {
-                EquationBrowser.BrowserNew(true, false);
-                return;
-            }
-
-            if (Globals.runningOnTTComputer && (text == "p"))
-            {
-                GekkoPivotTable.CreatePivotTable2();
-                return;
-            }
-
-            if (text == "fg" || text == "fg2")
-            {
-
-            }
-
-            if (text == "bash" && Globals.runningOnTTComputer)
-            {
-                string name = "gitstampstemporary";
-                string wd = "c:/Thomas/Gekko/GekkoCS/.git";
-                string wdf = wd + "/" + name + ".sh";
-
-                try
-                {
-                    ProcessStartInfo gitInfo = new ProcessStartInfo();
-                    Process gitProcess = new Process();
-
-                    string command = @"cd c:/Thomas/Gekko/GekkoCS/.git; ./" + name + ".sh";
-                    gitInfo.Arguments = "-c \" " + command + " \"";
-
-                    string s = null;
-
-                    if (File.Exists(wdf)) File.Delete(wdf);
-                    s += @"rm " + name + ".txt" + G.NL;
-                    s += @"for file in $(git ls-files -z); do" + G.NL;
-                    s += @"last_commit_date=$(git log -1 --format=""%ci"" -- ""$file"")" + G.NL;
-                    s += @"echo ""$file"" >> " + name + ".txt" + G.NL;
-                    s += @"echo ""$last_commit_date"" >> " + name + ".txt" + G.NL;
-                    s += @"done" + G.NL;
-                    File.WriteAllText(wdf, s);
-
-                    gitInfo.WorkingDirectory = wd;
-                    gitInfo.FileName = "c:\\Program Files\\Git\\git-bash.exe";
-                    gitInfo.UseShellExecute = false;
-
-                    gitInfo.RedirectStandardOutput = true;
-                    gitInfo.RedirectStandardError = true;
-
-                    gitProcess.StartInfo = gitInfo;
-                    gitProcess.Start();
-                    string stderr_str = gitProcess.StandardError.ReadToEnd();  // pick up STDERR
-                    string stdout_str = gitProcess.StandardOutput.ReadToEnd(); // pick up STDOUT
-                    gitProcess.WaitForExit();
-                    gitProcess.Close();
-                }
-                finally
-                {
-                    if (File.Exists(wdf)) File.Delete(wdf);
-                }
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
-
-                //Around 700 ms
-                DateTime t0 = DateTime.Now;
-                string md5a = G.GetMd5FromFile(file);
-                string md5b = G.GetMd5FromFile(file);
-                new Writeln("MD5 ms = " + (DateTime.Now - t0).TotalMilliseconds);
-
-                //Around 1400 ms
-                t0 = DateTime.Now;
-                bool identical = File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(file));
-                new Writeln("SeqEqual ms = " + (DateTime.Now - t0).TotalMilliseconds);
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                SplitVars();
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                Speed.Run();
-            }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                string file = @"c:\Thomas\Desktop\gekko\testing\skabelon.xlsx";
-                string sheetName = "Ark2";
-                TableLight matrix = new TableLight();
-
-                if (!File.Exists(file))
-                {
-                    new Error("File " + file + " does not seem to exist");
-                    //throw new GekkoException();
-                }
-
-                WriteXlsError(file);
-
-                try
-                {
-
-                    using (ExcelPackage excel2 = new ExcelPackage(new FileInfo(file)))
+                    GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
                     {
-                        ExcelWorksheet ws = null;
-                        if (sheetName != null)
+                        portf.Add(s, false);
+                    }
+
+                    GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
+                    {
+                        ovf.Add(s, false);
+                    }
+
+
+                    //ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                    //List<string> vars = modelGamsScalar.GetVars(2);
+                    //List<string> relevant = new List<string>();
+                    //GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    //int n = 0;
+                    //int nfix = 0;
+
+                    //GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    //foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" }) 
+                    //{
+                    //    d.Add(s, false);
+                    //}
+
+                    //GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    //foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
+                    //{
+                    //    portf.Add(s, false);
+                    //}
+
+                    //GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    //foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
+                    //{
+                    //    ovf.Add(s, false);
+                    //}                
+
+                    //foreach (string varNameWithIndexes in vars)
+                    //{
+                    //    n++;
+                    //    List<GekkoTime> fixVars = modelGamsScalar.GetFixedPeriods(varNameWithIndexes);
+                    //    if (fixVars.Contains(new GekkoTime(EFreq.A, 2030, 1)))
+                    //    {
+                    //        nfix++;
+                    //    }
+                    //    else
+                    //    {
+                    //        relevant.Add(varNameWithIndexes);
+                    //        string dbName, varName, freq; string[] indexes;
+                    //        O.Chop(varNameWithIndexes, out dbName, out varName, out freq, out indexes);
+
+                    //        if (indexes != null)
+                    //        {
+                    //            for (int pos = 0; pos < indexes.Length; pos++)
+                    //            {
+                    //                int i;
+                    //                if (int.TryParse(indexes[pos], out i))
+                    //                {
+                    //                    if (i >= 0 && i <= 120)
+                    //                    {
+                    //                        indexes[pos] = "40";
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    if (d.ContainsKey(indexes[pos])) indexes[pos] = "tje";
+                    //                    else if (portf.ContainsKey(indexes[pos])) indexes[pos] = "Obl";
+                    //                    else if (ovf.ContainsKey(indexes[pos])) indexes[pos] = "orlov";
+                    //                }
+                    //            }
+                    //        }
+                    //        string varNameWithIndexes2 = O.UnChop(dbName, varName, freq, indexes);
+                    //        if (indexes != null && !relevant2.ContainsKey(varNameWithIndexes2)) relevant2.Add(varNameWithIndexes2, false);
+                    //    }
+                    //}
+                    //List<string> important = relevant2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    //foreach (string s in important)
+                    //{
+                    //    G.Writeln(s);
+                    //}
+                    //new Writeln("n = " + n + " nfix = " + nfix + " ratio = " + (double)nfix / (double)n + "   " + relevant2.Count);
+                    //return;
+                }
+
+                if (Globals.runningOnTTComputer && (text == "d3"))
+                {
+                    EquationBrowser.BrowserNew(false, false);
+                    return;
+                }
+
+                if (Globals.runningOnTTComputer && (text == "d2"))
+                {
+                    EquationBrowser.BrowserNew(false, true);
+                    return;
+                }
+
+                if (Globals.runningOnTTComputer && (text == "dd"))
+                {
+                    EquationBrowser.BrowserNew(true, false);
+                    return;
+                }
+
+                if (Globals.runningOnTTComputer && (text == "p"))
+                {
+                    GekkoPivotTable.CreatePivotTable2();
+                    return;
+                }
+
+                if (text == "bash" && Globals.runningOnTTComputer)
+                {
+                    string name = "gitstampstemporary";
+                    string wd = "c:/Thomas/Gekko/GekkoCS/.git";
+                    string wdf = wd + "/" + name + ".sh";
+
+                    try
+                    {
+                        ProcessStartInfo gitInfo = new ProcessStartInfo();
+                        Process gitProcess = new Process();
+
+                        string command = @"cd c:/Thomas/Gekko/GekkoCS/.git; ./" + name + ".sh";
+                        gitInfo.Arguments = "-c \" " + command + " \"";
+
+                        string s = null;
+
+                        if (File.Exists(wdf)) File.Delete(wdf);
+                        s += @"rm " + name + ".txt" + G.NL;
+                        s += @"for file in $(git ls-files -z); do" + G.NL;
+                        s += @"last_commit_date=$(git log -1 --format=""%ci"" -- ""$file"")" + G.NL;
+                        s += @"echo ""$file"" >> " + name + ".txt" + G.NL;
+                        s += @"echo ""$last_commit_date"" >> " + name + ".txt" + G.NL;
+                        s += @"done" + G.NL;
+                        File.WriteAllText(wdf, s);
+
+                        gitInfo.WorkingDirectory = wd;
+                        gitInfo.FileName = "c:\\Program Files\\Git\\git-bash.exe";
+                        gitInfo.UseShellExecute = false;
+
+                        gitInfo.RedirectStandardOutput = true;
+                        gitInfo.RedirectStandardError = true;
+
+                        gitProcess.StartInfo = gitInfo;
+                        gitProcess.Start();
+                        string stderr_str = gitProcess.StandardError.ReadToEnd();  // pick up STDERR
+                        string stdout_str = gitProcess.StandardOutput.ReadToEnd(); // pick up STDOUT
+                        gitProcess.WaitForExit();
+                        gitProcess.Close();
+                    }
+                    finally
+                    {
+                        if (File.Exists(wdf)) File.Delete(wdf);
+                    }
+                }
+
+                if (false && Globals.runningOnTTComputer)
+                {
+                    string file = @"c:\Thomas\Desktop\gekko\testing\calib2.gdx";
+
+                    //Around 700 ms
+                    DateTime t0 = DateTime.Now;
+                    string md5a = G.GetMd5FromFile(file);
+                    string md5b = G.GetMd5FromFile(file);
+                    new Writeln("MD5 ms = " + (DateTime.Now - t0).TotalMilliseconds);
+
+                    //Around 1400 ms
+                    t0 = DateTime.Now;
+                    bool identical = File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(file));
+                    new Writeln("SeqEqual ms = " + (DateTime.Now - t0).TotalMilliseconds);
+                }
+
+                if (false && Globals.runningOnTTComputer)
+                {
+                    SplitVars();
+                }
+
+                if (false && Globals.runningOnTTComputer)
+                {
+                    Speed.Run();
+                }
+
+                if (false && Globals.runningOnTTComputer)
+                {
+                    string file = @"c:\Thomas\Desktop\gekko\testing\skabelon.xlsx";
+                    string sheetName = "Ark2";
+                    TableLight matrix = new TableLight();
+
+                    if (!File.Exists(file))
+                    {
+                        new Error("File " + file + " does not seem to exist");
+                        //throw new GekkoException();
+                    }
+
+                    WriteXlsError(file);
+
+                    try
+                    {
+
+                        using (ExcelPackage excel2 = new ExcelPackage(new FileInfo(file)))
                         {
-                            ws = excel2.Workbook.Worksheets[sheetName];
-                            if (ws == null)
+                            ExcelWorksheet ws = null;
+                            if (sheetName != null)
                             {
-                                new Error("Could not find sheet '" + sheetName + "' inside " + file);
-                                //throw new GekkoException();
+                                ws = excel2.Workbook.Worksheets[sheetName];
+                                if (ws == null)
+                                {
+                                    new Error("Could not find sheet '" + sheetName + "' inside " + file);
+                                    //throw new GekkoException();
+                                }
                             }
-                        }
-                        else
-                        {
-                            ws = excel2.Workbook.Worksheets.First<ExcelWorksheet>();
-                        }
+                            else
+                            {
+                                ws = excel2.Workbook.Worksheets.First<ExcelWorksheet>();
+                            }
 
-                        if (ws.Dimension == null)
-                        {
-                            new Error("It seems the sheet is empty.");
-                        }
-                        ExcelCellAddress start = ws.Dimension.Start;
-                        ExcelCellAddress end = ws.Dimension.End;
+                            if (ws.Dimension == null)
+                            {
+                                new Error("It seems the sheet is empty.");
+                            }
+                            ExcelCellAddress start = ws.Dimension.Start;
+                            ExcelCellAddress end = ws.Dimension.End;
 
-                        object[,] intput = (object[,])ws.Cells[1, 1, end.Row, end.Column].Value;
+                            object[,] intput = (object[,])ws.Cells[1, 1, end.Row, end.Column].Value;
 
-                        ExcelRange zz = ws.Cells[3, 3];
-                        string s = zz.Style.Border.Left.Style.ToString() + " " + zz.Style.Border.Right.Style.ToString() + " " + zz.Style.Border.Top.Style.ToString() + " " + zz.Style.Border.Bottom.Style.ToString();
-                        s = zz.Text;
+                            ExcelRange zz = ws.Cells[3, 3];
+                            string s = zz.Style.Border.Left.Style.ToString() + " " + zz.Style.Border.Right.Style.ToString() + " " + zz.Style.Border.Top.Style.ToString() + " " + zz.Style.Border.Bottom.Style.ToString();
+                            s = zz.Text;
 
-                        zz = ws.Cells[7, 3];
-                        s = zz.Style.Border.Left.Style.ToString() + " " + zz.Style.Border.Right.Style.ToString() + " " + zz.Style.Border.Top.Style.ToString() + " " + zz.Style.Border.Bottom.Style.ToString();
+                            zz = ws.Cells[7, 3];
+                            s = zz.Style.Border.Left.Style.ToString() + " " + zz.Style.Border.Right.Style.ToString() + " " + zz.Style.Border.Top.Style.ToString() + " " + zz.Style.Border.Bottom.Style.ToString();
 
-                        zz = ws.Cells[2, 2];
-                        s = zz.Comment.Text;
+                            zz = ws.Cells[2, 2];
+                            s = zz.Comment.Text;
 
-                        int rows2 = intput.GetLength(0);
-                        int cols2 = intput.GetLength(1);
+                            int rows2 = intput.GetLength(0);
+                            int cols2 = intput.GetLength(1);
 
-                        //beware, this array is 0-based
-                        for (int i = 0; i < end.Row; i++)
-                        { // Row by row...
-                            for (int j = 0; j < end.Column; j++)
-                            { // ... Cell by cell...
+                            //beware, this array is 0-based
+                            for (int i = 0; i < end.Row; i++)
+                            { // Row by row...
+                                for (int j = 0; j < end.Column; j++)
+                                { // ... Cell by cell...
 
-                                Object temp = intput[i, j];
-                                if (temp == null) continue;
-                                CellLight cell;
-                                Type t = temp.GetType();
-                                if (t == typeof(double))
-                                {
-                                    cell = new CellLight((double)temp);
-                                }
-                                else if (t == typeof(DateTime))
-                                {
-                                    cell = new CellLight((DateTime)temp);
-                                }
-                                else if (t == typeof(int))
-                                {
-                                    int iData = (int)temp;
-
-                                    //-2146826281 = #Div/0!
-                                    //-2146826246 = #N/A
-                                    //-2146826259 = #Name?
-                                    //-2146826288 = #Null!
-                                    //-2146826252 = #Num!
-                                    //-2146826265 = #Ref!
-                                    //-2146826273 = #Value!
-
-                                    if (iData == -2146826246)
+                                    Object temp = intput[i, j];
+                                    if (temp == null) continue;
+                                    CellLight cell;
+                                    Type t = temp.GetType();
+                                    if (t == typeof(double))
                                     {
-                                        //just like it is in a csv file. The -2146826246 is really a hexadecimal error code from Excel, stating that the number is N/A.
-                                        cell = new CellLight("#N/A");
+                                        cell = new CellLight((double)temp);
                                     }
-                                    else if (iData == -2146826259)
+                                    else if (t == typeof(DateTime))
                                     {
-                                        cell = new CellLight("#Name?");
+                                        cell = new CellLight((DateTime)temp);
                                     }
-                                    else if (iData == -2146826281)
+                                    else if (t == typeof(int))
                                     {
-                                        cell = new CellLight("#Div/0");
+                                        int iData = (int)temp;
+
+                                        //-2146826281 = #Div/0!
+                                        //-2146826246 = #N/A
+                                        //-2146826259 = #Name?
+                                        //-2146826288 = #Null!
+                                        //-2146826252 = #Num!
+                                        //-2146826265 = #Ref!
+                                        //-2146826273 = #Value!
+
+                                        if (iData == -2146826246)
+                                        {
+                                            //just like it is in a csv file. The -2146826246 is really a hexadecimal error code from Excel, stating that the number is N/A.
+                                            cell = new CellLight("#N/A");
+                                        }
+                                        else if (iData == -2146826259)
+                                        {
+                                            cell = new CellLight("#Name?");
+                                        }
+                                        else if (iData == -2146826281)
+                                        {
+                                            cell = new CellLight("#Div/0");
+                                        }
+                                        else
+                                        {
+                                            cell = new CellLight((double)iData);
+                                        }
+                                    }
+                                    else if (temp.GetType() == typeof(string))
+                                    {
+                                        cell = new CellLight((string)temp);
+                                    }
+                                    else if (temp.GetType() == typeof(OfficeOpenXml.ExcelErrorValue))
+                                    {
+                                        cell = new CellLight(double.NaN);
                                     }
                                     else
                                     {
-                                        cell = new CellLight((double)iData);
+                                        Type tt = temp.GetType();
+                                        string ttt = temp.GetType().ToString();
+                                        cell = new CellLight("[data not recognized error]");
                                     }
-                                }
-                                else if (temp.GetType() == typeof(string))
-                                {
-                                    cell = new CellLight((string)temp);
-                                }
-                                else if (temp.GetType() == typeof(OfficeOpenXml.ExcelErrorValue))
-                                {
-                                    cell = new CellLight(double.NaN);
-                                }
-                                else
-                                {
-                                    Type tt = temp.GetType();
-                                    string ttt = temp.GetType().ToString();
-                                    cell = new CellLight("[data not recognized error]");
-                                }
-                                matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
+                                    matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
 
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    if (!(e is GekkoException))
+                    catch (Exception e)
                     {
-                        if (e.Message != null && e.Message != "")
+                        if (!(e is GekkoException))
                         {
-                            new Error(e.Message, false);
-                            WriteExcelError();
+                            if (e.Message != null && e.Message != "")
+                            {
+                                new Error(e.Message, false);
+                                WriteExcelError();
+                            }
                         }
+                        throw;
                     }
-                    throw;
                 }
-            }
 
 
-            if (false && Globals.runningOnTTComputer)
-            {
-
-                //maybe buffer not larger then 1 mio.
-
-                int i = 0;
-
-                if (text.EndsWith("i1")) i = 1;
-                else if (text.EndsWith("i2")) i = 2;
-                else if (text.EndsWith("i3")) i = 3;
-                else if (text.EndsWith("i4")) i = 4;
-                else if (text.EndsWith("i5")) i = 5;
-                else if (text.EndsWith("i6")) i = 6;
-                else if (text.EndsWith("i7")) i = 7;
-                else if (text.EndsWith("i8")) i = 8;
-                else if (text.EndsWith("i9")) i = 9;
-                else if (text.EndsWith("i10")) i = 10;
-                else if (text.EndsWith("i11")) i = 11;
-                else if (text.EndsWith("i12")) i = 12;
-                else if (text.EndsWith("i13")) i = 13;
-                else if (text.EndsWith("i14")) i = 14;
-                else if (text.EndsWith("i15")) i = 15;
-                else if (text.EndsWith("i16")) i = 16;
-
-                string file1 = @"c:\Tools\test\makro0.gdx";
-                string file2 = @"c:\Tools\test\makro0.zip";
-                string file2a = @"c:\Tools\test\makro0a.zip";  //uncompressed
-                string file3 = @"c:\Tools\test\makro0.gbk";    //gbk version
-                string file4 = @"c:\Tools\test\makro0a.gbk";    //gbk version uncompressed
-                string file5 = @"c:\Tools\test\makro0.data";   //data protobuf file
-                string fileFolder = @"c:\Tools\test\file";
-                DateTime dt0 = DateTime.Now;
-
-                //int buf = 4096;
-                //buf = int.Parse(text);
-
-                if (true && Globals.runningOnTTComputer)
+                if (false && Globals.runningOnTTComputer)
                 {
 
-                    //   debug rel64      gdx is 127 mb, zipped 27 mb with compression. 
-                    //-------------------------------------------------------------------------------
-                    //i1   1800           normal sha
-                    //i2   1450           sha with 1.2 mb chunks
-                    //i3   1650           sha with 1.2 mb chunks and read access
-                    //i4   2900           md5 on text
-                    //i5   9000           md5 on text utf8
-                    //i6    200    180    file copy
-                    //i7           700    md5 directly on file
-                    //i8   1750   1600    sha with optimal mb chunks and read access
-                    //i9   4600   4450    zip with normal compression
-                    //i10  1000    900    zip with zero compression
-                    //i11  1100   1000    unzip with normal compression
-                    //i12   300    300    unzip with zero compression
-                    //i13  2500   2400    read<first> gbk with normal compression
-                    //i14  2200   2100    read<first> gbk with zero compression
-                    //i15  1400   1400    deflate directly from protobuf 
-                    //i16 11000   5600    read<first> gdx
-                    //-------------------------------------------------------------------------------
-                    //could be 10-20% faster if arrays used instead of ts.SetData().
-                    //caching would be around "file copy" + "md5" + "deflate" = 180+700+1400 = 2500. 
-                    //  Faster if gdx is zipped and hash, maybe 1900 = 3 x faster.
-                    //  Then read<gdx> first time would go from 2400 to 3400 = 40% worse.
-                    //reading gbk directly would be 2400.
+                    //maybe buffer not larger then 1 mio.
+
+                    int i = 0;
+
+                    if (text.EndsWith("i1")) i = 1;
+                    else if (text.EndsWith("i2")) i = 2;
+                    else if (text.EndsWith("i3")) i = 3;
+                    else if (text.EndsWith("i4")) i = 4;
+                    else if (text.EndsWith("i5")) i = 5;
+                    else if (text.EndsWith("i6")) i = 6;
+                    else if (text.EndsWith("i7")) i = 7;
+                    else if (text.EndsWith("i8")) i = 8;
+                    else if (text.EndsWith("i9")) i = 9;
+                    else if (text.EndsWith("i10")) i = 10;
+                    else if (text.EndsWith("i11")) i = 11;
+                    else if (text.EndsWith("i12")) i = 12;
+                    else if (text.EndsWith("i13")) i = 13;
+                    else if (text.EndsWith("i14")) i = 14;
+                    else if (text.EndsWith("i15")) i = 15;
+                    else if (text.EndsWith("i16")) i = 16;
+
+                    string file1 = @"c:\Tools\test\makro0.gdx";
+                    string file2 = @"c:\Tools\test\makro0.zip";
+                    string file2a = @"c:\Tools\test\makro0a.zip";  //uncompressed
+                    string file3 = @"c:\Tools\test\makro0.gbk";    //gbk version
+                    string file4 = @"c:\Tools\test\makro0a.gbk";    //gbk version uncompressed
+                    string file5 = @"c:\Tools\test\makro0.data";   //data protobuf file
+                    string fileFolder = @"c:\Tools\test\file";
+                    DateTime dt0 = DateTime.Now;
+
+                    //int buf = 4096;
+                    //buf = int.Parse(text);
+
+                    if (true && Globals.runningOnTTComputer)
+                    {
+
+                        //   debug rel64      gdx is 127 mb, zipped 27 mb with compression. 
+                        //-------------------------------------------------------------------------------
+                        //i1   1800           normal sha
+                        //i2   1450           sha with 1.2 mb chunks
+                        //i3   1650           sha with 1.2 mb chunks and read access
+                        //i4   2900           md5 on text
+                        //i5   9000           md5 on text utf8
+                        //i6    200    180    file copy
+                        //i7           700    md5 directly on file
+                        //i8   1750   1600    sha with optimal mb chunks and read access
+                        //i9   4600   4450    zip with normal compression
+                        //i10  1000    900    zip with zero compression
+                        //i11  1100   1000    unzip with normal compression
+                        //i12   300    300    unzip with zero compression
+                        //i13  2500   2400    read<first> gbk with normal compression
+                        //i14  2200   2100    read<first> gbk with zero compression
+                        //i15  1400   1400    deflate directly from protobuf 
+                        //i16 11000   5600    read<first> gdx
+                        //-------------------------------------------------------------------------------
+                        //could be 10-20% faster if arrays used instead of ts.SetData().
+                        //caching would be around "file copy" + "md5" + "deflate" = 180+700+1400 = 2500. 
+                        //  Faster if gdx is zipped and hash, maybe 1900 = 3 x faster.
+                        //  Then read<gdx> first time would go from 2400 to 3400 = 40% worse.
+                        //reading gbk directly would be 2400.
 
 
-                    //-------------------------------------------------------------------------------
+                        //-------------------------------------------------------------------------------
 
-                    if (i == 1)
+                        if (i == 1)
+                        {
+                            //almost as fast as 3 (fastest)
+                            using (FileStream stream = File.OpenRead(file1))
+                            {
+                                SHA256Managed sha = new SHA256Managed();
+                                byte[] checksum = sha.ComputeHash(stream);
+                                string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                            }
+                        }
+                        else if (i == 2)
+                        {
+                            //almost as fast as 3 (fastest)
+                            using (var stream = new BufferedStream(File.OpenRead(file1), 1200000))
+                            {
+                                SHA256Managed sha = new SHA256Managed();
+                                byte[] checksum = sha.ComputeHash(stream);
+                                string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                            }
+                        }
+                        else if (i == 3)
+                        {
+                            //seems fastest, but i ==1 and i == 2 are almost as fast
+                            using (var stream = new FileStream(file1, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
+                            {
+                                SHA256Managed sha = new SHA256Managed();
+                                byte[] checksum = sha.ComputeHash(stream);
+                                string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                            }
+                        }
+                        else if (i == 4)
+                        {
+                            //2.5 x time for i == 3
+                            string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, false), null, null);
+                        }
+                        else if (i == 5)
+                        {
+                            //7 x time for i == 3
+                            string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, true), null, null);
+                        }
+                        else if (i == 6)
+                        {
+                            //really fast
+                            WaitForFileCopy(file1, "c:\\tools\\slet\\sletmig.data");
+                        }
+                        else if (i == 7)
+                        {
+                            string s = Program.GetMD5Hash(null, file1, null);
+                        }
+                        else if (i == 8)
+                        {
+                            using (var stream = Program.WaitForFileStream(file1, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //50000
+                            {
+                                SHA256Managed sha = new SHA256Managed();
+                                byte[] checksum = sha.ComputeHash(stream);
+                                string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                            }
+                        }
+                        else if (i == 9)
+                        {
+                            File.Delete(file2);
+                            ZipFile.CreateFromDirectory(fileFolder, file2);
+                        }
+                        else if (i == 10)
+                        {
+                            File.Delete(file2a);
+                            ZipFile.CreateFromDirectory(fileFolder, file2a, System.IO.Compression.CompressionLevel.NoCompression, false);
+                        }
+                        else if (i == 11)
+                        {
+                            string folder = CreateTempFolderPath("temptsdxfolder");
+                            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                            ZipFile.ExtractToDirectory(file2, folder);
+                        }
+                        else if (i == 12)
+                        {
+                            string folder = CreateTempFolderPath("temptsdxfolder");
+                            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                            ZipFile.ExtractToDirectory(file2a, folder);
+                        }
+                        else if (i == 13)
+                        {
+                            Program.RunGekkoCommands("read <first> " + file3 + ";", "", 0, new P());
+                        }
+                        else if (i == 14)
+                        {
+                            Program.RunGekkoCommands("read <first> " + file4 + ";", "", 0, new P());
+                        }
+                        else if (i == 15)
+                        {
+                            Databank deserializedDatabank = ProtobufRead<Databank>(file5);
+                        }
+                        else if (i == 16)
+                        {
+                            Program.RunGekkoCommands("read <first gdx> " + file1 + ";", "", 0, new P());
+                        }
+                        else if (i == 17)
+                        {
+                            //This probably needs protobuf.NET >= 3.0
+                            //var list = new List<byte[]>();
+                            //var output = new Databank[list.Count];
+                            //Parallel.ForEach(list, () => 0, (x, pls, index, s) =>
+                            //{
+                            //    output[(int)index] = Serializer.Deserialize<Databank>(x);
+                            //    return 0;
+                            //}, _ => { });
+                        }
+                    }
+                    else
                     {
-                        //almost as fast as 3 (fastest)
-                        using (FileStream stream = File.OpenRead(file1))
+                        using (var stream = Program.WaitForFileStream(file1, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
                             string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
                         }
                     }
-                    else if (i == 2)
+
+                    new Writeln("Alternative " + i + ", time ms = " + (DateTime.Now - dt0).TotalMilliseconds);
+
+
+                    if (text == "arrow")
                     {
-                        //almost as fast as 3 (fastest)
-                        using (var stream = new BufferedStream(File.OpenRead(file1), 1200000))
-                        {
-                            SHA256Managed sha = new SHA256Managed();
-                            byte[] checksum = sha.ComputeHash(stream);
-                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
-                        }
-                    }
-                    else if (i == 3)
-                    {
-                        //seems fastest, but i ==1 and i == 2 are almost as fast
-                        using (var stream = new FileStream(file1, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
-                        {
-                            SHA256Managed sha = new SHA256Managed();
-                            byte[] checksum = sha.ComputeHash(stream);
-                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
-                        }
-                    }
-                    else if (i == 4)
-                    {
-                        //2.5 x time for i == 3
-                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, false), null, null);
-                    }
-                    else if (i == 5)
-                    {
-                        //7 x time for i == 3
-                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, true), null, null);
-                    }
-                    else if (i == 6)
-                    {
-                        //really fast
-                        WaitForFileCopy(file1, "c:\\tools\\slet\\sletmig.data");
-                    }
-                    else if (i == 7)
-                    {
-                        string s = Program.GetMD5Hash(null, file1, null);
-                    }
-                    else if (i == 8)
-                    {
-                        using (var stream = Program.WaitForFileStream(file1, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //50000
-                        {
-                            SHA256Managed sha = new SHA256Managed();
-                            byte[] checksum = sha.ComputeHash(stream);
-                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
-                        }
-                    }
-                    else if (i == 9)
-                    {
-                        File.Delete(file2);
-                        ZipFile.CreateFromDirectory(fileFolder, file2);
-                    }
-                    else if (i == 10)
-                    {
-                        File.Delete(file2a);
-                        ZipFile.CreateFromDirectory(fileFolder, file2a, System.IO.Compression.CompressionLevel.NoCompression, false);
-                    }
-                    else if (i == 11)
-                    {
-                        string folder = CreateTempFolderPath("temptsdxfolder");
-                        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-                        ZipFile.ExtractToDirectory(file2, folder);
-                    }
-                    else if (i == 12)
-                    {
-                        string folder = CreateTempFolderPath("temptsdxfolder");
-                        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-                        ZipFile.ExtractToDirectory(file2a, folder);
-                    }
-                    else if (i == 13)
-                    {
-                        Program.RunGekkoCommands("read <first> " + file3 + ";", "", 0, new P());
-                    }
-                    else if (i == 14)
-                    {
-                        Program.RunGekkoCommands("read <first> " + file4 + ";", "", 0, new P());
-                    }
-                    else if (i == 15)
-                    {
-                        Databank deserializedDatabank = ProtobufRead<Databank>(file5);
-                    }
-                    else if (i == 16)
-                    {
-                        Program.RunGekkoCommands("read <first gdx> " + file1 + ";", "", 0, new P());
-                    }
-                    else if (i == 17)
-                    {
-                        //This probably needs protobuf.NET >= 3.0
-                        //var list = new List<byte[]>();
-                        //var output = new Databank[list.Count];
-                        //Parallel.ForEach(list, () => 0, (x, pls, index, s) =>
+                        //while (true)
                         //{
-                        //    output[(int)index] = Serializer.Deserialize<Databank>(x);
-                        //    return 0;
-                        //}, _ => { });
+                        //    var codeToEval = Console.ReadLine();
+                        //    var result = await CSharpScript.EvaluateAsync(codeToEval);
+                        //    Console.WriteLine(result);
+                        //}
+
+                        //Arrow.Run();
+                        return;
                     }
-                }
-                else
-                {
-                    using (var stream = Program.WaitForFileStream(file1, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                    else if (text == "test")
                     {
-                        SHA256Managed sha = new SHA256Managed();
-                        byte[] checksum = sha.ComputeHash(stream);
-                        string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                        Translate_2_4_to_3_0.TestTranslation();
+                        return;
                     }
+
                 }
-
-                new Writeln("Alternative " + i + ", time ms = " + (DateTime.Now - dt0).TotalMilliseconds);
-
-
-                if (text == "arrow")
+                if (text.Trim().ToLower() == "datopgek3_agh7xvslke3jfhqp")
                 {
-                    //while (true)
-                    //{
-                    //    var codeToEval = Console.ReadLine();
-                    //    var result = await CSharpScript.EvaluateAsync(codeToEval);
-                    //    Console.WriteLine(result);
-                    //}
-
-                    //Arrow.Run();
+                    Translate_2_4_to_3_0.Insert();
                     return;
                 }
-                else if (text == "test")
+                else if (text.Trim().ToLower() == "clone gbk files lkjsf7akljaf7ds")
                 {
-                    Translate_2_4_to_3_0.TestTranslation();
+                    Translate_2_4_to_3_0.Insert2();
                     return;
                 }
-
-            }
-            if (text.Trim().ToLower() == "datopgek3_agh7xvslke3jfhqp")
-            {
-                Translate_2_4_to_3_0.Insert();
-                return;
-            }
-            else if (text.Trim().ToLower() == "clone gbk files lkjsf7akljaf7ds")
-            {
-                Translate_2_4_to_3_0.Insert2();
-                return;
-            }
-            else if (text.Trim().ToLower() == "clone data files ksf66adadjk34j")
-            {
-                Translate_2_4_to_3_0.Insert3();
-                return;
+                else if (text.Trim().ToLower() == "clone data files ksf66adadjk34j")
+                {
+                    Translate_2_4_to_3_0.Insert3();
+                    return;
+                }
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }        
+        }
 
         private static double Sum_numbers()
         {
