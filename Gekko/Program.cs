@@ -16115,7 +16115,7 @@ namespace Gekko
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), null);
-                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, null, helper, tUsedHere);
                         string eq = temp.resultingText;
                         if (temp.hasHit)
                         {
@@ -16526,7 +16526,7 @@ namespace Gekko
 
                     //Gets the equation text (raw)
                     EquationTextHelper helperA = new EquationTextHelper();
-                    GetEquationTextHelper helperAA = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helperA, tUsedHere);
+                    GetEquationTextHelper helperAA = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperA, tUsedHere);
                     string eqTextA = helperAA.s_gekkoSyntax;
 
                     if (true)
@@ -16686,7 +16686,7 @@ namespace Gekko
                     {
                         //Gets the equation text (raw)
                         EquationTextHelper helperB = new EquationTextHelper();
-                        GetEquationTextHelper helperBB = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helperB, tUsedHere);
+                        GetEquationTextHelper helperBB = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperB, tUsedHere);
                         string eqTextB = helperBB.s_scalarModel;                        
                         using (Writeln txt = new Writeln())
                         {

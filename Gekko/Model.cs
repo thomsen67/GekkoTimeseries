@@ -210,11 +210,13 @@ namespace Gekko
             if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(t0);
             string s = null;
             List<string> eqNames = new List<string>();
+            List<string>varNames= new List<string>();
             foreach (Link link in links)
             {
                 if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), null));
+                varNames.Add(link.varnames);  //SHOULD IT BE endo ?????????????????
             }
-            s = model.GetEquationText(eqNames, helper, t0).resultingText;
+            s = model.GetEquationText(eqNames, varNames, helper, t0).resultingText;
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
@@ -227,7 +229,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public GetEquationTextHelper GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
+        public GetEquationTextHelper GetEquationText(List<string> eqs, List<string>varNames, EquationTextHelper helper, GekkoTime t0)
         {
             GetEquationTextHelper rv = new GetEquationTextHelper();
 
