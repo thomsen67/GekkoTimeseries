@@ -20886,15 +20886,22 @@ namespace Gekko
 
             //
             // ------- comparefolders2.zip
-            //
+            //            
 
             Zipper zipper2 = new Zipper("comparefolders2.zip");
+            GekkoDictionary<string, bool> missingFolders1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, bool> missingFolders2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            
             if (true)
-            {
+            {                
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("// ========== From folder2 to folder1: copy files that are missing in folder1 ==========");
                 foreach (string s in e21)
                 {
+                    if (!Directory.Exists(Path.GetDirectoryName(f1 + s)))
+                    {
+                        if (!missingFolders1.ContainsKey(Path.GetDirectoryName(f1 + s))) missingFolders1.Add(Path.GetDirectoryName(f1 + s), false);
+                    }
                     sb.AppendLine("sys 'copy \"" + f2 + s + "\" \"" + f1 + s + "\"';");
                 }
                 sb.AppendLine("");
@@ -20909,15 +20916,33 @@ namespace Gekko
                 {
                     sb.AppendLine("sys 'copy /y \"" + f2 + s + "\" \"" + f1 + s + "\"';");
                 }
+
+                if (missingFolders1.Count > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine("/*");
+                    sb.AppendLine("-------------------------------------------------------------------");
+                    sb.AppendLine("In folder1, the following subfolders from folder2 do not exist:");
+                    foreach (string s in missingFolders1.Keys)
+                    {
+                        sb.AppendLine(G.Replace(s, f1, "", StringComparison.OrdinalIgnoreCase, 0));
+                    }
+                    sb.AppendLine("*/");
+                }
+
                 File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder1.gcm", sb.ToString());
             }
 
             if (true)
-            {
+            {                 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("// ========== From folder1 to folder2: copy files that are missing in folder2 ==========");
                 foreach (string s in e12)
                 {
+                    if (!Directory.Exists(Path.GetDirectoryName(f2 + s)))
+                    {
+                        if (!missingFolders2.ContainsKey(Path.GetDirectoryName(f2 + s))) missingFolders2.Add(Path.GetDirectoryName(f2 + s), false);
+                    }
                     sb.AppendLine("sys 'copy \"" + f1 + s + "\" \"" + f2 + s + "\"';");
                 }
                 sb.AppendLine("");
@@ -20932,6 +20957,20 @@ namespace Gekko
                 {
                     sb.AppendLine("sys 'copy /y \"" + f1 + s + "\" \"" + f2 + s + "\"';");
                 }
+
+                if (missingFolders2.Count > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine("/*");
+                    sb.AppendLine("-------------------------------------------------------------------");
+                    sb.AppendLine("In folder2, the following subfolders from folder1 do not exist:");
+                    foreach (string s in missingFolders2.Keys)
+                    {
+                        sb.AppendLine(G.Replace(s, f2, "", StringComparison.OrdinalIgnoreCase, 0));
+                    }
+                    sb.AppendLine("*/");
+                }
+
                 File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder2.gcm", sb.ToString());
             }
             zipper2.ZipAndCleanup();
@@ -20984,6 +21023,20 @@ namespace Gekko
                 txt.MainAdd(e21.Count() + " files from folder2 do not exist in folder1");
                 sb2.AppendLine(e21.Count() + " files from folder2 do not exist in folder1");
                 txt.MainNewLineTight();
+
+                if (missingFolders1.Count > 0)
+                {
+                    txt.MainAdd(missingFolders1.Count + " subfolders are missing in folder1");
+                    sb2.AppendLine(missingFolders1.Count + " subfolders are missing in folder1");
+                    txt.MainNewLineTight();
+                }
+
+                if (missingFolders2.Count > 0)
+                {
+                    txt.MainAdd(missingFolders2.Count + " subfolders are missing in folder2");
+                    sb2.AppendLine(missingFolders2.Count + " subfolders are missing in folder2");
+                    txt.MainNewLineTight();
+                }
             }
 
             //
