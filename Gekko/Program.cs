@@ -20749,16 +20749,24 @@ namespace Gekko
         {
             //TODO: warn or skip if some folder is a .git folder.
 
-            string omit = ".git";  //takes care of .gitignore etc.
+            string omit = "\\.git";  //takes care of .gitignore etc.
 
             DateTime t0 = DateTime.Now;
 
+            f1 = f1.Trim();
+            f2 = f2.Trim();
+
+            f1 = f1.Replace("/", "\\");
+            f2 = f2.Replace("/", "\\");
+
             if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
             if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
+            
             if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
             if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");
-            var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
-            var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+
+            var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
 
             bool option_text = false;
             bool option_strict = false;
