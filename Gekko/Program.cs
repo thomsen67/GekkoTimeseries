@@ -20763,7 +20763,7 @@ namespace Gekko
             if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
             
             if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
-            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist"); 
+            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");     
 
             var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
             var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
@@ -20895,19 +20895,19 @@ namespace Gekko
                 sb.AppendLine("// ========== From folder2 to folder1: copy files that are missing in folder1 ==========");
                 foreach (string s in e21)
                 {
-                    sb.AppendLine("sys 'copy " + f2 + s + " " + f1 + s + "';");
+                    sb.AppendLine("sys 'copy \"" + f2 + s + "\" \"" + f1 + s + "\"';");
                 }
                 sb.AppendLine("");
                 sb.AppendLine("// ========== From folder2 to folder1: overwrite common files that are different (binary) ==========");
                 foreach (string s in differentBinary)
                 {
-                    sb.AppendLine("sys 'copy /y " + f2 + s + " " + f1 + s + "';");
+                    sb.AppendLine("sys 'copy /y \"" + f2 + s + "\" \"" + f1 + s + "\"';");
                 }
                 sb.AppendLine("");
                 sb.AppendLine("// ========== From folder2 to folder1: overwrite common files that are different (text) ==========");
                 foreach (string s in differentText)
                 {
-                    sb.AppendLine("sys 'copy /y " + f2 + s + " " + f1 + s + "';");
+                    sb.AppendLine("sys 'copy /y \"" + f2 + s + "\" \"" + f1 + s + "\"';");
                 }
                 File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder1.gcm", sb.ToString());
             }
@@ -20918,19 +20918,19 @@ namespace Gekko
                 sb.AppendLine("// ========== From folder1 to folder2: copy files that are missing in folder2 ==========");
                 foreach (string s in e12)
                 {
-                    sb.AppendLine("sys 'copy " + f1 + s + " " + f2 + s + "';");
+                    sb.AppendLine("sys 'copy \"" + f1 + s + "\" \"" + f2 + s + "\"';");
                 }
                 sb.AppendLine("");
                 sb.AppendLine("// ========== From folder1 to folder2: overwrite common files that are different (binary) ==========");
                 foreach (string s in differentBinary)
                 {
-                    sb.AppendLine("sys 'copy /y " + f1 + s + " " + f2 + s + "';");
+                    sb.AppendLine("sys 'copy /y \"" + f1 + s + "\" \"" + f2 + s + "\"';");
                 }
                 sb.AppendLine("");
                 sb.AppendLine("// ========== From folder1 to folder2: overwrite common files that are different (text) ==========");
                 foreach (string s in differentText)
                 {
-                    sb.AppendLine("sys 'copy /y " + f1 + s + " " + f2 + s + "';");
+                    sb.AppendLine("sys 'copy /y \"" + f1 + s + "\" \"" + f2 + s + "\"';");
                 }
                 File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder2.gcm", sb.ToString());
             }
