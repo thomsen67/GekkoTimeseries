@@ -20763,7 +20763,7 @@ namespace Gekko
             if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
             
             if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
-            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");
+            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist"); 
 
             var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
             var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
