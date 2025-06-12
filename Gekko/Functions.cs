@@ -2197,6 +2197,10 @@ namespace Gekko
                 {
                     t1 = x_series.GetRealDataPeriodFirst();
                     t2 = x_series.GetRealDataPeriodLast();
+                    if (t1.IsNull())
+                    {
+                        new Error("isMiss() function: no data was found inside the series. Consider using the isMiss(..., 'all') instead.");
+                    }
                 }
                 else
                 {
@@ -3271,21 +3275,7 @@ namespace Gekko
             if (avg) rv = O.Divide(smpl, rv, new ScalarVal(m.list.Count));
 
             return rv;
-        }
-
-        public static IVariable ratio(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        {
-            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-
-            GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
-            IVariable iv = Series.ConvertToSeriesMaybeConstant(smplHere, x);
-            double d = 0d;
-            foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
-            {
-                d += (iv as Series).GetData(smpl, t);
-            }
-            return new ScalarVal(d);
-        }
+        }        
 
         public static IVariable percentile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable percent)
         {
