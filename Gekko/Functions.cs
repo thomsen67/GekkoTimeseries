@@ -2197,10 +2197,7 @@ namespace Gekko
                 {
                     t1 = x_series.GetRealDataPeriodFirst();
                     t2 = x_series.GetRealDataPeriodLast();
-                    if (t1.IsNull())
-                    {
-                        new Error("isMiss() function: no data was found inside the series. Consider using the isMiss(..., 'all') instead.");
-                    }
+                    if (t1.IsNull()) new Error("isMiss() function: no data was found inside the series. Consider using isMiss(..., 'all') instead.");                    
                 }
                 else
                 {
@@ -2273,6 +2270,7 @@ namespace Gekko
                 {
                     t1 = x_series.GetRealDataPeriodFirst();
                     t2 = x_series.GetRealDataPeriodLast();
+                    if (t1.IsNull()) new Error("isEps() function: no data was found inside the series. Consider using isEps(..., 'all') instead.");
                 }
                 else
                 {
@@ -2296,6 +2294,53 @@ namespace Gekko
             else
             {
                 bool b = x.ConvertToVal() == Globals.eps;
+                if (b) return Globals.scalarVal1;
+                return Globals.scalarVal0;
+            }
+        }
+
+        public static IVariable is0oreps(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            return is0oreps(smpl, _t1, _t2, x, null);
+        }
+
+        public static IVariable is0oreps(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable option)
+        {
+            if (x.Type() == EVariableType.Series)
+            {
+                Series x_series = x as Series;
+
+                GekkoTime t1 = GekkoTime.tNull;
+                GekkoTime t2 = GekkoTime.tNull;
+
+                if (option == null)
+                {
+                    t1 = x_series.GetRealDataPeriodFirst();
+                    t2 = x_series.GetRealDataPeriodLast();
+                    if (t1.IsNull()) new Error("is0oreps() function: no data was found inside the series. Consider using is0oreps(..., 'all') instead.");
+                }
+                else
+                {
+                    string option_string = O.ConvertToString(option);
+                    if (!G.Equal(option_string, "all"))
+                    {
+                        new Error("Expected 'all' option");
+                    }
+                    helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+                }
+
+                Series rv = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    bool b = x_series.GetDataSimple(t) == 0d || x_series.GetDataSimple(t) == Globals.eps;
+                    if (b) rv.SetData(t, 1d);
+                    else rv.SetData(t, 0d);
+                }
+                return rv;
+            }
+            else
+            {
+                bool b = x.ConvertToVal() == 0d || x.ConvertToVal() == Globals.eps;
                 if (b) return Globals.scalarVal1;
                 return Globals.scalarVal0;
             }

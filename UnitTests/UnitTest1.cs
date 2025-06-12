@@ -7633,8 +7633,10 @@ namespace UnitTests
         {
             I("reset; time 2001 2003;");
             I("eps = eps();");
+            I("zero = 0;");
             I("ii2 = 2;");
             I("ii3 = 3;");
+
             // -------------------------------------------------------------------
             // -------------------------- x1 + x2 --------------------------------
             // -------------------------------------------------------------------
@@ -7676,6 +7678,15 @@ namespace UnitTests
             I("y4 = iseps(ii2);"); _AssertSeries(First(), "y4!a", 2001, 0d, 0d);
             I("%y5 = iseps(2);"); _AssertScalarVal(First(), "%y5", 0d);
             I("y6 = iseps(ii2);"); _AssertSeries(First(), "y6!a", 2001, 0d, 0d);
+
+            I("%y1 = is0oreps(eps());"); _AssertScalarVal(First(), "%y1", 1d);
+            I("y2 = is0oreps(eps);"); _AssertSeries(First(), "y2!a", 2001, 1d, 0d);
+            I("%y3 = is0oreps(m());"); _AssertScalarVal(First(), "%y3", 0d);
+            I("y4 = is0oreps(ii2);"); _AssertSeries(First(), "y4!a", 2001, 0d, 0d);
+            I("%y5 = is0oreps(2);"); _AssertScalarVal(First(), "%y5", 0d);
+            I("y6 = is0oreps(ii2);"); _AssertSeries(First(), "y6!a", 2001, 0d, 0d);
+            I("%y7 = is0oreps(0);"); _AssertScalarVal(First(), "%y7", 1d);
+            I("y8 = is0oreps(zero);"); _AssertSeries(First(), "y8!a", 2001, 1d, 0d);
 
             // -------------------------------------------------------------------
             // -------------------------- x1 - x2 --------------------------------
