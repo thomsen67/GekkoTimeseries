@@ -13049,7 +13049,7 @@ namespace UnitTests
             Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.M, EFreq.A));
             Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.A, EFreq.M));
             Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.Q, EFreq.A));
-            Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.A, EFreq.Q));            
+            Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.A, EFreq.Q));
             Assert.AreEqual(EFreq.A, GekkoTime.HighestFreq(EFreq.A, EFreq.A));
             Assert.AreEqual(EFreq.Q, GekkoTime.HighestFreq(EFreq.Q, EFreq.Q));
             Assert.AreEqual(EFreq.M, GekkoTime.HighestFreq(EFreq.M, EFreq.M));
@@ -13073,7 +13073,7 @@ namespace UnitTests
             //option series data missing = zero;
             I("time 2020 2026;");
             I("model <gms> makro2gekko.zip;");
-            I("read <gdx> dec24;");            
+            I("read <gdx> dec24;");
             I("eXudl[xVar] = 6;");
             I("qXy[xVar] += -100, -200, -300, -150, -200, -100, -150;");
             //ShowDecompTable();
@@ -14283,7 +14283,7 @@ namespace UnitTests
                 I("c <2001 2002> = 462, 474;");
                 I("g <2001 2002> = 42, 62;");
 
-                I("decomp <2002 2002> y;");                
+                I("decomp <2002 2002> y;");
 
                 Thread.Sleep(1000);  //seems it otherwise may progress too fast 
                 Assert.AreEqual(Globals.itemHandler.Items[0].EquationName, "e1");
@@ -14299,7 +14299,7 @@ namespace UnitTests
                 Assert.AreEqual(Globals.itemHandler.Items[2].EquationName, "e2[-1]");
                 Assert.AreEqual(Globals.itemHandler.Items[2].Name, "");
                 Assert.AreEqual(Globals.itemHandler.Items[2].Lhs, "");
-                Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");                
+                Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");
 
                 Gekko.Table table = null;
 
@@ -17568,7 +17568,7 @@ namespace UnitTests
             // e1 $ (...) .. y = x;
             // y $ (...) = x;
             // y = sum(i $ (...), x(i))
-        }        
+        }
 
         [TestMethod]
         public void _Test_Decomp_GAMSRaw_AgeLead()
@@ -19485,7 +19485,7 @@ namespace UnitTests
             {
                 Globals.modelResUnitTest = false;
             }
-            
+
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 9.94176668132747E-16"));
             //TODO
@@ -19509,7 +19509,7 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear();
             I("reset; time 2001 2003;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
-            I("model <gms> pivot1.zip;");            
+            I("model <gms> pivot1.zip;");
             I("x1 = series(2);");
             I("x2 = series(2);");
             I("x3 = series(1);");
@@ -19563,7 +19563,7 @@ namespace UnitTests
             //ShowDecompTable();  //will show the following decomp table and then abort
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
+
             //I("decomp <d ignore = 70> y from e endo y rows time cols vars, lags;");
             //I("decomp <d> x1[a, c] from e endo x1[a, c] rows time cols vars, lags;");
             //I("decomp <d> y from e endo y rows vars, lags cols time;");
@@ -19588,7 +19588,7 @@ namespace UnitTests
             I("x.setdomains(('#i',));");
             I("y.setdomains(('#i',));");
 
-            I("time 2001 2003;");            
+            I("time 2001 2003;");
             I("y[a] = 1.52948239, 2.4211134, 1.43998;");
             I("y[b] = 0.57778239, 1.4276544, 2.55598;");
             I("y[tot] =  0.5277739, 2.98743364, 1.4555598;");
@@ -19664,7 +19664,7 @@ namespace UnitTests
                     {
                         Globals.modelResUnitTest = false;
                     }
-                    
+
                     string s = Globals.unitTestScreenOutput.ToString();
                     Assert.IsTrue(s.Contains("1063359 evaluations x 100 took"));
                     Assert.IsTrue(s.Contains("1.92045120177723E-10")); //this must be ok
@@ -19677,7 +19677,7 @@ namespace UnitTests
                     //TODO          
                 }
             }
-        }                
+        }
 
         [TestMethod]
         public void _Test_SolverConjugateGradientRosenbrock()
@@ -20299,7 +20299,7 @@ namespace UnitTests
             I("y[2004] = m();");
             FAIL("OLS y = x1, x2;");
             I("y[2005] = 6;");
-            I("y[2004] = 5;");            
+            I("y[2004] = 5;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2 missing values at end of sample"));
 
             Globals.unitTestScreenOutput.Clear();
@@ -20322,7 +20322,7 @@ namespace UnitTests
         {
             //Probably fails due to R and blanks and possibly (c) in folder names... :-(.
             //Maybe just test it manually.
-            
+
             //See also _Test_Python                   
 
             //TODO: Test what happens if <target> is used on file without gekkoimport, and vice versa
@@ -20941,7 +20941,7 @@ namespace UnitTests
 
             //I("SERIES ");
         }
-                
+
         [TestMethod]
         public void _Test_WriteDirs()
         {
@@ -22715,7 +22715,7 @@ print(df2)
             _AssertListString(First(), "#i1", new StringOrList("*", "#a1"));
             _AssertListString(First(), "#j1", new StringOrList("*", "#a1"));
             I("x3 = series(3);");
-            I("x3[a,b,c] = 2;");            
+            I("x3[a,b,c] = 2;");
             I("#i1 = x3[a,b,c].getparent().getdomains();");
             I("#j1 = x3.getdomains();");
             _AssertListString(First(), "#i1", new StringOrList("*", "*", "*"));
@@ -23487,8 +23487,8 @@ print(df2)
                 I("x[a, d] <2002 2002> = 6;");
                 I("x[b, c] <2001 2001> = 3;");
                 I("x[b, c] <2002 2002> = eps();");
-                I("x[b, d] <2001 2001> = 4;");                
-                I("x[b, d] <2002 2002> = 8;");                
+                I("x[b, d] <2001 2001> = 4;");
+                I("x[b, d] <2002 2002> = 8;");
 
                 I("prt <n> x;");
                 I("epsclone('x', 2003);");
@@ -23516,7 +23516,7 @@ print(df2)
 
                 if (true)
                 {
-                    
+
                 }
             }
             else
@@ -25652,7 +25652,7 @@ print(df2)
                 I("%t1_highfreq = 2001q1;");
                 I("%t2_highfreq = 2005q4;");
                 //Data: Denton's example:                
-                
+
                 I("y!a  <%t1 %t2>                   = 500,                  400,                  300,                  400,                  500;");
                 I("z!q  <%t1_highfreq %t2_highfreq> = 50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100;");
 
@@ -25730,7 +25730,7 @@ print(df2)
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 2, 124.14040d * factor, delta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 3, 177.57880d * factor, delta);
                     _AssertSeries(First(), "x!q", EFreq.Q, 2005, 4, 129.29799d * factor, delta);
-                }                
+                }
                 else Assert.Fail();
 
                 // Cf. Denton: Adjustment of Monthly or Quarterly Series to Annual Totals: An Approach Based on Quadratic Minimization
@@ -25824,7 +25824,7 @@ print(df2)
                 //5  68.98281   124.14040   177.57880   129.29799
             }
 
-            
+
             if (true)
             {
                 // ===================================================================
@@ -25838,7 +25838,7 @@ print(df2)
                     I("z!q = 10, 12, 10, 12,   20, 22, 20, 22,   10, 12, 10, 12,    20, 22, 20, 22,   10, 12, 10, 12;");
                     I("y = 44, 84, 44, 84, 44;");
 
-                    if (i == 0) 
+                    if (i == 0)
                     {
                         I("interpolate x!q = y indicator = z!q total denton;");
                     }
@@ -26493,7 +26493,7 @@ print(df2)
                     if (true)
                     {
                         //Olsette with no trend. Not really testing the data, but the trend is insignificant and the data resembles the trend-estimation a lot, so trend = no is probably correct.
-                                                
+
                         I("interpolate <print; option interpolate olsette trend = no> x!q = y!a indicator = z!q total olsette;");
                         I("print <n> x!q;");
                         _AssertSeries(First(), "x!q", EFreq.Q, 2014, 1, 672.8205d, delta);
@@ -29896,7 +29896,7 @@ print(df2)
         public void _Test_Databanks()
         {
             //Program.Flush();
-            
+
             // ----------------------------------------------------------
             //          - tsd and tsdx (latter with .tsd or .bin inside)
             //          - testing READ and WRITE of these files,
@@ -30566,7 +30566,7 @@ print(df2)
 
         [TestMethod]
         public void _Test_Matrix()
-        {            
+        {
 
             //I("time 2001 2003; xx = [1; 2; 3];");
             //_AssertSeries(First(), "xx", 2000, double.NaN, sharedDelta);
@@ -31487,7 +31487,7 @@ print(df2)
                 I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
             }
 
-            
+
         }
 
         [TestMethod]
@@ -31874,21 +31874,23 @@ print(df2)
             string xx1 = null;
             string xx2 = null;
             string xx3 = null;
+            string defa = null;
 
-            for (int array = 1; array >= 1; array--)
+            for (int array = 0; array < 1; array++)
             {
 
                 if (array == 0)
                 {
-                    xx1 = "a[xx1,b]";
-                    xx2 = "a[xx2,b]";
-                    xx3 = "a[xx3,b]";
-                }
-                else
-                {
                     xx1 = "xx1";
                     xx2 = "xx2";
                     xx3 = "xx3";
+                }
+                else
+                {
+                    defa = "a = series(2); ";
+                    xx1 = "a[xx1,b]";
+                    xx2 = "a[xx2,b]";
+                    xx3 = "a[xx3,b]";
                 }
 
                 List<string> other = new List<string>();
@@ -31906,89 +31908,89 @@ print(df2)
                     // ------ tsdx
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<" + Globals.extensionDatabank + ">temp;");
                         I("RESET;");
                         I("READ<" + Globals.extensionDatabank + ">temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ tsdx, selection
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                         I("WRITE<" + Globals.extensionDatabank + ">" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                         I("RESET;");
                         I("READ<" + Globals.extensionDatabank + ">temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ tsd
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<tsd>temp;");
                         I("RESET;");
                         I("READ<tsd>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ tsd, selection
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                         I("WRITE<tsd>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                         I("RESET;");
                         I("READ<tsd>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ csv
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 csv>temp;");
                         I("RESET;");
                         I("READ<csv>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
 
                         //cols
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 csv cols>temp;");
                         I("RESET;");
                         I("READ<csv cols>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
 
                     }
                     // ------ csv, selection
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                         I("WRITE<2001 2002 csv>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                         I("RESET;");
                         I("READ<csv>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ prn
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 prn>temp;");
                         I("RESET;");
                         I("READ<prn>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
 
                         //cols
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 prn cols>temp;");
                         I("RESET;");
                         I("READ<prn cols>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ prn, selection
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                         I("WRITE<2001 2002 prn>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                         I("RESET;");
                         I("READ<prn>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
                     // ------ xlsx
                     if (Globals.UNITTESTFOLLOWUP)
@@ -32001,55 +32003,55 @@ print(df2)
                     {
                         if (bank == null)
                         {
-                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (i == 0) I("OPTION sheet engine = internal;");
                             else I("OPTION sheet engine = excel;");
                             I("WRITE<xlsx>temp;");
                             I("RESET;");
                             I("READ<xlsx>temp;");
-                            ReadFormatsHelper("a", bank);
+                            ReadFormatsHelper("a", bank, array);
 
                             //cols
-                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (i == 0) I("OPTION sheet engine = internal;");
                             else I("OPTION sheet engine = excel;");
                             I("WRITE<xlsx cols>temp;");
                             I("RESET;");
                             I("READ<xlsx cols>temp;");
-                            ReadFormatsHelper("a", bank);
+                            ReadFormatsHelper("a", bank, array);
                         }
                         // ------ xlsx, selection
                         {
-                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (i == 0) I("OPTION sheet engine = internal;");
                             else I("OPTION sheet engine = excel;");
-                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                             I("WRITE<xlsx>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                             I("RESET;");
                             I("READ<xlsx>temp;");
-                            ReadFormatsHelper("a", bank);
+                            ReadFormatsHelper("a", bank, array);
                         }
 
                         // ------ xlsx cells with SHEET and SHEET<import>               
                         {
-                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (i == 0) I("OPTION sheet engine = internal;");
                             else I("OPTION sheet engine = excel;");
-                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                             I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> " + xx1 + ", " + bank + "" + xx3 + " file=temp;");  //export
                             I("RESET;");
                             I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> " + xx1 + ", " + xx3 + " file=temp;");  //import            
-                            ReadFormatsHelper("a", bank);
+                            ReadFormatsHelper("a", bank, array);
 
                             //cols
-                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (i == 0) I("OPTION sheet engine = internal;");
                             else I("OPTION sheet engine = excel;");
-                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                             I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no cols> " + xx1 + ", " + bank + "" + xx3 + " file=temp;");  //export
                             I("RESET;");
                             I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5' cols> " + xx1 + ", " + xx3 + " file=temp;");  //import            
-                            ReadFormatsHelper("a", bank);
+                            ReadFormatsHelper("a", bank, array);
 
                             //
                             // test matrix import/export
@@ -32077,34 +32079,35 @@ print(df2)
                     // ------ gnuplot (not actually testing the file)     
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 gnuplot>temp;");
                     }
                     // ------ gnuplot, selection  (not actually testing the file)                
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                         I("WRITE<2001 2002 gnuplot>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                     }
                     // ------ flat
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 flat>temp;");
                         I("RESET;");
                         I("READ<flat>temp;");
-                        ReadFormatsHelper("a", bank);
+                        ReadFormatsHelper("a", bank, array);
                     }
-
-                    // ---------- Testing on quarters
-                    // ---------- Testing on quarters
-                    // ---------- Testing on quarters
-                    // ---------- Testing on quarters
-                    // ---------- Testing on quarters
 
                     if (array == 0)
                     {
+
                         //We only test this for non-array series, because of lazyness (if it work for annual, it probably works for the others, too)
+
+                        // ---------- Testing on quarters
+                        // ---------- Testing on quarters
+                        // ---------- Testing on quarters
+                        // ---------- Testing on quarters
+                        // ---------- Testing on quarters
 
                         I("RESET;");
                         G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
@@ -32629,21 +32632,40 @@ print(df2)
                 }
             }
         }
-
         private static void ReadFormatsHelper(string freq, string bank)
+        {
+            ReadFormatsHelper(freq, bank, 0);
+        }
+
+        private static void ReadFormatsHelper(string freq, string bank, int array)
         {
             if (bank == null)
             {
                 if (freq == "a")
                 {
-                    _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
-                    _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
-                    _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2001, 3001, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2002, 3002, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
+                    if (array == 0)
+                    {
+                        _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2001, 3001, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2002, 3002, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
+                    }
+                    else
+                    {
+                        //FIXME!!
+                        _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2001, 3001, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2002, 3002, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
+                    }
                 }
                 else if (freq == "q")
                 {
