@@ -31854,13 +31854,15 @@ print(df2)
             //prn
             //xls(x), also via SHEET (includes importing matrix), both internal and excel engine            
             //flat
-            //gnplot (only writing)
+            //gnuplot (only writing)
             //tsp... hmmm not done...
             //px (only reading)
 
             //The testing includes tests where data is put in a separate bank named 'other'
             //There is also a test of IMPORT<per1 per2>
 
+            //Array-series or not are tested for xlsx and csv
+
             // testing on annual
             // testing on annual
             // testing on annual
@@ -31869,736 +31871,761 @@ print(df2)
             // testing on annual
             // testing on annual
 
-            List<string> other = new List<string>();
-            other.Add(null);
-            other.Add("other:");
+            string xx1 = null;
+            string xx2 = null;
+            string xx3 = null;
 
-            foreach (string bank in other)
+            for (int array = 1; array >= 1; array--)
             {
 
+                if (array == 0)
+                {
+                    xx1 = "a[xx1,b]";
+                    xx2 = "a[xx2,b]";
+                    xx3 = "a[xx3,b]";
+                }
+                else
+                {
+                    xx1 = "xx1";
+                    xx2 = "xx2";
+                    xx3 = "xx3";
+                }
 
-                // testing annual
+                List<string> other = new List<string>();
+                other.Add(null);
+                other.Add("other:");
 
-                I("RESET;");
-                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                // ------ tsdx
-                if (bank == null)
+                foreach (string bank in other)
                 {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ tsdx, selection
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ tsd
-                if (bank == null)
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<tsd>temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ tsd, selection
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ csv
-                if (bank == null)
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001 2002 csv>temp;");
-                    I("RESET;");
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("a", bank);
 
-                    //cols
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001 2002 csv cols>temp;");
-                    I("RESET;");
-                    I("READ<csv cols>temp;");
-                    ReadFormatsHelper("a", bank);
+                    // testing annual
 
-                }
-                // ------ csv, selection
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001 2002 csv>xx1, " + bank + "xx3 file=temp;");
                     I("RESET;");
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ prn
-                if (bank == null)
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001 2002 prn>temp;");
-                    I("RESET;");
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("a", bank);
-
-                    //cols
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001 2002 prn cols>temp;");
-                    I("RESET;");
-                    I("READ<prn cols>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ prn, selection
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001 2002 prn>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ xlsx
-                if (Globals.UNITTESTFOLLOWUP)
-                {
-                    //removed PIA interop xlsx checks below
-                    //cannot get xlsx writing to work on new pc.
-                    //and it is bad anyway.
-                }
-                for (int i = 0; i < 1; i++)  //was: 2
-                {
+                    G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                    // ------ tsdx
                     if (bank == null)
                     {
-                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx>temp;");
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<" + Globals.extensionDatabank + ">temp;");
                         I("RESET;");
-                        I("READ<xlsx>temp;");
+                        I("READ<" + Globals.extensionDatabank + ">temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ tsdx, selection
+                    {
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<" + Globals.extensionDatabank + ">" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
+                        I("RESET;");
+                        I("READ<" + Globals.extensionDatabank + ">temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ tsd
+                    if (bank == null)
+                    {
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<tsd>temp;");
+                        I("RESET;");
+                        I("READ<tsd>temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ tsd, selection
+                    {
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<tsd>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
+                        I("RESET;");
+                        I("READ<tsd>temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ csv
+                    if (bank == null)
+                    {
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<2001 2002 csv>temp;");
+                        I("RESET;");
+                        I("READ<csv>temp;");
                         ReadFormatsHelper("a", bank);
 
                         //cols
-                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx cols>temp;");
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<2001 2002 csv cols>temp;");
                         I("RESET;");
-                        I("READ<xlsx cols>temp;");
+                        I("READ<csv cols>temp;");
                         ReadFormatsHelper("a", bank);
-                    }
-                    // ------ xlsx, selection
-                    {
-                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
-                        I("RESET;");
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("a", bank);
-                    }
 
-                    // ------ xlsx cells with SHEET and SHEET<import>               
+                    }
+                    // ------ csv, selection
                     {
-                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<2001 2002 csv>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                         I("RESET;");
-                        I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                        I("READ<csv>temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ prn
+                    if (bank == null)
+                    {
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<2001 2002 prn>temp;");
+                        I("RESET;");
+                        I("READ<prn>temp;");
                         ReadFormatsHelper("a", bank);
 
                         //cols
-                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no cols> xx1, " + bank + "xx3 file=temp;");  //export
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<2001 2002 prn cols>temp;");
                         I("RESET;");
-                        I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5' cols> xx1, xx3 file=temp;");  //import            
+                        I("READ<prn cols>temp;");
                         ReadFormatsHelper("a", bank);
-
-                        //
-                        // test matrix import/export
-                        //
+                    }
+                    // ------ prn, selection
+                    {
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<2001 2002 prn>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
+                        I("RESET;");
+                        I("READ<prn>temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ xlsx
+                    if (Globals.UNITTESTFOLLOWUP)
+                    {
+                        //removed PIA interop xlsx checks below
+                        //cannot get xlsx writing to work on new pc.
+                        //and it is bad anyway.
+                    }
+                    for (int i = 0; i < 1; i++)  //was: 2
+                    {
                         if (bank == null)
                         {
-                            I("SHEET <IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
-                            _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
-                            _AssertMatrix(First(), "#m", 1, 2, 3001, sharedDelta);
-                            _AssertMatrix(First(), "#m", 2, 1, 1002, sharedDelta);
-                            _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);
+                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (i == 0) I("OPTION sheet engine = internal;");
+                            else I("OPTION sheet engine = excel;");
+                            I("WRITE<xlsx>temp;");
+                            I("RESET;");
+                            I("READ<xlsx>temp;");
+                            ReadFormatsHelper("a", bank);
 
-                            I("#m1 = [1, 2, 3; 4, 5, 6];");
-                            I("export <xlsx> #m1 file = matrixfile.xlsx;");
-                            I("SHEET <IMPORT MATRIX> work:#m2 file=matrixfile.xlsx;");  //imports 2x2 matrix #
-                            _AssertMatrix(First(), "#m2", 1, 1, 1d, sharedDelta);
-                            _AssertMatrix(First(), "#m2", 1, 2, 2d, sharedDelta);
-                            _AssertMatrix(First(), "#m2", 1, 3, 3d, sharedDelta);
-                            _AssertMatrix(First(), "#m2", 2, 1, 4d, sharedDelta);
-                            _AssertMatrix(First(), "#m2", 2, 2, 5d, sharedDelta);
-                            _AssertMatrix(First(), "#m2", 2, 3, 6d, sharedDelta);
+                            //cols
+                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (i == 0) I("OPTION sheet engine = internal;");
+                            else I("OPTION sheet engine = excel;");
+                            I("WRITE<xlsx cols>temp;");
+                            I("RESET;");
+                            I("READ<xlsx cols>temp;");
+                            ReadFormatsHelper("a", bank);
+                        }
+                        // ------ xlsx, selection
+                        {
+                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (i == 0) I("OPTION sheet engine = internal;");
+                            else I("OPTION sheet engine = excel;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<xlsx>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
+                            I("RESET;");
+                            I("READ<xlsx>temp;");
+                            ReadFormatsHelper("a", bank);
+                        }
+
+                        // ------ xlsx cells with SHEET and SHEET<import>               
+                        {
+                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (i == 0) I("OPTION sheet engine = internal;");
+                            else I("OPTION sheet engine = excel;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> " + xx1 + ", " + bank + "" + xx3 + " file=temp;");  //export
+                            I("RESET;");
+                            I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> " + xx1 + ", " + xx3 + " file=temp;");  //import            
+                            ReadFormatsHelper("a", bank);
+
+                            //cols
+                            I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (i == 0) I("OPTION sheet engine = internal;");
+                            else I("OPTION sheet engine = excel;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no cols> " + xx1 + ", " + bank + "" + xx3 + " file=temp;");  //export
+                            I("RESET;");
+                            I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5' cols> " + xx1 + ", " + xx3 + " file=temp;");  //import            
+                            ReadFormatsHelper("a", bank);
+
+                            //
+                            // test matrix import/export
+                            //
+                            if (bank == null)
+                            {
+                                I("SHEET <IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
+                                _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
+                                _AssertMatrix(First(), "#m", 1, 2, 3001, sharedDelta);
+                                _AssertMatrix(First(), "#m", 2, 1, 1002, sharedDelta);
+                                _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);
+
+                                I("#m1 = [1, 2, 3; 4, 5, 6];");
+                                I("export <xlsx> #m1 file = matrixfile.xlsx;");
+                                I("SHEET <IMPORT MATRIX> work:#m2 file=matrixfile.xlsx;");  //imports 2x2 matrix #
+                                _AssertMatrix(First(), "#m2", 1, 1, 1d, sharedDelta);
+                                _AssertMatrix(First(), "#m2", 1, 2, 2d, sharedDelta);
+                                _AssertMatrix(First(), "#m2", 1, 3, 3d, sharedDelta);
+                                _AssertMatrix(First(), "#m2", 2, 1, 4d, sharedDelta);
+                                _AssertMatrix(First(), "#m2", 2, 2, 5d, sharedDelta);
+                                _AssertMatrix(First(), "#m2", 2, 3, 6d, sharedDelta);
+                            }
                         }
                     }
-                }
-                // ------ gnuplot (not actually testing the file)     
-                if (bank == null)
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001 2002 gnuplot>temp;");
-                }
-                // ------ gnuplot, selection  (not actually testing the file)                
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001 2002 gnuplot>xx1, " + bank + "xx3 file=temp;");
-                }
-                // ------ flat
-                if (bank == null)
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001 2002 flat>temp;");
-                    I("RESET;");
-                    I("READ<flat>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-
-                // ---------- Testing on quarters
-                // ---------- Testing on quarters
-                // ---------- Testing on quarters
-                // ---------- Testing on quarters
-                // ---------- Testing on quarters
-
-                I("RESET;");
-                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                I("OPTION freq q;");
-                // ------ tsdx
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ tsdx, selection
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ tsd
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<tsd>temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ tsd, selection
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ csv
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001q1 2001q2 csv>temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("q", bank);
-
-                    //cols
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001q1 2001q2 csv cols>temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<csv cols>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ csv, selection
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001q1 2001q2 csv>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ prn
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001q1 2001q2 prn>temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("q", bank);
-
-                    //cols
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001q1 2001q2 prn cols>temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<prn cols>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ prn, selection
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001q1 2001q2 prn>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                if (Globals.UNITTESTFOLLOWUP)
-                {
-                    //removed PIA interop xlsx checks below
-                    //cannot get xlsx writing to work on new pc.
-                    //and it is bad anyway.
-                }
-                // ------ xlsx
-                for (int i = 0; i < 1; i++)  //was: 2
-                {
+                    // ------ gnuplot (not actually testing the file)     
                     if (bank == null)
                     {
-                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx>temp;");
-                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("q", bank);
-
-                        //cols
-                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx cols>temp;");
-                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                        I("READ<xlsx cols>temp;");
-                        ReadFormatsHelper("q", bank);
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<2001 2002 gnuplot>temp;");
                     }
-                    // ------ xlsx, selection
+                    // ------ gnuplot, selection  (not actually testing the file)                
                     {
-                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
-                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("q", bank);
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<2001 2002 gnuplot>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                     }
-
-                    // ------ xlsx cells with SHEET and SHEET<import>
-                    {
-                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
-                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                        I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
-                        ReadFormatsHelper("q", bank);
-
-                        //TODO: <cols>
-                    }
-                }
-                // ------ gnuplot (not actually testing the file)
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001q1 2001q2 gnuplot>temp;");
-                }
-                // ------ gnuplot, selection  (not actually testing the file)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001q1 2001q2 gnuplot>xx1, " + bank + "xx3 file=temp;");
-                }
-
-                // ------ flat
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001q1 2001q2 flat>temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<flat>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-
-                // ---------- Testing on daily
-                // ---------- Testing on daily
-                // ---------- Testing on daily
-                // ---------- Testing on daily
-                // ---------- Testing on daily
-                // ---------- Testing on daily
-
-                I("RESET;");
-                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                I("OPTION freq d;");
-                // ------ gbk
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ gbk, selection
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
-                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ tsd
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<tsd>temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ tsd, selection
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ csv
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001m4d30 2001m5d1 csv>temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("d", bank);
-
-                    //cols
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001m4d30 2001m5d1 csv cols>temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<csv cols>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ csv, selection
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001m4d30 2001m5d1 csv>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ prn
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001m4d30 2001m5d1 prn>temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("d", bank);
-
-                    //cols
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001m4d30 2001m5d1 prn cols>temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<prn cols>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                // ------ prn, selection
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001m4d30 2001m5d1 prn>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-                if (Globals.UNITTESTFOLLOWUP)
-                {
-                    //removed PIA interop xlsx checks below
-                    //cannot get xlsx writing to work on new pc.
-                    //and it is bad anyway.
-                }
-                // ------ xlsx
-                for (int i = 0; i < 1; i++)  //was: 2
-                {
+                    // ------ flat
                     if (bank == null)
                     {
-                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx>temp;");
-                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("d", bank);
-
-                        //cols
-                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx cols>temp;");
-                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                        I("READ<xlsx cols>temp;");
-                        ReadFormatsHelper("d", bank);
+                        I("RESET; TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                        I("WRITE<2001 2002 flat>temp;");
+                        I("RESET;");
+                        I("READ<flat>temp;");
+                        ReadFormatsHelper("a", bank);
                     }
-                    // ------ xlsx, selection
+
+                    // ---------- Testing on quarters
+                    // ---------- Testing on quarters
+                    // ---------- Testing on quarters
+                    // ---------- Testing on quarters
+                    // ---------- Testing on quarters
+
+                    if (array == 0)
                     {
-                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
-                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("d", bank);
+                        //We only test this for non-array series, because of lazyness (if it work for annual, it probably works for the others, too)
+
+                        I("RESET;");
+                        G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                        I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                        I("OPTION freq q;");
+                        // ------ tsdx
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ tsdx, selection
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ tsd
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<tsd>temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ tsd, selection
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ csv
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001q1 2001q2 csv>temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<csv>temp;");
+                            ReadFormatsHelper("q", bank);
+
+                            //cols
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001q1 2001q2 csv cols>temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<csv cols>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ csv, selection
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2001q1 2001q2 csv>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<csv>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ prn
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001q1 2001q2 prn>temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<prn>temp;");
+                            ReadFormatsHelper("q", bank);
+
+                            //cols
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001q1 2001q2 prn cols>temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<prn cols>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        // ------ prn, selection
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2001q1 2001q2 prn>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<prn>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+                        if (Globals.UNITTESTFOLLOWUP)
+                        {
+                            //removed PIA interop xlsx checks below
+                            //cannot get xlsx writing to work on new pc.
+                            //and it is bad anyway.
+                        }
+                        // ------ xlsx
+                        for (int i = 0; i < 1; i++)  //was: 2
+                        {
+                            if (bank == null)
+                            {
+                                I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                I("WRITE<xlsx>temp;");
+                                I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                                I("READ<xlsx>temp;");
+                                ReadFormatsHelper("q", bank);
+
+                                //cols
+                                I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                I("WRITE<xlsx cols>temp;");
+                                I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                                I("READ<xlsx cols>temp;");
+                                ReadFormatsHelper("q", bank);
+                            }
+                            // ------ xlsx, selection
+                            {
+                                I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                                I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                                I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                                I("READ<xlsx>temp;");
+                                ReadFormatsHelper("q", bank);
+                            }
+
+                            // ------ xlsx cells with SHEET and SHEET<import>
+                            {
+                                I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                                I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                                I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                                I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                                ReadFormatsHelper("q", bank);
+
+                                //TODO: <cols>
+                            }
+                        }
+                        // ------ gnuplot (not actually testing the file)
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001q1 2001q2 gnuplot>temp;");
+                        }
+                        // ------ gnuplot, selection  (not actually testing the file)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2001q1 2001q2 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                        }
+
+                        // ------ flat
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001q1 2001q2 flat>temp;");
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("READ<flat>temp;");
+                            ReadFormatsHelper("q", bank);
+                        }
+
+                        // ---------- Testing on daily
+                        // ---------- Testing on daily
+                        // ---------- Testing on daily
+                        // ---------- Testing on daily
+                        // ---------- Testing on daily
+                        // ---------- Testing on daily
+
+                        I("RESET;");
+                        G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                        I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                        I("OPTION freq d;");
+                        // ------ gbk
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                            I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ gbk, selection
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                            I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ tsd
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<tsd>temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ tsd, selection
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ csv
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001m4d30 2001m5d1 csv>temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<csv>temp;");
+                            ReadFormatsHelper("d", bank);
+
+                            //cols
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001m4d30 2001m5d1 csv cols>temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<csv cols>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ csv, selection
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2001m4d30 2001m5d1 csv>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<csv>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ prn
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001m4d30 2001m5d1 prn>temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<prn>temp;");
+                            ReadFormatsHelper("d", bank);
+
+                            //cols
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001m4d30 2001m5d1 prn cols>temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<prn cols>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        // ------ prn, selection
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2001m4d30 2001m5d1 prn>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<prn>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+                        if (Globals.UNITTESTFOLLOWUP)
+                        {
+                            //removed PIA interop xlsx checks below
+                            //cannot get xlsx writing to work on new pc.
+                            //and it is bad anyway.
+                        }
+                        // ------ xlsx
+                        for (int i = 0; i < 1; i++)  //was: 2
+                        {
+                            if (bank == null)
+                            {
+                                I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                I("WRITE<xlsx>temp;");
+                                I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                                I("READ<xlsx>temp;");
+                                ReadFormatsHelper("d", bank);
+
+                                //cols
+                                I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                I("WRITE<xlsx cols>temp;");
+                                I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                                I("READ<xlsx cols>temp;");
+                                ReadFormatsHelper("d", bank);
+                            }
+                            // ------ xlsx, selection
+                            {
+                                I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                                I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                                I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                                I("READ<xlsx>temp;");
+                                ReadFormatsHelper("d", bank);
+                            }
+
+                            // ------ xlsx cells with SHEET and SHEET<import>
+                            {
+
+                                I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                                I("SHEET <2001m4d30 2001m5d1 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                                I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                                I("SHEET <2001m4d30 2001m5d1 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                                ReadFormatsHelper("d", bank);
+
+                                //TODO: <cols>
+
+                            }
+                        }
+                        // ------ gnuplot (not actually testing the file)
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001m4d30 2001m5d1 gnuplot>temp;");
+                        }
+                        // ------ gnuplot, selection  (not actually testing the file)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2001m4d30 2001m5d1 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                        }
+
+                        // ------ flat
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2001m4d30 2001m5d1 flat>temp;");
+                            I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                            I("READ<flat>temp;");
+                            ReadFormatsHelper("d", bank);
+                        }
+
+
+                        // ---------- Testing on weekly
+                        // ---------- Testing on weekly
+                        // ---------- Testing on weekly
+                        // ---------- Testing on weekly
+                        // ---------- Testing on weekly
+                        // ---------- Testing on weekly
+
+                        I("RESET;");
+                        G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                        I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                        I("OPTION freq w;");
+                        // ------ gbk
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                            I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ gbk, selection
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                            I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ tsd
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<tsd>temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ tsd, selection
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ csv
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2020w53 2021w1 csv>temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<csv>temp;");
+                            ReadFormatsHelper("w", bank);
+
+                            //cols
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2020w53 2021w1 csv cols>temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<csv cols>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ csv, selection
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2020w53 2021w1 csv>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<csv>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ prn
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2020w53 2021w1 prn>temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<prn>temp;");
+                            ReadFormatsHelper("w", bank);
+
+                            //cols
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2020w53 2021w1 prn cols>temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<prn cols>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        // ------ prn, selection
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2020w53 2021w1 prn>xx1, " + bank + "xx3 file=temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<prn>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
+                        if (Globals.UNITTESTFOLLOWUP)
+                        {
+                            //removed PIA interop xlsx checks below
+                            //cannot get xlsx writing to work on new pc.
+                            //and it is bad anyway.
+                        }
+                        // ------ xlsx
+                        for (int i = 0; i < 1; i++)  //was: 2
+                        {
+                            if (bank == null)
+                            {
+                                I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                I("WRITE<xlsx>temp;");
+                                I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                                I("READ<xlsx>temp;");
+                                ReadFormatsHelper("w", bank);
+
+                                //cols
+                                I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                I("WRITE<xlsx cols>temp;");
+                                I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                                I("READ<xlsx cols>temp;");
+                                ReadFormatsHelper("w", bank);
+                            }
+                            // ------ xlsx, selection
+                            {
+                                I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                                I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                                I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                                I("READ<xlsx>temp;");
+                                ReadFormatsHelper("w", bank);
+                            }
+
+                            // ------ xlsx cells with SHEET and SHEET<import>
+                            {
+
+                                I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                                if (i == 0) I("OPTION sheet engine = internal;");
+                                else I("OPTION sheet engine = excel;");
+                                if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                                I("SHEET <2020w53 2021w1 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                                I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                                I("SHEET <2020w53 2021w1 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                                ReadFormatsHelper("w", bank);
+
+                                //TODO: <cols>
+
+                            }
+                        }
+                        // ------ gnuplot (not actually testing the file)
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2020w53 2021w1 gnuplot>temp;");
+                        }
+                        // ------ gnuplot, selection  (not actually testing the file)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<2020w53 2021w1 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                        }
+
+                        // ------ flat
+                        if (bank == null)
+                        {
+                            I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            I("WRITE<2020w53 2021w1 flat>temp;");
+                            I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                            I("READ<flat>temp;");
+                            ReadFormatsHelper("w", bank);
+                        }
                     }
-
-                    // ------ xlsx cells with SHEET and SHEET<import>
-                    {
-
-                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("SHEET <2001m4d30 2001m5d1 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
-                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                        I("SHEET <2001m4d30 2001m5d1 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
-                        ReadFormatsHelper("d", bank);
-
-                        //TODO: <cols>
-
-                    }
-                }
-                // ------ gnuplot (not actually testing the file)
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001m4d30 2001m5d1 gnuplot>temp;");
-                }
-                // ------ gnuplot, selection  (not actually testing the file)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2001m4d30 2001m5d1 gnuplot>xx1, " + bank + "xx3 file=temp;");
-                }
-
-                // ------ flat
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2001m4d30 2001m5d1 flat>temp;");
-                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
-                    I("READ<flat>temp;");
-                    ReadFormatsHelper("d", bank);
-                }
-
-
-                // ---------- Testing on weekly
-                // ---------- Testing on weekly
-                // ---------- Testing on weekly
-                // ---------- Testing on weekly
-                // ---------- Testing on weekly
-                // ---------- Testing on weekly
-
-                I("RESET;");
-                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                I("OPTION freq w;");
-                // ------ gbk
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ gbk, selection
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
-                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<" + Globals.extensionDatabank + ">temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ tsd
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<tsd>temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ tsd, selection
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<tsd>temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ csv
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2020w53 2021w1 csv>temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("w", bank);
-
-                    //cols
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2020w53 2021w1 csv cols>temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<csv cols>temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ csv, selection
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2020w53 2021w1 csv>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<csv>temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ prn
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2020w53 2021w1 prn>temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("w", bank);
-
-                    //cols
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2020w53 2021w1 prn cols>temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<prn cols>temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                // ------ prn, selection
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2020w53 2021w1 prn>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<prn>temp;");
-                    ReadFormatsHelper("w", bank);
-                }
-                if (Globals.UNITTESTFOLLOWUP)
-                {
-                    //removed PIA interop xlsx checks below
-                    //cannot get xlsx writing to work on new pc.
-                    //and it is bad anyway.
-                }
-                // ------ xlsx
-                for (int i = 0; i < 1; i++)  //was: 2
-                {
-                    if (bank == null)
-                    {
-                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx>temp;");
-                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("w", bank);
-
-                        //cols
-                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        I("WRITE<xlsx cols>temp;");
-                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                        I("READ<xlsx cols>temp;");
-                        ReadFormatsHelper("w", bank);
-                    }
-                    // ------ xlsx, selection
-                    {
-                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
-                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                        I("READ<xlsx>temp;");
-                        ReadFormatsHelper("w", bank);
-                    }
-
-                    // ------ xlsx cells with SHEET and SHEET<import>
-                    {
-
-                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (i == 0) I("OPTION sheet engine = internal;");
-                        else I("OPTION sheet engine = excel;");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("SHEET <2020w53 2021w1 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
-                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                        I("SHEET <2020w53 2021w1 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
-                        ReadFormatsHelper("w", bank);
-
-                        //TODO: <cols>
-
-                    }
-                }
-                // ------ gnuplot (not actually testing the file)
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2020w53 2021w1 gnuplot>temp;");
-                }
-                // ------ gnuplot, selection  (not actually testing the file)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<2020w53 2021w1 gnuplot>xx1, " + bank + "xx3 file=temp;");
-                }
-
-                // ------ flat
-                if (bank == null)
-                {
-                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<2020w53 2021w1 flat>temp;");
-                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
-                    I("READ<flat>temp;");
-                    ReadFormatsHelper("w", bank);
                 }
             }
         }
