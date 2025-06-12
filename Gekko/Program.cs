@@ -24149,33 +24149,37 @@ namespace Gekko
 
                 i++;
 
+                List<Tuple<string, Series>> vars2 = new List<Tuple<string, Series>>();  //Contains all normal or sub-series
                 foreach (ToFrom var in vars)
-                {
-                    j = 1;
+                {                    
                     string s3 = G.Chop_GetName(var.s2);  //If for instance export <csv> fy* file = test; the .s2 will be varnames with first bank glued on (typically work), and this bank is removed here.
-
                     IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
+                    vars2.Add(new Tuple<string, Series>(s3, ts));
+                }
 
+                foreach (Tuple<string, Series> tup in vars2)
+                {
+                    j = 1;
                     GekkoTime tsStart = GekkoTime.tNull;
                     GekkoTime tsEnd = GekkoTime.tNull;
-                    tsStart = ts.GetPeriodFirst();
-                    tsEnd = ts.GetPeriodLast();
+                    tsStart = tup.Item2.GetPeriodFirst();
+                    tsEnd = tup.Item2.GetPeriodLast();
 
                     counter++;
                     if (fileType == EdataFormat.Csv)
                     {
-                        tab.Add(i, j, new CellLight(s3)); j++;
+                        tab.Add(i, j, new CellLight(tup.Item1)); j++;
                     }
                     else
                     {
-                        string s4 = s3;
+                        string s4 = tup.Item1;
                         if (Program.options.bugfix_sas) s4 = "\"" + s4.ToUpper() + "\""; //fY --> "FY"
                         tab.Add(i, j, new CellLight(G.varFormat(s4, prnWidth))); j++;
                     }
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
-                        double data = ts.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
+                        double data = tup.Item2.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
                         if (G.IsNumericalError(data))
                         {
                             if (!Program.options.bugfix_csv_missing && (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd)))

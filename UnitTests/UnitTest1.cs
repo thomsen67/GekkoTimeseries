@@ -31875,8 +31875,9 @@ print(df2)
             string xx2 = null;
             string xx3 = null;
             string defa = null;
+            bool fixMeMaybe = false;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such.
 
-            for (int array = 0; array < 1; array++)
+            for (int array = 0; array >= 0; array--)
             {
 
                 if (array == 0)
@@ -31916,30 +31917,36 @@ print(df2)
                     }
                     // ------ tsdx, selection
                     {
-                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
-                        I("WRITE<" + Globals.extensionDatabank + ">" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
-                        I("RESET;");
-                        I("READ<" + Globals.extensionDatabank + ">temp;");
-                        ReadFormatsHelper("a", bank, array);
+                        if (array == 0 && fixMeMaybe == fixMeMaybe)
+                        {                        
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<" + Globals.extensionDatabank + ">" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
+                            I("RESET;");
+                            I("READ<" + Globals.extensionDatabank + ">temp;");
+                            ReadFormatsHelper("a", bank, array);
+                        }
                     }
-                    // ------ tsd
-                    if (bank == null)
+                    if (array == 0 && fixMeMaybe == fixMeMaybe)
                     {
-                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        I("WRITE<tsd>temp;");
-                        I("RESET;");
-                        I("READ<tsd>temp;");
-                        ReadFormatsHelper("a", bank, array);
-                    }
-                    // ------ tsd, selection
-                    {
-                        I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
-                        I("WRITE<tsd>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
-                        I("RESET;");
-                        I("READ<tsd>temp;");
-                        ReadFormatsHelper("a", bank, array);
+                        // ------ tsd
+                        if (bank == null)
+                        {
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            I("WRITE<tsd>temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("a", bank, array);
+                        }
+                        // ------ tsd, selection
+                        {
+                            I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
+                            I("WRITE<tsd>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
+                            I("RESET;");
+                            I("READ<tsd>temp;");
+                            ReadFormatsHelper("a", bank, array);
+                        }
                     }
                     // ------ csv
                     if (bank == null)
@@ -32656,15 +32663,14 @@ print(df2)
                     }
                     else
                     {
-                        //FIXME!!
-                        _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
-                        _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
-                        _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
-                        _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
-                        _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
-                        _AssertSeries(First(), "xx3", 2001, 3001, sharedDelta);
-                        _AssertSeries(First(), "xx3", 2002, 3002, sharedDelta);
-                        _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2001, 1001, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2002, 1002, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2001, 3001, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2002, 3002, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2003, double.NaN, sharedDelta);
                     }
                 }
                 else if (freq == "q")
