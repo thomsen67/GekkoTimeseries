@@ -1191,7 +1191,7 @@ namespace UnitTests
             //The following will not work as x[{#i}] or x['{#i}'], probably too confusing anyway
             I("reset; time 2001 2001;");
             I("#i = z,;");
-            I("x = series(1);");            
+            I("x = series(1);");
             I("x[#i] = 300;");
             _AssertSeries(First(), "x!a", new string[] { "z" }, 2001, 300d, sharedDelta);
 
@@ -4367,8 +4367,8 @@ namespace UnitTests
             I("x = 12, 13;");
             I("@x = 2, 3;");
             I("gmulprt x;");
-            table = Globals.lastPrtOrMulprtTable;            
-            Assert.AreEqual(table.Get(3, 2).number, 13d, sharedDelta);            
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(3, 2).number, 13d, sharedDelta);
             Assert.AreEqual(table.Get(3, 3).number, (13d / 12d - 1d) * 100d, sharedDelta);
             Assert.AreEqual(table.Get(3, 4).number, 3d, sharedDelta);
             Assert.AreEqual(table.Get(3, 5).number, (3d / 2d - 1d) * 100d, sharedDelta);
@@ -4421,7 +4421,7 @@ namespace UnitTests
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).number, 2d / 3d * 100d, sharedDelta);
             Assert.AreEqual(table.Get(4, 2).number, 4d / 3d * 100d, sharedDelta);
-            Assert.AreEqual(table.Get(6, 2).number, 6d / 3d * 100d, sharedDelta);            
+            Assert.AreEqual(table.Get(6, 2).number, 6d / 3d * 100d, sharedDelta);
             I("x = 2, 3, 4, 5, 6;");
             I("prt <i=2004> x;");
             table = Globals.lastPrtOrMulprtTable;
@@ -4458,9 +4458,9 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 3).number, 4d, sharedDelta);
             Assert.AreEqual(table.Get(6, 3).number, 6d, sharedDelta);
             I("prt <ad> x;");
-            table = Globals.lastPrtOrMulprtTable;            
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(4, 2).number, 1d, sharedDelta);
-            Assert.AreEqual(table.Get(6, 2).number, 1d, sharedDelta);            
+            Assert.AreEqual(table.Get(6, 2).number, 1d, sharedDelta);
             Assert.AreEqual(table.Get(4, 3).number, 1d, sharedDelta);
             Assert.AreEqual(table.Get(6, 3).number, 1d, sharedDelta);
 
@@ -7759,7 +7759,7 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2002, double.NaN, 0d);
             _AssertSeries(First(), "x2!a", 2002, double.NaN, 0d);
             _AssertSeries(First(), "x3!a", 2002, double.NaN, 0d);
-            _AssertSeries(First(), "x4!a", 2002, Math.Log(2.1d/2d), sharedDelta);
+            _AssertSeries(First(), "x4!a", 2002, Math.Log(2.1d / 2d), sharedDelta);
 
             // -------------------------------------------------------------------
             // -------------------------- -x1 ------------------------------------
@@ -7814,7 +7814,7 @@ namespace UnitTests
             // ----------------- Scalars ------------------------------------
             I("reset;");
             I("%eps = eps();");
-            I("%i = 2;");            
+            I("%i = 2;");
             I("%x = %eps + %eps;");
             _AssertScalarVal(First(), "%x", Globals.eps);
             I("%x = %eps - %eps;");
@@ -7843,7 +7843,7 @@ namespace UnitTests
             I("%y = %x2 * %x3;");
             _AssertScalarVal(First(), "%y", 6d);
             I("%y = %x2 / %x3;");
-            _AssertScalarVal(First(), "%y", 2d/3d);
+            _AssertScalarVal(First(), "%y", 2d / 3d);
             I("%y = %x2 ** %x3;");
             _AssertScalarVal(First(), "%y", 8d);
             I("%y = -%x2;");
@@ -9160,8 +9160,8 @@ namespace UnitTests
             double factor = double.NaN;
             I("reset; time 2001 2013;");
             I("x1 <2001 2010> = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;");
-            I("x2 <2008 2013> = 21, 22, 23, 24, 25, 26;");            
-            I("splice y = x1 x2;");            
+            I("x2 <2008 2013> = 21, 22, 23, 24, 25, 26;");
+            I("splice y = x1 x2;");
             factor = (21d + 22d + 23d) / (8d + 9d + 10d);
             _AssertSeries(First(), "y!a", 2001, 1d * factor, sharedDelta);
             _AssertSeries(First(), "y!a", 2002, 2d * factor, sharedDelta);
@@ -9175,7 +9175,7 @@ namespace UnitTests
             _AssertSeries(First(), "y!a", 2010, 23d, sharedDelta);
             _AssertSeries(First(), "y!a", 2011, 24d, sharedDelta);
             _AssertSeries(First(), "y!a", 2012, 25d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2013, 26d, sharedDelta);            
+            _AssertSeries(First(), "y!a", 2013, 26d, sharedDelta);
 
             I("reset; time 2001 2013;");
             I("x1 <2001 2009> = 1, 2, 3, 4, 5, 6, 7, 8, 9;"); //1 less year in non-primary
@@ -9602,7 +9602,7 @@ namespace UnitTests
             //
             //  
 
-            
+
             // ----------------------------------------
             // Sanity test of types rel1, rel2, rel3 and abs.
             // ----------------------------------------
@@ -10181,6 +10181,94 @@ namespace UnitTests
                     _AssertSeries(First(), "ts5b", 2007, 0d, sharedTableDelta);
                 }
             }
+        }
+
+
+        [TestMethod]
+        public void _Test_Div()
+        {
+            I("reset; time 2001 2003;");
+            I("x1 = 5;");
+            I("x2 = 0;");
+            I("y = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("x1 = 0;");
+            I("x2 = 0;");
+            I("y = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, double.NaN, sharedDelta);
+
+            // ================ <div=zeros1> ========================
+
+            I("reset; time 2001 2003;");
+            I("x1 = 5;");
+            I("x2 = 0;");
+            I("y <div=zeros1> = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 0d, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("x1 = 0;");
+            I("x2 = 0;");
+            I("y <div=zeros1> = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 0d, sharedDelta);
+
+            // ================ <div=zeros2> ========================
+
+            I("reset; time 2001 2003;");
+            I("x1 = 5;");
+            I("x2 = 0;");
+            I("y <div=zeros2> = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("x1 = 0;");
+            I("x2 = 0;");
+            I("y <div=zeros2> = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 0d, sharedDelta);
+
+            // ================ <div=zeros2error> ========================
+
+            I("reset; time 2001 2003;");
+            I("x1 = 5;");
+            I("x2 = 0;");
+            FAIL("y <div=zeros2error> = x1/x2;");
+
+            I("reset; time 2001 2003;");
+            I("x1 = 0;");
+            I("x2 = 0;");
+            I("y <div=zeros2error> = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 0d, sharedDelta);
+
+            // ================ <div=zeros2> + option series div zeros2 error = yes ========================
+
+            I("reset; time 2001 2003; option series div zeros2 error = yes;");
+            I("x1 = 5;");
+            I("x2 = 0;");
+            FAIL("y <div=zeros2> = x1/x2;");
+
+            I("reset; time 2001 2003; option series div zeros2 error = yes;");
+            I("x1 = 0;");
+            I("x2 = 0;");
+            I("y <div=zeros2> = x1/x2;");
+            _AssertSeries(First(), "y!a", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 0d, sharedDelta);
+
         }
 
         [TestMethod]
