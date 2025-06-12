@@ -27,6 +27,15 @@ using System.Linq;
 
 namespace Gekko
 {
+    public class GetEquationTextHelper2
+    {
+        public string s1;
+        public string s2;
+        public string s3;
+        public List<string> mathRename;
+    }
+
+
     public class GetEquationTextHelper
     {
         public string resultingText;
@@ -34,6 +43,7 @@ namespace Gekko
         public string s_gekkoSyntax;
         public string s_gamsOrFrnSyntax;
         public bool hasHit = true;
+        public List<string> mathRename = null;
     }
 
     /// <summary>
@@ -255,8 +265,9 @@ namespace Gekko
                 if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
                 {
-                    Tuple<string, string, string> two2 = this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0);                                       
-                    rv.s_scalarModel += two2.Item2 + G.NL;                    
+                    GetEquationTextHelper2 two2 = this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0);                                       
+                    rv.s_scalarModel += two2.s2 + G.NL;
+                    rv.mathRename = two2.mathRename;
                     if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else
@@ -280,7 +291,7 @@ namespace Gekko
                 rv.resultingText += Globals.eqs3 + G.NL + G.NL + rv.s_gamsOrFrnSyntax + G.NL;
             }            
             
-            if (!hit) rv.hasHit = false;
+            if (!hit) rv.hasHit = false;            
             return rv;
         }
 
@@ -1816,7 +1827,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public Tuple<string, string, string> GetEquationTextUnfolded(string name, EquationTextHelper helper, GekkoTime t0)
+        public GetEquationTextHelper2 GetEquationTextUnfolded(string name, EquationTextHelper helper, GekkoTime t0)
         {
             //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
@@ -1831,10 +1842,18 @@ namespace Gekko
             // superfluous parentheses.
             // -------------------------------------------
 
+            List<string> mathRename = null;
+            if (helper.mathRename) mathRename = new List<string>();
+
             int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
             if (eq == -12345)
             {
-                return new Tuple<string, string, string>(null, "...equation '" + name + "' " + Globals.eqs6, null);
+                GetEquationTextHelper2 tmp2 = new GetEquationTextHelper2();
+                tmp2.s1 = null;
+                tmp2.s2 = "...equation '" + name + "' " + Globals.eqs6;
+                tmp2.s3 = null;
+                tmp2.mathRename = null;
+                return tmp2;
             }
 
             //Beware of this: for a scalar-2000 model, time basis is always 2000.
@@ -1937,6 +1956,10 @@ namespace Gekko
                     {
                         varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, false);
                     }
+                    if (mathRename != null)
+                    {
+                        varname2 = Program.MathPutIntoDict(mathRename, varname2);
+                    }
                     sb.Append(G.Blanks(tokens[i].leftblanks) + varname2);
                     i += 14;
                 }
@@ -1945,7 +1968,18 @@ namespace Gekko
                     //constants
                     int i1 = int.Parse(tokens[i + 4].s);
                     double c = this.cc[this.dd[eq][i1]];
-                    sb.Append(G.Blanks(tokens[i].leftblanks) + c.ToString());
+
+                    
+                    string sC = c.ToString();
+                    if (false)
+                    {
+                        if (mathRename != null)
+                        {
+                            sC = Program.MathPutIntoDict(mathRename, sC);
+                        }
+                    }
+
+                    sb.Append(G.Blanks(tokens[i].leftblanks) + sC);
                     i += 6;
                 }
                 else if (tokens[i].s == "M" && tokens[i + 1].s == ".")
@@ -1976,8 +2010,13 @@ namespace Gekko
                     rv1 = name.Replace("," + t0.ToString() + "]", "]").Replace("[" + t0.ToString() + "]", "");
                 }
             }
-            return new Tuple<string, string, string>(rv1, sb.ToString().Trim(), resName);
-        }
+            GetEquationTextHelper2 tmp = new GetEquationTextHelper2();
+            tmp.s1 = rv1;
+            tmp.s2 = sb.ToString().Trim();
+            tmp.s3 = resName;
+            tmp.mathRename = mathRename;
+            return tmp;
+        }        
 
         public string GamsModelDefinedString()
         {

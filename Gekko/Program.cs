@@ -49,7 +49,7 @@ using System.Linq;
 using OfficeOpenXml;
 using System.IO.Compression;
 using System.Threading.Tasks;
-//using AngouriMath;
+using AngouriMath;
 
 namespace Gekko
 {
@@ -330,6 +330,7 @@ namespace Gekko
     {
         public bool showTime = false;
         public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.
+        public bool mathRename = false;
     }
 
     /// <summary>
@@ -16457,320 +16458,405 @@ namespace Gekko
         {            
             if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.print_disp_model_gams_scalar, "modern"))
             {
-                //
-                // MODERN LOOK FOR SCALAR MODELS
-                // MODERN LOOK FOR SCALAR MODELS
-                // MODERN LOOK FOR SCALAR MODELS
-                //
-                Model model = Program.model;
-                ModelGams modelGams = Program.model.modelGams;
-                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);                
+                eqsPrinted = DispHelperShowGamsEquationsModern(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, varnameWithoutFreq, eqsPrinted, bank, isGams);
+            }
+            else
+            {
+                eqsPrinted = DispHelperShowGamsEquationsStandard(showDetailed, clickedLink, gamsToGekko, var, varnameWithoutFreq, eqsPrinted);
+            }
+            return eqsPrinted;
+        }
 
-                List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(varnameWithoutFreq, tUsedHere, model, false, false);
+        private static bool DispHelperShowGamsEquationsStandard(bool showDetailed, bool clickedLink, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted)
+        {
+            //
+            // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
+            // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
+            // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
+            //
 
-                if (eqsContainingVariable.Count == 0)
+            string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
+
+            GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
+            {
+                foreach (ModelGamsEquation e5 in e4.Value)
                 {
-                    eqsPrinted = false;
+                    GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
+                    if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key))
+                    {
+                        dependents.Add(e4.Key, null);
+                    }
+                }
+            }
+
+            List<string> precedents2 = new List<string>();
+            precedents2.AddRange(dependents.Keys);
+            precedents2.Sort();
+
+            if (precedents2.Count > 0)
+            {
+                G.Write("Variable " + varnameWithoutFreqAndIndex + " influences: ");
+                int counter = -1;
+                foreach (string s in precedents2)
+                {
+                    counter++;
+                    if (counter > 0)
+                    {
+                        G.Write(", ");
+                    }
+                    G.WriteLink(s, "disp:" + s);
+                }
+                G.Writeln();
+            }
+
+            List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
+
+            if (G.IsUnitTesting())
+            {
+                Globals.unitTestDependents = new List<string>();
+                if (eqs != null)
+                {
+                    foreach (ModelGamsEquation eq in eqs)
+                    {
+                        Globals.unitTestDependents.Add(eq.nameGams);
+                    }
+                }
+            }
+
+            if (eqs != null && eqs.Count > 0)
+            {
+                if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
+                {
+                    new Note("Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
+                }
+
+                PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
+                eqsPrinted = true;
+
+                if (!showDetailed)
+                {
+                    G.Writeln();
+                    G.WriteLink("Show GAMS equation" + G.S(eqs.Count), "disp2:" + var);
+                    G.Writeln();
+                }
+            }
+
+            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
+            return eqsPrinted;
+        }
+
+        private static bool DispHelperShowGamsEquationsModern(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, string varnameWithoutFreq, bool eqsPrinted, string bank, bool isGams)
+        {
+            //
+            // MODERN LOOK FOR SCALAR MODELS
+            // MODERN LOOK FOR SCALAR MODELS
+            // MODERN LOOK FOR SCALAR MODELS
+            //
+            Model model = Program.model;
+            ModelGams modelGams = Program.model.modelGams;
+            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+            GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);
+
+            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(varnameWithoutFreq, tUsedHere, model, false, false);
+
+            if (eqsContainingVariable.Count == 0)
+            {
+                eqsPrinted = false;
+            }
+            else
+            {
+
+                //Gets the most promising equation
+                EqInfoSimple bestEq = eqsContainingVariable[0];
+
+                //Gets dependents: equations that contain the variable                    
+                string dependentEqsWithoutIndexes = null;
+                string dependentEqsWithIndexes = null;
+                List<string> eqNamesWithoutIndexesNoTimeList = new List<string>();
+                List<string> eqNamesWithIndexesNoTimeList = new List<string>();
+                GekkoDictionaryBlanks<int> eqNamesWithoutIndexesNoTime = new GekkoDictionaryBlanks<int>();
+                GekkoDictionaryBlanks<int> eqNamesWithIndexesNoTime = new GekkoDictionaryBlanks<int>();
+                foreach (EqInfoSimple eqHelper in eqsContainingVariable)
+                {
+                    string temp1 = G.Chop_RemoveIndex(eqHelper.eqName);
+                    if (!eqNamesWithoutIndexesNoTime.ContainsKey(temp1)) eqNamesWithoutIndexesNoTime.Add(temp1, 0);
+                    string temp2 = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);
+                    if (!eqNamesWithIndexesNoTime.ContainsKey(temp2)) eqNamesWithIndexesNoTime.Add(temp2, 0);
+                }
+                eqNamesWithoutIndexesNoTimeList = eqNamesWithoutIndexesNoTime.GetKeys();
+                eqNamesWithoutIndexesNoTimeList.Sort(G.CompareNaturalIgnoreCase);
+                eqNamesWithIndexesNoTimeList = eqNamesWithIndexesNoTime.GetKeys();
+                eqNamesWithIndexesNoTimeList.Sort(G.CompareNaturalIgnoreCase);
+                foreach (string s in eqNamesWithoutIndexesNoTimeList)
+                {
+                    dependentEqsWithoutIndexes += ", " + s;
+                }
+                dependentEqsWithoutIndexes = dependentEqsWithoutIndexes.Substring(", ".Length);
+                foreach (string s in eqNamesWithIndexesNoTimeList)
+                {
+                    dependentEqsWithIndexes += ", " + s;
+                }
+                dependentEqsWithIndexes = dependentEqsWithIndexes.Substring(", ".Length);
+
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainOmitVeryFirstNewLine();
+                    txt.MainAdd("Equation " + G.Chop_RemoveIndex(bestEq.eqName) + ":");
+                }
+
+                //Gets the equation text (raw)
+                EquationTextHelper helperA = new EquationTextHelper();
+                helperA.mathRename = true;  //activate it!
+                GetEquationTextHelper helperAA = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperA, tUsedHere);
+                string eqTextA = helperAA.s_gekkoSyntax;                
+
+                if (true)
+                {
+                    //Make raw equation text with links
+                    //GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
+                    string resulting = null;
+                    TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqTextA);
+                    for (int i = 0; i < tokens.storage.Count; i++)
+                    {
+                        bool done = false;
+                        TokenHelper token = tokens[i];
+                        string varname = token.s;
+                        string varnameWithIndex = null;
+                        int success = -12345;
+                        if (token.leftblanks > 0) resulting += G.Blanks(token.leftblanks);
+                        if (token.type == ETokenType.Word && !(i > 0 && tokens[i].leftblanks == 0 && tokens[i - 1].s == "#"))  //no sets
+                        {
+                            if (i < tokens.storage.Count - 1 && tokens[i + 1].s == "[")
+                            {
+                                for (int ii = i + 2; ii < tokens.storage.Count; ii++)
+                                {
+                                    if (tokens[ii].s == "[") break;  //Does not accept ...[...[
+                                    else if (tokens[ii].s == "]")
+                                    {
+                                        success = ii;
+                                        break;
+                                    }
+                                }
+                                if (success != -12345)
+                                {
+                                    for (int j = i; j <= success; j++)
+                                    {
+                                        varnameWithIndex += tokens[j].ToStringTrim();
+                                    }
+                                }
+                            }
+
+                            List<string> m = new List<string>() { varnameWithIndex, varname };
+
+                            for (int jj = 0; jj < 2; jj++)
+                            {
+                                string mm = m[jj];
+                                if (done) break;
+                                if (mm == null) continue;
+
+                                bool hit = false;
+                                List<string> vars = null;
+                                if (jj == 0) vars = Program.model.modelGamsScalar.GetVars(2);
+                                else vars = Program.model.modelGamsScalar.GetVars(3);
+                                foreach (string s in vars)
+                                {
+                                    if (G.EqualHandleBlanks(mm, s))
+                                    {
+                                        hit = true;
+                                        break;
+                                    }
+                                }
+
+                                Series ts2 = null;
+                                if (hit) ts2 = O.GetIVariableFromString(mm, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                if (ts2 != null)
+                                {
+                                    //
+                                    // This is the math equation, with links inserted
+                                    //
+                                    Action<GAO> a = (gao) =>
+                                    {
+                                        DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, true, ts2, mm, bank, isGams);
+                                        //DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts2, mm, bank, isGams);
+                                    };
+                                    resulting += G.GetLinkAction(mm, new GekkoAction(EGekkoActionTypes.Unknown, null, a));
+                                    if (jj == 0) i = success;
+                                    done = true;
+                                }
+                            }
+                        }
+
+                        if (!done)
+                        {
+                            resulting += varname;
+                        }
+                    }
+                    new Writeln(resulting, "", int.MaxValue, Color.Empty, false, ETabs.Main);
+                }
+
+                //Gets precedents (variables found in the equation)
+                EquationTextHelper helper2 = new EquationTextHelper();
+                helper2.showTime = false;
+                List<string> precedents = modelGamsScalar.GetPrecedentsNames(bestEq.eqNumber, helper2, tUsedHere);
+                precedents.Sort(G.CompareNaturalIgnoreCase);
+                List<string> precedents2 = new List<string>();
+                //
+                // This is the list of variables in the math equation, with links inserted
+                //
+                ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, precedents, precedents2);
+                string ss = Stringlist.GetListWithCommas(precedents2);
+                using (Writeln txt = new Writeln("Variables:  ", -12345, Color.Empty, false, ETabs.Main))
+                {
+                    txt.MainAdd(ss);
+                }
+
+                if (Program.options.bugfix_disp_influences_equ)
+                {
+                    using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
+                    {
+                        txt.MainOmitVeryFirstNewLine();
+                        txt.MainAdd(dependentEqsWithoutIndexes);
+                    }
                 }
                 else
                 {
+                    string eq1 = "$$$"; string eq2 = "equation ";
+                    string vars = null;
+                    string dependentVars = null;
+                    GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
 
-                    //Gets the most promising equation
-                    EqInfoSimple bestEq = eqsContainingVariable[0];
 
-                    //Gets dependents: equations that contain the variable                    
-                    string dependentEqsWithoutIndexes = null;
-                    string dependentEqsWithIndexes = null;
-                    List<string> eqNamesWithoutIndexesNoTimeList = new List<string>();
-                    List<string> eqNamesWithIndexesNoTimeList = new List<string>();
-                    GekkoDictionaryBlanks<int> eqNamesWithoutIndexesNoTime = new GekkoDictionaryBlanks<int>();
-                    GekkoDictionaryBlanks<int> eqNamesWithIndexesNoTime = new GekkoDictionaryBlanks<int>();
-                    foreach (EqInfoSimple eqHelper in eqsContainingVariable)
+                    GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    foreach (EqInfoSimple eqInfo in eqsContainingVariable)
                     {
-                        string temp1 = G.Chop_RemoveIndex(eqHelper.eqName);
-                        if (!eqNamesWithoutIndexesNoTime.ContainsKey(temp1)) eqNamesWithoutIndexesNoTime.Add(temp1, 0);
-                        string temp2 = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);
-                        if (!eqNamesWithIndexesNoTime.ContainsKey(temp2)) eqNamesWithIndexesNoTime.Add(temp2, 0);
+                        double bestScore = double.MinValue;
+                        string bestVar = "<not found>";
+                        foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars)
+                        {
+                            //foreach precedent variable
+                            string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                            EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
+                            GamsModel.ScoreEquationGivenVariable(eqInfoClone, varName, model, modelGams, modelGamsScalar);
+                            double score = eqInfoClone.score;
+                            if (score > bestScore)
+                            {
+                                bestVar = varName;
+                                bestScore = score;
+                            }
+                        }
+                        if (!deps.ContainsKey(bestVar) && !G.EqualHandleBlanks(bestVar, varnameWithoutFreq)) deps.Add(bestVar, false);
                     }
-                    eqNamesWithoutIndexesNoTimeList = eqNamesWithoutIndexesNoTime.GetKeys();
-                    eqNamesWithoutIndexesNoTimeList.Sort(G.CompareNaturalIgnoreCase);
-                    eqNamesWithIndexesNoTimeList = eqNamesWithIndexesNoTime.GetKeys();
-                    eqNamesWithIndexesNoTimeList.Sort(G.CompareNaturalIgnoreCase);
-                    foreach (string s in eqNamesWithoutIndexesNoTimeList)
+
+                    List<string> dependentVarsList = deps.Keys.ToList();
+                    dependentVarsList.Sort(G.CompareNaturalIgnoreCase);
+                    dependentVars = Stringlist.GetListWithCommas(dependentVarsList);
+                    List<string> dependentVarsList2 = new List<string>();
+                    //
+                    // This is the list of variables influenced by the variable, with links inserted
+                    //
+                    ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, dependentVarsList, dependentVarsList2);
+                    using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
                     {
-                        dependentEqsWithoutIndexes += ", " + s;
+                        txt.MainOmitVeryFirstNewLine();
+                        txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2).Replace(eq1, eq2));
                     }
-                    dependentEqsWithoutIndexes = dependentEqsWithoutIndexes.Substring(", ".Length);
-                    foreach (string s in eqNamesWithIndexesNoTimeList)
+                }
+
+                G.Writeln("------------------------------------------------------------------------------------------");
+                if (showDetailed)
+                {
+                    //Gets the equation text (raw)
+                    EquationTextHelper helperB = new EquationTextHelper();
+                    GetEquationTextHelper helperBB = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperB, tUsedHere);
+
+                    string eqTextB = null;
+                    if (Program.options.model_gams_scalar_normalize)
                     {
-                        dependentEqsWithIndexes += ", " + s;
+                        try
+                        {
+                            string output = MathNormalize(varnameWithoutFreq, helperAA.s_scalarModel, helperAA.mathRename);                            
+                            varnameWithoutFreq = MathGetPrettyName(varnameWithoutFreq, helperAA);
+                            eqTextB = varnameWithoutFreq + " = " + G.Substring(output, 2, output.Length - 2);
+                            if (Globals.runningOnTTComputer) eqTextB += G.NL + G.NL + "TT: " + helperBB.s_scalarModel;
+                        }
+                        catch
+                        {
+                            eqTextB = helperBB.s_scalarModel;
+                        }
                     }
-                    dependentEqsWithIndexes = dependentEqsWithIndexes.Substring(", ".Length);
+                    else
+                    {
+                        eqTextB = helperBB.s_scalarModel;
+                    }
 
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainOmitVeryFirstNewLine();
-                        txt.MainAdd("Equation " + G.Chop_RemoveIndex(bestEq.eqName) + ":");
-                    }
-
-                    //Gets the equation text (raw)
-                    EquationTextHelper helperA = new EquationTextHelper();
-                    GetEquationTextHelper helperAA = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperA, tUsedHere);
-                    string eqTextA = helperAA.s_gekkoSyntax;
-
-                    if (true)
-                    {
-                        //Make raw equation text with links
-                        //GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
-                        string resulting = null;
-                        TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqTextA);
-                        for (int i = 0; i < tokens.storage.Count; i++)
-                        {
-                            bool done = false;
-                            TokenHelper token = tokens[i];
-                            string varname = token.s;
-                            string varnameWithIndex = null;
-                            int success = -12345;
-                            if (token.leftblanks > 0) resulting += G.Blanks(token.leftblanks);
-                            if (token.type == ETokenType.Word && !(i > 0 && tokens[i].leftblanks == 0 && tokens[i - 1].s == "#"))  //no sets
-                            {
-                                if (i < tokens.storage.Count - 1 && tokens[i + 1].s == "[")
-                                {
-                                    for (int ii = i + 2; ii < tokens.storage.Count; ii++)
-                                    {
-                                        if (tokens[ii].s == "[") break;  //Does not accept ...[...[
-                                        else if (tokens[ii].s == "]")
-                                        {
-                                            success = ii;
-                                            break;
-                                        }
-                                    }
-                                    if (success != -12345)
-                                    {
-                                        for (int j = i; j <= success; j++)
-                                        {
-                                            varnameWithIndex += tokens[j].ToStringTrim();
-                                        }
-                                    }
-                                }
-
-                                List<string> m = new List<string>() { varnameWithIndex, varname };
-
-                                for (int jj = 0; jj < 2; jj++)
-                                {
-                                    string mm = m[jj];
-                                    if (done) break;
-                                    if (mm == null) continue;
-
-                                    bool hit = false;
-                                    List<string> vars = null;
-                                    if (jj == 0) vars = Program.model.modelGamsScalar.GetVars(2);
-                                    else vars = Program.model.modelGamsScalar.GetVars(3);
-                                    foreach (string s in vars)
-                                    {
-                                        if (G.EqualHandleBlanks(mm, s))
-                                        {
-                                            hit = true;
-                                            break;
-                                        }
-                                    }
-
-                                    Series ts2 = null;
-                                    if (hit) ts2 = O.GetIVariableFromString(mm, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
-                                    if (ts2 != null)
-                                    {
-                                        //
-                                        // This is the math equation, with links inserted
-                                        //
-                                        Action<GAO> a = (gao) =>
-                                        {
-                                            DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, true, ts2, mm, bank, isGams);
-                                            //DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts2, mm, bank, isGams);
-                                        };
-                                        resulting += G.GetLinkAction(mm, new GekkoAction(EGekkoActionTypes.Unknown, null, a));
-                                        if (jj == 0) i = success;
-                                        done = true;
-                                    }
-                                }
-                            }
-
-                            if (!done)
-                            {
-                                resulting += varname;
-                            }
-                        }
-                        new Writeln(resulting, "", int.MaxValue, Color.Empty, false, ETabs.Main);
-                    }
-
-                    //Gets precedents (variables found in the equation)
-                    EquationTextHelper helper2 = new EquationTextHelper();
-                    helper2.showTime = false;
-                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(bestEq.eqNumber, helper2, tUsedHere);
-                    precedents.Sort(G.CompareNaturalIgnoreCase);
-                    List<string> precedents2 = new List<string>();
-                    //
-                    // This is the list of variables in the math equation, with links inserted
-                    //
-                    ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, precedents, precedents2);
-                    string ss = Stringlist.GetListWithCommas(precedents2);
-                    using (Writeln txt = new Writeln("Variables:  ", -12345, Color.Empty, false, ETabs.Main))
-                    {
-                        txt.MainAdd(ss);
-                    }
-
-                    if (Program.options.bugfix_disp_influences_equ)
-                    {
-                        using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
-                        {
-                            txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd(dependentEqsWithoutIndexes);
-                        }
-                    }
-                    else
-                    {
-                        string eq1 = "$$$"; string eq2 = "equation ";
-                        string vars = null;
-                        string dependentVars = null;
-                        GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
-                        
-
-                        GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                        foreach (EqInfoSimple eqInfo in eqsContainingVariable)
-                        {
-                            double bestScore = double.MinValue;
-                            string bestVar = "<not found>";
-                            foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars)
-                            {
-                                //foreach precedent variable
-                                string varName = modelGamsScalar.GetVarNameA(dp.variable);
-                                EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
-                                GamsModel.ScoreEquationGivenVariable(eqInfoClone, varName, model, modelGams, modelGamsScalar);
-                                double score = eqInfoClone.score;
-                                if (score > bestScore)
-                                {
-                                    bestVar = varName;
-                                    bestScore = score;
-                                }
-                            }
-                            if (!deps.ContainsKey(bestVar) && !G.EqualHandleBlanks(bestVar, varnameWithoutFreq)) deps.Add(bestVar, false);
-                        }
-
-                        List<string> dependentVarsList = deps.Keys.ToList();
-                        dependentVarsList.Sort(G.CompareNaturalIgnoreCase);
-                        dependentVars = Stringlist.GetListWithCommas(dependentVarsList);
-                        List<string> dependentVarsList2 = new List<string>();
-                        //
-                        // This is the list of variables influenced by the variable, with links inserted
-                        //
-                        ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, dependentVarsList, dependentVarsList2);
-                        using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
-                        {
-                            txt.MainOmitVeryFirstNewLine();
-                            txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2).Replace(eq1, eq2));
-                        }
-                    }
-
-                    G.Writeln("------------------------------------------------------------------------------------------");
-                    if (showDetailed)
-                    {
-                        //Gets the equation text (raw)
-                        EquationTextHelper helperB = new EquationTextHelper();
-                        GetEquationTextHelper helperBB = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperB, tUsedHere);
-                        string eqTextB = helperBB.s_scalarModel;                        
-                        using (Writeln txt = new Writeln())
-                        {
-                            txt.MainOmitVeryFirstNewLine();                            
-                            txt.MainAdd(eqTextB);
-                        }
-                    }
-                    else
-                    {                        
-                        G.WriteLink("Show detailed equation", "disp2:" + varnameWithoutFreq);
-                        G.Writeln();                        
+                        txt.MainAdd(eqTextB);
                     }
                 }
-                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
-            }
-            else
-            {
-                //
-                // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
-                // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
-                // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
-                //
-
-                string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
-
-                GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
+                else
                 {
-                    foreach (ModelGamsEquation e5 in e4.Value)
-                    {
-                        GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
-                        if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key))
-                        {
-                            dependents.Add(e4.Key, null);
-                        }
-                    }
-                }
-
-                List<string> precedents2 = new List<string>();
-                precedents2.AddRange(dependents.Keys);
-                precedents2.Sort();
-
-                if (precedents2.Count > 0)
-                {
-                    G.Write("Variable " + varnameWithoutFreqAndIndex + " influences: ");
-                    int counter = -1;
-                    foreach (string s in precedents2)
-                    {
-                        counter++;
-                        if (counter > 0)
-                        {
-                            G.Write(", ");
-                        }
-                        G.WriteLink(s, "disp:" + s);
-                    }
+                    G.WriteLink("Show detailed equation", "disp2:" + varnameWithoutFreq);
                     G.Writeln();
                 }
-
-                List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
-
-                if (G.IsUnitTesting())
-                {
-                    Globals.unitTestDependents = new List<string>();
-                    if (eqs != null)
-                    {
-                        foreach (ModelGamsEquation eq in eqs)
-                        {
-                            Globals.unitTestDependents.Add(eq.nameGams);
-                        }
-                    }
-                }
-
-                if (eqs != null && eqs.Count > 0)
-                {
-                    if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
-                    {
-                        new Note("Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
-                    }
-
-                    PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
-                    eqsPrinted = true;
-
-                    if (!showDetailed)
-                    {
-                        G.Writeln();
-                        G.WriteLink("Show GAMS equation" + G.S(eqs.Count), "disp2:" + var);
-                        G.Writeln();
-                    }
-                }
-
-                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
             }
+            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
             return eqsPrinted;
         }
+
+        private static string MathGetPrettyName(string varnameWithoutFreq, GetEquationTextHelper helperAA)
+        {
+            for (int i = 0; i < helperAA.mathRename.Count; i++)
+            {
+                if (G.EqualHandleBlanks(varnameWithoutFreq, helperAA.mathRename[i]))
+                {
+                    varnameWithoutFreq = helperAA.mathRename[i];
+                    break;
+                }
+            }
+
+            return varnameWithoutFreq;
+        }
+
+        private static string MathNormalize(string varnameWithoutFreq, string modelText, List<string> mathRename)
+        {
+            Entity expr = modelText;
+            Entity.Variable x = MathPutIntoDict(mathRename, varnameWithoutFreq);
+            string s = expr.Solve(x).Simplify().ToString();
+            int more = 20;
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(s, more);
+            for (int i = 0; i < tokens.Count(); i++)
+            {
+                if (tokens[i].type == ETokenType.Word && tokens[i].s.StartsWith("x_"))
+                {
+                    tokens[i].s = mathRename[int.Parse(tokens[i].s.Substring(2))];
+                }
+            }
+            string output = tokens.ToString();
+            return output;
+        }
+
+        public static string MathPutIntoDict(List<string> mathRename, string varname2)
+        {
+            int i2 = -12345;
+            for (int i = 0; i < mathRename.Count; i++)
+            {
+                if (G.Equal(mathRename[i], G.HandleBlanksRemove(varname2)))
+                {
+                    i2 = i;
+                    break;
+                }
+            }
+            if (i2 == -12345)
+            {
+                mathRename.Add(varname2);
+                i2 = mathRename.Count - 1;
+            }
+            varname2 = "x_" + i2;
+            return varname2;
+        }        
 
         private static void ListWithLinks(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, string bank, bool isGams, List<string> precedents, List<string> precedents2)
         {
@@ -26479,7 +26565,12 @@ namespace Gekko
                 new Error("Method '" + method + "' only supports a --> q, a --> m or q --> m");
             }
 
-            if (n != m * k) new Error("Expected indicator to have " + (m * k) + " periods, got " + n);
+            if (n != m * k)
+            {
+                string note = null;
+                if (x.freq != z.freq) note = " Note: the left-hand timeseries and the indicator timeseries do not have the same frequency (" + x.freq.Pretty().ToLower() + " versus " + z.freq.Pretty().ToLower() + ").";
+                new Error("Expected indicator to have " + (m * k) + " periods, got " + n + "." + note);
+            }
 
             double factor = 1d; if (isAvg) factor = k;
 
@@ -27032,7 +27123,7 @@ namespace Gekko
         /// <summary>
         /// Takes a list of IVariables an convert them into a list of Series. The IVariables may
         /// be series, val or 1x1 matrix. 
-        /// Note: See also the methods O.ConvertToSeriesMaybeConstant() and Functions.Helper_GeneralFunction().
+        /// Note: See also the methods Series.ConvertToSeriesMaybeConstant() and Functions.Helper_GeneralFunction().
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="xlist"></param>
@@ -27044,7 +27135,7 @@ namespace Gekko
             {
                 if (x.Type() != EVariableType.List)
                 {
-                    xlistUnfolded.Add(O.ConvertToSeriesMaybeConstant(smpl, x));
+                    xlistUnfolded.Add(Series.ConvertToSeriesMaybeConstant(smpl, x));
                 }
                 else
                 {

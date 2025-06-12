@@ -1974,7 +1974,7 @@ namespace Gekko
         /// Helper method to deal with two-argument function, where arguments may be scalar or series or even 1x1 matrix.
         /// The function must be given normal and "swapped", for instance (x1, x2) => x1 - x2, followed by (x1, x2) => x2 - x1.
         /// Just swap varnames on rhs only in the swapped function (pure syntactics, no thinking needed). For symmetrical functions swapping yields the same, but must still be stated.
-        /// Note: See also the methods O.ConvertToSeriesMaybeConstant() and Program.UnfoldAsSeries().
+        /// Note: See also the methods Series.ConvertToSeriesMaybeConstant() and Program.UnfoldAsSeries().
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
@@ -2432,8 +2432,7 @@ namespace Gekko
             {
                 if (m2.data.GetLength(0) != 1)
                 {
-                    new Error("" + type.ToString() + "(): There are " + m1.data.GetLength(0) + " and " + m2.data.GetLength(0) + " rows in the matrices");
-                    //throw new GekkoException();
+                    new Error("" + type.ToString() + "(): There are " + m1.data.GetLength(0) + " and " + m2.data.GetLength(0) + " rows in the matrices");                    
                 }
                 else
                 {
@@ -2445,8 +2444,7 @@ namespace Gekko
             {
                 if (m2.data.GetLength(1) != 1)
                 {
-                    new Error("" + type.ToString() + "(): There are " + m1.data.GetLength(1) + " and " + m2.data.GetLength(1) + " cols in the matrices");
-                    //throw new GekkoException();
+                    new Error("" + type.ToString() + "(): There are " + m1.data.GetLength(1) + " and " + m2.data.GetLength(1) + " cols in the matrices");                    
                 }
                 else
                 {
@@ -3187,7 +3185,7 @@ namespace Gekko
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
-            IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
+            IVariable iv = Series.ConvertToSeriesMaybeConstant(smplHere, x);
             double d = 0d;
             foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
             {
@@ -3206,7 +3204,7 @@ namespace Gekko
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
-            IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
+            IVariable iv = Series.ConvertToSeriesMaybeConstant(smplHere, x);
             double d = 0d;
             foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
             {
@@ -3265,7 +3263,7 @@ namespace Gekko
             foreach (IVariable item in m.list)
             {
                 IVariable xx = null;
-                if (hasSeries) xx = O.ConvertToSeriesMaybeConstant(smpl, item);
+                if (hasSeries) xx = Series.ConvertToSeriesMaybeConstant(smpl, item);
                 else xx = new ScalarVal(O.ConvertToVal(item));  //will not happen often
                 rv = O.Add(smpl, rv, xx);
             }
@@ -3275,6 +3273,19 @@ namespace Gekko
             return rv;
         }
 
+        public static IVariable ratio(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+
+            GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
+            IVariable iv = Series.ConvertToSeriesMaybeConstant(smplHere, x);
+            double d = 0d;
+            foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
+            {
+                d += (iv as Series).GetData(smpl, t);
+            }
+            return new ScalarVal(d);
+        }
 
         public static IVariable percentile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable percent)
         {
@@ -4123,7 +4134,7 @@ namespace Gekko
                 {
                     //overlay, here we expect a series, scalar or 1x1 matrix
                     method = "overlay";
-                    overlay = O.ConvertToSeriesMaybeConstant(smplHere, x[1]);
+                    overlay = Series.ConvertToSeriesMaybeConstant(smplHere, x[1]);
                 }
             }
             else if (x.Length == 3)
@@ -4131,7 +4142,7 @@ namespace Gekko
                 if (x[1].Type() == EVariableType.String)
                 {
                     method = x[1].ConvertToString();
-                    overlay = O.ConvertToSeriesMaybeConstant(smplHere, x[2]);
+                    overlay = Series.ConvertToSeriesMaybeConstant(smplHere, x[2]);
                     if (!G.Equal(method, "overlay")) new Error("Expected 'overlay' as 2. argument if there are 3 arguments.");
                 }
                 else
@@ -6391,18 +6402,18 @@ namespace Gekko
                         if (!eq.Contains(t.ToString() + "]")) continue;
                         if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
                         if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
-                        Tuple<string, string, string> two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, t);
-                        string eqText = two.Item1 + " .. " + two.Item2;                                                
+                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, t);
+                        string eqText = two.s1 + " .. " + two.s2;
                         string lhs = "[unknown]";
-                        if (two.Item3 != null) lhs = G.Replace(two.Item3, "res_", "", StringComparison.OrdinalIgnoreCase, 1);
+                        if (two.s3 != null) lhs = G.Replace(two.s3, "res_", "", StringComparison.OrdinalIgnoreCase, 1);
                         string label = null;
                         if (lhs != "[unknown]") label = "'" + Helper_GetLabel(lhs) + "'";
                         sw.WriteLine();
-                        string s2 = lhs + " from " + two.Item1;
+                        string s2 = lhs + " from " + two.s1;
                         sw.WriteLine(s2);
                         sw.WriteLine(label);
                         sw.WriteLine();
-                        sw.WriteLine(two.Item2);
+                        sw.WriteLine(two.s2);
                         sw.WriteLine();
                         sw.WriteLine(" ------------------------------------------------------------------------------- ");                        
                     }

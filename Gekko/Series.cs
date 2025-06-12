@@ -2150,6 +2150,35 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Convert from IVariable, the input can be series, val or 1x1 matrix.
+        /// Note: See also the methods Functions.Helper_GeneralFunction() and Program.UnfoldAsSeries().
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static Series ConvertToSeriesMaybeConstant(GekkoSmpl smpl, IVariable x)
+        {
+            if (x.Type() == EVariableType.Series)
+            {
+                return x as Series;
+            }
+            else
+            {
+                //try to see if x can be a constant value
+                //Gekko 4.0: do this as a timeless series
+                Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
+                double x_val = O.ConvertToVal(x);
+                if (Series.MissingZero() && G.IsNumericalError(x_val)) x_val = 0d;
+                double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    temp[i] = x_val; //constant, will issue error if not a value
+                }
+                return tsl;
+            }
+        }
+
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
             if (G.IsGekkoNull(input)) return input;

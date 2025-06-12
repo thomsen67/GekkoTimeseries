@@ -6069,35 +6069,7 @@ namespace Gekko
             return m;
         }
 
-        // -------------- series converters start ---------------
-
-        /// <summary>
-        /// Convert from IVariable, the input can be series, val or 1x1 matrix.
-        /// Note: See also the methods Functions.Helper_GeneralFunction() and Program.UnfoldAsSeries().
-        /// </summary>
-        /// <param name="smpl"></param>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public static Series ConvertToSeriesMaybeConstant(GekkoSmpl smpl, IVariable x)
-        {
-            if (x.Type() == EVariableType.Series)
-            {
-                return x as Series;
-            }
-            else
-            {
-                //try to see if x can be a constant value
-                Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
-                double x_val = O.ConvertToVal(x);
-                if (Series.MissingZero() && G.IsNumericalError(x_val)) x_val = 0d;
-                double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    temp[i] = x_val; //constant, will issue error if not a value
-                }
-                return tsl;
-            }
-        }
+        // -------------- series converters start ---------------        
 
         /// <summary>
         /// Convert from IVariable.
@@ -7688,7 +7660,7 @@ namespace Gekko
                 // Now that data should be all set for calculations
                 // Some of the IVariables may be scalars, timeless series,
                 // 1x1 matrices --> for now we issue error for these.
-                // For scalars, we could in principle use O.ConvertToSeriesMaybeConstant()
+                // For scalars, we could in principle use Series.ConvertToSeriesMaybeConstant()
                 // but for now we issue error. Could be fixed if necessary, if the scalar is
                 // (a) not at start/end and (b) has explict dates given around itself.
                 // ----------------------------------------------------------------

@@ -169,6 +169,7 @@ namespace Gekko
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "both";  //lhs|eqname|both        
         public bool model_gams_scalar_data = false;  //set yes to read data from a scalar model gams.gms file. But does not work...        
+        public bool model_gams_scalar_normalize = true;  //Scalar equations are shown in normalized form.
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //default | gams
         // ---
@@ -486,6 +487,7 @@ namespace Gekko
             Add("MODEL GAMS DEP CURRENT", Globals.xbool);
             Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname", "both");            
             Add("MODEL GAMS SCALAR DATA", Globals.xbool);
+            Add("MODEL GAMS SCALAR NORMALIZE", Globals.xbool);
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
             Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");
             Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
