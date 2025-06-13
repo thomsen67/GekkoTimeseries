@@ -31875,11 +31875,10 @@ print(df2)
             string xx2 = null;
             string xx3 = null;
             string defa = null;
-            bool fixMeMaybe = false;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such.
+            const bool fixMePointer = true;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such. Always true, just a pointer.
 
             for (int array = 0; array >= 0; array--)
             {
-
                 if (array == 0)
                 {
                     xx1 = "xx1";
@@ -31917,7 +31916,7 @@ print(df2)
                     }
                     // ------ tsdx, selection
                     {
-                        if (array == 0 && fixMeMaybe == fixMeMaybe)
+                        if (array == 0 && fixMePointer)
                         {                        
                             I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
@@ -31927,7 +31926,7 @@ print(df2)
                             ReadFormatsHelper("a", bank, array);
                         }
                     }
-                    if (array == 0 && fixMeMaybe == fixMeMaybe)
+                    if (array == 0 && fixMePointer)
                     {
                         // ------ tsd
                         if (bank == null)

@@ -1889,11 +1889,23 @@ namespace Gekko
         public bool ignoreErrors = false;
     }
 
+    /// <summary>
+    /// Stores two series names in s1 and s2, for instance s1 = "b1:x1!a".
+    /// Note that for instance "write&lt;csv>x to y file=data" will 
+    /// yield s1 = "Work:x!a" and s2 = "Work:y!a". Without the "to", s1 and s2 are equal.
+    /// </summary>
     public class ToFrom
     {
         public string s1 = null;
         public string s2 = null;
         public bool b1Explicit = false;
+        
+        /// <summary>
+        /// See note regarding ToFrom class.
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <param name="b1Explicit"></param>
         public ToFrom(string s1, string s2, bool b1Explicit)
         {
             this.s1 = s1;
@@ -24149,14 +24161,7 @@ namespace Gekko
 
                 i++;
 
-                List<Tuple<string, Series>> vars2 = new List<Tuple<string, Series>>();  //Contains all normal or sub-series
-                foreach (ToFrom var in vars)
-                {                    
-                    string s3 = G.Chop_GetName(var.s2);  //If for instance export <csv> fy* file = test; the .s2 will be varnames with first bank glued on (typically work), and this bank is removed here.
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
-                    Series ts = iv as Series;
-                    vars2.Add(new Tuple<string, Series>(s3, ts));
-                }
+                List<Tuple<string, Series>> vars2 = GetNamesAndSeries(vars);
 
                 foreach (Tuple<string, Series> tup in vars2)
                 {
@@ -24349,6 +24354,24 @@ namespace Gekko
             return counter;
         }
 
+        /// <summary>
+        /// From a ToFrom list (where rename of the variable is an option), the "from" part is found as a series, and the "to" part is
+        /// kept as a string. This is used to read/write 2d formats like csv, xlsx, prn.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
+        public static List<Tuple<string, Series>> GetNamesAndSeries(List<ToFrom> vars)
+        {
+            List<Tuple<string, Series>> vars2 = new List<Tuple<string, Series>>();  //Contains all normal or sub-series                
+            foreach (ToFrom var in vars)
+            {
+                string s3 = G.Chop_GetName(var.s2);  //If for instance export <csv> fy* file = test; the .s2 will be varnames with first bank glued on (typically work), and this bank is removed here.
+                IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                Series ts = iv as Series;
+                vars2.Add(new Tuple<string, Series>(s3, ts));
+            }
+            return vars2;
+        }
 
 
         private static void GetDatabankPeriodFilteredForFreq(List<ToFrom> vars, ref GekkoTime per1, ref GekkoTime per2)
