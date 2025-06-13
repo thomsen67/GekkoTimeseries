@@ -395,19 +395,16 @@ namespace Gekko
             }
             else if (ts.type == ESeriesType.Light)
             {
-                new Error("getparent(): an expression cannot have a parent series");
-                //throw new GekkoException();
+                new Error("getparent(): an expression cannot have a parent series");                
             }
-            if (ts.mmi == null)
+            if (!ts.IsArraySubSeries())
             {
-                new Error("getparent(): this series is not an array subseries");
-                //throw new GekkoException();
+                new Error("getparent(): this series is not an array subseries");                
             }
 
             if (ts.mmi.parent == null)
             {
-                new Error("getparent(): this array subseries does not have a parent series assigned to it");
-                //throw new GekkoException();
+                new Error("getparent(): this array subseries does not have a parent series assigned to it");                
             }
 
             return ts.mmi.parent;

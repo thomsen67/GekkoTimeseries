@@ -31872,24 +31872,21 @@ print(df2)
             // testing on annual
 
             string xx1 = null;
-            string xx2 = null;
             string xx3 = null;
             string defa = null;
             const bool fixMePointer = true;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such. Always true, just a pointer.
-
+                        
             for (int array = 0; array >= 0; array--)
             {
                 if (array == 0)
                 {
                     xx1 = "xx1";
-                    xx2 = "xx2";
                     xx3 = "xx3";
                 }
                 else
                 {
                     defa = "a = series(2); ";
                     xx1 = "a[xx1,b]";
-                    xx2 = "a[xx2,b]";
                     xx3 = "a[xx3,b]";
                 }
 

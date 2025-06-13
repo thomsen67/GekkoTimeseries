@@ -173,7 +173,7 @@ namespace Gekko
         {
             GekkoDictionary<string, IVariable> rv = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
-            {
+            {                
                 if (kvp.Value.Type() == EVariableType.Series)
                 {
                     Series ts = kvp.Value as Series;
@@ -239,11 +239,35 @@ namespace Gekko
         public IVariable GetIVariable(string variable, bool isLhs)
         {
             //Most and maybe all variable access goes through here (see also #jslej48djsd9)
-            //Beware that an array-superseries is accessed here, but its sub-series are 
+            //Handles array-subseries too.
             IVariable iv = null;
-            if (this.storage.Count > 0)
+            if (variable.Contains("["))
             {
-                this.storage.TryGetValue(variable, out iv);
+                //qwerty
+                string dbName, varName, freq; string[] indexes; char firstChar;                
+                O.Chop(variable, out dbName, out varName, out freq, out indexes);
+                if (this.storage.Count > 0)
+                {
+                    string atsName = O.UnChop(dbName, varName, freq, null, null);
+                    IVariable iv2 = null; this.storage.TryGetValue(atsName, out iv2);
+                    if (iv2 == null)
+                    {
+                        new Error("Cannot find variable '" + atsName + "'");
+                    }
+                    else
+                    {
+                        Series ats = iv2 as Series;
+                        if (ats == null) new Error("Internal error #873k4j744734");
+                        iv = ats.FindArraySeries(null, indexes, false, false, null);
+                    }
+                }
+            }
+            else
+            {
+                if (this.storage.Count > 0)
+                {
+                    this.storage.TryGetValue(variable, out iv);
+                }
             }
             //What about             
             Program.RegisterANewTracePrecedent(iv, this, isLhs, true); //both precedents for DECOMP and data tracing
@@ -318,19 +342,43 @@ namespace Gekko
             if (!isSimpleName) G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));
 
             Series ts = x as Series;
+            if (ts != null && ts.type == ESeriesType.Light) throw new GekkoException(); //this check can be removed at some point
+
             if (ts != null)
             {
-                if (ts.type == ESeriesType.Light)
+                //Series type
+                if (ts.IsArraySubSeries())
                 {
-                    throw new GekkoException(); //this check can be removed at some point
+                    //qwerty
+                    string dbName, varName, freq; string[] indexes; char firstChar;
+                    O.Chop(name, out dbName, out varName, out freq, out indexes);
+                    string atsName = O.UnChop(dbName, varName, freq, null, null);                                        
+                    IVariable iv2 = null; this.storage.TryGetValue(atsName, out iv2);
+                    Series ats = iv2 as Series;
+                    if (ats == null)
+                    {
+                        //must construct it first
+                    }
+                    else
+                    {                        
+                        Series sub = ats.FindArraySeries(null, indexes, false, false, null) as Series;
+                    }
+
                 }
-                ts.meta.parentDatabank = this;
-                ts.SetDirty(true);
-                //for instance when cloning from x to y, the y object will have x as name. Therefor we set the name here.                
-                //often this name is already correct here, but for cloning (COPY command) etc. we need to set the name right.
-                ts.name = name;
+                else
+                {
+                    ts.meta.parentDatabank = this;
+                    ts.SetDirty(true);
+                    //for instance when cloning from x to y, the y object will have x as name. Therefor we set the name here.                
+                    //often this name is already correct here, but for cloning (COPY command) etc. we need to set the name right.
+                    ts.name = name;
+                    AddIvariableHelper(name, x);
+                }
             }
-            AddIvariableHelper(name, x);
+            else
+            {
+                AddIvariableHelper(name, x);
+            }
             Program.RegisterANewTracePrecedent(x, this, true, false);
         }
 
@@ -360,9 +408,32 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool ContainsIVariable(string name)
-        {
-            return this.storage.ContainsKey(name);
+        public bool ContainsIVariable(string variable)
+        {            
+            if (variable.Contains("["))
+            {
+                //qwerty
+                string dbName, varName, freq; string[] indexes; char firstChar;
+                O.Chop(variable, out dbName, out varName, out freq, out indexes);
+                string atsName = O.UnChop(dbName, varName, freq, null, null);
+                IVariable iv2 = null; this.storage.TryGetValue(atsName, out iv2);
+                if (iv2 == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    Series ats = iv2 as Series;
+                    if (ats == null) new Error("Internal error #873k4j744734");
+                    IVariable iv = ats.FindArraySeries(null, indexes, false, false, null);
+                    if (iv == null) return false;
+                    else return true;
+                }
+            }
+            else
+            {
+                return this.storage.ContainsKey(variable);
+            }
         }
 
         public string Message()

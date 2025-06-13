@@ -135,7 +135,7 @@ namespace Gekko
         [ProtoMember(11)]
         //BEWARE: Be careful when using .dataOffsetLag! #772439872435
         private int dataOffsetLag = 0;  //Added in protobuf for ultra-safety, should not be necessary. Only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
-        
+
         public MultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
 
@@ -172,24 +172,29 @@ namespace Gekko
         /// </summary>
         /// <returns></returns>
         public string GetName()
-        {            
+        {
             if (this.name == null || G.StartsWithCaseSensitiveFast(this.name, Globals.seriesArraySubName))
             {
-                if (this.mmi == null)
+                if (!this.IsArraySubSeries())
                 {
                     return null;
                 }
                 return this.mmi.GetName();
             }
             else return this.name;
-        }        
+        }
+
+        public bool IsArraySubSeries()
+        {
+            return this.mmi != null;
+        }
 
         /// <summary>
         /// Returns a string like "b1:y2"
         /// </summary>
         /// <returns></returns>
         public string GetNameAndParentDatabank()
-        {            
+        {
             string rv = null;
             string name = this.GetName();
             string parentDatabank = null;
@@ -219,7 +224,7 @@ namespace Gekko
                 return this.mmi?.parent?.meta?.parentDatabank;
             }
             else
-            {                
+            {
                 return this.meta?.parentDatabank;
             }
         }
@@ -233,8 +238,8 @@ namespace Gekko
             else
             {
                 return G.Chop_RemoveFreq(this.GetName());
-            }            
-        }        
+            }
+        }
 
         public Series(ESeriesType type, GekkoTime t1, GekkoTime t2)
         {
@@ -371,12 +376,12 @@ namespace Gekko
             //========================================================================================================
 
             //Also see #345632473
-            if (dates == null) return;            
+            if (dates == null) return;
             GekkoTime gt1 = GekkoTime.tNull;
             GekkoTime gt2 = GekkoTime.tNull;
             G.PickFromAllFreqs(dates, this.freq, out gt1, out gt2);
             this.Truncate(gt1, gt2);
-        }        
+        }
 
         /// <summary>
         /// Truncates the Series object, so that the starting period
@@ -396,8 +401,8 @@ namespace Gekko
             if (t1_input.freq != t2_input.freq)
             {
                 new Error("Truncate start and end have different frequencies");
-            }            
-            
+            }
+
             if (this.type == ESeriesType.Timeless) return;
             if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
@@ -413,7 +418,7 @@ namespace Gekko
             {
                 //Truncate the sub-series
                 foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
-                {                    
+                {
                     (kvp.Value as Series).Truncate(span.t1, span.t2);  //kvp.Value can only be normal series                    
                 }
             }
@@ -430,7 +435,7 @@ namespace Gekko
                 {
                     //the truncate window is completely before or after the data window
                     //wipe all the data, and set the sample to 1 length
-                    
+
                     for (int i = 0; i < this.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
                         this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = double.NaN;
@@ -539,7 +544,7 @@ namespace Gekko
         /// <param name="t"></param>
         /// <returns></returns>
         public double GetDataSimple(GekkoTime t)
-        {            
+        {
             return GetData(null, t);
         }
 
@@ -549,8 +554,8 @@ namespace Gekko
         /// <param name="t">The period.</param>
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
-            //smpl so that tooSmall/tooLarge error can be raised (set to null if irrelevant)
-            //set smpl = null if tooSmall/tooLarge is irrelevant (no light series used)
+        //smpl so that tooSmall/tooLarge error can be raised (set to null if irrelevant)
+        //set smpl = null if tooSmall/tooLarge is irrelevant (no light series used)
         public double GetData(GekkoSmpl smpl, GekkoTime t)
         {
             // ----------------------------------------------------------------------------
@@ -633,7 +638,7 @@ namespace Gekko
 
         private void FreqError(GekkoTime t)
         {
-            new Error("Frequency mismatch: it seems a "+ t.freq.Pretty() + " time period is used on a series with " + this.freq.Pretty() + " frequency");
+            new Error("Frequency mismatch: it seems a " + t.freq.Pretty() + " time period is used on a series with " + this.freq.Pretty() + " frequency");
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
@@ -676,12 +681,12 @@ namespace Gekko
         /// <param name="value">The value.</param>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public void SetData(GekkoTime t, double value)
-        {   
-            
+        {
+
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
-            
+
             if (this.type == ESeriesType.Timeless)
             {
                 //Should not normally be used.
@@ -689,9 +694,9 @@ namespace Gekko
                 //Normally timeless variables should be called via the SetData(double value) method
                 this.data.GetDataArray_ONLY_INTERNAL_USE()[0] = value;
             }
-           
+
             if (this.type != ESeriesType.Light && this.meta != null && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            
+
             if (this.freq != t.freq)
             {
                 //See comment to GetData()
@@ -799,7 +804,7 @@ namespace Gekko
                 for (int i = 0; i < n; i++) numbers[i] = d;
                 index1 = 0;
                 index2 = n - 1;
-                return numbers;                
+                return numbers;
             }
 
             if (this.freq != gt1.freq)
@@ -862,7 +867,7 @@ namespace Gekko
             }
         }
 
-       
+
 
         public double[] GetDataSequenceUnsafePointerAlterBEWARE()
         {
@@ -875,7 +880,7 @@ namespace Gekko
             //Also, if using this, beware of OPTION series data missing.
             //You may have to transform NaN to 0 if this option is set.
             //See also #87943523987543
-          
+
             this.SetDirty(true); //we have to mark dirty manually
 
             return this.data.GetDataArray_ONLY_INTERNAL_USE();
@@ -986,7 +991,7 @@ namespace Gekko
             // ------------------------------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() and ResizeDataArray() which are safe
             // ------------------------------------------------------------------------------------------------
-                                 
+
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #3");
@@ -1028,7 +1033,7 @@ namespace Gekko
             {
                 for (int i = 0; i < index2 - index1 + 1; i++)
                 {
-                    double z = input[i + inputOffset];                    
+                    double z = input[i + inputOffset];
                     if (z == Globals.skippedObservationArtificialNumber)
                     {
                         //do nothing, skip updating this observation so the lhs keeps its value
@@ -1075,7 +1080,7 @@ namespace Gekko
             }
             this.SetDirty(true);
 
-        }        
+        }
 
         /// <summary>
         /// Overload with no offset.
@@ -1119,7 +1124,7 @@ namespace Gekko
             }
             return GetPeriod(this.meta.lastPeriodPositionInArray);
         }
-               
+
         /// <summary>
         /// Finds the first real non-missing datapoint in the timeseries. Will return GekkoTime.tNull if all data are missing.
         /// </summary>
@@ -1145,8 +1150,8 @@ namespace Gekko
                             break;
                         }
                     }
-                }                
-            }            
+                }
+            }
             return rv;
         }
 
@@ -1176,7 +1181,7 @@ namespace Gekko
                         }
                     }
                 }
-            }            
+            }
             return rv;
         }
 
@@ -1208,12 +1213,12 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            
+
             if (this.freq == EFreq.W || this.freq == EFreq.D)
             {
                 int offset = indexInDataArray - this.GetAnchorPeriodPositionInArray();
                 return this.data.anchorPeriod.Add(offset);
-            }            
+            }
             else
             {
                 //Could use the above offsetting and .Add() too, but this is probably for speed
@@ -1239,7 +1244,7 @@ namespace Gekko
                     resultSubPer += subPeriods;
                 }
                 return new GekkoTime(this.freq, resultSuperPer, resultSubPer);
-            }            
+            }
         }
 
         // -----------------------------------------------------------------------------
@@ -1254,7 +1259,7 @@ namespace Gekko
                 G.SetNaN(dataArray);
             }
         }
-                
+
         /// <summary>
         /// For an uninitialized series object, anchorPeriodPositionInArray will be = -123454321, and this will overwhelm everything else,
         /// so a large negative number &lt; -100.000.000 will be returned. This is not pretty, and ought to be prettified for Gekko 4.0.
@@ -1277,8 +1282,8 @@ namespace Gekko
                         //Will keep any .dataOffsetLag, but that should not matter since
                         //it is filled with only missing values anyway.
                         InitDataArray(gt);
-                    }                                       
-                }                
+                    }
+                }
             }
 
             int rv = FromGekkoTimeToArrayIndexAbstract(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub, this.data.anchorPeriod.subsub), this.GetAnchorPeriodPositionInArray());
@@ -1334,7 +1339,7 @@ namespace Gekko
             }
 
             return rv;
-        }        
+        }
 
         public int FromGekkoTimeToArrayIndex(GekkoTime gt)
         {
@@ -1362,8 +1367,8 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
             // ----------------------------------------------------------------------------
-            
-            int index = GetArrayIndex(gt);            
+
+            int index = GetArrayIndex(gt);
 
             while (index < Math.Max(0, minIndex) || index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
             {
@@ -1404,7 +1409,7 @@ namespace Gekko
                         //
                         // Another and faster way of doing this is that the "shell" object of x[-1] has a
                         // pointer pointing back to the "real" series.
-                        
+
                         //There was the following problem (see unit test here: #79873242834)
                         //a series x was defined, bank was written and read
                         //so now the series array is exactly over 66-2018
@@ -1418,7 +1423,7 @@ namespace Gekko
                         //on? To avoid such confusion, if the .anchorPeriodPositionInArray is altered in such an "empty shell" object,
                         //we clone the dataarray for it. This will happen rarely anyway.   
 
-                        this.data = this.data.DeepClone(0);                        
+                        this.data = this.data.DeepClone(0);
 
                     }
 
@@ -1463,12 +1468,12 @@ namespace Gekko
                 this.data.SetDataarray_ONLY_INTERNAL_USE(new double[Globals.defaultPeriodsWhenCreatingTimeSeries]);
                 this.data.anchorPeriodPositionInArray = Globals.defaultPeriodsWhenCreatingTimeSeries / 2;  //possible to simulate 100 years forwards, and have data 100 years back.
                 InitializeDataArray(this.data.GetDataArray_ONLY_INTERNAL_USE());  //may fill it with NaN's
-                                                           //the following two will always be fixed to what they
-                                                           //were for the very first observation entering the double[] array (unless the array is resized).
+                                                                                  //the following two will always be fixed to what they
+                                                                                  //were for the very first observation entering the double[] array (unless the array is resized).
                 this.data.anchorPeriod = t;
             }
         }
-        
+
         public static string GetHashCodeFromIvariables(IVariable[] indexes)
         {
             string hash = null;
@@ -1552,7 +1557,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Internal error #4598243755"); rv_series = null; 
+                new Error("Internal error #4598243755"); rv_series = null;
                 //throw new GekkoException();
             }
 
@@ -1568,7 +1573,7 @@ namespace Gekko
 
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (O.UseFlexFreq(t0, t3, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);            
+            if (O.UseFlexFreq(t0, t3, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
 
             //Functions like d() and pch() where lag is used
             Series rv_series;
@@ -1640,7 +1645,7 @@ namespace Gekko
             }
             return rv_series;
         }
-        
+
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {
             // ----------------------------------------------------------------------------
@@ -1705,10 +1710,10 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() and GetStartEndPeriod() which are safe
             // ----------------------------------------------------------------------------
-            
+
             if (x1_series.type == ESeriesType.ArraySuper && x2_series.type == ESeriesType.ArraySuper)
             {
-                return ArithmeticsArraySeriesArraySeries(smpl, x1_series, x2_series, a);                
+                return ArithmeticsArraySeriesArraySeries(smpl, x1_series, x2_series, a);
             }
             else if (x1_series.type == ESeriesType.ArraySuper)
             {
@@ -1779,7 +1784,7 @@ namespace Gekko
                             if (G.IsNumericalError(d1)) d1 = 0d;
                         }
                         if (b2)
-                        {                            
+                        {
                             if (G.IsNumericalError(d2)) d2 = 0d;
                         }
                         arraya[i + ia1] = a(d1, d2);
@@ -1803,16 +1808,16 @@ namespace Gekko
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
-            List<MultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();            
+            List<MultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
 
-            keys1.Sort(Multidim.CompareMultidimItems);            
+            keys1.Sort(Multidim.CompareMultidimItems);
 
             for (int i = 0; i < keys1.Count; i++)
             {
-                MultidimItem mm1 = keys1[i];                
-                
+                MultidimItem mm1 = keys1[i];
+
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
-                
+
                 Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(sub1.freq));
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
@@ -1830,7 +1835,7 @@ namespace Gekko
                     {
                         temp.meta.domains[ii] = x1_series.meta.domains[ii];
                     }
-                }                
+                }
             }
             temp.SetDirty(true);
             return temp;
@@ -2072,7 +2077,7 @@ namespace Gekko
                         }
                         else
                         {
-                            double d = x2_list.list[i].ConvertToVal();                            
+                            double d = x2_list.list[i].ConvertToVal();
                             ts.SetData(t, d);
                         }
                     }
@@ -2089,7 +2094,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
                     Series ts = new Series(ESeriesType.Light, smpl.t1.Add(-Globals.smplOffset), smpl.t2);  //new series light
-                    
+
                     int i = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -2119,7 +2124,7 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
-            
+
             if (x1.type == ESeriesType.Light)
             {
                 window1 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());
@@ -2148,6 +2153,58 @@ namespace Gekko
             {
                 GekkoTime.ConvertFreqs(x1.freq, t0, t3, ref window1, ref window2);
             }
+        }
+
+        /// <summary>
+        /// Input is a variable name (possibly with databank and freq) OR a timeseries object, and output is a list of tuples of name, series.
+        /// If the input is a simple series, the output is a 1-element list with its name and the series.
+        /// If the input is an array-series, the output has n elements, with for instance "x[a,b]" as name.
+        /// If the input is non-series, the output has 0 elements. 
+        /// If using varname, you may or may not search for the varname if it has no "bank:" part.                
+        /// </summary>        
+        private static List<Tuple<string, Series>> FlattenArraySeries(Series tsInputOptional, string varname, bool search)
+        {
+            List<Tuple<string, Series>> rv = new List<Tuple<string, Series>>();
+            Series ts = null;
+            if (tsInputOptional == null)
+            {
+                IVariable iv = O.GetIVariableFromString(varname, O.ECreatePossibilities.NoneReportError, search);
+                ts = iv as Series;
+            }
+            else
+            {
+                ts = tsInputOptional;
+            }
+            if (ts == null) return rv;
+            if (ts.type == ESeriesType.ArraySuper)
+            {
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
+                {
+                    Series ts2 = kvp2.Value as Series;
+                    rv.Add(new Tuple<string, Series>(ts2.GetName(), ts2));
+                }
+            }
+            else
+            {
+                rv.Add(new Tuple<string, Series>(ts.GetName(), ts));
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// See called method.
+        /// </summary>        
+        public static List<Tuple<string, Series>> FlattenArraySeries(Series ts)
+        {
+            return FlattenArraySeries(ts, null, false);
+        }
+
+        /// <summary>
+        /// See called method.
+        /// </summary>
+        public static List<Tuple<string, Series>> FlattenArraySeries(string varname, bool search)
+        {
+            return FlattenArraySeries(null, varname, search);
         }
 
         /// <summary>
@@ -2513,8 +2570,7 @@ namespace Gekko
                 {
                     e.MainAdd("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
                     e.MainAdd("Indexer used: [" + txt.Substring(0, txt.Length - 2) + "].");
-                    e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it,");
-                    e.MainAdd("perhaps with 'CREATE " + this.name + ";' first.");
+                    e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it.");
                 }
             }                   
 
@@ -3056,7 +3112,7 @@ namespace Gekko
                     }
 
                 }
-                if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
+                if (this.IsArraySubSeries()) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }
 
             if (truncate != null)
@@ -3213,7 +3269,7 @@ namespace Gekko
             }
             else
             {
-                if (this.mmi != null && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.label))
+                if (this.IsArraySubSeries() && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.label))
                 {
                     label2 = this.mmi.parent.meta.label;
                 }
@@ -3235,7 +3291,7 @@ namespace Gekko
             }
             else
             {
-                if (this.mmi != null && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.source))
+                if (this.IsArraySubSeries() && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.source))
                 {
                     source2 = this.mmi.parent.meta.source;
                 }
@@ -3257,7 +3313,7 @@ namespace Gekko
             }
             else
             {
-                if (this.mmi != null && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.units))
+                if (this.IsArraySubSeries() && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.units))
                 {
                     units2 = this.mmi.parent.meta.units;
                 }

@@ -3165,7 +3165,6 @@ namespace Gekko
             {
                 //bad, also including a series with name 'x'
                 new Error("Variable name and type do not conform");
-                //throw new GekkoException();
             }
         }
 
@@ -3186,7 +3185,6 @@ namespace Gekko
             if (name == null || name.Length == 0)
             {
                 new Error("Name has zero length");
-                //throw new GekkoException();
             }
 
             if (name[0] == Globals.symbolScalar)
@@ -3203,7 +3201,6 @@ namespace Gekko
             if (hasSigil == 1 && name.Length == 1)
             {
                 new Error("Name is naked % or #");
-                //throw new GekkoException();
             }
 
             for (int i = hasSigil; i < name.Length; i++)
@@ -3228,13 +3225,15 @@ namespace Gekko
                     if (hasSigil == 1)
                     {
                         new Error("Cannot combine '%', '#' and '!'");
-                        //throw new GekkoException();
                     }
                 }
                 else
                 {
-                    new Error("Malformed name: '" + name + "'");
-                    //throw new GekkoException();
+                    if (c == '[')
+                    {
+                        break; //We accept x!q[... where something follows [.
+                    }                    
+                    new Error("Malformed name: '" + name + "'");                    
                 }
             }
 

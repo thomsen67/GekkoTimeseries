@@ -16229,7 +16229,7 @@ namespace Gekko
 
                     if (isGams)
                     {
-                        if (ts.mmi != null)
+                        if (ts.IsArraySubSeries())
                         {
                             //then it is a sub-series
                             Series parent = ts.mmi.parent;
@@ -24160,10 +24160,14 @@ namespace Gekko
                 }
 
                 i++;
+                                
+                List<Tuple<string, Series>> vars3 = new List<Tuple<string, Series>>();
+                foreach (Tuple<string, Series> tup in GetNamesAndSeries(vars))
+                {
+                    vars3.AddRange(Series.FlattenArraySeries(tup.Item2));
+                }
 
-                List<Tuple<string, Series>> vars2 = GetNamesAndSeries(vars);
-
-                foreach (Tuple<string, Series> tup in vars2)
+                foreach (Tuple<string, Series> tup in vars3)
                 {
                     j = 1;
                     GekkoTime tsStart = GekkoTime.tNull;
