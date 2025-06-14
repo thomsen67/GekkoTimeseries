@@ -22466,10 +22466,6 @@ namespace Gekko
         {
             //TODO: introduce frombank
 
-            if (o.opt_xlsx != null)
-            {
-            }
-
             EDatabankWriteType writeType = GetWriteType(o);
 
             List<ToFrom> list = null;
@@ -22911,7 +22907,7 @@ namespace Gekko
 
                 int counter = 0;
                 int numberOfCols = GekkoTime.Observations(tStart, tEnd);
-                int numberOfRows = list.Count;
+                int numberOfRows = list2.Count;
 
                 eo.excelData = new double[numberOfRows, numberOfCols];
                 eo.excelRowLabels = new string[numberOfRows, 1];
@@ -22919,11 +22915,11 @@ namespace Gekko
                 eo.excelColumnLabelsGekkoTime = new GekkoTime[1, numberOfCols];
                 eo.transpose = "no"; if (isCols) eo.transpose = "yes"; //kind of a workaround
 
-                for (int i = 0; i < list.Count; i++)
+                for (int i = 0; i < list2.Count; i++)
                 {
-                    IVariable iv = O.GetIVariableFromString(list[i].s1, O.ECreatePossibilities.NoneReportError, true);
+                    IVariable iv = list2[i].Item2; // O.GetIVariableFromString(list[i].s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
-                    string varLabel = G.Chop_GetName(list[i].s2);
+                    string varLabel = G.Chop_GetName(list2[i].Item1);
                     eo.excelRowLabels[i, 0] = varLabel;
 
                     if (ts == null)
@@ -22948,7 +22944,7 @@ namespace Gekko
             else
             {
                 int iHere = 0;
-                IVariable iv = O.GetIVariableFromString(list[iHere].s1, O.ECreatePossibilities.NoneReportError, true);
+                IVariable iv = list2[iHere].Item2; // O.GetIVariableFromString(list[iHere].s1, O.ECreatePossibilities.NoneReportError, true);
 
                 Matrix m = iv as Matrix;
                 List l = iv as List;
@@ -22960,12 +22956,11 @@ namespace Gekko
                 else if (l != null)
                 {
                     //See #lksfowm65assh
-                    new Error("The list '" + list[iHere].s1 + "' cannot be exported. Exporting of lists to Excel is not yet supported.");
+                    new Error("The list '" + list2[iHere].Item1 + "' cannot be exported. Exporting of lists to Excel is not yet supported.");
                 }
                 else
                 {
-                    new Error("The variable '" + list[iHere].s1 + "' cannot be exported. It is not a series, a list or a matrix");
-                    throw new GekkoException();
+                    new Error("The variable '" + list2[iHere].Item1 + "' cannot be exported. It is not a series, a list or a matrix");                    
                 }
             }
 

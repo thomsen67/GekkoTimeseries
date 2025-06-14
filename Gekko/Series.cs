@@ -2214,7 +2214,7 @@ namespace Gekko
                 }
                 else
                 {
-
+                    vars3.Add(new Tuple<string, IVariable>(tup.Item1, tup.Item2));
                 }
             }
             return vars3;
