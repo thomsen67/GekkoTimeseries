@@ -190,6 +190,19 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Find stuff like "x[i]".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static bool IsArraySubSeriesName(string s)
+        {
+            if (s.Length < 2) return false;
+            if (!G.IsLetterOrUnderscore(s[0])) return false;
+            if (s.Contains("[")) return true;
+            return false;
+        }
+
+        /// <summary>
         /// Returns a string like "b1:y2"
         /// </summary>
         /// <returns></returns>
@@ -496,7 +509,6 @@ namespace Gekko
             this.dimensionsStorage = new Multidim();
             this.dimensions = dimensionsIncludingTimeDimension - tDim;
             this.type = ESeriesType.ArraySuper;
-            //if (!hasTimeDimension) this.type = ESeriesType.Timeless;
         }
 
         /// <summary>

@@ -241,10 +241,10 @@ namespace Gekko
             //Most and maybe all variable access goes through here (see also #jslej48djsd9)
             //Handles array-subseries too.
             IVariable iv = null;
-            if (variable.Contains("["))
+            if (Series.IsArraySubSeriesName(variable))
             {
                 //qwerty
-                string dbName, varName, freq; string[] indexes; char firstChar;                
+                string dbName, varName, freq; string[] indexes; char firstChar;
                 O.Chop(variable, out dbName, out varName, out freq, out indexes);
                 if (this.storage.Count > 0)
                 {
@@ -331,6 +331,7 @@ namespace Gekko
 
         /// <summary>
         /// Main central method for adding a new IVariable. The other adding methods here go through this.
+        /// When it is known that isSimpleName == true, checking the name can be skipped for speed.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="x"></param>
@@ -347,7 +348,7 @@ namespace Gekko
             if (ts != null)
             {
                 //Series type
-                if (ts.IsArraySubSeries())
+                if (Series.IsArraySubSeriesName(name))
                 {
                     //qwerty
                     string dbName, varName, freq; string[] indexes; char firstChar;
@@ -357,12 +358,14 @@ namespace Gekko
                     Series ats = iv2 as Series;
                     if (ats == null)
                     {
-                        //must construct it first
+                        //must construct it first                        
+                        ats = new Series(G.ConvertFreq(freq), atsName);
+                        ats.SetArrayTimeseries(indexes.Length + 1, true);
+                        AddIvariableHelper(atsName, ats);
                     }
-                    else
-                    {                        
-                        Series sub = ats.FindArraySeries(null, indexes, false, false, null) as Series;
-                    }
+                    ats.SetDirty(true);
+                    ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(indexes, ats), ts);
+                    ts.name = Globals.seriesArraySubName + Globals.freqIndicator + freq;  //We have to overwrite it here, else it would be "x[a,b]!a"
 
                 }
                 else
@@ -377,6 +380,7 @@ namespace Gekko
             }
             else
             {
+                //Non-series
                 AddIvariableHelper(name, x);
             }
             Program.RegisterANewTracePrecedent(x, this, true, false);
@@ -409,8 +413,8 @@ namespace Gekko
         /// <param name="name"></param>
         /// <returns></returns>
         public bool ContainsIVariable(string variable)
-        {            
-            if (variable.Contains("["))
+        {
+            if (Series.IsArraySubSeriesName(variable))
             {
                 //qwerty
                 string dbName, varName, freq; string[] indexes; char firstChar;
@@ -425,7 +429,9 @@ namespace Gekko
                 {
                     Series ats = iv2 as Series;
                     if (ats == null) new Error("Internal error #873k4j744734");
-                    IVariable iv = ats.FindArraySeries(null, indexes, false, false, null);
+                    LookupSettings settings = new LookupSettings();
+                    settings.create = O.ECreatePossibilities.NoneReturnNullAlways;
+                    IVariable iv = ats.FindArraySeries(null, indexes, false, false, settings);
                     if (iv == null) return false;
                     else return true;
                 }

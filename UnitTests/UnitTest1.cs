@@ -31871,8 +31871,7 @@ print(df2)
             // testing on annual
             // testing on annual
 
-            string xx1 = null;
-            string xx3 = null;
+            string xx1, xx3;
             string defa = null;
             const bool fixMePointer = true;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such. Always true, just a pointer.
                         
