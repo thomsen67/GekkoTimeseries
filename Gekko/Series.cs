@@ -2174,9 +2174,9 @@ namespace Gekko
         /// If the input is non-series, the output has 0 elements. 
         /// If using varname, you may or may not search for the varname if it has no "bank:" part.                
         /// </summary>        
-        private static List<Tuple<string, Series>> FlattenArraySeries(Series tsInputOptional, string varname, bool search)
+        private static List<Tuple<string, IVariable>> FlattenArraySeries(Series tsInputOptional, string varname, bool search)
         {
-            List<Tuple<string, Series>> rv = new List<Tuple<string, Series>>();
+            List<Tuple<string, IVariable>> rv = new List<Tuple<string, IVariable>>();
             Series ts = null;
             if (tsInputOptional == null)
             {
@@ -2193,20 +2193,37 @@ namespace Gekko
                 foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
                 {
                     Series ts2 = kvp2.Value as Series;
-                    rv.Add(new Tuple<string, Series>(ts2.GetName(), ts2));
+                    rv.Add(new Tuple<string, IVariable>(ts2.GetName(), ts2));
                 }
             }
             else
             {
-                rv.Add(new Tuple<string, Series>(ts.GetName(), ts));
+                rv.Add(new Tuple<string, IVariable>(ts.GetName(), ts));
             }
             return rv;
+        }
+
+        public static List<Tuple<string, IVariable>> FlattenArraySeries(List<ToFrom> vars)
+        {
+            List<Tuple<string, IVariable>> vars3 = new List<Tuple<string, IVariable>>();
+            foreach (Tuple<string, IVariable> tup in Program.GetNamesAndVariableObject(vars))
+            {
+                if (tup.Item2.Type() == EVariableType.Series)
+                {
+                    vars3.AddRange(Series.FlattenArraySeries(tup.Item2 as Series));
+                }
+                else
+                {
+
+                }
+            }
+            return vars3;
         }
 
         /// <summary>
         /// See called method.
         /// </summary>        
-        public static List<Tuple<string, Series>> FlattenArraySeries(Series ts)
+        public static List<Tuple<string, IVariable>> FlattenArraySeries(Series ts)
         {
             return FlattenArraySeries(ts, null, false);
         }
@@ -2214,7 +2231,7 @@ namespace Gekko
         /// <summary>
         /// See called method.
         /// </summary>
-        public static List<Tuple<string, Series>> FlattenArraySeries(string varname, bool search)
+        public static List<Tuple<string, IVariable>> FlattenArraySeries(string varname, bool search)
         {
             return FlattenArraySeries(null, varname, search);
         }

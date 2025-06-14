@@ -22466,6 +22466,10 @@ namespace Gekko
         {
             //TODO: introduce frombank
 
+            if (o.opt_xlsx != null)
+            {
+            }
+
             EDatabankWriteType writeType = GetWriteType(o);
 
             List<ToFrom> list = null;
@@ -22896,6 +22900,8 @@ namespace Gekko
         private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
         {
             ExcelOptions eo = new ExcelOptions();
+
+            List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(list);
 
             if (variablesType == EVariablesForWrite.Normal)
             {
@@ -24161,20 +24167,17 @@ namespace Gekko
                 }
 
                 i++;
-                                
-                List<Tuple<string, Series>> vars3 = new List<Tuple<string, Series>>();
-                foreach (Tuple<string, Series> tup in GetNamesAndSeries(vars))
-                {
-                    vars3.AddRange(Series.FlattenArraySeries(tup.Item2));
-                }
 
-                foreach (Tuple<string, Series> tup in vars3)
+                List<Tuple<string, IVariable>> vars3 = Series.FlattenArraySeries(vars);
+
+                foreach (Tuple<string, IVariable> tup in vars3)
                 {
                     j = 1;
                     GekkoTime tsStart = GekkoTime.tNull;
                     GekkoTime tsEnd = GekkoTime.tNull;
-                    tsStart = tup.Item2.GetPeriodFirst();
-                    tsEnd = tup.Item2.GetPeriodLast();
+                    Series ts = tup.Item2 as Series;
+                    tsStart = ts.GetPeriodFirst();
+                    tsEnd = ts.GetPeriodLast();
 
                     counter++;
                     if (fileType == EdataFormat.Csv)
@@ -24189,7 +24192,7 @@ namespace Gekko
                     }
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
-                        double data = tup.Item2.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
+                        double data = ts.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
                         if (G.IsNumericalError(data))
                         {
                             if (!Program.options.bugfix_csv_missing && (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd)))
@@ -24357,7 +24360,7 @@ namespace Gekko
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
 
             return counter;
-        }
+        }        
 
         /// <summary>
         /// From a ToFrom list (where rename of the variable is an option), the "from" part is found as a series, and the "to" part is
@@ -24365,15 +24368,14 @@ namespace Gekko
         /// </summary>
         /// <param name="vars"></param>
         /// <returns></returns>
-        public static List<Tuple<string, Series>> GetNamesAndSeries(List<ToFrom> vars)
+        public static List<Tuple<string, IVariable>> GetNamesAndVariableObject(List<ToFrom> vars)
         {
-            List<Tuple<string, Series>> vars2 = new List<Tuple<string, Series>>();  //Contains all normal or sub-series                
+            List<Tuple<string, IVariable>> vars2 = new List<Tuple<string, IVariable>>();  //Contains all normal or sub-series                
             foreach (ToFrom var in vars)
             {
                 string s3 = G.Chop_GetName(var.s2);  //If for instance export <csv> fy* file = test; the .s2 will be varnames with first bank glued on (typically work), and this bank is removed here.
-                IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
-                Series ts = iv as Series;
-                vars2.Add(new Tuple<string, Series>(s3, ts));
+                IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);                
+                vars2.Add(new Tuple<string, IVariable>(s3, iv));
             }
             return vars2;
         }
