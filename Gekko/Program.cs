@@ -17885,6 +17885,7 @@ namespace Gekko
                 command = "WRITE";
                 command2 = "write";
                 command3 = "written";
+                allowIndexes = true;
             }
             else if (type == EWildcardSearchType.Delete)
             {

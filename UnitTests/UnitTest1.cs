@@ -31875,7 +31875,7 @@ print(df2)
             string defa = null;
             const bool fixMePointer = true;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such. Always true, just a pointer.
                         
-            for (int array = 0; array >= 0; array--)
+            for (int array = 1; array >= 0; array--)
             {
                 if (array == 0)
                 {
