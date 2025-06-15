@@ -31874,10 +31874,11 @@ print(df2)
             string defa = null;
             const bool fixMePointer = true;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such. Always true, just a pointer.
                         
-            for (int array = 0; array >= 0; array--)
+            for (int array = 1; array >= 0; array--)
             {
                 if (array == 0)
                 {
+                    defa = null;
                     xx1 = "xx1";
                     xx3 = "xx3";
                 }
@@ -32090,7 +32091,7 @@ print(df2)
                         I("WRITE<2001 2002 gnuplot>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                     }
                     // ------ flat
-                    if (bank == null)
+                    if (bank == null && array == 0 && fixMePointer)
                     {
                         I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 flat>temp;");
@@ -32102,7 +32103,7 @@ print(df2)
                     if (array == 0)
                     {
 
-                        //We only test this for non-array series, because of lazyness (if it work for annual, it probably works for the others, too)
+                        //We only test this for non-array series, because of lazyness (if it works for annual, it probably works for the others, too)
 
                         // ---------- Testing on quarters
                         // ---------- Testing on quarters
@@ -32706,14 +32707,30 @@ print(df2)
             {
                 if (freq == "a")
                 {
-                    _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
-                    _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
-                    _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2001, 4001, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2002, 4002, sharedDelta);
-                    _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
+
+                    if (array == 0)
+                    {
+                        _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
+                        _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2001, 4001, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2002, 4002, sharedDelta);
+                        _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
+                    }
+                    else
+                    {
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2001, 1001, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2002, 1002, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx1", "b" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2001, 4001, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2002, 4002, sharedDelta);
+                        _AssertSeries(First(), "a", new string[] { "xx3", "b" }, 2003, double.NaN, sharedDelta);
+                    }
+
                 }
                 else if (freq == "q")
                 {

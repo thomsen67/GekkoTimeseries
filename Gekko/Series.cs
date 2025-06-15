@@ -698,7 +698,7 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
-
+                        
             if (this.type == ESeriesType.Timeless)
             {
                 //Should not normally be used.
@@ -2600,9 +2600,9 @@ namespace Gekko
                 foreach (string ss in keys) txt += "'" + ss + "', ";
                 using (Error e = new Error())
                 {
-                    e.MainAdd("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
+                    e.MainAdd("The variable '" + this.name + "' is not an array-timeseries.");
                     e.MainAdd("Indexer used: [" + txt.Substring(0, txt.Length - 2) + "].");
-                    e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it.");
+                    e.MainAdd("(You may use '" + this.name + " = series(" + keys.Length + ");' to create a " + keys.Length + "-dimensional array-series).");
                 }
             }                   
 

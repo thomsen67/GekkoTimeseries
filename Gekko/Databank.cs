@@ -140,14 +140,14 @@ namespace Gekko
         public Databank(string name)
         {
             this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-            this.name = name;            
+            this.name = name;
         }
 
         /// <summary>
         /// Not exactly clear why this is not just done manually when reading a protobuf Databank object. Well, if it works, don't fix it.
         /// It is done manually for parallel gbk read/write.
         /// </summary>
-        [ProtoBeforeSerialization]        
+        [ProtoBeforeSerialization]
         public void BeforeProtobufWrite()
         {
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
@@ -173,7 +173,7 @@ namespace Gekko
         {
             GekkoDictionary<string, IVariable> rv = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
-            {                
+            {
                 if (kvp.Value.Type() == EVariableType.Series)
                 {
                     Series ts = kvp.Value as Series;
@@ -198,16 +198,16 @@ namespace Gekko
             return rv;
         }
 
-        public void Clear() 
+        public void Clear()
         {
-            if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");            
+            if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
             yearStart = -12345;
             yearEnd = -12345;
             info1 = null;
             date = null;
-            this.storage.Clear();            
+            this.storage.Clear();
             this.isDirty = true;
-        }        
+        }
 
         public void Trim()
         {
@@ -272,7 +272,43 @@ namespace Gekko
             //What about             
             Program.RegisterANewTracePrecedent(iv, this, isLhs, true); //both precedents for DECOMP and data tracing
             return iv;
-        }    
+        }
+
+        /// <summary>
+        /// See overload.
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        public IVariable GetIVariableMayCreateSeries(string variable)
+        {
+            return GetIVariableMayCreateSeries(variable, false);
+        }
+
+        /// <summary>
+        /// If sigil variable (% or #), it will get the IVariable like GetIVariable(). 
+        /// If series name, and if not present and a timeseries, the timeseries will be created (array or non-array).
+        /// If x[a,b] and not even x exists, both the x parent series and the x[a,b] subseries are created.
+        /// </summary>        
+        public IVariable GetIVariableMayCreateSeries(string variable, bool isLhs)
+        {
+            if (G.StartsWithSigil(variable)) return GetIVariable(variable, isLhs);
+            if (this.ContainsIVariable(variable))
+            {
+                Series ts = this.GetIVariable(variable, isLhs) as Series;
+                if (!Series.IsArraySubSeriesName(variable) && ts.type == ESeriesType.ArraySuper)
+                {
+                    new Error(0 + " dimensional index (that is: no []-index) used on " + ts.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ts.name));
+                }
+                return ts;
+            }
+            else
+            {
+                Series ts = new Series(G.ConvertFreq(G.Chop_GetFreq(variable)), null);
+                this.AddIVariable(variable, ts);                
+                return ts;
+            }
+        }
+
 
         /// <summary>
         /// Overload. May write a list file.
@@ -362,6 +398,10 @@ namespace Gekko
                         ats = new Series(G.ConvertFreq(freq), atsName);
                         ats.SetArrayTimeseries(indexes.Length + 1, true);
                         AddIvariableHelper(atsName, ats);
+                    }
+                    else
+                    {
+                        if (ats.dimensions != indexes.Length) new Error(indexes.Length + " dimensional index used on " + ats.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ats.name));
                     }
                     ats.SetDirty(true);
                     ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(indexes, ats), ts);

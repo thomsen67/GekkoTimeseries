@@ -5391,20 +5391,15 @@ namespace Gekko
             string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
             varName = G.Chop_AddFreq(varName, Program.options.freq);
             variableCounter++;
-            if (!databank.ContainsIVariable(varName))
-            {
-                Series data2 = new Series(freqHere, varName);
-                databank.AddIVariable(varName, data2);
-                ts = data2;
-            }
-            else
-            {
-                ts = databank.GetIVariable(varName, true) as Series;
-            }
+
+            //At this point, we do not know if the varName is "x", "x[a]", "x[a,b]" etc., and the problem is that
+            //the x series may exist already but be of the wrong dimension (above we have 0, 1 or 2 dimensions).
+
+            ts = databank.GetIVariableMayCreateSeries(varName) as Series;
 
             return ts;
         }
-
+        
         /// <summary>
         /// Helper method
         /// </summary>
@@ -6705,13 +6700,13 @@ namespace Gekko
             else if (G.Equal(o.opt_list, "yes")) type = ESheetCollection.List;
             else if (G.Equal(o.opt_map, "yes")) type = ESheetCollection.Map;
 
-            if (type != ESheetCollection.None)
+            if (type == ESheetCollection.None)
             {
-                listItems = O.Restrict(o.names, true, true, false, false);
+                listItems = O.Restrict(o.names, true, false, true, true);  //We now allow x[a,b]
             }
             else
             {
-                listItems = O.Restrict(o.names, true, false, true, false);
+                listItems = O.Restrict(o.names, true, true, false, false);
             }
 
             string collectionName = null;
@@ -6797,7 +6792,11 @@ namespace Gekko
             {
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
-                    Series ts = O.GetIVariableFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must, false) as Series;
+                    //Series ts = O.GetIVariableFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must, false) as Series;
+
+                    Databank databank = Program.databanks.GetFirst();
+                    Series ts = databank.GetIVariableMayCreateSeries(G.Chop_AddFreq(listItems[row - 1 - rowOffset], Program.options.freq)) as Series;
+
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {
                         CellLight cell = inputTable.Get(row, col);
