@@ -22619,14 +22619,35 @@ namespace Gekko
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
+                    List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);                    
+                    return CsvPrnWrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
+                }                       
+                else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
+                {
+                    //2D format
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);
+                    WriteToExcel(fileName, tStart, tEnd, list2, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
+                    return 0;
                 }
                 else if (G.Equal(o.opt_gnuplot, "yes"))
                 {
-                    //2D format
+                    //2D format, something like this, not mixing of frequencies. Something like this:
+                    //
+                    //#                   x1                x2
+                    //2015  2.0000000000E+00  5.0000000000E+00 
+                    //2016  2.0000000000E+00  5.0000000000E+00                     
+                    //
+                    // or this:
+                    //
+                    //#                         x1                x2
+                    //2015/01/01  1.0000000000E+00  2.0000000000E+00
+                    //2015/04/01  1.0000000000E+00  2.0000000000E+00
+                    //
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    return GnuplotWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd);
+                    List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);
+                    return GnuplotWrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
                 {
@@ -22634,13 +22655,6 @@ namespace Gekko
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
-                }
-                else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
-                {
-                    //2D format
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
-                    return 0;
                 }
                 else if (o.opt_gdx != null)
                 {
@@ -22893,11 +22907,9 @@ namespace Gekko
         /// <param name="datetype"></param>
         /// <param name="variablesType"></param>
         /// <exception cref="GekkoException"></exception>
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
-        {
-            ExcelOptions eo = new ExcelOptions();
-
-            List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(list);
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<Tuple<string, IVariable>> list2, List<ToFrom> list, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
+        {            
+            ExcelOptions eo = new ExcelOptions();            
 
             if (variablesType == EVariablesForWrite.Normal)
             {
@@ -24064,9 +24076,8 @@ namespace Gekko
             return;
         }
 
-        private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat)
-        {
-
+        private static int CsvPrnWrite(List<Tuple<string, IVariable>> vars, List<ToFrom> varsInput, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat)
+        {           
             bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
 
@@ -24161,11 +24172,9 @@ namespace Gekko
                     }
                 }
 
-                i++;
+                i++;                
 
-                List<Tuple<string, IVariable>> vars3 = Series.FlattenArraySeries(vars);
-
-                foreach (Tuple<string, IVariable> tup in vars3)
+                foreach (Tuple<string, IVariable> tup in vars)
                 {
                     j = 1;
                     GekkoTime tsStart = GekkoTime.tNull;
@@ -24445,10 +24454,9 @@ namespace Gekko
             }
         }
 
-        private static int GnuplotWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2)
+        private static int GnuplotWrite(List<Tuple<string, IVariable>> list2, List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2)
         {
-            int prnWidth = 18;
-            //Databank first = Program.databanks.GetFirst();
+            int prnWidth = 18;           
 
             G.Writeln2("Writing gnuplot file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
             filename = G.AddExtension(filename, ".dat");
@@ -24459,35 +24467,30 @@ namespace Gekko
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
-            {
-                //Writing to csv/prn file
-
+            {                
                 file.Write("# " + G.Blanks(prnWidth));  //comment
-                foreach (ToFrom var in vars)
+                foreach (Tuple<string, IVariable> tup in list2)
                 {
-                    //string s3 = var.name;
-                    //Databank db = GetBankFromBankNameVersion(var.bank);
-                    //Series ts = db.GetVariable(s3); //#getvar
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                    IVariable iv = tup.Item2; // O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
                     if (ts == null)
                     {
-                        new Error("Variable '" + var.s1 + "' is of wrong type");
+                        new Error("Variable '" + tup.Item1 + "' is of wrong type");
                     }
-                    file.Write(G.varFormat(G.Chop_GetName(var.s2), prnWidth));  //prn and gnuplot
+                    file.Write(G.varFormat(G.Chop_GetNameAndIndex(tup.Item1), prnWidth));  //prn and gnuplot
                 }
                 file.WriteLine();
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
                     file.Write(GetDateStringSuitableForGnuplot(t.ToString()) + " ");
-                    foreach (ToFrom var in vars)
+                    foreach (Tuple<string, IVariable> tup in list2)
                     {
                         //string s3 = var.name;
                         //Databank db = GetBankFromBankNameVersion(var.bank);
                         //Series ts = db.GetVariable(s3);  //existence has been checked //#getvar
 
-                        IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                        IVariable iv = tup.Item2; // O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                         Series ts = iv as Series;
 
                         double data = ts.GetDataSimple(t);
@@ -24507,9 +24510,9 @@ namespace Gekko
                 file.Flush();
             }
 
-            G.Writeln("Wrote " + vars.Count + " variables to " + pathAndFilename);
+            G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
 
-            return vars.Count;
+            return list2.Count;
         }
 
         private static string HandleFunnyNumbers(bool isCsv)
