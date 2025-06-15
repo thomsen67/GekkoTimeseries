@@ -1194,6 +1194,13 @@ namespace Gekko
             return O.UnChop(bank, name, freq, null);
         }
 
+        public static string Chop_GetNameAndIndex(string bankvarname)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);            
+            return O.UnChop(null, name, null, index);
+        }
+
         /// <summary>
         /// Remove freq part of varnamne.
         /// </summary>

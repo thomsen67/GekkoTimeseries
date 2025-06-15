@@ -22919,7 +22919,7 @@ namespace Gekko
                 {
                     IVariable iv = list2[i].Item2; // O.GetIVariableFromString(list[i].s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
-                    string varLabel = G.Chop_GetName(list2[i].Item1);
+                    string varLabel = G.Chop_GetNameAndIndex(list2[i].Item1);
                     eo.excelRowLabels[i, 0] = varLabel;
 
                     if (ts == null)
@@ -24177,7 +24177,7 @@ namespace Gekko
                     counter++;
                     if (fileType == EdataFormat.Csv)
                     {
-                        tab.Add(i, j, new CellLight(tup.Item1)); j++;
+                        tab.Add(i, j, new CellLight(G.Chop_GetNameAndIndex(tup.Item1))); j++;
                     }
                     else
                     {

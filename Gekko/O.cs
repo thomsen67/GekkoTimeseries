@@ -4192,7 +4192,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Index elements contain blanks like [a, b, c], not [a,b,c].
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Index elements do not contain blanks, so [a,b,c], not [a, b, c].
         /// Else see overload.
         /// </summary>
         /// <param name="bank"></param>
@@ -4202,7 +4202,7 @@ namespace Gekko
         /// <returns></returns>
         public static string UnChop(string bank, string name, string freq, string[] index)
         {
-            return UnChop(bank, name, freq, index, " ");
+            return UnChop(bank, name, freq, index, "");
         }
 
         /// <summary>
