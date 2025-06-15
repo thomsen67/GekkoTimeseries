@@ -22548,52 +22548,13 @@ namespace Gekko
 
                 //TODO TODO TODO
                 //TODO TODO TODO
-                //TODO TODO TODO Not sure is this filter stuff works ok for quarters and months...?
+                //TODO TODO TODO Not sure if this filter stuff works ok for quarters and months...?
                 //TODO TODO TODO
                 //TODO TODO TODO
-
-                List<ToFrom> listFilteredForCurrentFreq = null;
-                if (isRecordsFormat)
-                {
-                    //can handle multiple frequencies etc.
-                    listFilteredForCurrentFreq = list;
-                }
-                else
-                {
-                    //2D format, only 1 frequency
-                    //listFilteredForCurrentFreq = FilterListForFrequency(list);
-
-                    foreach (ToFrom two in list)
-                    {
-                        if (G.Equal(G.ConvertFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))  //.s2 is probably not used here
-                        {
-                            //good
-                            if (listFilteredForCurrentFreq == null) listFilteredForCurrentFreq = new List<ToFrom>();
-                            listFilteredForCurrentFreq.Add(two);
-                        }
-                    }
-
-                    if (listFilteredForCurrentFreq == null)
-                    {
-                        if (list.Count == 1 && G.Chop_HasSigil(list[0].s1))
-                        {
-                            variablesType = EVariablesForWrite.OneNonSeries;  //will only be active for 2D format
-                            //a %- or #-variable, not a series
-                            listFilteredForCurrentFreq = new List<ToFrom>();
-                            listFilteredForCurrentFreq.Add(list[0]);
-                        }
-                    }
-                }
-
-                if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
-                {
-                    string s = null;
-                    if (!isRecordsFormat)
-                    {
-                        s += "NOTE: Only variables of the current frequency (" + Program.options.freq.ToString() + ") are considered.";
-                    }
-                    new Error("No variables to write. " + s);
-                }
+                List<ToFrom> listMaybeFilteredForCurrentFreq = FilterByFreq(list, isRecordsFormat, ref variablesType);
+                //list1 is used for methods that know how to handle an array-series (gdx, gbk). list2 for those that do not (csv, xlsx, etc.)                
+                List<Tuple<string, IVariable>> list1 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, false);
+                List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, true);
 
                 if (tStart.IsNull() && tEnd.IsNull())
                 {
@@ -22603,15 +22564,13 @@ namespace Gekko
                     }
                     else
                     {
-                        //will find that largest timespan of the databank series
-                        GetDatabankPeriodFilteredForFreq(listFilteredForCurrentFreq, ref tStart, ref tEnd);
+                        //will find that largest timespan of the databank series (flattened)
+                        GetDatabankPeriodFilteredForFreq(list2, ref tStart, ref tEnd);
                     }
                 }
 
                 string writeOption = "" + Globals.extensionDatabank + "";  //default
                 if (G.Equal(o.opt_tsd, "yes")) writeOption = "tsd";
-
-                List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);
 
                 if (G.Equal(o.opt_csv, "yes") || G.Equal(o.opt_prn, "yes"))
                 {
@@ -22620,14 +22579,14 @@ namespace Gekko
                     EdataFormat format = EdataFormat.Csv;
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);                                     
-                    return CsvPrnWrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
-                }                       
+                    CheckSomethingToWrite(list2.Count);
+                    return CsvPrnWrite(list2, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
+                }
                 else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
                 {
                     //2D format
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);                    
-                    WriteToExcel(fileName, tStart, tEnd, list2, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
+                    CheckSomethingToWrite(list2.Count);
+                    WriteToExcel(fileName, tStart, tEnd, list2, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
                     return 0;
                 }
                 else if (G.Equal(o.opt_gnuplot, "yes"))
@@ -22645,15 +22604,15 @@ namespace Gekko
                     //2015/04/01  1.0000000000E+00  2.0000000000E+00
                     //
                     ErrorIfMatrix(variablesType);
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);                    
-                    return GnuplotWrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd);
+                    CheckSomethingToWrite(list2.Count);
+                    return GnuplotWrite(list2, fileName, tStart, tEnd);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
                 {
                     //RECORDS
                     ErrorIfMatrix(variablesType);
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    return Tspwrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
+                    CheckSomethingToWrite(list2.Count);
+                    return Tspwrite(list2, fileName, tStart, tEnd, isCaps);
                 }
                 else if (o.opt_gdx != null)
                 {
@@ -22663,17 +22622,17 @@ namespace Gekko
                     {
                         new Error("Please indicate a file name for EXPORT<gdx>");
                     }
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    CheckSomethingToWrite(list2.Count);
                     string file = G.AddExtension(fileName, "." + "gdx");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     if (Program.options.gams_fast)
                     {
-                        GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list2, list);
+                        GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list2);
                     }
                     else
                     {
-                        GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list2, list);
+                        GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list2);
                     }
                     return 0;
                 }
@@ -22685,7 +22644,7 @@ namespace Gekko
                     {
                         new Error("Please indicate a file name for EXPORT<arrow>");
                     }
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    CheckSomethingToWrite(list2.Count);
                     string file = G.AddExtension(fileName, "." + "arrow");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
@@ -22710,19 +22669,20 @@ namespace Gekko
                 else if (isRecordsFormat)
                 {
                     //RECORDS
-                    CheckSomethingToWrite(list);
+                    //TODO: In Gekko 4.0 we could use list1 here, with non-unfolded array-series. But for now we keep it. 
+                    CheckSomethingToWrite(list.Count);
                     //first argument (the databank) is only used if list = null
                     if (isDefault)
                     {
-                        return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
+                        return WriteGbk(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
                     }
                     if (writeType == EDatabankWriteType.Tsd)
                     {
-                        return WriteTsd(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                        return WriteTsd(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false);
                     }
                     else if (writeType == EDatabankWriteType.Flat)
                     {
-                        return WriteFlat(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                        return WriteFlat(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false);
                     }
                     else if (writeType == EDatabankWriteType.Gcm)
                     {
@@ -22743,6 +22703,54 @@ namespace Gekko
             {
                 Program.options.interface_alias = aliasRemember;
             }
+        }
+
+        private static List<ToFrom> FilterByFreq(List<ToFrom> list, bool isRecordsFormat, ref EVariablesForWrite variablesType)
+        {
+            List<ToFrom> listMaybeFilteredForCurrentFreq = null;
+            if (isRecordsFormat)
+            {
+                //can handle multiple frequencies etc.
+                listMaybeFilteredForCurrentFreq = list;
+            }
+            else
+            {
+                //2D format, only 1 frequency
+                //listFilteredForCurrentFreq = FilterListForFrequency(list);
+
+                foreach (ToFrom two in list)
+                {
+                    if (G.Equal(G.ConvertFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))  //.s2 is probably not used here
+                    {
+                        //good
+                        if (listMaybeFilteredForCurrentFreq == null) listMaybeFilteredForCurrentFreq = new List<ToFrom>();
+                        listMaybeFilteredForCurrentFreq.Add(two);
+                    }
+                }
+
+                if (listMaybeFilteredForCurrentFreq == null)
+                {
+                    if (list.Count == 1 && G.Chop_HasSigil(list[0].s1))
+                    {
+                        variablesType = EVariablesForWrite.OneNonSeries;  //will only be active for 2D format
+                                                                          //a %- or #-variable, not a series
+                        listMaybeFilteredForCurrentFreq = new List<ToFrom>();
+                        listMaybeFilteredForCurrentFreq.Add(list[0]);
+                    }
+                }
+            }
+
+            if (listMaybeFilteredForCurrentFreq == null || listMaybeFilteredForCurrentFreq.Count == 0)
+            {
+                string s = null;
+                if (!isRecordsFormat)
+                {
+                    s += "NOTE: Only variables of the current frequency (" + Program.options.freq.ToString() + ") are considered.";
+                }
+                new Error("No variables to write. " + s);
+            }
+
+            return listMaybeFilteredForCurrentFreq;
         }
 
         /// <summary>
@@ -22885,11 +22893,11 @@ namespace Gekko
         /// Error message for WRITE/EXPORT if there are 0 variables.
         /// </summary>
         /// <param name="listFilteredForCurrentFreq"></param>
-        private static void CheckSomethingToWrite(List<ToFrom> listFilteredForCurrentFreq)
+        private static void CheckSomethingToWrite(int count)
         {
-            if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
+            if (count == 0)
             {
-                new Error("No variables to write");
+                new Error("No variables to write.");
             }
         }
 
@@ -22905,7 +22913,7 @@ namespace Gekko
         /// <param name="datetype"></param>
         /// <param name="variablesType"></param>
         /// <exception cref="GekkoException"></exception>
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<Tuple<string, IVariable>> list2, List<ToFrom> list, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<Tuple<string, IVariable>> list2, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
         {            
             ExcelOptions eo = new ExcelOptions();            
 
@@ -22989,18 +22997,18 @@ namespace Gekko
         /// <summary>
         /// Write gbk databank (the native format of Gekko, may include traces).
         /// </summary>
+        /// <param name="list"></param>
         /// <param name="databank"></param>
         /// <param name="yr1"></param>
         /// <param name="yr2"></param>
         /// <param name="file"></param>
         /// <param name="isCaps"></param>
-        /// <param name="list"></param>
         /// <param name="writeOption"></param>
         /// <param name="writeAllVariables"></param>
         /// <param name="isCloseCommand"></param>
         /// <param name="noTrace"></param>
         /// <returns></returns>
-        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand, bool noTrace)
+        public static int WriteGbk(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand, bool noTrace)
         {
             if (databank.storage.Count == 0)
             {
@@ -23251,7 +23259,7 @@ namespace Gekko
             }
         }
 
-        public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteTsd(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
             if (databank.storage.Count == 0)
             {
@@ -23304,7 +23312,7 @@ namespace Gekko
             return count;
         }
 
-        public static int WriteFlat(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteFlat(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
             if (databank.storage.Count == 0)
             {
@@ -24074,7 +24082,7 @@ namespace Gekko
             return;
         }
 
-        private static int CsvPrnWrite(List<Tuple<string, IVariable>> vars, List<ToFrom> varsInput, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat)
+        private static int CsvPrnWrite(List<Tuple<string, IVariable>> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat)
         {           
             bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
@@ -24182,13 +24190,14 @@ namespace Gekko
                     tsEnd = ts.GetPeriodLast();
 
                     counter++;
+                    string nameWithIndex = G.Chop_GetNameAndIndex(tup.Item1);
                     if (fileType == EdataFormat.Csv)
                     {
-                        tab.Add(i, j, new CellLight(G.Chop_GetNameAndIndex(tup.Item1))); j++;
+                        tab.Add(i, j, new CellLight(nameWithIndex)); j++;
                     }
                     else
                     {
-                        string s4 = tup.Item1;
+                        string s4 = nameWithIndex;
                         if (Program.options.bugfix_sas) s4 = "\"" + s4.ToUpper() + "\""; //fY --> "FY"
                         tab.Add(i, j, new CellLight(G.varFormat(s4, prnWidth))); j++;
                     }
@@ -24383,19 +24392,16 @@ namespace Gekko
         }
 
 
-        private static void GetDatabankPeriodFilteredForFreq(List<ToFrom> vars, ref GekkoTime per1, ref GekkoTime per2)
-        {
-            //Databank first = Program.databanks.GetFirst();
-            //vars: annual is fy, quarterly is fy%q, monthly is fy%m, undated is fy%u
+        private static void GetDatabankPeriodFilteredForFreq(List<Tuple<string, IVariable>> list2, ref GekkoTime per1, ref GekkoTime per2)
+        {            
             int start = int.MaxValue;
             int end = int.MinValue;
-            foreach (ToFrom s in vars)
+            foreach (Tuple<string, IVariable> tup in list2)
             {
-                IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);
-                if (iv.Type() != EVariableType.Series) continue;  //should never happen                
-                Series ts = (Series)iv;
+                IVariable iv = tup.Item2; // O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);                
+                Series ts = iv as Series;
+                if (ts == null) continue;
                 if (ts.type != ESeriesType.Normal) continue;
-
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
                 end = G.GekkoMax(end, ts.GetPeriodLast().super);
             }
@@ -24452,7 +24458,7 @@ namespace Gekko
             }
         }
 
-        private static int GnuplotWrite(List<Tuple<string, IVariable>> list2, List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2)
+        private static int GnuplotWrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2)
         {
             int prnWidth = 18;           
 
@@ -24550,7 +24556,7 @@ namespace Gekko
             return s;
         }
 
-        private static int Tspwrite(List<Tuple<string, IVariable>> list2, List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
+        private static int Tspwrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
         {
             //Databank work = Program.databanks.GetFirst();
             filename = filename;
@@ -25177,7 +25183,7 @@ namespace Gekko
             if (!skipWrite)
             {
                 Globals.dependencyTracking.Add(2, "Write", false, removed.FileNameWithPath);
-                n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true, noTrace);
+                n = WriteGbk(null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
             }
         }
 

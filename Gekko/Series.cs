@@ -1821,7 +1821,6 @@ namespace Gekko
             temp.data = new SeriesDataInformation();
 
             List<MultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
-
             keys1.Sort(Multidim.CompareMultidimItems);
 
             for (int i = 0; i < keys1.Count; i++)
@@ -2174,7 +2173,7 @@ namespace Gekko
         /// If the input is non-series, the output has 0 elements. 
         /// If using varname, you may or may not search for the varname if it has no "bank:" part.                
         /// </summary>        
-        private static List<Tuple<string, IVariable>> FlattenArraySeries(Series tsInputOptional, string varname, bool search)
+        private static List<Tuple<string, IVariable>> FlattenArraySeries(Series tsInputOptional, string varname, bool search, bool flatten)
         {
             List<Tuple<string, IVariable>> rv = new List<Tuple<string, IVariable>>();
             Series ts = null;
@@ -2188,9 +2187,13 @@ namespace Gekko
                 ts = tsInputOptional;
             }
             if (ts == null) return rv;
-            if (ts.type == ESeriesType.ArraySuper)
+            if (flatten && ts.type == ESeriesType.ArraySuper)
             {
-                foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
+                //if flatten==false, the array-series is not unfolded.
+                //This is useful for components that know how to handle array-series.                                
+                List<KeyValuePair<MultidimItem, IVariable>> mmiSorted = new List<KeyValuePair<MultidimItem, IVariable>>(ts.dimensionsStorage.storage);                              
+                mmiSorted.Sort((leftKvp, rightKvp) => Multidim.CompareMultidimItems(leftKvp.Key, rightKvp.Key));
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in mmiSorted)
                 {
                     Series ts2 = kvp2.Value as Series;
                     rv.Add(new Tuple<string, IVariable>(ts2.GetName(), ts2));
@@ -2203,14 +2206,14 @@ namespace Gekko
             return rv;
         }
 
-        public static List<Tuple<string, IVariable>> FlattenArraySeries(List<ToFrom> vars)
+        public static List<Tuple<string, IVariable>> FlattenArraySeries(List<ToFrom> vars, bool flatten)
         {
             List<Tuple<string, IVariable>> vars3 = new List<Tuple<string, IVariable>>();
             foreach (Tuple<string, IVariable> tup in Program.GetNamesAndVariableObject(vars))
             {
                 if (tup.Item2.Type() == EVariableType.Series)
                 {
-                    vars3.AddRange(Series.FlattenArraySeries(tup.Item2 as Series));
+                    vars3.AddRange(Series.FlattenArraySeries(tup.Item2 as Series, flatten));
                 }
                 else
                 {
@@ -2223,17 +2226,17 @@ namespace Gekko
         /// <summary>
         /// See called method.
         /// </summary>        
-        public static List<Tuple<string, IVariable>> FlattenArraySeries(Series ts)
+        public static List<Tuple<string, IVariable>> FlattenArraySeries(Series ts, bool flatten)
         {
-            return FlattenArraySeries(ts, null, false);
+            return FlattenArraySeries(ts, null, false, flatten);
         }
 
         /// <summary>
         /// See called method.
         /// </summary>
-        public static List<Tuple<string, IVariable>> FlattenArraySeries(string varname, bool search)
+        public static List<Tuple<string, IVariable>> FlattenArraySeries(string varname, bool search, bool flatten)
         {
-            return FlattenArraySeries(null, varname, search);
+            return FlattenArraySeries(null, varname, search, flatten);
         }
 
         /// <summary>

@@ -1451,7 +1451,7 @@ namespace Gekko
                         G.Writeln("Starting to pack zip file...");
                         SolveDataInOut.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null, null);
                         Zipper zipper = new Zipper("gekko_sim_error.zip");
-                        Program.WriteGbk(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<ToFrom>(), "" + Globals.extensionDatabank + "", true, false, false);
+                        Program.WriteGbk(new List<ToFrom>(), Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, "" + Globals.extensionDatabank + "", true, false, false);
                         Program.WaitForFileCopy(Globals.modelPathAndFileName, zipper.tempFolder + "\\model.frm"); ;
                         Program.Pipe(zipper.tempFolder + "\\simerror.txt", null);
                         G.Writeln(Globals.packSim.tStart.ToString() + " " + Globals.packSim.tEnd.ToString());

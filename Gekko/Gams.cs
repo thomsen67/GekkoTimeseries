@@ -4802,7 +4802,7 @@ namespace Gekko
             if (gekkoDimensions == 0) isMultiDim = false;
         }
 
-        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<Tuple<string, IVariable>> list2, List<ToFrom> list)
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<Tuple<string, IVariable>> list2)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -5079,7 +5079,7 @@ namespace Gekko
             }
         }
 
-        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<Tuple<string, IVariable>> list2, List<ToFrom> list)
+        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<Tuple<string, IVariable>> list2)
         {
             //TODO: try-catch if writing fails
 
