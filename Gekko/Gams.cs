@@ -4802,7 +4802,7 @@ namespace Gekko
             if (gekkoDimensions == 0) isMultiDim = false;
         }
 
-        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<Tuple<string, IVariable>> list2, List<ToFrom> list)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -4889,13 +4889,11 @@ namespace Gekko
                         new Error("GAMS gdx write error number " + ErrNr);
                     }
 
-                    foreach (ToFrom bnv in list)
+                    foreach (Tuple<string, IVariable> tup in list2) 
                     {
-                        string inputVariableName = bnv.s1;
+                        IVariable iv = tup.Item2; // O.GetIVariableFromString(inputVariableName, O.ECreatePossibilities.NoneReportError, true);
 
-                        IVariable iv = O.GetIVariableFromString(inputVariableName, O.ECreatePossibilities.NoneReportError, true);
-
-                        string name = bnv.s2;
+                        string name = tup.Item1;// bnv.s2;
                         string nameWithoutFreq = G.Chop_GetName(name);
 
                         if (iv.Type() == EVariableType.Series)
@@ -4982,14 +4980,14 @@ namespace Gekko
                             if (ts.meta != null && ts.meta.fix == EFixedType.Parameter) dt_ = gamsglobals.dt_par;
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, dt_, 0) == 0)
                             {
-                                new Error("Internal GAMS/gdx problem (variable '" + inputVariableName + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
+                                new Error("Internal GAMS/gdx problem (variable '" + tup.Item1 + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
                             }
 
                             gdx.gdxSystemInfo(ref syCnt, ref uelCnt);
 
                             if (gdx.gdxSymbolSetDomainX(syCnt, domains) == 0)
                             {
-                                new Error("Could not write domain names (gdxSymbolSetDomainX), variable '" + inputVariableName + "'");
+                                new Error("Could not write domain names (gdxSymbolSetDomainX), variable '" + tup.Item1 + "'");
                             }
 
                             if (ts.type == ESeriesType.ArraySuper)
@@ -5008,7 +5006,7 @@ namespace Gekko
 
                             if (gdx.gdxDataWriteDone() == 0)
                             {
-                                new Error("GAMS gdx did not terminate properly, variable '" + inputVariableName + "'.");
+                                new Error("GAMS gdx did not terminate properly, variable '" + tup.Item1 + "'.");
                             }
                             counterVariables++;
                         }
@@ -5016,7 +5014,7 @@ namespace Gekko
                         {
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq.Replace(Globals.symbolCollection.ToString(), ""), "", 1, gamsglobals.dt_set, 0) == 0)
                             {
-                                new Error("Internal GAMS/gdx problem (variable '" + inputVariableName + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
+                                new Error("Internal GAMS/gdx problem (variable '" + tup.Item1 + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
                             }
 
                             List l = iv as List;
@@ -5025,13 +5023,13 @@ namespace Gekko
                             {
                                 if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
                                 {
-                                    new Error("Problem writing set (list) element for gdx, variable '" + inputVariableName + "'");
+                                    new Error("Problem writing set (list) element for gdx, variable '" + tup.Item1 + "'");
                                 }
                             }
 
                             if (gdx.gdxDataWriteDone() == 0)
                             {
-                                new Error("GAMS gdx did not terminate properly, variable '" + inputVariableName + "'.");
+                                new Error("GAMS gdx did not terminate properly, variable '" + tup.Item1 + "'.");
                             }
                             exportedSets++;
                         }
@@ -5081,7 +5079,7 @@ namespace Gekko
             }
         }
 
-        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
+        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<Tuple<string, IVariable>> list2, List<ToFrom> list)
         {
             //TODO: try-catch if writing fails
 
@@ -5121,16 +5119,9 @@ namespace Gekko
 
             GAMSDatabase db = ws.AddDatabase();
 
-            foreach (ToFrom bnv in list)
+            foreach (Tuple<string, IVariable> tup in list2)
             {
-                string name = bnv.s2;  // bnv.name;
-
-
-                string nameWithoutFreq = G.Chop_RemoveFreq(name);
-
-
-                IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
-
+                IVariable iv = tup.Item2; //O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
 
                 Series ts = iv as Series;
                 if (ts == null) continue;  //only write timeseries at the moment
@@ -5164,7 +5155,7 @@ namespace Gekko
                 for (int i = 0; i < domains.Length; i++) domains[i] = "*";
                 if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;  //we alway put the t domain last
 
-                GAMSVariable gvar = db.AddVariable(nameWithoutFreq, VarType.Free, label, domains);
+                GAMSVariable gvar = db.AddVariable(tup.Item1, VarType.Free, label, domains);
 
                 counterVariables = WriteGdxHelperSlow(t1, t2, usePrefix, counterVariables, ts, gvar);
 
