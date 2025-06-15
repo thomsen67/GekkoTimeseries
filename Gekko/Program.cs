@@ -22691,7 +22691,7 @@ namespace Gekko
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename);
+                        Arrow.WriteArrowDatabank(list2, tStart, tEnd, pathAndFilename);
                     }
                     catch (Exception e)
                     {
