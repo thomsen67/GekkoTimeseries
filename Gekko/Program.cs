@@ -22626,11 +22626,11 @@ namespace Gekko
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     if (Program.options.gams_fast)
                     {
-                        GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list2);
+                        GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1); //probably cannot handle list2
                     }
                     else
                     {
-                        GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list2);
+                        GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1); //probably cannot handle list2
                     }
                     return 0;
                 }

@@ -32887,87 +32887,87 @@ print(df2)
 
             I("prt <n> {'x[*, *]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, ax]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i, ay]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i, bx]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j, by]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x[j, by1]");
-            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x[j, by2]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,ax]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i,ay]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i,bx]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j,by]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x[j,by1]");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x[j,by2]");
             Assert.AreEqual(table.Get(1, 8), null);
 
             I("prt <n> {'x[*, b*]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j, by]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[j, by1]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j, by2]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j,by]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[j,by1]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j,by2]");
             Assert.AreEqual(table.Get(1, 6), null);
 
             I("prt <n> {'x[*, b?]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j, by]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j,by]");
             Assert.AreEqual(table.Get(1, 4), null);
 
             I("prt <n> x['*', '*'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, ax]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i, ay]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i, bx]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j, by]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x[j, by1]");
-            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x[j, by2]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,ax]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i,ay]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i,bx]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j,by]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x[j,by1]");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x[j,by2]");
             Assert.AreEqual(table.Get(1, 8), null);
 
             I("prt <n> x['*', 'b*'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j, by]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[j, by1]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j, by2]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j,by]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[j,by1]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[j,by2]");
             Assert.AreEqual(table.Get(1, 6), null);
 
             I("prt <n> x['*', 'b?'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j, by]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[j,by]");
             Assert.AreEqual(table.Get(1, 4), null);
 
             Globals.unitTestScreenOutput.Clear();
-            I("index {'x[*, *]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+            I("index {'x[*,*]'};");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,ax], x[i,ay], x[i,bx], x[j,by], x[j,by1], x[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index {'x[*, b*]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx], x[j,by], x[j,by1], x[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index {'x[*, b?]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx], x[j,by]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[*, *];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,ax], x[i,ay], x[i,bx], x[j,by], x[j,by1], x[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[*, b*];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx], x[j,by], x[j,by1], x[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[*, b?];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx], x[j,by]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x['*', '*'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,ax], x[i,ay], x[i,bx], x[j,by], x[j,by1], x[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x['*', 'b*'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx], x[j,by], x[j,by1], x[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x['*', 'b?'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx], x[j,by]\r\n"));
 
             // =========================================================================================
             // =========================================================================================
@@ -32989,73 +32989,73 @@ print(df2)
 
             I("prt <n> {'x[i, *]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, ax]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i, ay]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i, bx]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,ax]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i,ay]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i,bx]");
             Assert.AreEqual(table.Get(1, 5), null);
 
             I("prt <n> {'x[i, b*]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
             Assert.AreEqual(table.Get(1, 3), null);
 
             I("prt <n> {'x[i, b?]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
             Assert.AreEqual(table.Get(1, 3), null);
 
             I("prt <n> x['i', '*'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, ax]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i, ay]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i, bx]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,ax]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[i,ay]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[i,bx]");
             Assert.AreEqual(table.Get(1, 5), null);
 
             I("prt <n> x['i', 'b*'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
             Assert.AreEqual(table.Get(1, 3), null);
 
             I("prt <n> x['i', 'b?'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i, bx]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[i,bx]");
             Assert.AreEqual(table.Get(1, 3), null);
 
             Globals.unitTestScreenOutput.Clear();
             I("index {'x[i, *]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,ax], x[i,ay], x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index {'x[i, b*]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index {'x[i, b?]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[i, *];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,ax], x[i,ay], x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[i, b*];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[i, b?];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x['i', '*'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,ax], x[i,ay], x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x['i', 'b*'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x['i', 'b?'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i,bx]\r\n"));
 
             // =========================================================================================
             // =========================================================================================
@@ -33104,22 +33104,22 @@ print(df2)
 
             I("prt <n> {'x2[**]'};");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x2[i, ax]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x2[i, ay]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x2[i, bx]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x2[j, by]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x2[j, by1]");
-            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x2[j, by2]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x2[i,ax]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x2[i,ay]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x2[i,bx]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x2[j,by]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x2[j,by1]");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x2[j,by2]");
             Assert.AreEqual(table.Get(1, 8), null);
 
             I("prt <n> x2['**'];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x2[i, ax]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x2[i, ay]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x2[i, bx]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x2[j, by]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x2[j, by1]");
-            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x2[j, by2]");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x2[i,ax]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x2[i,ay]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x2[i,bx]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x2[j,by]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x2[j,by1]");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x2[j,by2]");
             Assert.AreEqual(table.Get(1, 8), null);
 
             Globals.unitTestScreenOutput.Clear();
@@ -33136,23 +33136,23 @@ print(df2)
 
             Globals.unitTestScreenOutput.Clear();
             I("index {'x2[**]'};");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i, ax], x2[i, ay], x2[i, bx], x2[j, by], x2[j, by1], x2[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i,ax], x2[i,ay], x2[i,bx], x2[j,by], x2[j,by1], x2[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x2[**];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i, ax], x2[i, ay], x2[i, bx], x2[j, by], x2[j, by1], x2[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i,ax], x2[i,ay], x2[i,bx], x2[j,by], x2[j,by1], x2[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index x2['**'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i, ax], x2[i, ay], x2[i, bx], x2[j, by], x2[j, by1], x2[j, by2]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i,ax], x2[i,ay], x2[i,bx], x2[j,by], x2[j,by1], x2[j,by2]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index ref:x2['**'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Ref:x2[i, ax], Ref:x2[i, ay], Ref:x2[i, bx], Ref:x2[j, by], Ref:x2[j, by1], Ref:x2[j, by2], Ref:x2[j, by3]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Ref:x2[i,ax], Ref:x2[i,ay], Ref:x2[i,bx], Ref:x2[j,by], Ref:x2[j,by1], Ref:x2[j,by2], Ref:x2[j,by3]\r\n"));
 
             Globals.unitTestScreenOutput.Clear();
             I("index @x2['**'];");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Ref:x2[i, ax], Ref:x2[i, ay], Ref:x2[i, bx], Ref:x2[j, by], Ref:x2[j, by1], Ref:x2[j, by2], Ref:x2[j, by3]\r\n"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Ref:x2[i,ax], Ref:x2[i,ay], Ref:x2[i,bx], Ref:x2[j,by], Ref:x2[j,by1], Ref:x2[j,by2], Ref:x2[j,by3]\r\n"));
 
         }
 
