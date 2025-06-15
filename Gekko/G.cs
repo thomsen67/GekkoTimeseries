@@ -996,6 +996,13 @@ namespace Gekko
             else return name + Globals.freqIndicator + freq;
         }
 
+        public static string Chop_GetNameAndFreqAndIndex(string bankvarname)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            return O.UnChop(null, name, freq, index);            
+        }
+
         /// <summary>
         /// Get index part of bankvarname, for instance x!q[a, b] returns ["a", "b"]. May return empty list.
         /// </summary>

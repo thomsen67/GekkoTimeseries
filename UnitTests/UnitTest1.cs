@@ -32091,7 +32091,7 @@ print(df2)
                         I("WRITE<2001 2002 gnuplot>" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
                     }
                     // ------ flat
-                    if (bank == null && array == 0 && fixMePointer)
+                    if (bank == null)
                     {
                         I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                         I("WRITE<2001 2002 flat>temp;");

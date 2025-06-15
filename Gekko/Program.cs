@@ -7982,8 +7982,6 @@ namespace Gekko
 
             DateTime dt1 = DateTime.Now;
 
-            int variableCounter = 0;
-
             char[] c = new char[] { ' ' };
             double[] tempArray = new double[10000];
 
@@ -8042,9 +8040,10 @@ namespace Gekko
                     if (obs != obs2 && obs2 > 1)  //for obs2 = 1, any timeperiod is ok.
                     {
                         new Error("IMPORT<flat>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
-                    }
+                    }                    
 
-                    Series ts = FindOrCreateTimeSeriesInDataBank(databank, varname, gt1.freq);
+                    Series ts = databank.GetIVariableMayCreateSeries(G.Chop_AddFreq(varname, gt1.freq)) as Series;
+                    if (ts == null) new Error("Expected timeseries name, not '" + varname + "'");
 
                     for (int i = 3; i < linesplit.Length; i++)
                     {
@@ -22681,7 +22680,7 @@ namespace Gekko
                     }
                     else if (writeType == EDatabankWriteType.Flat)
                     {
-                        return WriteFlat(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false);
+                        return WriteFlat(list2, tStart, tEnd, fileName);
                     }
                     else if (writeType == EDatabankWriteType.Gcm)
                     {
@@ -23311,14 +23310,8 @@ namespace Gekko
             return count;
         }
 
-        public static int WriteFlat(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteFlat(List<Tuple<string, IVariable>> list2, GekkoTime yr1, GekkoTime yr2, string file)
         {
-            if (databank.storage.Count == 0)
-            {
-                new Error("Databank is empty");
-                //throw new GekkoException();
-            }
-
             file = G.StripQuotes(file);
             bool isUsingOptionFolderBank = false;
             if (Program.options.folder && Program.options.folder_bank != "") isUsingOptionFolderBank = true;
@@ -23340,7 +23333,7 @@ namespace Gekko
             int count = 0;
 
             DateTime dt0 = DateTime.Now;
-            WriteFlatRecords(ref yr1, ref yr2, isCaps, list, databank, pathAndFilename, ref count);
+            WriteFlatRecords(ref yr1, ref yr2, list2, pathAndFilename, ref count);
 
             if (true)
             {
@@ -23357,23 +23350,23 @@ namespace Gekko
             return count;
         }
 
-        private static void WriteFlatRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, string pathAndFilename, ref int count)
+        private static void WriteFlatRecords(ref GekkoTime yr1, ref GekkoTime yr2, List<Tuple<string, IVariable>> list2, string pathAndFilename, ref int count)
         {
             StringBuilder sb = new StringBuilder();
 
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
-                foreach (ToFrom var in list)
+                foreach (Tuple<string, IVariable> tup in list2)
                 {
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                    IVariable iv = tup.Item2; // O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
 
                     Series ts = iv as Series;
                     {
                         if (ts == null) continue; //skip  
-                        if (ts.type != ESeriesType.Normal) continue; //skip  
+                        if (ts.type != ESeriesType.Normal) continue; //skip, but should not happen since list2 is unfolded
                         count++;
-                        WriteFlatRecord(yr1, yr2, res, ts, G.Chop_GetNameAndFreq(var.s2), sb);
+                        WriteFlatRecord(yr1, yr2, res, ts, G.Chop_GetNameAndFreqAndIndex(tup.Item1), sb);
                     }
                 }
                 res.Flush();
@@ -24628,9 +24621,7 @@ namespace Gekko
             Series ts = null;
 
             string varName2 = G.Chop_AddFreq(varName, frequency);
-
-            //string varName2 = Program.AddFreqAtEndOfVariableName(varName, frequency);
-
+            
             if (!databank.ContainsIVariable(varName2))
             {
                 ts = new Series(frequency, varName2);
