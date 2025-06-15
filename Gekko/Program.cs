@@ -22611,6 +22611,8 @@ namespace Gekko
                 string writeOption = "" + Globals.extensionDatabank + "";  //default
                 if (G.Equal(o.opt_tsd, "yes")) writeOption = "tsd";
 
+                List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);
+
                 if (G.Equal(o.opt_csv, "yes") || G.Equal(o.opt_prn, "yes"))
                 {
                     //2D format
@@ -22618,15 +22620,13 @@ namespace Gekko
                     EdataFormat format = EdataFormat.Csv;
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);                    
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);                                     
                     return CsvPrnWrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
                 }                       
                 else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
                 {
                     //2D format
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);                    
                     WriteToExcel(fileName, tStart, tEnd, list2, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
                     return 0;
                 }
@@ -22645,8 +22645,7 @@ namespace Gekko
                     //2015/04/01  1.0000000000E+00  2.0000000000E+00
                     //
                     ErrorIfMatrix(variablesType);
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listFilteredForCurrentFreq);
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);                    
                     return GnuplotWrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
@@ -22654,7 +22653,7 @@ namespace Gekko
                     //RECORDS
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
+                    return Tspwrite(list2, listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
                 }
                 else if (o.opt_gdx != null)
                 {
@@ -22685,7 +22684,6 @@ namespace Gekko
                     if (fileName == null || fileName.Trim() == "")
                     {
                         new Error("Please indicate a file name for EXPORT<arrow>");
-                        //throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = G.AddExtension(fileName, "." + "arrow");
@@ -22693,7 +22691,7 @@ namespace Gekko
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);
+                        Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename);
                     }
                     catch (Exception e)
                     {
@@ -24552,7 +24550,7 @@ namespace Gekko
             return s;
         }
 
-        private static int Tspwrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
+        private static int Tspwrite(List<Tuple<string, IVariable>> list2, List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
         {
             //Databank work = Program.databanks.GetFirst();
             filename = filename;
@@ -24565,7 +24563,7 @@ namespace Gekko
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 string fileName = Path.GetFileName(pathAndFilename);
-                file.WriteLine("? This file is produced by Gekko, and contains " + vars.Count + " LOAD-statements with data.");
+                file.WriteLine("? This file is produced by Gekko, and contains " + list2.Count + " LOAD-statements with data.");
                 file.WriteLine("? You may INPUT this file in your TSP program, but for large datasets it");
                 file.WriteLine("? may be better to create a TSP databank (.tlb).");
                 file.WriteLine("? To do this, you may try the following statements:");
@@ -24583,21 +24581,20 @@ namespace Gekko
                 file.WriteLine();
                 file.WriteLine("freq a;");
                 file.WriteLine();
-                foreach (ToFrom var in vars)
+                foreach (Tuple<string, IVariable> tup in list2)
                 {
                     //Databank db = GetBankFromBankNameVersion(var.bank);                    
                     //Series ts = db.GetVariable(var.name);  //#getvar
 
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                    IVariable iv = tup.Item2; // O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
 
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        new Error("Writing tsp file: variable " + var.s1 + " does not exist");
-                        //throw new GekkoException();
+                        new Error("Writing tsp file: variable of non-series type.");
                     }
-                    WriteTspRecord(per1, per2, file, ts, var.s2, isCaps);
+                    WriteTspRecord(per1, per2, file, ts, tup.Item1, isCaps);
                     counter++;
                 }
                 file.Flush();
