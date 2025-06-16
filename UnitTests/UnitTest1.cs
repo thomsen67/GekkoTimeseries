@@ -597,25 +597,25 @@ namespace UnitTests
             I("p #dif;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare < dump sort = rel >;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare < dump sort = abs >;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
             _AssertListString(First(), "#dif", 1, "yy[i]");
-            _AssertListString(First(), "#dif", 2, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "xx[b,y]");
 
             I("compare < dump abs = 1.01 >;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare < dump abs = 2.01 >;");  //xx[b, y] is filtered out
@@ -630,13 +630,13 @@ namespace UnitTests
             I("compare < dump rel = 0.0039 >;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare < dump rel = 0.0041 >;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             if (true)
             {
@@ -645,13 +645,13 @@ namespace UnitTests
                 I("compare < dump pch = 100*0.0039 >;");  //no effect
                 I("p <n m q> {#dif};");
                 _AssertListSize(First(), "#dif", 2);
-                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+                _AssertListString(First(), "#dif", 1, "xx[b,y]");
                 _AssertListString(First(), "#dif", 2, "yy[i]");
 
                 I("compare < dump pch = 100*0.0041 >;");  //yy[i] is filtered out
                 I("p <n m q> {#dif};");
                 _AssertListSize(First(), "#dif", 1);
-                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+                _AssertListString(First(), "#dif", 1, "xx[b,y]");
             }
 
             I("compare < dump rel = 0.0051 >;");  //all are filtered out
@@ -679,31 +679,31 @@ namespace UnitTests
             I("p #dif;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare <2001 2001 dump sort = rel >;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare <2001 2001 dump sort = abs >;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare <2001 2001 dump abs = 0.199 >;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare <2001 2001 dump abs = 0.201 >;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.401 >;");  //all are filtered out
             I("p <n m q> {#dif};");
@@ -712,13 +712,13 @@ namespace UnitTests
             I("compare <2001 2001 dump rel = 0.0001 >;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
 
             I("compare <2001 2001 dump rel = 0.0003 >;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             if (true)
             {
@@ -727,13 +727,13 @@ namespace UnitTests
                 I("compare <2001 2001 dump pch = 100*0.0001 >;");  //no effect
                 I("p <n m q> {#dif};");
                 _AssertListSize(First(), "#dif", 2);
-                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+                _AssertListString(First(), "#dif", 1, "xx[b,y]");
                 _AssertListString(First(), "#dif", 2, "yy[i]");
 
                 I("compare <2001 2001 dump pch = 100*0.0003 >;");  //yy[i] is filtered out
                 I("p <n m q> {#dif};");
                 _AssertListSize(First(), "#dif", 1);
-                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+                _AssertListString(First(), "#dif", 1, "xx[b,y]");
             }
 
             I("compare <2001 2001 dump rel = 0.0011 >;");  //all are filtered out
@@ -757,27 +757,27 @@ namespace UnitTests
             I("p #dif;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump sort = rel >xx;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump sort = abs >xx;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.199 >xx;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.201 >xx;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.401 >xx;");  //all are filtered out
             I("p <n m q> {#dif};");
@@ -786,12 +786,12 @@ namespace UnitTests
             I("compare <2001 2001 dump rel = 0.0001 >xx;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump rel = 0.0003 >xx;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump rel = 0.0011 >xx;");  //all are filtered out
             I("p <n m q> {#dif};");
@@ -815,27 +815,27 @@ namespace UnitTests
             I("p #dif;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump sort = rel> {#r};");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump sort = abs> {#r};");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.199> {#r};");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.201> {#r};");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump abs = 0.401> {#r};");  //all are filtered out
             I("p <n m q> {#dif};");
@@ -844,12 +844,12 @@ namespace UnitTests
             I("compare <2001 2001 dump rel = 0.0001> {#r};");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump rel = 0.0003> {#r};");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001 2001 dump rel = 0.0011> {#r};");  //all are filtered out
             I("p <n m q> {#dif};");
@@ -883,7 +883,7 @@ namespace UnitTests
             I("compare <2001q1 2001q1 dump abs = 0.201 >;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 1, "xx[b,y]");
 
             I("compare <2001q1 2001q1 dump abs = 0.401 >;");  //all are filtered out
             I("p <n m q> {#dif};");
@@ -19178,9 +19178,9 @@ namespace UnitTests
             s = ".............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt @z[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(3, suggestions.Count);
-            Assert.IsTrue(suggestions[0].s1 == "Ref:z[i, ax]");
-            Assert.IsTrue(suggestions[1].s1 == "Ref:z[i, ay]");
-            Assert.IsTrue(suggestions[2].s1 == "Ref:z[i, az]");
+            Assert.IsTrue(suggestions[0].s1 == "Ref:z[i,ax]");
+            Assert.IsTrue(suggestions[1].s1 == "Ref:z[i,ay]");
+            Assert.IsTrue(suggestions[2].s1 == "Ref:z[i,az]");
         }
 
         [TestMethod]
