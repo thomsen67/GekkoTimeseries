@@ -218,7 +218,7 @@ namespace Gekko
 
         public void FindSetEquation(string eq, EquationTextHelper helper, GekkoTime t0, Model model)
         {
-            string s = model.GetEquationText(new List<string>() { eq }, null, helper, t0).resultingText;
+            string s = model.GetEquationText(new List<string>() { eq }, helper, t0).resultingText;
             WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s));
         }
 

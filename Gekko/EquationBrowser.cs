@@ -1338,7 +1338,7 @@ img {border-style: none;
                     tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
                     string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
                     EquationTextHelper helper = new EquationTextHelper();
-                    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, null, helper, tUsedHere);
+                    GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
                     string s5 = helper22.s_gamsOrFrnSyntax;
                     string s6 = helper22.s_scalarModel;
                     int index = s6.IndexOf("..");
@@ -1683,7 +1683,7 @@ img {border-style: none;
             {
                 table += "<tr>";
                 EquationTextHelper helper = new EquationTextHelper();
-                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, null, helper, tUsedHere);
+                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
                 string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
                 string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + G.Chop_RemoveLagOrLead(eqNameWithLagNoBlanks).ToLower());
                 table += "<td style=`vertical-align:top`>";

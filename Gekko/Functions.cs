@@ -6416,7 +6416,7 @@ namespace Gekko
                 {
                     foreach (string s in x)
                     {
-                        if (G.StartsWith(s, "res_")) continue;  //do not show residuals
+                        if (G.StartsWith(s, Globals.decompResidualPrefix)) continue;  //do not show residuals
                         if (s.StartsWith("x_temp1")) continue;  //cf. gekko_equations.py
                         if (s.StartsWith("x_temp2")) continue;  //cf. gekko_equations.py
                         string label = "'" + Helper_GetLabel(s) + "'";
@@ -6434,10 +6434,10 @@ namespace Gekko
                         if (!eq.Contains(t.ToString() + "]")) continue;
                         if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
                         if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
-                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, t);
+                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t);
                         string eqText = two.s1 + " .. " + two.s2;
                         string lhs = "[unknown]";
-                        if (two.s3 != null) lhs = G.Replace(two.s3, "res_", "", StringComparison.OrdinalIgnoreCase, 1);
+                        if (two.s3 != null) lhs = G.Replace(two.s3, Globals.decompResidualPrefix, "", StringComparison.OrdinalIgnoreCase, 1);
                         string label = null;
                         if (lhs != "[unknown]") label = "'" + Helper_GetLabel(lhs) + "'";
                         sw.WriteLine();

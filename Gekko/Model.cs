@@ -39,7 +39,8 @@ namespace Gekko
     public class GetEquationTextHelper
     {
         public string resultingText;
-        public string s_scalarModel;
+        public string s_scalarModel;  //is actually just .s_scalarModelMathRename with .mathRename inserted, but we keep it for now. Maybe remove it in Gekko 4.0.
+        public string s_scalarModelMathRename;
         public string s_gekkoSyntax;
         public string s_gamsOrFrnSyntax;
         public bool hasHit = true;
@@ -219,14 +220,12 @@ namespace Gekko
             GekkoTime tUsedHere = t0;
             if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(t0);
             string s = null;
-            List<string> eqNames = new List<string>();
-            List<string>varNames= new List<string>();
+            List<string> eqNames = new List<string>();            
             foreach (Link link in links)
             {
-                if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), null));
-                varNames.Add(link.varnames);  //SHOULD IT BE endo ?????????????????
+                if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), null));                
             }
-            s = model.GetEquationText(eqNames, varNames, helper, t0).resultingText;
+            s = model.GetEquationText(eqNames, helper, t0).resultingText;
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
@@ -239,7 +238,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public GetEquationTextHelper GetEquationText(List<string> eqs, List<string>varNames, EquationTextHelper helper, GekkoTime t0)
+        public GetEquationTextHelper GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
         {
             GetEquationTextHelper rv = new GetEquationTextHelper();
 
@@ -259,15 +258,17 @@ namespace Gekko
             // -- s_gamsOrFrnSyntax
             
             int i = -1;
-            foreach (string s in eqs)
+            foreach (string eq in eqs)
             {
                 i++;
                 if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
-                {
-                    GetEquationTextHelper2 two2 = this.modelGamsScalar.GetEquationTextUnfolded(s, helper, t0);                                       
-                    rv.s_scalarModel += two2.s2 + G.NL;
-                    rv.mathRename = two2.mathRename;
+                {                    
+                    GetEquationTextHelper2 two2a = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t0);
+                    rv.s_scalarModel += two2a.s2 + G.NL;
+                    GetEquationTextHelper2 two2b = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, true, t0);
+                    rv.s_scalarModelMathRename += two2b.s2 + G.NL;
+                    rv.mathRename = two2b.mathRename;
                     if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else
@@ -287,7 +288,13 @@ namespace Gekko
                 if (G.NullOrBlanks(rv.s_gekkoSyntax)) rv.s_gekkoSyntax = Globals.eqs2 + G.NL;
                 if (G.NullOrBlanks(rv.s_gamsOrFrnSyntax)) rv.s_gamsOrFrnSyntax = Globals.eqs2 + G.NL;
                 rv.resultingText += rv.s_gekkoSyntax + G.NL;
-                rv.resultingText += Globals.eqs1 + G.NL + G.NL + rv.s_scalarModel + G.NL;
+                string scalarText = rv.s_scalarModel;
+                if (false && Program.options.model_gams_scalar_normalize)
+                {
+                    scalarText = Program.MathNormalize1(null, rv.s_scalarModelMathRename, rv.mathRename, rv.s_scalarModel);
+                    //Maybe use GamsModel.ScoreEquationGivenVariable(), over incoming vars, to get the LHS variable???
+                }
+                rv.resultingText += Globals.eqs1 + G.NL + G.NL + scalarText + G.NL;
                 rv.resultingText += Globals.eqs3 + G.NL + G.NL + rv.s_gamsOrFrnSyntax + G.NL;
             }            
             
@@ -1827,7 +1834,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public GetEquationTextHelper2 GetEquationTextUnfolded(string name, EquationTextHelper helper, GekkoTime t0)
+        public GetEquationTextHelper2 GetEquationTextUnfolded(string name, EquationTextHelper helper, bool useMathRename, GekkoTime t0)
         {
             //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
@@ -1843,7 +1850,7 @@ namespace Gekko
             // -------------------------------------------
 
             List<string> mathRename = null;
-            if (helper.mathRename) mathRename = new List<string>();
+            if (useMathRename) mathRename = new List<string>();
 
             int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
             if (eq == -12345)
@@ -1947,7 +1954,7 @@ namespace Gekko
                     if ((Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2) && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
                     string varname = this.GetVarNameA(i2);
                     string varname2;
-                    if (G.StartsWith(varname, "res_")) resName = varname;
+                    if (G.StartsWith(varname, Globals.decompResidualPrefix)) resName = varname;
                     if (helper.showTime)
                     {
                         varname2 = G.Chop_DimensionAddLast(varname, gt.ToString());
@@ -1973,6 +1980,7 @@ namespace Gekko
                     string sC = c.ToString();
                     if (false)
                     {
+                        //Doing constants may result in fC*0.8, not 0.8*fC
                         if (mathRename != null)
                         {
                             sC = Program.MathPutIntoDict(mathRename, sC);

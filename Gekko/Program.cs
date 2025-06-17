@@ -329,8 +329,7 @@ namespace Gekko
     public class EquationTextHelper
     {
         public bool showTime = false;
-        public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.
-        public bool mathRename = false;
+        public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.        
     }
 
     /// <summary>
@@ -16118,7 +16117,7 @@ namespace Gekko
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), null);
-                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, null, helper, tUsedHere);
+                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
                         string eq = temp.resultingText;
                         if (temp.hasHit)
                         {
@@ -16618,10 +16617,10 @@ namespace Gekko
                 }
 
                 //Gets the equation text (raw)
-                EquationTextHelper helperA = new EquationTextHelper();
-                helperA.mathRename = true;  //activate it!
-                GetEquationTextHelper helperAA = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperA, tUsedHere);
-                string eqTextA = helperAA.s_gekkoSyntax;                
+                EquationTextHelper helperA = new EquationTextHelper();                
+                GetEquationTextHelper helperA1 = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helperA, tUsedHere);
+
+                string eqTextA = helperA1.s_gekkoSyntax;                
 
                 if (true)
                 {
@@ -16778,27 +16777,8 @@ namespace Gekko
                 G.Writeln("------------------------------------------------------------------------------------------");
                 if (showDetailed)
                 {
-                    //Gets the equation text (raw)
-                    EquationTextHelper helperB = new EquationTextHelper();
-                    GetEquationTextHelper helperBB = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, null, helperB, tUsedHere);
-
-                    string eqTextB = null;
-                    if (Program.options.model_gams_scalar_normalize)
-                    {
-                        try
-                        {
-                            eqTextB = MathGetNormalizedText(varnameWithoutFreq, helperAA);
-                            if (Globals.runningOnTTComputer) eqTextB += G.NL + G.NL + "TT: " + helperBB.s_scalarModel;
-                        }
-                        catch
-                        {
-                            eqTextB = helperBB.s_scalarModel;
-                        }
-                    }
-                    else
-                    {
-                        eqTextB = helperBB.s_scalarModel;
-                    }
+                    //Gets the equation text (raw)                    
+                    string eqTextB = MathNormalize1(varnameWithoutFreq, helperA1.s_scalarModelMathRename, helperA1.mathRename, helperA1.s_scalarModel);
 
                     using (Writeln txt = new Writeln())
                     {
@@ -16816,33 +16796,64 @@ namespace Gekko
             return eqsPrinted;
         }
 
-        private static string MathGetNormalizedText(string varnameWithoutFreq, GetEquationTextHelper helperAA)
-        {            
-            string output = MathNormalize(varnameWithoutFreq, helperAA.s_scalarModel, helperAA.mathRename);
-            string varnameWithoutFreqPretty = MathGetPrettyName(varnameWithoutFreq, helperAA);
-            string eqTextB = varnameWithoutFreqPretty + " = " + G.Substring(output, 2, output.Length - 2);
-            return eqTextB;
+        /// <summary>
+        /// Tries to use s_scalarModelMathRename, falls back to s_scalarModel if problems.
+        /// </summary>
+        /// <param name="varnameWithoutFreq"></param>
+        /// <param name="s_scalarModelMathRename"></param>
+        /// <param name="mathRename"></param>
+        /// <param name="s_scalarModel"></param>
+        /// <returns></returns>
+        public static string MathNormalize1(string varnameWithoutFreq, string s_scalarModelMathRename, List<string> mathRename, string s_scalarModel)
+        {
+            string s = null;
+            if (Program.options.model_gams_scalar_normalize)
+            {
+                try
+                {
+                    s = MathNormalize2(varnameWithoutFreq, s_scalarModelMathRename, mathRename);
+                    if (Globals.runningOnTTComputer) s += G.NL + G.NL + "--> TT: " + s_scalarModel;
+                }
+                catch
+                {
+                    s = s_scalarModel;
+                }
+            }
+            else
+            {
+                s = s_scalarModel;
+            }
+
+            return s;
         }
 
-        private static string MathGetPrettyName(string varnameWithoutFreq, GetEquationTextHelper helperAA)
+        private static string MathGetPrettyName(string varnameWithoutFreq, List<string> mathRename)
         {
-            for (int i = 0; i < helperAA.mathRename.Count; i++)
+            for (int i = 0; i < mathRename.Count; i++)
             {
-                if (G.EqualHandleBlanks(varnameWithoutFreq, helperAA.mathRename[i]))
+                if (G.EqualHandleBlanks(varnameWithoutFreq, mathRename[i]))
                 {
-                    varnameWithoutFreq = helperAA.mathRename[i];
+                    varnameWithoutFreq = mathRename[i];
                     break;
                 }
             }
-
             return varnameWithoutFreq;
         }
 
-        private static string MathNormalize(string varnameWithoutFreq, string modelText, List<string> mathRename)
+        /// <summary>
+        /// Replaces stuff like "0.5445*x_0 + ..." with "0.5445*qBNP + ...". The 0 is looked up in mathRename list.
+        /// </summary>
+        /// <param name="varnameWithoutFreq"></param>
+        /// <param name="modelText"></param>
+        /// <param name="mathRename"></param>
+        /// <returns></returns>
+        private static string MathNormalize2(string varnameWithoutFreq, string modelText, List<string> mathRename)
         {
             Entity expr = modelText;
             Entity.Variable x = MathPutIntoDict(mathRename, varnameWithoutFreq);
-            string s = expr.Solve(x).Simplify().ToString();
+            string s2 = expr.Solve(x).Simplify().ToString();
+            string s = G.Substring(s2, 1, s2.Length - 2);
+            if (G.NullOrBlanks(s)) throw new GekkoException();  //will be caught
             int more = 20;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(s, more);
             for (int i = 0; i < tokens.Count(); i++)
@@ -16852,8 +16863,10 @@ namespace Gekko
                     tokens[i].s = mathRename[int.Parse(tokens[i].s.Substring(2))];
                 }
             }
-            string output = tokens.ToString();
-            return output;
+            string output = tokens.ToString().Trim();
+            string varnameWithoutFreqPretty = MathGetPrettyName(varnameWithoutFreq, mathRename);
+            string output2 = varnameWithoutFreqPretty + " = " + output;
+            return output2;
         }
 
         public static string MathPutIntoDict(List<string> mathRename, string varname2)
