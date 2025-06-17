@@ -15682,6 +15682,19 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_WriteXlsxTimeless()
+        {
+            //Must use realdatafirst()... etc.
+            //Must sort alphabetically before writing.
+            I("reset;");
+            I("x1 = timeless(1);");
+            I("x2 = series(2);");
+            I("x2[a, b] = timeless(2);");
+            I("write <xlsx> sletmig;");
+            Assert.Fail();
+        }
+
+        [TestMethod]
         public void _Test_TraceResurrection()
         {
             Assert.Fail();

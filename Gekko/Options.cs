@@ -321,7 +321,6 @@ namespace Gekko
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"
 
-
         public static List<List<string>> Syntax()
         {
             //All these have corresponding methods like O.XBool(), O.XString(), ... , cf. #jkafjkaddasfas

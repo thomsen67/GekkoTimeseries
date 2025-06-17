@@ -1511,7 +1511,7 @@ namespace Gekko
         {
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[rowcounter, colcounter].Formula = null;
-            ws.Cells[rowcounter, colcounter].Value = stamp;
+            ws.Cells[rowcounter, colcounter].Value = stamp;            
         }
 
         public static void WorkBookSetData_2(string heading, ExcelWorksheet ws, int rowcounter, int colcounter)
@@ -1563,7 +1563,7 @@ namespace Gekko
         {
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].Formula = null;
-            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
+            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));            
         }
 
         public static void WorkBookSetData_9(ExcelWorksheet ws, int d1, int d2, string[,] labels)
@@ -1571,6 +1571,9 @@ namespace Gekko
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].Formula = null;
             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
+            
+            //qwerty
+            //ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].AddComment("This is a comment", "Gekko");
         }
     }
 
@@ -3038,7 +3041,6 @@ namespace Gekko
                                 if (ws == null)
                                 {
                                     new Error("Could not find sheet '" + sheetName + "' inside " + file);
-                                    //throw new GekkoException();
                                 }
                             }
                             else
@@ -22551,8 +22553,8 @@ namespace Gekko
                 //TODO TODO TODO
                 List<ToFrom> listMaybeFilteredForCurrentFreq = FilterByFreq(list, isRecordsFormat, ref variablesType);
                 //list1 is used for methods that know how to handle an array-series (gdx, gbk). list2 for those that do not (csv, xlsx, etc.)                
-                List<Tuple<string, IVariable>> list1 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, false);
-                List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, true);
+                List<Tuple<string, IVariable>> list1 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, false); //non-flattened
+                List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, true);  //flattened
 
                 if (tStart.IsNull() && tEnd.IsNull())
                 {
@@ -24393,9 +24395,9 @@ namespace Gekko
                 IVariable iv = tup.Item2; // O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);                
                 Series ts = iv as Series;
                 if (ts == null) continue;
-                if (ts.type != ESeriesType.Normal) continue;
-                start = G.GekkoMin(start, ts.GetPeriodFirst().super);
-                end = G.GekkoMax(end, ts.GetPeriodLast().super);
+                if (ts.type != ESeriesType.Normal) continue;                
+                start = G.GekkoMin(start, ts.GetRealDataPeriodFirst().super);
+                end = G.GekkoMax(end, ts.GetRealDataPeriodLast().super);                
             }
             GetLowerFreqsFromYears(ref per1, ref per2, start, end);
         }
@@ -30783,7 +30785,6 @@ namespace Gekko
             if (!File.Exists(file))
             {
                 new Error("File " + file + " does not seem to exist");
-                //throw new GekkoException();
             }
 
             WriteXlsError(file);
@@ -30800,7 +30801,6 @@ namespace Gekko
                         if (ws == null)
                         {
                             new Error("Could not find sheet '" + sheetName + "' inside " + file);
-                            //throw new GekkoException();
                         }
                     }
                     else
@@ -30818,6 +30818,11 @@ namespace Gekko
                     object[,] intput = (object[,])ws.Cells[1, 1, end.Row, end.Column].Value;
                     int rows2 = intput.GetLength(0);
                     int cols2 = intput.GetLength(1);
+
+                    //qwerty
+                    //var comment = ws.Cells[1, 1, end.Row, end.Column].Comment;
+                    //var comment = ws.Cells[1, 0, 1, 0].Comment;
+                    //ExcelComment comment = ws.Cells[1, 0, 1, 0].Comment;
 
                     //beware, this array is 0-based
                     for (int i = 0; i < end.Row; i++)

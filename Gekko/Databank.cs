@@ -242,8 +242,7 @@ namespace Gekko
             //Handles array-subseries too.
             IVariable iv = null;
             if (Series.IsArraySubSeriesName(variable))
-            {
-                //qwerty
+            {                
                 string dbName, varName, freq; string[] indexes; char firstChar;
                 O.Chop(variable, out dbName, out varName, out freq, out indexes);
                 if (this.storage.Count > 0)
@@ -385,8 +384,7 @@ namespace Gekko
             {
                 //Series type
                 if (Series.IsArraySubSeriesName(name))
-                {
-                    //qwerty
+                {                    
                     string dbName, varName, freq; string[] indexes; char firstChar;
                     O.Chop(name, out dbName, out varName, out freq, out indexes);
                     string atsName = O.UnChop(dbName, varName, freq, null, null);                                        
@@ -455,8 +453,7 @@ namespace Gekko
         public bool ContainsIVariable(string variable)
         {
             if (Series.IsArraySubSeriesName(variable))
-            {
-                //qwerty
+            {                
                 string dbName, varName, freq; string[] indexes; char firstChar;
                 O.Chop(variable, out dbName, out varName, out freq, out indexes);
                 string atsName = O.UnChop(dbName, varName, freq, null, null);

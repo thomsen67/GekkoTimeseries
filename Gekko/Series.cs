@@ -2209,7 +2209,11 @@ namespace Gekko
         public static List<Tuple<string, IVariable>> FlattenArraySeries(List<ToFrom> vars, bool flatten)
         {
             List<Tuple<string, IVariable>> vars3 = new List<Tuple<string, IVariable>>();
-            foreach (Tuple<string, IVariable> tup in Program.GetNamesAndVariableObject(vars))
+
+            List<Tuple<string, IVariable>> sorted = Program.GetNamesAndVariableObject(vars);
+            sorted.Sort((leftKvp, rightKvp) => G.CompareNaturalIgnoreCase(leftKvp.Item1, rightKvp.Item1));
+
+            foreach (Tuple<string, IVariable> tup in sorted)
             {
                 if (tup.Item2.Type() == EVariableType.Series)
                 {
