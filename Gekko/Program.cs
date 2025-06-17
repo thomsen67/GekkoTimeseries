@@ -16787,9 +16787,7 @@ namespace Gekko
                     {
                         try
                         {
-                            string output = MathNormalize(varnameWithoutFreq, helperAA.s_scalarModel, helperAA.mathRename);                            
-                            varnameWithoutFreq = MathGetPrettyName(varnameWithoutFreq, helperAA);
-                            eqTextB = varnameWithoutFreq + " = " + G.Substring(output, 2, output.Length - 2);
+                            eqTextB = MathGetNormalizedText(varnameWithoutFreq, helperAA);
                             if (Globals.runningOnTTComputer) eqTextB += G.NL + G.NL + "TT: " + helperBB.s_scalarModel;
                         }
                         catch
@@ -16816,6 +16814,14 @@ namespace Gekko
             }
             if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
             return eqsPrinted;
+        }
+
+        private static string MathGetNormalizedText(string varnameWithoutFreq, GetEquationTextHelper helperAA)
+        {            
+            string output = MathNormalize(varnameWithoutFreq, helperAA.s_scalarModel, helperAA.mathRename);
+            string varnameWithoutFreqPretty = MathGetPrettyName(varnameWithoutFreq, helperAA);
+            string eqTextB = varnameWithoutFreqPretty + " = " + G.Substring(output, 2, output.Length - 2);
+            return eqTextB;
         }
 
         private static string MathGetPrettyName(string varnameWithoutFreq, GetEquationTextHelper helperAA)

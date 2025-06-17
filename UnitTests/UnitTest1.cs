@@ -15682,16 +15682,43 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_WriteXlsxTimeless()
+        public void _Test_WriteXlsxArraySeries()
         {
             //Must use realdatafirst()... etc.
             //Must sort alphabetically before writing.
-            I("reset;");
-            I("x1 = timeless(1);");
+            //I("reset;");
+            //I("x1 = timeless(1);");
+            //I("x2 = series(2);");
+            //I("x2[a, b] = timeless(2);");
+            //I("write <xlsx> sletmig;");
+            //Assert.Fail();
+
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
+            I("reset; time 2002 2002;");
+            I("x1 = 100;");
             I("x2 = series(2);");
-            I("x2[a, b] = timeless(2);");
-            I("write <xlsx> sletmig;");
-            Assert.Fail();
+            I("x2[a,b] = 200;");
+            I("x3 = series(1);");
+            I("x3[a] = 300;");
+            I("write temp;");
+
+            I("reset; time 2001 2003;");
+            I("x1 = 1000;");
+            I("x2 = series(2);");
+            I("x2[a,b] = 2000;");            
+            I("read <2001 2003 merge> temp;");
+
+            _AssertSeries(First(), "x1!a", 2001, 1000, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2002, 100, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2003, 1000, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2001, 300, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 300, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300, sharedDelta);
+            _AssertSeries(First(), "x2!a", new string[] { "a", "b" }, 2001, 2000, sharedDelta);
+            _AssertSeries(First(), "x2!a", new string[] { "a", "b" }, 2002, 200, sharedDelta);
+            _AssertSeries(First(), "x2!a", new string[] { "a", "b" }, 2003, 2000, sharedDelta);
+
         }
 
         [TestMethod]
