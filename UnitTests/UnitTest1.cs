@@ -15682,43 +15682,99 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_WriteXlsxArraySeries()
-        {
-            //Must use realdatafirst()... etc.
-            //Must sort alphabetically before writing.
-            //I("reset;");
-            //I("x1 = timeless(1);");
-            //I("x2 = series(2);");
-            //I("x2[a, b] = timeless(2);");
-            //I("write <xlsx> sletmig;");
-            //Assert.Fail();
-
+        public void _Test_ReadMergeAlsoForArraySeries()
+        {           
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
-            I("reset; time 2002 2002;");
-            I("x1 = 100;");
-            I("x2 = series(2);");
-            I("x2[a,b] = 200;");
-            I("x3 = series(1);");
-            I("x3[a] = 300;");
-            I("write temp;");
+            for (int i = 0; i < 2; i++)
+            {
+                string xlsx = null;
+                if (i == 1) xlsx = " xlsx";
+                if (true)
+                {
+                    I("reset; time 2001 2003;");
+                    I("x2 = 200, 201, 202;");
+                    I("x4 = 400, m(), 402;");
+                    I("x5 = m(), 501, m();");
+                    I("x6 = m(), m(), m();");                    
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");
+                    I("x1 = 100, 101, 102;");
+                    I("x3 = 300, m(), 302;");
+                    I("x4 = m(), 401, m();");
+                    I("x5 = 500, m(), 502;");
+                    I("x6 = 600, 601, 602;");
+                    I("read<merge" + xlsx + ">temp;");  //for each temp series, it looks at perStart/perEnd and only adds data in between those.
+                                            // ---
+                    _AssertSeries(First(), "x1!a", 2001, 100, sharedDelta);
+                    _AssertSeries(First(), "x1!a", 2002, 101, sharedDelta);
+                    _AssertSeries(First(), "x1!a", 2003, 102, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "x2!a", 2001, 200, sharedDelta);
+                    _AssertSeries(First(), "x2!a", 2002, 201, sharedDelta);
+                    _AssertSeries(First(), "x2!a", 2003, 202, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "x3!a", 2001, 300, sharedDelta);
+                    _AssertSeries(First(), "x3!a", 2002, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "x3!a", 2003, 302, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "x4!a", 2001, 400, sharedDelta);
+                    _AssertSeries(First(), "x4!a", 2002, double.NaN, sharedDelta);  //! Taken from imported series
+                    _AssertSeries(First(), "x4!a", 2003, 402, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "x5!a", 2001, 500, sharedDelta);
+                    _AssertSeries(First(), "x5!a", 2002, 501, sharedDelta);
+                    _AssertSeries(First(), "x5!a", 2003, 502, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "x6!a", 2001, 600, sharedDelta);
+                    _AssertSeries(First(), "x6!a", 2002, 601, sharedDelta);
+                    _AssertSeries(First(), "x6!a", 2003, 602, sharedDelta);
 
-            I("reset; time 2001 2003;");
-            I("x1 = 1000;");
-            I("x2 = series(2);");
-            I("x2[a,b] = 2000;");            
-            I("read <2001 2003 merge> temp;");
+                }
 
-            _AssertSeries(First(), "x1!a", 2001, 1000, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2002, 100, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2003, 1000, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2001, 300, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 300, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300, sharedDelta);
-            _AssertSeries(First(), "x2!a", new string[] { "a", "b" }, 2001, 2000, sharedDelta);
-            _AssertSeries(First(), "x2!a", new string[] { "a", "b" }, 2002, 200, sharedDelta);
-            _AssertSeries(First(), "x2!a", new string[] { "a", "b" }, 2003, 2000, sharedDelta);
-
+                if (true)
+                {
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x2] = 200, 201, 202;");
+                    I("a[x4] = 400, m(), 402;");
+                    I("a[x5] = m(), 501, m();");
+                    I("a[x6] = m(), m(), m();");
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x1] = 100, 101, 102;");
+                    I("a[x3] = 300, m(), 302;");
+                    I("a[x4] = m(), 401, m();");
+                    I("a[x5] = 500, m(), 502;");
+                    I("a[x6] = 600, 601, 602;");
+                    I("read<merge " + xlsx + ">temp;");  //for each temp series, it looks at perStart/perEnd and only adds data in between those.
+                                            // ---
+                    _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 100, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 101, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, 102, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "a!a", new string[] { "x2" }, 2001, 200, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x2" }, 2002, 201, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x2" }, 2003, 202, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "a!a", new string[] { "x3" }, 2001, 300, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x3" }, 2002, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x3" }, 2003, 302, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "a!a", new string[] { "x4" }, 2001, 400, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x4" }, 2002, double.NaN, sharedDelta);  //! Taken from imported series
+                    _AssertSeries(First(), "a!a", new string[] { "x4" }, 2003, 402, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "a!a", new string[] { "x5" }, 2001, 500, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x5" }, 2002, 501, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x5" }, 2003, 502, sharedDelta);
+                    // ---
+                    _AssertSeries(First(), "a!a", new string[] { "x6" }, 2001, 600, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x6" }, 2002, 601, sharedDelta);
+                    _AssertSeries(First(), "a!a", new string[] { "x6" }, 2003, 602, sharedDelta);
+                }
+            }
         }
 
         [TestMethod]

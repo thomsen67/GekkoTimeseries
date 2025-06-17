@@ -5848,6 +5848,7 @@ namespace Gekko
                     // ----------------------
                     //READ or IMPORT, puts data into First or Ref
                     // ----------------------
+
                     AllFreqsHelper dates = null;
                     if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
                     {
@@ -5933,6 +5934,8 @@ namespace Gekko
 
                                     if (tsExisting == null)
                                     {
+                                        tsImported.Truncate(dates);
+                                        tsImported.meta.parentDatabank = databank;  //otherwise it will be null or point to some temp databank
                                         databank.AddIVariable(name, tsImported); //the sub-timeseries will follow automatically!
                                     }
                                     else
@@ -5946,8 +5949,8 @@ namespace Gekko
                                             foreach (KeyValuePair<MultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                             {
                                                 MultidimItem nameDimProtobuf = kvpGmap.Key;
-                                                Series tsDimProtobuf = kvp.Value as Series;  //must be timeseries, no need to check that the type is so
-
+                                                Series tsDimProtobuf = kvpGmap.Value as Series;  //must be timeseries, no need to check that the type is so                                                
+                                                if (tsDimProtobuf?.mmi?.parent?.meta != null) tsDimProtobuf.mmi.parent.meta.parentDatabank = databank; //otherwise it will be null or point to some temp databank
                                                 IVariable ivDimExisting = null; gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
                                                 Series tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as Series;
 
@@ -5956,23 +5959,26 @@ namespace Gekko
                                                 if (tsDimExisting == null)
                                                 {
                                                     //add this sub-series to the array-timeseries                                   
-                                                    tsImported.Truncate(dates);
-                                                    gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsImported);
+                                                    tsDimProtobuf.Truncate(dates);
+                                                    gmapExisting.AddIVariableWithOverwrite(nameDimProtobuf, tsDimProtobuf);
                                                 }
                                                 else
                                                 {
                                                     //now we need to merge the two series
                                                     //also see #98520983
                                                     bool shouldOverwriteLaterOn = false;
-                                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsImported, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
-                                                    MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsImported, shouldOverwriteLaterOn);
+                                                    MergeTwoTimeseriesWithDateWindow(tsDimExisting, tsDimProtobuf, dates, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
+                                                    MergeTwoTimeseriesWithDateWindowHelper(gmapExisting, nameDimProtobuf, dates, tsImported, shouldOverwriteLaterOn);
+                                                    HandleTraceForReadOrImport(tsDimExisting.GetName(), tsDimExisting, tsDimProtobuf, dates, ffh.realPathAndFileName, isGbk, oRead.gekkocode, p);
                                                 }
                                             }
                                         }
                                         else
                                         {
                                             //dimensions do not match, wipe existing out!
-                                            databank.AddIVariableWithOverwrite(name, tsImported);  //the sub-timeseries will follow automatically!
+                                            tsImported.Truncate(dates);
+                                            tsImported.meta.parentDatabank = databank;  //otherwise it will be null or point to some temp databank
+                                            databank.AddIVariableWithOverwrite(name, tsImported);  //the sub-timeseries will follow automatically!                                            
                                         }
                                     }
                                 }
@@ -5981,169 +5987,11 @@ namespace Gekko
                                     //---------------------------
                                     // handle normal timeseries
                                     //---------------------------
-
                                     //also see #98520983
                                     bool wipeExistingOut = false;
-                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsImported, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
-                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, wipeExistingOut);
-                                    GekkoSmplSimple periods = dates?.GetPeriods(tsImported.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
-
-                                    if (Program.options.databank_trace)
-                                    {
-                                        try
-                                        {
-                                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
-                                            //When arriving here, it is a READ/IMPORT, not OPEN.
-                                            //There are these combinations:
-                                            //
-                                            // gbk or non-gbk
-                                            // no period or <...>-period
-                                            // series x already exists
-                                            //
-                                            // If non-gbk, we always do a "PARENT"
-                                            // Also for the below B, C and D.
-                                            // Only A is a raw copy, like in OPEN<edit>.
-                                            // ---------------------------------------------
-                                            //           |    no period           period
-                                            // ---------------------------------------------
-                                            // no exist  |      A                   B
-                                            // exist     |      C                   D             (only for gbk read<merge> or import)
-                                            // ---------------------------------------------                                        
-                                            // 
-
-                                            if (isGbk && tsExisting == null && periods == null)
-                                            {
-                                                //do nothing, just use the raw trace.
-                                                //Maybe decorate the trace with info on which databank (.gbk) the series was fetched from...? Perhaps even also gcm and line regarding the READ statement?
-                                            }
-                                            else
-                                            {
-                                                //All other get a trace with "read ... ;".
-
-                                                Trace2 trace = null;
-                                                Series x = null;
-
-                                                if (periods == null)
-                                                {
-                                                    GekkoTime t1 = tsImported.GetRealDataPeriodFirst();
-                                                    GekkoTime t2 = tsImported.GetRealDataPeriodLast();
-                                                    if (t1.IsNull())
-                                                    {
-                                                        //Can happen that a series is empty of data
-                                                        //When merging into existing 
-                                                        trace = new Trace2(ETraceType.Normal, true);
-                                                    }
-                                                    else
-                                                    {
-                                                        trace = new Trace2(ETraceType.Normal, t1, t2);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    trace = new Trace2(ETraceType.Normal, periods.t1, periods.t2);
-                                                }
-
-                                                if (tsExisting != null)
-                                                {
-                                                    //There is already a series with same name,
-                                                    //only happens with read<merge> or import.
-                                                    //for instance:
-                                                    //  reset; time 2001 2003;
-                                                    //  x1 = 2;
-                                                    //  read <merge> bank;    //where in the bank x1 <2002 2002> = 1
-                                                    //
-                                                    //should become: (HMMM, is this so?)
-                                                    //
-                                                    // | x1 = 2,                2001-2001, 2003-2003
-                                                    // | read <merge> bank;     2002-2002
-                                                    // |   x1 <2002 2002> = 1
-
-                                                    //tsExisting has x = 2
-                                                    trace.GetContents().text = oRead.gekkocode + ";"; //read <merge>
-                                                    trace.GetContents().dataFile = ffh.realPathAndFileName;
-                                                    trace.GetContents().name = name;
-                                                    trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-
-                                                    if (isGbk && dates == null)
-                                                    {
-                                                        //We are merging. No READ or IMPORT reported as trace,
-                                                        //but rather the traces of the read/imported series are used directly as siblings.                                                        
-                                                        //
-                                                        //This illustrates it:
-                                                        //
-                                                        //reset;
-                                                        //x1 <2008 2008> = 8;
-                                                        //x1 <2009 2009> = 9;
-                                                        //write x1;
-                                                        //
-                                                        //reset; time 2001 2010;
-                                                        //x1 = 2;
-                                                        //x1 <2004 2004> = 3;
-                                                        //read <merge> x1;
-                                                        //disp x1;
-                                                        // ==> GIVES the following which seems ok:
-                                                        //| x1 <2009 2009> = 9; --> 2009-2009
-                                                        //| x1 <2008 2008> = 8; --> 2008-2008
-                                                        //| x1 <2004 2004>= 3;  --> 2004-2004
-                                                        //| x1 = 2;             --> 2001-2003, 2005-2007, 2010-2010
-                                                        //
-                                                        //Essentially same traces as this:
-                                                        //
-                                                        //reset; time 2001 2010;
-                                                        //x1 = 2;
-                                                        //x1 <2004 2004> = 3;
-                                                        //x1 <2008 2008> = 8;
-                                                        //x1 <2009 2009> = 9;
-
-                                                        Precedents2 precedents = tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse();
-
-                                                        if (precedents != null)
-                                                        {
-                                                            foreach (TraceAndPeriods2 tap in precedents.GetStorage())
-                                                            {
-                                                                //This gets the first-level traces of the imported series into the traces of the existing series.
-                                                                if (tap.trace.type == ETraceType.Divider) continue;  //can that even happen when it is a trace just 1 level below GluedToSeries.
-                                                                //We MAY get null-periods here, but only if there are null-periods in the imported series
-                                                                Gekko.Trace2.PushIntoSeries(tsExisting, tap.trace, ETracePushType.Sibling, false); //x = 1
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
-                                                        if (tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse() != null)
-                                                        {
-                                                            trace.AddRangeFromSeries2(tsExisting, tsImported);
-                                                        }
-                                                        Gekko.Trace2.PushIntoSeries(tsExisting, trace, ETracePushType.Sibling, Globals.traceUsesOrMayUseRealDataPeriod);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    //There is no existing series with the same name (read will also trigger this)
-                                                    //
-                                                    //for instance:                                                
-                                                    //  reset;
-                                                    //  read <2001 2020 merge> bank;  //where in the bank x1 = 1
-                                                    //
-                                                    //should become:
-                                                    //                                                
-                                                    // | read <merge> bank;     2002-2002
-                                                    // |   x1 <2002 2002> = 1
-                                                    trace.GetContents().text = oRead.gekkocode + ";";
-                                                    trace.GetContents().dataFile = ffh.realPathAndFileName;
-                                                    trace.GetContents().name = name;
-                                                    trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                                    Gekko.Trace2.PushIntoSeries(tsImported, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                                                }
-                                            }
-                                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
-                                        }
-                                        catch
-                                        {
-                                            new Error(Globals.traceError);
-                                        }
-                                    }
+                                    MergeTwoTimeseriesWithDateWindow(tsExisting, tsImported, dates, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
+                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, wipeExistingOut);                                    
+                                    HandleTraceForReadOrImport(name, tsExisting, tsImported, dates, ffh.realPathAndFileName, isGbk, oRead.gekkocode, p);
                                 }
                             }
                             else
@@ -6284,6 +6132,168 @@ namespace Gekko
             }  //for each bank in list
 
             return;
+        }
+
+        private static void HandleTraceForReadOrImport(string name, Series tsExisting, Series tsImported, AllFreqsHelper dates, string realPathAndFileName, bool isGbk, string gekkocode, P p)
+        {
+            if (Program.options.databank_trace)
+            {
+                try
+                {                    
+                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                                                           //When arriving here, it is a READ/IMPORT, not OPEN.
+                                                           //There are these combinations:
+                                                           //
+                                                           // gbk or non-gbk
+                                                           // no period or <...>-period
+                                                           // series x already exists
+                                                           //
+                                                           // If non-gbk, we always do a "PARENT"
+                                                           // Also for the below B, C and D.
+                                                           // Only A is a raw copy, like in OPEN<edit>.
+                                                           // ---------------------------------------------
+                                                           //           |    no period           period
+                                                           // ---------------------------------------------
+                                                           // no exist  |      A                   B
+                                                           // exist     |      C                   D             (only for gbk read<merge> or import)
+                                                           // ---------------------------------------------                                        
+                                                           // 
+
+                    GekkoSmplSimple periods = dates?.GetPeriods(tsImported.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
+
+                    if (isGbk && tsExisting == null && periods == null)
+                    {
+                        //do nothing, just use the raw trace.
+                        //Maybe decorate the trace with info on which databank (.gbk) the series was fetched from...? Perhaps even also gcm and line regarding the READ statement?
+                    }
+                    else
+                    {
+                        //All other get a trace with "read ... ;".
+
+                        Trace2 trace = null;
+                        Series x = null;
+
+                        if (periods == null)
+                        {
+                            GekkoTime t1 = tsImported.GetRealDataPeriodFirst();
+                            GekkoTime t2 = tsImported.GetRealDataPeriodLast();
+                            if (t1.IsNull())
+                            {
+                                //Can happen that a series is empty of data
+                                //When merging into existing 
+                                trace = new Trace2(ETraceType.Normal, true);
+                            }
+                            else
+                            {
+                                trace = new Trace2(ETraceType.Normal, t1, t2);
+                            }
+                        }
+                        else
+                        {
+                            trace = new Trace2(ETraceType.Normal, periods.t1, periods.t2);
+                        }
+
+                        if (tsExisting != null)
+                        {
+                            //There is already a series with same name,
+                            //only happens with read<merge> or import.
+                            //for instance:
+                            //  reset; time 2001 2003;
+                            //  x1 = 2;
+                            //  read <merge> bank;    //where in the bank x1 <2002 2002> = 1
+                            //
+                            //should become: (HMMM, is this so?)
+                            //
+                            // | x1 = 2,                2001-2001, 2003-2003
+                            // | read <merge> bank;     2002-2002
+                            // |   x1 <2002 2002> = 1
+
+                            //tsExisting has x = 2
+                            trace.GetContents().text = gekkocode + ";"; //read <merge>
+                            trace.GetContents().dataFile = realPathAndFileName;
+                            trace.GetContents().name = name;
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+
+                            if (isGbk && dates == null)
+                            {
+                                //We are merging. No READ or IMPORT reported as trace,
+                                //but rather the traces of the read/imported series are used directly as siblings.                                                        
+                                //
+                                //This illustrates it:
+                                //
+                                //reset;
+                                //x1 <2008 2008> = 8;
+                                //x1 <2009 2009> = 9;
+                                //write x1;
+                                //
+                                //reset; time 2001 2010;
+                                //x1 = 2;
+                                //x1 <2004 2004> = 3;
+                                //read <merge> x1;
+                                //disp x1;
+                                // ==> GIVES the following which seems ok:
+                                //| x1 <2009 2009> = 9; --> 2009-2009
+                                //| x1 <2008 2008> = 8; --> 2008-2008
+                                //| x1 <2004 2004>= 3;  --> 2004-2004
+                                //| x1 = 2;             --> 2001-2003, 2005-2007, 2010-2010
+                                //
+                                //Essentially same traces as this:
+                                //
+                                //reset; time 2001 2010;
+                                //x1 = 2;
+                                //x1 <2004 2004> = 3;
+                                //x1 <2008 2008> = 8;
+                                //x1 <2009 2009> = 9;
+
+                                Precedents2 precedents = tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse();
+
+                                if (precedents != null)
+                                {
+                                    foreach (TraceAndPeriods2 tap in precedents.GetStorage())
+                                    {
+                                        //This gets the first-level traces of the imported series into the traces of the existing series.
+                                        if (tap.trace.type == ETraceType.Divider) continue;  //can that even happen when it is a trace just 1 level below GluedToSeries.
+                                                                                             //We MAY get null-periods here, but only if there are null-periods in the imported series
+                                        Gekko.Trace2.PushIntoSeries(tsExisting, tap.trace, ETracePushType.Sibling, false); //x = 1
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
+                                if (tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse() != null)
+                                {
+                                    trace.AddRangeFromSeries2(tsExisting, tsImported);
+                                }
+                                Gekko.Trace2.PushIntoSeries(tsExisting, trace, ETracePushType.Sibling, Globals.traceUsesOrMayUseRealDataPeriod);
+                            }
+                        }
+                        else
+                        {
+                            //There is no existing series with the same name (read will also trigger this)
+                            //
+                            //for instance:                                                
+                            //  reset;
+                            //  read <2001 2020 merge> bank;  //where in the bank x1 = 1
+                            //
+                            //should become:
+                            //                                                
+                            // | read <merge> bank;     2002-2002
+                            // |   x1 <2002 2002> = 1
+                            trace.GetContents().text = gekkocode + ";";
+                            trace.GetContents().dataFile = realPathAndFileName;
+                            trace.GetContents().name = name;
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            Gekko.Trace2.PushIntoSeries(tsImported, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
+                        }
+                    }
+                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                }
+                catch
+                {
+                    new Error(Globals.traceError);
+                }
+            }
         }
 
         /// <summary>
@@ -7425,12 +7435,12 @@ namespace Gekko
         /// <summary>
         /// Small helper method.
         /// </summary>
-        /// <param name="dates"></param>
         /// <param name="gmap"></param>
         /// <param name="gmapItem"></param>
+        /// <param name="dates"></param>
         /// <param name="tsProtobuf"></param>
         /// <param name="shouldOverwriteLaterOn"></param>
-        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, Multidim gmap, MultidimItem gmapItem, Series tsProtobuf, bool shouldOverwriteLaterOn)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(Multidim gmap, MultidimItem gmapItem, AllFreqsHelper dates, Series tsProtobuf, bool shouldOverwriteLaterOn)
         {
             if (shouldOverwriteLaterOn)
             {
@@ -7446,13 +7456,13 @@ namespace Gekko
         /// may be a time indication in the statement, for instance IMPORT&lt;2000 2020&gt;. This method handles the logic of these three 
         /// overlapping date "windows".
         /// </summary>
-        /// <param name="dates"></param>
         /// <param name="tsExisting"></param>
         /// <param name="tsSource"></param>
+        /// <param name="dates"></param>
         /// <param name="maxYearInProtobufFile"></param>
         /// <param name="minYearInProtobufFile"></param>
         /// <param name="shouldOverwriteLaterOn"></param>
-        public static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool shouldOverwriteLaterOn)
+        public static void MergeTwoTimeseriesWithDateWindow(Series tsExisting, Series tsSource, AllFreqsHelper dates, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool shouldOverwriteLaterOn)
         {
             if (tsSource.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
             {
@@ -16082,12 +16092,15 @@ namespace Gekko
                     if (name == null)
                     {
                         variableMaybeWithFreq = ts.GetName();
-                        bank = ts.GetParentDatabank().name;
+                        Databank db = ts.GetParentDatabank();
+                        bank = db.name;
+                        if (db != null) bank = db.name;
                     }
                     else
                     {
                         variableMaybeWithFreq = name;
-                        bank = ts.GetParentDatabank().name;
+                        Databank db = ts.GetParentDatabank();
+                        if (db != null) bank = db.name;
                     }
 
                     bool b = Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw || Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar;
@@ -16171,7 +16184,9 @@ namespace Gekko
             if (ts.type == ESeriesType.ArraySuper) ss = "ARRAY-SERIES";
             G.Writeln();
             G.Writeln("==========================================================================================");
-            G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + ts.GetNameWithoutCurrentFreq(true));
+            string x = null;
+            if (bank != null) x = bank + Globals.symbolBankColon + " ";
+            G.Writeln(ss + " " + x + ts.GetNameWithoutCurrentFreq(true));
             if (true)
             {
                 string type3 = "";
