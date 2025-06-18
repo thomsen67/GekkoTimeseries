@@ -54,6 +54,24 @@ namespace Gekko
         }
 
         /// <summary>
+        /// A list like ("a", "middle element", "c") is turned into "[a, 'middle element', c]".
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string GetIndexWithCommas(string[] list)
+        {
+            string txt = null;
+            foreach (string ss in list)
+            {
+                if (G.IsIdent(ss)) txt += ss + ",";
+                else txt += "'" + ss + "'" + ",";
+            }
+            if (txt.Length > 0) txt = "[" + txt.Substring(0, txt.Length - 1) + "]";
+            return txt;
+        }
+
+
+        /// <summary>
         /// Transform a list of strings to a comma-separated string.
         /// Choose blanks between for instance elements, "a, b, c" (listBlanks = " ") or "a,b,c" (listBlanks = null or "").
         /// </summary>

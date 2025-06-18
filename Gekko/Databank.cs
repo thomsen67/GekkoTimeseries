@@ -296,7 +296,7 @@ namespace Gekko
                 Series ts = this.GetIVariable(variable, isLhs) as Series;
                 if (!Series.IsArraySubSeriesName(variable) && ts.type == ESeriesType.ArraySuper)
                 {
-                    new Error(0 + " dimensional index (that is: no []-index) used on " + ts.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ts.name));
+                    new Error("Missing []-index on " + ts.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ts.name));
                 }
                 return ts;
             }
@@ -399,7 +399,7 @@ namespace Gekko
                     }
                     else
                     {
-                        if (ats.dimensions != indexes.Length) new Error(indexes.Length + " dimensional index used on " + ats.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ats.name));
+                        if (ats.dimensions != indexes.Length) new Error(indexes.Length + " dimensional index " + ats.name + Stringlist.GetIndexWithCommas(indexes) + " used on " + ats.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ats.name));
                     }
                     ats.SetDirty(true);
                     ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(indexes, ats), ts);

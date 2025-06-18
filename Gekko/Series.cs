@@ -2600,22 +2600,19 @@ namespace Gekko
 
             if (this.dimensionsStorage == null)
             {
-                string txt = null;
-                foreach (string ss in keys) txt += "'" + ss + "', ";
+                string txt = Stringlist.GetIndexWithCommas(keys);
                 using (Error e = new Error())
                 {
-                    e.MainAdd("The variable '" + this.name + "' is not an array-timeseries.");
-                    e.MainAdd("Indexer used: [" + txt.Substring(0, txt.Length - 2) + "].");
-                    e.MainAdd("(You may use '" + this.name + " = series(" + keys.Length + ");' to create a " + keys.Length + "-dimensional array-series).");
+                    e.MainAdd("Use of " + this.name + txt + ", but " + this.name + " is not an array-timeseries.");
                 }
-            }                   
+            }
 
             bool isDoubleStars = false;
             if (keys.Length == 1 && keys[0] == "**") isDoubleStars = true;
 
             if (!isDoubleStars && this.dimensions != keys.Length)
             {
-                new Error(keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
+                new Error(keys.Length + "-dimensional index " + this.name + Stringlist.GetIndexWithCommas(keys) + " used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
             }
 
             bool isWild = false;
@@ -2828,8 +2825,9 @@ namespace Gekko
             Program.RegisterANewTracePrecedent(rv, this.GetParentDatabank(), isLhs, true);  //both precedents for DECOMP and data tracing
 
             return rv;
-        }        
+        }
 
+        
         private void FindArraySeriesHelper2(string[] keys)
         {
             List<string> warnings = new List<string>();

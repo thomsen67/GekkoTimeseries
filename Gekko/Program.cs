@@ -5975,10 +5975,20 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            //dimensions do not match, wipe existing out!
-                                            tsImported.Truncate(dates);
-                                            tsImported.meta.parentDatabank = databank;  //otherwise it will be null or point to some temp databank
-                                            databank.AddIVariableWithOverwrite(name, tsImported);  //the sub-timeseries will follow automatically!                                            
+                                            if (false)
+                                            {
+                                                //dimensions do not match, wipe existing out!
+                                                tsImported.Truncate(dates);
+                                                tsImported.meta.parentDatabank = databank;  //otherwise it will be null or point to some temp databank
+                                                databank.AddIVariableWithOverwrite(name, tsImported);  //the sub-timeseries will follow automatically!                                            
+                                            }
+                                            else                                            
+                                            {
+                                                string array = null;
+                                                if (tsExisting.dimensions > 0) array = tsExisting.dimensions + "-dimensional array-";
+                                                else array = "normal ";
+                                                new Error("When merging data, a " + tsImported.dimensions + " dimensional array-series " + tsImported.name + " tries to add data to an existing " + array + "series with the same name.");
+                                            }
                                         }
                                     }
                                 }
