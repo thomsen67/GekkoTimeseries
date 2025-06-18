@@ -5995,12 +5995,13 @@ namespace Gekko
                                 else
                                 {
                                     //---------------------------
-                                    // handle normal timeseries
+                                    // handle normal timeseries, tsImported is normal
                                     //---------------------------
                                     //also see #98520983
-                                    bool wipeExistingOut = false;
-                                    MergeTwoTimeseriesWithDateWindow(tsExisting, tsImported, dates, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
-                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, wipeExistingOut);                                    
+                                    if (tsExisting != null && tsExisting.type == ESeriesType.ArraySuper) new Error("When merging data, a normal series " + tsImported.name + " tries to add data to an existing " + tsExisting.dimensions + "-dimensional array-series with the same name.");
+                                    bool shouldOverwriteLaterOn = false;
+                                    MergeTwoTimeseriesWithDateWindow(tsExisting, tsImported, dates, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
+                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, shouldOverwriteLaterOn);                                    
                                     HandleTraceForReadOrImport(name, tsExisting, tsImported, dates, ffh.realPathAndFileName, isGbk, oRead.gekkocode, p);
                                 }
                             }

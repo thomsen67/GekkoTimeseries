@@ -15774,6 +15774,37 @@ namespace UnitTests
                     _AssertSeries(First(), "a!a", new string[] { "x6" }, 2002, 601, sharedDelta);
                     _AssertSeries(First(), "a!a", new string[] { "x6" }, 2003, 602, sharedDelta);
                 }
+
+                if (true)
+                {
+                    //2-dim to 0-dim
+                    I("reset; time 2001 2003;");
+                    I("a = series(2);");
+                    I("a[x2,y2] = 200, 201, 202;");
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");                    
+                    I("a = 100, 101, 102;");
+                    FAIL("read<merge " + xlsx + ">temp;");
+                
+                    //0-dim to 2-dim
+                    I("reset; time 2001 2003;");                    
+                    I("a = 200, 201, 202;");                    
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");
+                    I("a = series(2);");
+                    I("a[x1,y1] = 100, 101, 102;");
+                    FAIL("read<merge " + xlsx + ">temp;");
+                
+                    //1-dim to 2-dim
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x2] = 200, 201, 202;");
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");
+                    I("a = series(2);");
+                    I("a[x1,y1] = 100, 101, 102;");
+                    FAIL("read<merge " + xlsx + ">temp;");
+                }
             }
         }
 
