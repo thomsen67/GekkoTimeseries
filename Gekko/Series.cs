@@ -3498,9 +3498,9 @@ namespace Gekko
 
         public void AddIVariableWithOverwrite(MultidimItem mmi, IVariable iv)
         {
-            if (iv.Type() == EVariableType.Series && ((Series)iv).type == ESeriesType.Light)
+            if (iv.Type() == EVariableType.Series && ((Series)iv).type == ESeriesType.ArraySuper || ((Series)iv).type == ESeriesType.Light)
             {
-                throw new GekkoException(); //this check can be removed at some point
+                throw new GekkoException(); //Sanity check, best to keep it here for the time being!
             }
             if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
             this.storage.Add(mmi, iv);

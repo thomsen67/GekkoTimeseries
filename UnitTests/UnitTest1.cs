@@ -15682,21 +15682,22 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_ReadMergeAlsoForArraySeries()
-        {           
+        public void _Test_MergeSeriesAndArraySeries()
+        {
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             for (int i = 0; i < 2; i++)
             {
                 string xlsx = null;
                 if (i == 1) xlsx = " xlsx";
+
                 if (true)
                 {
                     I("reset; time 2001 2003;");
                     I("x2 = 200, 201, 202;");
                     I("x4 = 400, m(), 402;");
                     I("x5 = m(), 501, m();");
-                    I("x6 = m(), m(), m();");                    
+                    I("x6 = m(), m(), m();");
                     I("write <" + xlsx + "> temp;");
                     I("reset; time 2001 2003;");
                     I("x1 = 100, 101, 102;");
@@ -15705,7 +15706,7 @@ namespace UnitTests
                     I("x5 = 500, m(), 502;");
                     I("x6 = 600, 601, 602;");
                     I("read<merge" + xlsx + ">temp;");  //for each temp series, it looks at perStart/perEnd and only adds data in between those.
-                                            // ---
+                                                        // ---
                     _AssertSeries(First(), "x1!a", 2001, 100, sharedDelta);
                     _AssertSeries(First(), "x1!a", 2002, 101, sharedDelta);
                     _AssertSeries(First(), "x1!a", 2003, 102, sharedDelta);
@@ -15749,7 +15750,7 @@ namespace UnitTests
                     I("a[x5] = 500, m(), 502;");
                     I("a[x6] = 600, 601, 602;");
                     I("read<merge " + xlsx + ">temp;");  //for each temp series, it looks at perStart/perEnd and only adds data in between those.
-                                            // ---
+                                                         // ---
                     _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 100, sharedDelta);
                     _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 101, sharedDelta);
                     _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, 102, sharedDelta);
@@ -15782,19 +15783,19 @@ namespace UnitTests
                     I("a = series(2);");
                     I("a[x2,y2] = 200, 201, 202;");
                     I("write <" + xlsx + "> temp;");
-                    I("reset; time 2001 2003;");                    
+                    I("reset; time 2001 2003;");
                     I("a = 100, 101, 102;");
                     FAIL("read<merge " + xlsx + ">temp;");
-                
+
                     //0-dim to 2-dim
-                    I("reset; time 2001 2003;");                    
-                    I("a = 200, 201, 202;");                    
+                    I("reset; time 2001 2003;");
+                    I("a = 200, 201, 202;");
                     I("write <" + xlsx + "> temp;");
                     I("reset; time 2001 2003;");
                     I("a = series(2);");
                     I("a[x1,y1] = 100, 101, 102;");
                     FAIL("read<merge " + xlsx + ">temp;");
-                
+
                     //1-dim to 2-dim
                     I("reset; time 2001 2003;");
                     I("a = series(1);");
@@ -15804,6 +15805,108 @@ namespace UnitTests
                     I("a = series(2);");
                     I("a[x1,y1] = 100, 101, 102;");
                     FAIL("read<merge " + xlsx + ">temp;");
+                }
+
+                if (true)
+                {
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x1] = timeless(1100);");
+                    I("a[x2] = timeless(1200);");
+                    I("a[x3] = m(), 1301, m();");
+                    I("a[x4] = m(), 1401, m();");
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x1] = timeless(100);");
+                    I("a[x2] = m(), 201, m();");
+                    I("a[x3] = timeless(300);");
+                    I("a[x4] = m(), 401, m();");
+                    I("read<merge " + xlsx + ">temp;");
+
+                    if (i == 0)
+                    {
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2000, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2004, 1100, sharedDelta);
+
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2000, 1200, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2001, 1200, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2002, 1200, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2003, 1200, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2004, 1200, sharedDelta);
+
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2002, 1301, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2004, double.NaN, sharedDelta);
+
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2000, double.NaN, sharedDelta); //?? Why not overrule with a full timeless series??
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2002, 1401, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2004, double.NaN, sharedDelta);
+                    }
+                    else
+                    {
+                        //Only 2002 because the xlsx file is only covering 2002. That seems fair enough, timeless
+                        //series must be truncated somehow as it is now. Else we need a xlsx decoration that says that
+                        //the data is timeless.
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2004, double.NaN, sharedDelta);
+
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2002, 1200, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2004, double.NaN, sharedDelta);
+
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2002, 1301, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x3" }, 2004, double.NaN, sharedDelta);
+
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2000, double.NaN, sharedDelta); //?? Why not overrule with a full timeless series??
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2002, 1401, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x4" }, 2004, double.NaN, sharedDelta);
+                    }
+                }
+
+                if (true)
+                {
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x1] = timeless(1100);");                    
+                    I("write <" + xlsx + "> temp;");
+                    I("reset; time 2001 2003;");
+                    I("a = series(1);");
+                    I("a[x1] = timeless(100);");
+                    I("read<merge " + xlsx + ">temp;");
+                    if (i == 0)
+                    {
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2000, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2004, 1100, sharedDelta);
+                    }
+                    else
+                    {
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2000, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, 1100, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2004, double.NaN, sharedDelta);
+                    }
                 }
             }
         }
@@ -33467,6 +33570,29 @@ print(df2)
         [TestMethod]
         public void _Test_ExportGcm()
         {
+            //Testing array-series and timeless series
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("time 2001 2003;");
+            I("y = series(2);");
+            I("y[a,b] = 101, 102, 104;");
+            I("y[a,c] = 201, 202, 204;");
+            I("z = series(1);");
+            I("z[a] = timeless(20);");
+            I("sys'del deleteme." + Globals.extensionCommand + "';");
+            I("export<2001 2003 gcm> deleteme;");
+            I("reset;");
+            I("run deleteme." + Globals.extensionCommand + ";");
+            _AssertSeries(First(), "y!a", new string[] { "a", "b" }, 2001, 101d, 0d);
+            _AssertSeries(First(), "y!a", new string[] { "a", "b" }, 2002, 102d, 0d);
+            _AssertSeries(First(), "y!a", new string[] { "a", "b" }, 2003, 104d, 0d);
+            _AssertSeries(First(), "y!a", new string[] { "a", "c" }, 2001, 201d, 0d);
+            _AssertSeries(First(), "y!a", new string[] { "a", "c" }, 2002, 202d, 0d);
+            _AssertSeries(First(), "y!a", new string[] { "a", "c" }, 2003, 204d, 0d);
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2000, 20, 0d);
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2001, 20, 0d);
+            Series z = O.GetIVariableFromString("z!a[a]", ECreatePossibilities.NoneReturnNullAlways) as Series;
+            Assert.IsTrue(z.type == ESeriesType.Timeless);
 
             // ------------------------ '=' --------------------------------
 

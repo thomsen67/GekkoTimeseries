@@ -5968,7 +5968,7 @@ namespace Gekko
                                                     //also see #98520983
                                                     bool shouldOverwriteLaterOn = false;
                                                     MergeTwoTimeseriesWithDateWindow(tsDimExisting, tsDimProtobuf, dates, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
-                                                    MergeTwoTimeseriesWithDateWindowHelper(gmapExisting, nameDimProtobuf, dates, tsImported, shouldOverwriteLaterOn);
+                                                    MergeTwoTimeseriesWithDateWindowHelper(gmapExisting, nameDimProtobuf, dates, tsDimProtobuf, shouldOverwriteLaterOn);
                                                     HandleTraceForReadOrImport(tsDimExisting.GetName(), tsDimExisting, tsDimProtobuf, dates, ffh.realPathAndFileName, isGbk, oRead.gekkocode, p);
                                                 }
                                             }
@@ -21811,7 +21811,7 @@ namespace Gekko
         /// <param name="per2_input"></param>
         /// <param name="op"></param>
         /// <param name="file"></param>
-        public static void WriteGcm(List<ToFrom> vars, GekkoTime per1_input, GekkoTime per2_input, string op, string file)
+        public static void WriteGcm(List<Tuple<string, IVariable>> list2, GekkoTime per1_input, GekkoTime per2_input, string op, string file)
         {
             if (op == null) op = "n";
             if (op == "#") new Error("The '#' operator is not supported in EXPORT<series>");
@@ -21832,24 +21832,25 @@ namespace Gekko
             {
                 new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " program file.");
             }
+
+            GekkoDictionary<string, bool> defined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
-                for (int j = 0; j < vars.Count; j++)
-                {
-                    string var = vars[j].s2;  //includes bankname and freq
-                    string baseVar = G.Chop_SetBank(vars[j].s2, Globals.Ref);
-                    IVariable ivBase = null;
-                    Series tsBase = null;
 
+                foreach (Tuple<string, IVariable> tup in list2)
+                {
+                    Series ts = tup.Item2 as Series;
+                    if (ts == null) continue; //skip  
+                    if (!(ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless)) continue; //skip, but should not happen since list2 is unfolded
+
+                    Series tsBase = null;
                     if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
-                        ivBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError);  //no search here
-                        tsBase = ivBase as Series;
+                        string baseVar = G.Chop_SetBank(tup.Item1, Globals.Ref);
+                        tsBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError) as Series;  //no search here                        
                     }
-
-                    IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError, true);  //can search!
-                    Series ts = iv as Series;
 
                     GekkoTime per1 = GekkoTime.tNull; GekkoTime per2 = GekkoTime.tNull;
                     if (per1_input.IsNull() && per2_input.IsNull())
@@ -21859,69 +21860,187 @@ namespace Gekko
                     }
                     else GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);
 
-                    StringBuilder sb = new StringBuilder();
-                    if (type == 1)
+                    string name = G.Chop_RemoveBank(tup.Item1);
+                    if (ts.IsArraySubSeries())
                     {
-                        sb.Append(G.Chop_RemoveBank(var) + " <" + per1.ToString() + " " + per2.ToString() + "> " + op + " ");
+                        string parentName = ts.mmi?.parent?.name;
+                        if (parentName != null)  //Should always be so
+                        {
+                            string parentNameTrim = parentName.Trim();  //probably unneccessary
+                            if (!defined.ContainsKey(parentNameTrim))
+                            {
+                                int dim = 0;
+                                if (ts.mmi?.parent != null)
+                                {
+                                    dim = ts.mmi.parent.dimensions;
+                                }
+                                sw.WriteLine(parentNameTrim + " = series(" + dim + ");");
+                                defined.Add(parentNameTrim, false);
+                            }
+                        }
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+
+                    if (ts.type == ESeriesType.Timeless && (op == "=" || op == "n"))
+                    {
+                        double w = ts.GetDataSimple(per1);
+                        sb.Append(name + " = timeless(" + w + ")");
                     }
                     else
                     {
-                        sb.Append(G.Chop_RemoveBank(var) + " <" + per1.ToString() + " " + per2.ToString() + " " + op + "> = ");
+
+                        if (type == 1)
+                        {
+                            sb.Append(name + " <" + per1.ToString() + " " + per2.ToString() + "> " + op + " ");
+                        }
+                        else
+                        {
+                            sb.Append(name + " <" + per1.ToString() + " " + per2.ToString() + " " + op + "> = ");
+                        }
+
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                        {
+                            double val = double.NaN;
+                            double w = ts.GetDataSimple(t);
+                            double wLag = ts.GetDataSimple(t.Add(-1));
+
+                            double b = double.NaN;
+                            double bLag = double.NaN;  //well, not use at the moment
+
+                            if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
+                            {
+                                b = tsBase.GetDataSimple(t);
+                            }
+
+                            if (op == "=" || op == "n")
+                            {
+                                val = w;
+                            }
+                            else if (op == "^=" || op == "d")
+                            {
+                                val = w - wLag;
+                            }
+                            else if (op == "%=" || op == "p")
+                            {
+                                val = (w / wLag - 1) * 100d;
+                            }
+                            else if (op == "+=" || op == "m")
+                            {
+                                val = w - b;
+                            }
+                            else if (op == "*=")
+                            {
+                                val = w / b;
+                            }
+                            else if (op == "q")
+                            {
+                                val = (w / b - 1) * 100d;
+                            }
+
+                            int decimals = 6;
+                            if (op == "*=") decimals = 8;
+                            string valstring = G.UpdprtFormat(val, decimals, true); //6 decimals, must be enough also for interest rates etc.
+
+                            valstring = valstring.Trim();  //necesssary?
+                            sb.Append(valstring);
+                            if (GekkoTime.Observations(t, per2) > 1) sb.Append(", ");
+                        }
                     }
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                    {
-                        double val = double.NaN;
-                        double w = ts.GetDataSimple(t);
-                        double wLag = ts.GetDataSimple(t.Add(-1));
-
-                        double b = double.NaN;
-                        double bLag = double.NaN;  //well, not use at the moment
-
-                        if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
-                        {
-                            b = tsBase.GetDataSimple(t);
-                            bLag = tsBase.GetDataSimple(t.Add(-1));
-                        }
-
-                        if (op == "=" || op == "n")
-                        {
-                            val = w;
-                        }
-                        else if (op == "^=" || op == "d")
-                        {
-                            val = w - wLag;
-                        }
-                        else if (op == "%=" || op == "p")
-                        {
-                            val = (w / wLag - 1) * 100d;
-                        }
-                        else if (op == "+=" || op == "m")
-                        {
-                            val = w - b;
-                        }
-                        else if (op == "*=")
-                        {
-                            val = w / b;
-                        }
-                        else if (op == "q")
-                        {
-                            val = (w / b - 1) * 100d;
-                        }
-
-                        int decimals = 6;
-                        if (op == "*=") decimals = 8;
-                        string valstring = G.UpdprtFormat(val, decimals, true); //6 decimals, must be enough also for interest rates etc.
-
-                        valstring = valstring.Trim();  //necesssary?
-                        sb.Append(valstring);
-                        if (GekkoTime.Observations(t, per2) > 1) sb.Append(", ");
-                    }
                     sb.Append(";");
                     sw.WriteLine(sb);
+
                 }
+
+
+                //for (int j = 0; j < vars.Count; j++)
+                //{
+                //    string var = vars[j].s2;  //includes bankname and freq
+                //    string baseVar = G.Chop_SetBank(vars[j].s2, Globals.Ref);
+                //    IVariable ivBase = null;
+                //    Series tsBase = null;
+
+                //    if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
+                //    {
+                //        ivBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError);  //no search here
+                //        tsBase = ivBase as Series;
+                //    }
+
+                //    IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError, true);  //can search!
+                //    Series ts = iv as Series;
+
+                //    GekkoTime per1 = GekkoTime.tNull; GekkoTime per2 = GekkoTime.tNull;
+                //    if (per1_input.IsNull() && per2_input.IsNull())
+                //    {
+                //        per1 = ts.GetRealDataPeriodFirst();
+                //        per2 = ts.GetRealDataPeriodLast();
+                //    }
+                //    else GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);
+
+                //    StringBuilder sb = new StringBuilder();
+                //    if (type == 1)
+                //    {
+                //        sb.Append(G.Chop_RemoveBank(var) + " <" + per1.ToString() + " " + per2.ToString() + "> " + op + " ");
+                //    }
+                //    else
+                //    {
+                //        sb.Append(G.Chop_RemoveBank(var) + " <" + per1.ToString() + " " + per2.ToString() + " " + op + "> = ");
+                //    }
+
+                //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                //    {
+                //        double val = double.NaN;
+                //        double w = ts.GetDataSimple(t);
+                //        double wLag = ts.GetDataSimple(t.Add(-1));
+
+                //        double b = double.NaN;
+                //        double bLag = double.NaN;  //well, not use at the moment
+
+                //        if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
+                //        {
+                //            b = tsBase.GetDataSimple(t);
+                //            bLag = tsBase.GetDataSimple(t.Add(-1));
+                //        }
+
+                //        if (op == "=" || op == "n")
+                //        {
+                //            val = w;
+                //        }
+                //        else if (op == "^=" || op == "d")
+                //        {
+                //            val = w - wLag;
+                //        }
+                //        else if (op == "%=" || op == "p")
+                //        {
+                //            val = (w / wLag - 1) * 100d;
+                //        }
+                //        else if (op == "+=" || op == "m")
+                //        {
+                //            val = w - b;
+                //        }
+                //        else if (op == "*=")
+                //        {
+                //            val = w / b;
+                //        }
+                //        else if (op == "q")
+                //        {
+                //            val = (w / b - 1) * 100d;
+                //        }
+
+                //        int decimals = 6;
+                //        if (op == "*=") decimals = 8;
+                //        string valstring = G.UpdprtFormat(val, decimals, true); //6 decimals, must be enough also for interest rates etc.
+
+                //        valstring = valstring.Trim();  //necesssary?
+                //        sb.Append(valstring);
+                //        if (GekkoTime.Observations(t, per2) > 1) sb.Append(", ");
+                //    }
+                //    sb.Append(";");
+                //    sw.WriteLine(sb);
+                //}
             }
-            G.Writeln2("Exported " + vars.Count + " variables to file " + pathAndFilename);
+            G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
         }
 
         /// <summary>
@@ -22611,6 +22730,14 @@ namespace Gekko
                     {
                         //will find that largest timespan of the databank series (flattened)
                         GetDatabankPeriodFilteredForFreq(list2, ref tStart, ref tEnd);
+                        if (tStart.IsNull() && tEnd.IsNull())
+                        {
+                            //Happens if there are only timeless series, in which case
+                            //we use the global time period. Will be a suitable freq, because
+                            //the vars have already been freq-filtered.
+                            tStart = Globals.globalPeriodStart;
+                            tEnd = Globals.globalPeriodEnd;
+                        }
                     }
                 }
 
@@ -22731,7 +22858,7 @@ namespace Gekko
                     }
                     else if (writeType == EDatabankWriteType.Gcm)
                     {
-                        Program.WriteGcm(list, tStart, tEnd, o.opt_op, fileName);
+                        Program.WriteGcm(list2, tStart, tEnd, o.opt_op, fileName);
                         return 0;
                     }
                     else
@@ -24443,8 +24570,8 @@ namespace Gekko
                 if (ts.type != ESeriesType.Normal) continue;                
                 start = G.GekkoMin(start, ts.GetRealDataPeriodFirst().super);
                 end = G.GekkoMax(end, ts.GetRealDataPeriodLast().super);                
-            }
-            GetLowerFreqsFromYears(ref per1, ref per2, start, end);
+            }            
+            GetLowerFreqsFromYears(ref per1, ref per2, start, end);            
         }
 
         private static Databank GetBankFromBankNameVersion(string bankName)
@@ -24470,6 +24597,9 @@ namespace Gekko
             //========================================================================================================
 
             //see also #980432
+
+            if (per1.IsNull() && per2.IsNull()) return;  //makes not sense, so return unaltered.
+
             if ((Program.options.freq == EFreq.A))
             {
                 per1 = new GekkoTime((Program.options.freq), yearStart, 1);
