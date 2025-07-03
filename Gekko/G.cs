@@ -5710,8 +5710,9 @@ namespace Gekko
 
             RichTextBoxEx textBox = null;            
 
-            bool mustAlsoPrintOnScreen = helper.mustAlsoPrintToScreen;            
-            
+            bool mustAlsoPrintOnScreen = helper.mustAlsoPrintToScreen;
+            if (Globals.pipe.mustPrintOnScreen) mustAlsoPrintOnScreen = true;  //Will always trump
+
             if (helper.type == EWrapType.Error)
             {
                 mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping or muting

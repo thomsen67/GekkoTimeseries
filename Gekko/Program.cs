@@ -19818,24 +19818,20 @@ namespace Gekko
                     {
                         Globals.pipeFileHelper.CloseFile();
                     }
-                    Globals.pipe = new PipeFileOptions(false, false);
+                    Globals.pipe = new PipeFileOptions(false, false);  //stop completely.
                     Globals.pipeFileHelper.pipeFile = null;
                     Globals.pipeFileHelper.pipeFileFileWithPath = "";
-                    if (!mute)
-                        G.Writeln2("Directing output to main window");
-                    if (G.Equal(fileName, "con"))
-                    {
-                        G.Warning("w18.1", "Please use PIPE<stop> instead of PIPE con");
-                    }
+                    if (!mute) G.Writeln2("Directing output to main window");
+                    if (G.Equal(fileName, "con")) G.Warning("w18.1", "Please use PIPE<stop> instead of PIPE con");                    
                 }
             }
             else if (pause)
             {                
-                Globals.pipe.isPiping = false;
+                Globals.pipe.isPiping = false;  //remember .mustPrintOnScreen
             }
             else if (continue2)
             {                
-                Globals.pipe.isPiping = true;
+                Globals.pipe.isPiping = true;  //use existing .mustPrintOnScreen
             }
             else
             {
@@ -19858,12 +19854,12 @@ namespace Gekko
                             {
                                 Globals.pipeFileHelper.CloseFile();
                             }
-                            StartPipingToFile(fileName, append, html, mute);
+                            StartPipingToFile(fileName, append, html, mute, echo);
                         }
                     }
                     else
                     {
-                        StartPipingToFile(fileName, append, html, mute);
+                        StartPipingToFile(fileName, append, html, mute, echo);
                     }
                 }
                 catch (Exception e)
@@ -19873,7 +19869,6 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 Globals.pipe.isPiping = true;
-
             }
         }
 
@@ -19884,11 +19879,11 @@ namespace Gekko
         /// <param name="append"></param>
         /// <param name="html"></param>
         /// <param name="mute"></param>
-        private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
+        private static void StartPipingToFile(string fileName, bool append, bool html, bool mute, bool echo)
         {
             Globals.dependencyTracking.Add(2, "Pipe", false, fileName);
-            if (!mute && !Globals.pipe.isPiping) G.Writeln2("Directing output to file: '" + fileName + "'");
-            Globals.pipe.isPiping = true;
+            if (!mute && !Globals.pipe.isPiping) G.Writeln2("Directing output to file: '" + fileName + "'");            
+            Globals.pipe = new PipeFileOptions(true, echo);
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
 
             bool exists = false; if (File.Exists(fileName)) exists = true;

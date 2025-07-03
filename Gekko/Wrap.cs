@@ -239,6 +239,8 @@ namespace Gekko
                 tab = w.tab;
             }
 
+            if (Globals.pipe.mustPrintOnScreen) mustAlsoPrintOnScreen = true;  //Will always trump
+
             string margin = G.Blanks(marginFirst.Length);
 
             //-------------------------------
