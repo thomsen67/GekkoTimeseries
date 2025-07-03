@@ -583,6 +583,7 @@ ASTCOMPARE2;
 	ASTOPT_STRING_PAUSE;
 	ASTOPT_STRING_CONTINUE;
 	ASTOPT_STRING_STOP;
+    ASTOPT_STRING_ECHO;
 ASTOPT_STRING_TITLE;
 ASTOPT_STRING_SUBTITLE;
 ASTOPT_STRING_FONT;
@@ -1185,6 +1186,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    ECHO = 'ECHO';
     OBS = 'OBS';
     A3DP = 'A3DP';
     A3 = 'A3';
@@ -1854,6 +1856,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("echo"               , ECHO  );
                                         d.Add("obs"               , OBS  );
                                         d.Add("A3DP", A3DP);
                                         d.Add("A3", A3);
@@ -3474,6 +3477,7 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | PAUSE (EQUAL yesNo)? -> ^(ASTOPT_STRING_PAUSE yesNo?)						
 						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
 						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
+                          | ECHO (EQUAL yesNo)? -> ^(ASTOPT_STRING_ECHO yesNo?)		
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4393,6 +4397,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  ECHO|
   OBS|
   A3DP|
   A3|

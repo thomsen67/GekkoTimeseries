@@ -7235,6 +7235,7 @@ namespace Gekko
             public string opt_pause = null;
             public string opt_continue = null;
             public string opt_stop = null;
+            public string opt_echo = null;
 
             public void Exe()
             {

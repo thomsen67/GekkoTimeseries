@@ -19748,6 +19748,7 @@ namespace Gekko
             if (G.Equal(o.opt_pause, "yes")) temp.Add("pause");
             if (G.Equal(o.opt_continue, "yes")) temp.Add("continue");
             if (G.Equal(o.opt_stop, "yes")) temp.Add("stop");
+            if (G.Equal(o.opt_echo, "yes")) temp.Add("echo");
             Pipe(o.fileName, temp);
         }
 
@@ -19774,6 +19775,7 @@ namespace Gekko
             bool stop = false;
             bool pause = false;
             bool continue2 = false;
+            bool echo = false;
 
             if (args != null)
             {
@@ -19784,6 +19786,7 @@ namespace Gekko
                     else if (G.Equal(s, "stop")) stop = true;
                     else if (G.Equal(s, "pause")) pause = true;
                     else if (G.Equal(s, "continue")) continue2 = true;
+                    else if (G.Equal(s, "echo")) echo = true;
                 }
             }
 
