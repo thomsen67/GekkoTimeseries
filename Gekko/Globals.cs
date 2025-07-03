@@ -652,7 +652,7 @@ namespace Gekko
 
         public static StringBuilder unitTestScreenOutput = new StringBuilder();
 
-        public static bool pipe = false;
+        public static PipeFileOptions pipe = new PipeFileOptions(false, false);
         public static PipeFileHelper pipeFileHelper = new PipeFileHelper();
 
         public static bool pipe2 = false;

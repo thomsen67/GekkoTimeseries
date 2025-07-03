@@ -5621,16 +5621,7 @@ namespace Gekko
         public static bool IsMuting()
         {
             return G.Equal(Program.options.interface_mute, "yes");
-        }
-
-        /// <summary>
-        /// Not used at the moment
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsPiping()
-        {
-            return Globals.pipe || Globals.pipe2;
-        }
+        }        
 
         /// <summary>
         /// This is the "real" method actually doing the printing
@@ -5747,7 +5738,7 @@ namespace Gekko
             if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
             
             //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
-            if (!Globals.pipe2 && Globals.pipe && Globals.pipeFileHelper.pipeFile != null)
+            if (!Globals.pipe2 && Globals.pipe.isPiping && Globals.pipeFileHelper.pipeFile != null)
             {
                 try
                 {
@@ -6207,7 +6198,7 @@ namespace Gekko
         private static bool AppendTextMaybePipe(string s, bool isMuting, bool isPiping)
         {
             //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
-            if (!Globals.pipe2 && Globals.pipe && Globals.pipeFileHelper.pipeFile != null)
+            if (!Globals.pipe2 && Globals.pipe.isPiping && Globals.pipeFileHelper.pipeFile != null)
             {
                 isPiping = true;
                 try
