@@ -15856,15 +15856,15 @@ namespace UnitTests
                         //series must be truncated somehow as it is now. Else we need a xlsx decoration that says that
                         //the data is timeless.
                         _AssertSeries(First(), "a!a", new string[] { "x1" }, 2000, double.NaN, sharedDelta);
-                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 1100, sharedDelta);
                         _AssertSeries(First(), "a!a", new string[] { "x1" }, 2002, 1100, sharedDelta);
-                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x1" }, 2003, 1100, sharedDelta);
                         _AssertSeries(First(), "a!a", new string[] { "x1" }, 2004, double.NaN, sharedDelta);
 
                         _AssertSeries(First(), "a!a", new string[] { "x2" }, 2000, double.NaN, sharedDelta);
-                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2001, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2001, 1200, sharedDelta);
                         _AssertSeries(First(), "a!a", new string[] { "x2" }, 2002, 1200, sharedDelta);
-                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2003, double.NaN, sharedDelta);
+                        _AssertSeries(First(), "a!a", new string[] { "x2" }, 2003, 1200, sharedDelta);
                         _AssertSeries(First(), "a!a", new string[] { "x2" }, 2004, double.NaN, sharedDelta);
 
                         _AssertSeries(First(), "a!a", new string[] { "x3" }, 2000, double.NaN, sharedDelta);

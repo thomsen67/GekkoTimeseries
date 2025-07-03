@@ -505,9 +505,36 @@ namespace Gekko
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
 
-                if (dbName != null)
+                if (true)
                 {
-                    varnameWithFreq = G.Chop_AddBank(varnameWithFreq, dbName);
+
+                    //Similar logic as for non-wildcards
+                    if (dbName == null || isAllSpecialDatabank)
+                    {                        
+                        if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                        {                            
+                            varnameWithFreq = G.Chop_SetBank(varnameWithFreq, Globals.ref_name);
+                        }
+                    }
+                    else
+                    {
+                        if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                        {                         
+                            varnameWithFreq = G.Chop_SetBank(varnameWithFreq, Globals.ref_name);
+                        }
+                        else
+                        {                            
+                            varnameWithFreq = G.Chop_AddBank(varnameWithFreq, dbName);
+                        }
+                    }
+                }
+                else
+                {
+                    //Old way, but buggy because would not react to <r> option etc.
+                    if (dbName != null)
+                    {
+                        varnameWithFreq = G.Chop_AddBank(varnameWithFreq, dbName);
+                    }
                 }
 
                 List<string> names = Program.Search(new List(new List<string>() { varnameWithFreq }), frombank, EVariableType.Var);
