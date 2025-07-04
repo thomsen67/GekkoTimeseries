@@ -244,8 +244,8 @@ namespace Gekko
                         List<string> lbl = new List<string>();  //count = 0!
 
                         try
-                        {
-                            lbl = OPrintLabels(element.labelGiven, element.labelRecordedPieces, prtElementCounter, i);
+                        {                            
+                            lbl = OPrintLabels(element, o.opt_label, prtElementCounter, i);
                         }
                         catch { lbl = new List<string>(); }
 
@@ -464,7 +464,7 @@ namespace Gekko
             int iPlot = 0;            
 
             Table printTable = null;
-            PlotTable plotTable = null; //more lightweight than Table
+            PlotTable plotTable = null; //more lightweight than Table                        
 
             if (tabletype == EPrtPlotSheet.Plot)
             {
@@ -594,6 +594,49 @@ namespace Gekko
                     CrossThreadStuff.CopyButtonEnabled(true);
                 }
             }
+        }
+
+        private static void GetLabelFromMetadata(O.Prt.Element element)
+        {
+            IVariable iv5 = null;
+            if (element.variable[0] != null) iv5 = element.variable[0];  //Seems we have no banknumber here
+            else iv5 = element.variable[1];
+            List<string> m = GetLabel(iv5);
+            if (m.Count > 0) element.labelGiven = m;
+        }
+
+        private static List<string> GetLabel(IVariable iv5)
+        {
+            List<string> m = new List<string>();
+            if (iv5.Type() == EVariableType.Series)
+            {
+                Series ts5 = iv5 as Series;
+
+                if (ts5.type == ESeriesType.Normal || ts5.type == ESeriesType.Timeless)
+                {
+                    if (ts5.meta != null)
+                    {
+                        if (!G.NullOrBlanks(ts5.meta.label))
+                        {
+                            m = new List<string>() { ts5.meta.label };
+                        }
+                    }
+                }
+                else if (ts5.type == ESeriesType.ArraySuper)
+                {
+                    //TODO TODO
+                    //TODO TODO  maybe not
+                    //TODO TODO
+                }
+            }
+            else if (iv5.Type() == EVariableType.List)
+            {                
+                foreach (IVariable iv6 in (iv5 as List).list)
+                {
+                    m.AddRange(GetLabel(iv6));
+                }
+            }
+            return m;
         }
 
         /// <summary>
@@ -1939,12 +1982,14 @@ namespace Gekko
             return false;
         }
 
-        public static List<string> OPrintLabels(List<string> labelGiven, List<O.RecordedPieces> labelRecordedPieces, int n, int i)
-        {
-            if (labelGiven.Count > 1)
+        public static List<string> OPrintLabels(O.Prt.Element element, string opt_label, int n, int i)
+        {            
+            if (G.Equal(opt_label, "yes")) GetLabelFromMetadata(element);
+
+            if (element.labelGiven.Count > 1)
             {
                 //this is the case for an array-series that has been unfolded
-                return labelGiven;
+                return element.labelGiven;
             }
 
             List<string> lbl = new List<string>();  //this must end up with as many strings as the element has subelements (sublist)
@@ -1953,9 +1998,9 @@ namespace Gekko
 
             //n is the number of subelements for the prtElement (for example if the item is a list like {#m}).
 
-            string[] w = RemoveSplitter(labelGiven[0]).Split('|');  //raw label   
+            string[] w = RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
 
-            if (labelRecordedPieces.Count == 0)
+            if (element.labelRecordedPieces.Count == 0)
             {
                 lbl.Add(G.ReplaceGlueSymbols(w[0]));
                 return lbl;
@@ -1970,15 +2015,15 @@ namespace Gekko
 
             //label is only added if --> counter % nn == nn - 1
 
-            int nn = labelRecordedPieces.Count / n;  //how many inserts like <q m p> per column
-            if (labelRecordedPieces.Count % n != 0)
+            int nn = element.labelRecordedPieces.Count / n;  //how many inserts like <q m p> per column
+            if (element.labelRecordedPieces.Count % n != 0)
             {
                 Mismatch(); //only shown on TT computer
             }
 
-            if (Globals.fixWildcardLabel && labelRecordedPieces.Count > 0 && labelRecordedPieces[0].s == Globals.wildcardText)  //just testing first one
+            if (Globals.fixWildcardLabel && element.labelRecordedPieces.Count > 0 && element.labelRecordedPieces[0].s == Globals.wildcardText)  //just testing first one
             {
-                foreach (O.RecordedPieces r in labelRecordedPieces)
+                foreach (O.RecordedPieces r in element.labelRecordedPieces)
                 {
                     lbl.Add(r.iv.ConvertToString());
                 }
@@ -2038,7 +2083,7 @@ namespace Gekko
                 //foreach recorded call of {} or [], via RecordLabel()
 
                 int counter = -1;
-                foreach (O.RecordedPieces piece in labelRecordedPieces)  //foreach RecordLabel()
+                foreach (O.RecordedPieces piece in element.labelRecordedPieces)  //foreach RecordLabel()
                 {
                     counter++;
                     string[] ss = piece.s.Split('|');
@@ -2119,8 +2164,6 @@ namespace Gekko
 
         private static int PrintCreateLabelsArrayNew(string label, int width, int numberOfLabelsRowsMax, int maxLength, out List<string> labelsArray)
         {
-            //labelsArray = new string[numberOfLabelsRowsMax];
-
             labelsArray = new List<string>(new string[numberOfLabelsRowsMax]);
 
             int numberOfLabelsRows = -12345;

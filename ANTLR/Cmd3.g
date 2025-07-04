@@ -3550,6 +3550,7 @@ prtOptionField4Helper:      width
 						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
 						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						
 						  | Y2 -> ^(ASTPRTELEMENTY2)
+                          | LABEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_LABEL yesNo?)	
 						    ;
 prtOpt1Helper:              filter						
 						  | opt2 -> ^(ASTPRTOPTION opt2)
@@ -3629,6 +3630,7 @@ prtOpt1Helper:              filter
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
 						  | I (EQUAL expression)? -> ^(ASTOPT_DATE_I expression?)
                           | YOY (EQUAL yesNo)? -> ^(ASTOPT_STRING_YOY yesNo?)
+                          | LABEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_LABEL yesNo?)	
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
