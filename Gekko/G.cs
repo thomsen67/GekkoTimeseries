@@ -5612,16 +5612,7 @@ namespace Gekko
             if (Globals.excelDna) return true;            
             if (Application.ExecutablePath.Contains("testhost.net48.exe") || Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe") || Application.ExecutablePath.Contains("testhost.exe")) return true;
             return false;
-        }
-
-        /// <summary>
-        /// Not used at the moment
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsMuting()
-        {
-            return G.Equal(Program.options.interface_mute, "yes");
-        }        
+        }                
 
         /// <summary>
         /// This is the "real" method actually doing the printing
@@ -5708,10 +5699,11 @@ namespace Gekko
                 return;
             }
 
-            RichTextBoxEx textBox = null;            
+            RichTextBoxEx textBox = null;
 
+            bool isMuting = false; if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
             bool mustAlsoPrintOnScreen = helper.mustAlsoPrintToScreen;
-            if (Globals.pipe.mustPrintOnScreen) mustAlsoPrintOnScreen = true;  //Will always trump
+            if (Globals.pipe.echo && !isMuting) mustAlsoPrintOnScreen = true; //Will always trump unless muting, see also #6356d83kpp
 
             if (helper.type == EWrapType.Error)
             {
@@ -5733,10 +5725,7 @@ namespace Gekko
                 }
             }
 
-            bool isPiping = false;
-            bool isMuting = false;
-
-            if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
+            bool isPiping = false;            
             
             //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
             if (!Globals.pipe2 && Globals.pipe.isPiping && Globals.pipeFileHelper.pipeFile != null)

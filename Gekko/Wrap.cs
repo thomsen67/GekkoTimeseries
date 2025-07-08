@@ -239,7 +239,7 @@ namespace Gekko
                 tab = w.tab;
             }
 
-            if (Globals.pipe.mustPrintOnScreen) mustAlsoPrintOnScreen = true;  //Will always trump
+            if (Globals.pipe.echo && !G.Equal(Program.options.interface_mute, "yes")) mustAlsoPrintOnScreen = true; //Will always trump unless muting, see also #6356d83kpp
 
             string margin = G.Blanks(marginFirst.Length);
 

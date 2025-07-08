@@ -2724,7 +2724,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {
+            {                
                 if (Globals.runningOnTTComputer)
                 {
                     if (true)
@@ -35844,11 +35844,11 @@ namespace Gekko
     public class PipeFileOptions
     {
         public bool isPiping = false;
-        public bool mustPrintOnScreen = false;  //PIPE<echo>
-        public PipeFileOptions(bool isPiping, bool mustPrintOnScreen)        
+        public bool echo = false;  //PIPE<echo>
+        public PipeFileOptions(bool isPiping, bool echo)        
         {
             this.isPiping = isPiping;
-            this.mustPrintOnScreen = mustPrintOnScreen;
+            this.echo = echo;
         }
     }
 
