@@ -606,17 +606,36 @@ namespace Gekko
 
         private static void GetInfoFromMetadata(O.Prt.Element element, string opt_label)
         {
+            List<EMetaType> types = new List<EMetaType>();
+            IVariable iv5 = null;
+            if (element.variable[0] != null) iv5 = element.variable[0];  //Seems we have no banknumber here
+            else iv5 = element.variable[1];
             if (G.Equal(opt_label, "yes"))
             {
-                IVariable iv5 = null;
-                if (element.variable[0] != null) iv5 = element.variable[0];  //Seems we have no banknumber here
-                else iv5 = element.variable[1];
                 EMetaType type = EMetaType.Label;
-                List<EMetaType> types = new List<EMetaType>();
                 types.Add(EMetaType.Label);
-                List<string> m = GetMeta(iv5, types);
-                if (m.Count > 0) element.labelGiven = m;
             }
+            else if (G.Equal(opt_label, "no"))
+            {
+                //Do nothing
+            }
+            else
+            {
+                foreach (char c in opt_label)
+                {
+                    if (G.Equal(c.ToString(), "n")) types.Add(EMetaType.Name);
+                    else if (G.Equal(c.ToString(), "l")) types.Add(EMetaType.Label);
+                    else if (G.Equal(c.ToString(), "s")) types.Add(EMetaType.Source);
+                    else if (G.Equal(c.ToString(), "u")) types.Add(EMetaType.Units);
+                    else if (G.Equal(c.ToString(), "p")) types.Add(EMetaType.Stamp);
+                    else
+                    {
+                        new Error("For <label=...>, only 'n', 'l', 's', 'u' or 'p' characters are allowed");
+                    }
+                }
+            }
+            List<string> m = GetMeta(iv5, types);
+            if (m.Count > 0) element.labelGiven = m;
         }
 
         private static List<string> GetMeta(IVariable iv5, List<EMetaType> types)
@@ -630,27 +649,39 @@ namespace Gekko
                     if (ts5.meta != null)
                     {
                         List<string> ss = new List<string>();
-                        foreach (EMetaType type in types)
+
+                        for (int i = 0; i < types.Count; i++)
                         {
+                            EMetaType type = types[i];
+                            string s5 = "";
+                            bool showType = true;
+                            if (i == 0) showType = false; //Do not show type for the first. "GDP. Name: fY" --- "GDP. Source: National accounts".
+                            if (i == 1 && types[0] == EMetaType.Name) showType = false; //If the first is name, the next does not need to show type. "fY. GDP" --- "fY. National Accounts"
+
                             if (type == EMetaType.Name)
                             {
-                                ss.Add(ts5.GetNameWithoutCurrentFreq(true));
+                                if (showType) s5 = Globals.Name + ": ";
+                                ss.Add(s5 + ts5.GetNameWithoutCurrentFreq(true));
                             }
-                            else if(type == EMetaType.Label)
+                            else if (type == EMetaType.Label)
                             {
-                                if (ts5.meta.label != null) ss.Add(G.ReplaceWhitespaceWith1Blank(ts5.meta.label.Trim()));
+                                if (showType) s5 = Globals.Label + ": ";
+                                if (ts5.meta.label != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.label.Trim()));
                             }
                             else if (type == EMetaType.Source)
                             {
-                                if (ts5.meta.source != null) ss.Add(G.ReplaceWhitespaceWith1Blank(ts5.meta.source.Trim()));
+                                if (showType) s5 = Globals.Source + ": ";
+                                if (ts5.meta.source != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.source.Trim()));
                             }
                             else if (type == EMetaType.Units)
                             {
-                                if (ts5.meta.units != null) ss.Add(G.ReplaceWhitespaceWith1Blank(ts5.meta.units.Trim()));
+                                if (showType) s5 = Globals.Units + ": ";
+                                if (ts5.meta.units != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.units.Trim()));
                             }
                             else if (type == EMetaType.Stamp)
                             {
-                                if (ts5.meta.stamp != null) ss.Add(G.ReplaceWhitespaceWith1Blank(ts5.meta.stamp.Trim()));
+                                if (showType) s5 = Globals.Stamp + ": ";
+                                if (ts5.meta.stamp != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.stamp.Trim()));
                             }
                         }
 
