@@ -521,9 +521,12 @@ namespace Gekko
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
         public static string endGekkoSmplIteratorCode = G.NL + "if (" + Globals.smpl + ".HasError()) O.TryNewSmpl(" + Globals.smpl + ", iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
 
-        //Seems this is used
         public const string labelCheatString = "[<{THIS IS A LABEL}>]";
-        //public static Parser.Gek.ParserGekCreateAST.EParserType syntaxType = Parser.Gek.ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;  //used in Cmd3.g        
+        public const string Name = "Name";
+        public const string Label = "Label";
+        public const string Source = "Source";
+        public const string Units = "Units";
+        public const string Stamp = "Stamp";
 
         public const string firstCheatString = "[FIRST]";
 

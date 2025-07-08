@@ -3550,7 +3550,8 @@ prtOptionField4Helper:      width
 						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
 						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						
 						  | Y2 -> ^(ASTPRTELEMENTY2)
-                          | LABEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_LABEL yesNo?)	
+                          | LABEL -> ^(ASTOPT_STRING_LABEL 'yes')	
+                          | LABEL (EQUAL name) -> ^(ASTOPT_STRING_LABEL name)	
 						    ;
 prtOpt1Helper:              filter						
 						  | opt2 -> ^(ASTPRTOPTION opt2)

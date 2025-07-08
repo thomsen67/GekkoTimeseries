@@ -12238,8 +12238,8 @@ namespace Gekko
                     if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless || ts.type == ESeriesType.ArraySuper)
                     {
                         string label_string = "";  //DGR asked to omit "Label: ", and it is typically pretty obvious anyway.
-                        string source_string = "Source: "; if (danish) source_string = "Kilde: ";
-                        string units_string = "Units: "; if (danish) units_string = "Enhed: ";  //DGR asked to change from Enheder --> Enhed.
+                        string source_string = Globals.Source + ": "; if (danish) source_string = "Kilde: ";
+                        string units_string = Globals.Units + ": "; if (danish) units_string = "Enhed: ";  //DGR asked to change from Enheder --> Enhed.
 
                         string label2 = ts.MetaGetLabel();
                         if (label2 != null) rv.Add(label_string + label2);
