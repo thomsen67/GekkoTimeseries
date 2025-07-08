@@ -630,7 +630,7 @@ namespace Gekko
                     else if (G.Equal(c.ToString(), "p")) types.Add(EMetaType.Stamp);
                     else
                     {
-                        new Error("For <label=...>, only 'n', 'l', 's', 'u' or 'p' characters are allowed");
+                        G.Warning("w12.3", "For <label=...>, only 'n', 'l', 's', 'u', 'p' allowed, not '" + c + "'");
                     }
                 }
             }
@@ -687,7 +687,7 @@ namespace Gekko
 
                         string s = string.Join(". ", ss);
 
-                        if (!G.NullOrBlanks(ts5.meta.label))
+                        if (!G.NullOrBlanks(s))
                         {
                             m = new List<string>() { s };
                         }
