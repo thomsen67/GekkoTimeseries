@@ -15825,12 +15825,12 @@ namespace Gekko
                 if (true)
                 {
                     //try variable labels
-                    foreach (IVariable iv in db.storage.Values)
+                    foreach (IVariable iv in db.storage.Values)  //For array-series really should look into these
                     {
                         Series ts = iv as Series;
                         if (ts == null) continue;
                         if (Program.options.freq != ts.freq) continue;
-                        string label = ts?.meta.label;
+                        string label = ts.MetaGetLabel();  //handles ts.meta == null too
                         if (label == null) continue;
                         if (G.Contains(label, s))
                         {

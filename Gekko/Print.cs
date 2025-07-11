@@ -253,7 +253,7 @@ namespace Gekko
 
                         try
                         {                            
-                            lbl = OPrintLabels(element, o.opt_label, prtElementCounter, i);
+                            lbl = OPrintLabels(element, o.opt_label, o.opt_meta, prtElementCounter, i);
                         }
                         catch { lbl = new List<string>(); }
 
@@ -604,38 +604,38 @@ namespace Gekko
             }
         }
 
-        private static void GetInfoFromMetadata(O.Prt.Element element, string opt_label)
+        private static void GetInfoFromMetadata(O.Prt.Element element, string opt_label, string opt_meta)
         {
-            List<EMetaType> types = new List<EMetaType>();
-            IVariable iv5 = null;
-            if (element.variable[0] != null) iv5 = element.variable[0];  //Seems we have no banknumber here
-            else iv5 = element.variable[1];
-            if (G.Equal(opt_label, "yes"))
+            bool labelYes = G.Equal(opt_label, "yes");
+            if (labelYes || opt_meta != null)
             {
-                EMetaType type = EMetaType.Label;
-                types.Add(EMetaType.Label);
-            }
-            else if (G.Equal(opt_label, "no"))
-            {
-                //Do nothing
-            }
-            else
-            {
-                foreach (char c in opt_label)
+                List<EMetaType> types = new List<EMetaType>();
+                IVariable iv5 = null;
+                if (element.variable[0] != null) iv5 = element.variable[0];  //Seems we have no banknumber here
+                else iv5 = element.variable[1];
+                if (labelYes)
                 {
-                    if (G.Equal(c.ToString(), "n")) types.Add(EMetaType.Name);
-                    else if (G.Equal(c.ToString(), "l")) types.Add(EMetaType.Label);
-                    else if (G.Equal(c.ToString(), "s")) types.Add(EMetaType.Source);
-                    else if (G.Equal(c.ToString(), "u")) types.Add(EMetaType.Units);
-                    else if (G.Equal(c.ToString(), "p")) types.Add(EMetaType.Stamp);
-                    else
+                    EMetaType type = EMetaType.Label;
+                    types.Add(EMetaType.Label);
+                }                
+                else
+                {
+                    foreach (char c in opt_meta)
                     {
-                        G.Warning("w12.3", "For <label=...>, only 'n', 'l', 's', 'u', 'p' allowed, not '" + c + "'");
+                        if (G.Equal(c.ToString(), "n")) types.Add(EMetaType.Name);
+                        else if (G.Equal(c.ToString(), "l")) types.Add(EMetaType.Label);
+                        else if (G.Equal(c.ToString(), "s")) types.Add(EMetaType.Source);
+                        else if (G.Equal(c.ToString(), "u")) types.Add(EMetaType.Units);
+                        else if (G.Equal(c.ToString(), "p")) types.Add(EMetaType.Stamp);
+                        else
+                        {
+                            G.Warning("w12.3", "For <meta=...>, only 'n', 'l', 's', 'u', 'p' allowed, not '" + c + "'");
+                        }
                     }
                 }
+                List<string> m = GetMeta(iv5, types);
+                if (m.Count > 0) element.labelGiven = m;
             }
-            List<string> m = GetMeta(iv5, types);
-            if (m.Count > 0) element.labelGiven = m;
         }
 
         private static List<string> GetMeta(IVariable iv5, List<EMetaType> types)
@@ -666,22 +666,26 @@ namespace Gekko
                             else if (type == EMetaType.Label)
                             {
                                 if (showType) s5 = Globals.Label + ": ";
-                                if (ts5.meta.label != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.label.Trim()));
+                                string s2 = ts5.MetaGetLabel();
+                                if (!G.NullOrBlanks(s2)) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(s2.Trim()));
                             }
                             else if (type == EMetaType.Source)
                             {
                                 if (showType) s5 = Globals.Source + ": ";
-                                if (ts5.meta.source != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.source.Trim()));
+                                string s2 = ts5.MetaGetSource();
+                                if (!G.NullOrBlanks(s2)) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(s2.Trim()));
                             }
                             else if (type == EMetaType.Units)
                             {
                                 if (showType) s5 = Globals.Units + ": ";
-                                if (ts5.meta.units != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.units.Trim()));
+                                string s2 = ts5.MetaGetUnits();
+                                if (!G.NullOrBlanks(s2)) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(s2.Trim()));
                             }
                             else if (type == EMetaType.Stamp)
                             {
                                 if (showType) s5 = Globals.Stamp + ": ";
-                                if (ts5.meta.stamp != null) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(ts5.meta.stamp.Trim()));
+                                string s2 = ts5.MetaGetStamp();
+                                if (!G.NullOrBlanks(s2)) ss.Add(s5 + G.ReplaceWhitespaceWith1Blank(s2.Trim()));
                             }
                         }
 
@@ -691,7 +695,6 @@ namespace Gekko
                         {
                             m = new List<string>() { s };
                         }
-
                     }
                 }
                 else if (ts5.type == ESeriesType.ArraySuper)
@@ -2054,9 +2057,9 @@ namespace Gekko
             return false;
         }
 
-        public static List<string> OPrintLabels(O.Prt.Element element, string opt_label, int n, int i)
+        public static List<string> OPrintLabels(O.Prt.Element element, string opt_label, string opt_meta, int n, int i)
         {
-            if (opt_label != null) GetInfoFromMetadata(element, opt_label);
+            GetInfoFromMetadata(element, opt_label, opt_meta);
 
             if (element.labelGiven.Count > 1)
             {

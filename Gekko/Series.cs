@@ -3355,6 +3355,28 @@ namespace Gekko
             return units2;
         }
 
+        /// <summary>
+        /// Get units from series (or parent series)
+        /// </summary>
+        /// <returns></returns>
+        public string MetaGetStamp()
+        {
+            if (this.meta == null) return null;
+            string stamp2 = null;
+            if (!G.NullOrBlanks(this.meta.stamp))
+            {
+                stamp2 = this.meta.stamp;
+            }
+            else
+            {
+                if (this.IsArraySubSeries() && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.stamp))
+                {
+                    stamp2 = this.mmi.parent.meta.stamp;
+                }
+            }
+            return stamp2;
+        }
+
     }
 
     [ProtoContract]

@@ -619,6 +619,7 @@ ASTOPT_VAL_Y2MINHARD;
 ASTOPT_VAL_Y2MINSOFT;
 ASTOPT_STRING_X2ZEROAXIS;
 ASTOPT_STRING_LABEL;
+ASTOPT_STRING_META;
 ASTOPT_STRING_ARROW;
 ASTOPT_STRING_LINETYPE;
 ASTOPT_STRING_DASHTYPE;
@@ -1186,6 +1187,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    META = 'META';
     ECHO = 'ECHO';
     OBS = 'OBS';
     A3DP = 'A3DP';
@@ -1856,6 +1858,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("meta"               , META  );
                                         d.Add("echo"               , ECHO  );
                                         d.Add("obs"               , OBS  );
                                         d.Add("A3DP", A3DP);
@@ -3549,9 +3552,7 @@ prtOptionField4Helper:      width
 						  | POINTTYPE '=' expression -> ^(ASTPRTELEMENTPOINTTYPE expression)
 						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
 						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						
-						  | Y2 -> ^(ASTPRTELEMENTY2)
-                          | LABEL -> ^(ASTOPT_STRING_LABEL 'yes')	
-                          | LABEL (EQUAL name) -> ^(ASTOPT_STRING_LABEL name)	
+						  | Y2 -> ^(ASTPRTELEMENTY2)                          
 						    ;
 prtOpt1Helper:              filter						
 						  | opt2 -> ^(ASTPRTOPTION opt2)
@@ -3632,6 +3633,7 @@ prtOpt1Helper:              filter
 						  | I (EQUAL expression)? -> ^(ASTOPT_DATE_I expression?)
                           | YOY (EQUAL yesNo)? -> ^(ASTOPT_STRING_YOY yesNo?)
                           | LABEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_LABEL yesNo?)	
+                          | META EQUAL name -> ^(ASTOPT_STRING_META name)	                          
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -4400,6 +4402,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  META|
   ECHO|
   OBS|
   A3DP|
@@ -4969,7 +4972,7 @@ ident2: 					Ident |
 ident3: 					Ident |
 					        // --- tokens4 start ---		
 						
-  
+  META|
   ASBANK|
   TOBANK|
   VARLIST|

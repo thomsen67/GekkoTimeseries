@@ -6672,23 +6672,23 @@ namespace Gekko
             }
             else if (G.Equal(s2, "label"))
             {
-                return new ScalarString(ts.meta.label);
+                return new ScalarString(ts.MetaGetLabel());
             }
             else if (G.Equal(s2, "source"))
             {
-                return new ScalarString(ts.meta.source);
+                return new ScalarString(ts.MetaGetSource());
             }
             else if (G.Equal(s2, "stamp"))
             {
-                return new ScalarString(ts.meta.stamp);
+                return new ScalarString(ts.MetaGetStamp());
             }
             else if (G.Equal(s2, "stamp2"))
             {
-                return new ScalarDate(GekkoTime.FromDateTimeToGekkoTime(EFreq.D, Program.GetDateTimePrettyInverse(ts.meta.stamp)));
+                return new ScalarDate(GekkoTime.FromDateTimeToGekkoTime(EFreq.D, Program.GetDateTimePrettyInverse(ts.MetaGetStamp())));
             }
             else if (G.Equal(s2, "units"))
             {
-                return new ScalarString(ts.meta.units);
+                return new ScalarString(ts.MetaGetUnits());
             }
             else if (G.Equal(s2, "perStart"))
             {

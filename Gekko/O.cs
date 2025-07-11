@@ -9771,6 +9771,7 @@ namespace Gekko
             public GekkoTime opt_i = GekkoTime.tNull; //may be set to GekkoTime.tSimilarToNull corresponding to <i> or 'yes'.
             public string opt_yoy = "no"; //<yoy>
             public string opt_label = null;  //<label>
+            public string opt_meta = null;  //<meta>
 
             public void Exe()
             {
@@ -9869,7 +9870,7 @@ namespace Gekko
                                     List<string> lbl = new List<string>();
                                     try
                                     {
-                                        lbl = Print.OPrintLabels(element, this.opt_label, 1, bankNumber);
+                                        lbl = Print.OPrintLabels(element, this.opt_label, this.opt_meta, 1, bankNumber);
                                     }
                                     catch { lbl = new List<string>(); }
 
@@ -9886,7 +9887,7 @@ namespace Gekko
                                 {
                                     try
                                     {
-                                        labelsUnfolded = Print.OPrintLabels(element, this.opt_label, n, bankNumber);
+                                        labelsUnfolded = Print.OPrintLabels(element, this.opt_label, this.opt_meta, n, bankNumber);
                                     }
                                     catch { labelsUnfolded = new List<string>(); }
                                 }
