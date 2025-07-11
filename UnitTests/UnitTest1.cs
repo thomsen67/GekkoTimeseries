@@ -19832,7 +19832,12 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear();
             I("prt <width=50 meta=ls n> x[#m];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1. Source: src1"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2. Source: src2"));            
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2. Source: src2"));
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 meta=ls n> x;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1. Source: src1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2. Source: src2"));
         }
 
         [TestMethod]
