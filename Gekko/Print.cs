@@ -2059,6 +2059,9 @@ namespace Gekko
 
         public static List<string> OPrintLabels(O.Prt.Element element, string opt_label, string opt_meta, int n, int i)
         {
+            //element.labelGiven may be something like: x¨{%¨s}|[@2,2:2='x',<903>,1:2]|[@8,8:8='}',<1418>,1:8]
+            //for prt x{%s}.
+
             GetInfoFromMetadata(element, opt_label, opt_meta);
 
             if (element.labelGiven.Count > 1)
@@ -2105,6 +2108,13 @@ namespace Gekko
             }
             else
             {
+                if (w.Length == 1)
+                {
+                    //We get here with for instance prt<label>x[a], where x[a] has a label.
+                    //In any case, with w.Length == 1 we get an exception anyway since w[1] is used below.
+                    lbl.Add(G.ReplaceGlueSymbols(w[0]));
+                    return lbl;
+                }
 
                 //
                 // for instance PRT <n p> x[#i], #i = a, b, c.

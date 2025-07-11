@@ -19732,8 +19732,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Labels()
-        {
-            Globals.unitTestScreenOutput.Clear();
+        {            
             I("reset;");
             I("x1 = 2;");
             I("x2 = 3;");
@@ -19786,6 +19785,54 @@ namespace UnitTests
             I("prt <width=50 meta=nls n> {#m};");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x1. lbl1. Source: src1"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2. lbl2. Source: src2"));
+
+            //
+            // ==================== array-series ==========================================
+            // 
+
+            I("reset;");
+            I("x = series(1);");
+            I("x[1] = 2;");
+            I("x[2] = 3;");
+            I("doc x[1] label = 'lbl1';");
+            I("doc x[2] label = 'lbl2';");
+            I("doc x[1] source = 'src1';");
+            I("doc x[2] source = 'src2';");
+            I("#m = ('1', '2');");
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 label n> x[1];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl"));
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 label n> x[1], x[2];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2"));
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 label n> x[#m];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2"));
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 label n> x;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2"));
+            // ---------------------------------------------------------------------------------
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 meta=ls n> x[1];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1. Source: src1"));
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 meta=ls n> x[1], x[2];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1. Source: src1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2. Source: src2"));
+            // ---
+            Globals.unitTestScreenOutput.Clear();
+            I("prt <width=50 meta=ls n> x[#m];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1. Source: src1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2. Source: src2"));            
         }
 
         [TestMethod]
