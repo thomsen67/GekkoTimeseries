@@ -2445,7 +2445,7 @@ namespace Gekko
                             if (value == "NaN") value = "M";
                         }
 
-                        string type = a.Type().ToString().ToUpper();
+                        string type = a.Type().ToString().ToLower();
 
                         tab.Set(row, 1, type);
                         tab.Set(row, 2, s);
@@ -8845,25 +8845,6 @@ namespace Gekko
                 Decomp.Find(this);
             }            
         }
-
-        public class Show
-        {
-            public IVariable input = null;
-            public string label = null;
-            public void Exe()
-            {
-                if (input.Type() == EVariableType.Matrix)
-                {
-                    Matrix a = (Matrix)input;
-                    Program.ShowMatrix(a, this.label);
-                }
-                else
-                {
-                    new Error("Unsupported type (" + input.Type().ToString() + "), for SHOW");
-                    //throw new GekkoException();
-                }
-            }
-        }        
 
         public class Decomp2
         {

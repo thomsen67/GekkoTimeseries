@@ -16271,8 +16271,8 @@ namespace UnitTests
             I("clone;");
             I("tracedelete2('ref');");
             string s2 = Globals.unitTestScreenOutput.ToString();
-            if (false) Assert.IsTrue(s2.Contains("Deleted 11 data traces from databank 'Ref'"));
-            else Assert.IsTrue(s2.Contains("Deleted 9 data traces from databank 'Ref'"));
+            if (false) Assert.IsTrue(s2.Contains("Deleted 11 data-traces from databank 'Ref'"));
+            else Assert.IsTrue(s2.Contains("Deleted 9 data-traces from databank 'Ref'"));
 
             if (false)
             {

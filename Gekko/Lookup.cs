@@ -1471,7 +1471,7 @@ namespace Gekko
                             txt.MoreAdd("emulate Gekko < 3.1.19 behavior and skip this consistency check.");
                             txt.MoreNewLine();
                             txt.MoreAdd("In Gekko < 3.1.19, an invalid statement like for instance 'x <2020 2010> = 100;' entails that only the first period x[2020] gets updated, and no error is issued.");
-                            txt.MoreAdd("Note: When data tracing is activated (which it is per default in Gekko >= 3.1.16), an invalid series statement period will generally crash the data tracing part in any case and result in an error.");
+                            txt.MoreAdd("Note: When data-tracing is activated (which it is per default in Gekko >= 3.1.16), an invalid series statement period will generally crash the data-tracing part in any case and result in an error.");
                         }
                     }
                 }

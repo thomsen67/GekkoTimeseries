@@ -2807,7 +2807,7 @@ namespace Gekko
 
                 }
 
-                if (Globals.runningOnTTComputer && (text == "d"))
+                if (Globals.runningOnTTComputer && (text == "d777"))
                 {
                     //GekkoDictionaryBlanks<string> dict = GamsModel.Lhs(Program.model);
                     DateTime dt = DateTime.Now;
@@ -7214,8 +7214,8 @@ namespace Gekko
                                 {
                                     using (var txt = new Warning(EWarningType.UsingWithTypeId, "w28.1"))
                                     {
-                                        if (unknowVersion) txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ", but Gekko " + Globals.gekkoVersion + " only supports data trace versions: " + Stringlist.GetListWithCommas(Globals.traceVersions) + ".");
-                                        else txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ". This data trace version is known to Gekko " + Globals.gekkoVersion + ", but reading the traces failed.");
+                                        if (unknowVersion) txt.MainAdd("The data-traces inside the .gbk databank have data-trace version " + traceVersion + ", but Gekko " + Globals.gekkoVersion + " only supports data-trace versions: " + Stringlist.GetListWithCommas(Globals.traceVersions) + ".");
+                                        else txt.MainAdd("The data-traces inside the .gbk databank have data-trace version " + traceVersion + ". This data-trace version is known to Gekko " + Globals.gekkoVersion + ", but reading the traces failed.");
                                         txt.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
                                     }
                                 }
@@ -16049,20 +16049,20 @@ namespace Gekko
                     G.Writeln2("------------------------------------------------------------------------------------------");
                     DispHelperArraySeries(ts, keys, false);
                     G.Writeln("------------------------------------------------------------------------------------------");
-                    new Writeln("As seen above, '" + ts.GetNameAndParentDatabank() + "' is an array-series. Please choose one of its elements (sub-series) for data tracing.");
+                    new Writeln("As seen above, '" + ts.GetNameAndParentDatabank() + "' is an array-series. Please choose one of its elements (sub-series) for data-tracing.");
                 }
                 else
                 {                    
                     Trace2 trace = ts.meta.trace2;
                     if (trace == null)
                     {
-                        new Writeln("Series '" + ts.GetNameAndParentDatabank() + "' does not have any data traces.");
+                        new Writeln("Series '" + ts.GetNameAndParentDatabank() + "' does not have any data-traces.");
                         continue;
                     }
                     count++;
                     if (count > 10)
                     {
-                        new Writeln("Limit of 10 consecutive data trace windows exceeded.");
+                        new Writeln("Limit of 10 consecutive data-trace windows exceeded.");
                         break;
                     }                    
                     Trace2.CallTraceViewer(trace, int.MaxValue);
@@ -23370,7 +23370,7 @@ namespace Gekko
                     {
                         try { File.Delete(pathAndFilename3); } catch { }  //a corrupted trace.data may be present: get it wiped out before zipping!
                         try { foreach (SeriesMetaInformation meta in th.metas) meta.traceID2 = null; } catch { } //some of these may have been constructed: wipe them out!                        
-                        txt.MainAdd("Writing " + traceCount + " data traces to .gbk file failed for unknown reasons (but the data part of the file may be ok).");
+                        txt.MainAdd("Writing " + traceCount + " data-traces to .gbk file failed for unknown reasons (but the data part of the file may be ok).");
                         txt.MainAdd(Globals.traceError);
                     }
                 }
@@ -34633,7 +34633,7 @@ namespace Gekko
                     {
                         Functions.tracestats2(null, null, null, new ScalarString(this.databank.GetName()));
                     };
-                    tab.CurRow.SetText(1, "Trace    : " + th.traces.Count + " data traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    tab.CurRow.SetText(1, "Trace    : " + th.traces.Count + " data-traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                     tab.CurRow.Next();
                 }
 

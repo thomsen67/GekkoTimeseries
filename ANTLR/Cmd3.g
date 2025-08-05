@@ -4040,8 +4040,10 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // TRACE2
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-trace2:						TRACE2 stringInQuotes -> ^({token("ASTTRACESEARCH2", ASTTRACESEARCH2, input.LT(1).Line)} stringInQuotes)
-						  | TRACE2 seqOfBankvarnames -> ^({token("ASTTRACE2", ASTTRACE2, input.LT(1).Line)} seqOfBankvarnames)
+trace2:						TRACE stringInQuotes -> ^({token("ASTTRACESEARCH2", ASTTRACESEARCH2, input.LT(1).Line)} stringInQuotes)
+						  | TRACE seqOfBankvarnames -> ^({token("ASTTRACE2", ASTTRACE2, input.LT(1).Line)} seqOfBankvarnames)
+        				  | TRACE2 stringInQuotes -> ^({token("ASTTRACESEARCH2", ASTTRACESEARCH2, input.LT(1).Line)} stringInQuotes)  //obsolete
+						  | TRACE2 seqOfBankvarnames -> ^({token("ASTTRACE2", ASTTRACE2, input.LT(1).Line)} seqOfBankvarnames) //obsolete
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

@@ -391,7 +391,6 @@ namespace Gekko
             if (ts.type == ESeriesType.ArraySuper)
             {
                 new Error("getparent(): this is already an array parent-series");
-                //throw new GekkoException();
             }
             else if (ts.type == ESeriesType.Light)
             {
@@ -762,12 +761,12 @@ namespace Gekko
         }
 
 
-        public static IVariable gettrace2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        public static IVariable fromtrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //Only at 1 level below "GluedToSeries", so there should be no dividers here... (or what?)
             //Think about dividers if it is made more advanced.
 
-            Series ts = Helper_GetSeriesFromSeriesOrString(x1, "Function getTrace(): ");
+            Series ts = Helper_GetSeriesFromSeriesOrString(x1, "Function fromTrace(): ");
             string type = O.ConvertToString(x2);
             List m = new List();
             if (ts.meta.trace2 != null)
@@ -819,7 +818,7 @@ namespace Gekko
                         }
                         else if (G.Equal(type, "file"))
                         {
-                            m.Add(new ScalarString(tap.trace.GetContents().commandFileAndLine));
+                            m.Add(new ScalarString(tap.trace.GetContents().commandFileAndLine.Replace("¤", " line ")));
                         }
                         else if (G.Equal(type, "datafile"))
                         {
@@ -1288,8 +1287,7 @@ namespace Gekko
             Databank db = Program.databanks.GetDatabank(y1);
             if (db == null)
             {
-                new Error("No open databank has the name '" + y1 + "'");
-                //throw new GekkoException();
+                new Error("No open databank has the name '" + y1 + "'");                
             }
 
             string y2 = x2.ConvertToString();
@@ -1364,7 +1362,6 @@ namespace Gekko
         public static IVariable piece(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
         {
             new Error("Rename: please use substring() instead of piece()"); return null;
-            //throw new GekkoException();
         }
 
         public static IVariable substring(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
@@ -1849,7 +1846,7 @@ namespace Gekko
             }
             else
             {
-                int n = CheckSquare(xx);
+                int n = Helper_CheckSquare(xx);
                 m = new Matrix(n, 1);
                 for (int i = 0; i < n; i++)
                 {
@@ -1862,7 +1859,7 @@ namespace Gekko
         public static IVariable trace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             Matrix m = O.ConvertToMatrix(x);
-            int n = CheckSquare(m);
+            int n = Helper_CheckSquare(m);
             double d = 0d;
             for (int i = 0; i < n; i++)
             {
@@ -1871,7 +1868,7 @@ namespace Gekko
             return new ScalarVal(d);
         }
 
-        private static int CheckSquare(Matrix m)
+        private static int Helper_CheckSquare(Matrix m)
         {
             if (m.data.GetLength(0) != m.data.GetLength(1))
             {
@@ -1883,7 +1880,7 @@ namespace Gekko
         public static IVariable inv(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             Matrix m = O.ConvertToMatrix(x);
-            int n = CheckSquare(m);
+            int n = Helper_CheckSquare(m);
             Matrix clone = m.Clone();
             clone.data = Program.InvertMatrix(clone.data);
             return clone;
@@ -2102,37 +2099,37 @@ namespace Gekko
 
         public static IVariable sumr(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Sum);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Sum);
         }
 
         public static IVariable sumc(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Sum);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Sum);
         }
 
         public static IVariable avgr(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Avg);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Avg);
         }
 
         public static IVariable avgc(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Avg);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Avg);
         }
 
         public static IVariable minr(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Min);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Min);
         }
 
         public static IVariable minc(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Min);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Min);
         }
 
         public static IVariable maxr(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Max);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Max);
         }
 
         public static IVariable null2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -2349,10 +2346,10 @@ namespace Gekko
 
         public static IVariable maxc(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Max);
+            return Helper_SumHelper(smpl, _t1, _t2, x, ESumDim.Cols, ESumType.Max);
         }
 
-        private static IVariable SumHelper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, ESumDim dim, ESumType type)
+        private static IVariable Helper_SumHelper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, ESumDim dim, ESumType type)
         {
             Matrix m = O.ConvertToMatrix(x);
             int rows = m.data.GetLength(0);
@@ -2593,7 +2590,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("length", x1);
+                Helper_FunctionError("length", x1);
                 return null;
             }
         }
@@ -2660,7 +2657,7 @@ namespace Gekko
                 //throw new GekkoException();
             }
 
-            double[,] z = Cholesky(y, upper);
+            double[,] z = Helper_Cholesky(y, upper);
             Matrix rv = new Matrix();
             rv.data = z;
             return rv;
@@ -2775,7 +2772,7 @@ namespace Gekko
                     //throw new GekkoException();
                 }
 
-                double[,] tmp = Cholesky(m.data, false);
+                double[,] tmp = Helper_Cholesky(m.data, false);
                 //after this, #m = t(#tmp)*#tmp
 
                 double[,] randoms = new double[n, 1];
@@ -2806,7 +2803,7 @@ namespace Gekko
             }
         }
 
-        private static double[,] Cholesky(double[,] m, bool upper)
+        private static double[,] Helper_Cholesky(double[,] m, bool upper)
         {
             if (m.GetLength(0) != m.GetLength(1))
             {
@@ -3131,7 +3128,7 @@ namespace Gekko
             string s = O.ConvertToString(y);
             if (ths.Type() != EVariableType.List)
             {
-                FunctionError("count", ths);
+                Helper_FunctionError("count", ths);
             }
             int c = 0;
             foreach (IVariable iv in (ths as List).list)
@@ -3151,7 +3148,7 @@ namespace Gekko
             string s = O.ConvertToString(y);
             if (ths.Type() != EVariableType.List)
             {
-                FunctionError("remove", ths);
+                Helper_FunctionError("remove", ths);
             }
             List m = new List();
 
@@ -3177,20 +3174,20 @@ namespace Gekko
         public static IVariable pop(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable i)
         {
             int ii = O.ConvertToInt(i);
-            return PopHelper(ths, ii);
+            return Helper_PopHelper(ths, ii);
         }
 
         public static IVariable pop(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
-            return PopHelper(ths, -12345);
+            return Helper_PopHelper(ths, -12345);
         }
 
-        private static IVariable PopHelper(IVariable ths, int ii)
+        private static IVariable Helper_PopHelper(IVariable ths, int ii)
         {
             //ii is 1-based
             if (ths.Type() != EVariableType.List)
             {
-                FunctionError("pop", ths);
+                Helper_FunctionError("pop", ths);
             }
             List m = new List();
 
@@ -3431,19 +3428,19 @@ namespace Gekko
             if (_t1 != null || _t2 != null) new Error("iif() function does not accept local time period");            
             Series result = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
 
-            if (!IsValOrTimeseries(i1))
+            if (!Helper_IsValOrTimeseries(i1))
             {
                 new Error("iif(): arg 1, type " + i1.Type().ToString() + " not supported");
             }
-            if (!IsValOrTimeseries(i2))
+            if (!Helper_IsValOrTimeseries(i2))
             {
                 new Error("iif(): arg 3, type " + i2.Type().ToString() + " not supported");
             }
-            if (!IsValOrTimeseries(o1))
+            if (!Helper_IsValOrTimeseries(o1))
             {
                 new Error("iif(): arg 4, type " + o1.Type().ToString() + " not supported");
             }
-            if (!IsValOrTimeseries(o2))
+            if (!Helper_IsValOrTimeseries(o2))
             {
                 new Error("iif(): arg 5, type " + o2.Type().ToString() + " not supported");
             }
@@ -3722,7 +3719,7 @@ namespace Gekko
             return rv;
         }
 
-        private static bool IsValOrTimeseries(IVariable x)
+        private static bool Helper_IsValOrTimeseries(IVariable x)
         {
             return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series;
         }
@@ -3856,7 +3853,7 @@ namespace Gekko
         {
             if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return MovAvgSum(smpl, x1, ilags, false);
+            return Helper_MovAvgSum(smpl, x1, ilags, false);
         }
 
         [MyCustom(Lag = "lag=[4]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
@@ -3864,7 +3861,7 @@ namespace Gekko
         {
             if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return MovAvgSum(smpl, x1, ilags, true);
+            return Helper_MovAvgSum(smpl, x1, ilags, true);
         }
 
         public static IVariable modelrawvars(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -3966,6 +3963,9 @@ namespace Gekko
             return Globals.scalarVal0;  //will never get here
         }
 
+        /// <summary>
+        /// Internal: used for Central Bank
+        /// </summary>        
         public static IVariable asbrename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable name, IVariable file, IVariable decorate)
         {
             string s = null;
@@ -4099,7 +4099,7 @@ namespace Gekko
             return rv;
         }
 
-        private static IVariable MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, bool avg)
+        private static IVariable Helper_MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, bool avg)
         {
             IVariable rv = null;
             int d = O.ConvertToInt(ilags);
@@ -4529,7 +4529,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagANumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], Helper_SeriesLagANumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
             {
@@ -4554,7 +4554,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagQNumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], Helper_SeriesLagQNumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
             {
@@ -4585,7 +4585,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], SeriesLagANumber(x1_series));  // (x1, x2) => x1 - x2;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], Helper_SeriesLagANumber(x1_series));  // (x1, x2) => x1 - x2;
             }
             else
             {
@@ -4608,7 +4608,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], SeriesLagQNumber(x1_series));  // (x1, x2) => x1 - x2;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], Helper_SeriesLagQNumber(x1_series));  // (x1, x2) => x1 - x2;
             }
             else
             {
@@ -4631,7 +4631,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagANumber(x1_series));  // Math.Log(x1 / x2);
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], Helper_SeriesLagANumber(x1_series));  // Math.Log(x1 / x2);
             }
             else
             {
@@ -4656,7 +4656,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_series = x1 as Series;
-                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagQNumber(x1_series));  // Math.Log(x1 / x2);
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], Helper_SeriesLagQNumber(x1_series));  // Math.Log(x1 / x2);
             }
             else
             {
@@ -4667,7 +4667,7 @@ namespace Gekko
             return null;
         }
 
-        private static int SeriesLagANumber(Series x1_series)
+        private static int Helper_SeriesLagANumber(Series x1_series)
         {
             int i = 1;
             if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) i = Globals.freqASubperiods;
@@ -4677,7 +4677,7 @@ namespace Gekko
             return i;
         }
 
-        private static int SeriesLagQNumber(Series x1_series)
+        private static int Helper_SeriesLagQNumber(Series x1_series)
         {
             int i = 1;
             if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) new Error("You cannot show quarterly change for an annual or undated series (difq(), pchq() or dlogq()).");
@@ -4891,7 +4891,6 @@ namespace Gekko
         public static IVariable search(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             new Error("search() is now index() in Gekko 3.0"); return null;
-            //throw new GekkoException();
         }
 
         public static IVariable index(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
@@ -5127,7 +5126,6 @@ namespace Gekko
         public static IVariable trim(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             new Error("trim() is now strip() in Gekko 3.0."); return null;
-            //throw new GekkoException();
         }
 
         public static IVariable strip(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
@@ -5177,7 +5175,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("upper", ths);  //throws exception
+                Helper_FunctionError("upper", ths);  //throws exception
                 return null;
             }
         }
@@ -5213,7 +5211,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("upper", ths);  //throws exception
+                Helper_FunctionError("upper", ths);  //throws exception
                 return null;
             }
         }
@@ -5229,7 +5227,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("isUpper", ths);  //throws exception
+                Helper_FunctionError("isUpper", ths);  //throws exception
                 return null;
             }
         }
@@ -5245,7 +5243,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("isLower", ths);  //throws exception
+                Helper_FunctionError("isLower", ths);  //throws exception
                 return null;
             }
         }
@@ -5261,7 +5259,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("isAlpha", ths);  //throws exception
+                Helper_FunctionError("isAlpha", ths);  //throws exception
                 return null;
             }
         }
@@ -5277,7 +5275,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("isNumeric", ths);  //throws exception
+                Helper_FunctionError("isNumeric", ths);  //throws exception
                 return null;
             }
         }
@@ -5363,7 +5361,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("upper", ths);  //throws exception
+                Helper_FunctionError("upper", ths);  //throws exception
                 return null;
             }
         }
@@ -5616,8 +5614,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Cannot only convert annual or undated date to value");
-                    //throw new GekkoException();
+                    new Error("Can only convert annual or undated date to value");
                 }
             }
             else if (x1.Type() == EVariableType.String)
@@ -5843,7 +5840,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("replace", ths);  //throws exception
+                Helper_FunctionError("replace", ths);  //throws exception
                 return null;
             }
         }
@@ -5997,10 +5994,19 @@ namespace Gekko
             new Writeln("Scrambled data");
         }
 
+        public static void tracedelete(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            tracedelete(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
+        }
 
         public static void tracedelete2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {            
             tracedelete2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
+        }
+
+        public static void tracedelete(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            tracedelete2(smpl, _t1, _t2, x);
         }
 
         public static void tracedelete2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
@@ -6014,7 +6020,7 @@ namespace Gekko
                 meta.trace2 = null;
             }
             db.isDirty = true;
-            new Writeln("Deleted " + th.traces.Count + " data traces from databank '" + db.GetName() + "'");
+            new Writeln("Deleted " + th.traces.Count + " data-traces from databank '" + db.GetName() + "'");
         }
         
         private static void Helper_BankFlatten(GekkoTime t1, GekkoTime t2, GekkoTime t, IVariable iv)
@@ -6066,6 +6072,11 @@ namespace Gekko
                     }
                 }
             }
+        }
+
+        public static void tracestats(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            tracestats(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
         }
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -6230,7 +6241,7 @@ namespace Gekko
             int FIFTEEN = 15;
             Dictionary<string, bool> found1 = Program.TraceGetPrecedents(null, "adambk", false, null);
             List<string> adamvars = found1.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-            if (adamvars.Count == 0) new Error("No variables found: did you READ a databank with data traces?");
+            if (adamvars.Count == 0) new Error("No variables found: did you READ a databank with data-traces?");
             int n = 0;
 
             using (FileStream fs = Program.WaitForFileStream("traceadam3.txt", null, Program.GekkoFileReadOrWrite.Write))
@@ -6333,7 +6344,11 @@ namespace Gekko
             List m = new List(names);
             return m;
         }
-        
+
+        public static void tracestats(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            tracestats2(smpl, _t1, _t2, x);
+        }
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
@@ -6656,7 +6671,6 @@ namespace Gekko
             if (ts == null)
             {
                 new Error("Variable is not of series type");
-                //throw new GekkoException();
             }
 
             if (G.Equal(s2, "name"))
@@ -6976,17 +6990,17 @@ namespace Gekko
             List<string> intersection = new List<string>();
             if (lx1.Count > lx2.Count)  //for speedup, we do the heaviest looping on the smaller list.
             {
-                ListMultiplyHelper(lx1, lx2, intersection);
+                Helper_ListMultiplyHelper(lx1, lx2, intersection);
             }
             else
             {
-                ListMultiplyHelper(lx2, lx1, intersection);
+                Helper_ListMultiplyHelper(lx2, lx1, intersection);
             }
             //intersection.Sort(StringComparer.InvariantCulture);  //or maybe only sort when printing/reporting/iterating?
             return new List(intersection);
         }
 
-        private static void ListMultiplyHelper(List<string> x1, List<string> x2, List<string> intersection)
+        private static void Helper_ListMultiplyHelper(List<string> x1, List<string> x2, List<string> intersection)
         {
             GekkoDictionary<string, bool> temp = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in x1)
@@ -7205,46 +7219,50 @@ namespace Gekko
         //    }
         //}
 
-
-
         //SOME HARDCODED FUNCTIONS FOR MODELS:
         //See #09875209837532
 
+        //Internal
         public static double CES_UC(double p1rel, double p2rel, double theta, double sigma)
         {
             double c = Math.Pow(theta * Math.Pow(p1rel, 1 - sigma) + (1 - theta) * Math.Pow(p2rel, 1 - sigma), 1 / (1 - sigma));
             return c;
         }
 
+        //Internal
         public static double CES_XL(double yrel, double p1rel, double p2rel, double theta, double sigma)
         {
             double uc = CES_UC(p1rel, p2rel, theta, sigma);
             return yrel * Math.Pow(uc / p1rel, sigma);
         }
 
+        //Internal
         public static double CES_XR(double yrel, double p1rel, double p2rel, double theta, double sigma)
         {
             double uc = CES_UC(p1rel, p2rel, theta, sigma);
             return yrel * Math.Pow(uc / p2rel, sigma);
         }
 
+        //Internal
         //See also #9823750983752
-
         public static double ces_costs(double y, double p1, double p2, double kappa, double phi, double sigma)
         {
             return y / kappa * Math.Pow(Math.Pow((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
         }
 
+        //Internal
         public static double ces_ac(double p1, double p2, double kappa, double phi, double sigma)
         {
             return 1d / kappa * Math.Pow(Math.Pow((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
         }
 
+        //Internal
         public static double ces_factor1(double y, double p1, double p2, double kappa, double phi, double sigma)
         {
             return Math.Pow((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), (sigma / (1 - sigma))) * y / kappa * Math.Pow((Math.Pow((p2 / p1), (1 - sigma)) * Math.Pow(((1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))) / (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))), sigma) + 1), (sigma / (1 - sigma)));
         }
 
+        //Internal
         public static double ces_factor2(double y, double p1, double p2, double kappa, double phi, double sigma)
         {
             return Math.Pow((1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))), (sigma / (1 - sigma))) * y / kappa * Math.Pow((Math.Pow((p1 / p2), (1 - sigma)) * Math.Pow((((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))) / (1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))))), sigma) + 1), (sigma / (1 - sigma)));
@@ -7289,7 +7307,7 @@ namespace Gekko
         //see also the other extend() method
         public static IVariable extend(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable index, IVariable x)
         {
-            if (ths.Type() != EVariableType.List) FunctionError("extend", x);
+            if (ths.Type() != EVariableType.List) Helper_FunctionError("extend", x);
             int i = O.ConvertToInt(index, true);
             List temp = ths.DeepClone(0, null, null) as List;
             if (i - 1 < 0 || i - 1 > temp.list.Count)
@@ -7305,7 +7323,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("extend", x);
+                Helper_FunctionError("extend", x);
             }
             return temp;
         }
@@ -7313,7 +7331,7 @@ namespace Gekko
         //see also the other extend() method
         public static IVariable extend(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable x)
         {
-            if (ths.Type() != EVariableType.List) FunctionError("extend", x);
+            if (ths.Type() != EVariableType.List) Helper_FunctionError("extend", x);
             List temp = ths as List;
             if (x.Type() == EVariableType.List)
             {
@@ -7323,7 +7341,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("extend", x);
+                Helper_FunctionError("extend", x);
             }
             return temp;
         }
@@ -7350,7 +7368,7 @@ namespace Gekko
             }
             else
             {
-                FunctionError("prefix", ths);
+                Helper_FunctionError("prefix", ths);
                 throw new GekkoException();
             }
             return rv;
@@ -7378,13 +7396,13 @@ namespace Gekko
             }
             else
             {
-                FunctionError("prefix", ths);
+                Helper_FunctionError("prefix", ths);
                 throw new GekkoException();
             }
             return rv;
         }
 
-        private static void FunctionError(string s, IVariable x)
+        private static void Helper_FunctionError(string s, IVariable x)
         {
             new Error("Function " + s + "() does not allow a " + G.GetTypeString(x) + " variable");
         }
