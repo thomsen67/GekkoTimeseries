@@ -1020,10 +1020,8 @@ namespace Gekko
                 c++;
                 if (key.Item1 != c) new Error("Bad dimension");
                 m.Add(new ScalarVal(key.Item2));
-            }
+            }            
             
-            //Series z = new Series(ts.freq, G.Chop_SetFreq(ts.name, ts.freq));
-            //z.SetArrayTimeseries(ts.dimensions + 1, true);
             Series z = ts.DeepClone(0, null, null) as Series;
             int dim = 0;
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in z.dimensionsStorage.storage)
@@ -1039,8 +1037,7 @@ namespace Gekko
                     if (to != null)
                     {
                         map.storage[i] = to;
-                    }
-                    
+                    }                    
                 }
             }
 
