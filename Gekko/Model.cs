@@ -1489,9 +1489,9 @@ namespace Gekko
                     }
                 }
 
-                bool isRes = G.StartsWith(name, Globals.decompResidualPrefix);                
+                bool canSetResToZero = Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(name, Globals.decompResidualPrefix);
 
-                if (isRes || G.DecompShouldHandleMissings(decompIgnoreMissing))
+                if (canSetResToZero || G.DecompShouldHandleMissings(decompIgnoreMissing))
                 {
                     //In principle, here we could distinguish between a missing sub-series or a missing normal series,
                     //but for simplicity in DECOMP we just use one option: option series data missing = zero, and we

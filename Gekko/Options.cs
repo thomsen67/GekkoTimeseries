@@ -73,7 +73,8 @@ namespace Gekko
         public int decomp_flowgraph_depth = 2;
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
-        public int decomp_plot_zoom = 100; //Relative size
+        public int decomp_plot_zoom = 100; //Relative size        
+        public ESeriesMissing decomp_res_missing = ESeriesMissing.Zero;
         // ---
         public int fit_ols_rekur_dfmin = 10;        
         // ---
@@ -404,7 +405,10 @@ namespace Gekko
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);
             Add("DECOMP PLOT ZOOM", Globals.xint);
+            Add("DECOMP RES MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");    //#ljfdssdfgsh
+
             Add("FIT OLS REKUR DFMIN", Globals.xint);
+            
             Add("FOLDER", Globals.xbool);
             Add("FOLDER BANK", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("FOLDER BANK1", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
