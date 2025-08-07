@@ -4329,7 +4329,7 @@ namespace Gekko
                                 bool missingResVariable = false;
                                 if (tsFirst == null)
                                 {
-                                    if (G.StartsWith(chop.varName, Globals.decompResidualPrefix))
+                                    if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.varName, Globals.decompResidualPrefix))
                                     {
                                         missingResVariable = true;
                                     }
@@ -4360,7 +4360,7 @@ namespace Gekko
                                 bool missingResVariable = false;
                                 if (tsRef == null)
                                 {
-                                    if (G.StartsWith(chop.varName, Globals.decompResidualPrefix))  //fullNameRef is made from chop anyways.
+                                    if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.varName, Globals.decompResidualPrefix))  //fullNameRef is made from chop anyways.
                                     {
                                         missingResVariable = true;
                                     }
