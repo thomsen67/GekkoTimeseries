@@ -6256,36 +6256,55 @@ namespace Gekko
                 List<string> m = new List<string>() { "adambk", "fk" };
                 foreach (string bank in m)
                 {
-                    Dictionary<string, bool> found = Program.TraceGetPrecedents(null, bank, direct, null);
+                    Dictionary<string, bool> found = Program.TraceGetPrecedents(null, bank, direct, null);  //ADAM-vars returned
                     List<string> vars = found.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
-                    if (bank == "adambk" && vars.Count == 0) new Error("No 'adambk' variables found: did you read a databank with data-traces?");
+                    GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
+                    //matrix1 is makroname --> adamnames
+                    //matrix2 is adamname --> makronames
+                    GekkoDictionary<string, GekkoDictionary<string, bool>> matrix1 = new GekkoDictionary<string, GekkoDictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, GekkoDictionary<string, bool>> matrix2 = new GekkoDictionary<string, GekkoDictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
 
-                    int n = 0;
-                    G.Writeln();
-                    foreach (string name in vars)
+                    foreach (KeyValuePair<string, IVariable> kvp in flat)
                     {
-                        if (n % 100 == 0) G.Writeln(bank + ": " + n + " out of " + vars.Count + " variables");
-                        n++;
-                        Dictionary<string, bool> found2 = Program.TraceGetDependents(new ScalarString(name), bank, direct);
-                        List<string> makrovars = found2.Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                        string varNoFreq = G.Chop_RemoveFreq(name);
-                        if (bank != "adambk") varNoFreq = bank + ":" + varNoFreq;
-                        if (makrovars.Count > 0)
+                        if (kvp.Value.Type() != EVariableType.Series) continue;
+
+                        Series ts = kvp.Value as Series;
+                        if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
+
+                        //precedents                                  
+                        string name = G.Chop_RemoveFreq(ts.GetName());
+                        GekkoDictionary<string, bool> found2 = Program.TraceGetPrecedents(new ScalarString(name), bank, direct, null);
+                                                
+                        matrix1.Add(name, found2); //not really used here
+
+                        foreach (string key in found2.Keys)
                         {
-                            for (int i = 0; i < makrovars.Count; i++)
+                            if (!matrix2.ContainsKey(key))
                             {
-                                makrovars[i] = G.Chop_RemoveFreq(makrovars[i]);
-                                makrovars[i] = makrovars[i].Replace(" ", "");
+                                GekkoDictionary<string, bool> temp = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                                temp.Add(name, true);
+                                matrix2.Add(key, temp);
                             }
-                            sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
-                        }
-                        else
-                        {
-                            if(direct) sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + "--- no direct effect ---");
-                            else if (direct) sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + "--- no direct or indirect effect ---");
+                            else
+                            {
+                                GekkoDictionary<string, bool> temp = matrix2[key];
+                                if (!temp.ContainsKey(name))
+                                {
+                                    temp.Add(name, true);
+                                }
+                            }
                         }
                     }
+                    List<string> adamvars = matrix2.Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    foreach (string adamvar in adamvars)
+                    {
+                        List<string> makrovars = matrix2[adamvar].Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                        string varNoFreq = G.Chop_RemoveFreq(adamvar);
+                        if (bank != "adambk") varNoFreq = bank + ":" + varNoFreq;
+                        sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
+                    }
+
                     sw.WriteLine();
                 }
             }
