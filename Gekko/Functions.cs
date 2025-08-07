@@ -6231,41 +6231,65 @@ namespace Gekko
                     sw.Close();
                 }
             }
+            new Writeln("See file: traceadam2.txt");
         }
 
         public static void traceadam3(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            int FIFTEEN = 15;
-            Dictionary<string, bool> found1 = Program.TraceGetPrecedents(null, "adambk", false, null);
-            List<string> adamvars = found1.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-            if (adamvars.Count == 0) new Error("No variables found: did you READ a databank with data-traces?");
-            int n = 0;
+            Helper_TraceAdam(true);  //direct effects only
+        }
 
-            using (FileStream fs = Program.WaitForFileStream("traceadam3.txt", null, Program.GekkoFileReadOrWrite.Write))
+        public static void traceadam4(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            Helper_TraceAdam(false);  //direct and indirect effects only
+        }
+
+        private static void Helper_TraceAdam(bool direct)
+        {
+            int TWENTY = 20;
+            string fName = "traceadam3.txt";
+            if (!direct) fName = "traceadam4.txt";
+
+            using (FileStream fs = Program.WaitForFileStream(fName, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
-                foreach (string adamvar in adamvars)
+                List<string> m = new List<string>() { "adambk", "fk" };
+                foreach (string bank in m)
                 {
-                    n++;
-                    //if (n > 100) break;
-                    Dictionary<string, bool> found2 = Program.TraceGetDependents(new ScalarString(adamvar), "adambk", true);
-                    List<string> makrovars = found2.Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                    string adamvarNoFreq = G.Chop_RemoveFreq(adamvar);
-                    if (makrovars.Count > 0)
+                    Dictionary<string, bool> found = Program.TraceGetPrecedents(null, bank, direct, null);
+                    List<string> vars = found.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+
+                    if (bank == "adambk" && vars.Count == 0) new Error("No 'adambk' variables found: did you read a databank with data-traces?");
+
+                    int n = 0;
+                    G.Writeln();
+                    foreach (string name in vars)
                     {
-                        for (int i = 0; i < makrovars.Count; i++)
+                        if (n % 100 == 0) G.Writeln(bank + ": " + n + " out of " + vars.Count + " variables");
+                        n++;
+                        Dictionary<string, bool> found2 = Program.TraceGetDependents(new ScalarString(name), bank, direct);
+                        List<string> makrovars = found2.Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                        string varNoFreq = G.Chop_RemoveFreq(name);
+                        if (bank != "adambk") varNoFreq = bank + ":" + varNoFreq;
+                        if (makrovars.Count > 0)
                         {
-                            makrovars[i] = G.Chop_RemoveFreq(makrovars[i]);
-                            makrovars[i] = makrovars[i].Replace(" ", "");
+                            for (int i = 0; i < makrovars.Count; i++)
+                            {
+                                makrovars[i] = G.Chop_RemoveFreq(makrovars[i]);
+                                makrovars[i] = makrovars[i].Replace(" ", "");
+                            }
+                            sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
                         }
-                        sw.WriteLine(adamvarNoFreq + G.Blanks(FIFTEEN - adamvarNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
+                        else
+                        {
+                            if(direct) sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + "--- no direct effect ---");
+                            else if (direct) sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + "--- no direct or indirect effect ---");
+                        }
                     }
-                    else
-                    {
-                        sw.WriteLine(adamvarNoFreq + G.Blanks(FIFTEEN - adamvarNoFreq.Length) + "--- no direct effect ---");
-                    }
+                    sw.WriteLine();
                 }
             }
+            new Writeln("See file: " + fName);
         }
 
         public static IVariable tracebank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
