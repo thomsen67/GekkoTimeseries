@@ -495,7 +495,8 @@ namespace Gekko
                 dataMax[j] = max2;
             }
 
-            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
+            bool allAreLinespointsType1 = true;
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq, out allAreLinespointsType1);
 
             StringBuilder txt = new StringBuilder();
 
@@ -828,7 +829,8 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
-            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
+            bool allAreLinespointsType2 = true;
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq, out allAreLinespointsType2);
             txt.AppendLine(plotline);
 
             using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
@@ -862,7 +864,7 @@ namespace Gekko
                                         
                     SvgFix(Globals.guiGraphZoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     o.guiGraphScaleGeneral = Globals.guiGraphZoom / 100d;  //Makes the wpf component size ok for PLOT
-                    CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
+                    CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName, allAreLinespointsType2);
                 }
             }
             return plotFileName;
@@ -984,7 +986,7 @@ namespace Gekko
             return highestFreq == EFreq.A || highestFreq == EFreq.U;
         }
 
-        private static void CallGnuplotMakeWindow(O.Prt o, List<string> labelsNonBroken, string emfName)
+        private static void CallGnuplotMakeWindow(O.Prt o, List<string> labelsNonBroken, string emfName, bool allAreLinespointsType)
         {
             if (o.opt_filename != null && o.opt_filename != "")
             {
@@ -1064,7 +1066,7 @@ namespace Gekko
                     graphOptions.index = o.opt_i;
                     graphOptions.yoy = G.Equal(o.opt_yoy, "yes");
                     graphOptions.points = false;
-                    if (o.opt_linetype == null || G.Equal(o.opt_linetype, "linespoints")) graphOptions.points = true;
+                    if (allAreLinespointsType) graphOptions.points = true;  //handles option plot lines points, <type>...</type>, plot<type=...>.
                     graphOptions.scaleDecomp = o.guiGraphScaleDecomp;
                     graphOptions.scaleGeneral = o.guiGraphScaleGeneral;
 
@@ -1479,7 +1481,7 @@ namespace Gekko
             return setTitlePlaceholder;
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside, EFreq highestFreq)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside, EFreq highestFreq, out bool allAreLinespointsType)
         {
             string plotline = "plot ";
 
@@ -1497,6 +1499,7 @@ namespace Gekko
                 palette2 = colors;
             }
 
+            allAreLinespointsType = true; //Used for checkbox in GUI
             int boxesYCounter = 0;
             int boxesY2Counter = 0;
             int areasYCounter = 0;
@@ -1515,7 +1518,7 @@ namespace Gekko
                 string ddashtype = "1";
                 string dlinewidth = "3";
 
-                string dlinecolor = dlinecolor = palette2[i % palette2.Count].Trim();
+                string dlinecolor = palette2[i % palette2.Count].Trim();
 
                 string dpointtype = "7";
                 string dpointsize = "0.5";
@@ -1545,6 +1548,7 @@ namespace Gekko
                 // ---------------------------------------------
 
                 linetype = GetText(co[i].linetype, o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
+                if (!G.Equal(linetype, "linespoints")) allAreLinespointsType = false;
                 dashtype = GetText(co[i].dashtype, o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
                 linewidth = GetText(G.IsNumericalError(co[i].linewidth) ? null : co[i].linewidth.ToString(), G.IsNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
                 linecolor = GetText(co[i].linecolor, o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
