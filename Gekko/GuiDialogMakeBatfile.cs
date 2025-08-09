@@ -72,7 +72,7 @@ namespace Gekko
             "The benefit of this is that " + programName + " remembers the folder from where '" + programShortcut + "' was typed, and will use " +
             "this folder as it's working folder." + G.NL +
              helperString + "\n" +
-            "NOTE: The Windows path is a so-called 'Environment variable' (Danish: 'miljøvariabel') if you need to change it. " +
+            "NOTE: The Windows path is a so-called 'Environment variable' if you need to change it. " +
             G.NL +
             G.NL +
             okhelper +
