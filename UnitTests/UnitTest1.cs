@@ -30501,6 +30501,7 @@ print(df2)
 
                 foreach (string freq in freqs)
                 {
+                    //This will also implicitly test export<all>, which is same as write.
                     I("OPTION freq " + freq + ";");
                     I("READ<tsd>small;");
                     I("EXPORT <csv all> temp\\small_" + freq + ";");
