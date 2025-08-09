@@ -24593,9 +24593,7 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
 
-            //see also #980432
-
-            if (per1.IsNull() && per2.IsNull()) return;  //makes not sense, so return unaltered.
+            //see also #980432            
 
             if ((Program.options.freq == EFreq.A))
             {
