@@ -1,6 +1,6 @@
 /* 
     Gekko Timeseries Software (www.t-t.dk/gekko).
-    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2025, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -867,14 +867,18 @@ namespace Gekko
             "DOC",
             "DOWNLOAD",
             "EDIT",
+            "ELSE",
+            "ELSEIF",
             "END",
             "ENDO",
             "EXIT",
             "EXO",
             "EXPORT",
+            "FIND",
             "FINDMISSINGDATA",
             "FOR",
             "FUNCTION",
+            "GEKKO",
             "GLOBAL",
             "GOTO",
             "HDG",
@@ -928,7 +932,7 @@ namespace Gekko
             "TELL",
             "TIME",
             "TIMEFILTER",
-            "TRACE2",
+            "TRACE",
             "TRANSLATE",
             "TRUNCATE",
             "UNFIX",

@@ -1063,6 +1063,12 @@ namespace Gekko
 
             modelGamsScalar.hasResVariables = hasResVariables;
 
+            if (Program.options.model_gams_scalar_data)
+            {                
+                //modelGamsScalar.a = helper.a; --> not necessary, is already so.
+                modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);                
+            }
+
             return model;
         }
 

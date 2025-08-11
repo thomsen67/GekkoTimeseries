@@ -1473,7 +1473,7 @@ img {border-style: none;
                         ToggleLink(html1, "Data-traces", "To see these data-traces in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read makrobk.gbk; //.gdx has no data-traces");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("trace2 " + variableName + ";");
+                        html1.AppendLine("trace " + variableName + ";");
                         html1.AppendLine("disp " + variableName + "; //click the trace link");
                         html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
 
