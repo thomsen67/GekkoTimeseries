@@ -1818,13 +1818,13 @@ namespace Gekko
                 }
             }
 
-            eqs = eqs.OrderBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            eqs = eqs.OrderBy(x1 => x1.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "identities.txt", null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 foreach (IdentityHelper ih in eqs)
                 {
-                    List<string> childrenSorted = ih.children.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    List<string> childrenSorted = ih.children.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
                     List<string> xx = new List<string>();
                     foreach (string s in childrenSorted)
                     {
@@ -6347,6 +6347,8 @@ namespace Gekko
 
         public static void traceadam2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
+            //This kind of writes out a variable list, with MAKRO-name, used ADAM-names, period, and code.
+            //Probably not used by anybody...
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> dublets = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             //precedents
@@ -6381,30 +6383,49 @@ namespace Gekko
                 }
             }
             new Writeln("See file: traceadam2.txt");
-        }
+        }        
 
-        public static void traceadam3(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        public static void tracebanks(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            Helper_TraceAdam(true);  //direct effects only
-        }
-
-        public static void traceadam4(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
-        {
-            Helper_TraceAdam(false);  //direct and indirect effects only
-        }
-
-        private static void Helper_TraceAdam(bool direct)
-        {
-            int TWENTY = 20;
-            string fName = "traceadam3.txt";
-            if (!direct) fName = "traceadam4.txt";
-
-            using (FileStream fs = Program.WaitForFileStream(fName, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            //1. argument: list of bank names
+            //2. argument: Direct (0/1), default = 0
+            //3. argument: Show frequencies (0/1), default = 0
+            bool direct = false;            
+            bool showFreq = false;
+            int n = x.Length;
+            if (n != 1 && n != 3) new Error("Expected 1 or 3 arguments");
+            List m = x[0] as List;
+            if (m == null) new Error("Expected first argument to be a list of banknames");
+            if (n > 1)
             {
-                List<string> m = new List<string>() { "adambk", "fk" };
-                foreach (string bank in m)
+                direct = O.ConvertToInt(x[1]) != 0;
+                showFreq = O.ConvertToInt(x[2]) != 0;
+            }            
+            Helper_TraceAdam(m, direct, showFreq);  //direct and indirect effects only
+        }
+
+        private static void Helper_TraceAdam(List m, bool direct, bool showFreq)
+        {
+            //!Will remove frequencies in output
+
+            int TWENTY = 20;
+
+            List<string> fNames = new List<string>();
+            int count = -1;
+            foreach (IVariable ibank in m.list)
+            {
+                count++;
+
+                ScalarString ss = ibank as ScalarString;
+                if (ss == null) new Error("Expected all list elements in tracebanks() to be strings");
+                string bank = ss.string2;
+                string fName = "tracebanks_" + bank + ".txt";
+                fNames.Add(fName);
+
+                using (FileStream fs = Program.WaitForFileStream(fName, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
+                    
                     Dictionary<string, bool> found = Program.TraceGetPrecedents(null, bank, direct, null);  //ADAM-vars returned
                     List<string> vars = found.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
@@ -6421,10 +6442,11 @@ namespace Gekko
                         Series ts = kvp.Value as Series;
                         if (ts.type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
 
-                        //precedents                                  
-                        string name = G.Chop_RemoveFreq(ts.GetName());
+                        //precedents
+                        string name = ts.GetName();
+                        if (!showFreq) name = G.Chop_RemoveFreq(ts.GetName());
                         GekkoDictionary<string, bool> found2 = Program.TraceGetPrecedents(new ScalarString(name), bank, direct, null);
-                                                
+
                         matrix1.Add(name, found2); //not really used here
 
                         foreach (string key in found2.Keys)
@@ -6449,15 +6471,15 @@ namespace Gekko
                     foreach (string adamvar in adamvars)
                     {
                         List<string> makrovars = matrix2[adamvar].Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                        string varNoFreq = G.Chop_RemoveFreq(adamvar);
-                        if (bank != "adambk") varNoFreq = bank + ":" + varNoFreq;
+                        string varNoFreq = adamvar;
+                        if (!showFreq) varNoFreq = G.Chop_RemoveFreq(adamvar);
                         sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
                     }
 
                     sw.WriteLine();
                 }
             }
-            new Writeln("See file: " + fName);
+            new Writeln("See file" + G.S(fNames.Count) + ": " + Stringlist.GetListWithCommas(fNames));
         }
 
         public static IVariable tracebank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
