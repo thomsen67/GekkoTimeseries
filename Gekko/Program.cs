@@ -332,6 +332,12 @@ namespace Gekko
         public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.        
     }
 
+    public class IdentityHelper 
+    {
+        public string eqName = null;
+        public List<string> children = new List<string>();
+    }
+
     /// <summary>
     /// Contains for instance the "a", "b" in x[a, b].
     /// </summary>
@@ -2817,7 +2823,7 @@ namespace Gekko
                     return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "d2"))
+                if (Globals.runningOnTTComputer && (text == "xd2"))
                 {
 
                     ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;

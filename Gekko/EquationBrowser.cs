@@ -1228,8 +1228,7 @@ img {border-style: none;
             bh.freq = freq;
             bh.firstColWidth = 200;
 
-            bool adam = false;
-            bool pivot = true;  //also calculates pivot table (only relevant when showGUI == false)                        
+            bool adam = false;            
 
             Program.options.databank_search = false;
 
@@ -1243,7 +1242,8 @@ img {border-style: none;
                 else
                 {
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
-                    Program.RunGekkoCommands("reset; time 2025 2030; model<gms>makro_exo.zip; read makro_exo; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    //Program.RunGekkoCommands("reset; time 2025 2030; model<gms>makro_exo.zip; read makro_exo; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    Program.RunGekkoCommands("flush(); reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
                     //Program.RunGekkoCommands("qbnp <2030 2035> *= 1.1, 1.2, 1.3, 1.4, 1.5, 1.6;", "", 0, new P());
                 }
             }
@@ -1643,7 +1643,11 @@ img {border-style: none;
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
                         ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
                         o0.prtElements.Add(ope0);
-                        o0.Exe();
+                        try
+                        {
+                            o0.Exe();
+                        }
+                        catch { };  //May be a plot containing all missing value, and this should not stop everything.
                     }
 
                     using (FileStream fs = Program.WaitForFileStream(fileNameWithPath, null, Program.GekkoFileReadOrWrite.Write))

@@ -1712,6 +1712,155 @@ namespace Gekko
             return ts;
         }
 
+        public static void identities(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+            GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
+            GekkoTime t = new GekkoTime(EFreq.A, 2024, 1, 1);
+
+            Databank db = Program.databanks.GetDatabank("m");
+            GekkoDictionary<string, bool> names = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            int dublets = 0;
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+            {
+                if (kvp.Key.StartsWith("#G_data_"))
+                {
+                    string name = kvp.Key.Substring("#G_data_".Length);
+                    List m1 = kvp.Value as List;
+                    if (m1.Count() == 0)
+                    {
+                        if (names.ContainsKey(name)) { dublets++; }
+                        else names.Add(name, false);
+                        continue;
+                    }
+                    if (m1.list[0].Type() == EVariableType.String)
+                    {
+                        foreach (ScalarString ss2 in m1.list)
+                        {                            
+                            string fullName = name + "[" + ss2.string2 + "]";
+                            if (names.ContainsKey(fullName)) { dublets++; }
+                            else names.Add(fullName, false);
+                        }
+                    }
+                    else
+                    {
+                        foreach (List m2 in m1.list)
+                        {
+                            string idx = null;
+                            foreach (ScalarString ss in m2.list)
+                            {
+                                idx += ss.string2 + ",";
+                            }
+                            idx = idx.Substring(0, idx.Length - 1);
+                            string fullName = name + "[" + idx + "]";                            
+                            if (names.ContainsKey(fullName)) { dublets++; }
+                            else names.Add(fullName, false);
+                        }
+                    }
+                }
+            }
+
+            int a1 = 0;
+            int a2 = 0;
+            int a3 = 0;
+            int n = modelGamsScalar.CountEqs(1);
+            List<IdentityHelper> eqs = new List<IdentityHelper>();
+            for (int i = 0; i < n; i++)
+            {
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);
+                var equationName = helper2.resultingFullName;
+
+                if (helper2.time.Equals(t))
+                {
+                    a1++;
+                    EquationTextHelper helper = new EquationTextHelper();
+                    helper.showTime = true;
+                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t);
+                    int c1 = 0;
+                    int c2 = 0;
+                    foreach (string variableName in precedentsTemp)
+                    {
+                        if (G.StartsWith(variableName, "res_")) continue;
+                        c1++;
+                        string variableNameWithoutBlanks = variableName.Replace(" ", "");
+                        if (names.ContainsKey(variableNameWithoutBlanks)) c2++;
+                        //string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
+                        //if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
+                        //combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
+                    }
+                    if (c1 == c2)
+                    {
+                        a2++;
+                        string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);
+                        bool found = false;
+                        foreach (IdentityHelper ih in eqs)
+                        {
+                            if (G.Equal(eqNameWithoutIndex, ih.eqName))
+                            {
+                                found = true;
+                                ih.children.Add(eqName);
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            IdentityHelper ih = new IdentityHelper();
+                            ih.eqName = eqNameWithoutIndex;
+                            ih.children.Add(eqName);
+                            eqs.Add(ih);
+                        }
+                    }
+                    else if (c1 == c2 + 1)
+                    {
+                        a3++;
+                    }
+                }
+            }
+
+            eqs = eqs.OrderBy(x => x.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "identities.txt", null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                foreach (IdentityHelper ih in eqs)
+                {
+                    List<string> childrenSorted = ih.children.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    List<string> xx = new List<string>();
+                    foreach (string s in childrenSorted)
+                    {
+                        xx.Add(G.Chop_DimensionRemoveLast_FASTER(s).Replace(ih.eqName, ""));
+                    }
+                    EquationTextHelper eh = new EquationTextHelper();
+                    eh.showTime = false;
+                    GetEquationTextHelper output1 = Program.model.GetEquationText(new List<string>() { childrenSorted[0] }, eh, t);
+                    string extra = null;
+                    if (childrenSorted.Count > 1) extra = " (" + childrenSorted.Count + " sub-equations)";
+                    sw.WriteLine(ih.eqName + extra);
+                    if (childrenSorted.Count > 1) sw.WriteLine(Stringlist.GetListWithCommas(xx));
+                    sw.WriteLine();
+                    sw.WriteLine(output1.s_gamsOrFrnSyntax);
+                    sw.WriteLine(output1.s_scalarModel);
+                    if (childrenSorted.Count > 1)
+                    {
+                        sw.WriteLine("...");
+                        GetEquationTextHelper output2 = Program.model.GetEquationText(new List<string>() { childrenSorted[childrenSorted.Count - 1] }, eh, t);
+                        sw.WriteLine(output2.s_scalarModel);
+                    }
+                    sw.WriteLine();
+                    sw.WriteLine("================================================================================");
+                    sw.WriteLine();
+                }
+                sw.Flush(); sw.Close();
+            }
+            
+
+            new Writeln("Found " + a1 + " eqs for 2024, of which " + a2 + " are identities, and " + a3 + " are near-identities");
+            new Writeln("Found " + eqs.Count + " super-eqs for 2024");
+            new Writeln("Dublets: " + dublets + " out of " + names.Count + " names");
+
+            return;
+        }
+
         private static Series helper_seriesAndTimeless(string type, IVariable[] x)
         {
             Series ts = null;

@@ -896,6 +896,11 @@ namespace Gekko
                         //TODO TODO TODO what to do about these, if read from .fx lines
                         //TODO TODO TODO
                         i1 = 0;
+
+                        //bool b = false; if (timeless.ContainsKey(aNumber)) b = true;
+                        //bool b1 = helper.isTimeless[aNumber - 1];
+                        //bool b2 = helper.isTimeless[aNumber];
+                        //bool b3 = helper.isTimeless[aNumber + 1];
                     }
                     else
                     {

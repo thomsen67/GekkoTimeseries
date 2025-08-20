@@ -1448,7 +1448,7 @@ namespace Gekko
             {
                 string name = this.dict_FromANumberToVarName[i];                
 
-                Series ts = DatabankAHelperScalarModel(db, i, name, true, isRef);
+                Series ts = DatabankAHelperScalarModel(db, i, name, true, isRef, false);  //Later on, it is checked wheather the ts series is timeless or not. So ok to keep last argument false, since this has worked implicitly = false for a long time.
                 if (ts == null)
                 {
                     //Will have missing values
@@ -1467,11 +1467,7 @@ namespace Gekko
                     {
                         if (Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2)
                         {
-                            double data = ts.GetTimelessData();
-                            //for (int t = 0; t < n; t++)
-                            //{
-                            //    a[t][i] = data;
-                            //}
+                            double data = ts.GetTimelessData();                            
                             a[Globals.decompTimelessNumber][i] = data;
                         }
                         else
@@ -1665,16 +1661,23 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelperScalarModel(db, i, name, false, isRef);
+                Series ts = DatabankAHelperScalarModel(db, i, name, false, isRef, this.isTimeless[i]);
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
                 // NB: beware of OPTION series data missing, if it is set.
-                int index1 = -12345;
-                int index2 = -12345;                
-                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tStart, tEnd);
-                for (int t = 0; t < n; t++)
+                if (this.isTimeless[i])
                 {
-                    data[index1 + t] = a[t][i];
+                    ts.SetTimelessData(a[Globals.decompTimelessNumber][i]);
+                }
+                else
+                {
+                    int index1 = -12345;
+                    int index2 = -12345;
+                    double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tStart, tEnd);
+                    for (int t = 0; t < n; t++)
+                    {
+                        data[index1 + t] = a[t][i];
+                    }
                 }
             }
         }
@@ -1686,7 +1689,7 @@ namespace Gekko
         /// <param name="name"></param>
         /// <param name="fromDatabankToA"></param>
         /// <returns></returns>
-        private Series DatabankAHelperScalarModel(Databank db, int aNumber, string name, bool fromDatabankToA, bool isRef)
+        private Series DatabankAHelperScalarModel(Databank db, int aNumber, string name, bool fromDatabankToA, bool isRef, bool isTimeless)
         {            
             Series ts = null;
 
@@ -1694,13 +1697,14 @@ namespace Gekko
             if (isRef) firstRef = "reference";
 
             //See also #asf87aufkdh where similar loading is done regarding reading gdx files  
+            int hasTimeDimension = 1;
+            if (isTimeless) hasTimeDimension = 0;
             EFreq freq = this.parent.modelCommon.GetFreq();
             List<string> dims = G.Chop_GetIndex(name);
             string varNameWithFreqAndIndexes = G.Chop_AddFreq(name, freq);
             string varNameWithFreq = G.Chop_GetNameAndFreq(varNameWithFreqAndIndexes);
-            int gdxDimensions = dims.Count + 1;
-            int gekkoDimensions; bool isMultiDimInModel;
-            int hasTimeDimension = 1;
+            int gdxDimensions = dims.Count + hasTimeDimension;
+            int gekkoDimensions; bool isMultiDimInModel;            
             GamsData.IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDimInModel);  //calling this is overkill, but binds neatly with other use of the method
             
             if (isMultiDimInModel)
@@ -1772,7 +1776,14 @@ namespace Gekko
                         }
                         return ts;
                     }
-                    ts = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
+                    if (isTimeless)
+                    {
+                        ts = new Series(ESeriesType.Timeless, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq), double.NaN);
+                    }
+                    else
+                    {
+                        ts = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
+                    }
                     ats.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                 }
                 else
@@ -1814,7 +1825,14 @@ namespace Gekko
                         }
                         return ts;
                     }
-                    ts = new Series(freq, varNameWithFreq);
+                    if (isTimeless)
+                    {
+                        ts = new Series(ESeriesType.Timeless, freq, varNameWithFreq, double.NaN);
+                    }
+                    else
+                    {
+                        ts = new Series(freq, varNameWithFreq);
+                    }
                     db.AddIVariable(ts.name, ts);
                 }                
             }
