@@ -852,8 +852,9 @@ namespace Gekko
                 if (type == EPlotType.Decomp)
                 {
                     if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
-                    {                        
-                        SvgFix(Program.options.decomp_plot_zoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    {
+                        //SvgFix changes the produced file, only meaningful for .svg
+                        if (G.Equal(extension, "svg")) SvgFix(Program.options.decomp_plot_zoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     }
                 }
                 else
@@ -861,8 +862,8 @@ namespace Gekko
                     //if svgFile border in wpf is adjusted with size, we can adjust zoomDpi *= ...,
                     //and we also need to adjust to overall window dimensions. But then it should work
                     //as a setting... !!
-                                        
-                    SvgFix(Globals.guiGraphZoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
+                    //SvgFix changes the produced file, only meaningful for .svg
+                    if (G.Equal(extension, "svg")) SvgFix(Globals.guiGraphZoom / 100d * dpiScale / 150d, decompSvgOverallWidth, decompSvgOverallHeight, plotFileName);
                     o.guiGraphScaleGeneral = Globals.guiGraphZoom / 100d;  //Makes the wpf component size ok for PLOT
                     CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName, allAreLinespointsType2);
                 }
