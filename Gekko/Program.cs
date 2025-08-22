@@ -17914,10 +17914,18 @@ namespace Gekko
 
             bool allowIndexes = false;
 
-            string command = "COPY";
-            string command2 = "copy";
-            string command3 = "copied";
-            if (type == EWildcardSearchType.Rename)
+            string command = null;
+            string command2 = null;
+            string command3 = null;
+
+            if (type == EWildcardSearchType.Copy)
+            {
+                //allowIndexes = true;
+                command = "COPY";
+                command2 = "copy";
+                command3 = "copied";
+            }
+            else if (type == EWildcardSearchType.Rename)
             {
                 command = "RENAME";
                 command2 = "rename";
@@ -17943,6 +17951,7 @@ namespace Gekko
                 command2 = "delete";
                 command3 = "deleted";
             }
+            else new Error("Internal error: wrong command name");
 
             List<ToFrom> outputs = new List<ToFrom>();
 

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Gekko.WindowPlot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:jas="clr-namespace:Gekko"    
+    xmlns:jas="clr-namespace:Gekko"       
     Title="Gekko plot" Name="PlotMain"  HorizontalAlignment="Left" Height="542" Width="590" Left="0" Top="0" Closing="Window_Closing">
 
     <Window.InputBindings>
@@ -13,7 +13,7 @@
         <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
     </Window.CommandBindings>
 
-    <StackPanel Orientation="Vertical">        
+    <StackPanel Orientation="Vertical">
         <Grid Name="grid0" Height="122" Width="580" HorizontalAlignment="Left" ShowGridLines="False" Margin="10,10,0,0"  DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
@@ -42,10 +42,10 @@
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" HorizontalAlignment="Left" Orientation="Horizontal">
                 <TextBlock Name="textMerge" FontSize="11" Width="105" Foreground="Gray" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,1,0,0"/>
             </StackPanel>
-            
+
             <DockPanel Grid.ColumnSpan="3" Grid.Row="1" Grid.Column="3">
                 <TextBlock TextWrapping="Wrap" Margin="-20,0,0,0" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
-            </DockPanel>            
+            </DockPanel>
 
             <DockPanel Grid.Row="2" Grid.Column="1">
                 <Border BorderThickness="1,1,0,0" BorderBrush="LightGray" CornerRadius="10,0,0,0">
@@ -214,13 +214,13 @@
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="120,2,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
                 <CheckBox Name="CheckBox_ref" Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_ref_Checked" Unchecked="CheckBox_ref_Unchecked" ToolTip="Shows variables from the 'REF' databank (cf. the F2 window).">Ref</CheckBox>
-                <CheckBox Name="CheckBox_all" Width="62" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_all_Checked" Unchecked="CheckBox_all_Unchecked" ToolTip="Shows variables searched for in numbered databanks (cf. the F2 window),&#x0a;together with variables from the 'REF' databank (cf. the F2 window).">All</CheckBox>                    
-            </StackPanel>            
+                <CheckBox Name="CheckBox_all" Width="62" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBox_all_Checked" Unchecked="CheckBox_all_Unchecked" ToolTip="Shows variables searched for in numbered databanks (cf. the F2 window),&#x0a;together with variables from the 'REF' databank (cf. the F2 window).">All</CheckBox>
+            </StackPanel>
         </Grid>
 
         <StackPanel Orientation="Horizontal">
             <Border Name="svgfile" Height="360" Width="450">
-              <WebBrowser Name="webBrowser"  HorizontalAlignment="Left" Margin="10,5,0,0"/>
+                <WebBrowser Name="webBrowser"  HorizontalAlignment="Left" Margin="10,5,0,0"/>
             </Border>
 
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
@@ -247,38 +247,44 @@
                 </ComboBox>
 
 
+
                 <Button Content="Refresh" Margin="2,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (may also be used when changing time period)." Click="Button_refresh">
                     <Button.Resources>
                         <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-                <Button Content="Copy link" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="File link to .svg file: in Word, use Insert --> Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." Click="Button_copy">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
+                            <Setter Property="CornerRadius" Value="3"/>
                         </Style>
                     </Button.Resources>
                 </Button>
 
-                <Button Content="Save" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg." Click="Button_save">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Copy" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="To clipboard as a bitmap/png. Should paste as an image in Word, Outlook, Gmail and most others." Click="Button_copy_png">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="CopyComboBox" SelectionChanged="CopyComboBox_SelectionChanged" Background="White">
+                        <ComboBoxItem Content="Png" ToolTipService.ToolTip="To clipboard as a bitmap/png. Should paste as an image in Word, Outlook, Gmail and most others."/>
+                        <ComboBoxItem Content="Emf" ToolTipService.ToolTip ="To clipboard as a .emf. This pastes directly as a vector image in Word/PowerPoint/Excel, possibly not Outlook." />
+                        <ComboBoxItem Content="Svg (link)" ToolTipService.ToolTip="To clipboard as a file link (string) to a .svg file: in Word, use Insert -->Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." />
+                    </ComboBox>
+                </StackPanel>
 
-                <Button Content="Save As" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a svg/emf/png/pdf file, for later use in e.g. Word or a html page (the user chooses a file name)." Click="Button_saveas">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Save" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg." Click="Button_save">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="SaveComboBox" SelectionChanged="SaveComboBox_SelectionChanged" Background="White">
+                        <ComboBoxItem Content="Save" ToolTipService.ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg."/>
+                        <ComboBoxItem Content="Save As" ToolTipService.ToolTip ="Saves the plot as a svg/emf/png/pdf file, for later use in e.g. Word or a html page (the user chooses a file name)." />                        
+                    </ComboBox>
+                </StackPanel>                                
 
-                
                 <StackPanel>
                     <CheckBox x:Name="CheckBox_points"  Width="57" Margin="2,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show line 'points' for each period (typically small circles). &#x0a;Selected corresponds to &lt;type=linespoints> and unselected corresponds to &lt;type=lines>"  Content="Points" Checked="CheckBox_points_Checked" Unchecked="CheckBox_points_Unchecked"/>
                 </StackPanel>

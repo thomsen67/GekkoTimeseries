@@ -354,6 +354,43 @@ namespace Gekko
 
         private void Button_copy(object sender, RoutedEventArgs e)
         {
+            CopySvg();
+        }
+
+        
+        private void CopyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Get the selected ComboBoxItem
+            var selectedItem = CopyComboBox.SelectedItem as ComboBoxItem;
+
+            if (selectedItem != null)
+            {
+                // Get the content of the selected item
+                string selectedValue = selectedItem.Content.ToString();
+
+                // You can use a switch statement for more complex logic
+                switch (selectedValue)
+                {
+                    case "Png":
+                        CopyPng();
+                        break;
+                    case "Emf":
+                        CopyEmf();
+                        break;
+                    case "Svg (link)":
+                        CopySvg();
+                        break;
+                }
+            }
+        }
+
+        private void Button_copy_png(object sender, RoutedEventArgs e)
+        {
+            CopyPng();
+        }
+
+        private void CopySvg()
+        {
             // Copy the .svg file to the clipboard for use in e.g. Word
             //string[] ss = new string[1];
             //ss[0] = this.graphOptions.emfName;
@@ -361,16 +398,95 @@ namespace Gekko
             //Clipboard.SetDataObject(iData, true);
             try
             {
-                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, null);
+                string inputName = null;
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
                 Clipboard.SetText(plotName);
             }
             catch
             {
                 MessageBox.Show("Due to errors, the plot could not be copied.");
-            }            
+            }
+        }
+
+        private void CopyPng()
+        {
+            try
+            {
+                string inputName = "temp.png";
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
+
+                //Copy the .emf file to the clipboard for use in e.g. Word
+                //string[] ss = new string[1];
+                //ss[0] = this.graphOptions.emfName;
+                //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
+                //Clipboard.SetDataObject(iData, true);
+
+                string s = @"c:\Users\thoma\AppData\Local\Gekko\Gekko\3.3.1.0\gnuplot\tempfiles\temp2096039915.png";
+
+                using (System.Drawing.Image image = System.Drawing.Image.FromFile(s))
+                {
+                    System.Windows.Forms.Clipboard.SetImage(image);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Due to errors, the plot could not be copied.");
+            }
+        }
+
+        private void CopyEmf()
+        {
+            try
+            {
+                string inputName = "temp.png";
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
+
+                //Copy the .emf file to the clipboard for use in e.g. Word
+                //string[] ss = new string[1];
+                //ss[0] = this.graphOptions.emfName;
+                //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
+                //Clipboard.SetDataObject(iData, true);
+
+                string s = @"c:\Users\thoma\AppData\Local\Gekko\Gekko\3.3.1.0\gnuplot\tempfiles\temp2096039915.png";
+
+                using (System.Drawing.Image image = System.Drawing.Image.FromFile(s))
+                {
+                    System.Windows.Forms.Clipboard.SetImage(image);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Due to errors, the plot could not be copied.");
+            }
+        }
+
+        private void SaveComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {            
+            var selectedItem = SaveComboBox.SelectedItem as ComboBoxItem;
+            if (selectedItem != null)
+            {
+                // Get the content of the selected item
+                string selectedValue = selectedItem.Content.ToString();
+
+                // You can use a switch statement for more complex logic
+                switch (selectedValue)
+                {
+                    case "Save":
+                        Save();
+                        break;
+                    case "Save As":
+                        SaveAs();
+                        break;                    
+                }
+            }
         }
 
         private void Button_save(object sender, RoutedEventArgs e)
+        {
+            Save();
+        }
+
+        private void Save()
         {
             //Copy the .svg file to file for later use in e.g. Word
             string input = "gekkoplot";
@@ -387,7 +503,7 @@ namespace Gekko
             catch
             {
                 MessageBox.Show("Due to errors, the plot could not be saved.");
-            }            
+            }
         }
 
         private void Button_search(object sender, RoutedEventArgs e)
@@ -395,8 +511,8 @@ namespace Gekko
             MessageBox.Show("One or more variables in the plot were found in a databank in position 2 or lower in the databank list (F2 window). To switch databank searching off, use 'option databank search = no', in which case an error would have been issued instead. Beware of unintended missing variables in the first-position databank, which in this case is not empty. (Note that 'Ref' variables are never searched for, but are always taken from the databank corresponding to the 'REF' position in the F2 databank list).");
         }
 
-        private void Button_saveas(object sender, RoutedEventArgs e)
-        {            
+        private void SaveAs()
+        {
             Microsoft.Win32.SaveFileDialog saveFileDialog1 = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "svg files (*.svg)|*.svg|emf files (*.emf)|*.emf|png files (*.png)|*.png|pdf files (*.pdf)|*.pdf|All files (*.*)|*.*",
@@ -761,6 +877,6 @@ namespace Gekko
         private void SetZoomText()
         {
             ZoomComboBox.Text = Globals.guiGraphZoom + "%";
-        }
+        }        
     }
 }

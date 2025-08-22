@@ -2113,7 +2113,9 @@ namespace Gekko
                             O.Help("restore_session");
                         };
 
-                        G.Writeln2("Restore session (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("snapshot (" + G.CountLines(Globals.sessionMemorySnapshot, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  |  " + G.GetLinkAction("history (" + G.CountLines(Globals.sessionMemoryHistory, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  |  " + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
+                        int i1 = G.CountLines(Globals.sessionMemorySnapshot, true);
+                        int i2 = G.CountLines(Globals.sessionMemoryHistory, true);
+                        G.Writeln2("Restore session (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("snapshot (" + i1 + " line" + G.S(i1) + ")", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  |  " + G.GetLinkAction("history (" + i2 + " line" + G.S(i2) + ")", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  |  " + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
                     }
                 }
 
