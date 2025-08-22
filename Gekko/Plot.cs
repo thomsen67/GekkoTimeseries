@@ -516,22 +516,26 @@ namespace Gekko
             }
 
             string enhanced = null;
-            string pdfSize = null;
+            string terminalSize = null;
             if (G.Equal(extension, "emf") || G.Equal(extension, "pdf"))
             {
                 enhanced = " enhanced";
                 fontsize = 0.95 * fontsize;
                 if (G.Equal(extension, "pdf"))
                 {
-                    pdfSize = " size 4, 3";  //default is 5 x 3 inches, too wide.
-                }
+                    terminalSize = " size 4, 3";  //default is 5 x 3 inches, too wide.
+                }                
             }
             else
             {
                 fontsize = 0.75 * fontsize;
+                if (G.Equal(extension, "png"))
+                {
+                    //terminalSize = " size 2000, 1500";  //default is too small, should be ok regarding aspect ratio
+                }
             }
 
-            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSvgSize);
+            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + terminalSize + decompSvgSize);
 
             string graphFileName = file2;
             if (o.isBrowser) graphFileName = o.browserPath.Replace("\\", "\\\\");

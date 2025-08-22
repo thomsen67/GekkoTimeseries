@@ -14,14 +14,6 @@ namespace Gekko
         {
             //[[commandStart]]0
             p.SetStack(@"¤1"); O.InitSmpl(smpl, p);
-
-            O.Rebase o0 = new O.Rebase();
-            o0.names = O.FlattenIVariablesSeq(false, new List(new List<IVariable> { new ScalarString("x") }));
-            o0.t1 = O.ConvertToDate(i1, O.GetDateChoices.Strict);
-            o0.gekkocode = @"rebase x 2000";
-            o0.p = p; o0.Exe();
-
-            //[[commandEnd]]0
         }
 
 

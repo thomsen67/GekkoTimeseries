@@ -357,12 +357,9 @@ namespace Gekko
             CopySvg();
         }
 
-        
-        private void CopyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CopyComboBoxItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Get the selected ComboBoxItem
-            var selectedItem = CopyComboBox.SelectedItem as ComboBoxItem;
-
+            var selectedItem = sender as ComboBoxItem;
             if (selectedItem != null)
             {
                 // Get the content of the selected item
@@ -382,7 +379,34 @@ namespace Gekko
                         break;
                 }
             }
+
         }
+
+        //private void CopyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    // Get the selected ComboBoxItem
+        //    var selectedItem = CopyComboBox.SelectedItem as ComboBoxItem;
+
+        //    if (selectedItem != null)
+        //    {
+        //        // Get the content of the selected item
+        //        string selectedValue = selectedItem.Content.ToString();
+
+        //        // You can use a switch statement for more complex logic
+        //        switch (selectedValue)
+        //        {
+        //            case "Png":
+        //                CopyPng();
+        //                break;
+        //            case "Emf":
+        //                CopyEmf();
+        //                break;
+        //            case "Svg (link)":
+        //                CopySvg();
+        //                break;
+        //        }
+        //    }
+        //}
 
         private void Button_copy_png(object sender, RoutedEventArgs e)
         {
@@ -399,7 +423,7 @@ namespace Gekko
             try
             {
                 string inputName = null;
-                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
+                string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);                
                 Clipboard.SetText(plotName);
             }
             catch
@@ -412,7 +436,8 @@ namespace Gekko
         {
             try
             {
-                string inputName = "temp.png";
+                string inputName = null;                
+                inputName = "temp.png";  //to indicate .png type                
                 string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
 
                 //Copy the .emf file to the clipboard for use in e.g. Word
@@ -421,9 +446,7 @@ namespace Gekko
                 //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
                 //Clipboard.SetDataObject(iData, true);
 
-                string s = @"c:\Users\thoma\AppData\Local\Gekko\Gekko\3.3.1.0\gnuplot\tempfiles\temp2096039915.png";
-
-                using (System.Drawing.Image image = System.Drawing.Image.FromFile(s))
+                using (System.Drawing.Image image = System.Drawing.Image.FromFile(plotName))
                 {
                     System.Windows.Forms.Clipboard.SetImage(image);
                 }
@@ -438,21 +461,18 @@ namespace Gekko
         {
             try
             {
-                string inputName = "temp.png";
+                string inputName = "temp.emf";
                 string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
-
-                //Copy the .emf file to the clipboard for use in e.g. Word
-                //string[] ss = new string[1];
-                //ss[0] = this.graphOptions.emfName;
-                //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
-                //Clipboard.SetDataObject(iData, true);
-
-                string s = @"c:\Users\thoma\AppData\Local\Gekko\Gekko\3.3.1.0\gnuplot\tempfiles\temp2096039915.png";
-
-                using (System.Drawing.Image image = System.Drawing.Image.FromFile(s))
+                if (true)
                 {
-                    System.Windows.Forms.Clipboard.SetImage(image);
-                }
+                    //Copy the .emf file to the clipboard for use in e.g. Word
+                    //This is a file drop (string path on clipboard), but it works for Word and PowerPoint.
+                    //It ought to be the emf itself on the clipboard, but can't get it to work.
+                    string[] ss = new string[1];
+                    ss[0] = plotName;
+                    IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
+                    Clipboard.SetDataObject(iData, true);
+                }                
             }
             catch
             {
@@ -460,10 +480,10 @@ namespace Gekko
             }
         }
 
-        private void SaveComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {            
-            var selectedItem = SaveComboBox.SelectedItem as ComboBoxItem;
-            if (selectedItem != null)
+        private void SaveComboBoxItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var selectedItem = sender as ComboBoxItem;
+            if (selectedItem != null)                
             {
                 // Get the content of the selected item
                 string selectedValue = selectedItem.Content.ToString();

@@ -9655,7 +9655,7 @@ namespace Gekko
             //public string rows = null;            
             public List<Element> prtElements = new List<Element>();                        
             public List<OptString> operators = new List<OptString>();
-            public string emfName = null;  //name of produced emf file if PLOT
+            public string emfName = null;  //name of produced emf file if PLOT            
                         
             public int printStorageAsFuncCounter = -12345;
             

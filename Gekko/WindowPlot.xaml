@@ -264,7 +264,12 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="CopyComboBox" SelectionChanged="CopyComboBox_SelectionChanged" Background="White">
+                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="CopyComboBox" Background="White">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <EventSetter Event="PreviewMouseDown" Handler="CopyComboBoxItem_PreviewMouseDown"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
                         <ComboBoxItem Content="Png" ToolTipService.ToolTip="To clipboard as a bitmap/png. Should paste as an image in Word, Outlook, Gmail and most others."/>
                         <ComboBoxItem Content="Emf" ToolTipService.ToolTip ="To clipboard as a .emf. This pastes directly as a vector image in Word/PowerPoint/Excel, possibly not Outlook." />
                         <ComboBoxItem Content="Svg (link)" ToolTipService.ToolTip="To clipboard as a file link (string) to a .svg file: in Word, use Insert -->Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." />
@@ -279,7 +284,12 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="SaveComboBox" SelectionChanged="SaveComboBox_SelectionChanged" Background="White">
+                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="SaveComboBox" Background="White">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <EventSetter Event="PreviewMouseDown" Handler="SaveComboBoxItem_PreviewMouseDown"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
                         <ComboBoxItem Content="Save" ToolTipService.ToolTip="Saves the plot as a .svg file for later use in e.g. Word or a html page. &#x0a;The name is gekkoplot[number].svg."/>
                         <ComboBoxItem Content="Save As" ToolTipService.ToolTip ="Saves the plot as a svg/emf/png/pdf file, for later use in e.g. Word or a html page (the user chooses a file name)." />                        
                     </ComboBox>
