@@ -51,6 +51,8 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
+            double pngFactor = 2;
+
             double dpiScale = DpiScale(plotHelper.isDecompPlot);
 
             double decompSvgOverallWidth = 0;
@@ -361,7 +363,8 @@ namespace Gekko
             string italic = GetText(null, o.opt_italic, null, doc.SelectSingleNode("gekkoplot/italic"), null);
             string ticsInOut = GetText(null, o.opt_tics, null, doc.SelectSingleNode("gekkoplot/tics"), "out");
             string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "yes");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
-            string gridstyle = GetText(null, o.opt_gridstyle, null, doc.SelectSingleNode("gekkoplot/gridstyle"), "linecolor rgb \"#d3d3d3\" dashtype 3 linewidth 1.5");
+            double gridWidth = 1.5; if (G.Equal(extension, "png")) gridWidth = 1.5 * pngFactor;
+            string gridstyle = GetText(null, o.opt_gridstyle, null, doc.SelectSingleNode("gekkoplot/gridstyle"), "linecolor rgb \"#d3d3d3\" dashtype 3 linewidth " + gridWidth);
             string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse height 1");  //height 1 givers nicer vertical spacing
             string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), defaultPalette);
             string stack = GetText(null, o.opt_stack, null, doc.SelectSingleNode("gekkoplot/stack"), "no");  //default: no, #23475432985    
@@ -434,10 +437,15 @@ namespace Gekko
 
             double linewidthCorrection = 1d;
             double pointsizeCorrection = 1d;
-            if (G.Equal(extension, "svg") || G.Equal(extension, "png"))
+            if (G.Equal(extension, "svg"))
             {
                 linewidthCorrection = 2d / 3d;
                 pointsizeCorrection = 0.8d / 0.5d;
+            }
+            else if (G.Equal(extension, "png"))
+            {
+                linewidthCorrection = pngFactor * 2d / 3d;
+                pointsizeCorrection = pngFactor * 0.8d / 0.5d;
             }
             else if (G.Equal(extension, "pdf"))
             {
@@ -517,6 +525,7 @@ namespace Gekko
 
             string enhanced = null;
             string terminalSize = null;
+            string extra2 = null;
             if (G.Equal(extension, "emf") || G.Equal(extension, "pdf"))
             {
                 enhanced = " enhanced";
@@ -531,11 +540,14 @@ namespace Gekko
                 fontsize = 0.75 * fontsize;
                 if (G.Equal(extension, "png"))
                 {
-                    //terminalSize = " size 2000, 1500";  //default is too small, should be ok regarding aspect ratio
+                    terminalSize = " size " + 640 * pngFactor + "," + 480 * pngFactor;
+                    //terminalSize = " size 200,150 fontscale 4.0 linewidth 4.0 ";  //default is too small, should be ok regarding aspect ratio
+                    //extra2 = "cairo";
+                    fontsize = pngFactor * fontsize;
                 }
             }
-
-            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + terminalSize + decompSvgSize);
+                        
+            txt.AppendLine("set terminal " + extension + extra2 + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + terminalSize + decompSvgSize);
 
             string graphFileName = file2;
             if (o.isBrowser) graphFileName = o.browserPath.Replace("\\", "\\\\");
