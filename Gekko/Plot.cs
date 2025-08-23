@@ -50,9 +50,7 @@ namespace Gekko
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
-
-            double pngFactor = 2;
-
+            
             double dpiScale = DpiScale(plotHelper.isDecompPlot);
 
             double decompSvgOverallWidth = 0;
@@ -363,7 +361,7 @@ namespace Gekko
             string italic = GetText(null, o.opt_italic, null, doc.SelectSingleNode("gekkoplot/italic"), null);
             string ticsInOut = GetText(null, o.opt_tics, null, doc.SelectSingleNode("gekkoplot/tics"), "out");
             string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "yes");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
-            double gridWidth = 1.5; if (G.Equal(extension, "png")) gridWidth = 1.5 * pngFactor;
+            double gridWidth = 1.5; if (G.Equal(extension, "png")) gridWidth = 1.5 * Program.options.plot_png_scale;
             string gridstyle = GetText(null, o.opt_gridstyle, null, doc.SelectSingleNode("gekkoplot/gridstyle"), "linecolor rgb \"#d3d3d3\" dashtype 3 linewidth " + gridWidth);
             string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse height 1");  //height 1 givers nicer vertical spacing
             string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), defaultPalette);
@@ -444,8 +442,8 @@ namespace Gekko
             }
             else if (G.Equal(extension, "png"))
             {
-                linewidthCorrection = pngFactor * 2d / 3d;
-                pointsizeCorrection = pngFactor * 0.8d / 0.5d;
+                linewidthCorrection = Program.options.plot_png_scale * 2d / 3d;
+                pointsizeCorrection = Program.options.plot_png_scale * 0.8d / 0.5d;
             }
             else if (G.Equal(extension, "pdf"))
             {
@@ -508,6 +506,21 @@ namespace Gekko
 
             StringBuilder txt = new StringBuilder();
 
+            if (G.Equal(extension, "png"))
+            {
+                //It seems defaults are (maybe). We multiply by 4 for png.
+                //set dashtype 2  (8,4)
+                //set dashtype 3  (2,3)
+                //set dashtype 4  (8,2,2,2)
+                //set dashtype 5  (8,2,2,2,2,2)
+                //set dashtype 6  (12,4,2,4)
+                txt.AppendLine("set dashtype 2 (32, 16)");
+                txt.AppendLine("set dashtype 3 (8, 12)");
+                txt.AppendLine("set dashtype 4 (32, 8, 8, 8)");
+                txt.AppendLine("set dashtype 5 (32, 8, 8, 8, 8, 8)");
+                txt.AppendLine("set dashtype 6 (48, 16, 8, 16)");
+            }
+
             txt.AppendLine("set size " + decompXZoom * zoom + "," + zoom + "");
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
@@ -540,10 +553,9 @@ namespace Gekko
                 fontsize = 0.75 * fontsize;
                 if (G.Equal(extension, "png"))
                 {
-                    terminalSize = " size " + 640 * pngFactor + "," + 480 * pngFactor;
-                    //terminalSize = " size 200,150 fontscale 4.0 linewidth 4.0 ";  //default is too small, should be ok regarding aspect ratio
-                    //extra2 = "cairo";
-                    fontsize = pngFactor * fontsize;
+                    //It seems default for "set terminal png" is "set terminal pngcairo" (better quality). So no need for extra2.
+                    terminalSize = " size " + 640 * Program.options.plot_png_scale + "," + 480 * Program.options.plot_png_scale;  //Seems 640x 480 is default for png. Must have size it here for scaling.
+                    fontsize = Program.options.plot_png_scale * fontsize;                    
                 }
             }
                         
@@ -670,6 +682,13 @@ namespace Gekko
 
             if (NotNullAndNotNo(xzeroaxis)) txt.AppendLine("set xzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
 
+            string borderExtra = null;
+            if (G.Equal(extension, "png"))
+            {
+                txt.AppendLine("set style line 103 lc rgb \"black\" lw " + Program.options.plot_png_scale);  //103 is just an id number, like 102
+                borderExtra = " ls 103";
+            }
+
             bool setTitlePlaceholder = false;
             if (numberOfY2s == 0 && !isSeparated)
             {
@@ -677,28 +696,28 @@ namespace Gekko
                 if (ymirror == "0")  //nothing
                 {
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
-                    txt.AppendLine("set border 3");
+                    txt.AppendLine("set border 3" + borderExtra);
                     if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
 
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
-                    txt.AppendLine("set border 11");
+                    txt.AppendLine("set border 11" + borderExtra);
                     if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set y2tics " + ticsInOut);
-                    txt.AppendLine("set border 11");
+                    txt.AppendLine("set border 11" + borderExtra);
                     if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 }
                 else if (ymirror == "3")
                 {
                     txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
                     txt.AppendLine("set y2tics " + ticsInOut);
-                    txt.AppendLine("set border 11");
+                    txt.AppendLine("set border 11" + borderExtra);
                     if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                     if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 }
@@ -708,7 +727,7 @@ namespace Gekko
                 //there is a series being shown at the y2 axis
                 txt.AppendLine("set ytics nomirror " + ticsInOut);
                 txt.AppendLine("set y2tics " + ticsInOut);
-                txt.AppendLine("set border 11");
+                txt.AppendLine("set border 11" + borderExtra);
                 if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 if (!G.NullOrBlanks(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 

@@ -180,6 +180,7 @@ namespace Gekko
         public int plot_elements_max = 200;        
         public bool plot_lines_points = true;
         public string plot_palette = "gekko";  //gekko | dream | excel
+        public double plot_png_scale = 3;  //1 gives 640 x 480 (used in Gekko < 3.1.1). With 3 we get 1920 on x axis, so if on paper it is 6 inch wide (15 cm) it would have about 300 dpi. Graphs are often not that wide in eg Word, so factor 3 should be more than enough. If a .svg is dragged into Word, an internal .png is actually generated, with resolution 2500 x 2000, so even bigger (corresponds to factor 4). Therefore, using svg gives even larger .docx files than using .png with factor 3.
         public string plot_using = ""; //a global template
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
@@ -498,6 +499,7 @@ namespace Gekko
             Add("PLOT ELEMENTS MAX", Globals.xint);            
             Add("PLOT LINES POINTS", Globals.xbool);
             Add("PLOT PALETTE", Globals.xnameOrString, "gekko", "excel", "dream");
+            Add("PLOT PNG SCALE", Globals.xval);
             Add("PLOT USING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
             Add("PLOT XLABELS DIGITS", Globals.xint);
