@@ -508,17 +508,21 @@ namespace Gekko
 
             if (G.Equal(extension, "png"))
             {
-                //It seems defaults are (maybe). We multiply by 4 for png.
+                //It seems defaults are (maybe). We multiply by 2 for png.
                 //set dashtype 2  (8,4)
                 //set dashtype 3  (2,3)
                 //set dashtype 4  (8,2,2,2)
                 //set dashtype 5  (8,2,2,2,2,2)
                 //set dashtype 6  (12,4,2,4)
-                txt.AppendLine("set dashtype 2 (32, 16)");
-                txt.AppendLine("set dashtype 3 (8, 12)");
-                txt.AppendLine("set dashtype 4 (32, 8, 8, 8)");
-                txt.AppendLine("set dashtype 5 (32, 8, 8, 8, 8, 8)");
-                txt.AppendLine("set dashtype 6 (48, 16, 8, 16)");
+                txt.AppendLine("set dashtype 2 (16, 8)");
+                txt.AppendLine("set dashtype 3 (4, 6)");
+                txt.AppendLine("set dashtype 4 (16, 4, 4, 4)");
+                txt.AppendLine("set dashtype 5 (16, 4, 4, 4, 4, 4)");
+                txt.AppendLine("set dashtype 6 (24, 8, 4, 8)");
+            }
+            else if (G.Equal(extension, "svg"))
+            {
+                txt.AppendLine("set dashtype 2 (8, 4)");
             }
 
             txt.AppendLine("set size " + decompXZoom * zoom + "," + zoom + "");
