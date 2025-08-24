@@ -508,7 +508,7 @@ namespace Gekko
 
             if (G.Equal(extension, "png"))
             {
-                //It seems defaults are (maybe). We multiply by 2 for png.
+                //It seems defaults are (maybe, but for which terminal?). We multiply by 2 for png.
                 //set dashtype 2  (8,4)
                 //set dashtype 3  (2,3)
                 //set dashtype 4  (8,2,2,2)

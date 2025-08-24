@@ -2804,8 +2804,7 @@ namespace Gekko
                 //%x or #x
                 if (indexes != null)
                 {
-                    new Error("Name like " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " not allowed");
-                    //throw new GekkoException();
+                    new Error("Name like " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " not allowed");                    
                 }
                 else
                 {
@@ -2819,21 +2818,20 @@ namespace Gekko
 
                 if (indexes != null)
                 {
-                    //array-series
+                    //array-series, for instance "x!a[k]" into which the iv variable is to be put.
 
                     MultidimItem mmi = new MultidimItem(indexes);
 
                     //now we know that the series exists
 
-                    Series iv_series = iv as Series;
+                    Series existing = bank.GetIVariable(nameWithFreq) as Series;
 
-                    if (iv_series.type == ESeriesType.ArraySuper)
+                    if (existing.type != ESeriesType.ArraySuper)
                     {
                         new Error("Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
-                        //throw new GekkoException();
                     }
 
-                    iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, iv);
+                    existing.dimensionsStorage.AddIVariableWithOverwrite(mmi, iv);
 
                 }
                 else

@@ -17909,7 +17909,6 @@ namespace Gekko
             bool removeCurrentFirstBankAndCurrentFreq = true;
 
             string currentFirstBankName = Program.databanks.GetFirst().name;
-            string currentRefBankName = Program.databanks.GetRef().name;
             string currentFreq = G.ConvertFreq(Program.options.freq);
 
             bool allowIndexes = false;
@@ -17920,7 +17919,7 @@ namespace Gekko
 
             if (type == EWildcardSearchType.Copy)
             {
-                //allowIndexes = true;
+                allowIndexes = true;
                 command = "COPY";
                 command2 = "copy";
                 command3 = "copied";
@@ -18219,6 +18218,12 @@ namespace Gekko
                     //This is (re)chopping of a LHS variable that has already had bankname etc. added
                     string bankLhs, nameLhs, freqLhs; string[] indexLhs;
                     O.Chop(lhsElement, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
+
+                    //At this point, before 24/8 2025 (and before Gekko 3.3.1) it seems that indexLhs has never been
+                    //anything other than null when running unit tests.
+                    //It was used in 6 places (new FromTo(...)), in the "to" parts. This should have been indexRhs instead, and was changed.
+                    //if (indexLhs != null) MessageBox.Show("ERROR!!!");
+
                     bankLhs = SubstituteFirstRefNames(bankLhs);
 
                     //TODO: some superfluous repetitive chopping here, if rhs has only 1 element
@@ -18262,12 +18267,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankTemp, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankTemp, nameRhs, freqLhs, indexRhs), lhsElementExplicit));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(currentFirstBankName, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(currentFirstBankName, name2split[0] + nameLhs + name2split[1], freqLhs, indexRhs), lhsElementExplicit));
                         }
                     }
                     else if (!bankRhs.Contains("*"))
@@ -18285,12 +18290,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, nameRhs, freqLhs, indexRhs), lhsElementExplicit));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexRhs), lhsElementExplicit));
                         }
                     }
                     else
@@ -18309,12 +18314,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, nameRhs, freqLhs, indexRhs), lhsElementExplicit));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexRhs), lhsElementExplicit));
                         }
                     }
                 }

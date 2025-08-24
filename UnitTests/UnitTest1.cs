@@ -6085,6 +6085,94 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_CopyDeleteArraySeries()
+        {
+            //? Can rename always be done as a copy+delete?
+            //? How about traces?
+            //
+            // --> Maybe just waith with RENAME for array-series
+            //
+
+            //Array to array
+            I("reset; time 2001 2003;");
+            I("x = series(2);");
+            I("y = series(2);");
+            I("x[a,m] = 1, 2 , 3;");
+            I("x[a,n] = 11, 12, 13;");
+            I("x[b,m] = 21, 22, 23;");
+            I("x[b,n] = 31, 32, 33;");
+            I("y = series(2);");
+            I("z = series(1);");
+            I("copy x[a,m] to y[a,p];");
+            I("copy x[a,n] to y[b,p];");
+            I("copy <2002 2002> x[b,m] to y[b,p];");
+            _AssertSeries(First(), "y!a", new string[] { "a", "p" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "a", "p" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "a", "p" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "b", "p" }, 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "b", "p" }, 2002, 22d, sharedDelta);  //!
+            _AssertSeries(First(), "y!a", new string[] { "b", "p" }, 2003, 13d, sharedDelta);
+            I("copy x[a,n] to z[a];");
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2003, 13d, sharedDelta);            
+            Assert.IsFalse(O.GetIVariableFromString("x[a,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            Assert.IsFalse(O.GetIVariableFromString("x[a,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            Assert.IsFalse(O.GetIVariableFromString("x[b,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            Assert.IsFalse(O.GetIVariableFromString("x[b,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            I("delete x[b,n];");
+            Assert.IsFalse(O.GetIVariableFromString("x[a,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            Assert.IsFalse(O.GetIVariableFromString("x[a,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            Assert.IsFalse(O.GetIVariableFromString("x[b,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            Assert.IsTrue(O.GetIVariableFromString("x[b,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
+            
+            //Normal to array
+            I("reset; time 2001 2003;");            
+            I("y = series(2);");
+            I("xam = 1, 2, 3;");
+            I("xan = 11, 12, 13;");
+            I("xbm = 21, 22, 23;");
+            I("xbn = 31, 32, 33;");
+            I("y = series(2);");
+            I("z = series(1);");
+            I("copy xam to y[a,p];");
+            I("copy xan to y[b,p];");
+            I("copy <2002 2002> xbm to y[b,p];");
+            _AssertSeries(First(), "y!a", new string[] { "a", "p" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "a", "p" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "a", "p" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "b", "p" }, 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "b", "p" }, 2002, 22d, sharedDelta);  //!
+            _AssertSeries(First(), "y!a", new string[] { "b", "p" }, 2003, 13d, sharedDelta);
+            I("copy xan to z[a];");
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2003, 13d, sharedDelta);
+            
+            //Array to normal
+            I("reset; time 2001 2003;");
+            I("x = series(2);");
+            I("y = series(2);");
+            I("x[a,m] = 1, 2 , 3;");
+            I("x[a,n] = 11, 12, 13;");
+            I("x[b,m] = 21, 22, 23;");
+            I("x[b,n] = 31, 32, 33;");            
+            I("copy x[a,m] to yap;");
+            I("copy x[a,n] to ybp;");
+            I("copy <2002 2002> x[b,m] to ybp;");
+            _AssertSeries(First(), "yap!a", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "yap!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "yap!a", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "ybp!a", 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "ybp!a", 2002, 22d, sharedDelta);  //!
+            _AssertSeries(First(), "ybp!a", 2003, 13d, sharedDelta);
+            I("copy x[a,n] to za;");
+            _AssertSeries(First(), "za!a", 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "za!a", 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "za!a", 2003, 13d, sharedDelta);
+        }
+
+        [TestMethod]
         public void _Test_Copy1()
         {
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
