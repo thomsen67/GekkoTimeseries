@@ -858,7 +858,7 @@ namespace Gekko
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
             {
-                new Error("You must use a array-timeseries variable");
+                new Error("You must use an array-timeseries variable");
             }
 
             List<int> oldDim = new List<int>();
@@ -1117,13 +1117,11 @@ namespace Gekko
             if (ts == null || ts.type != ESeriesType.ArraySuper)
             {
                 new Error("You must use a array-timeseries variable");
-                //throw new GekkoException();
             }
 
             if (iDim > ts.dimensions || iDim < 1)
             {
                 new Error("Array-series does not have a dimension #" + iDim);
-                //throw new GekkoException();
             }
                         
             Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));

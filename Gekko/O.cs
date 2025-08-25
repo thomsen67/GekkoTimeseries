@@ -2819,12 +2819,10 @@ namespace Gekko
                 if (indexes != null)
                 {
                     //array-series, for instance "x!a[k]" into which the iv variable is to be put.
-
-                    MultidimItem mmi = new MultidimItem(indexes);
-
                     //now we know that the series exists
 
                     Series existing = bank.GetIVariable(nameWithFreq) as Series;
+                    MultidimItem mmi = new MultidimItem(indexes, existing);
 
                     if (existing.type != ESeriesType.ArraySuper)
                     {
@@ -3210,9 +3208,9 @@ namespace Gekko
 
                     Series iv_series = iv as Series;
 
-                    if (iv_series.type == ESeriesType.ArraySuper)
+                    if (iv_series.type != ESeriesType.ArraySuper)
                     {
-                        new Error("Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");                        
+                        new Error("Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
                     }
 
                     IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
@@ -8631,7 +8629,6 @@ namespace Gekko
                     if (this.names != null)
                     {
                         new Error("You cannot mix <nonmodel> and variables");
-                        //throw new GekkoException();
                     }
                     Program.Trimvars();
                 }

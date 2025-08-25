@@ -17918,11 +17918,11 @@ namespace Gekko
             string command3 = null;
 
             if (type == EWildcardSearchType.Copy)
-            {
-                allowIndexes = true;
+            {                
                 command = "COPY";
                 command2 = "copy";
                 command3 = "copied";
+                allowIndexes = true;
             }
             else if (type == EWildcardSearchType.Rename)
             {
@@ -17949,6 +17949,7 @@ namespace Gekko
                 command = "DELETE";
                 command2 = "delete";
                 command3 = "deleted";
+                allowIndexes = true;
             }
             else new Error("Internal error: wrong command name");
 
@@ -27088,7 +27089,7 @@ namespace Gekko
 
         public static void Delete(List vars2)
         {
-            List vars = O.Restrict2(vars2, true, true, true, false);
+            List vars = O.Restrict2(vars2, true, true, true, true);
 
             List<ToFrom> list = SearchFromTo(vars, null, null, null, EWildcardSearchType.Delete, null);
 

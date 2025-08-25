@@ -303,7 +303,6 @@ namespace Gekko
             else
             {
                 new Error("SERIES constructor 2");
-                //throw new GekkoException();
             }
         }
 
