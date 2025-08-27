@@ -6093,6 +6093,31 @@ namespace UnitTests
             // --> Maybe just waith with RENAME for array-series
             //
 
+            //We allow this:
+            //For array-series, for instance ... = x[i] or x[*] etc. we allow this:
+            //copy ... to *; (same name, first bank)
+            //copy ... to b:*; (same name, b bank)
+            //copy ... to *:*; (same name, same bank, will fail)
+            //But NOT copy ... to *:a*b, where a is prefix and b is suffix
+            //So with indexes, name can only be *, and whatever []-indexes are found on LHS are transferred to RHS.
+
+            //Array to array
+            I("reset; time 2001 2003;");
+            I("x = series(2);");
+            I("y = series(2);");
+            I("x[a,m] = 1, 2 , 3;");
+            I("x[a,n] = 11, 12, 13;");
+            I("x[b,m] = 21, 22, 23;");
+            I("x[b,n] = 31, 32, 33;");
+            I("y = series(2);");            
+            I("copy x[a,m] to y[a,p];");
+
+
+
+
+
+
+
             //Array to array
             I("reset; time 2001 2003;");
             I("x = series(2);");

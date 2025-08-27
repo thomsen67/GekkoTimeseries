@@ -60,6 +60,14 @@ namespace Gekko
         Pause
     }
 
+    public enum ERhsStarType 
+    {
+        None,
+        OneNaked,
+        OneNonNaked,
+        TwoOrMore
+    }
+
     public enum EMasks
     {
         None,
@@ -18051,16 +18059,20 @@ namespace Gekko
 
                 if (bankLhs == null && frombank != null) bankLhs = frombank;  //overwrites "naked" vars, so "COPY <frombank=b> a, b to c, d;" is same as "COPY b:a, b:b to c, d;"
 
-                bool lhsHasStarOrQuestion = false;
-                if (bankLhs != null && (bankLhs.Contains("*") || bankLhs.Contains("?"))) lhsHasStarOrQuestion = true;
-                if (nameLhs != null && (nameLhs.Contains("*") || nameLhs.Contains("?"))) lhsHasStarOrQuestion = true;
-                if (freqLhs != null && (freqLhs.Contains("*") || freqLhs.Contains("?"))) lhsHasStarOrQuestion = true;
-                if (nameLhsRange1 != null) lhsHasStarOrQuestion = true;  //range
-                if (lhsHasStarOrQuestion) lhsHasStarOrQuestionGlobal = true;  //used outside loop
+                bool lhsBankOrNameHasStarOrQuestion = false;
+                if (bankLhs != null && (bankLhs.Contains("*") || bankLhs.Contains("?"))) lhsBankOrNameHasStarOrQuestion = true;
+                if (nameLhs != null && (nameLhs.Contains("*") || nameLhs.Contains("?"))) lhsBankOrNameHasStarOrQuestion = true;
+                if (freqLhs != null && (freqLhs.Contains("*") || freqLhs.Contains("?"))) lhsBankOrNameHasStarOrQuestion = true;
+                if (nameLhsRange1 != null) lhsBankOrNameHasStarOrQuestion = true;  //range
+                if (lhsBankOrNameHasStarOrQuestion) lhsHasStarOrQuestionGlobal = true;  //used outside loop
+
+                //TODO
+                //TODO Check here if lhs index has stars and if so fail if lhsBankOrNameHasStarOrQuestion is also true
+                //TODO
 
                 if (indexLhs != null)
                 {
-                    if (lhsHasStarOrQuestion)
+                    if (lhsBankOrNameHasStarOrQuestion)
                     {
                         new Error("" + command + " where variable name has wildcard and where []-brackets are present is not yet implemented");
                     }
@@ -18072,15 +18084,36 @@ namespace Gekko
 
                 bool hasExplicitBank = bankLhs != null;
 
-                if (!lhsHasStarOrQuestion && type == EWildcardSearchType.Search)
+                bool searchInIndexes = false;
+                if (!lhsBankOrNameHasStarOrQuestion && indexLhs != null)
                 {
-                    //a hack to make DISP x[a] work                    
-                    //OR: it is an INDEX statement without stars, here we must find out if the single non-wildcard item exists
-                    //OR: it is an index wildcard like x[*] or x[?] that returns a List (of Series).
-                    IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
-                    if (iv != null)
+                    if (type == EWildcardSearchType.Search)
                     {
-                        if (!wildCardLhs.StartsWith(Globals.symbolCollection.ToString()) && iv.Type() == EVariableType.List)
+                        searchInIndexes = true;
+                    }
+                    else if (type == EWildcardSearchType.Copy)
+                    {
+                        if (IndexHasStars(indexLhs)) searchInIndexes = true;
+                    }
+                }
+
+                if (searchInIndexes)
+                {
+                    //Only called if LHS contains some [] and the LHS bank or name itself does not contain stars, for 
+                    //instance x[a], b:x[a], x[*], b:x[*].
+                    //Makes DISP x[a] work                    
+                    //Also handles INDEX statement without stars, here we must find out if the single non-wildcard item exists
+                    //Also handles index wildcard like x[*] or x[?] that returns a List (of Series).
+                    //Also handles COPY x[*] ...
+                    string wildCardLhs2 = wildCardLhs;
+                    if (frombank != null)
+                    {
+                        wildCardLhs2 = G.Chop_AddBank(wildCardLhs, frombank);
+                    }
+                    IVariable iv = O.GetIVariableFromString(wildCardLhs2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
+                    if (iv != null)
+                    {                        
+                        if (!G.Chop_GetName(wildCardLhs).StartsWith(Globals.symbolCollection.ToString()) && iv.Type() == EVariableType.List)
                         {
                             //DISP x[*], DISP x[?] etc., but not DISP #i.
                             foreach (IVariable child in (iv as List).list)
@@ -18088,31 +18121,27 @@ namespace Gekko
                                 Series child_ts = child as Series;
                                 string db = child_ts.GetParentDatabank().GetName();
                                 EFreq freq = child_ts.freq;
-
                                 string name = child_ts.GetName();
-
                                 if (freq != Program.options.freq)
                                 {
                                     name = G.Chop_SetFreq(name, freq);
-                                }
-
-                                if (!G.Equal(currentFirstBankName, db))
-                                {
-                                    name = G.Chop_SetBank(name, db);
-                                }
-
+                                }                                
+                                name = G.Chop_SetBank(name, db);
                                 lhsUnfolded.Add(name);
                                 lhsUnfoldedExplicit.Add(hasExplicitBank);
                             }
                         }
                         else
                         {
-                            lhsUnfolded.Add(wildCardLhs);
+                            string bankTemp, freq;
+                            HandleBankAndFreq(currentFreq, bankLhs, nameLhs, freqLhs, out bankTemp, out freq);
+                            lhsUnfolded.Add(O.UnChop(bankTemp, nameLhs, freq, indexLhs));
+                            //lhsUnfolded.Add(wildCardLhs);
                             lhsUnfoldedExplicit.Add(hasExplicitBank);
                         }
                     }
                 }
-                else if (lhsHasStarOrQuestion)
+                else if (lhsBankOrNameHasStarOrQuestion)
                 {
                     //There is a star or question in bank, name or freq, or a range in name                                        
                     List<string> db_banks = new List<string>();
@@ -18148,18 +18177,8 @@ namespace Gekko
                 else
                 {
                     //item without * or ? or range
-                    string bankTemp = bankLhs;
-                    if (bankLhs == null)
-                    {
-                        LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(nameLhs); //should be without freq                                                                                                             
-                        bankTemp = O.HandleLocalGlobalBank2(lg);
-                    }
-                    string freq = null;
-                    if (!G.Chop_HasSigil(nameLhs))
-                    {
-                        freq = freqLhs;
-                        if (freqLhs == null) freq = currentFreq;
-                    }
+                    string bankTemp, freq;
+                    HandleBankAndFreq(currentFreq, bankLhs, nameLhs, freqLhs, out bankTemp, out freq);
                     lhsUnfolded.Add(O.UnChop(bankTemp, nameLhs, freq, indexLhs));
                     lhsUnfoldedExplicit.Add(hasExplicitBank);
                 }
@@ -18195,14 +18214,12 @@ namespace Gekko
                     {
                         //Such assignment is too error-prone, like "COPY x* TO a, b, c;"
                         new Error("Using wildcards before TO/AS, you must state a single wildcard element after TO/AS");
-                        //throw new GekkoException();
                     }
                     else
                     {
                         if (lhs.Count != rhs.Count)
                         {
                             new Error("Mismatch: there are " + lhs.Count + " elements before TO/AS, and " + rhs.Count + " elements after TO/AS");
-                            //throw new GekkoException();
                         }
                     }
                 }
@@ -18240,15 +18257,40 @@ namespace Gekko
                     if (bankRhs == null && tobank != null) bankRhs = tobank;  //overwrites "naked" vars, so "COPY <tobank=b> a, b to c, d;" is same as "COPY a, b to b:c, b:d;"
 
                     string[] name2split = nameRhs.Split('*');
+                    ERhsStarType rhsType = ERhsStarType.None;
+                    if (name2split.Length == 1)
+                    {
+                        rhsType = ERhsStarType.None;  //copy ... to a;
+                    }
+                    else if (name2split.Length == 2)
+                    {
+                        //copy ... to *;  //copy ... to a*;  //copy ... to *b; //copy ... to a*b;
+                        if (G.NullOrEmpty(name2split[0]) && G.NullOrEmpty(name2split[1])) rhsType = ERhsStarType.OneNaked;
+                        else rhsType = ERhsStarType.OneNonNaked;
+                    }
+                    else rhsType = ERhsStarType.TwoOrMore;
+                                        
+                    if (IndexHasStars(indexRhs)) new Error("Indexes containing '*' not allowed in TO/AS part of " + command + "");
 
-                    if (name2split.Length - 1 > 1)
+                    if (rhsType == ERhsStarType.TwoOrMore)
                     {
                         new Error("More than one '*' not allowed in name in TO/AS part of " + command + "");
+                    }
+
+                    if (rhsType == ERhsStarType.OneNonNaked && indexLhs != null)
+                    {
+                        new Error("Regarding TO/AS part of " + command + ", using a pattern like for instance a*b (to prefix with 'a' and suffix with 'b'), this cannot be combined with the use of indexes.");
                     }
 
                     if ((bankRhs != null && bankRhs.Contains("?")) || nameRhs.Contains("?"))
                     {
                         new Error("'?' not not allowed in TO/AS part of " + command + "");
+                    }
+
+                    if (indexLhs != null && indexRhs == null && rhsType == ERhsStarType.OneNaked)
+                    {
+                        //At this point, we cannot have indexLhs != null && rhsType == ERhsStarType.OneNonNaked, because that has been filtered out (error) above, so we need not treat the ERhsStarType.OneNonNaked possibility here.
+                        indexRhs = indexLhs;  //Will not affect x[a,b] to y[m,n], but will affect x[a,b] to * or x[a,b] to b:*.
                     }
 
                     if (bankRhs == null)
@@ -18265,7 +18307,7 @@ namespace Gekko
                         }
 
                         //no bank given in second part
-                        if (name2split.Length == 1)
+                        if (rhsType == ERhsStarType.None)
                         {
                             //no stars
                             outputs.Add(new ToFrom(lhsElement, O.UnChop(bankTemp, nameRhs, freqLhs, indexRhs), lhsElementExplicit));
@@ -18288,7 +18330,7 @@ namespace Gekko
                         }
 
                         //fixed bank given in second part
-                        if (name2split.Length == 1)
+                        if (rhsType == ERhsStarType.None)
                         {
                             //no stars
                             outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, nameRhs, freqLhs, indexRhs), lhsElementExplicit));
@@ -18308,11 +18350,10 @@ namespace Gekko
                         if (bankRhs != "*")
                         {
                             new Error("Only simple '*' allowed in TO/AS part of " + command + "");
-                            //throw new GekkoException();
                         }
 
                         //original bank stated in second part
-                        if (name2split.Length == 1)
+                        if (rhsType == ERhsStarType.None)
                         {
                             //no stars
                             outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, nameRhs, freqLhs, indexRhs), lhsElementExplicit));
@@ -18408,6 +18449,39 @@ namespace Gekko
             if (freqWarning != null) G.Warning("w17.1", freqWarning); //Gekko 4.0  --> maybe make this an error
 
             return outputs;
+        }
+
+        private static bool IndexHasStars(string[] indexRhs)
+        {
+            bool b = false;
+            if (indexRhs != null)
+            {
+                foreach (string idx in indexRhs)
+                {
+                    if (idx.Contains("*"))
+                    {
+                        b = true; break;
+                    }
+                }
+            }
+
+            return b;
+        }
+
+        private static void HandleBankAndFreq(string currentFreq, string bankLhs, string nameLhs, string freqLhs, out string bankTemp, out string freq)
+        {
+            bankTemp = bankLhs;
+            if (bankLhs == null)
+            {
+                LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(nameLhs); //should be without freq                                                                                                             
+                bankTemp = O.HandleLocalGlobalBank2(lg);
+            }
+            freq = null;
+            if (!G.Chop_HasSigil(nameLhs))
+            {
+                freq = freqLhs;
+                if (freqLhs == null) freq = currentFreq;
+            }
         }
 
         public static string DstCodes(string s, bool d)
