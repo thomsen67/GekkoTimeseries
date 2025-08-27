@@ -3523,10 +3523,14 @@ namespace Gekko
             {
                 throw new GekkoException(); //Sanity check, best to keep it here for the time being!
             }
-            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
+            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);            
             this.storage.Add(mmi, iv);
             Series ts = iv as Series;  //always so
-            if (ts != null) ts.mmi = mmi;  //so that the sub-series points to the mmi object, which in turn points to the array-series
+            if (ts != null)
+            {
+                ts.mmi = mmi;  //so that the sub-series points to the mmi object, which in turn points to the array-series
+                ts.name = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(ts.freq); //We have to overwrite it here, else it could be a name like x!a if a normal timeseries is copied into an array series
+            }
             if (mmi.parent != null) mmi.parent.SetDirty(true);  //Gekko 4.0: mmi.parent probably never null
         }
 
