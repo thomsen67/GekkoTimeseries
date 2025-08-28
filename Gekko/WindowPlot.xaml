@@ -225,7 +225,7 @@
 
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
 
-                <TextBox Name="TextBox_period" Width="75" Height="17" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
+                <TextBox Name="TextBox_period" Width="75" Height="17" Margin="-3,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
 
                 <ComboBox Name="ZoomComboBox"
                   IsEditable="True"
@@ -264,7 +264,7 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="CopyComboBox" Background="White">
+                    <ComboBox Width="18" Margin="3,5,0,0" Height="10" Name="CopyComboBox" Background="White" ToolTip="Copy as .png, .emf or .svg">
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="ComboBoxItem">
                                 <EventSetter Event="PreviewMouseDown" Handler="CopyComboBoxItem_PreviewMouseDown"/>
@@ -284,7 +284,7 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-                    <ComboBox Width="18" Margin="5,5,0,0" Height="10" Name="SaveComboBox" Background="White">
+                    <ComboBox Width="18" Margin="3,5,0,0" Height="10" Name="SaveComboBox" Background="White" ToolTip="Save or Save As">
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="ComboBoxItem">
                                 <EventSetter Event="PreviewMouseDown" Handler="SaveComboBoxItem_PreviewMouseDown"/>

@@ -18084,16 +18084,18 @@ namespace Gekko
 
                 bool hasExplicitBank = bankLhs != null;
 
+                //If searchInIndexes is true, a special part of the code is called. We are a bit restrictive/defensive about
+                //calling this part, even though it actually may work for more cases than for instance x[a,*] etc.
                 bool searchInIndexes = false;
                 if (!lhsBankOrNameHasStarOrQuestion && indexLhs != null)
-                {
+                {                    
                     if (type == EWildcardSearchType.Search)
                     {
                         searchInIndexes = true;
                     }
-                    else if (type == EWildcardSearchType.Copy)
+                    else if (type == EWildcardSearchType.Copy || type == EWildcardSearchType.Delete)
                     {
-                        if (IndexHasStars(indexLhs)) searchInIndexes = true;
+                        if (IndexHasStars(indexLhs) || IndexHasQuestions(indexLhs)) searchInIndexes = true;
                     }
                 }
 
@@ -18459,6 +18461,23 @@ namespace Gekko
                 foreach (string idx in indexRhs)
                 {
                     if (idx.Contains("*"))
+                    {
+                        b = true; break;
+                    }
+                }
+            }
+
+            return b;
+        }
+
+        private static bool IndexHasQuestions(string[] indexRhs)
+        {
+            bool b = false;
+            if (indexRhs != null)
+            {
+                foreach (string idx in indexRhs)
+                {
+                    if (idx.Contains("?"))
                     {
                         b = true; break;
                     }

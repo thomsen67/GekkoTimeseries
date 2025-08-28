@@ -525,6 +525,8 @@ namespace Gekko
                 txt.AppendLine("set dashtype 2 (8, 4)");
             }
 
+            txt.AppendLine("set style line 103 lc rgb \"black\" lw " + Program.options.plot_png_scale);  //103 is just an id number, like 102
+
             txt.AppendLine("set size " + decompXZoom * zoom + "," + zoom + "");
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
@@ -684,12 +686,21 @@ namespace Gekko
             txt.AppendLine("set xtic scale 2, 0.7");
             txt.AppendLine("set xtics nomirror " + ticsInOut + "");
 
-            if (NotNullAndNotNo(xzeroaxis)) txt.AppendLine("set xzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
+            if (NotNullAndNotNo(xzeroaxis))
+            {
+                if (G.Equal(extension, "png"))
+                {
+                    txt.AppendLine("set xzeroaxis ls 103"); //draws x axis. May get ugly if residuals are present.
+                }
+                else
+                {
+                    txt.AppendLine("set xzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
+                }                
+            }
 
             string borderExtra = null;
             if (G.Equal(extension, "png"))
-            {
-                txt.AppendLine("set style line 103 lc rgb \"black\" lw " + Program.options.plot_png_scale);  //103 is just an id number, like 102
+            {                
                 borderExtra = " ls 103";
             }
 
@@ -754,12 +765,18 @@ namespace Gekko
                 if (setTitlePlaceholder) txt.AppendLine("set title " + Globals.QT + " " + Globals.QT);
             }
 
+            string arrowExtra = null;
+            if (G.Equal(extension, "png"))
+            {
+                arrowExtra = " ls 103";
+            }
+
             foreach (string s in xlines)
             {
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = Program.PlotTableTime(gt.freq, gt) + GetXAdjustmentForInsideTics(isInside);
                 if (G.Equal(Program.options.plot_xlabels_nonannual, "at") && !IsAOrUHighestFreq(highestFreq)) d += -0.5;
-                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
+                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead" + arrowExtra);
             }
 
             foreach (string s in xlinebefores)
@@ -767,7 +784,7 @@ namespace Gekko
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = (Program.PlotTableTime(gt.freq, gt) + Program.PlotTableTime(gt.freq, gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside);
                 if (G.Equal(Program.options.plot_xlabels_nonannual, "at") && !IsAOrUHighestFreq(highestFreq)) d += -0.5;
-                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
+                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead" + arrowExtra);
             }
 
             foreach (string s in xlineafters)
@@ -775,13 +792,13 @@ namespace Gekko
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = (Program.PlotTableTime(gt.freq, gt) + Program.PlotTableTime(gt.freq, gt.Add(1))) / 2d + GetXAdjustmentForInsideTics(isInside);
                 if (G.Equal(Program.options.plot_xlabels_nonannual, "at") && !IsAOrUHighestFreq(highestFreq)) d += -0.5;
-                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
+                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead" + arrowExtra);
             }
 
             foreach (string s in ylines)
             {
                 double d = Program.ParseIntoDouble(s);
-                if (!G.IsNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");
+                if (!G.IsNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead" + arrowExtra);
             }
 
             foreach (string s in y2lines)
@@ -789,7 +806,7 @@ namespace Gekko
                 if (numberOfY2s > 0)  //theses lines are ignored if there is no y2 axis shown
                 {
                     double d = Program.ParseIntoDouble(s);
-                    if (!G.IsNumericalError(d)) txt.AppendLine("set arrow from graph 0, second " + d + " to graph 1, second " + d + " nohead");
+                    if (!G.IsNumericalError(d)) txt.AppendLine("set arrow from graph 0, second " + d + " to graph 1, second " + d + " nohead" + arrowExtra);
                 }
             }
 
