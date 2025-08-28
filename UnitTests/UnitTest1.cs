@@ -6085,6 +6085,59 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_CopyWithIndexSanity()
+        {            
+            void Setup()
+            {
+                I("reset;");
+                I("open<edit>b1; clear b1; x=series(1); x[a]=1; x[b]=2; close b1; open b1; unlock b1;");
+                I("open<edit>b2; clear b2; x=series(1); close b2; open b2; unlock b2;");
+            }
+
+            Setup(); FAIL("copy x[*] to *;"); //fail
+            Setup(); FAIL("copy x[*] to b2:*;"); //fail
+            Setup(); FAIL("copy b1:x[*] to *;"); //fail
+            Setup(); I("copy b1:x[*] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+
+            Setup(); FAIL("copy <frombank=b1> x[*] to *;"); //fail
+            Setup(); I("copy <frombank=b1> x[*] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+            Setup(); FAIL("copy <frombank=b1> b1:x[*] to *;"); //fail
+            Setup(); I("copy <frombank=b1> b1:x[*] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+
+            Setup(); FAIL("copy <tobank=b2> x[*] to *;"); //fail
+            Setup(); FAIL("copy <tobank=b2> x[*] to b2:*;"); //fail
+            Setup(); I("copy <tobank=b2> b1:x[*] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+            Setup(); I("copy <tobank=b2> b1:x[*] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+
+            Setup(); I("copy <frombank=b1 tobank=b2> x[*] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+            Setup(); I("copy <frombank=b1 tobank=b2> x[*] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+            Setup(); I("copy <frombank=b1 tobank=b2> b1:x[*] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+            Setup(); I("copy <frombank=b1 tobank=b2> b1:x[*] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 2);
+
+            // -----------------
+
+            Setup(); FAIL("copy x[a] to *;"); //fail
+            Setup(); FAIL("copy x[a] to b2:*;"); //fail
+            Setup(); FAIL("copy b1:x[a] to *;"); //fail
+            Setup(); I("copy b1:x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+
+            Setup(); FAIL("copy <frombank=b1> x[a] to *;"); //fail
+            Setup(); I("copy <frombank=b1> x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+            Setup(); FAIL("copy <frombank=b1> b1:x[a] to *;"); //fail
+            Setup(); I("copy <frombank=b1> b1:x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+
+            Setup(); FAIL("copy <tobank=b2> x[a] to *;"); //fail
+            Setup(); FAIL("copy <tobank=b2> x[a] to b2:*;"); //fail
+            Setup(); I("copy <tobank=b2> b1:x[a] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+            Setup(); I("copy <tobank=b2> b1:x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+
+            Setup(); I("copy <frombank=b1 tobank=b2> x[a] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+            Setup(); I("copy <frombank=b1 tobank=b2> x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+            Setup(); I("copy <frombank=b1 tobank=b2> b1:x[a] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+            Setup(); I("copy <frombank=b1 tobank=b2> b1:x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
+        }        
+
+        [TestMethod]
         public void _Test_CopyDeleteArraySeries()
         {
             //? Can rename always be done as a copy+delete?
@@ -6100,23 +6153,6 @@ namespace UnitTests
             //copy ... to *:*; (same name, same bank, will fail)
             //But NOT copy ... to *:a*b, where a is prefix and b is suffix
             //So with indexes, name can only be *, and whatever []-indexes are found on LHS are transferred to RHS.
-
-            //Array to array
-            I("reset; time 2001 2003;");
-            I("x = series(2);");
-            I("y = series(2);");
-            I("x[a,m] = 1, 2 , 3;");
-            I("x[a,n] = 11, 12, 13;");
-            I("x[b,m] = 21, 22, 23;");
-            I("x[b,n] = 31, 32, 33;");
-            I("y = series(2);");            
-            I("copy x[a,m] to y[a,p];");
-
-
-
-
-
-
 
             //Array to array
             I("reset; time 2001 2003;");
@@ -29766,9 +29802,9 @@ print(df2)
 
             // === DOC ===
             Setup_Exceptions_Test();
-            Globals.unitTestScreenOutput.Clear();
-            I("DOC x1 label='abc';");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Changed meta information for 0 series"));
+            //Globals.unitTestScreenOutput.Clear();
+            FAIL("DOC x1 label='abc';"); // --> changed 27/8 2025, but it must be better it issues an error!
+            //Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Changed meta information for 0 series"));
             Globals.unitTestScreenOutput.Clear();
             I("DOC temp:x1 label='abc';");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Changed meta information for 1 series"));
