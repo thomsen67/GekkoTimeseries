@@ -6492,7 +6492,7 @@ namespace Gekko
 
             if (x.Length == 0) new Error("Expected > 0 arguments to tracebank() function");
             List<string> names = new List<string>();
-            
+
             if (x.Length == 2 || x.Length == 3)
             {
                 IVariable ivName = null;
@@ -6500,7 +6500,7 @@ namespace Gekko
                 string precOrDep = null;
 
                 if (x.Length == 2)
-                {                    
+                {
                     bankname = O.ConvertToString(x[0]);
                     precOrDep = O.ConvertToString(x[1]);
                 }
@@ -6532,27 +6532,84 @@ namespace Gekko
                 }
                 else new Error("Tracebank(): the type must be 'precedents', 'precedents1', 'dependents' or 'dependents1'");
 
-                GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                
-                if (type == ETraceBank.Precedents)
+                string special = null;
+                if (G.Equal(bankname, "<special>"))
                 {
-                    //precedents                                  
-                    found = Program.TraceGetPrecedents(ivName, bankname, direct, null);                    
+                    special = "";
+                    direct = true;
+                    type = ETraceBank.Precedents;
+                }
+
+                GekkoDictionary<string, bool> found = null;
+
+                if (special == null)
+                {
+                    if (type == ETraceBank.Precedents)
+                    {
+                        //precedents                                  
+                        found = Program.TraceGetPrecedents(ivName, bankname, direct, null);
+                    }
+                    else
+                    {
+                        //dependents                    
+                        found = Program.TraceGetDependents(ivName, bankname, direct);
+                    }
                 }
                 else
                 {
-                    //dependents                    
-                    found = Program.TraceGetDependents(ivName, bankname, direct);
-                }                
+                    GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
+                    List<string> eqs = new List<string>();
+                    foreach (KeyValuePair<string, IVariable> kvp in flat)
+                    {
+                        if (kvp.Value.Type() != EVariableType.Series) continue;
 
-                names = found.Keys.ToList();
-                names.Sort(StringComparer.OrdinalIgnoreCase);
+                        ivName = kvp.Value as Series;
+                        if ((ivName as Series).type == ESeriesType.ArraySuper) new Error("Internal error #78yuasfasdf32");
+
+                        special = "frml _i " + HandleMakroName((ivName as Series).GetName()) + " = ";
+                        GekkoDictionary<string, bool> found1 = Program.TraceGetPrecedents(ivName, "work", direct, null);
+                        List<string> names1 = found1.Keys.ToList();
+                        names1.Sort(StringComparer.OrdinalIgnoreCase);
+                        foreach (string s in names1)
+                        {
+                            special += HandleMakroName(s) + " + ";
+                        }
+                        GekkoDictionary<string, bool> found2 = Program.TraceGetPrecedents(ivName, "adambk", direct, null);
+                        List<string> names2 = found2.Keys.ToList();
+                        names2.Sort(StringComparer.OrdinalIgnoreCase);
+                        foreach (string s in names2)
+                        {
+                            special += "__adam__" + G.Chop_RemoveFreq(s) + " + ";
+                        }
+                        if (names1.Count + names2.Count == 0) special = special.Replace(" = ", " = 0   "); //three blanks at the end are pruned next line
+                        special = special.Substring(0, special.Length - " + ".Length) + ";";
+                        
+                        eqs.Add(special);
+                    }
+                    eqs.Sort(StringComparer.OrdinalIgnoreCase);
+                                        
+                    using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "datop.frm", null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string eq in eqs)
+                        {
+                            sw.WriteLine(eq);
+                            sw.WriteLine();
+                        }                                           
+                    }
+                    return new List(names);
+                }                
             }
             else new Error("Expected 2 or 3 arguments to tracebank() function");
             
             List m = new List(names);
             return m;
-        }
+
+            string HandleMakroName(string s)
+            {
+                return "__makro__" + G.Chop_RemoveFreq(s).Replace("[", "__lb__").Replace("]", "__rb__").Replace(",", "__comma__").Trim();
+            }
+        }        
 
         public static void tracestats(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {

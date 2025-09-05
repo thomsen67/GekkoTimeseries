@@ -1584,8 +1584,7 @@ namespace Gekko
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].Formula = null;
             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
-            
-            //qwerty
+                        
             //ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].AddComment("This is a comment", "Gekko");
         }
     }
@@ -17599,7 +17598,17 @@ namespace Gekko
 
                 nOk++;
 
-                IVariable existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
+                if (G.Chop_HasIndex(output.s2))
+                {
+                    //We check that the destination array-series exists at all
+                    string s = G.Chop_RemoveIndex(output.s2);
+                    IVariable existing2 = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReturnNullAlways);
+                    //If existing2 is not an array-series, this error is caught somewhere else.
+                    if (existing2 == null) new Error("The destination array-series '" + s + "' does not exist. Gekko needs such a (possibly empty) array-series to put the sub-series into. See the series() function regarding array-series construction.");
+                }
+
+                IVariable existing = existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
+                                
                 bool injectingToExistingSeries = false;
 
                 GekkoSmplSimple truncateTemp = null;
@@ -31103,7 +31112,6 @@ namespace Gekko
                     int rows2 = intput.GetLength(0);
                     int cols2 = intput.GetLength(1);
 
-                    //qwerty
                     //var comment = ws.Cells[1, 1, end.Row, end.Column].Comment;
                     //var comment = ws.Cells[1, 0, 1, 0].Comment;
                     //ExcelComment comment = ws.Cells[1, 0, 1, 0].Comment;
@@ -35754,7 +35762,7 @@ namespace Gekko
         /// <param name="stream">Stream to read from.</param>
         /// <returns>True if the whole stream is utf8 encoded.</returns>
         public static bool IsUtf8(Stream stream)
-        {
+        {            
             int count = 4 * 1024;
             byte[] buffer;
             int read;

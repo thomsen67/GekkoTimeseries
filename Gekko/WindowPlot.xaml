@@ -225,7 +225,7 @@
 
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
 
-                <TextBox Name="TextBox_period" Width="75" Height="17" Margin="-3,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
+                <TextBox Name="TextBox_period" Width="75" Height="17" Margin="-4,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
 
                 <ComboBox Name="ZoomComboBox"
                   IsEditable="True"
@@ -246,8 +246,6 @@
                     <ComboBoxItem>200%</ComboBoxItem>
                 </ComboBox>
 
-
-
                 <Button Content="Refresh" Margin="2,10,0,0" HorizontalAlignment="Left" Width="60" Height="18" Padding="0,-2,0,0" Opacity="0.7" ToolTip="Update with new data from databanks (may also be used when changing time period)." Click="Button_refresh">
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -257,7 +255,7 @@
                 </Button>
 
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Copy" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="To clipboard as a bitmap/png. Should paste as an image in Word, Outlook, Gmail and most others." Click="Button_copy_png">
+                    <Button Content="Copy" Margin="2,10,0,0" Width="60" Height="18" Padding="0,-2,0,0" HorizontalAlignment="Left" Opacity="0.7" ToolTip="To clipboard as a .png file (bitmap). Should paste as an image in Word, mail programs, etc." Click="Button_copy_png">
                         <Button.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="3"/>
@@ -270,9 +268,9 @@
                                 <EventSetter Event="PreviewMouseDown" Handler="CopyComboBoxItem_PreviewMouseDown"/>
                             </Style>
                         </ComboBox.ItemContainerStyle>
-                        <ComboBoxItem Content="Png" ToolTipService.ToolTip="To clipboard as a bitmap/png. Should paste as an image in Word, Outlook, Gmail and most others."/>
-                        <ComboBoxItem Content="Emf" ToolTipService.ToolTip ="To clipboard as a .emf. This pastes directly as a vector image in Word/PowerPoint/Excel, possibly not Outlook." />
-                        <ComboBoxItem Content="Svg (link)" ToolTipService.ToolTip="To clipboard as a file link (string) to a .svg file: in Word, use Insert -->Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." />
+                        <ComboBoxItem Content="Png" ToolTipService.ToolTip="To clipboard as a .png file (bitmap). Should paste as an image in Word, mail programs, many others."/>
+                        <ComboBoxItem Content="Emf" ToolTipService.ToolTip ="To clipboard as a .emf file. This pastes directly as a vector image in Word/PowerPoint/Excel, possibly not Outlook." />
+                        <ComboBoxItem Content="Svg (link)" ToolTipService.ToolTip="To clipboard as a file link (string) to a vector image .svg file: in Word, use Insert -->Pictures --> This Device... &#x0a;Unfortunately, the Windows clipboard does not support .svg files directly." />
                     </ComboBox>
                 </StackPanel>
 

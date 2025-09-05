@@ -2822,6 +2822,7 @@ namespace Gekko
                     //now we know that the series exists
 
                     Series existing = bank.GetIVariable(nameWithFreq) as Series;
+                    if (existing == null) new Error("The series '" + nameWithFreq + "' from databank '" + bank.GetName() + "' does not exist, for putting a sub-series into");
                     MultidimItem mmi = new MultidimItem(indexes, existing);
 
                     if (existing.type != ESeriesType.ArraySuper)
