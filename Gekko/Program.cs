@@ -16949,9 +16949,19 @@ namespace Gekko
                 }
             }
         }
-
+        
         public static void CallPrtViewer(DataTable dt)
         {
+            Thread thread = new Thread(new ParameterizedThreadStart(Program.CallPrtViewer2));
+            thread.Name = "Gekko viewer";
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.CurrentCulture = CultureInfo.InvariantCulture;            
+            thread.Start(dt);
+        }
+
+        public static void CallPrtViewer2(Object o)
+        {
+            DataTable dt = (DataTable)o;
             WindowTableViewer w = new WindowTableViewer(dt);
             w.Title = "Gekko viewer";
             w.ShowDialog();
