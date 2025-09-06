@@ -2610,7 +2610,8 @@ namespace Gekko
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
                     thread.Start(decompFind);
-                    if (Globals.python) System.Threading.Thread.Sleep(int.MaxValue);  //HACK
+                    //if (Globals.python) System.Threading.Thread.Sleep(int.MaxValue);  //HACK
+                    if (Globals.python) System.Threading.Thread.Sleep(5000);  //HACK
                 }
 
                 //Also see #9237532567

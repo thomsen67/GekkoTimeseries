@@ -274,7 +274,7 @@ namespace Gekko
         public static bool nolog = false;    //-nolog parameter for gekko.exe
         public static bool hideGui = false;  //true for use without GUI window
         public static bool excelDna = false; //true for use with ExcelDna solution
-        public static bool python = false;   //true for use with Python, calling C# (and Gekko) directly from Python
+        public static bool python = false;   //true for use with Python, calling C# (and Gekko) directly from Python --> is set true in Python.PreparePython()
         public static StringBuilder excelDnaOutput = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static ExcelDnaData excelDnaData = null;

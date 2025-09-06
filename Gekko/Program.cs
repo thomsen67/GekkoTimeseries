@@ -192,6 +192,48 @@ namespace Gekko
         Unknown
     }
 
+    public class CheckboxImageConverter : System.Windows.Data.IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            // Check for null or invalid inputs
+            if (values.Length != 2 || !(values[0] is bool) || !(values[1] is bool))
+            {
+                return null;
+            }
+
+            bool isMouseOver = (bool)values[0];
+            bool isChecked = (bool)values[1];
+
+            // This code gets the directory of your executing .NET assembly.
+            // It's a robust way to get the base path regardless of the entry point (gekko.exe).
+            string assemblyDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string imagePath;
+
+            if (isMouseOver && !isChecked)
+            {
+                imagePath = System.IO.Path.Combine(assemblyDir, "images", "hover.png");
+            }
+            else if (isChecked)
+            {
+                imagePath = System.IO.Path.Combine(assemblyDir, "images", "checked.png");
+            }
+            else
+            {
+                imagePath = Path.Combine(assemblyDir, "images", "normal.png");
+            }
+
+            // Return a BitmapImage object with the correct Uri
+            return new System.Windows.Media.Imaging.BitmapImage(new Uri(imagePath));
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class Masks
     {
 

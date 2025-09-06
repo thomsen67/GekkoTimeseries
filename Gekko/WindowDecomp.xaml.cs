@@ -39,8 +39,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gekko
-{
-
+{    
 
     /// <summary>
     /// Interaction logic for Window1.xaml
