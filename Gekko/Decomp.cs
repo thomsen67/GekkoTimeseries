@@ -2610,8 +2610,7 @@ namespace Gekko
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
                     thread.Start(decompFind);
-                    //if (Globals.python) System.Threading.Thread.Sleep(int.MaxValue);  //HACK
-                    if (Globals.python) System.Threading.Thread.Sleep(5000);  //HACK
+                    if (Globals.python) System.Threading.Thread.Sleep(int.MaxValue);  //HACK
                 }
 
                 //Also see #9237532567
@@ -2620,7 +2619,7 @@ namespace Gekko
                 {
                     System.Threading.Thread.Sleep(10);  //0.01s
                                                         //not sure why decompFind.decompOptions2 can become == null in the other thread...?
-                    if (decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0 || decompFind.hasException)
+                    if ((decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0) || decompFind.hasException)
                     {
                         break;
                     }
