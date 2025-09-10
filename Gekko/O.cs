@@ -3104,7 +3104,7 @@ namespace Gekko
                     string rv = null;
 
                     DialogResult result = DialogResult.OK;
-                    if (G.IsUnitTesting())
+                    if (G.IsUnitTestingOrNotShowingGUI())
                     {
                         rv = Globals.unitTestsPromtingHelper[i];
                     }

@@ -311,7 +311,7 @@ namespace Gekko
             if (G.Equal(s, Globals.INTERNAL))
             {
                 s = "w0.1";
-                if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                if (Globals.runningOnTTComputer || G.IsUnitTestingOrNotShowingGUI())
                 {
                     isInternal = true;  //For Gekko developer
                 }
@@ -544,7 +544,7 @@ namespace Gekko
                     if (n == 1) s5 = "There was " + n + " distinct WARNING message";
                     txt.MainAdd(s5 + " while running the job (" + G.GetLinkAction("show warnings", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)) + ")");
 
-                    if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                    if (Globals.runningOnTTComputer || G.IsUnitTestingOrNotShowingGUI())
                     {
                         bool hasInternalWarnings = false;
                         foreach (KeyValuePair<string, WarningInfo> kvp in this.storage)

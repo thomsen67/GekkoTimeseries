@@ -511,7 +511,7 @@ namespace Gekko
                             }
                             catch (Exception e)
                             {
-                                if (G.IsUnitTesting())
+                                if (G.IsUnitTestingOrNotShowingGUI())
                                 {
                                     throw;
                                 }

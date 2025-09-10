@@ -264,9 +264,9 @@ namespace Gekko
                 if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
                 {                    
-                    GetEquationTextHelper2 two2a = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t0);
+                    GetEquationTextHelper2 two2a = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t0, null);
                     rv.s_scalarModel += two2a.s2 + G.NL;
-                    GetEquationTextHelper2 two2b = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, true, t0);
+                    GetEquationTextHelper2 two2b = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, true, t0, null);
                     rv.s_scalarModelMathRename += two2b.s2 + G.NL;
                     rv.mathRename = two2b.mathRename;
                     if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
@@ -1847,12 +1847,13 @@ namespace Gekko
         /// c[d[0]] is replaced with "real" variable[period]. By avoiding storing the full 
         /// scalar model in human-readable form (up to 1 mio eqs),
         /// a lot of RAM is saved.
+        /// The ScalarDictionary is for re-emitting a scalar model, this arg can be set to null.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public GetEquationTextHelper2 GetEquationTextUnfolded(string name, EquationTextHelper helper, bool useMathRename, GekkoTime t0)
+        public GetEquationTextHelper2 GetEquationTextUnfolded(string name, EquationTextHelper helper, bool useMathRename, GekkoTime t0, ScalarDictionary sd)
         {
             //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
@@ -1984,6 +1985,19 @@ namespace Gekko
                     if (mathRename != null)
                     {
                         varname2 = Program.MathPutIntoDict(mathRename, varname2);
+                    }
+                    if (sd != null)
+                    {
+                        if (!sd.vars.ContainsKey(varname2))
+                        {
+                            string xName = "x" + (sd.vars.Count + 1);
+                            sd.vars.Add(varname2, xName);  //Starts with x1
+                            varname2 = xName;
+                        }
+                        else
+                        {
+                            varname2 = sd.vars[varname2];
+                        }                        
                     }
                     sb.Append(G.Blanks(tokens[i].leftblanks) + varname2);
                     i += 14;

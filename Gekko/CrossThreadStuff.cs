@@ -148,7 +148,7 @@ namespace Gekko
         delegate void SetTextUpperCallback(Wrap x);
         public static void Wrap(Wrap wrap)
         {
-            if (!G.IsUnitTesting() && Gui.gui.textBoxMainTabLower.InvokeRequired)
+            if (!G.IsUnitTestingOrNotShowingGUI() && Gui.gui.textBoxMainTabLower.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new SetTextUpperCallback(Wrap), new object[] { wrap });
@@ -164,7 +164,7 @@ namespace Gekko
         delegate void ZoomCallback();
         public static void Zoom()
         {
-            if (G.IsUnitTesting())
+            if (G.IsUnitTestingOrNotShowingGUI())
             {
                 return;
             }
@@ -232,7 +232,7 @@ namespace Gekko
         delegate void SetTabCallback(string text, bool refreshArrows);
         public static void SetTab(string text, bool refreshArrows)
         {
-            if (G.IsUnitTesting()) return;  //ignore the tab shift
+            if (G.IsUnitTestingOrNotShowingGUI()) return;  //ignore the tab shift
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -262,7 +262,7 @@ namespace Gekko
         delegate void ModeCallback();
         public static void Mode()
         {
-            if (G.IsUnitTesting())
+            if (G.IsUnitTestingOrNotShowingGUI())
             {
                 return;
             }
@@ -299,7 +299,7 @@ namespace Gekko
         delegate void ClsCallback(string text);
         public static void Cls(string text)
         {
-            if (G.IsUnitTesting())
+            if (G.IsUnitTestingOrNotShowingGUI())
             {
                 Globals.unitTestScreenOutput = new StringBuilder();  //used to capture text written on the GUI screen, for testing purposes
                 //just ignore it: do not clear the stuff
@@ -338,7 +338,7 @@ namespace Gekko
         delegate void WorkingFolderCallback(string text);
         public static void WorkingFolder(string text)  //called only from dynamic code
         {
-            if (!G.IsUnitTesting() && Gui.gui.InvokeRequired)
+            if (!G.IsUnitTestingOrNotShowingGUI() && Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new WorkingFolderCallback(WorkingFolder), new object[] { text });
@@ -461,7 +461,7 @@ namespace Gekko
         delegate void CopyButtonCallbackEnabled(bool status);
         public static void CopyButtonEnabled(bool status)
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -477,7 +477,7 @@ namespace Gekko
         delegate void SetCheckedCallback();
         public static void SetChecked()
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -514,7 +514,7 @@ namespace Gekko
         delegate void CutButtonCallbackEnabled(bool status);
         public static void CutButtonEnabled(bool status)
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -530,7 +530,7 @@ namespace Gekko
         delegate void BlinkCallback();
         public static void Blink()
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -548,7 +548,7 @@ namespace Gekko
         delegate void PulseCallback();
         public static void Pulse()
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -649,7 +649,7 @@ namespace Gekko
         delegate void RestartMenuBrowserCallback();
         public static void RestartMenuBrowser()
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -665,7 +665,7 @@ namespace Gekko
         delegate void RefreshArrowsEtcCallback();
         public static void RefreshArrowsEtc()
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.

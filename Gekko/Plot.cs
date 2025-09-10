@@ -1269,7 +1269,7 @@ namespace Gekko
             string exe = "wgnuplot51.exe";
 
             Process process = new Process();
-            if (G.IsUnitTesting())
+            if (G.IsUnitTestingOrNotShowingGUI())
             {
                 process.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
             }

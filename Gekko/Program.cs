@@ -379,7 +379,14 @@ namespace Gekko
     public class EquationTextHelper
     {
         public bool showTime = false;
-        public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.        
+        public bool showEq = true;  //Note: when false, the return slot #1 just returns null. So not a big effect.
+        public bool emitScalarModel = false;  //for re-emitting a scalar model
+    }
+
+    public class ScalarDictionary
+    {
+        public GekkoDictionary<string, string> vars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, string> eqs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);        
     }
 
     public class IdentityHelper 
@@ -10460,7 +10467,7 @@ namespace Gekko
         /// <param name="s"></param>
         public static void ShowPeriodInStatusField(string s)
         {
-            if (G.IsUnitTesting()) return;
+            if (G.IsUnitTestingOrNotShowingGUI()) return;
 
             string s1 = "";
             //TODO: make a smart trim procedure
@@ -11911,7 +11918,7 @@ namespace Gekko
             {
                 Process process = new Process();
                 string startup = null;
-                if (G.IsUnitTesting())
+                if (G.IsUnitTestingOrNotShowingGUI())
                 {
                     startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
                 }
@@ -12968,7 +12975,7 @@ namespace Gekko
                         sw.Close();
                     }
 
-                    if (!G.IsUnitTesting())
+                    if (!G.IsUnitTestingOrNotShowingGUI())
                     {
                         CrossThreadStuff.SetTab("menu", true);
                         Gui.gui.webBrowser.Url = new Uri("file:///" + Globals.localTempFilesLocation + "\\table.html");
@@ -16365,7 +16372,7 @@ namespace Gekko
 
                 if (!isGams)
                 {
-                    if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
+                    if (!G.IsUnitTestingOrNotShowingGUI()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
 
                     if (G.GetModelSourceType() == EModelType.Gekko)
                     {
@@ -16603,7 +16610,7 @@ namespace Gekko
 
             List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
 
-            if (G.IsUnitTesting())
+            if (G.IsUnitTestingOrNotShowingGUI())
             {
                 Globals.unitTestDependents = new List<string>();
                 if (eqs != null)
@@ -16633,7 +16640,7 @@ namespace Gekko
                 }
             }
 
-            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
+            if (!G.IsUnitTestingOrNotShowingGUI()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
             return eqsPrinted;
         }
 
@@ -16872,7 +16879,7 @@ namespace Gekko
                     G.Writeln();
                 }
             }
-            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
+            if (!G.IsUnitTestingOrNotShowingGUI()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
             return eqsPrinted;
         }
 
@@ -17518,7 +17525,7 @@ namespace Gekko
 
             List<ToFrom> outputs = SearchFromTo(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename, null);
 
-            if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
+            if (G.IsUnitTestingOrNotShowingGUI() && Globals.unitTestCopyHelper2)
             {
                 Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
                 return;
@@ -17603,7 +17610,7 @@ namespace Gekko
             int nIgnores = 0;
             int nOk = 0;
 
-            if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
+            if (G.IsUnitTestingOrNotShowingGUI() && Globals.unitTestCopyHelper2)
             {
                 Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
                 return;
@@ -19373,7 +19380,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (G.IsUnitTesting())
+                    if (G.IsUnitTestingOrNotShowingGUI())
                     {
                         throw;
                     }
@@ -21808,7 +21815,7 @@ namespace Gekko
 
 
 
-                if (G.IsUnitTesting())
+                if (G.IsUnitTestingOrNotShowingGUI())
                 {
                     //We do it pretty simple when unit testing.
                     using (process)
@@ -21874,7 +21881,7 @@ namespace Gekko
                             }
                         }
 
-                        if (!G.IsUnitTesting())
+                        if (!G.IsUnitTestingOrNotShowingGUI())
                         {
                             if (!Globals.threadIsInProcessOfAborting)
                             {
@@ -25531,7 +25538,7 @@ namespace Gekko
                 p.hasShownErrorHandling = EHasShownErrorHandling.True;  //to make the statement files 'Fail' in status window.
                 return "stop";
             }
-            if (G.IsUnitTesting()) return "stop";
+            if (G.IsUnitTestingOrNotShowingGUI()) return "stop";
 
             if (!p.hasBeenCmdFile) return "stop";
 

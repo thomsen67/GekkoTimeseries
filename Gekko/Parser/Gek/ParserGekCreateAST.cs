@@ -131,7 +131,7 @@ namespace Gekko.Parser.Gek
             string csCode2 = wh2.headerCs.ToString(); string csMethods2 = "";
             if (Program.options.system_code_split > 0) CodeSplit(ref csCode2, ref csMethods2, "CC");
 
-            if (Program.options.system_code_split > 0 && Globals.showTimings && !G.IsUnitTesting())
+            if (Program.options.system_code_split > 0 && Globals.showTimings && !G.IsUnitTestingOrNotShowingGUI())
             {
                 G.Writeln("Splitting took " + (DateTime.Now - dt).TotalMilliseconds / 1000d + "s", Color.Gray);
             }

@@ -220,7 +220,7 @@ namespace Gekko
             {
                 marginFirst = Globals.warningString;
                 color = Globals.warningColor;
-                if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                if (Globals.runningOnTTComputer || G.IsUnitTestingOrNotShowingGUI())
                 {
                     if (this.storageMain[0].storage[0].Contains(Globals.internalGekkoWarningString)) color = Globals.warningColorInternal;
                 }
@@ -319,7 +319,7 @@ namespace Gekko
                     WrapHelper(0, 2, margin, margin, "--> Info and detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", lineWidth, color, ETabs.Main, this.type, mustAlsoPrintOnScreen);
                 }
 
-                if (!G.IsUnitTesting()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.
+                if (!G.IsUnitTestingOrNotShowingGUI()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.
             }
 
         }
@@ -424,7 +424,7 @@ namespace Gekko
 
             int textLengthStart = -12345;  //used to set color at the very end    
             RichTextBoxEx textBox = null;
-            if (!G.IsUnitTesting())
+            if (!G.IsUnitTestingOrNotShowingGUI())
             {
                 if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
                 else textBox = Gui.gui.textBoxMainTabUpper;

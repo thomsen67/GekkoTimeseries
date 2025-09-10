@@ -121,7 +121,7 @@ namespace Gekko.Parser.Gek
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
             }
-            else if (G.IsUnitTesting())
+            else if (G.IsUnitTestingOrNotShowingGUI())
             {
                 //if running test cases, use this absolute path, this will never be run by users                
                 compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");

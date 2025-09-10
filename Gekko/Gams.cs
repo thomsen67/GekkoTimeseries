@@ -1656,7 +1656,7 @@ namespace Gekko
                 }
             }
 
-            if (G.IsUnitTesting())
+            if (G.IsUnitTestingOrNotShowingGUI())
             {
                 Globals.unitTestLhsNotFoundInModel = notFoundInModel;
                 Globals.unitTestLhsNotFoundInEq = notFoundInEq;

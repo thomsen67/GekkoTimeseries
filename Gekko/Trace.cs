@@ -1204,7 +1204,7 @@ namespace Gekko
 
             int nn = 0;
 
-            if (Globals.python || !G.IsUnitTesting())
+            if (Globals.python || !G.IsUnitTestingOrNotShowingGUI())
             {
                 if (Globals.python)
                 {

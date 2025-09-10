@@ -1114,7 +1114,7 @@ namespace Gekko
             if (folder.StartsWith("20. ")) folder = folder.Substring(4);
             if (folder == "") return;
 
-            if (!G.IsUnitTesting()) Globals.userSettings.WorkingFolder = folder;            
+            if (!G.IsUnitTestingOrNotShowingGUI()) Globals.userSettings.WorkingFolder = folder;            
 
             Program.options.folder_working = folder;
             //Globals.dependencyTracking.FencingWarning();
@@ -1126,7 +1126,7 @@ namespace Gekko
             {
                 G.Writeln();
                 G.WriteDirs("small", false);
-                if (!G.IsUnitTesting())
+                if (!G.IsUnitTestingOrNotShowingGUI())
                 {
                     Globals.guiRecentFoldersCache[Program.options.folder_working] = Program.options.folder_working;
                     GuiUpdateRecentFilesMenu();

@@ -52,12 +52,8 @@ using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using Microsoft.Data.Analysis;
 using static Gekko.O;
-//using Microsoft.Office.Interop.Excel;
 using System.Linq;
-using System.Drawing;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
-using System.IO.Compression;
-//using System.Windows.Documents;
+
 
 namespace UnitTests
 {
@@ -14732,6 +14728,70 @@ namespace UnitTests
             {
                 Globals.decompUseBracketNames = true;
             }
+        }
+
+
+        [TestMethod]
+        public void _Test_Scalar_Slice()
+        {
+            //e1[t] $ t0(t) .. y[t] = E = c[t] + g[t] + z1[t];
+            //e2[t] $ t0(t) .. c[t] = E = 0.1 * y[t-1] + 0.4 * y[t] + 0.3 * y[t+1] + z2[t];
+            //e3[t] $ t0(t) .. g[t] = E = 0.1 * c[t] + 0.1 * c[t-1] + z3[t];
+
+            //Variables 1 to 21
+            //x1 y(2000),   x2 y(2001),   x3 y(2002),   x4 y(2003),   x5 y(2004),   x6 c(2000),   x7 c(2001),   x8 c(2002),   x9 c(2003)
+            //x10 g(2001),  x11 g(2002),   x12 g(2003),   x13 z1(2001),   x14 z1(2002),   x15 z1(2003),   x16 z2(2001),   x17 z2(2002)
+            //x18 z2(2003),  x19 z3(2001),   x20 z3(2002),   x21 z3(2003)
+
+            //e1 .. x2 - x7 - x10 - x13 = E = 0;
+            //e2 .. x3 - x8 - x11 - x14 = E = 0;
+            //e3 .. x4 - x9 - x12 - x15 = E = 0;
+            //e4 .. -0.1 * x1 - 0.4 * x2 - 0.3 * x3 + x7 - x16 = E = 0;
+            //e5 .. -0.1 * x2 - 0.4 * x3 - 0.3 * x4 + x8 - x17 = E = 0;
+            //e6 .. -0.1 * x3 - 0.4 * x4 - 0.3 * x5 + x9 - x18 = E = 0;
+            //e7 .. -0.1 * x6 - 0.1 * x7 + x10 - x19 = E = 0;
+            //e8 .. -0.1 * x7 - 0.1 * x8 + x11 - x20 = E = 0;
+            //e9 .. -0.1 * x8 - 0.1 * x9 + x12 - x21 = E = 0;            
+
+            //e1[2001] .. y(2001) - c(2001) - g(2001) - z1(2001) = E = 0;
+            //e1[2002] .. y(2002) - c(2002) - g(2002) - z1(2002) = E = 0;
+            //e1[2003] .. y(2003) - c(2003) - g(2003) - z1(2003) = E = 0;
+            //e2[2001] .. -0.1 * y(2000) - 0.4 * y(2001) - 0.3 * y(2002) + c(2001) - z2(2001) = E = 0;
+            //e2[2002] .. -0.1 * y(2001) - 0.4 * y(2002) - 0.3 * y(2003) + c(2002) - z2(2002) = E = 0;
+            //e2[2003] .. -0.1 * y(2002) - 0.4 * y(2003) - 0.3 * y(2004) + c(2003) - z2(2003) = E = 0;
+            //e3[2001] .. -0.1 * c(2000) - 0.1 * c(2001) + g(2001) - z3(2001) = E = 0;
+            //e3[2002] .. -0.1 * c(2001) - 0.1 * c(2002) + g(2002) - z3(2002) = E = 0;
+            //e3[2003] .. -0.1 * c(2002) - 0.1 * c(2003) + g(2003) - z3(2003) = E = 0;
+
+
+            Globals.decompUseBracketNames = false;
+
+            I("flush();");
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("option model gams dep method = lhs;");
+            I("model <gms> simulLagLead.zip;");
+            // ----------------            
+            I("y <2000 2003> = 500, 499, 531, 540;");
+            I("c <2001 2002> = 459, 471;");
+            I("g <2001 2002> = 40, 60;");
+            I("clone;");  //ref
+            I("y <2000 2003> = 500, 504, 536, 540;");
+            I("c <2001 2002> = 462, 474;");
+            I("g <2001 2002> = 42, 62;");            
+
+            Gekko.Table table = null;
+
+            //ModelGamsScalar.FlushAAndRArrays();
+            //modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            //modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+
+            Functions.identities(null, null, null, null);
+
+            //ShowDecompTable();  //will show the following decomp table and then abort
+            //I("decomp <2002 2002> y from e1;");
+                        
+
         }
 
         [TestMethod]

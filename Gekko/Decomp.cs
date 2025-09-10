@@ -2597,7 +2597,7 @@ namespace Gekko
                     CrossThreadStuff.GetDecompSizes(parent);
                 }
 
-                if (!Globals.python && (G.IsUnitTesting() && Globals.showDecompTable == true))
+                if (!Globals.python && (G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == true))
                 {                    
                     //Skip the "Decomp" thread stuff when unit testing -- will give TreadAbortedException for some reason not understood.
                     CreateDecompWindow(decompFind);
@@ -2660,7 +2660,7 @@ namespace Gekko
                 windowDecomp.RecalcCellsWithNewType(decompFind.model);  //With fail, we get                 
                 
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
-                if (!Globals.python && G.IsUnitTesting() && Globals.showDecompTable == false)
+                if (!Globals.python && G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == false)
                 {
                     Globals.windowsDecomp2.Clear();
                     windowDecomp = null;
@@ -5906,7 +5906,7 @@ namespace Gekko
 
         public static void Find(O.Find o)
         {
-            if (!Globals.python && G.IsUnitTesting() && Globals.showFind == true)
+            if (!Globals.python && G.IsUnitTestingOrNotShowingGUI() && Globals.showFind == true)
             {
                 //Skip the "Decomp" thread stuff when unit testing -- will give TreadAbortedException for some reason not understood.
                 CreateFindWindow(o);

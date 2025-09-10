@@ -280,8 +280,11 @@ namespace Gekko
         public static ExcelDnaData excelDnaData = null;
         public static string excelDnaName = "Gekcel"; //probably unwise to delete this...
 
+        public static Application application; //for wpf in Python
+        public static Thread thread; //for wpf in Python
+
         //public static int decompWindowCounter = 0;
-                
+
         public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
         public static string windowDecompStatusBarText_gekko = "Click to decompose variable, Ctrl+click to find equation(s)."; //Gekko model
         public static string windowDecompStatusBarText_gekko2 = "Ctrl+click to find equation(s)."; //Gekko model

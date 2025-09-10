@@ -5605,7 +5605,7 @@ namespace Gekko
         /// For developer use/debugging. Will also be true if ExcelDna or hiding GUI is active.
         /// Beware: It seems the when running unit tests, Globals.runningOnTTComputer is false.
         /// </summary>
-        public static bool IsUnitTesting()
+        public static bool IsUnitTestingOrNotShowingGUI()
         {            
             if (Globals.hideGui) return true;
             if (Globals.python) return true;
@@ -5780,14 +5780,18 @@ namespace Gekko
 
             if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
             {                
-                if (G.IsUnitTesting())
-                {                    
+                if (G.IsUnitTestingOrNotShowingGUI())
+                {
                     if (newline)
-                    {                        
-                        if (Globals.excelDna || Globals.python || Globals.hideGui)
-                        {                            
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);                         
-                        }                        
+                    {
+                        if (Globals.python)
+                        {
+                            Console.WriteLine(s);
+                        }
+                        else if (Globals.excelDna || Globals.hideGui)
+                        {
+                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
+                        }
                         else
                         {
                             Globals.unitTestScreenOutput.AppendLine(s);
@@ -5796,9 +5800,13 @@ namespace Gekko
                     }
                     else
                     {
-                        if (Globals.excelDna || Globals.python || Globals.hideGui)
-                        {                            
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);                         
+                        if (Globals.python)
+                        {
+                            Console.Write(s);
+                        }
+                        else if (Globals.excelDna || Globals.hideGui)
+                        {
+                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
                         }
                         else
                         {
@@ -6139,14 +6147,18 @@ namespace Gekko
             if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
 
             bool isPiping = false;
-            isPiping = AppendTextMaybePipe(s, isMuting, isPiping);            
+            isPiping = AppendTextMaybePipe(s, isMuting, isPiping);
 
 
             if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
-            {
-                if (G.IsUnitTesting())
+            {                
+                if (G.IsUnitTestingOrNotShowingGUI())
                 {
-                    if (Globals.excelDna || Globals.python || Globals.hideGui)
+                    if (Globals.python)
+                    {
+                        Console.Write(s);
+                    }
+                    else if (Globals.excelDna || Globals.hideGui)
                     {
                         if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
                     }
@@ -6158,7 +6170,7 @@ namespace Gekko
                 }
                 else
                 {
-                    //not piping, not muting, not ExcelDna'ing, not unit testing --> normal printing
+                    //not piping, not muting, not ExcelDna'ing, not unit testing, not pythoning --> normal printing
                     if (link == null)
                     {
                         textBox.AppendText(s);

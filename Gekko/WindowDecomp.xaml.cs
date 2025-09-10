@@ -2075,7 +2075,7 @@ namespace Gekko
             }
             catch (Exception e)
             {                
-                if (G.IsUnitTesting()) throw;
+                if (G.IsUnitTestingOrNotShowingGUI()) throw;
                 if (this.decompFind.decompOptions2Previous != null)
                 {
                     this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;
@@ -2269,7 +2269,7 @@ namespace Gekko
                 webBrowser.Visibility = Visibility.Collapsed;
                 scrollView1.Visibility = Visibility.Visible;
 
-                if (!Globals.python && G.IsUnitTesting() && Globals.showDecompTable == false)
+                if (!Globals.python && G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == false)
                 {
                     Globals.lastDecompTable = decompOutput.table;
                 }

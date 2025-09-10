@@ -1716,6 +1716,42 @@ namespace Gekko
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
             GekkoTime t = new GekkoTime(EFreq.A, 2024, 1, 1);
 
+            if (true)
+            {
+                //List<IdentityHelper> eqs = new List<IdentityHelper>();
+
+                ScalarDictionary sd = new ScalarDictionary();
+
+                for (int i = 0; i < modelGamsScalar.CountEqs(1); i++)
+                {
+                    string eq = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
+                    EquationTextHelper helper = new EquationTextHelper();
+                    helper.showTime = true;
+                    helper.emitScalarModel = true;
+
+                    //if (!eq.Contains(t.ToString() + "]")) continue;
+                    //if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
+                    //if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
+                    GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t, sd);
+                    string eqText = two.s1 + " .. " + two.s2;
+                    //string lhs = "[unknown]";
+                    //if (two.s3 != null) lhs = G.Replace(two.s3, Globals.decompResidualPrefix, "", StringComparison.OrdinalIgnoreCase, 1);
+                    //string label = null;
+                    ////if (lhs != "[unknown]") label = "'" + Helper_GetLabel(lhs) + "'";
+                    //sw.WriteLine();
+                    //string s2 = lhs + " from " + two.s1;
+                    //sw.WriteLine(s2);
+                    //sw.WriteLine(label);
+                    //sw.WriteLine();
+                    //sw.WriteLine(two.s2);
+                    //sw.WriteLine();
+                    //sw.WriteLine(" ------------------------------------------------------------------------------- ");
+
+                    new Writeln(eqText);
+                }
+                return;
+            }
+
             Databank db = Program.databanks.GetDatabank("m");
             GekkoDictionary<string, bool> names = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             int dublets = 0;
@@ -6648,7 +6684,7 @@ namespace Gekko
                 foreach (KeyValuePair<int, int> kvp in depths)
                 {
                     string extra = null;
-                    if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                    if (Globals.runningOnTTComputer || G.IsUnitTestingOrNotShowingGUI())
                     {
                         if (kvp.Key == -1) extra = "TTH: ";
                     }
@@ -6715,7 +6751,7 @@ namespace Gekko
                         if (!eq.Contains(t.ToString() + "]")) continue;
                         if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
                         if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
-                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t);
+                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t, null);
                         string eqText = two.s1 + " .. " + two.s2;
                         string lhs = "[unknown]";
                         if (two.s3 != null) lhs = G.Replace(two.s3, Globals.decompResidualPrefix, "", StringComparison.OrdinalIgnoreCase, 1);
@@ -6772,9 +6808,9 @@ namespace Gekko
 
         public static void warning(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            if (!(G.IsUnitTesting() || Globals.runningOnTTComputer)) new Error("Function warning() is unknown.");
+            if (!(G.IsUnitTestingOrNotShowingGUI() || Globals.runningOnTTComputer)) new Error("Function warning() is unknown.");
             double d = O.ConvertToVal(x);
-            if (G.IsUnitTesting() || Globals.runningOnTTComputer)
+            if (G.IsUnitTestingOrNotShowingGUI() || Globals.runningOnTTComputer)
             {
                 //Do not delete: used in unit tests
                 if (d == 1)

@@ -2202,7 +2202,7 @@ img {border-style: none;
                     string[] files = Directory.GetFiles(folder + "\\");
                     if (files.Length > 0)
                     {
-                        if (!G.IsUnitTesting())
+                        if (!G.IsUnitTestingOrNotShowingGUI())
                         {
                             DialogResult result = MessageBox.Show("All " + files.Length + " files in '" + folder + "' will be deleted", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                             if (result == DialogResult.Yes)
