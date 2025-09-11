@@ -1874,12 +1874,19 @@ namespace Gekko
             int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
             if (eq == -12345)
             {
-                GetEquationTextHelper2 tmp2 = new GetEquationTextHelper2();
-                tmp2.s1 = null;
-                tmp2.s2 = "...equation '" + name + "' " + Globals.eqs6;
-                tmp2.s3 = null;
-                tmp2.mathRename = null;
-                return tmp2;
+                if (sd == null)
+                {
+                    GetEquationTextHelper2 tmp2 = new GetEquationTextHelper2();
+                    tmp2.s1 = null;
+                    tmp2.s2 = "...equation '" + name + "' " + Globals.eqs6;
+                    tmp2.s3 = null;
+                    tmp2.mathRename = null;
+                    return tmp2;
+                }
+                else
+                {
+                    new Error("Could not find equation " + name + " in period " + t0.ToString());
+                }
             }
 
             //Beware of this: for a scalar-2000 model, time basis is always 2000.
@@ -1980,6 +1987,7 @@ namespace Gekko
                     }
                     else
                     {
+                        if (sd != null) new Error("Not showing time not expected");
                         varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, false);
                     }
                     if (mathRename != null)
@@ -1992,6 +2000,7 @@ namespace Gekko
                         {
                             string xName = "x" + (sd.vars.Count + 1);
                             sd.vars.Add(varname2, xName);  //Starts with x1
+                            sd.varsList.Add(varname2);  //Will start at slot 0
                             varname2 = xName;
                         }
                         else
@@ -2007,7 +2016,6 @@ namespace Gekko
                     //constants
                     int i1 = int.Parse(tokens[i + 4].s);
                     double c = this.cc[this.dd[eq][i1]];
-
                     
                     string sC = c.ToString();
                     if (false)
@@ -2043,10 +2051,29 @@ namespace Gekko
                 if (helper.showTime)
                 {
                     //do nothing, time is already there
-                    rv1 = name;
+
+                    if (sd != null)
+                    {
+                        if (!sd.eqs.ContainsKey(name))
+                        {
+                            string eName = "e" + (sd.eqs.Count + 1);
+                            sd.eqs.Add(name, eName);  //Starts with e1
+                            sd.eqsList.Add(name);  //Will start with slot 0
+                            rv1 = eName;
+                        }
+                        else
+                        {
+                            new Error("Dublet equation");  //Should not be possible.
+                        }
+                    }
+                    else
+                    {
+                        rv1 = name;
+                    }
                 }
                 else
                 {
+                    if (sd != null) new Error("Not showing time not expected");
                     rv1 = name.Replace("," + t0.ToString() + "]", "]").Replace("[" + t0.ToString() + "]", "");
                 }
             }

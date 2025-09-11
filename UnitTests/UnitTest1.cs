@@ -14751,7 +14751,7 @@ namespace UnitTests
             //e6 .. -0.1 * x3 - 0.4 * x4 - 0.3 * x5 + x9 - x18 = E = 0;
             //e7 .. -0.1 * x6 - 0.1 * x7 + x10 - x19 = E = 0;
             //e8 .. -0.1 * x7 - 0.1 * x8 + x11 - x20 = E = 0;
-            //e9 .. -0.1 * x8 - 0.1 * x9 + x12 - x21 = E = 0;            
+            //e9 .. -0.1 * x8 - 0.1 * x9 + x12 - x21 = E = 0;                        
 
             //e1[2001] .. y(2001) - c(2001) - g(2001) - z1(2001) = E = 0;
             //e1[2002] .. y(2002) - c(2002) - g(2002) - z1(2002) = E = 0;
@@ -14762,7 +14762,6 @@ namespace UnitTests
             //e3[2001] .. -0.1 * c(2000) - 0.1 * c(2001) + g(2001) - z3(2001) = E = 0;
             //e3[2002] .. -0.1 * c(2001) - 0.1 * c(2002) + g(2002) - z3(2002) = E = 0;
             //e3[2003] .. -0.1 * c(2002) - 0.1 * c(2003) + g(2003) - z3(2003) = E = 0;
-
 
             Globals.decompUseBracketNames = false;
 
@@ -14778,7 +14777,7 @@ namespace UnitTests
             I("clone;");  //ref
             I("y <2000 2003> = 500, 504, 536, 540;");
             I("c <2001 2002> = 462, 474;");
-            I("g <2001 2002> = 42, 62;");            
+            I("g <2001 2002> = 42, 62;");
 
             Gekko.Table table = null;
 
@@ -14790,7 +14789,7 @@ namespace UnitTests
 
             //ShowDecompTable();  //will show the following decomp table and then abort
             //I("decomp <2002 2002> y from e1;");
-                        
+
 
         }
 

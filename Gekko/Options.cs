@@ -141,6 +141,7 @@ namespace Gekko
         public string interface_debug = "dialog";  //or "none"  
         public string interface_edit_style = "gekko";  // gekko | gekko2 | rs | rs2
         public string interface_errors = "normal";  // old | normal
+        public int interface_gcm_ndec = 6;  //for export<gcm>, //6 decimals, must be enough also for interest rates etc.
         public bool interface_excel_ignoremissing = false; //with true, all missings are shown as blanks when EXPORTed
         public string interface_excel_language = "danish";
         public bool interface_excel_modernlook = true;
@@ -469,6 +470,7 @@ namespace Gekko
             Add("INTERFACE EXCEL IGNOREMISSING", Globals.xbool);
             Add("INTERFACE EXCEL LANGUAGE", Globals.xnameOrString, "danish", "english");            
             Add("INTERFACE EXCEL MODERNLOOK", Globals.xbool);
+            Add("INTERFACE GCM NDEC", Globals.xint);
             Add("INTERFACE HELP COPYLOCAL", Globals.xbool);
             Add("INTERFACE MODE", Globals.xnameOrString, "mixed", "sim", "data");
             Add("INTERFACE MUTE", Globals.xnameOrString, "yes", "no"); //Note: this is not a boolean because value = null is used in the program (mute has 3 values)

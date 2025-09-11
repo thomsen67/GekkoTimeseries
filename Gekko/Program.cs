@@ -386,7 +386,9 @@ namespace Gekko
     public class ScalarDictionary
     {
         public GekkoDictionary<string, string> vars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> eqs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);        
+        public GekkoDictionary<string, string> eqs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public List<string> varsList = new List<string>();
+        public List<string> eqsList = new List<string>();
     }
 
     public class IdentityHelper 
@@ -22117,10 +22119,19 @@ namespace Gekko
                                 val = (w / b - 1) * 100d;
                             }
 
-                            int decimals = 6;
-                            if (op == "*=") decimals = 8;
-                            string valstring = G.UpdprtFormat(val, decimals, true); //6 decimals, must be enough also for interest rates etc.
-
+                            string valstring = val.ToString();
+                            if (G.IsNumericalError(val))
+                            {
+                                valstring = "m()";
+                            }
+                            else
+                            {
+                                if (Program.options.interface_gcm_ndec < 20)
+                                {
+                                    int add = 0; if (op == "*=") add = 2;
+                                    valstring = Program.NumberFormat(val, "f" + (Program.options.interface_gcm_ndec + add));
+                                }
+                            }
                             valstring = valstring.Trim();  //necesssary?
                             sb.Append(valstring);
                             if (GekkoTime.Observations(t, per2) > 1) sb.Append(", ");
