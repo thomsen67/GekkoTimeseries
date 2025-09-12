@@ -135,7 +135,7 @@ namespace Gekko
     [ProtoContract]
     public class Model
     {
-        //Do not add fields here, in that case use ModelCommon classe.
+        //Do not add fields here, in that case use ModelCommon class.
         public ModelCommon modelCommon = new ModelCommon();
         public ModelGekko modelGekko = null;
         public ModelGams modelGams = null;
@@ -750,6 +750,9 @@ namespace Gekko
         public GekkoDictionary<string, EquationLhsPoints> lhsVariables = null;  //Is created when FIND is first used -- at that point we have sets/lists, too.
         
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
+
+        [ProtoMember(4)]
+        public string rawGmsFile = null; //mostly used when creating a scalar model from another scalar model, copiying this over, too.
 
         /// <summary>
         /// Only for protobuf, use ModelGams(Model...).
@@ -1983,7 +1986,7 @@ namespace Gekko
                     if (G.StartsWith(varname, Globals.decompResidualPrefix)) resName = varname;
                     if (helper.showTime)
                     {
-                        varname2 = G.Chop_DimensionAddLast(varname, gt.ToString());
+                        varname2 = G.Chop_DimensionAddLast(varname, gt.ToString(), "");  //No dim blanks, so we get "x[a,b,c,2025]".
                     }
                     else
                     {

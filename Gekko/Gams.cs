@@ -982,6 +982,7 @@ namespace Gekko
                     GekkoDictionary<string, string> dependents = tup.Item1;
                     modelGams = GamsModel.ReadGamsModelHelper(false, Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
                     if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
+                    modelGams.rawGmsFile = text;
                 }
             }
 
@@ -1850,66 +1851,67 @@ namespace Gekko
         {
             ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
-            GekkoTime t = new GekkoTime(EFreq.A, 2024, 1, 1);
+            GekkoTime t1 = new GekkoTime(EFreq.A, 2022, 1, 1);
+            GekkoTime t2 = new GekkoTime(EFreq.A, 2024, 1, 1);
 
-            if (false)
-            {
-                //List<IdentityHelper> eqs = new List<IdentityHelper>();
+            //if (false)
+            //{
+            //    //List<IdentityHelper> eqs = new List<IdentityHelper>();
 
-                ScalarDictionary sd = new ScalarDictionary();
+            //    ScalarDictionary sd = new ScalarDictionary();
 
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "gams.gms", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    for (int i = 0; i < modelGamsScalar.CountEqs(1); i++)
-                    {
-                        string eq = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
-                        EquationTextHelper helper = new EquationTextHelper();
-                        helper.showTime = true;
-                        helper.emitScalarModel = true;
-                        //if (!eq.Contains(t.ToString() + "]")) continue;
-                        //if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
-                        //if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
-                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t, sd);
-                        string eqText = two.s1 + ".. " + two.s2.Replace("=", "=E=") + ";";  //First one MUST be e1.. 
-                        sw.WriteLine(eqText);
-                    }
-                }
+            //    using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "gams.gms", null, Program.GekkoFileReadOrWrite.Write))
+            //    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            //    {
+            //        for (int i = 0; i < modelGamsScalar.CountEqs(1); i++)
+            //        {
+            //            string eq = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
+            //            EquationTextHelper helper = new EquationTextHelper();
+            //            helper.showTime = true;
+            //            helper.emitScalarModel = true;
+            //            //if (!eq.Contains(t.ToString() + "]")) continue;
+            //            //if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
+            //            //if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
+            //            GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t, sd);
+            //            string eqText = two.s1 + ".. " + two.s2.Replace("=", "=E=") + ";";  //First one MUST be e1.. 
+            //            sw.WriteLine(eqText);
+            //        }
+            //    }
 
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "dict.txt", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
+            //    using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "dict.txt", null, Program.GekkoFileReadOrWrite.Write))
+            //    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            //    {
 
-                    sw.WriteLine("Equation counts");  //Gekko will find this, and look for the next number
-                    sw.WriteLine("Total");
-                    sw.WriteLine(sd.eqsList.Count);
-                    sw.WriteLine();
+            //        sw.WriteLine("Equation counts");  //Gekko will find this, and look for the next number
+            //        sw.WriteLine("Total");
+            //        sw.WriteLine(sd.eqsList.Count);
+            //        sw.WriteLine();
 
-                    sw.WriteLine("Variable counts");  //Gekko will find this, and look for the next number
-                    sw.WriteLine("Total");
-                    sw.WriteLine(sd.varsList.Count);
-                    sw.WriteLine();
+            //        sw.WriteLine("Variable counts");  //Gekko will find this, and look for the next number
+            //        sw.WriteLine("Total");
+            //        sw.WriteLine(sd.varsList.Count);
+            //        sw.WriteLine();
 
-                    sw.WriteLine("Equations 1 to " + sd.eqsList.Count);
-                    int j = -1;
-                    foreach (string s in sd.eqsList)
-                    {
-                        j++;
-                        sw.WriteLine("e" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
-                    }
+            //        sw.WriteLine("Equations 1 to " + sd.eqsList.Count);
+            //        int j = -1;
+            //        foreach (string s in sd.eqsList)
+            //        {
+            //            j++;
+            //            sw.WriteLine("e" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
+            //        }
 
-                    sw.WriteLine();
-                    sw.WriteLine("Variables 1 to " + sd.varsList.Count);
-                    j = -1;
-                    foreach (string s in sd.varsList)
-                    {
-                        j++;
-                        sw.WriteLine("x" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
-                    }
-                }
+            //        sw.WriteLine();
+            //        sw.WriteLine("Variables 1 to " + sd.varsList.Count);
+            //        j = -1;
+            //        foreach (string s in sd.varsList)
+            //        {
+            //            j++;
+            //            sw.WriteLine("x" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
+            //        }
+            //    }
 
-                return;
-            }
+            //    return;
+            //}
 
             GekkoDictionary<string, bool> names; int dublets;
             HandleG_data(out names, out dublets);
@@ -1924,12 +1926,12 @@ namespace Gekko
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);
                 var equationName = helper2.resultingFullName;
 
-                if (helper2.time.Equals(t))
+                if (helper2.time.LargerThanOrEqual(t1) && helper2.time.SmallerThanOrEqual(t2))
                 {
                     a1++;
                     EquationTextHelper helper = new EquationTextHelper();
                     helper.showTime = true;
-                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t);
+                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t1);
                     int c1 = 0;
                     int c2 = 0;
                     foreach (string variableName in precedentsTemp)
@@ -1972,6 +1974,9 @@ namespace Gekko
                 }
             }
 
+            StringBuilder sb_gams_gms = new StringBuilder();
+            StringBuilder sb_raw_gms = new StringBuilder();
+            ScalarDictionary sd2 = new ScalarDictionary();
             eqs = eqs.OrderBy(x1 => x1.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "identities.txt", null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -1986,7 +1991,7 @@ namespace Gekko
                     }
                     EquationTextHelper eh = new EquationTextHelper();
                     eh.showTime = false;
-                    GetEquationTextHelper output1 = Program.model.GetEquationText(new List<string>() { childrenSorted[0] }, eh, t);
+                    GetEquationTextHelper output1 = Program.model.GetEquationText(new List<string>() { childrenSorted[0] }, eh, t1);
                     string extra = null;
                     if (childrenSorted.Count > 1) extra = " (" + childrenSorted.Count + " sub-equations)";
                     sw.WriteLine(ih.eqName + extra);
@@ -1997,16 +2002,85 @@ namespace Gekko
                     if (childrenSorted.Count > 1)
                     {
                         sw.WriteLine("...");
-                        GetEquationTextHelper output2 = Program.model.GetEquationText(new List<string>() { childrenSorted[childrenSorted.Count - 1] }, eh, t);
+                        GetEquationTextHelper output2 = Program.model.GetEquationText(new List<string>() { childrenSorted[childrenSorted.Count - 1] }, eh, t1);
                         sw.WriteLine(output2.s_scalarModel);
                     }
                     sw.WriteLine();
                     sw.WriteLine("================================================================================");
                     sw.WriteLine();
+
+                    foreach (string child in childrenSorted)
+                    {
+                        string eq = child; // Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        EquationTextHelper helper = new EquationTextHelper();
+                        helper.showTime = true;
+                        helper.emitScalarModel = true;
+                        //if (!eq.Contains(t.ToString() + "]")) continue;
+                        //if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
+                        //if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
+                        GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t1, sd2);
+                        string eqText = two.s1 + ".. " + two.s2.Replace("=", "=E=") + ";";  //First one MUST be e1.. 
+                        sb_gams_gms.AppendLine(eqText);
+                    }
+                    sb_raw_gms.AppendLine(output1.s_gamsOrFrnSyntax);
                 }
                 sw.Flush(); sw.Close();
             }
 
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("* " + Globals.string_equation_counts);  //Gekko will find this, and look for the next number
+            sb.AppendLine("* " + Globals.string_total);
+            sb.AppendLine("* " + sd2.eqsList.Count.ToString());
+            sb.AppendLine();
+            sb.AppendLine("* " + Globals.string_variable_counts);  //Gekko will find this, and look for the next number
+            sb.AppendLine("* " + Globals.string_total);
+            sb.AppendLine("* " + sd2.varsList.Count.ToString());
+            sb.AppendLine();
+            sb_gams_gms.Insert(0, sb);
+
+            using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "dict.txt", null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+
+                sw.WriteLine(Globals.string_equation_counts);  //Gekko will find this, and look for the next number
+                sw.WriteLine(Globals.string_total);
+                sw.WriteLine(sd2.eqsList.Count);
+                sw.WriteLine();
+
+                sw.WriteLine(Globals.string_variable_counts);  //Gekko will find this, and look for the next number
+                sw.WriteLine(Globals.string_total);
+                sw.WriteLine(sd2.varsList.Count);
+                sw.WriteLine();
+
+                sw.WriteLine(Globals.string_equations_1_to + sd2.eqsList.Count);
+                int j = -1;
+                foreach (string s in sd2.eqsList)
+                {
+                    j++;
+                    sw.WriteLine("e" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
+                }
+
+                sw.WriteLine();
+                sw.WriteLine(Globals.string_variables_1_to + sd2.varsList.Count);
+                j = -1;
+                foreach (string s in sd2.varsList)
+                {
+                    j++;
+                    sw.WriteLine("x" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
+                }
+            }
+
+            using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + Globals.string_gams_gms, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.WriteLine(sb_gams_gms);
+            }            
+
+            using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + Globals.string_raw_gms, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.WriteLine(Program.model.modelGams.rawGmsFile);
+            }
 
             new Writeln("Found " + a1 + " eqs for 2024, of which " + a2 + " are identities, and " + a3 + " are near-identities");
             new Writeln("Found " + eqs.Count + " super-eqs for 2024");
@@ -2084,11 +2158,11 @@ namespace Gekko
                     else
                     {
                         //start.Add(line);
-                        if (line.StartsWith("* Equation counts"))
+                        if (line.StartsWith("* "+Globals.string_equation_counts))
                         {
                             substatus = 1;
                         }
-                        else if (line.StartsWith("* Variable counts"))
+                        else if (line.StartsWith("* "+Globals.string_variable_counts))
                         {
                             substatus = 2;
                         }
@@ -2187,11 +2261,11 @@ namespace Gekko
             while ((line = sr.ReadLine()) != null)
             {
                 if (line.Trim() == "") continue;
-                if (line.ToLower().Contains("equation counts"))
+                if (G.Contains(line, Globals.string_equation_counts))
                 {
                     substatus2 = 1;
                 }
-                else if (line.ToLower().Contains("variable counts"))
+                else if (G.Contains(line, Globals.string_variable_counts))
                 {
                     substatus2 = 2;
                 }
@@ -2848,9 +2922,9 @@ namespace Gekko
             FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, false, false, o.p);
 
             //defaults
-            input.unrolledModel = "gams.gms";
-            input.unrolledNames = "dict.txt";
-            input.rawModel = "raw.gms";
+            input.unrolledModel = Globals.string_gams_gms;
+            input.unrolledNames = Globals.string_dict_txt;
+            input.rawModel = Globals.string_raw_gms;
 
             if (ffh2.realPathAndFileName == null)
             {
@@ -2886,7 +2960,7 @@ namespace Gekko
             input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, true, false, o.p);  //this will not abort with error if file not found 
 
             model = ReadGamsScalarModelEquations(input, model);
-            
+
             DateTime t1 = DateTime.Now;
             return model;
         }

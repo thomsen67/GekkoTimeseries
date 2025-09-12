@@ -216,6 +216,15 @@ namespace Gekko
         public const string languageDaDK = "da-DK";
         public const string languageEnUS = "en-US";
 
+        public const string string_gams_gms = "gams.gms";
+        public const string string_dict_txt = "dict.txt";
+        public const string string_raw_gms = "raw.gms";
+        public const string string_equation_counts = "Equation counts";
+        public const string string_variable_counts = "Variable counts";
+        public const string string_equations_1_to = "Equations 1 to";
+        public const string string_variables_1_to = "Variables 1 to";
+        public const string string_total = "Total";
+
         // ------------------------------------------------------------
         // Protobuf tuning start
         // ------------------------------------------------------------        

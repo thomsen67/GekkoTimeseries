@@ -19547,8 +19547,8 @@ namespace Gekko
             for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
             List<string> dictionaryEqs = new List<string>();  //0-based
 
-            equations.Add("* Equation counts " + Program.model.modelGekko.equations.Count);
-            equations.Add("* Variable counts " + Program.model.modelGekko.varsBType.Count);
+            equations.Add("* " + Globals.string_equation_counts + " " + Program.model.modelGekko.equations.Count);
+            equations.Add("* " + Globals.string_variable_counts + " " + Program.model.modelGekko.varsBType.Count);
 
             GekkoTime t0 = new GekkoTime(model.modelCommon.GetFreq(), Globals.decomp2000, 1);
 
@@ -19572,14 +19572,14 @@ namespace Gekko
                 dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0.Add(lag).ToString()) + ")";
             }
 
-            dictionary.Add("Equation counts " + dictionaryEqs.Count);
+            dictionary.Add(Globals.string_equation_counts + " " + dictionaryEqs.Count);
             dictionary.Add("");
-            dictionary.Add("Variable counts " + dictionaryNames.Count);
+            dictionary.Add(Globals.string_variable_counts + " " + dictionaryNames.Count);
             dictionary.Add("");
-            dictionary.Add("Equations " + "1" + " to " + dictionaryEqs.Count);
+            dictionary.Add(Globals.string_equations_1_to + " " + dictionaryEqs.Count);
             dictionary.AddRange(dictionaryEqs);
             dictionary.Add("");
-            dictionary.Add("Variables " + "1" + " to " + dictionaryNames.Count);
+            dictionary.Add(Globals.string_variables_1_to + " " + dictionaryNames.Count);
             dictionary.AddRange(dictionaryNames);
             dictionary.Add("");
 
