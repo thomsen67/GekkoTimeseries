@@ -28,6 +28,7 @@ namespace Gekko
         public int firstColWidth = 200;
         public EFreq freq = EFreq.A;
         public int plotTypes = 2;  //2 = n and p
+        public bool removeTx0Dollar = false;
     }
 
     public class EquationNameAndNumber
@@ -1200,11 +1201,12 @@ img {border-style: none;
 
         public static void BrowserNew(bool limit, bool onlyHtml)
         {
-            bool ignoreMissing = false;
+            bool small = true;            
+            bool ignoreMissing = true;  //quite a lot of missings in MAKRO
             string op = "d";
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            if (false)
+            if (small)
             {
                 restrict.Add("qbnp", false);
                 restrict.Add("pbnp", false);
@@ -1219,7 +1221,8 @@ img {border-style: none;
                 restrict.Add("qM[tot]", false);
                 restrict.Add("qX[xTot]", false);
             }
-            
+
+            Globals.browser = true;  //Do not change, internal TTH popup
             BrowserHelper bh = new BrowserHelper();
             bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
@@ -1227,6 +1230,7 @@ img {border-style: none;
             bh.pixelsAfterArrow = 12;
             bh.freq = freq;
             bh.firstColWidth = 200;
+            bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
 
             bool adam = false;            
 
@@ -1243,7 +1247,10 @@ img {border-style: none;
                 {
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
                     //Program.RunGekkoCommands("reset; time 2025 2030; model<gms>makro_exo.zip; read makro_exo; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
-                    Program.RunGekkoCommands("flush(); reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    //Program.RunGekkoCommands("flush(); reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+
+                    Program.RunGekkoCommands("flush(); reset; option model gams scalar data = yes; read <gdx> previous_deep_calibration.gdx; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());                    
+
                     //Program.RunGekkoCommands("qbnp <2030 2035> *= 1.1, 1.2, 1.3, 1.4, 1.5, 1.6;", "", 0, new P());
                 }
             }
@@ -1340,6 +1347,7 @@ img {border-style: none;
                     EquationTextHelper helper = new EquationTextHelper();
                     GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
                     string s5 = helper22.s_gamsOrFrnSyntax;
+                    if (th.removeTx0Dollar) s5 = Tx0(s5);
                     string s6 = helper22.s_scalarModel;
                     int index = s6.IndexOf("..");
                     if (index >= 0) s6 = s6.Substring(index + "..".Length).Trim();
@@ -1372,14 +1380,17 @@ img {border-style: none;
                     helper2.showTime = false;
                     List<string> precedent2 = modelGamsScalar.GetPrecedentsNames(equationHelper.i, helper2, t1);
                     precedent2.Sort(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, bool> dict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                     foreach (string variableName2 in precedent2)
                     {
                         string varnameWithoutLag = G.Chop_RemoveLagOrLead(variableName2);
                         if (G.Equal(varnameWithoutLag, variableName)) continue;  //Shown at top
+                        if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
-                        html1.Append("<td>" + EquationBrowser.HtmlLink(variableName2, varnameWithoutLag.ToLower() + ".html") + "</td>");
+                        html1.Append("<td>" + EquationBrowser.HtmlLink(varnameWithoutLag, varnameWithoutLag.ToLower() + ".html") + "</td>");
                         html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
                         html1.AppendLine("</tr>");
+                        dict.Add(varnameWithoutLag, false);
                     }
                     html1.AppendLine("</table>");
                     // ------------------------------------------------------
@@ -1515,7 +1526,7 @@ img {border-style: none;
                 BrowserNewCssAndJs(variableName, th.firstColWidth, th.pixels, th.pixelsAfterArrow, equations, out x, out js);
 
                 x.AppendLine("  <body>");
-                string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere);
+                string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere, th);
                 x.Append(html2);
                 x.Append(html1);
                 x.AppendLine(js);
@@ -1623,7 +1634,7 @@ img {border-style: none;
                             o0.opt_ymaxhard = 100d;
                             o0.opt_yminsoft = -1d;
                             o0.opt_ymaxsoft = 1d;
-                            //o0.opt_ytitle = "%"; Produces very large .svg files -- strange...!
+                            o0.opt_ytitle = "%"; //Produces very large .svg files -- strange...!
                         }
 
                         o0.isBrowser = true;
@@ -1670,7 +1681,7 @@ img {border-style: none;
             if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }
 
-        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere)
+        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere, BrowserHelper th)
         {
             List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false);
             StringBuilder html2 = new StringBuilder();
@@ -1694,7 +1705,9 @@ img {border-style: none;
                 table += link;
                 table += "</td>";
                 table += "<td style=`vertical-align:top`>";
-                table += "<pre><code>" + helper22.s_gamsOrFrnSyntax + "</code></pre>";
+                string s = helper22.s_gamsOrFrnSyntax;
+                if (th.removeTx0Dollar) s = Tx0(s);
+                table += "<pre><code>" +s + "</code></pre>";
                 table += "</td>";
                 table += "</tr>";
             }
@@ -1702,7 +1715,13 @@ img {border-style: none;
             html2.AppendLine(table);            
             html2.AppendLine("</div>");
             return html2.ToString();
-        }        
+        }
+
+        private static string Tx0(string s)
+        {
+            s = s.Replace("over sets: [t], with $-condition: ((tx0[t]))", "");
+            return s;
+        }
 
         private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, string variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
         {

@@ -4233,7 +4233,7 @@ namespace Gekko
             {
                 if (!ChopFullVariableName(lhs2, fullVariableName).isLhs) orderedNames.Add(fullVariableName);
             }
-            if (hit != 1 && Globals.runningOnTTComputer)
+            if (Globals.runningOnTTComputer && !Globals.browser && hit != 1)
             {
                 MessageBox.Show("LHS problem: hit number is: " + hit);
             }
