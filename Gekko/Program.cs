@@ -22009,7 +22009,7 @@ namespace Gekko
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
             Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
-            if (File.Exists(pathAndFilename))
+            if (File.Exists(pathAndFilename) && G.Equal(Path.GetExtension(pathAndFilename), "." + Globals.extensionCommand))
             {
                 new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " program file.");
             }
