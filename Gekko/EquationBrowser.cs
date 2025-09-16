@@ -1201,9 +1201,9 @@ img {border-style: none;
 
         public static void BrowserNew(bool limit, bool onlyHtml)
         {
-            bool small = true;            
-            bool ignoreMissing = true;  //quite a lot of missings in MAKRO
-            string op = "d";
+            bool small = false; //in general: false.
+            bool flush = true;  //True because of data series missing otherwise
+            bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO            
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             if (small)
@@ -1222,7 +1222,6 @@ img {border-style: none;
                 restrict.Add("qX[xTot]", false);
             }
 
-            Globals.browser = true;  //Do not change, internal TTH popup
             BrowserHelper bh = new BrowserHelper();
             bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
             bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
@@ -1232,7 +1231,8 @@ img {border-style: none;
             bh.firstColWidth = 200;
             bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
 
-            bool adam = false;            
+            bool adam = false;
+            Globals.browser = true;  //Do not change, internal TTH popup
 
             Program.options.databank_search = false;
 
@@ -1245,11 +1245,12 @@ img {border-style: none;
                 }
                 else
                 {
+                    string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
                     //Program.RunGekkoCommands("reset; time 2025 2030; model<gms>makro_exo.zip; read makro_exo; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
-                    //Program.RunGekkoCommands("flush(); reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    //Program.RunGekkoCommands(f + "reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
 
-                    Program.RunGekkoCommands("flush(); reset; option model gams scalar data = yes; read <gdx> previous_deep_calibration.gdx; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());                    
+                    Program.RunGekkoCommands(f + "reset; option model gams scalar data = yes; read <gdx> previous_deep_calibration.gdx; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
 
                     //Program.RunGekkoCommands("qbnp <2030 2035> *= 1.1, 1.2, 1.3, 1.4, 1.5, 1.6;", "", 0, new P());
                 }
@@ -1257,14 +1258,14 @@ img {border-style: none;
 
             if (limit) return;
 
-            string path = @"c:\Thomas\Desktop\gekko\testing\Browser";
+            string path = @"c:\Thomas\Desktop\gekko\testing\Browser3";
             if (!onlyHtml)
             {
                 G.DeleteFolder(path, "css", false);
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\" + "checked.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\" + "normal.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\" + "checked_red.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\" + "normal_red.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
             }
 
             GekkoTime t1 = GekkoTime.tNull;
@@ -1281,33 +1282,26 @@ img {border-style: none;
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar);
 
-            if (true)
-            {
-                if(!onlyHtml) BrowserNewPlots(combos, path, restrict);
-                BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
-            }
-            else
-            {
-                List<int> lists = new List<int>() { 0, 1 };
-                Parallel.ForEach(lists, (i) =>
-                {
-                    if (i == 0)
-                    {
-                        BrowserNewPlots(combos, path, restrict);
-                    }
-                    else if (i == 1)
-                    {
-                        BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
-                    }
-                    else throw new GekkoException();
-                });
-            }
-            
+            if (!onlyHtml) BrowserNewPlots(combos, path, restrict);
+            BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
+
             return;
         }
 
         private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, BrowserHelper th, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
+            //FIXME
+            //FIXME
+            //FIXME
+            //FIXME
+            //FIXME            
+            string settings_css_filename = "style.css";
+            string settings_vars_foldername = "vars";
+            string modelFrequencyString = "a";
+            string res = "res_";
+
+            //             
+
             DateTime dt1 = DateTime.UtcNow;
             int count = 0;
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
@@ -1315,12 +1309,12 @@ img {border-style: none;
                 count++;
                 string variableName = kvp.Key;
                 List<EquationNameAndNumber> equations = kvp.Value;
-                if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;                
+                if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
 
                 string fileName1 = variableName.ToLower() + ".html";
 
                 GekkoTime tUsedHere = t1;
-                
+
                 if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
                 //new Writeln(fileName1);
 
@@ -1338,7 +1332,7 @@ img {border-style: none;
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
                     html1.Append("</p>");
                     // ------------------------------------------------------
-                    
+
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
@@ -1401,13 +1395,15 @@ img {border-style: none;
                 {
                     html1.AppendLine("<div id = `hash-2` class=`content`>");
                     html1.Append("<br>");
-                    EquationBrowser.WriteHtmlBold(html1, "Related equations");
-                    bool first2 = true;
+                    EquationBrowser.WriteHtmlBold(html1, "Related variables");
                     string s8 = null;
-                    foreach (EqInfoSimple eqHelper in GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false))
+                    List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false);
+                    List<string> dependentVarsList = Program.FindDependentVars(variableName, model, model.modelGams, modelGamsScalar, eqsContainingVariable);
+                    bool first2 = true;
+                    foreach (string s in dependentVarsList)
                     {
-                        string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
-                        string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + eqNameWithLagNoBlanks.ToLower());
+                        string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s));
+                        string link = EquationBrowser.HtmlLink(s, s.ToLower() + ".html", tooltip);
                         if (!first2) s8 += ", ";
                         s8 += link;
                         first2 = false;
@@ -1429,15 +1425,15 @@ img {border-style: none;
                     {
                         //only plot the series from Work                        
                         //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
-                        html1.AppendLine("<img src = `" + variableName.ToLower() + ".svg" + "`>");
-                        if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px;" + "` src = `" + variableName.ToLower() + "__p.svg" + "`>");                                                                        
+                        html1.AppendLine("<img style = `max-width: 425px;` src = `" + variableName.ToLower() + ".svg" + "`>");
+                        if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + variableName.ToLower() + "__p.svg" + "`>");
                         html1.AppendLine("<p>");
                     }
                     catch
                     {
                     }
                     html1.AppendLine("</div>");
-                }                
+                }
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
@@ -1520,29 +1516,296 @@ img {border-style: none;
                         EquationBrowser.WriteHtml(html1, s);
                         html1.AppendLine("</div>");
                     }
-                }                
+                }
 
                 StringBuilder x; string js;
-                BrowserNewCssAndJs(variableName, th.firstColWidth, th.pixels, th.pixelsAfterArrow, equations, out x, out js);
+                BrowserNewCssAndJs(variableName, th.firstColWidth, th.pixels, th.pixelsAfterArrow, equations, true, out x, out js);
 
                 x.AppendLine("  <body>");
+                x.Append(LinkHome(true));
                 string html2 = BrowserNewSelector(t1, model, modelGamsScalar, variableName, tUsedHere, th);
                 x.Append(html2);
                 x.Append(html1);
                 x.AppendLine(js);
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
-                using (FileStream fs = Program.WaitForFileStream(path + "\\" + fileName1, null, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(path + "\\vars\\" + fileName1, null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
-                    //BEWARE: In JavaScript, it is legal to do y = `i am a string';, where backticks indicate that {}-interpolation 
+                    //BEWARE: In JavaScript, it is legal to do y = `i am a string`;, where backticks indicate that {}-interpolation 
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
             }
-            
+
+            if (true)
+            {
+                StringBuilder x2 = new StringBuilder(); 
+                foreach (string s in CreateCss(false)) x2.AppendLine(s);                
+                x2.AppendLine(LinkHome(false));
+                WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
+                x2.AppendLine("<table style = `width:100%`>");
+
+                List<string> vars = combos.Keys.ToList();
+                vars.Sort(G.CompareNaturalIgnoreCase);
+
+                foreach (string var2 in vars)
+                {
+                    if (G.StartsWith(var2, res)) continue;  //skip res_... variables.
+                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2));
+                    x2.Append("<tr>");
+                    x2.Append("<td width = `20%`>");
+                    x2.Append(HtmlLink(var2, settings_vars_foldername + "/" + var2.ToLower() + ".html"));
+                    x2.Append("</td>");
+                    x2.Append("<td width = `80%` style=`color:gray`>");
+                    x2.Append(expl);
+                    x2.Append("</td>");
+                    x2.Append("</tr>");
+                }
+                x2.AppendLine("</table>");
+
+                x2.AppendLine("  </p>");
+                x2.AppendLine("  </body>");
+                x2.AppendLine("</html>");
+
+                using (FileStream fs = Program.WaitForFileStream(path + "\\" + "list.html", null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(x2.Replace('`', '\"'));
+                }
+            }
+
+            if (true)
+            {
+                StringBuilder x2 = new StringBuilder(); 
+                foreach (string s in CreateCss(false)) x2.AppendLine(s);
+                x2.AppendLine(LinkHome(false));
+                WriteHtmlBold(x2, "Search for variable name or variable desciption.");
+                WriteHtml(x2, "This page is under construction: use <a href = `list.html`>alphabetical list</a> for now.");                
+                x2.AppendLine("  </body>");
+                x2.AppendLine("</html>");
+                using (FileStream fs = Program.WaitForFileStream(path + "\\" + "find.html", null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(x2.Replace('`', '\"'));
+                }
+            }
+
+            /*
+
+
+            // ------------------------------------------------------------
+            // ----------------- find -------------------------------------
+            // ------------------------------------------------------------
+
+            var sorted = vars2.OrderBy(o => o.s1, StringComparer.OrdinalIgnoreCase);
+
+            StringBuilder x3 = new StringBuilder();
+            x3.AppendLine("<html>");
+            x3.AppendLine("<head>");
+            x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
+            x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
+            x3.AppendLine("</head>");
+
+            x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
+
+            string s1 = G.NL;
+            string s2 = G.NL;
+            foreach (EquationBrowserHelper s in sorted)
+            {
+                s1 += "\"" + s.s1 + "\"" + ", " + G.NL;
+                s2 += "\"" + s.s2 + "\"" + ", " + G.NL;
+            }
+
+            string write = null;
+            string join = null;
+            if (jsmFix)
+            {
+                write = "document.write";
+            }
+            else
+            {
+                write = "content.push";
+                join = "document.body.innerHTML = content.join(``);";
+            }
+
+            string js = @"
+
+            function varnavns() {
+                var varnavn = [" + s1 + @"];
+                return varnavn;
+            }
+
+            function beskrivs() {
+                var beskriv = [" + s2 + @"];
+                return beskriv;
+            }
+
+            function findvarnavn(){
+                var content = [];
+                var varnavn = varnavns();
+                var beskriv = beskrivs();
+                antal = varnavn.length;
+                tekst = new String;
+                tekst1 = new String;
+                tekst = document.form1.tekst.value;
+                fundet = false;
+
+                " + write + @"(`" + Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + tekst + `'<br><br>`);
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i];
+                    if (tekst1.toUpperCase() == tekst.toUpperCase())
+                    {
+                        fundet = true;
+
+                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        " + write + @"(`<br>` + beskriv[i] + `<br><hr><br>`);
+                    } //endif
+                } //endfor
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i];
+                    if (tekst1.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                    {
+                        if (tekst1.toUpperCase() != tekst.toUpperCase())
+                        {
+                            fundet = true;
+                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
+                        } //endif
+                    } //endif
+                } //endfor
+
+                if (fundet == false)
+                {
+                    " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
+                } //endif
+                " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br> <a href=" + settings_index_filename + @">" + Language(isDanish, "Gå til hovedside", "Go to main page") + @"</a>`);
+                tekst1.free;
+                tekst.free;
+                " + join + @"
+            }  //endfunction
+
+            function check(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findvarnavn();
+        }  // endfunction
+
+        function findbeskriv()
+        {
+            var content = [];
+            var varnavn = varnavns();
+            var beskriv = beskrivs();
+            antal = varnavn.length;
+            tekst = new String;
+            tekst2 = new String;
+            tekst = document.form2.tekst.value;
+
+            " + write + @"(`" + Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + tekst + `' " + Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
+            fundet = false;
+            for (var i = 0; i < antal; i++)
+            {
+                tekst2 = beskriv[i];
+                if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                {
+                    fundet = true;
+                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                    " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
+                } //endif
+            } //endfor
+            if (fundet == false)
+            {
+                " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
+            } //endif            
+            " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br> <a href=" + settings_index_filename + @">" + Language(isDanish, "Gå til hovedside", "Go to main page") + @"</a>`);
+            tekst.free;
+            tekst2.free;
+
+            " + join + @"
+        }  //endfunction
+
+        function check2(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findbeskriv();
+        }  // endfunction
+
+        ";
+
+            x3.AppendLine(js);
+            x3.AppendLine("// -->");
+            x3.AppendLine("</script>");
+            x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
+            x3.AppendLine("<table width=`100 % `><tr><td>");
+            //if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
+            x3.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`> ");
+            x3.AppendLine("  <tr>");
+            x3.AppendLine("  <td width = `80 %` ><b><big>" + Language(isDanish, "Søg", "Search") + "</big></b></td>");
+            x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_list_filename + "` > " + "List" + " </a></td >");
+            x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
+            x3.AppendLine("  </tr>");
+            x3.AppendLine("  </table>");
+            x3.AppendLine("");
+            //if (isDanish) x3.AppendLine("Søgning efter variabelnavn:");
+            x3.AppendLine("Search variable name:");
+            x3.AppendLine("<FORM NAME = `form1` >");
+            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
+            x3.AppendLine("</FORM>");
+            x3.AppendLine("<p>&nbsp;</p>");
+            //if (isDanish) x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
+            x3.AppendLine("Free text search in variable descriptions:");
+            x3.AppendLine("<FORM NAME = `form2`>");
+            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findbeskriv()`>");
+            x3.AppendLine("</FORM></center>");
+            x3.AppendLine("</td></tr></table>");
+            x3.AppendLine("</body>");
+            x3.AppendLine("</html>");
+
+            string pathAndFilename3 = rootFolder + "\\" + settings_find_filename;
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x3.Replace('`', '\"'));
+            }
+
+
+            */
+
+
+
+
+
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
             return;
+        }
+
+        private static string LinkHome(bool levelUp)
+        {
+            string up = null;
+            if (levelUp) up = "../";            
+            return "<div style=`display: block; color: #0645AD; font-size: 0.8em;`>&larr;<a href = `" + up + "index.html`>Home</a></div>";
+        }
+
+        private static List<string> CreateCss(bool levelUp)
+        {
+            List<string> head = new List<string>();
+            string up = null;
+            if (levelUp) up = "../";
+            head.Add("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+            head.Add("<HTML>");
+            head.Add("<HEAD>");
+            head.Add("<TITLE>MAKRO equation browser</TITLE>");
+            head.Add("<link rel = `stylesheet` href = `" + up + "styles.css` type = `text/css` >");
+            head.Add("<link rel=`shortcut icon` href =`punkt-bomaerke.ico` type =`image/vnd.microsoft.icon` >");
+            head.Add("<link rel=`icon` sizes =`32x32` type =`image/png` href =`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=32&amp;height=32` ><link rel=`icon` sizes =`16x16` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=16&amp;height=16`><link rel=`icon` sizes=`128x128` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=128&amp;height=128`><link rel=`icon` sizes=`196x196` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=196&amp;height=196`><link rel=`apple-touch-icon` sizes=`180x180` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=180&amp;height=180`><link rel=`apple-touch-icon` sizes=`152x152` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=152&amp;height=152`><link rel=`apple-touch-icon` sizes=`167x167` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=167&amp;height=167`>");
+            head.Add("<meta http-equiv=`Content-Type` content=`text/html; charset=utf-8`>");
+            head.Add("</HEAD>");
+            head.Add("<body>");
+            return head;
         }
 
         /// <summary>
@@ -1645,7 +1908,7 @@ img {border-style: none;
                             extra = "__" + op;
                             extra2 = " (%)";
                         }
-                        o0.browserPath = browserPath + "\\" + kvp.Key.ToLower() + extra + ".svg";
+                        o0.browserPath = browserPath + "\\vars\\" + kvp.Key.ToLower() + extra + ".svg";
                         o0.prtType = "plot";
                         o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
                         O.Prt.Element ope0 = new O.Prt.Element();
@@ -1694,13 +1957,16 @@ img {border-style: none;
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
             string table = "<table cellpadding=`5`>";
+            int count = -1;
             foreach (EqInfoSimple eqHelper in eqsNew)
             {
+                count++;
                 table += "<tr>";
                 EquationTextHelper helper = new EquationTextHelper();
                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);
-                string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");
+                string eqNameWithLagNoBlanks = eqHelper.eqNameWithLag.Replace(" ", "");                
                 string link = EquationBrowser.HtmlLink(eqNameWithLagNoBlanks, variableName.ToLower() + ".html" + "#" + G.Chop_RemoveLagOrLead(eqNameWithLagNoBlanks).ToLower());
+                if (count == 0) link ="<b>" + link + "</b>";
                 table += "<td style=`vertical-align:top`>";
                 table += link;
                 table += "</td>";
@@ -2652,7 +2918,7 @@ img {border-style: none;
             }
         }
 
-        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, List<EquationNameAndNumber> equations, out StringBuilder x, out string js)
+        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, List<EquationNameAndNumber> equations, bool levelUp, out StringBuilder x, out string js)
         {
             string s = null;
             foreach (EquationNameAndNumber equation in equations)
@@ -2660,12 +2926,14 @@ img {border-style: none;
                 s += "updateTable('#" + equation.name.ToLower() + "');" + G.NL;  //activate checkbox listeners for each decomp table
             }
 
+            string up = null;
+            if (levelUp) up = "../";
             x = new StringBuilder();
             x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
             x.AppendLine("<html>");
             x.AppendLine("  <head>");
-            x.AppendLine("    <link rel=`stylesheet` href=`" + "styles.css" + @"` type=`text/css`>");
-            x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+            x.AppendLine("    <link rel=`stylesheet` href=`" + up + "styles.css" + @"` type=`text/css`>");
+            x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=utf-8`>");
             x.AppendLine("    <title>" + variableName + "</title>");
 
             string css = @"<style>        

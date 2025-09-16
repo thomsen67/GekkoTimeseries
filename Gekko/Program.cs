@@ -2984,19 +2984,19 @@ namespace Gekko
 
                 if (Globals.runningOnTTComputer && (text == "d3"))
                 {
-                    EquationBrowser.BrowserNew(false, false);
+                    EquationBrowser.BrowserNew(false, false);  //everything
                     return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "d2"))
+                if (Globals.runningOnTTComputer && (text == "d2")) 
                 {
-                    EquationBrowser.BrowserNew(false, true);
+                    EquationBrowser.BrowserNew(false, true); //only html
                     return;
                 }
 
                 if (Globals.runningOnTTComputer && (text == "dd"))
                 {
-                    EquationBrowser.BrowserNew(true, false);
+                    EquationBrowser.BrowserNew(true, false); //only setting up
                     return;
                 }
 
@@ -7391,7 +7391,7 @@ namespace Gekko
                 string name = ts1.variableName;
 
                 if (ts1.IsGhost()) continue;
-                if (name.Contains(Globals.symbolTurtle))
+                if (!Program.options.bugfix_gbk_underscore && name.Contains(Globals.symbolTurtle))
                 {
                     //array-timeseries
                     string[] ss = GetArrayTimeseriesName_1_1(name);
@@ -16820,46 +16820,20 @@ namespace Gekko
                     }
                 }
                 else
-                {
-                    string eq1 = "$$$"; string eq2 = "equation ";
+                {                                        
                     string vars = null;
-                    string dependentVars = null;
-                    GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
-
-
-                    GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (EqInfoSimple eqInfo in eqsContainingVariable)
-                    {
-                        double bestScore = double.MinValue;
-                        string bestVar = "<not found>";
-                        foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars)
-                        {
-                            //foreach precedent variable
-                            string varName = modelGamsScalar.GetVarNameA(dp.variable);
-                            EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
-                            GamsModel.ScoreEquationGivenVariable(eqInfoClone, varName, model, modelGams, modelGamsScalar);
-                            double score = eqInfoClone.score;
-                            if (score > bestScore)
-                            {
-                                bestVar = varName;
-                                bestScore = score;
-                            }
-                        }
-                        if (!deps.ContainsKey(bestVar) && !G.EqualHandleBlanks(bestVar, varnameWithoutFreq)) deps.Add(bestVar, false);
-                    }
-
-                    List<string> dependentVarsList = deps.Keys.ToList();
-                    dependentVarsList.Sort(G.CompareNaturalIgnoreCase);
-                    dependentVars = Stringlist.GetListWithCommas(dependentVarsList);
-                    List<string> dependentVarsList2 = new List<string>();
+                    List<string> dependentVarsList = FindDependentVars(varnameWithoutFreq, model, modelGams, modelGamsScalar, eqsContainingVariable);
                     //
                     // This is the list of variables influenced by the variable, with links inserted
                     //
+                    List<string> dependentVarsList2 = new List<string>();
                     ListWithLinks(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, bank, isGams, dependentVarsList, dependentVarsList2);
+                    //string eq1 = "$$$"; string eq2 = "equation ";
                     using (Writeln txt = new Writeln("Influences: ", -12345, Color.Empty, false, ETabs.Main))
                     {
                         txt.MainOmitVeryFirstNewLine();
-                        txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2).Replace(eq1, eq2));
+                        //txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2).Replace(eq1, eq2));
+                        txt.MainAdd(Stringlist.GetListWithCommas(dependentVarsList2));
                     }
                 }
 
@@ -16883,6 +16857,38 @@ namespace Gekko
             }
             if (!G.IsUnitTestingOrNotShowingGUI()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
             return eqsPrinted;
+        }
+
+        public static List<string> FindDependentVars(string varnameWithoutFreq, Model model, ModelGams modelGams, ModelGamsScalar modelGamsScalar, List<EqInfoSimple> eqsContainingVariable)
+        {            
+            string vars = null;
+            string dependentVars = null;
+            GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
+
+            GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (EqInfoSimple eqInfo in eqsContainingVariable)
+            {
+                double bestScore = double.MinValue;
+                string bestVar = "<not found>";
+                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars)
+                {
+                    //foreach precedent variable
+                    string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                    EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
+                    GamsModel.ScoreEquationGivenVariable(eqInfoClone, varName, model, modelGams, modelGamsScalar);
+                    double score = eqInfoClone.score;
+                    if (score > bestScore)
+                    {
+                        bestVar = varName;
+                        bestScore = score;
+                    }
+                }
+                if (!deps.ContainsKey(bestVar) && !G.EqualHandleBlanks(bestVar, varnameWithoutFreq)) deps.Add(bestVar, false);
+            }
+
+            List<string> dependentVarsList = deps.Keys.ToList();
+            dependentVarsList.Sort(G.CompareNaturalIgnoreCase);
+            return dependentVarsList;
         }
 
         /// <summary>
