@@ -36135,20 +36135,6 @@ print(df2)
             }
         }
 
-        public void _Test_Systems_MAKROBK()
-        {
-            //Tests MAKROBK update
-            //Changes compared to downloaded version:
-            //1. Remember to copy the existing (downloaded) makrobk.gdx as previous_makrobk.gdx.
-            //2. 
-            string folder = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2023-11-01-790eb70\Data\Makrobk";
-            I("RESET;");
-            I("OPTION folder working = '" + folder + "';");
-            I("RUN makrobk;");
-            Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1968_1993.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
-            Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1994_2022.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
-        }
-
         [TestMethod]
         public void _Test_Systems_MONABK()
         {            

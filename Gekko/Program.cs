@@ -2982,21 +2982,27 @@ namespace Gekko
                     //return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "d3"))
+                if (Globals.runningOnTTComputer && (text == "d00"))
                 {
                     EquationBrowser.BrowserNew(false, false);  //everything
                     return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "d2")) 
+                if (Globals.runningOnTTComputer && (text == "d01")) 
                 {
                     EquationBrowser.BrowserNew(false, true); //only html
                     return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "dd"))
+                if (Globals.runningOnTTComputer && (text == "d10"))
                 {
                     EquationBrowser.BrowserNew(true, false); //only setting up
+                    return;
+                }
+
+                if (Globals.runningOnTTComputer && (text == "d11"))
+                {
+                    EquationBrowser.BrowserNew(true, true); //only setting up
                     return;
                 }
 
@@ -7385,13 +7391,19 @@ namespace Gekko
             readInfo.endPerInFile = readInfo_oldbank.endPerInFile;
             readInfo.variables = readInfo_oldbank.variables;
 
+            bool underscore = false;
+
             foreach (KeyValuePair<string, TimeSeries_1_1> kvp in databank_1_1.storage)
             {
                 TimeSeries_1_1 ts1 = kvp.Value;
                 string name = ts1.variableName;
 
                 if (ts1.IsGhost()) continue;
-                if (!Program.options.bugfix_gbk_underscore && name.Contains(Globals.symbolTurtle))
+
+                bool isUnderscore = name.Contains(Globals.symbolTurtle);
+                if (isUnderscore) underscore = true;
+
+                if (Program.options.databank_file_gbk_underscore && isUnderscore)
                 {
                     //array-timeseries
                     string[] ss = GetArrayTimeseriesName_1_1(name);
@@ -7467,6 +7479,8 @@ namespace Gekko
                     deserializedDatabank.AddIVariableWithOverwrite(ts2);
                 }
             }
+
+            if (!Program.options.databank_file_gbk_underscore && underscore) G.Warning("w3.3", "Use 'option databank file gbk underscore' to convert to array-series");
 
             return deserializedDatabank;
         }

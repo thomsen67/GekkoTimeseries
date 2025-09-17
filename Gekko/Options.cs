@@ -52,7 +52,7 @@ namespace Gekko
         public bool bugfix_disp_influences_equ = false;   //not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
-        public bool bugfix_gbk_underscore = false; //not mentioned in help, set true to avoid reading for instance series a____ from Gekko 2.x databank as array-series a['_']. Cf. Globals.symbolTurtle.
+
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -65,6 +65,7 @@ namespace Gekko
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;        
         public string databank_file_gbk_internal = "databank.data";
+        public bool databank_file_gbk_underscore = false; //if set to true, when reading a Gekko 2.x gbk databank, a variable like x___a___b is understood as an array-series x[a,b].
         public bool databank_search = true;
 
         public bool databank_trace = true;
@@ -389,8 +390,7 @@ namespace Gekko
             Add("BUGFIX DECOMP JACOBI", Globals.xbool);
             //Add("BUGFIX DISP", Globals.xbool);
             Add("BUGFIX DISP INFLUENCES EQU", Globals.xbool);
-            Add("BUGFIX PLOT", Globals.xbool);
-            Add("BUGFIX GBK UNDERSCORE", Globals.xbool);
+            Add("BUGFIX PLOT", Globals.xbool);            
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
@@ -399,7 +399,8 @@ namespace Gekko
             Add("DATABANK CREATE AUTO", Globals.xbool);
             Add("DATABANK FILE COPYLOCAL", Globals.xbool);
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
-            Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);
+            Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);                        
+            Add("DATABANK FILE GBK UNDERSCORE", Globals.xbool);
             Add("DATABANK SEARCH", Globals.xbool);
 
             Add("DATABANK TRACE", Globals.xbool);

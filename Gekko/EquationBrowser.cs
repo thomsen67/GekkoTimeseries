@@ -1199,8 +1199,12 @@ img {border-style: none;
             return q;
         }
 
-        public static void BrowserNew(bool limit, bool onlyHtml)
+        public static void BrowserNew(bool skip, bool onlyHtml)
         {
+            bool onlyPlot = true;
+
+
+
             bool small = false; //in general: false.
             bool flush = true;  //True because of data series missing otherwise
             bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO            
@@ -1246,8 +1250,7 @@ img {border-style: none;
                 else
                 {
                     string f = null; if (flush) f = "flush(); ";
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
-                    //Program.RunGekkoCommands("reset; time 2025 2030; model<gms>makro_exo.zip; read makro_exo; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\2024-01-10-c2f2447\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";                    
                     //Program.RunGekkoCommands(f + "reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
 
                     Program.RunGekkoCommands(f + "reset; option model gams scalar data = yes; read <gdx> previous_deep_calibration.gdx; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
@@ -1256,7 +1259,7 @@ img {border-style: none;
                 }
             }
 
-            if (limit) return;
+            if (skip) return;
 
             string path = @"c:\Thomas\Desktop\gekko\testing\Browser3";
             if (!onlyHtml)
@@ -1282,8 +1285,20 @@ img {border-style: none;
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar);
 
-            if (!onlyHtml) BrowserNewPlots(combos, path, restrict);
-            BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
+            if (onlyHtml && onlyHtml) new Error("Hov");
+            if (onlyHtml)
+            {
+                BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
+            }
+            else if (onlyPlot)
+            {
+                BrowserNewPlots(combos, path, restrict);
+            }
+            else
+            {
+                BrowserNewHtml(t1, t2, bh, path, restrict, combos, bh, model, modelGamsScalar);
+                BrowserNewPlots(combos, path, restrict);
+            }           
 
             return;
         }
@@ -1933,6 +1948,7 @@ img {border-style: none;
                             sw.WriteLine("load " + Globals.QT + (gnuplotPath + "\\" + s).Replace("\\", "\\\\") + Globals.QT);
                         }
                     }
+                    new Writeln("Running " + fileNameWithPath);
                     Plot.CallGnuplot2(o0, 0, null, "browser.gp", null, gnuplotPath, null, null, 10080);  //minutes corresponding to 1 week
                 }
                 finally
