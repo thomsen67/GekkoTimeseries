@@ -221,8 +221,8 @@ namespace Gekko
         public const string string_raw_gms = "raw.gms";
         public const string string_equation_counts = "Equation counts";
         public const string string_variable_counts = "Variable counts";
-        public const string string_equations_1_to = "Equations 1 to";
-        public const string string_variables_1_to = "Variables 1 to";
+        public const string string_equations_1_to = "Equations 1 to ";
+        public const string string_variables_1_to = "Variables 1 to ";
         public const string string_total = "Total";
 
         // ------------------------------------------------------------

@@ -674,6 +674,9 @@ namespace Gekko
         [ProtoMember(9)]
         public int countVars3 = -12345;
 
+        [ProtoMember(10)]
+        public int hasReadSomeData = -12345;
+
         public void Print(bool loadedFromCacheFile, bool hasResVariables, DateTime t)
         {
             Table tab = new Table();
@@ -703,6 +706,12 @@ namespace Gekko
             tab.CurRow.SetText(1, "Vars per period = " + this.countVars2 + " (no time dimension)");
             tab.CurRow.Next();
             tab.CurRow.SetText(1, "Var names       = " + this.countVars3 + " (no dimensions)");
+            if (this.hasReadSomeData > 0)
+            {
+                tab.CurRow.SetBottomBorder(1, 1);
+                tab.CurRow.Next();
+                tab.CurRow.SetText(1, "Var data        = " + this.hasReadSomeData + " observations");
+            }
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.SetLeftBorder(1);
             tab.CurRow.SetRightBorder(1);
@@ -829,12 +838,16 @@ namespace Gekko
         [ProtoMember(5)]
         public bool option_solve_gauss_reorder;
 
+        [ProtoMember(6)]
+        public bool option_model_gams_scalar_data;
+
         public bool IsSame(ModelCacheParams other)
         {
             if (!G.Equal(this.dep, other.dep)) return false;
             if (this.option_model_gams_dep_current != other.option_model_gams_dep_current) return false;
             if (!G.Equal(this.option_model_gams_dep_method, other.option_model_gams_dep_method)) return false;
             if (this.option_solve_gauss_reorder != other.option_solve_gauss_reorder) return false;
+            if (this.option_model_gams_scalar_data != other.option_model_gams_scalar_data) return false;
             return true;
         }
     }
@@ -1007,6 +1020,9 @@ namespace Gekko
 
         [ProtoMember(34)]  //Only used when there are no res_... and 
         public GekkoDictionary<string, string> depNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        [ProtoMember(35)]
+        public int hasReadSomeData = 0; //if Program.options.model_gams_scalar_data == true, AND at least one data value was read from gams.gms.
 
         // =============================================
         // =============================================
@@ -1638,7 +1654,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Takes data from a Databank and puts it into an a[][] data array (this array is from model.a).
+        /// Takes data from a[][] array and puts it into a Databank (this array is from model.a).
         /// If model is a ModelGamsScalar.        
         /// </summary>
         /// <param name="db"></param>

@@ -863,6 +863,9 @@ namespace Gekko
                 }
             }
 
+            
+            int hasReadSomeData = 0;
+
             if (Program.options.model_gams_scalar_data)
             {                
                 //We don't read the endo values from gams.gms anymore: reading data from a databank is mandatory now.
@@ -942,6 +945,7 @@ namespace Gekko
                     {
                         new Error("Index out of range when reading GAMS scalar equation");
                     }
+                    hasReadSomeData++;
                 }                
             }
 
@@ -1068,8 +1072,9 @@ namespace Gekko
             }
 
             modelGamsScalar.hasResVariables = hasResVariables;
+            modelGamsScalar.hasReadSomeData = hasReadSomeData;
 
-            if (Program.options.model_gams_scalar_data)
+            if (Program.options.model_gams_scalar_data && modelGamsScalar.hasReadSomeData > 0)  //don't do if no data was found in scalar model
             {                
                 //modelGamsScalar.a = helper.a; --> not necessary, is already so.
                 modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);                
@@ -2907,6 +2912,7 @@ namespace Gekko
             mi.countVars1 = model.modelGamsScalar.CountVars(1);
             mi.countVars2 = model.modelGamsScalar.CountVars(2);
             mi.countVars3 = model.modelGamsScalar.CountVars(3);
+            mi.hasReadSomeData = model.modelGamsScalar.hasReadSomeData;
 
             model.modelGamsScalar.modelInfoGamsScalar = mi;
             model.modelGamsScalar.modelInfoGamsScalar.Print(false, model.modelGamsScalar.hasResVariables, t);
@@ -2993,6 +2999,11 @@ namespace Gekko
                     modelGamsScalar.a[i] = modelGamsScalar.aTemp[i].storage;
                 }
                 modelGamsScalar.aTemp = null;
+                if (Program.options.model_gams_scalar_data && modelGamsScalar.hasReadSomeData > 0)  //don't do if no data was found in scalar model
+                {
+                    //Get these modelGamsScalar.a values into databank                    
+                    modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
+                }
 
                 modelGamsScalar.fix = new byte[modelGamsScalar.fixTemp.Length][];
                 for (int i = 0; i < modelGamsScalar.fixTemp.Length; i++)

@@ -19370,6 +19370,7 @@ namespace Gekko
                     }
                     cacheParameters.option_model_gams_dep_current = Program.options.model_gams_dep_current;
                     cacheParameters.option_model_gams_dep_method = Program.options.model_gams_dep_method;
+                    cacheParameters.option_model_gams_scalar_data = Program.options.model_gams_scalar_data;  //Problem is if model is read without the option, and then read again from cache with the option. So better to have this as a condition.
 
                     if (modelTemp != null && modelTemp.modelCommon != null && modelTemp.modelCommon.cacheParameters != null && modelTemp.modelCommon.cacheParameters.IsSame(cacheParameters))
                     {
