@@ -533,6 +533,12 @@ namespace Gekko
             txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set datafile missing \"NaN\"");
 
+            if (!plotTable.hasAtLeast1RealNumber)
+            {
+                txt.AppendLine("set xrange [" + o.t1.super + ":" + o.t2.super + "]");
+                txt.AppendLine("set yrange [-1:1]");                
+            }
+
             if (decompMargin != null) txt.AppendLine(decompMargin);
 
             int ii = 0;
@@ -829,7 +835,7 @@ namespace Gekko
 
             if (isInside)
             {
-                HandleXTicsInside(o, highestFreq, firstXLabelFix, txt);
+                HandleXTicsInside(o, highestFreq, firstXLabelFix, txt, plotTable.hasAtLeast1RealNumber);
             }
             else
             {
@@ -1410,7 +1416,7 @@ namespace Gekko
             return GetText(x, null);
         }
 
-        private static void HandleXTicsInside(O.Prt o, EFreq highestFreq, bool firstXLabelFix, StringBuilder txt)
+        private static void HandleXTicsInside(O.Prt o, EFreq highestFreq, bool firstXLabelFix, StringBuilder txt, bool hasAtLeast1RealNumber)
         {
             //TODO: if there are too many minor tics, turn them off
             //TODO: if years get too cramped, show every second (even)
@@ -1518,12 +1524,12 @@ namespace Gekko
 
             txt.AppendLine("set xtics (" + ss + ")");
             txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
-            if (firstXLabelFix)
+            if (firstXLabelFix && hasAtLeast1RealNumber)
             {
                 if ((highestFreq == EFreq.M && o.t1.freq == EFreq.M && o.t1.sub <= 1) || (highestFreq == EFreq.Q && o.t1.freq == EFreq.Q && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
                 {
                     //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
-                    double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
+                    double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label                    
                     txt.AppendLine("set xrange [" + tStart.ToString() + ":]");      //see above
                 }
             }

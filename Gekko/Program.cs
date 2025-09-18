@@ -1197,6 +1197,7 @@ namespace Gekko
 
     public class PlotTable
     {
+        public bool hasAtLeast1RealNumber = false;
         public List<List<double>> dates = null;
         public List<List<double>> values = null;
     }
@@ -27876,8 +27877,7 @@ namespace Gekko
         /// Plotting in Gekko (PLOT statement). Can plot mixed frequencies.
         /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
-        {
-            bool hasAtLeast1RealNumber = false;
+        {            
             PlotTable plotTable = new PlotTable();
             plotTable.dates = new List<List<double>>();
             plotTable.values = new List<List<double>>();
@@ -27937,16 +27937,16 @@ namespace Gekko
                     plotTable.dates[j - 2].Add(tt);
                     plotTable.values[j - 2].Add(d);
 
-                    if (!G.IsNumericalError(d)) hasAtLeast1RealNumber = true;
+                    if (!G.IsNumericalError(d)) plotTable.hasAtLeast1RealNumber = true;
                 }
             }
 
-            if (!hasAtLeast1RealNumber)
-            {
-                string s = "";
-                if (!o.opt_i.IsNull()) s = "It seems option <i> is used. For a series x, if x[ti] is a missing value (where ti is the index date, for instance the start of the time period), the whole indexed series 100*x/x[ti] will have missing values. You may want to adjust the time period.";
-                new Error("The plot contains all missing values and therefore cannot be drawn. " + s);
-            }
+            //if (!plotTable.hasAtLeast1RealNumber)
+            //{
+            //    string s = "";                
+            //    if (!o.opt_i.IsNull()) s = "It seems option <i> is used. For a series x, if x[ti] is a missing value (where ti is the index date, for instance the start of the time period), the whole indexed series 100*x/x[ti] will have missing values. You may want to adjust the time period.";                
+            //    new Error("The plot contains all missing values and therefore cannot be drawn. " + s);
+            //}
 
             return plotTable;
         }

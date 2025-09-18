@@ -868,9 +868,7 @@ namespace Gekko
 
             if (Program.options.model_gams_scalar_data)
             {                
-                //We don't read the endo values from gams.gms anymore: reading data from a databank is mandatory now.
-                //Do not delete this: is may be resurrected sometime, but for now we do not like data to be stored
-                //in a model.zip file inside gams.gms.
+                //Read data from the scalar model (gams.gms)
                 foreach (string line in values)
                 {                    
                     if (line.Trim() == "" || line.StartsWith("*")) continue;
@@ -949,7 +947,7 @@ namespace Gekko
                 }                
             }
 
-            if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS data .fx reading: " + G.Seconds(dt1));
+            if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS data reading " + hasReadSomeData + " obs: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
