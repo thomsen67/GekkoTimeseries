@@ -531,13 +531,7 @@ namespace Gekko
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
-            txt.AppendLine("set datafile missing \"NaN\"");
-
-            if (!plotTable.hasAtLeast1RealNumber)
-            {
-                txt.AppendLine("set xrange [" + o.t1.super + ":" + o.t2.super + "]");
-                txt.AppendLine("set yrange [-1:1]");                
-            }
+            txt.AppendLine("set datafile missing \"NaN\"");            
 
             if (decompMargin != null) txt.AppendLine(decompMargin);
 
@@ -835,7 +829,7 @@ namespace Gekko
 
             if (isInside)
             {
-                HandleXTicsInside(o, highestFreq, firstXLabelFix, txt, plotTable.hasAtLeast1RealNumber);
+                HandleXTicsInside(o, highestFreq, firstXLabelFix, txt);
             }
             else
             {
@@ -891,6 +885,18 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
+
+            if (!plotTable.hasAtLeast1RealNumber)
+            {
+                //With all NaN (missing), we override any x(2)range or y(2)range, so these are fixed.
+                //TODO: This will still fail if there are all missing data on say y2 axis.
+                //      To fix it, we need to split those data that are <y2> and those data that are not.
+                txt.AppendLine("set xrange [" + o.t1.super + ":" + o.t2.super + "]");
+                txt.AppendLine("set x2range [" + o.t1.super + ":" + o.t2.super + "]");
+                txt.AppendLine("set yrange [-1:1]");
+                txt.AppendLine("set y2range [-1:1]");
+            }
+
             bool allAreLinespointsType2 = true;
             string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq, out allAreLinespointsType2);
             txt.AppendLine(plotline);
@@ -1416,7 +1422,7 @@ namespace Gekko
             return GetText(x, null);
         }
 
-        private static void HandleXTicsInside(O.Prt o, EFreq highestFreq, bool firstXLabelFix, StringBuilder txt, bool hasAtLeast1RealNumber)
+        private static void HandleXTicsInside(O.Prt o, EFreq highestFreq, bool firstXLabelFix, StringBuilder txt)
         {
             //TODO: if there are too many minor tics, turn them off
             //TODO: if years get too cramped, show every second (even)
@@ -1524,7 +1530,7 @@ namespace Gekko
 
             txt.AppendLine("set xtics (" + ss + ")");
             txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
-            if (firstXLabelFix && hasAtLeast1RealNumber)
+            if (firstXLabelFix)
             {
                 if ((highestFreq == EFreq.M && o.t1.freq == EFreq.M && o.t1.sub <= 1) || (highestFreq == EFreq.Q && o.t1.freq == EFreq.Q && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
                 {

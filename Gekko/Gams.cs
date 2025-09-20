@@ -1203,9 +1203,11 @@ namespace Gekko
                 double extra = 0d;
                 if (modelGamsScalar.hasResVariables)
                 {
-                    //res_... variables, trying those first, then eq names as backup
+                    //res_... variables, trying those first, then eq names as backup, depending on option
                     extra = GetSortedEquationsByResVariable(eqInfo.eqNumber, variableName, modelGamsScalar);
-                    if (extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
+                    //Regarding the call below, this does not look whether the var is LHS, this has been done above and will be added later on
+                    //It only looks at the equation name and performs some magic. When res_... are present, not need to use that magic.
+                    if (Program.options.bugfix_score_even_with_res_vars && extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
                 }
                 else
                 {

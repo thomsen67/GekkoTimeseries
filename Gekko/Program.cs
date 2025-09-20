@@ -2983,27 +2983,9 @@ namespace Gekko
                     //return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "d00"))
+                if (Globals.runningOnTTComputer && (text == "b"))
                 {
-                    EquationBrowser.BrowserNew(false, false);  //everything
-                    return;
-                }
-
-                if (Globals.runningOnTTComputer && (text == "d01")) 
-                {
-                    EquationBrowser.BrowserNew(false, true); //only html
-                    return;
-                }
-
-                if (Globals.runningOnTTComputer && (text == "d10"))
-                {
-                    EquationBrowser.BrowserNew(true, false); //only setting up
-                    return;
-                }
-
-                if (Globals.runningOnTTComputer && (text == "d11"))
-                {
-                    EquationBrowser.BrowserNew(true, true); //only setting up
+                    EquationBrowser.BrowserNew();
                     return;
                 }
 
@@ -27937,7 +27919,10 @@ namespace Gekko
                     plotTable.dates[j - 2].Add(tt);
                     plotTable.values[j - 2].Add(d);
 
-                    if (!G.IsNumericalError(d)) plotTable.hasAtLeast1RealNumber = true;
+                    if (!plotTable.hasAtLeast1RealNumber && PlotMixedRangeOk(d, o))
+                    {
+                        plotTable.hasAtLeast1RealNumber = true;
+                    }                    
                 }
             }
 
@@ -27949,6 +27934,22 @@ namespace Gekko
             //}
 
             return plotTable;
+        }
+
+        private static bool PlotMixedRangeOk(double d, O.Prt o)
+        {            
+            //Used to test if at least on point will be shown. If it returns true, it will be so.
+            if (G.IsNumericalError(d)) return false;
+            double ymax = double.MaxValue;
+            double ymaxhard = double.MaxValue;
+            double ymin = double.MinValue;
+            double yminhard = double.MinValue;
+            if (!double.IsNaN(o.opt_ymax)) ymax = o.opt_ymax;
+            if (!double.IsNaN(o.opt_ymaxhard)) ymaxhard = o.opt_ymaxhard;
+            if (!double.IsNaN(o.opt_ymin)) ymin = o.opt_ymin;
+            if (!double.IsNaN(o.opt_yminhard)) yminhard = o.opt_yminhard;
+            if (d <= ymax && d <= ymaxhard && d >= ymin && d >= yminhard) return true;
+            return false;
         }
 
         /// <summary>

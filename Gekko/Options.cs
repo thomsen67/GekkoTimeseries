@@ -52,6 +52,7 @@ namespace Gekko
         public bool bugfix_disp_influences_equ = false;   //not mentioned in help, set false for old link generation for gekko models
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
+        public bool bugfix_score_even_with_res_vars = false;
 
         // ---
         //method options could look like the 2 following:
@@ -390,7 +391,8 @@ namespace Gekko
             Add("BUGFIX DECOMP JACOBI", Globals.xbool);
             //Add("BUGFIX DISP", Globals.xbool);
             Add("BUGFIX DISP INFLUENCES EQU", Globals.xbool);
-            Add("BUGFIX PLOT", Globals.xbool);            
+            Add("BUGFIX PLOT", Globals.xbool);
+            Add("BUGFIX SCORE EVEN WITH RES VARS", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

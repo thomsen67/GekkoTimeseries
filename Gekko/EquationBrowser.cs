@@ -1199,16 +1199,34 @@ img {border-style: none;
             return q;
         }
 
-        public static void BrowserNew(bool skip, bool onlyHtml)
+        public static void BrowserNew()
         {
-            bool onlyPlot = true;
+            string path = @"c:\Thomas\Desktop\gekko\testing\browser";  //Normally something with "browser".
+            bool deleteFolder = true;  //if true, everything is wiped out first.
+            string subfolder = "vars";
 
+            bool onlyHtml = false; //default: false
+            bool onlyPlot = false; //default: false
+            bool skip = false;  //only for debug
+            
+            bool small = false; //default: false, only few eqs.
+            bool flush = false;  //Not necessary to set true anymore
+            bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO, but what does this really do?           
+            EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
 
+            // --------------------------------------------------------------------------------------------------------
 
-            bool small = false; //in general: false.
-            bool flush = true;  //True because of data series missing otherwise
-            bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO            
-            EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??            
+            BrowserHelper bh = new BrowserHelper();
+            bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
+            bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
+            bh.pixels = 20;
+            bh.pixelsAfterArrow = 12;
+            bh.freq = freq;
+            bh.firstColWidth = 200;
+            bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
+
+            // --------------------------------------------------------------------------------------------------------
+
             GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             if (small)
             {
@@ -1226,14 +1244,40 @@ img {border-style: none;
                 restrict.Add("qX[xTot]", false);
             }
 
-            BrowserHelper bh = new BrowserHelper();
-            bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
-            bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
-            bh.pixels = 20;
-            bh.pixelsAfterArrow = 12;
-            bh.freq = freq;
-            bh.firstColWidth = 200;
-            bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
+            if (deleteFolder && Directory.Exists(path))
+            {
+                DialogResult result = MessageBox.Show("About to delete " + path + " and subfolders. It this ok?", "Deleting", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                if (result == DialogResult.Yes)
+                {
+                    G.DeleteFolder(path, true);
+                    new Writeln("Folder " + path + " deleted");
+                }
+                else
+                {
+                    new Error("User abort");
+                }
+            }
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            if (!Directory.Exists(Path.Combine(path, subfolder)))
+            {
+                Directory.CreateDirectory(Path.Combine(path, subfolder));
+            }
+
+            if (true)
+            {
+                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\index.html", path + "\\" + "index.html");
+                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\styles.css", path + "\\" + "styles.css");
+                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\header_MAKRO.svg", path + "\\" + "header_MAKRO.svg");
+                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\DREAM_logo_500x70px.svg", path + "\\" + "DREAM_logo_500x70px.svg");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
+            }            
 
             bool adam = false;
             Globals.browser = true;  //Do not change, internal TTH popup
@@ -1250,26 +1294,12 @@ img {border-style: none;
                 else
                 {
                     string f = null; if (flush) f = "flush(); ";
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";                    
-                    //Program.RunGekkoCommands(f + "reset; option model gams scalar data = yes; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
-
-                    Program.RunGekkoCommands(f + "reset; option model gams scalar data = yes; read <gdx> previous_deep_calibration.gdx; time 2025 2030; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
-
-                    //Program.RunGekkoCommands("qbnp <2030 2035> *= 1.1, 1.2, 1.3, 1.4, 1.5, 1.6;", "", 0, new P());
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
+                    Program.RunGekkoCommands(f + "reset; read <gdx> previous_deep_calibration.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());                    
                 }
             }
 
-            if (skip) return;
-
-            string path = @"c:\Thomas\Desktop\gekko\testing\Browser3";
-            if (!onlyHtml)
-            {
-                G.DeleteFolder(path, "css", false);
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
-            }
+            if (skip) return;                        
 
             GekkoTime t1 = GekkoTime.tNull;
             GekkoTime t2 = GekkoTime.tNull;
@@ -1865,6 +1895,8 @@ img {border-style: none;
         /// <param name="combos"></param>
         private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict)
         {
+            double yminhard = -100d;
+            double ymaxhard = 100d;
             DateTime dt0 = DateTime.UtcNow;
             List<string> m = new List<string>() { "n", "p" };
             foreach (string op in m)
@@ -1908,8 +1940,8 @@ img {border-style: none;
                         if (op == "p")
                         {
                             //So we do not show too small or too large percentages
-                            o0.opt_yminhard = -100d;
-                            o0.opt_ymaxhard = 100d;
+                            o0.opt_yminhard = yminhard;
+                            o0.opt_ymaxhard = ymaxhard;
                             o0.opt_yminsoft = -1d;
                             o0.opt_ymaxsoft = 1d;
                             o0.opt_ytitle = "%"; //Produces very large .svg files -- strange...!
