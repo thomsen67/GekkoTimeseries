@@ -1369,7 +1369,7 @@ img {border-style: none;
                     x2.Append("<td width = `80%` style=`color:gray`>");
                     x2.Append(expl);
                     x2.Append("</td>");
-                    x2.Append("</tr>");
+                    x2.AppendLine("</tr>");
 
                     EquationBrowserHelper ebh = new EquationBrowserHelper();
                     ebh.s1 = var2;
@@ -1421,26 +1421,18 @@ img {border-style: none;
                 x3.AppendLine("<head>");
                 x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
                 //x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
-                x3.AppendLine("</head>");
-
-                //x3.AppendLine("<html>");
-                //x3.AppendLine("<HEAD>");
-                //x3.AppendLine("<TITLE>MAKRO equation browser</TITLE>");
-                //x3.AppendLine("<link rel = `stylesheet` href = `styles.css` type = `text/css` >");
-                //x3.AppendLine("<link rel=`shortcut icon` href=`punkt-bomaerke.ico` type=`image/vnd.microsoft.icon`>");
-                //x3.AppendLine("<link rel=`icon` sizes=`32x32` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=32&amp;height=32`><link rel=`icon` sizes=`16x16` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=16&amp;height=16`><link rel=`icon` sizes=`128x128` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=128&amp;height=128`><link rel=`icon` sizes=`196x196` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=196&amp;height=196`><link rel=`apple-touch-icon` sizes=`180x180` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=180&amp;height=180`><link rel=`apple-touch-icon` sizes=`152x152` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=152&amp;height=152`><link rel=`apple-touch-icon` sizes=`167x167` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=167&amp;height=167`>");
-                //x3.AppendLine("</HEAD>");
+                x3.AppendLine("</head>");                
 
                 foreach (string s in CreateCss(false)) x3.AppendLine(s);
 
                 x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
 
-                string s1 = G.NL;
-                string s2 = G.NL;
+                StringBuilder s1 = new StringBuilder(); s1.AppendLine();
+                StringBuilder s2 = new StringBuilder(); s2.AppendLine();
                 foreach (EquationBrowserHelper s in sorted)
                 {
-                    s1 += "\"" + s.s1 + "\"" + ", " + G.NL;
-                    s2 += "\"" + s.s2 + "\"" + ", " + G.NL;
+                    s1.AppendLine("\"" + s.s1 + "\"" + ", ");
+                    s2.AppendLine("\"" + s.s2 + "\"" + ", ");
                 }
 
                 string write = null;
@@ -1449,98 +1441,125 @@ img {border-style: none;
 
                 string js = @"
 
-            function varnavns() {
-                var varnavn = [" + s1 + @"];
-                return varnavn;
+            function varnames() {
+                var varname = [" + s1.ToString() + @"];
+                return varname;
             }
 
             function describes() {
-                var describe = [" + s2 + @"];
+                var describe = [" + s2.ToString() + @"];
                 return describe;
             }
 
-            function findvarnavn(){
-                var content = [];
-                var varnavn = varnavns();
-                var describe = describes();
-                antal = varnavn.length;
-                tekst = new String;
-                tekst1 = new String;
-                tekst = document.form1.tekst.value;
-                fundet = false;
+            function findvarname(){
+              event.preventDefault(); // Prevents the page from reloading
+              const resultsContainer = document.getElementById('results-container');              
+              var content = [];
+              var varname = varnames();
+              var describe = describes();
+              number = varname.length;
+              text = new String;
+              text1 = new String;
+              text = document.form1.text.value;
+              found = false;              
+              
+              let html = '<hr><table style = `width: 100 % `>';                
 
-                " + write + @"(`" + Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + tekst + `'<br><br>`);
-
-                for (var i = 0; i < antal; i++)
+              for (var i = 0; i < number; i++)
                 {
-                    tekst1 = varnavn[i];
-                    if (tekst1.toUpperCase() == tekst.toUpperCase())
+                    text1 = varname[i];
+                    if (text1.toUpperCase() == text.toUpperCase())
                     {
-                        fundet = true;
+                        found = true;
+                        html += '<tr><td width = `20%`><a href =' + varname[i].toLowerCase() + '>' + varname[i] + '</a></td><td width = `80%` style =`color:gray`>' + describe[i] + '</td></tr>';
+                    } //endif
+                } //endfor
+                html += '</table>';
+                resultsContainer.innerHTML = html;
+            }
 
-                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+            function findvarname2(){
+                var content = [];
+                var varname = varnames();
+                var describe = describes();
+                number = varname.length;
+                text = new String;
+                text1 = new String;
+                text = document.form1.text.value;
+                found = false;
+
+                " + write + @"(`" + Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + text + `'<br><br>`);
+
+                for (var i = 0; i < number; i++)
+                {
+                    text1 = varname[i];
+                    if (text1.toUpperCase() == text.toUpperCase())
+                    {
+                        found = true;
+
+                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varname[i].toLowerCase() + `.html style='text-decoration:none'>` + varname[i] + `</a></b>`);
                         " + write + @"(`<br>` + describe[i] + `<br><hr><br>`);
                     } //endif
                 } //endfor
 
-                for (var i = 0; i < antal; i++)
+                for (var i = 0; i < number; i++)
                 {
-                    tekst1 = varnavn[i];
-                    if (tekst1.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                    text1 = varname[i];
+                    if (text1.toUpperCase().indexOf(text.toUpperCase()) != -1)
                     {
-                        if (tekst1.toUpperCase() != tekst.toUpperCase())
+                        if (text1.toUpperCase() != text.toUpperCase())
                         {
-                            fundet = true;
-                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            found = true;
+                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varname[i].toLowerCase() + `.html style='text-decoration:none;'>` + varname[i] + `</a>`);
                             " + write + @"(`<br>` + describe[i] + `<br><br>`);
                         } //endif
                     } //endif
                 } //endfor
 
-                if (fundet == false)
+                if (found == false)
                 {
                     " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
                 } //endif
                 " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br>`);
-                tekst1.free;
-                tekst.free;
+                text1.free;
+                text.free;
                 " + join + @"
             }  //endfunction
 
             function check(event) {
             var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) findvarnavn();
+        if (charCode == 13) findvarname();
         }  // endfunction
 
         function finddescribe()
         {
             var content = [];
-            var varnavn = varnavns();
+            var varname = varnames();
             var describe = describes();
-            antal = varnavn.length;
-            tekst = new String;
-            tekst2 = new String;
-            tekst = document.form2.tekst.value;
+            number = varname.length;
+            text = new String;
+            text2 = new String;
+            text = document.form2.text.value;
 
-            " + write + @"(`" + Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + tekst + `' " + Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
-            fundet = false;
-            for (var i = 0; i < antal; i++)
+            " + write + @"(`" + Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + text + `' " + Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
+            found = false;
+            for (var i = 0; i < number; i++)
             {
-                tekst2 = describe[i];
-                if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                text2 = describe[i];
+                if (text2.toUpperCase().indexOf(text.toUpperCase()) != -1)
                 {
-                    fundet = true;
-                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                    found = true;
+                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varname[i].toLowerCase() + `.html style='text-decoration:none'>` + varname[i] + `</a></b>`);
                     " + write + @"(`<br>` + describe[i] + `<br><br>`);
                 } //endif
             } //endfor
-            if (fundet == false)
+            if (found == false)
             {
                 " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
             } //endif            
             " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br>`);
-            tekst.free;
-            tekst2.free;
+            text.free;
+            text2.free;
 
             " + join + @"
         }  //endfunction
@@ -1555,31 +1574,20 @@ img {border-style: none;
                 x3.AppendLine(js);
                 x3.AppendLine("// -->");
                 x3.AppendLine("</script>");
-                x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
-                x3.AppendLine("<table width=`100 % `><tr><td>");
-                //if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
-                x3.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`> ");
-                x3.AppendLine("  <tr>");
-                x3.AppendLine("  <td width = `80 %` ><b><big>" + Language(isDanish, "Søg", "Search") + "</big></b></td>");
-                //x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_list_filename + "` > " + "List" + " </a></td >");
-                //x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
-                x3.AppendLine("  </tr>");
-                x3.AppendLine("  </table>");
-                x3.AppendLine("");
-                //if (isDanish) x3.AppendLine("Søgning efter variabelnavn:");
+                x3.AppendLine("<body onload = `document.form1.text.focus()`>");                
+                x3.AppendLine("<p style = `font-weight: bold;`>Search</p>");
+                x3.AppendLine("");                
                 x3.AppendLine("Search variable name:");
-                x3.AppendLine("<FORM NAME = `form1` >");
-                x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
-                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
-                x3.AppendLine("</FORM>");
-                //x3.AppendLine("<p>&nbsp;</p>");
-                //if (isDanish) x3.AppendLine("Fritekstsøgning i variabeldescribeelserne:");
+                x3.AppendLine("<FORM NAME = `form1`>");
+                x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
+                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarname()`>");
+                x3.AppendLine("</FORM>");                
                 x3.AppendLine("Free text search in variable descriptions:");
                 x3.AppendLine("<FORM NAME = `form2`>");
-                x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
+                x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
                 x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`finddescribe()`>");
                 x3.AppendLine("</FORM></center>");
-                x3.AppendLine("</td></tr></table>");
+                x3.AppendLine("<div id = `results-container`></div>");  
                 x3.AppendLine("</body>");
                 x3.AppendLine("</html>");
 
