@@ -1029,15 +1029,8 @@ img {border-style: none;
 
             string write = null;
             string join = null;
-            if (jsmFix)
-            {
-                write = "document.write";
-            }
-            else
-            {
-                write = "content.push";
-                join = "document.body.innerHTML = content.join(``);";
-            }            
+            
+            write = "document.write";            
 
             string js = @"
 
@@ -1344,11 +1337,263 @@ img {border-style: none;
             string settings_vars_foldername = "vars";
             string modelFrequencyString = "a";
             string res = "res_";
+            bool isDanish = false;
+            string settings_find_filename = "find.html";
 
             //             
 
             DateTime dt1 = DateTime.UtcNow;
             int count = 0;
+
+            if (true)
+            {
+                List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();
+                StringBuilder x2 = new StringBuilder();
+                foreach (string s in CreateCss(false)) x2.AppendLine(s);
+                x2.AppendLine("<body>");
+                x2.AppendLine(LinkHome(false));
+                WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
+                x2.AppendLine("<table style = `width:100%`>");
+
+                List<string> vars = combos.Keys.ToList();
+                vars.Sort(G.CompareNaturalIgnoreCase);
+
+                foreach (string var2 in vars)
+                {
+                    if (G.StartsWith(var2, res)) continue;  //skip res_... variables.
+                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2));
+                    x2.Append("<tr>");
+                    x2.Append("<td width = `20%`>");
+                    x2.Append(HtmlLink(var2, settings_vars_foldername + "/" + var2.ToLower() + ".html"));
+                    x2.Append("</td>");
+                    x2.Append("<td width = `80%` style=`color:gray`>");
+                    x2.Append(expl);
+                    x2.Append("</td>");
+                    x2.Append("</tr>");
+
+                    EquationBrowserHelper ebh = new EquationBrowserHelper();
+                    ebh.s1 = var2;
+                    if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
+                    ebh.s2 = G.ReplaceWhitespaceWith1Blank(expl);
+                    if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
+                    vars2.Add(ebh);
+                }
+                x2.AppendLine("</table>");
+
+                x2.AppendLine("  </p>");
+                x2.AppendLine("  </body>");
+                x2.AppendLine("</html>");
+
+                using (FileStream fs = Program.WaitForFileStream(path + "\\" + "list.html", null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(x2.Replace('`', '\"'));
+                }
+
+                G.WritelnGray("Finished list.html");
+
+                // -------------------------------------------------------------------
+
+                //if (false)
+                //{
+                //    StringBuilder x2 = new StringBuilder();
+                //    foreach (string s in CreateCss(false)) x2.AppendLine(s);
+                //    x2.AppendLine(LinkHome(false));
+                //    WriteHtmlBold(x2, "Search for variable name or variable desciption.");
+                //    WriteHtml(x2, "This page is under construction: use <a href = `list.html`>alphabetical list</a> for now.");
+                //    x2.AppendLine("  </body>");
+                //    x2.AppendLine("</html>");
+                //    using (FileStream fs = Program.WaitForFileStream(path + "\\" + "find.html", null, Program.GekkoFileReadOrWrite.Write))
+                //    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                //    {
+                //        sw.Write(x2.Replace('`', '\"'));
+                //    }
+                //}                
+
+                // ------------------------------------------------------------
+                // ----------------- find -------------------------------------
+                // ------------------------------------------------------------
+
+                var sorted = vars2.OrderBy(o => o.s1, StringComparer.OrdinalIgnoreCase);
+
+                StringBuilder x3 = new StringBuilder();
+                x3.AppendLine("<html>");
+                x3.AppendLine("<head>");
+                x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
+                //x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
+                x3.AppendLine("</head>");
+
+                //x3.AppendLine("<html>");
+                //x3.AppendLine("<HEAD>");
+                //x3.AppendLine("<TITLE>MAKRO equation browser</TITLE>");
+                //x3.AppendLine("<link rel = `stylesheet` href = `styles.css` type = `text/css` >");
+                //x3.AppendLine("<link rel=`shortcut icon` href=`punkt-bomaerke.ico` type=`image/vnd.microsoft.icon`>");
+                //x3.AppendLine("<link rel=`icon` sizes=`32x32` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=32&amp;height=32`><link rel=`icon` sizes=`16x16` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=16&amp;height=16`><link rel=`icon` sizes=`128x128` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=128&amp;height=128`><link rel=`icon` sizes=`196x196` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=196&amp;height=196`><link rel=`apple-touch-icon` sizes=`180x180` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=180&amp;height=180`><link rel=`apple-touch-icon` sizes=`152x152` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=152&amp;height=152`><link rel=`apple-touch-icon` sizes=`167x167` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=167&amp;height=167`>");
+                //x3.AppendLine("</HEAD>");
+
+                foreach (string s in CreateCss(false)) x3.AppendLine(s);
+
+                x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
+
+                string s1 = G.NL;
+                string s2 = G.NL;
+                foreach (EquationBrowserHelper s in sorted)
+                {
+                    s1 += "\"" + s.s1 + "\"" + ", " + G.NL;
+                    s2 += "\"" + s.s2 + "\"" + ", " + G.NL;
+                }
+
+                string write = null;
+                string join = null;
+                write = "document.write";
+
+                string js = @"
+
+            function varnavns() {
+                var varnavn = [" + s1 + @"];
+                return varnavn;
+            }
+
+            function describes() {
+                var describe = [" + s2 + @"];
+                return describe;
+            }
+
+            function findvarnavn(){
+                var content = [];
+                var varnavn = varnavns();
+                var describe = describes();
+                antal = varnavn.length;
+                tekst = new String;
+                tekst1 = new String;
+                tekst = document.form1.tekst.value;
+                fundet = false;
+
+                " + write + @"(`" + Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + tekst + `'<br><br>`);
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i];
+                    if (tekst1.toUpperCase() == tekst.toUpperCase())
+                    {
+                        fundet = true;
+
+                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        " + write + @"(`<br>` + describe[i] + `<br><hr><br>`);
+                    } //endif
+                } //endfor
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i];
+                    if (tekst1.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                    {
+                        if (tekst1.toUpperCase() != tekst.toUpperCase())
+                        {
+                            fundet = true;
+                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            " + write + @"(`<br>` + describe[i] + `<br><br>`);
+                        } //endif
+                    } //endif
+                } //endfor
+
+                if (fundet == false)
+                {
+                    " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
+                } //endif
+                " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br>`);
+                tekst1.free;
+                tekst.free;
+                " + join + @"
+            }  //endfunction
+
+            function check(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findvarnavn();
+        }  // endfunction
+
+        function finddescribe()
+        {
+            var content = [];
+            var varnavn = varnavns();
+            var describe = describes();
+            antal = varnavn.length;
+            tekst = new String;
+            tekst2 = new String;
+            tekst = document.form2.tekst.value;
+
+            " + write + @"(`" + Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + tekst + `' " + Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
+            fundet = false;
+            for (var i = 0; i < antal; i++)
+            {
+                tekst2 = describe[i];
+                if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                {
+                    fundet = true;
+                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                    " + write + @"(`<br>` + describe[i] + `<br><br>`);
+                } //endif
+            } //endfor
+            if (fundet == false)
+            {
+                " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
+            } //endif            
+            " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br>`);
+            tekst.free;
+            tekst2.free;
+
+            " + join + @"
+        }  //endfunction
+
+        function check2(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) finddescribe();
+        }  // endfunction
+
+        ";
+
+                x3.AppendLine(js);
+                x3.AppendLine("// -->");
+                x3.AppendLine("</script>");
+                x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
+                x3.AppendLine("<table width=`100 % `><tr><td>");
+                //if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
+                x3.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`> ");
+                x3.AppendLine("  <tr>");
+                x3.AppendLine("  <td width = `80 %` ><b><big>" + Language(isDanish, "Søg", "Search") + "</big></b></td>");
+                //x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_list_filename + "` > " + "List" + " </a></td >");
+                //x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
+                x3.AppendLine("  </tr>");
+                x3.AppendLine("  </table>");
+                x3.AppendLine("");
+                //if (isDanish) x3.AppendLine("Søgning efter variabelnavn:");
+                x3.AppendLine("Search variable name:");
+                x3.AppendLine("<FORM NAME = `form1` >");
+                x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
+                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
+                x3.AppendLine("</FORM>");
+                //x3.AppendLine("<p>&nbsp;</p>");
+                //if (isDanish) x3.AppendLine("Fritekstsøgning i variabeldescribeelserne:");
+                x3.AppendLine("Free text search in variable descriptions:");
+                x3.AppendLine("<FORM NAME = `form2`>");
+                x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
+                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`finddescribe()`>");
+                x3.AppendLine("</FORM></center>");
+                x3.AppendLine("</td></tr></table>");
+                x3.AppendLine("</body>");
+                x3.AppendLine("</html>");
+
+                string pathAndFilename3 = path + "\\" + settings_find_filename;
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(x3.Replace('`', '\"'));
+                }
+                G.WritelnGray("Finished find.html");
+            }
+
+            new Error("Stop"); //qwerty
+
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
@@ -1581,248 +1826,7 @@ img {border-style: none;
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
-            }
-
-            if (true)
-            {
-                StringBuilder x2 = new StringBuilder(); 
-                foreach (string s in CreateCss(false)) x2.AppendLine(s);                
-                x2.AppendLine(LinkHome(false));
-                WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
-                x2.AppendLine("<table style = `width:100%`>");
-
-                List<string> vars = combos.Keys.ToList();
-                vars.Sort(G.CompareNaturalIgnoreCase);
-
-                foreach (string var2 in vars)
-                {
-                    if (G.StartsWith(var2, res)) continue;  //skip res_... variables.
-                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2));
-                    x2.Append("<tr>");
-                    x2.Append("<td width = `20%`>");
-                    x2.Append(HtmlLink(var2, settings_vars_foldername + "/" + var2.ToLower() + ".html"));
-                    x2.Append("</td>");
-                    x2.Append("<td width = `80%` style=`color:gray`>");
-                    x2.Append(expl);
-                    x2.Append("</td>");
-                    x2.Append("</tr>");
-                }
-                x2.AppendLine("</table>");
-
-                x2.AppendLine("  </p>");
-                x2.AppendLine("  </body>");
-                x2.AppendLine("</html>");
-
-                using (FileStream fs = Program.WaitForFileStream(path + "\\" + "list.html", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(x2.Replace('`', '\"'));
-                }
-            }
-
-            if (true)
-            {
-                StringBuilder x2 = new StringBuilder(); 
-                foreach (string s in CreateCss(false)) x2.AppendLine(s);
-                x2.AppendLine(LinkHome(false));
-                WriteHtmlBold(x2, "Search for variable name or variable desciption.");
-                WriteHtml(x2, "This page is under construction: use <a href = `list.html`>alphabetical list</a> for now.");                
-                x2.AppendLine("  </body>");
-                x2.AppendLine("</html>");
-                using (FileStream fs = Program.WaitForFileStream(path + "\\" + "find.html", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(x2.Replace('`', '\"'));
-                }
-            }
-
-            /*
-
-
-            // ------------------------------------------------------------
-            // ----------------- find -------------------------------------
-            // ------------------------------------------------------------
-
-            var sorted = vars2.OrderBy(o => o.s1, StringComparer.OrdinalIgnoreCase);
-
-            StringBuilder x3 = new StringBuilder();
-            x3.AppendLine("<html>");
-            x3.AppendLine("<head>");
-            x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
-            x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
-            x3.AppendLine("</head>");
-
-            x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
-
-            string s1 = G.NL;
-            string s2 = G.NL;
-            foreach (EquationBrowserHelper s in sorted)
-            {
-                s1 += "\"" + s.s1 + "\"" + ", " + G.NL;
-                s2 += "\"" + s.s2 + "\"" + ", " + G.NL;
-            }
-
-            string write = null;
-            string join = null;
-            if (jsmFix)
-            {
-                write = "document.write";
-            }
-            else
-            {
-                write = "content.push";
-                join = "document.body.innerHTML = content.join(``);";
-            }
-
-            string js = @"
-
-            function varnavns() {
-                var varnavn = [" + s1 + @"];
-                return varnavn;
-            }
-
-            function beskrivs() {
-                var beskriv = [" + s2 + @"];
-                return beskriv;
-            }
-
-            function findvarnavn(){
-                var content = [];
-                var varnavn = varnavns();
-                var beskriv = beskrivs();
-                antal = varnavn.length;
-                tekst = new String;
-                tekst1 = new String;
-                tekst = document.form1.tekst.value;
-                fundet = false;
-
-                " + write + @"(`" + Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + tekst + `'<br><br>`);
-
-                for (var i = 0; i < antal; i++)
-                {
-                    tekst1 = varnavn[i];
-                    if (tekst1.toUpperCase() == tekst.toUpperCase())
-                    {
-                        fundet = true;
-
-                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
-                        " + write + @"(`<br>` + beskriv[i] + `<br><hr><br>`);
-                    } //endif
-                } //endfor
-
-                for (var i = 0; i < antal; i++)
-                {
-                    tekst1 = varnavn[i];
-                    if (tekst1.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
-                    {
-                        if (tekst1.toUpperCase() != tekst.toUpperCase())
-                        {
-                            fundet = true;
-                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
-                            " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
-                        } //endif
-                    } //endif
-                } //endfor
-
-                if (fundet == false)
-                {
-                    " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
-                } //endif
-                " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br> <a href=" + settings_index_filename + @">" + Language(isDanish, "Gå til hovedside", "Go to main page") + @"</a>`);
-                tekst1.free;
-                tekst.free;
-                " + join + @"
-            }  //endfunction
-
-            function check(event) {
-            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) findvarnavn();
-        }  // endfunction
-
-        function findbeskriv()
-        {
-            var content = [];
-            var varnavn = varnavns();
-            var beskriv = beskrivs();
-            antal = varnavn.length;
-            tekst = new String;
-            tekst2 = new String;
-            tekst = document.form2.tekst.value;
-
-            " + write + @"(`" + Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + tekst + `' " + Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
-            fundet = false;
-            for (var i = 0; i < antal; i++)
-            {
-                tekst2 = beskriv[i];
-                if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
-                {
-                    fundet = true;
-                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
-                    " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
-                } //endif
-            } //endfor
-            if (fundet == false)
-            {
-                " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
-            } //endif            
-            " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br> <a href=" + settings_index_filename + @">" + Language(isDanish, "Gå til hovedside", "Go to main page") + @"</a>`);
-            tekst.free;
-            tekst2.free;
-
-            " + join + @"
-        }  //endfunction
-
-        function check2(event) {
-            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) findbeskriv();
-        }  // endfunction
-
-        ";
-
-            x3.AppendLine(js);
-            x3.AppendLine("// -->");
-            x3.AppendLine("</script>");
-            x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
-            x3.AppendLine("<table width=`100 % `><tr><td>");
-            //if (isDanish) x3.AppendLine("<p><b>Indtast søgeord:</b></p>");
-            x3.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`> ");
-            x3.AppendLine("  <tr>");
-            x3.AppendLine("  <td width = `80 %` ><b><big>" + Language(isDanish, "Søg", "Search") + "</big></b></td>");
-            x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_list_filename + "` > " + "List" + " </a></td >");
-            x3.AppendLine("  <td width = `10 %` ><a href = `" + settings_index_filename + "` > " + ss2 + " </a></td >");
-            x3.AppendLine("  </tr>");
-            x3.AppendLine("  </table>");
-            x3.AppendLine("");
-            //if (isDanish) x3.AppendLine("Søgning efter variabelnavn:");
-            x3.AppendLine("Search variable name:");
-            x3.AppendLine("<FORM NAME = `form1` >");
-            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
-            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
-            x3.AppendLine("</FORM>");
-            x3.AppendLine("<p>&nbsp;</p>");
-            //if (isDanish) x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
-            x3.AppendLine("Free text search in variable descriptions:");
-            x3.AppendLine("<FORM NAME = `form2`>");
-            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
-            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findbeskriv()`>");
-            x3.AppendLine("</FORM></center>");
-            x3.AppendLine("</td></tr></table>");
-            x3.AppendLine("</body>");
-            x3.AppendLine("</html>");
-
-            string pathAndFilename3 = rootFolder + "\\" + settings_find_filename;
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-            {
-                sw.Write(x3.Replace('`', '\"'));
-            }
-
-
-            */
-
-
-
-
+            }                        
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
             return;
@@ -1848,8 +1852,7 @@ img {border-style: none;
             head.Add("<link rel=`shortcut icon` href =`punkt-bomaerke.ico` type =`image/vnd.microsoft.icon` >");
             head.Add("<link rel=`icon` sizes =`32x32` type =`image/png` href =`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=32&amp;height=32` ><link rel=`icon` sizes =`16x16` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=16&amp;height=16`><link rel=`icon` sizes=`128x128` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=128&amp;height=128`><link rel=`icon` sizes=`196x196` type=`image/png` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=196&amp;height=196`><link rel=`apple-touch-icon` sizes=`180x180` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=180&amp;height=180`><link rel=`apple-touch-icon` sizes=`152x152` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=152&amp;height=152`><link rel=`apple-touch-icon` sizes=`167x167` href=`https://dreamgroup.dk/Media/638097183650056393/indeks.png?width=167&amp;height=167`>");
             head.Add("<meta http-equiv=`Content-Type` content=`text/html; charset=utf-8`>");
-            head.Add("</HEAD>");
-            head.Add("<body>");
+            head.Add("</HEAD>");            
             return head;
         }
 
