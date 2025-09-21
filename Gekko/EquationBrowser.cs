@@ -1339,6 +1339,7 @@ img {border-style: none;
             string res = "res_";
             bool isDanish = false;
             string settings_find_filename = "find.html";
+            string sub = "vars";
 
             //             
 
@@ -1392,29 +1393,11 @@ img {border-style: none;
 
                 G.WritelnGray("Finished list.html");
 
-                // -------------------------------------------------------------------
-
-                //if (false)
-                //{
-                //    StringBuilder x2 = new StringBuilder();
-                //    foreach (string s in CreateCss(false)) x2.AppendLine(s);
-                //    x2.AppendLine(LinkHome(false));
-                //    WriteHtmlBold(x2, "Search for variable name or variable desciption.");
-                //    WriteHtml(x2, "This page is under construction: use <a href = `list.html`>alphabetical list</a> for now.");
-                //    x2.AppendLine("  </body>");
-                //    x2.AppendLine("</html>");
-                //    using (FileStream fs = Program.WaitForFileStream(path + "\\" + "find.html", null, Program.GekkoFileReadOrWrite.Write))
-                //    using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                //    {
-                //        sw.Write(x2.Replace('`', '\"'));
-                //    }
-                //}                
-
                 // ------------------------------------------------------------
                 // ----------------- find -------------------------------------
                 // ------------------------------------------------------------
 
-                var sorted = vars2.OrderBy(o => o.s1, StringComparer.OrdinalIgnoreCase);
+                var sorted = vars2.OrderBy(o => o.s1, new G.NaturalComparer(G.NaturalComparerOptions.Default));
 
                 StringBuilder x3 = new StringBuilder();
                 x3.AppendLine("<html>");
@@ -1451,6 +1434,13 @@ img {border-style: none;
                 return describe;
             }
 
+            // A function to convert the wildcard pattern to a regular expression
+            function createRegexFromWildcard(pattern) {
+                let regexPattern = pattern.replace(/[.+^${}()|[\]\\]/g, `\\$&`).replace(/\*/g, `.*`).replace(/\?/g, `.`);                
+                return new RegExp(`^` + regexPattern + `$`, 'i');
+            }
+
+            //Note: almost same as below
             function findvarname(){
               event.preventDefault(); // Prevents the page from reloading
               const resultsContainer = document.getElementById('results-container');              
@@ -1461,108 +1451,76 @@ img {border-style: none;
               text = new String;
               text1 = new String;
               text = document.form1.text.value;
-              found = false;              
-              
-              let html = '<hr><table style = `width: 100 % `>';                
+              found = 0;
 
+              const myRegex = createRegexFromWildcard(text);
+              
+              let html = '';
               for (var i = 0; i < number; i++)
                 {
                     text1 = varname[i];
-                    if (text1.toUpperCase() == text.toUpperCase())
+                    //alert(text + '...' + text1);
+                    if (myRegex.test(text1))
                     {
-                        found = true;
-                        html += '<tr><td width = `20%`><a href =' + varname[i].toLowerCase() + '>' + varname[i] + '</a></td><td width = `80%` style =`color:gray`>' + describe[i] + '</td></tr>';
+                        found++;
+                        html += '<tr><td width = `20%`><a href =' + 'vars/' + varname[i].toLowerCase() + '.html>' + varname[i] + '</a></td><td width = `80 %` style =`color: gray`> ' + describe[i] + '</td></tr>';
                     } //endif
-                } //endfor
-                html += '</table>';
-                resultsContainer.innerHTML = html;
-            }
-
-            function findvarname2(){
-                var content = [];
-                var varname = varnames();
-                var describe = describes();
-                number = varname.length;
-                text = new String;
-                text1 = new String;
-                text = document.form1.text.value;
-                found = false;
-
-                " + write + @"(`" + Language(isDanish, "Søgning efter variablen:", "Searching for the variable") + @": '` + text + `'<br><br>`);
-
-                for (var i = 0; i < number; i++)
+               } //endfor
+               html += '</table>';
+                if (found == 0)
                 {
-                    text1 = varname[i];
-                    if (text1.toUpperCase() == text.toUpperCase())
+                  resultsContainer.innerHTML = '<br><hr><br><p style =`color:gray` > ...No results found...</p>';
+                }
+                else {
+                  s = '';
+                  if(found != 1) s = 's';
+                  resultsContainer.innerHTML = '<br><hr><br><p>Found ' + found + ' matching variable' +s+ '</p>' + '<table style = `width:100%` > ' + html;
+                }
+            } 
+
+            //Note: almost same as above
+            function finddescribe(){
+              event.preventDefault(); // Prevents the page from reloading
+              const resultsContainer = document.getElementById('results-container');              
+              var content = [];
+              var varname = varnames();
+              var describe = describes();
+              number = describe.length;
+              text = new String;
+              text1 = new String;
+              text = document.form2.text.value;
+              text = '*' + text + '*';  //Extra wildcards
+              found = 0;
+
+              const myRegex = createRegexFromWildcard(text);
+              
+              let html = '';
+              for (var i = 0; i < number; i++)
+                {
+                    text1 = describe[i];
+                    //alert(text + '...' + text1);
+                    if (myRegex.test(text1))
                     {
-                        found = true;
-
-                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varname[i].toLowerCase() + `.html style='text-decoration:none'>` + varname[i] + `</a></b>`);
-                        " + write + @"(`<br>` + describe[i] + `<br><hr><br>`);
+                        found++;
+                        html += '<tr><td width = `20%`><a href =' + 'vars/' + varname[i].toLowerCase() + '.html>' + varname[i] + '</a></td><td width = `80 %` style =`color: gray`> ' + describe[i] + '</td></tr>';
                     } //endif
-                } //endfor
-
-                for (var i = 0; i < number; i++)
+               } //endfor
+               html += '</table>';
+                if (found == 0)
                 {
-                    text1 = varname[i];
-                    if (text1.toUpperCase().indexOf(text.toUpperCase()) != -1)
-                    {
-                        if (text1.toUpperCase() != text.toUpperCase())
-                        {
-                            found = true;
-                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varname[i].toLowerCase() + `.html style='text-decoration:none;'>` + varname[i] + `</a>`);
-                            " + write + @"(`<br>` + describe[i] + `<br><br>`);
-                        } //endif
-                    } //endif
-                } //endfor
+                  resultsContainer.innerHTML = '<br><hr><br><p style =`color:gray` > ...No results found...</p>';
+                }
+                else {
+                  s = '';
+                  if(found != 1) s = 's';
+                  resultsContainer.innerHTML = '<br><hr><br><p>Found ' + found + ' matching variable' +s+ '</p>' + '<table style = `width:100%` > ' + html;
+                }
+            } 
 
-                if (found == false)
-                {
-                    " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
-                } //endif
-                " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br>`);
-                text1.free;
-                text.free;
-                " + join + @"
-            }  //endfunction
-
-            function check(event) {
+        function check(event) {
             var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) findvarname();
-        }  // endfunction
-
-        function finddescribe()
-        {
-            var content = [];
-            var varname = varnames();
-            var describe = describes();
-            number = varname.length;
-            text = new String;
-            text2 = new String;
-            text = document.form2.text.value;
-
-            " + write + @"(`" + Language(isDanish, "Søgning efter teksten", "Searching for the text") + @": '` + text + `' " + Language(isDanish, "i variabelliste", "in the variable list") + @"<br><br>`);
-            found = false;
-            for (var i = 0; i < number; i++)
-            {
-                text2 = describe[i];
-                if (text2.toUpperCase().indexOf(text.toUpperCase()) != -1)
-                {
-                    found = true;
-                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varname[i].toLowerCase() + `.html style='text-decoration:none'>` + varname[i] + `</a></b>`);
-                    " + write + @"(`<br>` + describe[i] + `<br><br>`);
-                } //endif
-            } //endfor
-            if (found == false)
-            {
-                " + write + @"(`... " + Language(isDanish, "gav intet resultat", "gave no result") + @".<br>`);
-            } //endif            
-            " + write + @"(`<br><br><a href=" + settings_find_filename + @">" + Language(isDanish, "Søg igen", "Search again") + @"</a> <br>`);
-            text.free;
-            text2.free;
-
-            " + join + @"
-        }  //endfunction
+            if (charCode == 13) findvarname();
+        }          
 
         function check2(event) {
             var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
@@ -1575,17 +1533,18 @@ img {border-style: none;
                 x3.AppendLine("// -->");
                 x3.AppendLine("</script>");
                 x3.AppendLine("<body onload = `document.form1.text.focus()`>");                
+                x3.AppendLine(LinkHome(false));
                 x3.AppendLine("<p style = `font-weight: bold;`>Search</p>");
                 x3.AppendLine("");                
-                x3.AppendLine("Search variable name:");
+                x3.AppendLine("Search variable names (wildcards: * or ?):");
                 x3.AppendLine("<FORM NAME = `form1`>");
                 x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
-                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarname()`>");
+                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Search` onClick=`findvarname()`>");
                 x3.AppendLine("</FORM>");                
                 x3.AppendLine("Free text search in variable descriptions:");
                 x3.AppendLine("<FORM NAME = `form2`>");
                 x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
-                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`finddescribe()`>");
+                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Search` onClick=`finddescribe()`>");
                 x3.AppendLine("</FORM></center>");
                 x3.AppendLine("<div id = `results-container`></div>");  
                 x3.AppendLine("</body>");
@@ -1600,7 +1559,7 @@ img {border-style: none;
                 G.WritelnGray("Finished find.html");
             }
 
-            new Error("Stop"); //qwerty
+            //new Error("Stop");
 
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {

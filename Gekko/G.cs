@@ -2994,15 +2994,28 @@ namespace Gekko
             return GekkoStreamWriter(fs2, G.GetEncoding());
         }
 
+        //To make sure it is utf-8 with bom, best when writing html for instance
+        public static StreamWriter GekkoStreamWriterUtf8Bom(FileStream fs2)
+        {
+            return GekkoStreamWriter(fs2, new UTF8Encoding(true));
+        }
+
+        public static StreamWriter GekkoStreamWriterUtf8(FileStream fs2)
+        {
+            return GekkoStreamWriter(fs2, new UTF8Encoding(false));
+        }
+
         /// <summary>
         /// Get ANSI or UTF8 encoding depending upon 'option system character encoding'.
         /// </summary>
         /// <returns></returns>
         public static Encoding GetEncoding()
         {
-            Encoding encoding = null;
+            Encoding encoding = null;            
             if (G.Equal(Program.options.system_write_encoding, "ansi"))
             {
+                //For emitting html for MAKRO, this seems to be the only one that gives ok æ ø å,
+                //just not for the dynamic JavaScript.
                 encoding = Encoding.GetEncoding("Windows-1252");                
             }
             else if (G.Equal(Program.options.system_write_encoding, "utf8"))
