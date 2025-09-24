@@ -30,12 +30,16 @@ namespace Gekko
 
             if (IsGmulprt(o, type))
             {
-
                 for (int i = 0; i < o.prtElements.Count; i++)
                 {
                     o.prtElements[i].operatorsFinal = new List<string> { "n", "p", "rn", "rp", "m", "q" };
                     o.prtElements[i].operatorsFinalAll = new List<int> { 0, 0, 0, 0, 0, 0 };
                 }
+            }
+
+            if(o.operators.Count == 0 && G.Equal(o.opt_yoy, "yes"))  //We interpret <yoy> option as <yoy p>, unless we have something like prt <yoy> x<d>, y<d>.
+            {
+                PrintHandleYoyWithNoOperator(o);
             }
 
             bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;
@@ -601,6 +605,37 @@ namespace Gekko
                     }
                     Globals.lastPrtOrMulprtTable = printTable;  //if CLIP x, y, z, this Globals.lastPrtOrMulprtTable is used later on
                     CrossThreadStuff.CopyButtonEnabled(true);
+                }
+            }
+        }
+
+        private static void PrintHandleYoyWithNoOperator(O.Prt o)
+        {
+            bool foundAtLeast1NonN = false;
+            for (int i = 0; i < o.prtElements.Count; i++)
+            {
+                if (o.prtElements[i].operatorsFinal.Count > 0)
+                {
+                    foreach (string s in o.prtElements[i].operatorsFinal)
+                    {
+                        if (!G.Equal(s, "n"))
+                        {
+                            foundAtLeast1NonN = true;
+                            goto Lbl1;
+                        }
+                    }
+                }
+            }
+
+        Lbl1:;
+            if (!foundAtLeast1NonN)
+            {
+                //No element operators like prt x<d>, x<p>.
+                o.operators.Add(new OptString("p", "yes"));  //Necessary regarding tick marks in PLOT window
+                for (int i = 0; i < o.prtElements.Count; i++)
+                {
+                    o.prtElements[i].operatorsFinal = new List<string> { "p" };  //Also the data is not transformed
+                    o.prtElements[i].operatorsFinalAll = new List<int> { 0 };
                 }
             }
         }
