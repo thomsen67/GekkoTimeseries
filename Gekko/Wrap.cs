@@ -330,10 +330,18 @@ namespace Gekko
         private void MessageBoxShow()
         {
             string s1 = MetaConsolidate(this.storageMain);
-            string s2= MetaConsolidate(this.storageMore);
+            string s2 = MetaConsolidate(this.storageMore);
             if (s2 != null) s1 += "\n\n" + s2;
             string s3 = s1 + "\n\nBeware of inconsistent data.";
-            MessageBox.Show(s3);
+            if (G.IsUnitTesting())
+            {
+                G.Writeln(s3);
+                throw new GekkoException();
+            }
+            else
+            {
+                MessageBox.Show(s3);
+            }
         }
 
         /// <summary>

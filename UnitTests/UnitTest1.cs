@@ -4388,6 +4388,9 @@ namespace UnitTests
             I("prt <p yoy> x;");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(10, 2).number, (13d / 3d - 1d) * 100d, sharedDelta);
+            I("prt <yoy> x;");  //just <yoy> should be understood as <yoy p>.
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(10, 2).number, (13d / 3d - 1d) * 100d, sharedDelta);
 
             //Testing <i>
             I("reset; time 2001 2005;");
@@ -14732,7 +14735,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test_Scalar_Slice()
+        public void _Test_Decomp_Scalar_Missings()
         {
             //e1[t] $ t0(t) .. y[t] = E = c[t] + g[t] + z1[t];
             //e2[t] $ t0(t) .. c[t] = E = 0.1 * y[t-1] + 0.4 * y[t] + 0.3 * y[t+1] + z2[t];
@@ -14763,8 +14766,6 @@ namespace UnitTests
             //e3[2002] .. -0.1 * c(2001) - 0.1 * c(2002) + g(2002) - z3(2002) = E = 0;
             //e3[2003] .. -0.1 * c(2002) - 0.1 * c(2003) + g(2003) - z3(2003) = E = 0;
 
-            Globals.decompUseBracketNames = false;
-
             I("flush();");
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
@@ -14778,20 +14779,103 @@ namespace UnitTests
             I("y <2000 2003> = 500, 504, 536, 540;");
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
+            // ----------------
+            I("z1 <2001 2003> = 0;");
+            I("z2 <2001 2003> = 0;");
+            I("z3 <2001 2003> = 0;");
+            I("@z1 <2001 2003> = 0;");
+            I("@z2 <2001 2003> = 0;");
+            I("@z3 <2001 2003> = 0;");
 
             Gekko.Table table = null;
 
-            //ModelGamsScalar.FlushAAndRArrays();
-            //modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            //modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
-
-            Functions.identities(null, null, null, null);
-
             //ShowDecompTable();  //will show the following decomp table and then abort
-            //I("decomp <2002 2002> y from e1;");
 
+            // --------------
 
+            I("decomp <2002 2002> y from e1;");
+            table = Globals.lastDecompTable;                        
+            HelperMissings(table, 536d, 474d, 62d, 0d);
+            
+            I("decomp <2002 2002 d> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 32d, 12d, 20d, 0d);
+
+            // -------------- missing value ----------
+
+            I("z1 <2001 2003> = m();");
+            
+            I("decomp <2002 2002> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 536d, 474d, 62d, double.NaN);
+
+            I("decomp <2002 2002 missing=zero> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 536d, 474d, 62d, 0d);
+
+            // --- <d>
+
+            I("decomp <2002 2002 d> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 32d, double.NaN, double.NaN, double.NaN);            
+
+            I("decomp <2002 2002  missing=zero d> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 32d, 12d, 20d, 0d);
+
+            I("z1 <2001 2003> = 0;");
+
+            // -------------- missing variable ----------
+
+            I("delete z1;");
+
+            I("decomp <2002 2002> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 536d, 474d, 62d, double.NaN);
+
+            I("decomp <2002 2002 missing=zero> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 536d, 474d, 62d, double.NaN);
+
+            // --- <d>
+
+            if (true)
+            {
+                I("decomp <2002 2002 d> y from e1;");  //Popup: "Could not find variable ..."
+                table = Globals.lastDecompTable;
+                Assert.IsTrue(table == null);  //Kind of same as the DECOMP has failed                
+            }
+
+            I("decomp <2002 2002 missing=zero d> y from e1;");
+            table = Globals.lastDecompTable;
+            HelperMissings(table, 32d, 12d, 20d, 0d);
+
+            I("z1 <2001 2003> = 0;");
         }
+
+        private static void HelperMissings(Gekko.Table table, double y, double c, double g, double z1)
+        {
+            int i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
+            AreEqualHandleMissings(table.Get(i, 2).number, y, 0.0001d);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            AreEqualHandleMissings(table.Get(i, 2).number, c, 0.0001d);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g");
+            AreEqualHandleMissings(table.Get(i, 2).number, g, 0.0001d);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1");
+            AreEqualHandleMissings(table.Get(i, 2).number, z1, 0.0001d);
+
+            void AreEqualHandleMissings(double x1, double x2, double tol)
+            {
+                if (G.IsBothNumericalError(x1, x2)) Assert.IsTrue(true);
+                else Assert.AreEqual(x1, x2, tol);
+            }
+        }        
 
         [TestMethod]
         public void _Test_Decomp_Scalar_Simul5()

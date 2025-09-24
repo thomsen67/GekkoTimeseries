@@ -291,9 +291,17 @@ namespace Gekko
         /// </summary>
         /// <param name="missingAsZero"></param>
         /// <returns></returns>
-        public static bool DecompShouldHandleMissings(bool missingAsZero)
+        public static bool DecompShouldHandleMissings(bool missingAsZero, bool wholeSeriesExistence)
         {
-            return Globals.decompFixMissingIgnoreProblem && (missingAsZero || Program.options.series_data_missing == ESeriesMissing.Zero);
+            if(!Globals.decompFixMissingIgnoreProblem)return false;
+            if (wholeSeriesExistence)
+            {
+                return missingAsZero || Program.options.series_array_calc_missing == ESeriesMissing.Zero;
+            }
+            else
+            {
+                return missingAsZero || Program.options.series_data_missing == ESeriesMissing.Zero;
+            }
         }
 
         /// <summary>
@@ -5619,13 +5627,22 @@ namespace Gekko
         /// Beware: It seems the when running unit tests, Globals.runningOnTTComputer is false.
         /// </summary>
         public static bool IsUnitTestingOrNotShowingGUI()
-        {            
+        {
             if (Globals.hideGui) return true;
             if (Globals.python) return true;
-            if (Globals.excelDna) return true;            
-            if (Application.ExecutablePath.Contains("testhost.net48.exe") || Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe") || Application.ExecutablePath.Contains("testhost.exe")) return true;
+            if (Globals.excelDna) return true;
+            if (IsUnitTesting()) return true;
             return false;
-        }                
+        }
+
+        /// <summary>
+        /// True when unit testing
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsUnitTesting()
+        {
+            return Application.ExecutablePath.Contains("testhost.net48.exe") || Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe") || Application.ExecutablePath.Contains("testhost.exe");
+        }
 
         /// <summary>
         /// This is the "real" method actually doing the printing

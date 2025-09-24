@@ -702,7 +702,7 @@ namespace Gekko
             {
                 //Should not normally be used.
                 //But this may be called from for instance DECOMP, calling it with a time period
-                //Normally timeless variables should be called via the SetData(double value) method
+                //Normally timeless variables should be called via the SetTimelessData(double value) method
                 this.data.GetDataArray_ONLY_INTERNAL_USE()[0] = value;
             }
 
@@ -2765,8 +2765,7 @@ namespace Gekko
                         }
                         else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
                         {
-                            new Error("Please use 'OPTION series array calc missing = zero' instead of 'skip'");
-                            //throw new GekkoException();
+                            new Error("Please use 'OPTION series array calc missing = zero' instead of 'skip'");                            
                         }
                         else throw new GekkoException();
                     }

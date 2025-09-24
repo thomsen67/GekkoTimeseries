@@ -2144,7 +2144,7 @@ namespace Gekko
                             //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
                         }
                         ts.Lag(lag2);
-                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
                         {
                             DecompMainStoreRawVariableHelper(ts);
                         }
@@ -2177,7 +2177,7 @@ namespace Gekko
                             //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
                         }
                         ts.Lag(lag2);
-                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
                         {
                             DecompMainStoreRawVariableHelper(ts);
                         }
@@ -4301,7 +4301,7 @@ namespace Gekko
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
-                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero)) 
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false)) 
                                 {
                                     if (G.IsNumericalError(dLevel)) dLevel = 0d;
                                     if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
@@ -4314,7 +4314,7 @@ namespace Gekko
                                 dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
-                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
                                 {
                                     if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
                                     if (G.IsNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
@@ -4328,12 +4328,17 @@ namespace Gekko
                             {
                                 Series tsFirst = null;
                                 tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
-                                bool missingResVariable = false;
+                                bool isMissingResVariable = false;
                                 if (tsFirst == null)
                                 {
                                     if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.varName, Globals.decompResidualPrefix))
                                     {
-                                        missingResVariable = true;
+                                        isMissingResVariable = true;
+                                    }
+                                    else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true))
+                                    {
+                                        tsFirst = new Series(ESeriesType.Timeless, per1.freq, null);
+                                        tsFirst.SetTimelessData(0d);
                                     }
                                     else
                                     {
@@ -4341,13 +4346,13 @@ namespace Gekko
                                         new Error("Could not find variable " + s2 + "");
                                     }
                                 }
-                                if (!missingResVariable)
+                                if (!isMissingResVariable)
                                 {
                                     dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
                                     dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 }
-                                if (missingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                                if (isMissingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
                                 {
                                     if (G.IsNumericalError(dLevel)) dLevel = 0d;
                                     if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
@@ -4365,6 +4370,11 @@ namespace Gekko
                                     if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.varName, Globals.decompResidualPrefix))  //fullNameRef is made from chop anyways.
                                     {
                                         missingResVariable = true;
+                                    }                                    
+                                    else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true))
+                                    {
+                                        tsRef = new Series(ESeriesType.Timeless, per1.freq, null);
+                                        tsRef.SetTimelessData(0d);
                                     }
                                     else
                                     {
@@ -4378,7 +4388,7 @@ namespace Gekko
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
                                     dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 }
-                                if (missingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero))
+                                if (missingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
                                 {
                                     if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
                                     if (G.IsNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
