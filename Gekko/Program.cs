@@ -6275,7 +6275,7 @@ namespace Gekko
                             trace.GetContents().text = gekkocode + ";"; //read <merge>
                             trace.GetContents().dataFile = realPathAndFileName;
                             trace.GetContents().name = name;
-                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
 
                             if (isGbk && dates == null)
                             {
@@ -6346,7 +6346,7 @@ namespace Gekko
                             trace.GetContents().text = gekkocode + ";";
                             trace.GetContents().dataFile = realPathAndFileName;
                             trace.GetContents().name = name;
-                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
                             Gekko.Trace2.PushIntoSeries(tsImported, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         }
                     }
@@ -9392,7 +9392,7 @@ namespace Gekko
                                 trace.GetContents().text = downloadHelper.gekkoCode + ";";
                                 trace.GetContents().dataFile = downloadHelper.dataFile;
                                 trace.GetContents().name = ts.GetNameAndParentDatabank();
-                                trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
                                 //trace can only have null period if px date range is null, not possible
                                 Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
@@ -9454,7 +9454,7 @@ namespace Gekko
                                 trace.GetContents().text = downloadHelper.gekkoCode + ";";
                                 trace.GetContents().dataFile = downloadHelper.dataFile;
                                 trace.GetContents().name = ts.GetNameAndParentDatabank();
-                                trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
                                 //trace can only have null period if px file has null period --> not possible
                                 Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
@@ -17633,7 +17633,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = o.gekkocode + ";";
                         trace.GetContents().name = ts.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
+                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true, true);
                         Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
@@ -17783,7 +17783,7 @@ namespace Gekko
                                     Trace2 trace = new Trace2(ETraceType.Normal, truncateTemp.t1, truncateTemp.t2, true);
                                     trace.GetContents().text = o.gekkocode + ";";
                                     trace.GetContents().name = existing_series.GetNameAndParentDatabank();
-                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
+                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true, true);
                                     trace.AddRangeFromSeries2(existing_series, iv_series);
                                     Gekko.Trace2.PushIntoSeries(existing_series, trace, ETracePushType.Sibling, false);
                                     Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
@@ -17821,7 +17821,7 @@ namespace Gekko
                             Trace2 newTrace = new Trace2(ETraceType.Normal, xt1, xt2, true);
                             newTrace.GetContents().text = o.gekkocode + ";";
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
-                            newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
+                            newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true, true);
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                             Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
@@ -25880,15 +25880,7 @@ namespace Gekko
             if (fileText != null)
             {
                 commandLines = Stringlist.CreateListOfStringsFromFile(fileText);
-            }
-            //if (!Globals.stopFix)
-            //{
-            //    if (p.hasSeenStopCommand == 1)
-            //    {
-            //        lineNumber2++;  //else it reports the line before the STOP statement                
-            //        p.hasSeenStopCommand = 2;  //no adjustments for callee statement files (this is a bit of a hack)
-            //    }
-            //}
+            }            
         }
 
         /// <summary>
@@ -26315,7 +26307,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = gekkocode + ";";
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
                         trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
@@ -26648,7 +26640,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = gekkocode + ";";
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
                         trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
@@ -35580,8 +35572,7 @@ namespace Gekko
     {
         public bool hasWrittenRunTimeErrorOnce = false;  //bit hacky
         public EHasShownErrorHandling hasShownErrorHandling = EHasShownErrorHandling.False;
-        private int counter = 0;  //1 gets added soon enough
-        //private Q[] stackQ = new Q[200]; //contains arguments to different methods, new object put in here every time a new .cmd file is run.
+        private int counter = 0;  //1 gets added soon enough        
         private string[] stack = new string[200];  //2000 nested cmd files -- should be enough
         private string[] stackCommandFileText = new string[200];
         private string[] stackFileSentToAntlr = new string[200];
@@ -35621,11 +35612,11 @@ namespace Gekko
         /// If simple==true, simply returns what is on the stack (may be null or not useful). Accepts function/procedure lines.
         /// If simple==false, returns the currently executing gcm file (but not the line "¤"). Will not return functions/procedures,
         /// these are considered "free floating". May return null (among other things if root() is called from GUI),
-        /// and beware when calling that the P p object may be null. NOTE1: will check for file existence, so this
-        /// will be slow.
+        /// and beware when calling that the P p object may be null. NOTE: With checkFileExistence, there is a slow file
+        /// existence check.
         /// </summary>
         /// <returns></returns>
-        public string GetExecutingGcmFile(bool simple)
+        public string GetExecutingGcmFile(bool simple, bool checkFileExistence)
         {
             string command = null;
             if (simple)
@@ -35635,7 +35626,7 @@ namespace Gekko
                     command = this.GetStack(this.GetDepth());
                 }
                 catch { } //do not choke on this
-                return command;
+                return command?.Trim();
             }
             else
             {
@@ -35652,7 +35643,17 @@ namespace Gekko
                         else
                         {
                             string[] ss = command.Split('¤');
-                            if (ss.Length == 2 && File.Exists(ss[0])) return ss[0];
+                            if (ss.Length == 2 && !G.NullOrBlanks(ss[0]))
+                            {
+                                if (checkFileExistence)
+                                {
+                                    if (File.Exists(ss[0])) return ss[0]?.Trim();
+                                }
+                                else
+                                {
+                                    return ss[0]?.Trim();
+                                }
+                            }                         
                         }
                     }
                 }

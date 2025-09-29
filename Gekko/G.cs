@@ -3433,8 +3433,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// BEWARE: can return null (= error)!! Another "interface" to the substring method, with start end end position, instead of using length. Indexes are 0-based.
-        /// The positions are inclusive.
+        /// BEWARE: can return null (= error)!! Another "interface" to the substring method, with start end end position, instead of using length. 
+        /// Indexes are 0-based. The positions are inclusive.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="position1"></param>

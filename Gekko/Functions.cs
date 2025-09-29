@@ -6738,7 +6738,7 @@ namespace Gekko
 
         public static IVariable currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            return new ScalarString(Program.options.folder_working);
+            return new ScalarString(Program.options.folder_working?.Trim());
         }
 
         public static IVariable filteredperiods(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
@@ -7211,11 +7211,37 @@ namespace Gekko
             }
         }
 
+        public static IVariable runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {
+            if (vars.Length > 1) new Error("Funtion runfolder() only accepts 0 or 1 arguments");
+            string gcm = Path.GetDirectoryName(Helper_GetExecutingGcm(smpl));            
+
+            if (vars.Length == 0)
+            {                
+                return new ScalarString(gcm?.Trim());
+            }
+            else
+            {
+                if (G.Equal(vars[0].ConvertToString(), "rel"))
+                {
+                    string root = Functions.root(smpl, _t1, _t2, new IVariable[] { }).ConvertToString();
+                    if (G.NullOrBlanks(gcm)) new Error("Failure in runfolder() function");
+                    int index = gcm.IndexOf(root, StringComparison.OrdinalIgnoreCase);
+                    if (index == -1) new Error("The root '" + root + "' is not contained inside the executing gcm '" + gcm + "'");
+                    string gcm2 = gcm.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end
+                    return new ScalarString(gcm2);
+                }
+                else new Error("Expected argument 'rel'");
+            }
+            new Error("Failure in runfolder() function");
+            return null;
+        }
+
         public static IVariable branch(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
             IVariable root = Functions.root(smpl, _t1, _t2, new IVariable[] { new ScalarString("git") });
             string branch = Program.GetCurrentBranchName(root.ConvertToString());
-            return new ScalarString(branch);
+            return new ScalarString(branch?.Trim());
         }
 
         /// <summary>
@@ -7267,8 +7293,7 @@ namespace Gekko
                 if (dir1.EndsWith("\\")) dir1 = dir1.Remove(dir1.Length - 1);
 
                 //now we test that the executing gcm (if any) is consistent with this root
-                P p = smpl.p;
-                string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(false); //p may be null, and method may return null                    
+                string gcm = Helper_GetExecutingGcm(smpl);
                 if (gcm != null)
                 {
                     string folder2 = Path.GetDirectoryName(gcm);
@@ -7291,7 +7316,7 @@ namespace Gekko
                     }
                 }
 
-                return new ScalarString(dir1);
+                return new ScalarString(dir1?.Trim());
             }
             else
             {
@@ -7309,7 +7334,14 @@ namespace Gekko
                 }
             }
             return null;  //because of errors we never get here
-        }        
+        }
+
+        private static string Helper_GetExecutingGcm(GekkoSmpl smpl)
+        {
+            P p = smpl.p;
+            string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(false, true); //p may be null, and method may return null            
+            return gcm;
+        }
 
         private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
         {

@@ -1952,7 +1952,7 @@ namespace Gekko
                         string b = null;
                         if (databank != null) b = databank.GetName() + Globals.symbolBankColon;
                         trace.GetContents().name = b + lhs_series.GetName();
-                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
                         trace.GetContents().text = traceString + ";";
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                         if (Globals.traceContainer != null && Globals.traceContainer.Count() > 0)
