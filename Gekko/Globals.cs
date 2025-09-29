@@ -247,6 +247,8 @@ namespace Gekko
         public const string rootError1 = "This is not allowed, in order to avoid confusion. Please change your Gekko working folder (File --> Set working folder...) and try again.";
         public const string rootError2 = "This is not allowed,";  //for unit tests: because of line breaks.
 
+        public static string branch = null;  //Git branch, only checked when starting up or switching working folder
+
         public const bool handleZero = false;  //for laspchain() ===> only affects when all microprices are == 0 for one and only one period. Disabled.
         public const double factorZero = 100d; //for laspchain()
 

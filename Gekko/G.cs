@@ -3861,6 +3861,13 @@ namespace Gekko
             string s = version;
             if (stable) s += " (stable)";
             else s += " (develop)";
+            string sBranch = null;
+            if (!G.NullOrBlanks(Globals.branch))
+            {
+                if (G.StartsWithCaseSensitiveFast(Globals.branch, "tag: ")) sBranch = ", " + Globals.branch;
+                else sBranch = ", branch: " + Globals.branch;
+            } 
+            s += sBranch;
             if (type != "large")  //i.e., == "small"
             {
                 sb.AppendLine(" Gekko version " + s + "  " + Globals.versionInternal);
@@ -3890,13 +3897,11 @@ namespace Gekko
                 catch { }
 
                 sb.AppendLine(" Program folder: ");
-                sb.AppendLine("   " + pd + exe);
-
-                
+                sb.AppendLine("   " + pd + exe);                
             }
 
             sb.AppendLine(" Working folder: ");
-            sb.AppendLine("   " + workingFolder);
+            sb.AppendLine("   " + workingFolder);            
 
             if (type == "large")
             {

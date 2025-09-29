@@ -7240,6 +7240,7 @@ namespace Gekko
         public static IVariable branch(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
             IVariable root = Functions.root(smpl, _t1, _t2, new IVariable[] { new ScalarString("git") });
+            if (G.NullOrBlanks(root.ConvertToString())) return new ScalarString("");
             string branch = Program.GetCurrentBranchName(root.ConvertToString());
             return new ScalarString(branch?.Trim());
         }
@@ -7277,8 +7278,15 @@ namespace Gekko
             //From gcm file
 
             if (rootHelper1.roots.Count == 0)
-            {               
-                new Error("Could not find a " + rootFileName + " " + fileOrFolder + " in the folder '" + folder1 + "' or any parent folders");
+            {
+                if (G.Equal(rootFileName, ".git"))
+                {
+                    return new ScalarString("");  //Signals that \.git is not found
+                }
+                else
+                {
+                    new Error("Could not find a " + rootFileName + " " + fileOrFolder + " in the folder '" + folder1 + "' or any parent folders");
+                }
             }
             else if (rootHelper1.roots.Count == 1)
             {
@@ -7338,6 +7346,7 @@ namespace Gekko
 
         private static string Helper_GetExecutingGcm(GekkoSmpl smpl)
         {
+            if (smpl == null) return null;
             P p = smpl.p;
             string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(false, true); //p may be null, and method may return null            
             return gcm;

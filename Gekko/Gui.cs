@@ -353,6 +353,7 @@ namespace Gekko
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
 
+            Globals.branch = Program.GetBranch();  //Globals.branch is only used for GUI stuff, ok to have it here
             G.WriteDirs("small", false);            
 
             Program.CreateLocalCopyHelpChm();
@@ -1124,6 +1125,7 @@ namespace Gekko
             }
             else
             {
+                Globals.branch = Program.GetBranch();
                 G.Writeln();
                 G.WriteDirs("small", false);
                 if (!G.IsUnitTestingOrNotShowingGUI())
@@ -1134,11 +1136,11 @@ namespace Gekko
                 ChangeWorkingFolderNoteMessage();
                 Globals.remoteIsInvestigating = false;  //probably superfluous
                 Globals.remoteFileStamp = new DateTime(0l);  //just because we change working folder, an existing remote.gcm file in that folder should not be considered 'new' just because of that change.
-                Program.RemoteInit();
+                Program.RemoteInit();                
             }
 
             Globals.dependencyTracking.FencingWarning(); //if the user (or program) changes working folder.
-        }
+        }        
 
         private static void ChangeWorkingFolderNoteMessage()
         {

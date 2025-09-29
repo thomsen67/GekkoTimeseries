@@ -10553,7 +10553,13 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            string ss = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst()) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef()) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
+            string sw = GetDatabankFileNameWithPath(Program.databanks.GetFirst());
+            string sr = GetDatabankFileNameWithPath(Program.databanks.GetRef());
+            string ss = "Period: " + f + " " + start + "-" + end + G.NL;            
+            if (!G.NullOrBlanks(sw)) ss += "First: " + sw + G.NL;
+            if (!G.NullOrBlanks(sr)) ss += Globals.Ref + ": " + sr + G.NL;
+            ss += "Working folder: " + Program.options.folder_working + G.NL;
+            if (!G.NullOrBlanks(Globals.branch)) ss += "Git branch: " + Globals.branch + G.NL;
 
             if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
 
@@ -10593,6 +10599,15 @@ namespace Gekko
                 i++;
             }
             CrossThreadStuff.CutButtonEnabled(i > 0);
+        }
+
+        /// <summary>
+        /// Returns Git branch name (if any)
+        /// </summary>
+        /// <returns></returns>
+        public static string GetBranch()
+        {
+            return (Functions.branch(null, null, null, new IVariable[] { }) as ScalarString).string2;
         }
 
         /// <summary>
