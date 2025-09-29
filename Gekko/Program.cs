@@ -10627,13 +10627,14 @@ namespace Gekko
 
         /// <summary>
         /// Reads the HEAD file in the .git directory to determine the current branch name. Does not handle worktrees!!
-        /// May return 'tag:...' or '(unknown state)' or '(detached HEAD)'. But normally just the branch name, like 'main'.
+        /// May return 'tag: ...' or 'hash: ...'. But normally just the branch name, like 'main'.
+        /// Returns null if nothing is found.
         /// </summary>
         /// <param name="gitMetadataPath">The absolute path to the Git metadata directory (e.g., C:\Repo\.git).</param>
         /// <returns>The name of the current branch (e.g., "main"), or null if detached/error.</returns>
-        public static string GetCurrentBranchName(string input)
+        public static string GetCurrentBranchName(string path)
         {
-            string gitMetadataPath = Path.Combine(input, ".git");
+            string gitMetadataPath = Path.Combine(path, ".git");
 
             if (string.IsNullOrEmpty(gitMetadataPath) || !Directory.Exists(gitMetadataPath))
             {
@@ -10645,7 +10646,8 @@ namespace Gekko
             if (!File.Exists(headFilePath))
             {
                 // This shouldn't happen in a valid repo, but check just in case.
-                new Error("The HEAD file does not exist in folder: " + gitMetadataPath);
+                //new Error("The HEAD file does not exist in folder: " + gitMetadataPath);
+                return null;
             }
 
             try
@@ -10670,7 +10672,7 @@ namespace Gekko
                 if (Regex.IsMatch(headContent, @"^[0-9a-fA-F]{7,40}$"))
                 {
                     // The repository is in a detached HEAD state (e.g., checked out a commit or tag)
-                    return "(detached HEAD)";
+                    return "hash: " + headContent;
                 }
 
                 // 3. Check for tag reference
@@ -10686,9 +10688,10 @@ namespace Gekko
             }
             catch (Exception ex)
             {
-                new Error($"Error reading Git HEAD file: {ex.Message}");
                 return null;
+                //new Error($"Error reading Git HEAD file: {ex.Message}");                
             }
+            return null;
         }
 
         /// <summary>

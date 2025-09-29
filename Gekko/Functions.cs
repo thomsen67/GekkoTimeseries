@@ -42,6 +42,7 @@ namespace Gekko
     {
         public string rootFileName = null;
         public List<string> roots = new List<string>();
+        public bool onlyOne = false;
     }
 
     public class Functions
@@ -7246,7 +7247,9 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Inbuilt function to search for the file root.ini upwards in the directory structure. Use 'root', 'gekko' or 'git' as argument.
+        /// Inbuilt function to search for the file root.ini upwards in the directory structure. 
+        /// Use 'root', 'gekko' or 'git' as argument.
+        /// Is always using Program.options.folder_working as a starting point.
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
@@ -7273,6 +7276,7 @@ namespace Gekko
             //From working folder
             RootHelper rootHelper1 = new RootHelper();
             rootHelper1.rootFileName = rootFileName;
+            if (G.Equal(rootFileName, ".git")) rootHelper1.onlyOne = true;
             helper_root(new DirectoryInfo(folder1), rootHelper1);
 
             //From gcm file
@@ -7288,7 +7292,7 @@ namespace Gekko
                     new Error("Could not find a " + rootFileName + " " + fileOrFolder + " in the folder '" + folder1 + "' or any parent folders");
                 }
             }
-            else if (rootHelper1.roots.Count == 1)
+            else if (rootHelper1.roots.Count == 1 || (rootHelper1.roots.Count > 1 && G.Equal(rootFileName, ".git")))
             {
                 string fileAndFolder1 = rootHelper1.roots[0];
                 //seems to work ok on UNC path, for instance "\\localhost\b$\xx\root.ini" --> "\\localhost\b$\xx"
@@ -7385,27 +7389,9 @@ namespace Gekko
             }
             DirectoryInfo parent = directoryInfo.Parent;
             if (parent == null) return;
+            if (rootHelper.onlyOne && rootHelper.roots.Count > 0) return;  //quick return
             helper_root(parent, rootHelper);
         }
-
-
-        //public static IVariable checkroot(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        //{
-
-        //    WalkFolderHelper(new DirectoryInfo(""));
-
-        //    void WalkFolderHelper(DirectoryInfo directoryInfo)
-        //    {
-        //        foreach (FileInfo file in directoryInfo.GetFiles())
-        //        {
-
-        //        }
-        //        foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
-        //        {
-        //            WalkFolderHelper(subfolder);
-        //        }
-        //    }
-        //}
 
         //SOME HARDCODED FUNCTIONS FOR MODELS:
         //See #09875209837532
