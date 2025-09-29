@@ -7211,8 +7211,15 @@ namespace Gekko
             }
         }
 
+        public static IVariable branch(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {
+            IVariable root = Functions.root(smpl, _t1, _t2, new IVariable[] { new ScalarString("git") });
+            string branch = Program.GetCurrentBranchName(root.ConvertToString());
+            return new ScalarString(branch);
+        }
+
         /// <summary>
-        /// Inbuilt function to search for the file root.ini upwards in the directory structure.
+        /// Inbuilt function to search for the file root.ini upwards in the directory structure. Use 'root', 'gekko' or 'git' as argument.
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
@@ -7223,12 +7230,15 @@ namespace Gekko
             if (vars.Length > 1) new Error("Funtion root() only accepts 0 or 1 arguments");
 
             string rootFileName = "root.ini";
+            string fileOrFolder = "file";
             if (vars.Length == 1)
             {
                 string s = O.ConvertToString(vars[0]);
+                if (G.Equal(s, "git")) fileOrFolder = "folder";
                 if (G.Equal(s, "gekko")) rootFileName = "gekko.ini";
                 else if (G.Equal(s, "root")) rootFileName = "root.ini";
-                else new Error("Expected argument to be 'root' or 'gekko'");
+                else if (G.Equal(s, "git")) rootFileName = ".git";
+                else new Error("Expected argument to be 'root', 'gekko' or 'git'");                
             }
 
             string folder1 = Program.options.folder_working;
@@ -7241,8 +7251,8 @@ namespace Gekko
             //From gcm file
 
             if (rootHelper1.roots.Count == 0)
-            {
-                new Error("Could not find a " + rootFileName + " file in the folder '" + folder1 + "' or any parent folders");
+            {               
+                new Error("Could not find a " + rootFileName + " " + fileOrFolder + " in the folder '" + folder1 + "' or any parent folders");
             }
             else if (rootHelper1.roots.Count == 1)
             {
@@ -7275,7 +7285,7 @@ namespace Gekko
                             string fileAndFolder2 = rootHelper2.roots[0];  //the first and deepest one
                             if (!G.Equal(fileAndFolder1, fileAndFolder2))
                             {
-                                new Error("The " + rootFileName + " file determined from the Gekko working folder is '" + fileAndFolder1 + "', while the " + rootFileName + " file determined from the currently running gcm file is '" + fileAndFolder2 + "'. " + Globals.rootError1);
+                                new Error("The " + rootFileName + " " + fileOrFolder + " determined from the Gekko working folder is '" + fileAndFolder1 + "', while the " + rootFileName + " " + fileOrFolder + " determined from the currently running gcm file is '" + fileAndFolder2 + "'. " + Globals.rootError1);
                             }
                         }
                     }
@@ -7287,7 +7297,7 @@ namespace Gekko
             {
                 using (Error error = new Error())
                 {
-                    error.MainAdd("When searching for a " + rootFileName + " file in the folder '" + folder1 + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The files found are the following:");
+                    error.MainAdd("When searching for a " + rootFileName + " " + fileOrFolder + " in the folder '" + folder1 + "' or any parent folders, several " + fileOrFolder + "s were found. This is illegal, since it is bound to produce confusion and perhaps errors. The " + fileOrFolder + "s found are the following:");
                     error.MainNewLineTight();
                     int counter = 0;
                     foreach (string s in rootHelper1.roots)
@@ -7299,18 +7309,32 @@ namespace Gekko
                 }
             }
             return null;  //because of errors we never get here
-        }    
+        }        
 
         private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
         {
             try
             {
-                foreach (FileInfo file in directoryInfo.GetFiles())
+                if (G.Equal(rootHelper.rootFileName, ".git"))
                 {
-                    if (G.Equal(file.Name.Trim(), rootHelper.rootFileName.Trim()))
+                    foreach (DirectoryInfo dir in directoryInfo.GetDirectories())
                     {
-                        rootHelper.roots.Add(file.FullName.Trim());
-                        break;  //no need to carry on, cannot have dublets
+                        if (G.Equal(dir.Name.Trim(), rootHelper.rootFileName.Trim()))
+                        {
+                            rootHelper.roots.Add(dir.FullName.Trim());
+                            break;  //no need to carry on, cannot have dublets
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (FileInfo file in directoryInfo.GetFiles())
+                    {
+                        if (G.Equal(file.Name.Trim(), rootHelper.rootFileName.Trim()))
+                        {
+                            rootHelper.roots.Add(file.FullName.Trim());
+                            break;  //no need to carry on, cannot have dublets
+                        }
                     }
                 }
             }

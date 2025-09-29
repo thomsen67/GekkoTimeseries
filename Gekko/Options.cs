@@ -79,6 +79,8 @@ namespace Gekko
         public int decomp_maxlead = 10;
         public int decomp_plot_zoom = 100; //Relative size        
         public ESeriesMissing decomp_res_missing = ESeriesMissing.Zero;
+        public ESeriesMissing decomp_array_calc_missing = ESeriesMissing.M;
+        public ESeriesMissing decomp_data_missing = ESeriesMissing.M;
         // ---
         public int fit_ols_rekur_dfmin = 10;        
         // ---
@@ -170,6 +172,8 @@ namespace Gekko
         // ---
         public string menu_startfile = "menu.html";
         // ---
+        public ESeriesMissing missing = ESeriesMissing.Error; //error|ignore, will turn on/off other options if set. Default = error, because an error popup box will be shown if the (sub)series does not exist at all.
+        // ---
         public bool model_cache = true;  //if using cache on file or not        
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
         public bool model_gams_dep_current = false;
@@ -221,17 +225,14 @@ namespace Gekko
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
-        
-        // remove start --> remove these 2 in Gekko 4.0
-        public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;         //Not used??
-        public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;          //Not used?? for sum, zero = skip
-        // remove end
-
+        //
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
-        public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
-        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip --> the whole array-subseries x[i] is missing                
         public ESeriesMissing series_array_table_missing = ESeriesMissing.Error;          //not used at the moment
+        //
+        //The 3 following are used for prt<missing=ignore>, and 2 following are used for y <missing=ignore> = ... ;        
+        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip --> the whole array-subseries x[i] is missing                        
         public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero, last one only when accessing a series from an open databank, not in other cases. Not implemented for SIM (has its own solve option for that)
+        public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
         // ---
         public string sheet_collapse = "none";  //avg or total or none
         public string sheet_engine = "internal";        
@@ -408,12 +409,14 @@ namespace Gekko
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 
             Add("DATABANK TRACE DIVIDE", Globals.xbool);
-                        
+
+            Add("DECOMP ARRAY CALC MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");
+            Add("DECOMP DATA MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");
             Add("DECOMP FLOWGRAPH DEPTH", Globals.xint);
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);
             Add("DECOMP PLOT ZOOM", Globals.xint);
-            Add("DECOMP RES MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");    //#ljfdssdfgsh
+            Add("DECOMP RES MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");    //#ljfdssdfgsh                  
 
             Add("FIT OLS REKUR DFMIN", Globals.xint);
             
@@ -494,6 +497,9 @@ namespace Gekko
             Add("INTERPOLATE OLSETTE TREND", Globals.xbool);
             Add("LIBRARY CACHE", Globals.xbool);
             Add("MENU STARTFILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+
+            Add("MISSING", Globals.xoptionSeriesMissing, "error", "ignore");    //#ljfdssdfgsh                  
+
             Add("MODEL CACHE", Globals.xbool);
             Add("MODEL CACHE MAX", Globals.xint);            
             Add("MODEL GAMS DEP CURRENT", Globals.xbool);
@@ -551,8 +557,7 @@ namespace Gekko
             Add("SERIES DYN", Globals.xbool);
             Add("SERIES DYN CHECK", Globals.xbool);
             Add("SERIES FAILSAFE", Globals.xbool);
-            Add("SERIES NORMAL PRINT MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
-            Add("SERIES NORMAL CALC MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO");             //#ljfdssdfgsh
+            
             Add("SERIES NORMAL TABLE MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
             Add("SERIES ARRAY PRINT MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
             Add("SERIES ARRAY CALC MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO");              //#ljfdssdfgsh
@@ -825,7 +830,7 @@ namespace Gekko
         /// </summary>
         public void Write()
         {
-            Write("Program.options.", true);
+            Write("Program.options.", true, true);
         }
 
         /// <summary>
@@ -833,7 +838,7 @@ namespace Gekko
         /// </summary>
         /// <param name="optionName5"></param>
         /// <param name="question"></param>
-        public void Write(string optionName5, bool question)
+        public void Write(string optionName5, bool question, bool newline)
         {
             string optionName = null;
             if (optionName5 != null) optionName = optionName5.Replace("Program.options.", "");
@@ -930,7 +935,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln();
+                if(newline) G.Writeln();
                 foreach (string s in lines)
                 {
                     G.Writeln(s);

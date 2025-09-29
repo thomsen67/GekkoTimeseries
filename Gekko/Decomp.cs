@@ -859,7 +859,11 @@ namespace Gekko
             if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
             if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
             if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
-            if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
+            if (G.Equal(o.opt_missing, "zero") || G.Equal(o.opt_missing, "ignore"))
+            {
+                //Use <missing=ignore>, not <missing=zero>, but the latter will be allowed for now.
+                decompOptions2.missingAsZero = true;
+            }
             if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
             if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
             if (G.Equal(o.opt_expand, "yes")) decompOptions2.expand = true;
@@ -2144,7 +2148,7 @@ namespace Gekko
                             //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
                         }
                         ts.Lag(lag2);
-                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
+                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                         {
                             DecompMainStoreRawVariableHelper(ts);
                         }
@@ -2177,7 +2181,7 @@ namespace Gekko
                             //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
                         }
                         ts.Lag(lag2);
-                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
+                        if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                         {
                             DecompMainStoreRawVariableHelper(ts);
                         }
@@ -4301,7 +4305,7 @@ namespace Gekko
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
-                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false)) 
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero) 
                                 {
                                     if (G.IsNumericalError(dLevel)) dLevel = 0d;
                                     if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
@@ -4314,7 +4318,7 @@ namespace Gekko
                                 dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
                                 dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
                                 dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
-                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
                                     if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
                                     if (G.IsNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
@@ -4335,15 +4339,13 @@ namespace Gekko
                                     {
                                         isMissingResVariable = true;
                                     }
-                                    else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true))
+                                    else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true) == ESeriesMissing.Zero)
                                     {
-                                        tsFirst = new Series(ESeriesType.Timeless, per1.freq, null);
-                                        tsFirst.SetTimelessData(0d);
+                                        tsFirst = DecompCreateArtificialSeries(model.modelGamsScalar, 0d);
                                     }
                                     else
                                     {
-                                        string s2 = chop.fullName.Replace("¤", "");
-                                        new Error("Could not find variable " + s2 + "");
+                                        tsFirst = DecompCreateArtificialSeries(model.modelGamsScalar, double.NaN);
                                     }
                                 }
                                 if (!isMissingResVariable)
@@ -4352,7 +4354,7 @@ namespace Gekko
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
                                     dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 }
-                                if (isMissingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
+                                if (isMissingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
                                     if (G.IsNumericalError(dLevel)) dLevel = 0d;
                                     if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
@@ -4371,15 +4373,13 @@ namespace Gekko
                                     {
                                         missingResVariable = true;
                                     }                                    
-                                    else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true))
+                                    else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true) == ESeriesMissing.Zero)
                                     {
-                                        tsRef = new Series(ESeriesType.Timeless, per1.freq, null);
-                                        tsRef.SetTimelessData(0d);
+                                        tsRef = DecompCreateArtificialSeries(model.modelGamsScalar, 0d);
                                     }
                                     else
                                     {
-                                        string s2 = fullNameRef.Replace("¤", "");
-                                        new Error("Could not find variable " + s2 + "");
+                                        tsRef = DecompCreateArtificialSeries(model.modelGamsScalar, double.NaN);
                                     }
                                 }
                                 if (!missingResVariable)
@@ -4388,7 +4388,7 @@ namespace Gekko
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
                                     dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
                                 }
-                                if (missingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false))
+                                if (missingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
                                     if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
                                     if (G.IsNumericalError(dLevelRefLag)) dLevelRefLag = 0d;
@@ -4647,6 +4647,24 @@ namespace Gekko
             }
 
             return frame;
+        }
+
+        /// <summary>
+        /// Creates an artifial helper series (with null name), from the scalar model start to end (with 20 periods added at each end for safety)
+        /// </summary>
+        /// <param name="modelGamsScalar"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        private static Series DecompCreateArtificialSeries(ModelGamsScalar modelGamsScalar, double d)
+        {
+            //Not sure if timeless series would work here
+            Series tsRef = new Series(modelGamsScalar.absoluteT1.freq, null);
+            foreach (GekkoTime t in new GekkoTimeIterator(modelGamsScalar.absoluteT1.Add(-Globals.decompExtraPeriods), modelGamsScalar.absoluteT2.Add(Globals.decompLagAddition)))
+            {
+                tsRef.SetData(t, d);
+            }
+
+            return tsRef;
         }
 
         private static bool AgeHelper2(int a1, int a2, int[] hits)

@@ -10529,7 +10529,6 @@ namespace Gekko
                     string ss1 = banks2.Substring(0, 17);
                     string ss2 = banks2.Substring(banks2.Length - 10);
                     banks2 = ss1 + "..." + ss2;
-
                 }
 
                 if (wCount == 0) banks1 = "[empty]";
@@ -10549,7 +10548,6 @@ namespace Gekko
                 }
 
                 workingFolder = Program.options.folder_working;
-
             }
 
             //========================================================================================================
@@ -10610,6 +10608,72 @@ namespace Gekko
                 fileName = bank.FileNameWithPathPretty;
             }
             return fileName;
+        }
+
+        /// <summary>
+        /// Reads the HEAD file in the .git directory to determine the current branch name. Does not handle worktrees!!
+        /// May return 'tag:...' or '(unknown state)' or '(detached HEAD)'. But normally just the branch name, like 'main'.
+        /// </summary>
+        /// <param name="gitMetadataPath">The absolute path to the Git metadata directory (e.g., C:\Repo\.git).</param>
+        /// <returns>The name of the current branch (e.g., "main"), or null if detached/error.</returns>
+        public static string GetCurrentBranchName(string input)
+        {
+            string gitMetadataPath = Path.Combine(input, ".git");
+
+            if (string.IsNullOrEmpty(gitMetadataPath) || !Directory.Exists(gitMetadataPath))
+            {
+                new Error("Cannot find folder: " + gitMetadataPath);
+            }
+
+            string headFilePath = Path.Combine(gitMetadataPath, "HEAD");
+
+            if (!File.Exists(headFilePath))
+            {
+                // This shouldn't happen in a valid repo, but check just in case.
+                new Error("The HEAD file does not exist in folder: " + gitMetadataPath);
+            }
+
+            try
+            {
+                // Read the entire content of the HEAD file
+                string headContent = File.ReadAllText(headFilePath).Trim();
+
+                // 1. Check for a tracked branch (e.g., "ref: refs/heads/main")
+                // This is the common case where the repo is on a named branch.
+                // Regex to match "ref: refs/heads/<branch_name>" and capture the branch_name
+                var branchMatch = Regex.Match(headContent, @"^ref:\s*refs/heads/(?<branchname>.+)$");
+
+                if (branchMatch.Success)
+                {
+                    // The branch name is everything captured after refs/heads/
+                    return branchMatch.Groups["branchname"].Value;
+                }
+
+                // 2. Detached HEAD (e.g., a commit SHA-1 or tag)
+                // If the content is not a "ref:", it's likely a 7-40-character SHA-1 hash.
+                // You can optionally return the hash or a specific message.
+                if (Regex.IsMatch(headContent, @"^[0-9a-fA-F]{7,40}$"))
+                {
+                    // The repository is in a detached HEAD state (e.g., checked out a commit or tag)
+                    return "(detached HEAD)";
+                }
+
+                // 3. Check for tag reference
+                // Less common, but sometimes HEAD might point directly to a tag ref
+                var tagMatch = Regex.Match(headContent, @"^ref:\s*refs/tags/(?<tagname>.+)$");
+                if (tagMatch.Success)
+                {
+                    return $"tag: {tagMatch.Groups["tagname"].Value}";
+                }
+
+                // Fallback for unexpected content
+                return "(unknown state)";
+            }
+            catch (Exception ex)
+            {
+                new Error($"Error reading Git HEAD file: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>

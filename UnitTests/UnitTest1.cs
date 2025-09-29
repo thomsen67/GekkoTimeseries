@@ -14838,13 +14838,10 @@ namespace UnitTests
             HelperMissings(table, 536d, 474d, 62d, double.NaN);
 
             // --- <d>
-
-            if (true)
-            {
-                I("decomp <2002 2002 d> y from e1;");  //Popup: "Could not find variable ..."
-                table = Globals.lastDecompTable;
-                Assert.IsTrue(table == null);  //Kind of same as the DECOMP has failed                
-            }
+            
+            I("decomp <2002 2002 d> y from e1;");  //Popup: "Could not find variable ..."
+            table = Globals.lastDecompTable;
+            Assert.IsTrue(table == null);  //This means that DECOMP has failed                            
 
             I("decomp <2002 2002 missing=zero d> y from e1;");
             table = Globals.lastDecompTable;

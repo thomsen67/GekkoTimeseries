@@ -291,16 +291,16 @@ namespace Gekko
         /// </summary>
         /// <param name="missingAsZero"></param>
         /// <returns></returns>
-        public static bool DecompShouldHandleMissings(bool missingAsZero, bool wholeSeriesExistence)
-        {
-            if(!Globals.decompFixMissingIgnoreProblem)return false;
+        public static ESeriesMissing DecompShouldHandleMissings(bool missingAsZero, bool wholeSeriesExistence)
+        {            
+            if (missingAsZero) return ESeriesMissing.Zero;
             if (wholeSeriesExistence)
             {
-                return missingAsZero || Program.options.series_array_calc_missing == ESeriesMissing.Zero;
+                return Program.options.decomp_array_calc_missing;
             }
             else
             {
-                return missingAsZero || Program.options.series_data_missing == ESeriesMissing.Zero;
+                return Program.options.decomp_data_missing;
             }
         }
 

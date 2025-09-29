@@ -627,7 +627,7 @@ namespace Gekko
         public static bool decompPlotFix = true;
 
         public static double pruneDecomp = 0.10d;
-        public static double guiPruneDecomp = 0.20d;  //bind this to combobox in gui -- not used?
+        public static double guiPruneDecomp = 0.20d;  //bind this to combobox in gui -- not used?        
 
         public const string freelists = "|||";
         public static bool fixWildcardLabel = true;  //keep this variable, it points to something to bugfix
@@ -693,6 +693,7 @@ namespace Gekko
         public const int decompHackt1 = 1980; //can be anything, TODO handle frequencies
         public const int decompHackt2 = 2101; //can be anything, TODO handle frequencies
         public const int decompLagAddition = 4;  //so we are quite sure that a <dp> will work.
+        public const int decompExtraPeriods = 20;  //added before and after model periods
 
         //GUI hacks
         public static ItemHandler itemHandler = null;  //hack regardig FIND window

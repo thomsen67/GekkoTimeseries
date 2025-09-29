@@ -845,7 +845,7 @@ namespace Gekko
         /// <param name="path"></param>
         public static void PrintOptions(string path, bool question)
         {
-            Program.options.Write(path, question);
+            Program.options.Write(path, question, true);
         }
 
         /// <summary>
@@ -859,7 +859,7 @@ namespace Gekko
         public static void HandleOptions(string s, int isBlock, P p)
         {
             string s2 = s.Replace("Program.options.", "");
-                        
+
             if (s2.ToLower().StartsWith("global_"))
             {
                 if (p != null)
@@ -897,7 +897,7 @@ namespace Gekko
             else if (G.Equal(s2, "folder_menu") || G.Equal(s2, "menu_startfile"))
             {
                 CrossThreadStuff.RestartMenuBrowser();
-            }                        
+            }
             else if (G.Equal(s2, "interface_zoom"))
             {
                 CrossThreadStuff.Zoom();
@@ -940,7 +940,34 @@ namespace Gekko
             else if (isBlock == 0 && G.Equal(s2, "timefilter_type"))  //TODO: only issue if really avg
             {
                 new Note("Timefilter type = 'avg' only works for PRT and MULPRT.");
-            }            
+            }
+            else if (G.Equal(s2, "missing"))
+            {
+                if (Program.options.missing == ESeriesMissing.Ignore)
+                {
+                    Program.options.decomp_array_calc_missing = ESeriesMissing.Zero;
+                    Program.options.decomp_data_missing = ESeriesMissing.Zero;
+                    Program.options.series_array_calc_missing = ESeriesMissing.Zero;
+                    Program.options.series_data_missing = ESeriesMissing.Zero;
+                    Program.options.series_array_print_missing = ESeriesMissing.Skip;
+                }
+                else if (Program.options.missing == ESeriesMissing.Error)
+                {
+                    //This sets their default values, like when Gekko starts up, of after RESET/RESTART.
+                    Program.options.decomp_array_calc_missing = ESeriesMissing.M;  //We do not use .Error here, too confusing with popup error windows in the GUI. Af something is missing, people will try to print it anyway.
+                    Program.options.decomp_data_missing = ESeriesMissing.M;
+                    Program.options.series_array_calc_missing = ESeriesMissing.Error;
+                    Program.options.series_data_missing = ESeriesMissing.M;
+                    Program.options.series_array_print_missing = ESeriesMissing.Error;
+                }
+                else new Error("Expected 'option missing' to be 'error' or 'ignore'");
+
+                Program.options.Write("decomp_array_calc_missing", false, false);
+                Program.options.Write("decomp_data_missing", false, false);
+                Program.options.Write("series_array_calc_missing", false, false);
+                Program.options.Write("series_data_missing", false, false);
+                Program.options.Write("series_array_print_missing", false, false);                
+            }
         }
 
         /// <summary>
@@ -1429,6 +1456,7 @@ namespace Gekko
                 ESeriesMissing missing = G.GetMissing(s);
                 if (missing == ESeriesMissing.Ignore)
                 {
+                    //Guess this is always so, because we only use y <missing=ignore> = ... not anything besides 'ignore'.
                     Program.options.series_array_print_missing = ESeriesMissing.Skip;
                     Program.options.series_array_calc_missing = ESeriesMissing.Zero;
                     Program.options.series_data_missing = ESeriesMissing.Zero;
