@@ -1459,16 +1459,20 @@ namespace Gekko
         }
 
         public GekkoSmpl(GekkoTime t1, GekkoTime t2)
-        {
-            //FIXME
-            //FIXME
-            //FIXME
-            //FIXME
-            //FIXME
+        {            
             this.t0 = t1;
             this.t1 = t1;
             this.t2 = t2;
             this.t3 = t2;
+        }
+
+        public GekkoSmpl(GekkoTime t1, GekkoTime t2, GekkoSmpl orig)
+        {
+            this.t0 = t1;
+            this.t1 = t1;
+            this.t2 = t2;
+            this.t3 = t2;
+            if (orig != null) this.p = orig.p;
         }
 
         public bool HasError()
@@ -10558,8 +10562,7 @@ namespace Gekko
             string ss = "Period: " + f + " " + start + "-" + end + G.NL;            
             if (!G.NullOrBlanks(sw)) ss += "First: " + sw + G.NL;
             if (!G.NullOrBlanks(sr)) ss += Globals.Ref + ": " + sr + G.NL;
-            ss += "Working folder: " + Program.options.folder_working + G.NL;
-            if (!G.NullOrBlanks(Globals.branch)) ss += "Git branch: " + Globals.branch + G.NL;
+            ss += "Working folder: " + Program.options.folder_working + G.NL;            
 
             if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
 
@@ -10627,7 +10630,7 @@ namespace Gekko
 
         /// <summary>
         /// Reads the HEAD file in the .git directory to determine the current branch name. Does not handle worktrees!!
-        /// May return 'tag: ...' or 'hash: ...'. But normally just the branch name, like 'main'.
+        /// Returns '...' for branch, 'tag: ...' for tag, or 'hash: ...' for commit. Example: 'main' for main branch.
         /// Returns null if nothing is found.
         /// </summary>
         /// <param name="gitMetadataPath">The absolute path to the Git metadata directory (e.g., C:\Repo\.git).</param>

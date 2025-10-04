@@ -3844,7 +3844,7 @@ namespace Gekko
         {
             StringBuilder sb = new StringBuilder();
             string workingFolder = GetWorkingFolder();
-            sb.AppendLine("==========================================================================");
+            sb.AppendLine("==================================================================================");
             if (type == "large")
             {
                 sb.AppendLine(" Gekko Timeseries Software -- timeseries handling and modeling");
@@ -3860,14 +3860,7 @@ namespace Gekko
             }
             string s = version;
             if (stable) s += " (stable)";
-            else s += " (develop)";
-            string sBranch = null;
-            if (!G.NullOrBlanks(Globals.branch))
-            {
-                if (G.StartsWithCaseSensitiveFast(Globals.branch, "tag: ")) sBranch = ", " + Globals.branch;
-                else sBranch = ", branch: " + Globals.branch;
-            } 
-            s += sBranch;
+            else s += " (develop)";            
             if (type != "large")  //i.e., == "small"
             {
                 sb.AppendLine(" Gekko version " + s + "  " + Globals.versionInternal);
@@ -3900,8 +3893,16 @@ namespace Gekko
                 sb.AppendLine("   " + pd + exe);                
             }
 
+            string branch = Program.GetBranch();
+            string sBranch = null;
+            if (!G.NullOrBlanks(branch))
+            {
+                if (branch.Contains(":")) sBranch = " (" + branch + ")";
+                else sBranch = " (branch: " + branch + ")";
+            }
+                        
             sb.AppendLine(" Working folder: ");
-            sb.AppendLine("   " + workingFolder);            
+            sb.AppendLine("   " + workingFolder + sBranch);
 
             if (type == "large")
             {
@@ -3959,7 +3960,7 @@ namespace Gekko
 
 
             }
-            sb.AppendLine("==========================================================================");
+            sb.AppendLine("==================================================================================");
             sb.AppendLine();
             if (!silent)
             {
@@ -3977,9 +3978,7 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                }
-
-                //Program.ShowPeriodInStatusField("");                
+                }                  
             }
             return sb;
         }

@@ -352,8 +352,7 @@ namespace Gekko
 
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
-
-            Globals.branch = Program.GetBranch();  //Globals.branch is only used for GUI stuff, ok to have it here
+                        
             G.WriteDirs("small", false);            
 
             Program.CreateLocalCopyHelpChm();
@@ -1124,8 +1123,7 @@ namespace Gekko
                 //folder does not exist.
             }
             else
-            {
-                Globals.branch = Program.GetBranch();
+            {                
                 G.Writeln();
                 G.WriteDirs("small", false);
                 if (!G.IsUnitTestingOrNotShowingGUI())

@@ -1047,6 +1047,13 @@ namespace Gekko
             return y;
         }
 
+        public static IVariable reverse(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            List iv_list = x1 as List;
+            if (iv_list == null) new Error("Expexted list argument");
+            List m = new List(System.Linq.Enumerable.Reverse(iv_list.list).ToList());  //LINQ version
+            return m;
+        }
 
         public static IVariable reorder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {            
@@ -7212,30 +7219,116 @@ namespace Gekko
             }
         }
 
+        public static IVariable ident(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {
+            return new ScalarString(Environment.UserName);            
+        }
+
+        public static IVariable ident1(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {            
+            return new ScalarString(Environment.UserDomainName);            
+        }
+
+        public static IVariable runfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {
+            if (vars.Length > 0) new Error("Funtion runfile() only accepts 0 arguments");
+            string gcm = Path.GetFileName(Helper_GetExecutingGcm(smpl));
+            if (G.NullOrBlanks(gcm)) new Error("Failure in runfile(): it seems the function is not called from a .gcm file (cf. the RUN statement).");            
+            return new ScalarString(gcm?.Trim());            
+        }
+
         public static IVariable runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
-            if (vars.Length > 1) new Error("Funtion runfolder() only accepts 0 or 1 arguments");
-            string gcm = Path.GetDirectoryName(Helper_GetExecutingGcm(smpl));            
+            return Helper_Runfolder(smpl, _t1, _t2, vars);
+        }
+        
+
+        /// <summary>
+        /// Chops up a part as a list of strings.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="vars"></param>
+        /// <returns></returns>
+        public static IVariable pathparts(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {
+            if (vars.Length != 1) new Error("Funtion pathparts() only accepts 1 argument");
+            string s = O.ConvertToString(vars[0]);
+            return Stringlist.CreateListFromStrings(Helper_DecomposeFullPath(s).ToArray());
+        }
+
+        private static IVariable Helper_Runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable[] vars)
+        {
+            string function = "runfolder";        
+            if (vars.Length > 1) new Error("Funtion " + function + "() only accepts 0 or 1 arguments");
+            string gcm = Path.GetDirectoryName(Helper_GetExecutingGcm(smpl));
+            if (G.NullOrBlanks(gcm)) new Error("Failure in " + function + "(): it seems the function is not called from a .gcm file (cf. the RUN statement).");
 
             if (vars.Length == 0)
             {                
-                return new ScalarString(gcm?.Trim());
+                return new ScalarString(gcm?.Trim());                
             }
             else
             {
                 if (G.Equal(vars[0].ConvertToString(), "rel"))
                 {
                     string root = Functions.root(smpl, _t1, _t2, new IVariable[] { }).ConvertToString();
-                    if (G.NullOrBlanks(gcm)) new Error("Failure in runfolder() function");
                     int index = gcm.IndexOf(root, StringComparison.OrdinalIgnoreCase);
                     if (index == -1) new Error("The root '" + root + "' is not contained inside the executing gcm '" + gcm + "'");
-                    string gcm2 = gcm.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end
-                    return new ScalarString(gcm2);
+                    string gcm2 = gcm.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
+                    return new ScalarString(gcm2);                    
                 }
                 else new Error("Expected argument 'rel'");
             }
-            new Error("Failure in runfolder() function");
-            return null;
+            new Error("Failure in " + function + "() function"); return null;  //We should never get to this line
+        }
+
+        /// <summary>
+        /// Chops up a part as a list of strings.         
+        /// For "xx\root.ini" or "\xx\root.ini\", it will return ["xx", "root.ini"].
+        /// For "c:\xx\root.ini", it will return ["c:", "xx", "root.ini"].
+        /// For "\\localhost\b$\xx\root.ini", it will return ["\\localhost\b$", "xx", "root.ini"].
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static List<string> Helper_DecomposeFullPath(string path)
+        {            
+            // Check if the path is rooted (starts with C:\, \\server, etc.)
+            bool isRooted = Path.IsPathRooted(path);
+            // Get the root part (e.g., "c:\", "\\server\share\")
+            string root = Path.GetPathRoot(path);
+            // List to hold the final parts
+            List<string> finalParts = new List<string>();
+            if (isRooted && !string.IsNullOrEmpty(root))
+            {
+                // 1. Handle Rooted Paths (e.g., "c:\a\b" or "\\server\share\a\b")
+                // Add the clean root component (e.g., "c:" or "\\server\share")
+                // Use TrimEnd to ensure the separator is removed from the root
+                string rootComponent = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                // Handle UNC paths which look like "\\server\share"
+                if (root.StartsWith(@"\\"))
+                {
+                    // For UNC, the root is usually the server and share
+                    // We use the original root because UNC stripping is complex
+                    rootComponent = root.TrimEnd(Path.DirectorySeparatorChar);
+                }
+                else
+                {
+                    // For drive letters, just take the first part
+                    rootComponent = root.Split(Path.DirectorySeparatorChar)[0];
+                }
+                finalParts.Add(rootComponent);
+                // Remove the root part from the path string
+                path = path.Substring(root.Length);
+            }
+            // 2. Split the remaining path (which may be the whole original path if relative)
+            // The replace handles mixed separators like 'a/b\c'
+            string normalizedPath = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            string[] directoryParts = normalizedPath.Split(new char[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+            // 3. Add the rest of the segments
+            finalParts.AddRange(directoryParts);
+            return finalParts;
         }
 
         public static IVariable branch(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)

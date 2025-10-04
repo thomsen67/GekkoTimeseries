@@ -4600,7 +4600,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() {" + label5 + "};" + G.NL);
                         if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.                            
 
-                        node.Code.A("" + Globals.smpl + " = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); " + Globals.smpl + ".t0 = " + Globals.smpl + ".t0.Add(-2);" + G.NL);
+                        node.Code.A("" + Globals.smpl + " = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2, " + Globals.smpl + "); " + Globals.smpl + ".t0 = " + Globals.smpl + ".t0.Add(-2);" + G.NL);  //Puts .p into new object from existing object, so p can be used for instance with prt f(), where f() is a function.
 
                         //If there is <yoy>, we set t0 13 periods before (also ok for months)
                         //See metadata for pchy() and pcha() functions. For some reason, G.Equal() does not work here...
