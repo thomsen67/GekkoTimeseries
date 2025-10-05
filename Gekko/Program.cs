@@ -2793,7 +2793,9 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {                
+            {
+                List<(int start, int end)> xx = G.GetNonCommaRangesWithQuotes("a,bb,'x,y',c");
+
                 if (Globals.runningOnTTComputer)
                 {
                     if (true)

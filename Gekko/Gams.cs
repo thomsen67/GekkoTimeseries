@@ -577,55 +577,96 @@ namespace Gekko
             }
 
             if (!simple)
-            {
-                //For some reason, this is really slow.
-                //It is ok for a quarterly scalar-timeless model from .frm, but not  
-                //for instance 1 million quarterly equations.
+            {                
                 List<string> fullName = new List<string>();
                 string start = null;
                 int i = varname.IndexOf('[');
                 if (i >= 1)
                 {
-                    //with index (...)                                    
-                    start = varname.Substring(0, i).Trim();
-                    string rest = varname.Substring(i).Trim();
-                    string rest2 = rest.Substring(1, rest.Length - 2);
-                    string[] ss = rest2.Split(',');
-                    int int2 = -12345;
-                    for (int j = 0; j < ss.Length; j++)
+                    //with index (...)
+
+                    if (Program.options.model_gams_scalar_freq == EFreq.A)
                     {
-                        string s = ss[j].Trim();
-
-                        GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
-                        bool good = true;
-                        //This would be easier if time was known to be always last...
-                        if (tt.IsNull()) good = false;
-                        if (s.Length < 4) good = false; //avoid the 18 in x[18, 2020q2] is a hit.
-                        if (tt.super < 1900 || tt.super > 4000) good = false; //sensible?
-                        if (!(tt.freq == EFreq.A || tt.freq == EFreq.Q || tt.freq == EFreq.M)) good = false;
-
-                        if (good)
+                        start = varname.Substring(0, i).Trim();
+                        string rest = varname.Substring(i).Trim();
+                        string rest2 = rest.Substring(1, rest.Length - 2);
+                        List<(int start, int end)> parts = G.GetNonCommaRangesWithQuotes(rest2);
+                        foreach ((int start, int end) part in parts)
                         {
-                            //Time is in this index
-                            if (!helper.time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
-                            helper.time = tt;
-                        }
-
-                        if (helper.time.IsNull())
-                        {
-                            fullName.Add(s);
-                        }
-                        else
-                        {
-                            //not part of indexes
+                            bool isTime = false;
+                            string s = G.Substring(rest2, part.start, part.end);
+                            if (part.end - part.start + 1 == 4 && (rest2[part.start] == '1' || rest2[part.start] == '2'))  //Must be 1xxx or 2xxx
+                            {
+                                bool good = true;
+                                for (int i2 = part.start + 1; i2 <= part.end; i2++)
+                                {
+                                    if (!Char.IsDigit(rest2[i2])) { good = false; break; }
+                                }
+                                if (good)
+                                {                                    
+                                    GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error                                    
+                                    if (tt.IsNull() || tt.freq != EFreq.A)
+                                    {                                        
+                                    }
+                                    else
+                                    {
+                                        //Time is in this index
+                                        if (!helper.time.IsNull()) new Error("2 time indexes found: " + varname);
+                                        helper.time = tt;
+                                        isTime = true;
+                                    }                                    
+                                }
+                            }
+                            if (!isTime) fullName.Add(s);
                         }
                     }
-                                 
+                    else 
+                    {
+                        // IS THIS USED BY ANYONE?
+                        // IS THIS USED BY ANYONE?
+                        // IS THIS USED BY ANYONE?
+                        //For some reason, this is really slow (will only be for non-annual)
+                        //It is ok for a quarterly scalar-timeless model from .frm, but not  
+                        //for instance 1 million quarterly equations.
+                        start = varname.Substring(0, i).Trim();
+                        string rest = varname.Substring(i).Trim();
+                        string rest2 = rest.Substring(1, rest.Length - 2);
+                        string[] ss = rest2.Split(',');
+                        int int2 = -12345;
+                        for (int j = 0; j < ss.Length; j++)
+                        {
+                            string s = ss[j].Trim();
+                            GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
+                            bool good = true;
+                            //This would be easier if time was known to be always last...
+                            if (tt.IsNull()) good = false;
+                            if (s.Length < 4) good = false; //avoid the 18 in x[18, 2020q2] is a hit.
+                            if (tt.super < 1900 || tt.super > 4000) good = false; //sensible?
+                            if (!(tt.freq == EFreq.A || tt.freq == EFreq.Q || tt.freq == EFreq.M)) good = false;
+
+                            if (good)
+                            {
+                                //Time is in this index
+                                if (!helper.time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
+                                helper.time = tt;
+                            }
+
+                            if (helper.time.IsNull())  //Presupposes it is last?????!!!!!
+                            {
+                                fullName.Add(s);
+                            }
+                            else
+                            {
+                                //not part of indexes
+                            }
+                        }
+                    }
+
                     if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
-                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, null) + "]";                    
+                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, null) + "]";
                 }
                 else
-                {                    
+                {
                     start = varname;
                     helper.resultingFullName = varname;
                 }
@@ -2317,17 +2358,23 @@ namespace Gekko
                 }
                 if (status2 == 1)
                 {
-                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                    int idx5 = G.FirstNonBlankIndexOf(line, 0);
+                    if (idx5 == -1 || line[idx5] != 'e') new Error("Malformed e... line: " + line);
+                    int idx6 = G.FirstBlankIndexOf(line, idx5 + 1);
+                    if (idx6 == -1) new Error("Malformed e... line: " + line);
+                    int idx7 = G.FirstNonBlankIndexOf(line, idx6 + 1);
+                    if (idx7 == -1) new Error("Malformed e... line: " + line);
                     int n = -12345;
                     try
                     {
-                        n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                        n = int.Parse(G.Substring(line, idx5 + 1, idx6 - 1)) - 1; //so it is 0-based
                     }
                     catch
                     {
-                        new Error("Could not parse integer part of the string '" + ss[0] + "'");
+                        new Error("Malformed e... line integer: " + line);
                     }
-                    string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                    string ss2 = G.Substring(line, idx7, line.Length - 1).Replace("(", "[").Replace(")", "]");
+
                     string eqName = ss2;
                     if (G.Contains(eqName, Globals.scalarModelExtraVariable))
                     {
@@ -2343,18 +2390,23 @@ namespace Gekko
 
                 }
                 else if (status2 == 2)
-                {
-                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                {                    
+                    int idx5 = G.FirstNonBlankIndexOf(line, 0);
+                    if (idx5 == -1 || line[idx5] != 'x') new Error("Malformed x... line: " + line);
+                    int idx6 = G.FirstBlankIndexOf(line, idx5 + 1);
+                    if (idx6 == -1) new Error("Malformed x... line: " + line);
+                    int idx7 = G.FirstNonBlankIndexOf(line, idx6 + 1);
+                    if (idx7 == -1) new Error("Malformed x... line: " + line);
                     int n = -12345;
                     try
                     {
-                        n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based                        
+                        n = int.Parse(G.Substring(line, idx5 + 1, idx6 - 1)) - 1; //so it is 0-based
                     }
                     catch
                     {
-                        new Error("Could not parse integer part of the string '" + ss[0] + "'");
+                        new Error("Malformed x... line integer: " + line);
                     }
-                    string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                    string ss2 = G.Substring(line, idx7, line.Length - 1).Replace("(", "[").Replace(")", "]");
 
                     if (!res_variables && G.StartsWith(ss2, Globals.decompResidualPrefix)) res_variables = true;
 
@@ -2596,8 +2648,7 @@ namespace Gekko
                         }
                     }
 
-                    if (lefttype == int.MaxValue || righttype == int.MaxValue)
-                        new Error("Problem resolving '**' power");
+                    if (lefttype == int.MaxValue || righttype == int.MaxValue) new Error("Problem resolving '**' power");
 
                     helper.remove.Add(i, "");
                     helper.remove.Add(i + 1, "");
@@ -2812,6 +2863,7 @@ namespace Gekko
                 else if (G.Equal(th1.s, "sqr")) s = "M.Sqr";
                 else if (G.Equal(th1.s, "sqrt")) s = "M.Sqrt";
                 else if (G.Equal(th1.s, "tanh")) s = "M.Tanh";
+                else if (G.Equal(th1.s, "errorf")) s = "M.Errorf";  //GREU, seems it is "Integral of the standard normal distribution"
             }
             else
             {

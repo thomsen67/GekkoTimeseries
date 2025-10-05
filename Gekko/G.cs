@@ -462,6 +462,51 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Splits up "a,bb,'x,y',c" into 0,0 and 2,3 and 5,9 and 11,11
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static List<(int start, int end)> GetNonCommaRangesWithQuotes(string s)
+        {
+            var result = new List<(int, int)>();
+            bool inQuotes = false;
+            int? start = null;
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                char c = s[i];
+
+                if (c == '\'')
+                {
+                    inQuotes = !inQuotes;
+                    // If we’re entering a quoted block and not already in a range, start it
+                    if (start == null) start = i;
+                    // If we’re exiting quotes, keep going (don’t close yet)
+                    continue;
+                }
+
+                if (!inQuotes && c == ',')
+                {
+                    // End of a non-quoted range
+                    if (start != null)
+                    {
+                        result.Add((start.Value, i - 1));
+                        start = null;
+                    }
+                }
+                else
+                {
+                    // Start of a new range
+                    if (start == null) start = i;
+                }
+            }
+
+            // If ended inside a range
+            if (start != null) result.Add((start.Value, s.Length - 1));
+            return result;
+        }
+
+        /// <summary>
         /// Add 's' to plural word. For instance "0 files", "1 file", "2 files", ... . 
         /// If addIsAre is active, it will return "are 0 files", "is 1 file", "are 2 files", ...
         /// Some words are known, like library --> libraries.
@@ -3053,6 +3098,46 @@ namespace Gekko
                 index = input.IndexOf(substring, index + 1, comparisonType);
             }
             return allIndexOf;
+        }
+
+        public static int FirstNonBlankIndexOf(string text, int start)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return -1; // Or throw an exception, depending on your needs
+            }
+
+            // Iterate through the string character by character
+            for (int i = start; i < text.Length; i++)
+            {
+                // checks for spaces, tabs, newlines, etc.
+                if (!char.IsWhiteSpace(text[i]))
+                {
+                    return i; // Found the index of the first non-blank character
+                }
+            }
+
+            return -1; // No non-blank character found (string is all whitespace)
+        }
+
+        public static int FirstBlankIndexOf(string text, int start)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return -1; // Or throw an exception, depending on your needs
+            }
+
+            // Iterate through the string character by character
+            for (int i = start; i < text.Length; i++)
+            {
+                // checks for spaces, tabs, newlines, etc.
+                if (char.IsWhiteSpace(text[i]))
+                {
+                    return i; // Found the index of the first non-blank character
+                }
+            }
+
+            return -1; // No non-blank character found (string is all whitespace)
         }
 
         /// <summary>

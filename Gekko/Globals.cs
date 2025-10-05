@@ -175,7 +175,9 @@ namespace Gekko
         public static bool bugfixLhsIsFunctionParameter = true;        
 
         public const int startPrime = 1013;  //next is 1019.
-                
+        public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();
+        public static bool greuHack = true;
+
         public const int decompFixTimelessProblem = 2;  //1 or 2
         public const bool decompFixMissingIgnoreProblem = true;
         public const string decompResidualPrefix = "res_";

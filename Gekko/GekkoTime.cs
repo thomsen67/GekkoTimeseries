@@ -544,14 +544,17 @@ namespace Gekko
 
             GekkoTime t = GekkoTime.tNull;
 
-            if (true)
+            if (s.Length == 2 || s.Length == 4)  //"95" or "1995"
             {
-                int i = -12345;
-                bool b = int.TryParse(s, out i);
-                if (b)
+                if (s[0] != '0')
                 {
-                    //happens often, so we do it fast
-                    return new GekkoTime(EFreq.A, G.FindYear(i, allowTwoDigits), 1);
+                    int i = -12345;
+                    bool b = int.TryParse(s, out i);
+                    if (b)
+                    {
+                        //fast parsing of annual years, happens often, so we do it fast
+                        return new GekkoTime(EFreq.A, G.FindYear(i, allowTwoDigits), 1);
+                    }
                 }
             }
 
