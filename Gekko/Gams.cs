@@ -584,43 +584,7 @@ namespace Gekko
                 if (i >= 1)
                 {
                     //with index (...)
-
-                    if (Program.options.model_gams_scalar_freq == EFreq.A)
-                    {
-                        start = varname.Substring(0, i).Trim();
-                        string rest = varname.Substring(i).Trim();
-                        string rest2 = rest.Substring(1, rest.Length - 2);
-                        List<(int start, int end)> parts = G.GetNonCommaRangesWithQuotes(rest2);
-                        foreach ((int start, int end) part in parts)
-                        {
-                            bool isTime = false;
-                            string s = G.Substring(rest2, part.start, part.end);
-                            if (part.end - part.start + 1 == 4 && (rest2[part.start] == '1' || rest2[part.start] == '2'))  //Must be 1xxx or 2xxx
-                            {
-                                bool good = true;
-                                for (int i2 = part.start + 1; i2 <= part.end; i2++)
-                                {
-                                    if (!Char.IsDigit(rest2[i2])) { good = false; break; }
-                                }
-                                if (good)
-                                {                                    
-                                    GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error                                    
-                                    if (tt.IsNull() || tt.freq != EFreq.A)
-                                    {                                        
-                                    }
-                                    else
-                                    {
-                                        //Time is in this index
-                                        if (!helper.time.IsNull()) new Error("2 time indexes found: " + varname);
-                                        helper.time = tt;
-                                        isTime = true;
-                                    }                                    
-                                }
-                            }
-                            if (!isTime) fullName.Add(s);
-                        }
-                    }
-                    else 
+                    if (true)
                     {
                         // IS THIS USED BY ANYONE?
                         // IS THIS USED BY ANYONE?
@@ -2357,78 +2321,163 @@ namespace Gekko
                     continue;
                 }
                 if (status2 == 1)
-                {
-                    int idx5 = G.FirstNonBlankIndexOf(line, 0);
-                    if (idx5 == -1 || line[idx5] != 'e') new Error("Malformed e... line: " + line);
-                    int idx6 = G.FirstBlankIndexOf(line, idx5 + 1);
-                    if (idx6 == -1) new Error("Malformed e... line: " + line);
-                    int idx7 = G.FirstNonBlankIndexOf(line, idx6 + 1);
-                    if (idx7 == -1) new Error("Malformed e... line: " + line);
-                    int n = -12345;
-                    try
-                    {
-                        n = int.Parse(G.Substring(line, idx5 + 1, idx6 - 1)) - 1; //so it is 0-based
-                    }
-                    catch
-                    {
-                        new Error("Malformed e... line integer: " + line);
-                    }
-                    string ss2 = G.Substring(line, idx7, line.Length - 1).Replace("(", "[").Replace(")", "]");
+                {                    
+                    int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
+                    List<string> parts; string time;
+                    LineChopper(line, 'e', out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
 
-                    string eqName = ss2;
+                    string eqName = nameWithIndexes;
                     if (G.Contains(eqName, Globals.scalarModelExtraVariable))
                     {
                         fakeEqCounts2++;
                     }
-
-                    int idx = ss2.IndexOf("[");
-                    if (idx >= 0) eqName = ss2.Substring(0, idx);
-                    helper.dict_FromEqNumberToEqName[n] = ss2;
-                    helper.dict_FromEqNameToEqNumber.Add(ss2, n, b);  //filling this out could be postponed until decomp if loading is slow                        
+                    
+                    eqName = nameWithoutIndexes;
+                    helper.dict_FromEqNumberToEqName[n] = nameWithIndexes;
+                    helper.dict_FromEqNameToEqNumber.Add(nameWithIndexes, n, b);  //filling this out could be postponed until decomp if loading is slow                        
                     helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count(), b);
                     helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
-
                 }
                 else if (status2 == 2)
                 {                    
-                    int idx5 = G.FirstNonBlankIndexOf(line, 0);
-                    if (idx5 == -1 || line[idx5] != 'x') new Error("Malformed x... line: " + line);
-                    int idx6 = G.FirstBlankIndexOf(line, idx5 + 1);
-                    if (idx6 == -1) new Error("Malformed x... line: " + line);
-                    int idx7 = G.FirstNonBlankIndexOf(line, idx6 + 1);
-                    if (idx7 == -1) new Error("Malformed x... line: " + line);
-                    int n = -12345;
-                    try
-                    {
-                        n = int.Parse(G.Substring(line, idx5 + 1, idx6 - 1)) - 1; //so it is 0-based
-                    }
-                    catch
-                    {
-                        new Error("Malformed x... line integer: " + line);
-                    }
-                    string ss2 = G.Substring(line, idx7, line.Length - 1).Replace("(", "[").Replace(")", "]");
+                    int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
+                    List<string> parts; string time;
+                    LineChopper(line, 'x', out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
 
-                    if (!res_variables && G.StartsWith(ss2, Globals.decompResidualPrefix)) res_variables = true;
+                    if (!res_variables && G.StartsWith(nameWithIndexes, Globals.decompResidualPrefix)) res_variables = true;                    
 
-                    if (G.Contains(ss2, Globals.scalarModelExtraVariable))
+                    if (G.Contains(nameWithIndexes, Globals.scalarModelExtraVariable))
                     {
                         fakeVarCounts2++;
                     }
 
-                    helper.dict_FromVarNumberToVarName[n] = ss2;
-                    helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, ss2, true);
-                    if (helper2.time.IsNull())
+                    helper.dict_FromVarNumberToVarName[n] = nameWithIndexes;
+                    helper.dict_FromVarNameToVarNumber.Add(nameWithIndexes, n, b);
+
+                    GekkoTime t = GekkoTime.tNull;
+                    if (time != null)
+                    {
+                        if (Program.options.model_gams_scalar_freq != EFreq.A) new Error("Non-annual freq not implemented for GAMS scalar model");
+                        int i = G.IntParse(time);
+                        if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);
+                    }
+
+                    if (t.IsNull())
                     {
                         if (!timeless.ContainsKey(helper.dict_FromVarNameToANumber.Count())) timeless.Add(helper.dict_FromVarNameToANumber.Count(), 1); //1 is just arbitrary
                     }
                     else
                     {
-                        if (helper.t1.IsNull() || helper2.time.StrictlySmallerThan(helper.t1)) helper.t1 = helper2.time;
-                        if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;                        
+                        if (helper.t1.IsNull() || t.StrictlySmallerThan(helper.t1)) helper.t1 = t;
+                        if (helper.t2.IsNull() || t.StrictlyLargerThan(helper.t2)) helper.t2 = t;
                     }
-                    helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(helper2.resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
+                    helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(nameWithIndexesNoTime, helper.dict_FromVarNameToANumber.Count(), b);
                 }
+            }
+        }
+
+        private static void LineChopper(string line, char ex, out int n, out string nameWithIndex, out string nameWithIndexNoTime, out string nameWithoutIndex, out List<string> parts, out string time)
+        {
+            nameWithoutIndex = null;
+            time = null;
+            parts = null;
+            int timePart = -12345;
+            int idx5 = G.FirstNonBlankIndexOf(line, 0);
+            if (idx5 == -1 || line[idx5] != ex) new Error("Malformed " + ex + "... line: " + line);
+            int idx6 = G.FirstBlankIndexOf(line, idx5 + 1);
+            if (idx6 == -1) new Error("Malformed " + ex + "... line: " + line);
+            int idx7 = G.FirstNonBlankIndexOf(line, idx6 + 1);
+            if (idx7 == -1) new Error("Malformed " + ex + "... line: " + line);
+            n = -12345;
+            try
+            {
+                n = int.Parse(G.Substring(line, idx5 + 1, idx6 - 1)) - 1; //so it is 0-based
+            }
+            catch
+            {
+                new Error("Malformed " + ex + "... line integer: " + line);
+            }
+            
+            nameWithIndex = G.Substring(line, idx7, line.Length - 1).Replace("(", "[").Replace(")", "]").Trim();
+            nameWithIndexNoTime = nameWithIndex;
+            int i = nameWithIndex.IndexOf('[');
+            if (i != -1)
+            {
+                if (Program.options.model_gams_scalar_freq == EFreq.A)
+                {
+                    nameWithoutIndex = nameWithIndex.Substring(0, i).Trim();
+                    string rest = nameWithIndex.Substring(i).Trim();
+                    string rest2 = rest.Substring(1, rest.Length - 2);
+                    parts = G.SplitIgnoringQuotedCommas(rest2);
+                    int counter = -1;
+                    foreach (string part in parts)
+                    {
+                        counter++;
+                        bool isTime = false;
+                        if (part.Length == 4 && (part[0] == '1' || part[0] == '2'))  //Must be 1xxx or 2xxx
+                        {
+                            bool good = true;
+                            for (int i2 = 1; i2 < part.Length; i2++)
+                            {
+                                if (!Char.IsDigit(part[i2])) { good = false; break; }
+                            }
+                            if (good)
+                            {
+                                if (timePart != -12345) new Error("2 time indexes found: " + nameWithIndex);
+                                timePart = counter;
+                            }
+                        }
+                    }
+
+                    if (timePart != -12345)
+                    {                        
+
+                        if (timePart != parts.Count - 1)
+                        {
+                            string temp = parts[timePart];
+                            parts[timePart] = parts[parts.Count - 1];
+                            parts[parts.Count - 1] = temp;
+
+                            StringBuilder sb1 = new StringBuilder();
+                            for (int j = 0; j < parts.Count; j++)
+                            {
+                                string s = parts[j];
+                                sb1.Append(s).Append(",");
+                            }
+                            if (sb1.Length > 0) sb1.Length--;
+                            string s3 = null; if (sb1.Length > 0) s3 = "[" + sb1.ToString() + "]";
+                            nameWithIndex = nameWithoutIndex + s3;                            
+                        }
+                        else
+                        {
+                            //is already done at top of method
+                        }
+
+                        StringBuilder sb2 = new StringBuilder();
+                        for (int j = 0; j < parts.Count - 1; j++)  //skips the last, which is time
+                        {
+                            string s = parts[j];
+                            sb2.Append(s).Append(",");
+                        }
+                        if (sb2.Length > 0) sb2.Length--;
+                        string s2 = null; if (sb2.Length > 0) s2 = "[" + sb2.ToString() + "]";
+                        nameWithIndexNoTime = nameWithoutIndex + s2;
+                        time = parts[parts.Count - 1];
+                    }
+                    else
+                    {
+                        //No time
+                        //is already done at top of method
+                    }
+                }
+                else
+                {
+                    new Error("Non-annual frequency not implemented for GAMS scalar models yet");
+                }
+            }
+            else
+            {
+                nameWithoutIndex = nameWithIndex;
             }
         }
 

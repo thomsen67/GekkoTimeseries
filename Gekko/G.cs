@@ -462,49 +462,98 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Splits up "a,bb,'x,y',c" into 0,0 and 2,3 and 5,9 and 11,11
+        /// Splits a string by commas, but ignores commas found inside single quotes.
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static List<(int start, int end)> GetNonCommaRangesWithQuotes(string s)
+        /// <param name="input">The string to split (e.g., "a,bb,'x,y',c").</param>
+        /// <returns>A List of strings (e.g., "a", "bb", "x,y", "c").</returns>
+        public static List<string> SplitIgnoringQuotedCommas(string input)
         {
-            var result = new List<(int, int)>();
+            bool fixQuotesProblem = true;
+            var result = new List<string>();
+            // StringBuilder to build the current token/field
+            var currentToken = new StringBuilder();
+            // Flag to track if we are inside a single-quoted section
             bool inQuotes = false;
-            int? start = null;
 
-            for (int i = 0; i < s.Length; i++)
+            foreach (char c in input)
             {
-                char c = s[i];
-
                 if (c == '\'')
                 {
-                    inQuotes = !inQuotes;
-                    // If we’re entering a quoted block and not already in a range, start it
-                    if (start == null) start = i;
-                    // If we’re exiting quotes, keep going (don’t close yet)
+                    // Toggle the inQuotes state when a single quote is encountered
+                    inQuotes = !inQuotes;                    
+                    currentToken.Append(c);
                     continue;
                 }
 
-                if (!inQuotes && c == ',')
+                if (c == ',' && !inQuotes)
                 {
-                    // End of a non-quoted range
-                    if (start != null)
-                    {
-                        result.Add((start.Value, i - 1));
-                        start = null;
-                    }
+                    // If we hit a comma *outside* of quotes, the current token is complete.
+                    // 1. Add the trimmed token to the result list.
+                    result.Add(currentToken.ToString().Trim());
+                    // 2. Clear the StringBuilder for the next token.
+                    currentToken.Clear();
                 }
                 else
                 {
-                    // Start of a new range
-                    if (start == null) start = i;
+                    // Otherwise (if it's not a quote, or it's a comma *inside* quotes, or any other character),
+                    // just append the character to the current token.
+                    currentToken.Append(c);
                 }
             }
 
-            // If ended inside a range
-            if (start != null) result.Add((start.Value, s.Length - 1));
+            // After the loop, the last token needs to be added to the list.
+            if (currentToken.Length > 0 || result.Count == 0)
+            {
+                result.Add(currentToken.ToString().Trim());
+            }
+
             return result;
         }
+
+        ///// <summary>
+        ///// Splits up "a,bb,'x,y',c" into "a", "bb", "x,y, "c"
+        ///// </summary>
+        ///// <param name="s"></param>
+        ///// <returns></returns>
+        //public static List<string> GetNonCommaRangesWithQuotes(string s)
+        //{
+        //    var result = new List<string>();
+        //    bool inQuotes = false;
+        //    int? start = null;
+
+        //    for (int i = 0; i < s.Length; i++)
+        //    {
+        //        char c = s[i];
+
+        //        if (c == '\'')
+        //        {
+        //            inQuotes = !inQuotes;
+        //            // If we’re entering a quoted block and not already in a range, start it
+        //            if (start == null) start = i;
+        //            // If we’re exiting quotes, keep going (don’t close yet)
+        //            continue;
+        //        }
+
+        //        if (!inQuotes && c == ',')
+        //        {
+        //            // End of a non-quoted range
+        //            if (start != null)
+        //            {
+        //                result.Add((start.Value, i - 1));
+        //                start = null;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // Start of a new range
+        //            if (start == null) start = i;
+        //        }
+        //    }
+
+        //    // If ended inside a range
+        //    if (start != null) result.Add((start.Value, s.Length - 1));
+        //    return result;
+        //}
 
         /// <summary>
         /// Add 's' to plural word. For instance "0 files", "1 file", "2 files", ... . 
