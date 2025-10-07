@@ -719,7 +719,10 @@ namespace Gekko
                 //Write any pending OPEN databanks:
                 int w = -12345;
                 int b = -12345;
-                Program.MaybeWriteOpenDatabanks(ref w, ref b, false);  //w and b are not used. We write traces here, because this is not a CLOSE<trace=no>*, but a user closing the main window.
+                //Regarding the first argument below: this happens when a user has an open databank with datachanges and closes Gekko
+                //without first using a CLOSE to close the open databank. In that case, the databank will not register any .gcm
+                //field (path to running gcm file), which is fine (because there *is* none).
+                Program.MaybeWriteOpenDatabanks(null, ref w, ref b, false);  //w and b are not used. We write traces here, because this is not a CLOSE<trace=no>*, but a user closing the main window.
 
                 if (track) MessageBox.Show("28");
                 if (Globals.pipeFileHelper.pipeFile != null)
@@ -1451,7 +1454,7 @@ namespace Gekko
                         G.Writeln("Starting to pack zip file...");
                         SolveDataInOut.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null, null);
                         Zipper zipper = new Zipper("gekko_sim_error.zip");
-                        Program.WriteGbk(new List<ToFrom>(), Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, "" + Globals.extensionDatabank + "", true, false, false);
+                        Program.WriteGbk(null, new List<ToFrom>(), Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, "" + Globals.extensionDatabank + "", true, false, false);
                         Program.WaitForFileCopy(Globals.modelPathAndFileName, zipper.tempFolder + "\\model.frm"); ;
                         Program.Pipe(zipper.tempFolder + "\\simerror.txt", null);
                         G.Writeln(Globals.packSim.tStart.ToString() + " " + Globals.packSim.tEnd.ToString());

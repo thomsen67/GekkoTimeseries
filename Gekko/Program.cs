@@ -23180,7 +23180,7 @@ namespace Gekko
                     //first argument (the databank) is only used if list = null
                     if (isDefault)
                     {
-                        return WriteGbk(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
+                        return WriteGbk(o.p, list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
                     }
                     if (writeType == EDatabankWriteType.Tsd)
                     {
@@ -23514,7 +23514,7 @@ namespace Gekko
         /// <param name="isCloseCommand"></param>
         /// <param name="noTrace"></param>
         /// <returns></returns>
-        public static int WriteGbk(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand, bool noTrace)
+        public static int WriteGbk(P p, List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand, bool noTrace)
         {
             if (databank.storage.Count == 0)
             {
@@ -23577,7 +23577,7 @@ namespace Gekko
                 //in the very rare case, any files here will be overwritten
             }
 
-            CreateDatabankXmlInfo(databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
+            CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
 
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
 
@@ -23945,7 +23945,7 @@ namespace Gekko
             }
         }
 
-        private static void CreateDatabankXmlInfo(Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand)
+        private static void CreateDatabankXmlInfo(P p, Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand)
         {
 
             // Create the xml document containe
@@ -23987,7 +23987,9 @@ namespace Gekko
                 try 
                 {                    
                     XmlElement gcm = doc.CreateElement("Gcm");
-                    gcm.InnerText = (Functions.runfolder(null, null, null, new IVariable[] { }) as ScalarString).string2;
+                    GekkoSmpl tempSmpl = new GekkoSmpl();  //just used to transfer the .p object into Function
+                    tempSmpl.p = p;
+                    gcm.InnerText = (Functions.runfolder(tempSmpl, null, null, new IVariable[] { }) as ScalarString).string2 + "|||delimiter|||" + (Functions.runfile(tempSmpl, null, null, new IVariable[] { }) as ScalarString).string2;
                     root.AppendChild(gcm);
                 } 
                 catch { }
@@ -25252,7 +25254,7 @@ namespace Gekko
         }
 
 
-        public static void MaybeWriteOpenDatabank(Databank removed, bool noTrace)
+        public static void MaybeWriteOpenDatabank(P p, Databank removed, bool noTrace)
         {
             if (Program.IsDatabankDirty(removed))
             {
@@ -25266,7 +25268,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.WriteRemovedDatabank(removed, noTrace);
+                    Program.WriteRemovedDatabank(p, removed, noTrace);
                 }
             }
         }
@@ -25286,7 +25288,7 @@ namespace Gekko
 
             int w = -12345;
             int b = -12345;
-            MaybeWriteOpenDatabanks(ref w, ref b, false);  //We write traces here, because this is not a CLOSE<trace=no>*, but a RESET/RESTART.
+            MaybeWriteOpenDatabanks(p, ref w, ref b, false);  //We write traces here, because this is not a CLOSE<trace=no>*, but a RESET/RESTART.
             Databank w2 = Program.databanks.storage[w]; w2.Clear();
             Databank b2 = Program.databanks.storage[b]; b2.Clear();
             Program.databanks.storage.Clear();
@@ -25640,7 +25642,7 @@ namespace Gekko
             return gekkoBuiltInFunctions;
         }
 
-        public static void MaybeWriteOpenDatabanks(ref int w, ref int b, bool noTrace)
+        public static void MaybeWriteOpenDatabanks(P p, ref int w, ref int b, bool noTrace)
         {
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
@@ -25649,12 +25651,12 @@ namespace Gekko
                 else if (G.Equal(Program.databanks.storage[i].name, Globals.Ref)) b = i;
                 else
                 {
-                    MaybeWriteOpenDatabank(Program.databanks.storage[i], noTrace);
+                    MaybeWriteOpenDatabank(p, Program.databanks.storage[i], noTrace);
                 }
             }
         }
 
-        public static void WriteRemovedDatabank(Databank removed, bool noTrace)
+        public static void WriteRemovedDatabank(P p, Databank removed, bool noTrace)
         {
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
             if (removed.FileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
@@ -25716,7 +25718,7 @@ namespace Gekko
             if (!skipWrite)
             {
                 Globals.dependencyTracking.Add(2, "Write", false, removed.FileNameWithPath);
-                n = WriteGbk(null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
+                n = WriteGbk(p, null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
             }
         }
 

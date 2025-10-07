@@ -8122,6 +8122,7 @@ namespace Gekko
             public List listItems = null;
             public string opt_save = null;
             public string opt_trace = null;
+            public P p = null;
             public void Exe()
             {
 
@@ -8191,7 +8192,7 @@ namespace Gekko
                     }
                     else
                     {
-                        Program.MaybeWriteOpenDatabank(removed, G.Equal(this.opt_trace, "no"));
+                        Program.MaybeWriteOpenDatabank(this.p, removed, G.Equal(this.opt_trace, "no"));
                     }
                 }
                 if (databanks.Count > 0)
@@ -10793,7 +10794,8 @@ namespace Gekko
             public string fileName = null;
             public List list1 = null;
             public List list2 = null;
-            
+            public P p = null;
+
             public string opt_tsd = null;
             public string opt_tsdx = null;
             public string opt_gbk = null;

@@ -1118,6 +1118,7 @@ namespace Gekko.Parser.Gek
                 case "ASTCLOSE":
                     {
                         node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
                         GetCodeFromAllChildren(node, node[1]);  //options                      
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -4989,6 +4990,7 @@ ASTPLACEHOLDER [0]
                 case "ASTWRITE":
                     {
                         node.Code.A("O.Write o" + Num(node) + " = new O.Write();" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
                         GetCodeFromAllChildren(node, node[1]);  //options
                         node.Code.A("o" + Num(node) + ".fileName = " + node[2].Code + ";" + G.NL);
