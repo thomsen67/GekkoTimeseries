@@ -2624,7 +2624,6 @@ namespace Gekko
             if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("It seems no Gekko model is defined. See MODEL command.");
-                //throw new GekkoException();
             }
             if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
             {

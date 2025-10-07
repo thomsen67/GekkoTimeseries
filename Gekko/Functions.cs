@@ -7219,12 +7219,12 @@ namespace Gekko
             }
         }
 
-        public static IVariable ident(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        public static IVariable user(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
             return new ScalarString(Environment.UserName);            
         }
 
-        public static IVariable ident1(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        public static IVariable userdomain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {            
             return new ScalarString(Environment.UserDomainName);            
         }
@@ -7335,8 +7335,16 @@ namespace Gekko
         {
             IVariable root = Functions.root(smpl, _t1, _t2, new IVariable[] { new ScalarString("git") });
             if (G.NullOrBlanks(root.ConvertToString())) return new ScalarString("");
-            string branch = Program.GetCurrentBranchName(root.ConvertToString());
-            return new ScalarString(branch?.Trim());
+            Tuple<string, string> tup = Program.GetCurrentSnapshot(root.ConvertToString());
+            return new ScalarString(tup.Item1?.Trim());
+        }
+
+        public static IVariable commit(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        {
+            IVariable root = Functions.root(smpl, _t1, _t2, new IVariable[] { new ScalarString("git") });
+            if (G.NullOrBlanks(root.ConvertToString())) return new ScalarString("");
+            Tuple<string, string> tup = Program.GetCurrentSnapshot(root.ConvertToString());
+            return new ScalarString(tup.Item2?.Trim());
         }
 
         /// <summary>

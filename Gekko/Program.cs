@@ -2794,6 +2794,10 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                new Writeln("-1.96 --> " + M.Errorf(-1.96d));
+                new Writeln("0 --> " + M.Errorf(0d));
+                new Writeln("1.96 --> " + M.Errorf(1.96d));
+
                 if (Globals.runningOnTTComputer)
                 {
                     if (true)
@@ -10632,70 +10636,84 @@ namespace Gekko
         /// Reads the HEAD file in the .git directory to determine the current branch name. Does not handle worktrees!!
         /// Returns '...' for branch, 'tag: ...' for tag, or 'hash: ...' for commit. Example: 'main' for main branch.
         /// Returns null if nothing is found.
-        /// </summary>
-        /// <param name="gitMetadataPath">The absolute path to the Git metadata directory (e.g., C:\Repo\.git).</param>
-        /// <returns>The name of the current branch (e.g., "main"), or null if detached/error.</returns>
-        public static string GetCurrentBranchName(string path)
+        public static Tuple<string, string> GetCurrentSnapshot(string path)
         {
             string gitMetadataPath = Path.Combine(path, ".git");
 
             if (string.IsNullOrEmpty(gitMetadataPath) || !Directory.Exists(gitMetadataPath))
             {
-                new Error("Cannot find folder: " + gitMetadataPath);
+                return new Tuple<string, string>(null, null);
             }
 
             string headFilePath = Path.Combine(gitMetadataPath, "HEAD");
 
             if (!File.Exists(headFilePath))
             {
-                // This shouldn't happen in a valid repo, but check just in case.
-                //new Error("The HEAD file does not exist in folder: " + gitMetadataPath);
-                return null;
+                return new Tuple<string, string>(null, null);
             }
 
             try
             {
-                // Read the entire content of the HEAD file
                 string headContent = File.ReadAllText(headFilePath).Trim();
+                string commitHash = null;
+                string branchOrState = null;
 
-                // 1. Check for a tracked branch (e.g., "ref: refs/heads/main")
-                // This is the common case where the repo is on a named branch.
-                // Regex to match "ref: refs/heads/<branch_name>" and capture the branch_name
-                var branchMatch = Regex.Match(headContent, @"^ref:\s*refs/heads/(?<branchname>.+)$");
+                // 1. Check for a tracked branch (Attached HEAD: e.g., "ref: refs/heads/main")
+                var branchMatch = Regex.Match(headContent, @"^ref:\s*(?<refpath>refs/heads/(?<branchname>.+))$");
 
                 if (branchMatch.Success)
                 {
-                    // The branch name is everything captured after refs/heads/
-                    return branchMatch.Groups["branchname"].Value;
-                }
+                    // Attached HEAD: Get the branch name and the path to the file containing the hash
+                    string refPath = branchMatch.Groups["refpath"].Value;
+                    branchOrState = branchMatch.Groups["branchname"].Value;
 
-                // 2. Detached HEAD (e.g., a commit SHA-1 or tag)
-                // If the content is not a "ref:", it's likely a 7-40-character SHA-1 hash.
-                // You can optionally return the hash or a specific message.
-                if (Regex.IsMatch(headContent, @"^[0-9a-fA-F]{7,40}$"))
+                    string refFilePath = Path.Combine(gitMetadataPath, refPath);
+
+                    // Read the file containing the actual hash
+                    if (File.Exists(refFilePath))
+                    {
+                        commitHash = File.ReadAllText(refFilePath).Trim();
+                    }
+                }
+                else
                 {
-                    // The repository is in a detached HEAD state (e.g., checked out a commit or tag)
-                    return "hash: " + headContent;
+                    // 2. Detached HEAD (e.g., a direct 40-character SHA-1 hash)
+                    if (Regex.IsMatch(headContent, @"^[0-9a-fA-F]{40}$"))
+                    {
+                        branchOrState = "DETACHED_HEAD";
+                        commitHash = headContent;
+                    }
+                    // 3. Check for a tag reference (e.g., "ref: refs/tags/v1.0.0")
+                    else if (Regex.IsMatch(headContent, @"^ref:\s*(?<refpath>refs/tags/(?<tagname>.+))$"))
+                    {
+                        var tagMatch = Regex.Match(headContent, @"^ref:\s*(?<refpath>refs/tags/(?<tagname>.+))$");
+                        string refPath = tagMatch.Groups["refpath"].Value;
+                        branchOrState = $"TAG: {tagMatch.Groups["tagname"].Value}";
+
+                        string refFilePath = Path.Combine(gitMetadataPath, refPath);
+                        if (File.Exists(refFilePath))
+                        {
+                            // Note: For simplicity, we assume lightweight tag or annotated tag reference hash.
+                            commitHash = File.ReadAllText(refFilePath).Trim();
+                        }
+                    }
+                    else
+                    {
+                        branchOrState = "UNKNOWN_STATE";
+                    }
                 }
 
-                // 3. Check for tag reference
-                // Less common, but sometimes HEAD might point directly to a tag ref
-                var tagMatch = Regex.Match(headContent, @"^ref:\s*refs/tags/(?<tagname>.+)$");
-                if (tagMatch.Success)
-                {
-                    return $"tag: {tagMatch.Groups["tagname"].Value}";
-                }
-
-                // Fallback for unexpected content
-                return "(unknown state)";
+                // Return the final tuple
+                return new Tuple<string, string>(branchOrState, commitHash);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return null;
-                //new Error($"Error reading Git HEAD file: {ex.Message}");                
+                // Return a tuple indicating a read error
+                return new Tuple<string, string>("READ_ERROR", null);
             }
-            return null;
         }
+
+
 
         /// <summary>
         /// Helper method for the up/down fields in DECOMP and FLOW windows.
