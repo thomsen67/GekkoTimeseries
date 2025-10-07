@@ -528,7 +528,16 @@ namespace Gekko
             txt.AppendLine("set style line 103 lc rgb \"black\" lw " + Program.options.plot_png_scale);  //103 is just an id number, like 102
 
             txt.AppendLine("set size " + decompXZoom * zoom + "," + zoom + "");
-            txt.AppendLine("set encoding iso_8859_1");
+
+            if (G.Equal(Program.options.system_write_encoding, "utf8"))
+            {
+                txt.AppendLine("set encoding utf8");
+            }
+            else
+            {
+                txt.AppendLine("set encoding iso_8859_1");
+            }
+
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set datafile missing \"NaN\"");            
@@ -1278,7 +1287,7 @@ namespace Gekko
             }
 
             string fileName = path + "\\" + file2;
-            string exe = "wgnuplot51.exe";
+            string exe = "wgnuplot.exe";
 
             Process process = new Process();
             if (G.IsUnitTestingOrNotShowingGUI())

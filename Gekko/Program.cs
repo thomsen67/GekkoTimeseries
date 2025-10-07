@@ -2794,9 +2794,9 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("-1.96 --> " + M.Errorf(-1.96d));
-                new Writeln("0 --> " + M.Errorf(0d));
-                new Writeln("1.96 --> " + M.Errorf(1.96d));
+                //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
+                //new Writeln("0 --> " + M.Errorf(0d));
+                //new Writeln("1.96 --> " + M.Errorf(1.96d));
 
                 if (Globals.runningOnTTComputer)
                 {
