@@ -597,6 +597,15 @@ namespace Gekko
         [ProtoMember(27)]
         public string modelLargestLead;
 
+        [ProtoMember(28)]
+        public string user;
+        [ProtoMember(29)]
+        public string branch;
+        [ProtoMember(30)]
+        public string commit;
+        [ProtoMember(31)]
+        public string gcm;
+
         // ================= COMPARE =======================================================
 
         /// <summary>
@@ -606,6 +615,8 @@ namespace Gekko
         /// <returns></returns>
         public bool IsSame(DatabankCacheParams other)
         {
+            //??? should this also compare user, branch, commit and gcm ???
+            
             if (other == null) return false;
             //xlsx
             if (!G.Equal(this.cols, other.cols)) return false;

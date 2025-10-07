@@ -143,6 +143,8 @@ namespace Gekko
         public const bool traceEndoRhsFix1 = true;   //fix hall or mirrors for x[%t] = x[%t] + ...
         public const bool traceEndoRhsFix2 = true;   //fix for  x = 1; x = x + 1; x = x + 1; ...
 
+        public static bool gbkExtraMetadata = true;
+
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
         public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;

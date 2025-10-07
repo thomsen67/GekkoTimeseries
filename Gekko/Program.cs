@@ -7145,6 +7145,34 @@ namespace Gekko
                 string gekkoVersion = root.GetAttribute("gekkoVersion").Trim();
                 if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
 
+                if (Globals.gbkExtraMetadata)
+                {
+                    XmlNodeList users = doc.GetElementsByTagName("User");
+                    foreach (XmlNode user in users) //should be only 1 in this loop
+                    {
+                        readInfo.user = user.InnerText.Trim();
+                    }
+
+                    XmlNodeList branchs = doc.GetElementsByTagName("Branch");
+                    foreach (XmlNode branch in branchs) //should be only 1 in this loop
+                    {
+                        readInfo.branch = branch.InnerText.Trim();
+                    }
+
+                    XmlNodeList commits = doc.GetElementsByTagName("Commit");
+                    foreach (XmlNode commit in commits) //should be only 1 in this loop
+                    {
+                        readInfo.commit = commit.InnerText.Trim();
+                        if (!G.NullOrBlanks(readInfo.commit)) readInfo.commit = readInfo.commit.Length > 8 ? readInfo.commit.Substring(0, 8) : readInfo.commit;
+                    }
+
+                    XmlNodeList gcms = doc.GetElementsByTagName("Gcm");
+                    foreach (XmlNode gcm in gcms) //should be only 1 in this loop
+                    {
+                        readInfo.gcm = gcm.InnerText.Trim();
+                    }
+                }
+
                 if (!Globals.gbkVersions.Contains(databankVersion))
                 {
                     using (Error e = new Error())
@@ -7329,6 +7357,15 @@ namespace Gekko
                 cacheParameters.databankVersion = readInfo.databankVersion;
                 cacheParameters.info1 = readInfo.info1;
                 cacheParameters.date = readInfo.date;
+
+                if (Globals.gbkExtraMetadata)
+                {
+                    cacheParameters.user = readInfo.user;
+                    cacheParameters.branch = readInfo.branch;
+                    cacheParameters.commit = readInfo.commit;
+                    cacheParameters.gcm = readInfo.gcm;
+                }
+
                 cacheParameters.modelName = readInfo.modelName;
                 cacheParameters.modelInfo = readInfo.modelInfo;
                 cacheParameters.modelDate = readInfo.modelDate;
@@ -23920,7 +23957,41 @@ namespace Gekko
             XmlElement root = doc.CreateElement("DatabankInfo");
             root.SetAttribute("databankVersion", databankVersion);  //needs to be changed if Databank/Series change
             root.SetAttribute("traceVersion", traceVersion);  //needs to be changed if Databank/Series change
-            root.SetAttribute("gekkoVersion", Globals.gekkoVersion);
+            root.SetAttribute("gekkoVersion", Globals.gekkoVersion);            
+            if (Globals.gbkExtraMetadata)
+            {
+                try 
+                {                     
+                    XmlElement user = doc.CreateElement("User");                    
+                    user.InnerText = (Functions.user(null, null, null, new IVariable[] { }) as ScalarString).string2;
+                    root.AppendChild(user);
+                } 
+                catch { }
+                
+                try 
+                {                     
+                    XmlElement branch = doc.CreateElement("Branch");
+                    branch.InnerText = (Functions.branch(null, null, null, new IVariable[] { }) as ScalarString).string2;
+                    root.AppendChild(branch);
+                } 
+                catch { }
+                
+                try 
+                {                    
+                    XmlElement commit = doc.CreateElement("Commit");
+                    commit.InnerText = (Functions.commit(null, null, null, new IVariable[] { }) as ScalarString).string2;
+                    root.AppendChild(commit);
+                } 
+                catch { }
+                
+                try 
+                {                    
+                    XmlElement gcm = doc.CreateElement("Gcm");
+                    gcm.InnerText = (Functions.runfolder(null, null, null, new IVariable[] { }) as ScalarString).string2;
+                    root.AppendChild(gcm);
+                } 
+                catch { }
+            }
             doc.AppendChild(root);
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
@@ -34845,6 +34916,10 @@ namespace Gekko
             public string databankVersion = "";
             public string info1 = null;
             public string date;
+            public string user;
+            public string branch;
+            public string commit;
+            public string gcm;
             public string modelName;
             public string modelInfo;
             public string modelDate;
@@ -34897,6 +34972,29 @@ namespace Gekko
                 tab.CurRow.Next();
                 tab.CurRow.SetText(1, "Date     : " + date);
                 tab.CurRow.Next();
+                if (Globals.gbkExtraMetadata)
+                {
+                    if (!G.NullOrBlanks(this.user))
+                    {
+                        tab.CurRow.SetText(1, "User     : " + this.user);
+                        tab.CurRow.Next();
+                    }
+                    if (!G.NullOrBlanks(this.branch))
+                    {
+                        tab.CurRow.SetText(1, "Branch   : " + this.branch);
+                        tab.CurRow.Next();
+                    }
+                    if (!G.NullOrBlanks(this.branch))
+                    {
+                        tab.CurRow.SetText(1, "Commit   : " + this.commit);
+                        tab.CurRow.Next();
+                    }
+                    if (!G.NullOrBlanks(this.branch))
+                    {
+                        tab.CurRow.SetText(1, "Gcm      : " + this.gcm);
+                        tab.CurRow.Next();
+                    }
+                }
                 if (open)
                 {
                     tab.CurRow.SetText(1, "Open     : Opened " + fileNameNamePretty + " as '" + this.dbName + "'");

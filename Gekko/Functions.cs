@@ -7258,12 +7258,12 @@ namespace Gekko
             return Stringlist.CreateListFromStrings(Helper_DecomposeFullPath(s).ToArray());
         }
 
-        private static IVariable Helper_Runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable[] vars)
+        public static IVariable Helper_Runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable[] vars)
         {
             string function = "runfolder";        
             if (vars.Length > 1) new Error("Funtion " + function + "() only accepts 0 or 1 arguments");
             string gcm = Path.GetDirectoryName(Helper_GetExecutingGcm(smpl));
-            if (G.NullOrBlanks(gcm)) new Error("Failure in " + function + "(): it seems the function is not called from a .gcm file (cf. the RUN statement).");
+            //if (G.NullOrBlanks(gcm)) new Error("Failure in " + function + "(): it seems the function is not called from a .gcm file (cf. the RUN statement).");
 
             if (vars.Length == 0)
             {                
