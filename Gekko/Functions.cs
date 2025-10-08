@@ -7232,8 +7232,7 @@ namespace Gekko
         public static IVariable runfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
             if (vars.Length > 0) new Error("Funtion runfile() only accepts 0 arguments");
-            string gcm = Path.GetFileName(Helper_GetExecutingGcm(smpl));
-            if (G.NullOrBlanks(gcm)) new Error("Failure in runfile(): it seems the function is not called from a .gcm file (cf. the RUN statement).");            
+            string gcm = Path.GetFileName(smpl?.p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence)); //Since it is RUNfile(), it must be okay to find an executing .gcm file, and not return a proc/func.
             return new ScalarString(gcm?.Trim());            
         }
 
@@ -7241,7 +7240,17 @@ namespace Gekko
         {
             return Helper_Runfolder(smpl, _t1, _t2, vars);
         }
-        
+
+        //public static IVariable xxx(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        //{
+        //    return new ScalarString(smpl?.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc));
+        //}
+
+        //public static IVariable yyy(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
+        //{
+        //    return new ScalarString(smpl?.p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncCheckExistence));
+        //}
+
 
         /// <summary>
         /// Chops up a part as a list of strings.
@@ -7262,21 +7271,21 @@ namespace Gekko
         {
             string function = "runfolder";        
             if (vars.Length > 1) new Error("Funtion " + function + "() only accepts 0 or 1 arguments");
-            string gcm = Path.GetDirectoryName(Helper_GetExecutingGcm(smpl));
-            //if (G.NullOrBlanks(gcm)) new Error("Failure in " + function + "(): it seems the function is not called from a .gcm file (cf. the RUN statement).");
+            string gcm = smpl?.p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence); //Since it is RUNfolder(), it must be okay to find an executing .gcm file, and not return a proc/func.
+            string gcmFolder = Path.GetDirectoryName(gcm);
 
             if (vars.Length == 0)
             {                
-                return new ScalarString(gcm?.Trim());                
+                return new ScalarString(gcmFolder?.Trim());                
             }
             else
             {
                 if (G.Equal(vars[0].ConvertToString(), "rel"))
                 {
                     string root = Functions.root(smpl, _t1, _t2, new IVariable[] { }).ConvertToString();
-                    int index = gcm.IndexOf(root, StringComparison.OrdinalIgnoreCase);
-                    if (index == -1) new Error("The root '" + root + "' is not contained inside the executing gcm '" + gcm + "'");
-                    string gcm2 = gcm.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
+                    int index = gcmFolder.IndexOf(root, StringComparison.OrdinalIgnoreCase);
+                    if (index == -1) new Error("The root '" + root + "' is not contained inside the executing gcm '" + gcmFolder + "'");
+                    string gcm2 = gcmFolder.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
                     return new ScalarString(gcm2);                    
                 }
                 else new Error("Expected argument 'rel'");
@@ -7406,7 +7415,7 @@ namespace Gekko
                 if (dir1.EndsWith("\\")) dir1 = dir1.Remove(dir1.Length - 1);
 
                 //now we test that the executing gcm (if any) is consistent with this root
-                string gcm = Helper_GetExecutingGcm(smpl);
+                string gcm = smpl?.p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncCheckExistence);
                 if (gcm != null)
                 {
                     string folder2 = Path.GetDirectoryName(gcm);
@@ -7447,14 +7456,6 @@ namespace Gekko
                 }
             }
             return null;  //because of errors we never get here
-        }
-
-        private static string Helper_GetExecutingGcm(GekkoSmpl smpl)
-        {
-            if (smpl == null) return null;
-            P p = smpl.p;
-            string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(false, true); //p may be null, and method may return null            
-            return gcm;
         }
 
         private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)

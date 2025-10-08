@@ -864,7 +864,7 @@ namespace Gekko
             {
                 if (p != null)
                 {
-                    string file = p.GetExecutingGcmFile(false, true);
+                    string file = p.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncCheckExistence);
                     string file3 = Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
                     if (!G.Equal(file, file3))
                     {
@@ -7401,7 +7401,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = this.gekkocode + ";";
                         trace.GetContents().name = lhs.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(true, true);
+                        trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                         trace.AddRangeFromSeries2(lhs, rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
@@ -7455,7 +7455,7 @@ namespace Gekko
                         DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(true, true);
+                        trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                         int counter = 0;
                         foreach (IVariable iv in this.rhs.list)
                         {
@@ -8591,7 +8591,7 @@ namespace Gekko
                             Trace2 trace = new Trace2(ETraceType.Normal, this.t1, this.t2);
                             trace.GetContents().text = this.gekkocode + ";";
                             trace.GetContents().name = ts.GetNameAndParentDatabank();
-                            trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(true, true);
+                            trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                             //trace can only have null period if TRUNCATE is call with null period --> not possible
                             Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
@@ -9530,7 +9530,7 @@ namespace Gekko
                             Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast(), true);
                             trace.GetContents().text = this.gekkocode + ";";                            
                             trace.GetContents().name = tsNew.GetNameAndParentDatabank();
-                            trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(true, true);
+                            trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                             //trace can only have null period if lhs has all missing values
                             Gekko.Trace2.PushIntoSeries(tsNew, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                             Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch

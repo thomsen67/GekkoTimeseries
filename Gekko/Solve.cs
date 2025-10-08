@@ -2153,7 +2153,7 @@ namespace Gekko
                             Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
                             trace.GetContents().text = src;
                             trace.GetContents().name = ts.GetNameAndParentDatabank();
-                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true, true);
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                             //trace can only have null period if SIM period is null --> not possible
                             Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling, false);
                             Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
