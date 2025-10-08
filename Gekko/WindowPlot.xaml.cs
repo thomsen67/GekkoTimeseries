@@ -414,12 +414,7 @@ namespace Gekko
         }
 
         private void CopySvg()
-        {
-            // Copy the .svg file to the clipboard for use in e.g. Word
-            //string[] ss = new string[1];
-            //ss[0] = this.graphOptions.emfName;
-            //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
-            //Clipboard.SetDataObject(iData, true);
+        {            
             try
             {
                 string inputName = null;
@@ -435,17 +430,10 @@ namespace Gekko
         private void CopyPng()
         {
             try
-            {
-                string inputName = null;                
-                inputName = "temp.png";  //to indicate .png type                
+            {                             
+                string inputName = System.IO.Path.Combine(Globals.localTempFilesLocationGnuplot, "tempfiles", "temp.png");  //to indicate .png type                
                 string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
-
-                //Copy the .emf file to the clipboard for use in e.g. Word
-                //string[] ss = new string[1];
-                //ss[0] = this.graphOptions.emfName;
-                //IDataObject iData = new DataObject(DataFormats.FileDrop, ss);
-                //Clipboard.SetDataObject(iData, true);
-
+                
                 using (System.Drawing.Image image = System.Drawing.Image.FromFile(plotName))
                 {
                     System.Windows.Forms.Clipboard.SetImage(image);
@@ -461,7 +449,7 @@ namespace Gekko
         {
             try
             {
-                string inputName = "temp.emf";
+                string inputName = System.IO.Path.Combine(Globals.localTempFilesLocationGnuplot, "tempfiles", "temp.emf");  //to indicate .png type               
                 string plotName = CreatePlotFileInBackground(Globals.guiPlotFontScaling, Globals.guiPlotSizeScaling, inputName);
                 if (true)
                 {

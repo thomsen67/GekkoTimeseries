@@ -1070,7 +1070,11 @@ namespace Gekko
             {
                 string fileNameWithPath = Program.CreateFullPathAndFileName(o.opt_filename);
                 Program.WaitForFileCopy(emfName, fileNameWithPath);
-                G.Writeln2("PLOT created file " + fileNameWithPath);
+                if (!fileNameWithPath.StartsWith(Globals.localTempFilesLocationGnuplot, StringComparison.OrdinalIgnoreCase))
+                {
+                    //The if avoids this printing when hitting the copy button in the PLOT window.
+                    G.Writeln2("PLOT created file " + fileNameWithPath);
+                }
                 return;
             }
 
