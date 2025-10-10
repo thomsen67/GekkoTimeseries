@@ -561,20 +561,54 @@ namespace Gekko
                 if (G.Equal(extension, "pdf"))
                 {
                     terminalSize = " size 4, 3";  //default is 5 x 3 inches, too wide.
-                }                
+                }
+                if (G.Equal(extension, "pdf"))
+                {
+                    extra2 = "cairo";
+                }
             }
             else
             {
                 fontsize = 0.75 * fontsize;
                 if (G.Equal(extension, "png"))
-                {
-                    //It seems default for "set terminal png" is "set terminal pngcairo" (better quality). So no need for extra2.
+                {                    
                     terminalSize = " size " + 640 * Program.options.plot_png_scale + "," + 480 * Program.options.plot_png_scale;  //Seems 640x 480 is default for png. Must have size it here for scaling.
-                    fontsize = Program.options.plot_png_scale * fontsize;                    
+                    fontsize = Program.options.plot_png_scale * fontsize;
+                    extra2 = "cairo";
                 }
             }
-                        
-            txt.AppendLine("set terminal " + extension + extra2 + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + terminalSize + decompSvgSize);
+
+            //decompSvgSize may override
+            if (o.opt_filename != null && o.opt_filename.IndexOf(Globals.localTempFilesLocationGnuplot + "\\tempfiles") == -1)
+            {
+                if (G.Equal(extension, "emf") && !G.NullOrBlanks(Program.options.plot_emf_size)) terminalSize = "size " + Program.options.plot_emf_size;
+                else if (G.Equal(extension, "png") && !G.NullOrBlanks(Program.options.plot_png_size))
+                {
+                    string[] parts = Program.options.plot_png_size.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (parts.Length != 2)
+                    {                        
+                        new Error("Option 'plot_png_size' cannot be understood as two comma-separated figures.");
+                    }
+
+                    double figure1, figure2;
+                    if (!double.TryParse(parts[0].Trim(), out figure1))
+                    {
+                        new Error("Option 'plot_png_size' cannot be understood as two comma-separated figures.");
+                    }
+                    if (!double.TryParse(parts[1].Trim(), out figure2))
+                    {
+                        new Error("Option 'plot_png_size' cannot be understood as two comma-separated figures.");
+                    }                    
+                    double result1 = figure1 * Program.options.plot_png_scale;
+                    double result2 = figure2 * Program.options.plot_png_scale;
+                    string png_size = "" + (int)result1 + "," + (int)result2;
+                    terminalSize = "size " + png_size;
+                }
+                else if (G.Equal(extension, "pdf") && !G.NullOrBlanks(Program.options.plot_pdf_size)) terminalSize = "size " + Program.options.plot_pdf_size;
+                else if (G.Equal(extension, "svg") && !G.NullOrBlanks(Program.options.plot_svg_size)) terminalSize = "size " + Program.options.plot_svg_size;
+            }
+            txt.AppendLine("set terminal " + extension + extra2 + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + terminalSize + decompSvgSize);            
 
             string graphFileName = file2;
             if (o.isBrowser) graphFileName = o.browserPath.Replace("\\", "\\\\");

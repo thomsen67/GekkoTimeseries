@@ -2159,6 +2159,7 @@ namespace Gekko
                 List<O.Prt.Element> container = new List<O.Prt.Element>();                
 
                 PlotTable plotTable = new PlotTable();
+                plotTable.hasAtLeast1RealNumber = true;  //We assume at least 1 non-missing. If not set to true, an yrange of [-1; 1] would be set...
                 plotTable.dates = new List<List<double>>();
                 plotTable.values = new List<List<double>>();
                 

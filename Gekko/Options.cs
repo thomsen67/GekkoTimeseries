@@ -186,15 +186,19 @@ namespace Gekko
         // ---
         public int plot_all_dash_order = 1; //1 = default, //0=none | 1=1,3,2 | 2=1,2,3 | 3=3,1,2 | 4=2,1,3 | 5=3,2,1 | 6=2,3,1
         public string plot_decimalseparator = "period";  //comma|period
-        public int plot_elements_max = 200;        
+        public int plot_elements_max = 200;
+        public string plot_emf_size = ""; //may override if exact pixel size is needed, when producing files
         public bool plot_lines_points = true;
         public string plot_palette = "gekko";  //gekko | dream | excel
+        public string plot_pdf_size = ""; //may override if exact pixel size is needed, when producing files
         public double plot_png_scale = 3;  //1 gives 640 x 480 (used in Gekko < 3.1.1). With 3 we get 1920 on x axis, so if on paper it is 6 inch wide (15 cm) it would have about 300 dpi. Graphs are often not that wide in eg Word, so factor 3 should be more than enough. If a .svg is dragged into Word, an internal .png is actually generated, with resolution 2500 x 2000, so even bigger (corresponds to factor 4). Therefore, using svg gives even larger .docx files than using .png with factor 3.
+        public string plot_png_size = ""; //may override if exact pixel size is needed, when producing files
+        public string plot_svg_size = ""; //may override if exact pixel size is needed, when producing files
         public string plot_using = ""; //a global template
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type
-        public int plot_zoom_dpiscale = 0; // zooming of fonts. If 0 it is ignored.
+        public int plot_zoom_dpiscale = 0; // zooming of fonts. If 0 it is ignored.        
         // ---
         public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
@@ -511,10 +515,14 @@ namespace Gekko
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
             Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");
             Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
-            Add("PLOT ELEMENTS MAX", Globals.xint);            
+            Add("PLOT ELEMENTS MAX", Globals.xint);
+            Add("PLOT EMF SIZE", Globals.xstring);
             Add("PLOT LINES POINTS", Globals.xbool);
             Add("PLOT PALETTE", Globals.xnameOrString, "gekko", "excel", "dream");
+            Add("PLOT PDF SIZE", Globals.xstring);
             Add("PLOT PNG SCALE", Globals.xval);
+            Add("PLOT PNG SIZE", Globals.xstring);
+            Add("PLOT SVG SIZE", Globals.xstring);
             Add("PLOT USING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
             Add("PLOT XLABELS DIGITS", Globals.xint);
