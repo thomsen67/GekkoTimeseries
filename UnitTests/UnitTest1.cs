@@ -14977,6 +14977,29 @@ namespace UnitTests
             }
         }
 
+
+        [TestMethod]
+        public void _Test_TraceBank1()
+        {
+            //Good test of traces, trace logic, and tracebank() function. Taken from help system.
+            I("open <edit> b; clear b;");
+            I("x1 = 1;");
+            I("x2 = x1 + 2;");
+            I("close b;");
+            I("open b;");
+            I("y1 = 1 + b:x1;");
+            I("y2 = y1 + 2 + b:x2;");
+            I("#i1 = tracebank('y2', 'b', 'precedents');");
+            I("#i2 = tracebank('y2', 'b', 'precedents1');");
+            I("#i3 = tracebank('x1', 'b', 'dependents');");
+            I("#i4 = tracebank('x1', 'b', 'dependents1');");
+            _AssertListString(First(), "#i1", new StringOrList("x1!a", "x2!a"));
+            _AssertListString(First(), "#i2", new StringOrList("x2!a"));
+            _AssertListString(First(), "#i3", new StringOrList("y1!a", "y2!a"));
+            _AssertListString(First(), "#i4", new StringOrList("y1!a"));            
+        }
+
+
         [TestMethod]
         public void _Test_TracePowerPointExample()
         {

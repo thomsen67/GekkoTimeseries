@@ -1083,7 +1083,7 @@ img {border-style: none;
                     tekst1 = varnavn[i];
                     if (tekst1.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
                     {
-                        if (tekst1.toUpperCase() != tekst.toUpperCase())
+                        if (tekst1.toUpperCase() != tekst.toUpperCase()) /* unclear why they may not be identical...? */
                         {
                             fundet = true;
                             " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
@@ -1533,7 +1533,7 @@ img {border-style: none;
               text = document.form1.text.value;
               found = 0;
 
-              const myRegex = createRegexFromWildcard(text);
+              const myRegex = createRegexFromWildcard(text.replace(/ /g, '')); /* replace blanks with nothing, so that x[i, j, *] becomes x[i,j,*]. */
               
               let html = '';
               for (var i = 0; i < number; i++)

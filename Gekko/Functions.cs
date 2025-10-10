@@ -6419,6 +6419,8 @@ namespace Gekko
                         //dependents                    
                         found = Program.TraceGetDependents(ivName, bankname, direct);
                     }
+                    names = found.Keys.ToList();
+                    names.Sort(StringComparer.OrdinalIgnoreCase);
                 }
                 else
                 {
