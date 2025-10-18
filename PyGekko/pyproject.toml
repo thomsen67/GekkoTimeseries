@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+# Tell hatch where to find the package
+packages = ["src/pygekko"]
+
+[tool.hatch.version]  
+path = "src/pygekko/__init__.py"
+
+[project]
+name = "pygekko"
+authors = [
+  { name="Thomas Thomsen" },
+]
+description = "PyGekko: Gekko Timeseries and Modeling Software for Python"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C#",
+    "Operating System :: Microsoft :: Windows",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+dynamic = ["version"]
+dependencies = [
+    "pythonnet >=3.0.1, <4.0.0"
+]
+
+[project.urls]
+Homepage = "https://t-t.dk/gekko"
+Repository = "https://github.com/thomsen67/GekkoTimeseries"
+
