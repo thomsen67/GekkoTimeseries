@@ -25,8 +25,16 @@ classifiers = [
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 dynamic = ["version"]
-dependencies = [
-    "pythonnet >=3.0.1, <4.0.0"
+dependencies = [            
+    # dependencies: 'win32' signifies any Windows version, also 64-bit. Then 'AMD64' restricts to 64-bit.
+    # dependencies: On Linux/Mac or on 32-bit, pythonnet will not install, and the user will get an ImportError if trying to use PyGekko.
+    "pythonnet >=3.0.1, <4.0.0 ; sys_platform == 'win32' and platform_machine == 'AMD64'",
+]
+
+[tool.setuptools.package-data]
+mypackage = [
+    "native/win-x64/*.*",
+    "native/win-x86/*.*"
 ]
 
 [project.urls]
