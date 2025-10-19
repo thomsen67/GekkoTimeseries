@@ -1,7 +1,44 @@
-# Gekko Timeseries And Modeling Software
-PyGekko is a Python package for Gekko. Gekko is for timeseries handling, and solving and analyzing large-scale economic models. The Gekko package only works for Python versions 3.11, 3.12 and 3.13 (because Python.NET only supports these versions).
+# ![Gekko logo](Gekko.png) Gekko Timeseries And Modeling Software
+PyGekko is a Python package for Gekko. Gekko is an open-source time-series oriented software package for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. You may install the PyGekko package with (requires Python 3.11-3.13 and Windows):
 
-Gekko is an open-source time-series oriented software package for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. Since 2009, Gekko is being used by Danish ministeries, banks, interest groups and universities, for the simulation of economic and energy-related models. It is also used to show and analyze GAMS models. The software runs under Windows (.NET), and is licenced under GNU GPL.
+    pip install pygekko
+
+Following this, you may for instance use PyGekko like this:
+
+    import pygekko as pg
+    t1 = 2021
+    t2 = 2023
+    pg.run("reset;")
+    pg.run(f"time {t1} {t2};")
+    pg.run("x1 = 2, 3, 4;")
+    pg.run("x2 = 7, 5, 6;")
+    pg.run("y = x1 + x2;")
+    pg.run("prt x1, x2, x1/y;")
+
+In general, at the moment, you call Gekko through text strings, with the run() function. Output will be shown in the Python terminal, in this case:
+
+                     x1         %             x2         %           x1/y         % 
+    2021         2.0000         M         7.0000         M         0.2222         M
+    2022         3.0000     50.00         5.0000    -28.57         0.3750     68.75
+    2023         4.0000     33.33         6.0000     20.00         0.4000      6.67
+
+## Disclaimers
+The PyGekko 0.0.x versions are purely experimental, and use an experimental Gekko 3.3.x version internally. Regarding more professional use, please wait until an official PyGekko 3.3.x version is released, which will indicate that the Gekko interface is considered stable/mature (in the longer run, PyGekko version numbers will follow Gekko version numbers). Such a PyGekko 3.3.x release is expected before the end of 2025.
+
+## Requirements
+The Gekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python.NET only works under Windows and only supports Python 3.11-3.13, and 32-bit Windows is not supported as of yet).
+
+## Gekko links
+* [Gekko main homepage](http://www.t-t.dk/gekko)
+* [GitHub repository](https://github.com/thomsen67/GekkoTimeseries)
+* [Gekko help pages](http://t-t.dk/gekko/docs/user-manual/index.html)
+* [New features (3.2)](http://t-t.dk/gekko/docs/user-manual/index.html?i_new_features.htm)
+
+## Contributing + source code
+See the GitHub repository.
+
+## More info
+Since 2009, Gekko is being used by Danish ministeries, banks, interest groups and universities, for the simulation of economic and energy-related models. It is also used to show and analyze GAMS models. The software runs under Windows (.NET), and is licenced under GNU GPL.
 
 Some features:
 * Timeseries-oriented software, with flexible databanks. Suitable data handling/wrangling and modeling, etc.
@@ -21,11 +58,3 @@ Some features:
 * Used by Statistics Denmark, Ministry of Finance, Ministry for Economic Affairs, Danish Economic Councils, the central bank of Denmark, institutions, universities and more.
 * Easy installation by means of a all-inclusive Windows installer, or manually by means of a zip-file with gekko.exe etc.
 * Open source. No licenses to compilers etc. -- everything used is C#/.NET (+ gnuplot and x12a). So everything is open-source, and therefore free of charge.
-
-## More Gekko info:
-* [Gekko main homepage](http://www.t-t.dk/gekko)
-* [New features (3.2)](http://t-t.dk/gekko/docs/user-manual/index.html?i_new_features.htm)
-* [Releases on GitHub](https://github.com/thomsen67/GekkoTimeseries/releases)
-
-## Contributing + source code
-* See the GitHub repository.
