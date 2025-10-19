@@ -2234,7 +2234,17 @@ namespace Gekko
             List<string> folders = new List<string>();
             if (Program.options.interface_help_copylocal) folders.Add(Globals.localTempFilesLocation + "\\"); //try here first, the file is copied from the path below (helpful if StartupPath is on a network drive)
             folders.Add(Program.options.folder_help);  //looks here first, will actually before anything else look in working folder (which should not contain any help files)
-            folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
+
+            if (G.IsUnitTestingOrNotShowingGUI())
+            {
+                //Gekko 4.0: Probably always right, instead of the one in the else clause.
+                //This is intended to make pg.run("help;") work in Python
+                folders.Add(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\helpfiles\\");
+            }
+            else
+            {
+                folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
+            }            
 
             FindFileHelper ffh = Program.FindFile("gekko.chm", folders, true, false, false, true, null);  //calls CreateFullPathAndFileName()
             string path = ffh.realPathAndFileName;

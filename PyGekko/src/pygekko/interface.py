@@ -44,6 +44,8 @@ def runfile(s: str):
     type_checks.is_string(s)
     python.RunFile(s)
 
-
-
-
+def wait():    
+    """
+    Used at the end of a .py file to keep Gekko windows open
+    """      
+    python.Wait()       

@@ -1,7 +1,7 @@
 __version__ = "0.0.2" # always increment with new upload to PyPI
 
-from .interface import run, threads
 from . import type_checks
+from .interface import run, wait
 
 # Regarding helper functions like decomp():
 # In C#.NET (Python.cs) there is this method: 
@@ -16,17 +16,27 @@ def decomp(*args, **kwargs):
     Gekko DECOMP statement
     """  
     if False: 
+        # A possible direct call...
         interface.python.Decomp(*args, **kwargs)
     else:        
+        # Using a string call
         type_checks.length(args, 1); type_checks.is_string(args[0])
         t = op = from1 = endo = ""
-        if 't' in kwargs: 
-            tt = kwargs['t']
-            type_checks.length(tt, 2)
-            t = f"{tt[0]} {tt[1]}"
-        if 'op' in kwargs: op = f"{kwargs['op']}"
-        if 'from_' in kwargs: from1 = f"from {kwargs['from_']}" # 'from' is not allowed as kwarg
-        if 'endo' in kwargs: endo = f"endo {kwargs['from']}"        
+        for key, value in kwargs.items():        
+            if key == 't':
+                tt = kwargs['t']
+                type_checks.length(tt, 2)
+                t = f"{tt[0]} {tt[1]}"
+            elif key == 'op': 
+                op = f"{kwargs['op']}"
+            elif key == 'from': 
+                raise SyntaxError("Use 'from_=...' instead of 'from=...'")
+            elif key == 'from_': 
+                from1 = f"from {strings_to_string(kwargs['from_'])}" # 'from' is not allowed as kwarg
+            elif key == 'endo': 
+                endo = f"endo {strings_to_string(kwargs['endo'])}"
+            else:
+                raise SyntaxError(f"Keyword '{key}' not implemented")
         s = f"decomp <{t} {op}> {args[0]} {from1} {endo};"
         interface.run(s)
 
@@ -34,23 +44,58 @@ def plot(*args, **kwargs):
     """
     Gekko PLOT statement
     """      
-    if False: 
-        interface.python.Decomp(*args, **kwargs)
+    #type_checks.length(args, 1); type_checks.is_list_of_strings(args[0])
+    vars = strings_or_values_to_string(args[0])
+    t = op = ""
+    for key, value in kwargs.items():        
+        if key == 't':
+            tt = kwargs['t']
+            type_checks.length(tt, 2)
+            t = f"{tt[0]} {tt[1]}"
+        elif key == 'op': 
+            op = f"{kwargs['op']}"        
+        else:
+            raise SyntaxError(f"Keyword '{key}' not implemented")
+        s = f"plot <{t} {op}> {vars};"
+    interface.run(s)
+
+def strings_or_values_to_string(x):
+    """
+    Transforms a single value (str, int, float) or a list of these values 
+    into a comma-separated string. So "x" --> "x", "[2, "x", 3.5]" --> "2, x, 3.5".
+    """    
+    if isinstance(x, list):
+        result = ""
+        for s in x:     
+            if not isinstance(s, (str, int, float)): 
+                raise TypeError(f"Input must be a string, integer, float, or a list thereof")
+        string_list = [str(item) for item in x]
+        result = ", ".join(string_list)            
+    elif isinstance(x, (str, int, float)):        
+        result = str(x)            
     else:        
-        type_checks.positional_args(args, 1)        
-        type_checks.is_string(args[0])
-        op = kwargs['op']
-        t = kwargs['t']        
-        eq = kwargs['eq']
-        s = f"decomp <{t[0]} {t[1]} {op}> {args[0]} from {eq};"
-        print(s)
-        interface.run(s)
+        raise TypeError(f"Input must be a string, integer, float, or a list thereof")
+    return result
 
 
+def strings_to_string(x):
+    """
+    Transforms a single string or a list of these
+    into a comma-separated string. So "x" --> "x", "["x", "y"]" --> "x, y".
+    """    
+    if isinstance(x, list):
+        result = ""
+        for s in x:     
+            if not isinstance(s, str): 
+                raise TypeError(f"Input must be a string or a list thereof")
+        string_list = [str(item) for item in x]
+        result = ", ".join(string_list)            
+    elif isinstance(x, str):        
+        result = str(x)            
+    else:        
+        raise TypeError(f"Input must be a string or a list thereof")
+    return result
 
 
-
-
-
-
+    
 
