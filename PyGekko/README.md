@@ -1,32 +1,41 @@
-# ![Gekko logo](Gekko.png) Gekko Timeseries And Modeling Software
-PyGekko is a Python package for Gekko. Gekko is an open-source time-series oriented software package for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. You may install the PyGekko package with (requires Python 3.11-3.13 and Windows):
+# ![](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/PyGekko/Gekko.png) Gekko Timeseries And Modeling Software
+PyGekko is a Python package for Gekko. Gekko is open-source time-series oriented software for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. You may install the PyGekko package with the following (Windows, Python 3.11-3.13):
 
     pip install pygekko
 
-Following this, you may for instance use PyGekko like this:
+Subsequently, you may for instance use PyGekko like this:
 
-    import pygekko as pg
-    t1 = 2021
-    t2 = 2023
-    pg.run("reset;")
-    pg.run(f"time {t1} {t2};")
-    pg.run("x1 = 2, 3, 4;")
-    pg.run("x2 = 7, 5, 6;")
-    pg.run("y = x1 + x2;")
-    pg.run("prt x1, x2, x1/y;")
+```python
+import pygekko as pg
+t1 = 2021
+t2 = 2023
+pg.run("reset;")
+pg.run(f"time {t1} {t2};")
+pg.run("x1 = 2, 3, 4;")
+pg.run("x2 = 7, 5, 6;")
+pg.run("y = x1 + x2;")
+pg.run("prt x1, x2, x1/y;")
+```
 
-In general, at the moment, you call Gekko through text strings, with the run() function. Output will be shown in the Python terminal, in this case:
+In general, at the moment, you call Gekko through text strings, with the `.run()` function. Output will be shown in the Python terminal, in this case:
 
                      x1         %             x2         %           x1/y         % 
     2021         2.0000         M         7.0000         M         0.2222         M
     2022         3.0000     50.00         5.0000    -28.57         0.3750     68.75
     2023         4.0000     33.33         6.0000     20.00         0.4000      6.67
 
+## Looks
+The following is how the Gekko stand-alone application looks. PyGekko does not show the main Gekko window, but can show other windows like plot, decomp, flowgraph, data-trace viewer, etc. As mentioned later on, you may have to end your Python program with a `pg.wait()` to make the Gekko windows stay open.
+
+[![Main window](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/Diverse/gekko_windows2.png "Main window")](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/Diverse/gekko_windows1.png "Main window")
+
 ## Disclaimers
 The PyGekko 0.0.x versions are purely experimental, and use an experimental Gekko 3.3.x version internally. Regarding more professional use, please wait until an official PyGekko 3.3.x version is released, which will indicate that the Gekko interface is considered stable/mature (in the longer run, PyGekko version numbers will follow Gekko version numbers). Such a PyGekko 3.3.x release is expected before the end of 2025.
 
+When you open up Gekko windows like for instance the plot window (for instance with `pg.run("plot x1, x2, x1/y;"`), you may put a `pg.wait()` at the end of your Python program to make the window(s) stay open (otherwise Python takes theses windows down when it finishes).
+
 ## Requirements
-The Gekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python 3.11 was released in October 2022). PyGekko uses Python.NET under the hood, which only works for Windows and does not yet support Python 3.14+ (released in October 2025). PyGekko support for Python < 3.11 could be provided if there is sufficient interest. Windows 32-bit is no longer supported
+The Gekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python 3.11 was released in October 2022). PyGekko uses the Python.NET package under the hood, which only works for Windows and does not yet support Python 3.14 (released in October 2025). PyGekko support for Python < 3.11 could be provided if there is sufficient interest. Windows 32-bit is no longer supported
 for newer Gekko versions 3.3.x, and hence is not supported for PyGekko either. PyGekko is set up
 to use the .NET Framework (not .NET Core) with version at least 4.6.1. If a normal
 Gekko version can run on your Windows 64-bit pc, so should PyGekko (because it uses the same
@@ -40,6 +49,11 @@ Gekko version can run on your Windows 64-bit pc, so should PyGekko (because it u
 
 ## Contributing + source code
 See the GitHub repository.
+
+## Roadmap
+Among other things, it is expected that the string-based interface will gradually be supplemented with a more proper Python-function interface, for instance supplementing the string-based `pg.run(f"decomp <{t1} {t2} {op}> qBNP from E_qBNP;")` with an in-built `pg.decomp()` function providing a more Pythonic `pg.decomp("qBNP", t=[t1, t2], op=op, from_="E_qBNP")`.
+
+Regarding Python and PyGekko, see much more details in [this roadmap](https://www.t-t.dk/gekko/docs/blueprints/Gekko_Roadmap_2025.pdf).
 
 ## More info
 Since 2009, Gekko is being used by Danish ministeries, banks, interest groups and universities, for the simulation of economic and energy-related models. It is also used to show and analyze GAMS models. The software runs under Windows (.NET), and is licenced under GNU GPL.
