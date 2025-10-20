@@ -42,6 +42,7 @@ tokens {
 	ASTDECOMPLINK1;
 	ASTDECOMPWHERE2;
     ASTDECOMPFROM;
+    ASTDECOMPTYPE;
     ASTDECOMPENDO;
 	ASTDECOMPCOLS;
 	ASTDECOMPROWS;
@@ -406,6 +407,7 @@ ASTCOMPARE2;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
     ASTFINDMISSINGDATA;	
+    ASTFLOW;
     ASTYOY;
 	ASTPREDICT;
     ASTFIND;
@@ -1187,6 +1189,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    FLOW      = 'FLOW'     ;   
     META = 'META';
     ECHO = 'ECHO';
     OBS = 'OBS';
@@ -1858,6 +1861,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("flow"               , FLOW  );
                                         d.Add("meta"               , META  );
                                         d.Add("echo"               , ECHO  );
                                         d.Add("obs"               , OBS  );
@@ -3038,8 +3042,10 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 // DECOMP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-decomp:                    	DECOMP decompOpt1? decompVar1Simple decompFrom? decompEndo? decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom?) ^(ASTDECOMPENDO decompEndo?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
+decomp:                    	decompHelper decompOpt1? decompVar1Simple decompFrom? decompEndo? decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple) ^(ASTDECOMPFROM decompFrom?) ^(ASTDECOMPENDO decompEndo?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?) ^(ASTDECOMPTYPE decompHelper))
                             ;
+
+decompHelper:				DECOMP | FLOW;
 
 seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
 seqOfBankvarnamesAlias:     seqOfBankvarnames;
@@ -4404,6 +4410,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  FLOW|
   META|
   ECHO|
   OBS|

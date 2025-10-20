@@ -8902,6 +8902,7 @@ namespace Gekko
             public string expressionCs = null;
             public Func<GekkoSmpl, IVariable> expression = null;            
             public string label = null;
+            public bool isFlowStatement = false; //Is put into decompFind.isFlowStatement.
             public IVariable name = null;  //name given from ASTDECOMPITEMS2, is only active if DECOMP x, DECOM x[a] and the like (a name, no expression)
             public List<List<IVariable>> where = new List<List<IVariable>>();
             public List<List<IVariable>> group = new List<List<IVariable>>();            

@@ -350,18 +350,23 @@ namespace Gekko
                             DecompFind decompFindHere = this.decompFind;
                             DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
                             decompFindHereChild.decompOptions2.guiFlowName = G.HandleBlanksRemove(name);
-                            Thread thread = new Thread(new ParameterizedThreadStart(CreateWindowFlow));
-                            thread.Name = "Flow";
-                            thread.SetApartmentState(ApartmentState.STA);
-                            thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                            thread.IsBackground = true;
-                            thread.Start(decompFindHereChild);
+                            CallFlowGraph(decompFindHereChild);                            
                         }
                     }
                     e.Handled = true;
                 }
             }
             catch { }
+        }
+
+        public static void CallFlowGraph(DecompFind decompFind)
+        {
+            Thread thread = new Thread(new ParameterizedThreadStart(WindowFlow.CreateWindowFlow));
+            thread.Name = "Flow";
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            thread.IsBackground = true;
+            thread.Start(decompFind);
         }
 
         private void SetViewMenu(Menu mainMenu)

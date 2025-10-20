@@ -708,6 +708,7 @@ namespace Gekko
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
             }
+            o.decompFind.isFlowStatement = o.isFlowStatement;
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
             if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
@@ -2650,52 +2651,63 @@ namespace Gekko
         private static void CreateDecompWindow(object o2)
         {            
             DecompFind decompFind = o2 as DecompFind;
-            WindowDecomp windowDecomp = null;
 
-            try
+            if (decompFind.isFlowStatement && decompFind.depth == 0)
             {
-                windowDecomp = new WindowDecomp(decompFind);
-                windowDecomp.decompFind.SetWindow(windowDecomp);
-                Globals.windowsDecomp2.Add(windowDecomp);
-                windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-                windowDecomp.SetRadioButtons();
-                windowDecomp.isInitializing = false;                
-                
-                windowDecomp.RecalcCellsWithNewType(decompFind.model);  //With fail, we get                 
-                
-                decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
-                if (!Globals.python && G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == false)
+                //Flowgraph, and only if called from statement "FLOW ...;", which will have depth == 0.
+                decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];
+                WindowFlow.CallFlowGraph(decompFind);
+            }
+            else
+            {
+                //Normal decomp window
+                WindowDecomp windowDecomp = null;
+
+                try
                 {
-                    Globals.windowsDecomp2.Clear();
-                    windowDecomp = null;
-                }
-                else
-                {
-                    if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
+                    windowDecomp = new WindowDecomp(decompFind);
+                    windowDecomp.decompFind.SetWindow(windowDecomp);
+                    Globals.windowsDecomp2.Add(windowDecomp);
+                    windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+                    windowDecomp.SetRadioButtons();
+                    windowDecomp.isInitializing = false;
+
+                    windowDecomp.RecalcCellsWithNewType(decompFind.model);  //With fail, we get                 
+
+                    decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
+                    if (!Globals.python && G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == false)
                     {
-                        //The line below removes the window from the global list of active windows.
-                        //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                        if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                        Globals.windowsDecomp2.Clear();
+                        windowDecomp = null;
                     }
                     else
-                    {                        
-                        windowDecomp.ShowDialog();                     
-                        if (Globals.showDecompTable)
+                    {
+                        if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
                         {
-                            Globals.showDecompTable = false;
-                            new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                            //The line below removes the window from the global list of active windows.
+                            //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                            if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                        }
+                        else
+                        {
+                            windowDecomp.ShowDialog();
+                            if (Globals.showDecompTable)
+                            {
+                                Globals.showDecompTable = false;
+                                new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                //we ignore the exception here, so that Gekko and other windows are not crashing.
-                if (Globals.runningOnTTComputer)
+                catch (Exception e)
                 {
-                    MessageBox.Show(e.Message + " --decomptrace-> " + e.StackTrace);
+                    //we ignore the exception here, so that Gekko and other windows are not crashing.
+                    if (Globals.runningOnTTComputer)
+                    {
+                        MessageBox.Show(e.Message + " --decomptrace-> " + e.StackTrace);
+                    }
+                    decompFind.hasException = true;
                 }
-                decompFind.hasException = true;
             }
         }
 

@@ -4853,7 +4853,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);
                         node.Code.A("o" + Num(node) + ".type = @`" + node.Text + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
-                        GetCodeFromAllChildren(node);
+                        GetCodeFromAllChildren(node);                        
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -4868,6 +4868,14 @@ ASTPLACEHOLDER [0]
                 case "ASTDECOMPFROM":
                     {
                         if (node.ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".from.Add(" + node[0].Code + ");" + G.NL);
+                    }
+                    break;
+                case "ASTDECOMPTYPE":
+                    {
+                        if (G.Equal(node[0].Text, "FLOW"))
+                        {
+                            node.Code.A("o" + Num(node) + ".isFlowStatement = true;" + G.NL);
+                        }
                     }
                     break;
                 case "ASTDECOMPSELECT":

@@ -26,7 +26,11 @@ In general, at the moment, you call Gekko through text strings, with the run() f
 The PyGekko 0.0.x versions are purely experimental, and use an experimental Gekko 3.3.x version internally. Regarding more professional use, please wait until an official PyGekko 3.3.x version is released, which will indicate that the Gekko interface is considered stable/mature (in the longer run, PyGekko version numbers will follow Gekko version numbers). Such a PyGekko 3.3.x release is expected before the end of 2025.
 
 ## Requirements
-The Gekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python.NET only works under Windows and only supports Python 3.11-3.13, and 32-bit Windows is not supported as of yet).
+The Gekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python 3.11 was released in October 2022). PyGekko uses Python.NET under the hood, which only works for Windows and does not yet support Python 3.14+ (released in October 2025). PyGekko support for Python < 3.11 could be provided if there is sufficient interest. Windows 32-bit is no longer supported
+for newer Gekko versions 3.3.x, and hence is not supported for PyGekko either. PyGekko is set up
+to use the .NET Framework (not .NET Core) with version at least 4.6.1. If a normal
+Gekko version can run on your Windows 64-bit pc, so should PyGekko (because it uses the same
+.NET Framework).
 
 ## Gekko links
 * [Gekko main homepage](http://www.t-t.dk/gekko)

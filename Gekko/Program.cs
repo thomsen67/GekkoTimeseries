@@ -951,6 +951,7 @@ namespace Gekko
         public Model model = null;
         public bool closed = false;
         public bool hasException = false;
+        public bool isFlowStatement = false;  //Can call "FLOW qBNP from E_BNP;", and will activate flowgraph but only for depth==0!
 
         public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, Model model)
         {

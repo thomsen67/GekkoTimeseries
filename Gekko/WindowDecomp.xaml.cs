@@ -3102,14 +3102,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                DecompFind decompFindHere = this.decompFind;
-                decompFindHere.decompOptions2.guiFlowName = this.decompFind.decompOptions2.new_select[0];
-                Thread thread = new Thread(new ParameterizedThreadStart(WindowFlow.CreateWindowFlow));
-                thread.Name = "Flow";
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                thread.IsBackground = true;
-                thread.Start(decompFindHere);
+                decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];
+                WindowFlow.CallFlowGraph(this.decompFind);
             }
         }        
 
