@@ -2360,6 +2360,7 @@ namespace Gekko
                         EFreq freq = GetResultingFreq(gekkoModelFreq);
                         if (freq == EFreq.A)
                         {
+                            //We try to do it fast for YYYY annual type.
                             int i = G.IntParse(time);
                             if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);
                         }
@@ -2411,9 +2412,7 @@ namespace Gekko
             int i = nameWithIndex.IndexOf('[');
             if (i != -1)
             {
-                EFreq freq = GetResultingFreq(gekkoModelFreq);
-
-                //We try to do it fast for annual freq
+                EFreq freq = GetResultingFreq(gekkoModelFreq);                                
                 //This version does not need the time index to be last, also stuff like x[a, b, 'a,b', 2020] is valid, 4 elements.
 
                 nameWithoutIndex = nameWithIndex.Substring(0, i).Trim();
@@ -2427,7 +2426,7 @@ namespace Gekko
                     bool isTime = false;
 
                     if (freq == EFreq.A)
-                    {
+                    {                        
                         if (part.Length == 4 && (part[0] == '1' || part[0] == '2'))  //Must be 1xxx or 2xxx
                         {
                             bool good = true;
