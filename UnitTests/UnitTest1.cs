@@ -4388,9 +4388,10 @@ namespace UnitTests
             I("prt <p yoy> x;");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(10, 2).number, (13d / 3d - 1d) * 100d, sharedDelta);
-            I("prt <yoy> x;");  //just <yoy> should be understood as <yoy p>.
+            I("prt <yoy> x;");  //just <yoy> should be understood as <n p yoy>. Making it be <p yoy> instead is a bit diffifult due to the old <abs> and <pch> options.
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(10, 2).number, (13d / 3d - 1d) * 100d, sharedDelta);
+            Assert.AreEqual(table.Get(10, 2).number, 13d, sharedDelta);
+            Assert.AreEqual(table.Get(10, 3).number, (13d / 3d - 1d) * 100d, sharedDelta);
 
             //Testing <i>
             I("reset; time 2001 2005;");
@@ -6026,6 +6027,7 @@ namespace UnitTests
             I("option system read encoding = auto;"); //revert
 
             //Test Gekko-written ANSI            
+            I("option system write encoding = ansi;");
             I("writefile('ansi_2.txt', %svs);");
             I("%bansi_2 = isUtf8File('ansi_2.txt');");
             _AssertScalarVal(First(), "%bansi_2", 0d);
@@ -6080,7 +6082,9 @@ namespace UnitTests
             Assert.AreEqual(bytesutf8_4[3], 230); //汉1 (汉 takes three bytes in utf8, cf. https://stackoverflow.com/questions/643694/what-is-the-difference-between-utf-8-and-unicode)
             Assert.AreEqual(bytesutf8_4[4], 177); //汉2
             Assert.AreEqual(bytesutf8_4[5], 137); //汉3
-            I("option system write encoding = ansi;"); //reverting            
+            
+            I("option system write encoding = utf8;"); //reverting
+            I("option system write utf8 bom = no;"); //reverting
         }
 
         [TestMethod]
@@ -14839,9 +14843,9 @@ namespace UnitTests
 
             // --- <d>
             
-            I("decomp <2002 2002 d> y from e1;");  //Popup: "Could not find variable ..."
+            I("decomp <2002 2002 d> y from e1;");  //Before Gekko 3.3.1, this gave a popup: "Could not find variable ...". Now values just show as missings.
             table = Globals.lastDecompTable;
-            Assert.IsTrue(table == null);  //This means that DECOMP has failed                            
+            HelperMissings(table, 32d, double.NaN, double.NaN, double.NaN);
 
             I("decomp <2002 2002 missing=zero d> y from e1;");
             table = Globals.lastDecompTable;
