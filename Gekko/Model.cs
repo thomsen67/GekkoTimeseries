@@ -807,10 +807,19 @@ namespace Gekko
             return this.type;
         }
 
+        /// <summary>
+        /// Sets to Program.options.freq if not set.
+        /// </summary>
+        /// <returns></returns>
         public EFreq GetFreq()
         {
             if (this.freq == EFreq.None) return Program.options.freq;
             else return this.freq;
+        }
+
+        public EFreq GetRealFreq()
+        {            
+            return this.freq;
         }
 
         public void SetModelSourceType(EModelType type)

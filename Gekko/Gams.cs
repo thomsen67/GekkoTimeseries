@@ -730,14 +730,14 @@ namespace Gekko
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
                 }
             }
 
@@ -2264,7 +2264,7 @@ namespace Gekko
         /// <param name="fakeEqCounts2"></param>
         /// <param name="fakeVarCounts2"></param>
         /// <param name="sr"></param>
-        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref bool res_variables, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
+        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, EFreq gekkoModelFreq, ref bool res_variables, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
         {            
             bool b = false;
             string line = null;
@@ -2324,7 +2324,7 @@ namespace Gekko
                 {                    
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
-                    LineChopper(line, 'e', out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
+                    LineChopper(line, 'e', gekkoModelFreq, out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
 
                     string eqName = nameWithIndexes;
                     if (G.Contains(eqName, Globals.scalarModelExtraVariable))
@@ -2342,8 +2342,8 @@ namespace Gekko
                 {                    
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
-                    LineChopper(line, 'x', out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
-
+                    LineChopper(line, 'x', gekkoModelFreq, out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
+                                        
                     if (!res_variables && G.StartsWith(nameWithIndexes, Globals.decompResidualPrefix)) res_variables = true;                    
 
                     if (G.Contains(nameWithIndexes, Globals.scalarModelExtraVariable))
@@ -2357,9 +2357,17 @@ namespace Gekko
                     GekkoTime t = GekkoTime.tNull;
                     if (time != null)
                     {
-                        if (Program.options.model_gams_scalar_freq != EFreq.A) new Error("Non-annual freq not implemented for GAMS scalar model");
-                        int i = G.IntParse(time);
-                        if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);
+                        EFreq freq = GetResultingFreq(gekkoModelFreq);
+                        if (freq == EFreq.A)
+                        {
+                            int i = G.IntParse(time);
+                            if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);
+                        }
+                        else if (freq == EFreq.Q)
+                        {
+                            t = GekkoTime.FromStringToGekkoTime(time, false, true, false);                            
+                        }
+                        else new Error("Only Annual or Quarterly freq supported");                        
                     }
 
                     if (t.IsNull())
@@ -2376,7 +2384,7 @@ namespace Gekko
             }
         }
 
-        private static void LineChopper(string line, char ex, out int n, out string nameWithIndex, out string nameWithIndexNoTime, out string nameWithoutIndex, out List<string> parts, out string time)
+        private static void LineChopper(string line, char ex, EFreq gekkoModelFreq, out int n, out string nameWithIndex, out string nameWithIndexNoTime, out string nameWithoutIndex, out List<string> parts, out string time)
         {
             nameWithoutIndex = null;
             time = null;
@@ -2403,17 +2411,23 @@ namespace Gekko
             int i = nameWithIndex.IndexOf('[');
             if (i != -1)
             {
-                if (Program.options.model_gams_scalar_freq == EFreq.A)
+                EFreq freq = GetResultingFreq(gekkoModelFreq);
+
+                //We try to do it fast for annual freq
+                //This version does not need the time index to be last, also stuff like x[a, b, 'a,b', 2020] is valid, 4 elements.
+
+                nameWithoutIndex = nameWithIndex.Substring(0, i).Trim();
+                string rest = nameWithIndex.Substring(i).Trim();
+                string rest2 = rest.Substring(1, rest.Length - 2);
+                parts = G.SplitIgnoringQuotedCommas(rest2);
+                int counter = -1;
+                foreach (string part in parts)
                 {
-                    nameWithoutIndex = nameWithIndex.Substring(0, i).Trim();
-                    string rest = nameWithIndex.Substring(i).Trim();
-                    string rest2 = rest.Substring(1, rest.Length - 2);
-                    parts = G.SplitIgnoringQuotedCommas(rest2);
-                    int counter = -1;
-                    foreach (string part in parts)
+                    counter++;
+                    bool isTime = false;
+
+                    if (freq == EFreq.A)
                     {
-                        counter++;
-                        bool isTime = false;
                         if (part.Length == 4 && (part[0] == '1' || part[0] == '2'))  //Must be 1xxx or 2xxx
                         {
                             bool good = true;
@@ -2428,57 +2442,79 @@ namespace Gekko
                             }
                         }
                     }
-
-                    if (timePart != -12345)
-                    {                        
-
-                        if (timePart != parts.Count - 1)
+                    else if (freq == EFreq.Q)
+                    {
+                        if (part.Length == 6 && (part[0] == '1' || part[0] == '2'))  //Must be 1xxxqx or 2xxxqx
                         {
-                            string temp = parts[timePart];
-                            parts[timePart] = parts[parts.Count - 1];
-                            parts[parts.Count - 1] = temp;
-
-                            StringBuilder sb1 = new StringBuilder();
-                            for (int j = 0; j < parts.Count; j++)
+                            bool good = true;
+                            for (int i2 = 1; i2 < 4; i2++)
                             {
-                                string s = parts[j];
-                                sb1.Append(s).Append(",");
+                                if (!Char.IsDigit(part[i2])) { good = false; break; }
                             }
-                            if (sb1.Length > 0) sb1.Length--;
-                            string s3 = null; if (sb1.Length > 0) s3 = "[" + sb1.ToString() + "]";
-                            nameWithIndex = nameWithoutIndex + s3;                            
+                            if (part[4] != 'q' && part[4] != 'Q') { good = false; break; }
+                            if (part[5] != '1' && part[5] != '2' && part[5] != '3' && part[5] != '4') { good = false; break; }
+                            if (good)
+                            {
+                                if (timePart != -12345) new Error("2 time indexes found: " + nameWithIndex);
+                                timePart = counter;
+                            }
                         }
-                        else
-                        {
-                            //is already done at top of method
-                        }
+                    }
+                    else new Error("Model: only Annual and Quarterly supported at the moment");
+                }
 
-                        StringBuilder sb2 = new StringBuilder();
-                        for (int j = 0; j < parts.Count - 1; j++)  //skips the last, which is time
+                if (timePart != -12345)
+                {
+                    if (timePart != parts.Count - 1)
+                    {
+                        string temp = parts[timePart];
+                        parts[timePart] = parts[parts.Count - 1];
+                        parts[parts.Count - 1] = temp;
+
+                        StringBuilder sb1 = new StringBuilder();
+                        for (int j = 0; j < parts.Count; j++)
                         {
                             string s = parts[j];
-                            sb2.Append(s).Append(",");
+                            sb1.Append(s).Append(",");
                         }
-                        if (sb2.Length > 0) sb2.Length--;
-                        string s2 = null; if (sb2.Length > 0) s2 = "[" + sb2.ToString() + "]";
-                        nameWithIndexNoTime = nameWithoutIndex + s2;
-                        time = parts[parts.Count - 1];
+                        if (sb1.Length > 0) sb1.Length--;
+                        string s3 = null; if (sb1.Length > 0) s3 = "[" + sb1.ToString() + "]";
+                        nameWithIndex = nameWithoutIndex + s3;
                     }
                     else
                     {
-                        //No time
                         //is already done at top of method
                     }
+
+                    StringBuilder sb2 = new StringBuilder();
+                    for (int j = 0; j < parts.Count - 1; j++)  //skips the last, which is time
+                    {
+                        string s = parts[j];
+                        sb2.Append(s).Append(",");
+                    }
+                    if (sb2.Length > 0) sb2.Length--;
+                    string s2 = null; if (sb2.Length > 0) s2 = "[" + sb2.ToString() + "]";
+                    nameWithIndexNoTime = nameWithoutIndex + s2;
+                    time = parts[parts.Count - 1];
                 }
                 else
                 {
-                    new Error("Non-annual frequency not implemented for GAMS scalar models yet");
+                    //No time
+                    //is already done at top of method
                 }
+
             }
             else
             {
                 nameWithoutIndex = nameWithIndex;
             }
+        }
+
+        private static EFreq GetResultingFreq(EFreq gekkoModelFreq)
+        {
+            EFreq freq = Program.options.model_gams_scalar_freq;  //Default: .A
+            if (gekkoModelFreq != EFreq.None) freq = gekkoModelFreq; //This only happens for a Gekko .frm model decorated with frequency info
+            return freq;
         }
 
         private static void CalculatePrecedentsAndDependents(ModelGamsScalar modelGamsScalar, int bigN)

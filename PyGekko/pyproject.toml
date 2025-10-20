@@ -16,7 +16,7 @@ authors = [
 ]
 description = "PyGekko: Gekko Timeseries and Modeling Software for Python"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11, <3.14"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: C#",
@@ -40,12 +40,3 @@ mypackage = [
 [project.urls]
 Homepage = "https://t-t.dk/gekko"
 Repository = "https://github.com/thomsen67/GekkoTimeseries"
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "/Gekko.png",
-]
-
-[tool.hatch.metadata]
-allow-direct-references = true
-

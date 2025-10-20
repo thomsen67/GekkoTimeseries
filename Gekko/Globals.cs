@@ -860,7 +860,7 @@ namespace Gekko
         };
 
         public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko statements" in the help files
-            //done January 2021, see also Globals.extraNames and Globals.commandNames
+            //done for Gekko 3.3.1
             "ACCEPT",
             "ANALYZE",
             "BLOCK",
@@ -893,6 +893,7 @@ namespace Gekko
             "EXPORT",
             "FIND",
             "FINDMISSINGDATA",
+            "FLOW",
             "FOR",
             "FUNCTION",
             "GEKKO",
