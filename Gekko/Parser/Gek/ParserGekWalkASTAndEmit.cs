@@ -4872,7 +4872,7 @@ ASTPLACEHOLDER [0]
                     break;
                 case "ASTDECOMPTYPE":
                     {
-                        if (G.Equal(node[0].Text, "FLOW"))
+                        if (G.Equal(node[0].Text, "flow"))
                         {
                             node.Code.A("o" + Num(node) + ".isFlowStatement = true;" + G.NL);
                         }

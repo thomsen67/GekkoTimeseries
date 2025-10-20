@@ -708,7 +708,7 @@ namespace Gekko
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
             }
-            o.decompFind.isFlowStatement = o.isFlowStatement;
+            decompOptions2.guiIsFlowStatement = o.isFlowStatement;
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
             if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
@@ -2652,7 +2652,7 @@ namespace Gekko
         {            
             DecompFind decompFind = o2 as DecompFind;
 
-            if (decompFind.isFlowStatement && decompFind.depth == 0)
+            if (decompFind.decompOptions2.guiIsFlowStatement && decompFind.depth == 0)
             {
                 //Flowgraph, and only if called from statement "FLOW ...;", which will have depth == 0.
                 decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];

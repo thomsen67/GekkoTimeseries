@@ -3217,6 +3217,7 @@ namespace Gekko
         public LocalBanks localBanks = null;  //Seems to be unused, remove in Gekko 4.0
         public string modelHash = null;
         // ---
+        public bool guiIsFlowStatement = false; //True for "FLOW qBNP ...;", and will activate flowgraph but only for depth==0!
         public string guiFlowName = null;
         public bool guiFlowRotate = false;        
         public bool guiFlowLagsOrLeadsWereEncountered = false;
@@ -3336,7 +3337,8 @@ namespace Gekko
             d.dream = this.dream;
 
             d.flowgraphDepth = this.flowgraphDepth;
-            d.guiFlowName = this.guiFlowName;
+            d.guiIsFlowStatement = this.guiIsFlowStatement;
+            d.guiFlowName = this.guiFlowName;            
 
             foreach (string s in this.subst)
             {
