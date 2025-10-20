@@ -214,7 +214,7 @@ namespace Gekko
 
             // This code gets the directory of your executing .NET assembly.
             // It's a robust way to get the base path regardless of the entry point (gekko.exe).
-            string assemblyDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string assemblyDir = G.GekkoExeFolder();
 
             string imagePath;
 
@@ -11106,9 +11106,7 @@ namespace Gekko
                 {
                     version = version.Substring(0, version.Length - 2);
                 }
-                Globals.gekkoVersion = version;
-                string path = Assembly.GetExecutingAssembly().Location;
-                Globals.gekkoExePath = path;
+                Globals.gekkoVersion = version;                
             }
             catch (Exception e) { };
         }
@@ -11129,7 +11127,7 @@ namespace Gekko
 
             try
             {
-                ReflectedAssembly = Assembly.LoadFile(Globals.gekkoExePath);
+                ReflectedAssembly = Assembly.LoadFile(G.GekkoExePath());
             }
             catch (Exception e)
             {
@@ -12064,7 +12062,11 @@ namespace Gekko
             {
                 Process process = new Process();
                 string startup = null;
-                if (G.IsUnitTestingOrNotShowingGUI())
+                if (Globals.python)
+                {
+                    startup = G.GekkoExeFolder();
+                }
+                else if (G.IsUnitTestingOrNotShowingGUI())
                 {
                     startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
                 }

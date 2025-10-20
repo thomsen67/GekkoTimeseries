@@ -1206,128 +1206,74 @@ namespace Gekko
 
             if (Globals.python || !G.IsUnitTestingOrNotShowingGUI())
             {
-                if (Globals.python)
+                Thread sta = new Thread(delegate ()
                 {
-                    Globals.itemCounter = 0;
-                    TreeGridModel model = new TreeGridModel();
-                    TraceItem temp = null;
-
-                    if (true)
-                    {
-                        TraceItem item = trace.FromTraceToTreeViewItem(null);
-                        //At startup, we need to get two levels in: depth=0 and depth=1.
-                        List<TraceAndPeriods2> taps1 = trace.TimeShadow2();
-                        if (taps1 != null && taps1.Count > 0)
-                        {
-                            foreach (TraceAndPeriods2 tap1 in taps1)
-                            {
-                                if (!Program.options.databank_trace_divide && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                                Trace2 trace1 = tap1.trace;
-                                TraceItem item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
-                                item.GetChildren().Add(item1);
-                                ExpandTraceInTraceViewer(item1);
-
-                                List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
-                                if (taps2 != null && taps2.Count > 0)
-                                {
-                                    foreach (TraceAndPeriods2 tap2 in taps2)
-                                    {
-                                        if (!Program.options.databank_trace_divide && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                                        Trace2 trace2 = tap2.trace;
-                                        bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
-                                        if (!ignore)
-                                        {
-                                            TraceItem item2 = trace2.FromTraceToTreeViewItem(tap2.periods);
-                                            item1.GetChildren().Add(item2);
-                                            ExpandTraceInTraceViewer(item2);
-                                        }
-                                    }
-                                }
-                                if (item1.GetChildren().Count == 0) item1.HasChildren = false;
-                                else item1.HasChildren = true;
-                            }
-                        }
-                        temp = item;
-                    }
-
-                    foreach (TraceItem item in temp.GetChildren())
-                    {
-                        model.Add(item);
-                    }
-
-                    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                    Globals.windowsTrace.Add(w);
-                    w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
-                    string v = null;
-                    if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
-                    w.Title = v + "Gekko data-trace";
-                    w.ShowDialog();
-                }
-                else
-                {
-                    Thread sta = new Thread(delegate ()
-                    {                        
-                        Globals.itemCounter = 0;
-                        TreeGridModel model = new TreeGridModel();
-                        TraceItem temp = null;
-
-                        if (true)
-                        {
-                            TraceItem item = trace.FromTraceToTreeViewItem(null);
-                            //At startup, we need to get two levels in: depth=0 and depth=1.
-                            List<TraceAndPeriods2> taps1 = trace.TimeShadow2();
-                            if (taps1 != null && taps1.Count > 0)
-                            {
-                                foreach (TraceAndPeriods2 tap1 in taps1)
-                                {
-                                    if (!Program.options.databank_trace_divide && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                                    Trace2 trace1 = tap1.trace;
-                                    TraceItem item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
-                                    item.GetChildren().Add(item1);
-                                    ExpandTraceInTraceViewer(item1);
-
-                                    List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
-                                    if (taps2 != null && taps2.Count > 0)
-                                    {
-                                        foreach (TraceAndPeriods2 tap2 in taps2)
-                                        {
-                                            if (!Program.options.databank_trace_divide && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                                            Trace2 trace2 = tap2.trace;
-                                            bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
-                                            if (!ignore)
-                                            {
-                                                TraceItem item2 = trace2.FromTraceToTreeViewItem(tap2.periods);
-                                                item1.GetChildren().Add(item2);
-                                                ExpandTraceInTraceViewer(item2);
-                                            }
-                                        }
-                                    }
-                                    if (item1.GetChildren().Count == 0) item1.HasChildren = false;
-                                    else item1.HasChildren = true;
-                                }
-                            }
-                            temp = item;
-                        }
-
-                        foreach (TraceItem item in temp.GetChildren())
-                        {
-                            model.Add(item);
-                        }
-
-                        WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                        Globals.windowsTrace.Add(w);
-                        w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
-                        string v = null;
-                        if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
-                        w.Title = v + "Gekko data-trace";
-                        w.Show();
-                        System.Windows.Threading.Dispatcher.Run();
-                    });
-                    sta.SetApartmentState(ApartmentState.STA);
-                    sta.Start();
-                }
+                    WindowTreeViewWithTable w = CallTraceViewerHelper(trace);
+                    w.Show();
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+                sta.SetApartmentState(ApartmentState.STA);
+                sta.Start();
             }
             return nn;
+        }
+
+        private static WindowTreeViewWithTable CallTraceViewerHelper(Trace2 trace)
+        {
+            Globals.itemCounter = 0;
+            TreeGridModel model = new TreeGridModel();
+            TraceItem temp = null;
+
+            if (true)
+            {
+                TraceItem item = trace.FromTraceToTreeViewItem(null);
+                //At startup, we need to get two levels in: depth=0 and depth=1.
+                List<TraceAndPeriods2> taps1 = trace.TimeShadow2();
+                if (taps1 != null && taps1.Count > 0)
+                {
+                    foreach (TraceAndPeriods2 tap1 in taps1)
+                    {
+                        if (!Program.options.databank_trace_divide && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                        Trace2 trace1 = tap1.trace;
+                        TraceItem item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
+                        item.GetChildren().Add(item1);
+                        ExpandTraceInTraceViewer(item1);
+
+                        List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
+                        if (taps2 != null && taps2.Count > 0)
+                        {
+                            foreach (TraceAndPeriods2 tap2 in taps2)
+                            {
+                                if (!Program.options.databank_trace_divide && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                Trace2 trace2 = tap2.trace;
+                                bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
+                                if (!ignore)
+                                {
+                                    TraceItem item2 = trace2.FromTraceToTreeViewItem(tap2.periods);
+                                    item1.GetChildren().Add(item2);
+                                    ExpandTraceInTraceViewer(item2);
+                                }
+                            }
+                        }
+                        if (item1.GetChildren().Count == 0) item1.HasChildren = false;
+                        else item1.HasChildren = true;
+                    }
+                }
+                temp = item;
+            }
+
+            foreach (TraceItem item in temp.GetChildren())
+            {
+                model.Add(item);
+            }
+
+            WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+            Globals.windowsTrace.Add(w);
+            w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
+            string v = null;
+            if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
+            w.Title = v + "Gekko data-trace";
+            return w;
         }
 
         /// <summary>

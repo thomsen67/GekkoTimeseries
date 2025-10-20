@@ -117,7 +117,7 @@ namespace Gekko.Parser.Gek
             }
             else if (Globals.python)
             {
-                string xx = Path.GetDirectoryName(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\"); //HACK
+                string xx = G.GekkoExeFolder();
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
             }

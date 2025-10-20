@@ -2239,7 +2239,7 @@ namespace Gekko
             {
                 //Gekko 4.0: Probably always right, instead of the one in the else clause.
                 //This is intended to make pg.run("help;") work in Python
-                folders.Add(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\helpfiles\\");
+                folders.Add(G.GekkoExeFolder() + "\\helpfiles\\");
             }
             else
             {

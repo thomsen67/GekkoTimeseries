@@ -1328,7 +1328,12 @@ namespace Gekko
             string exe = "wgnuplot.exe";
 
             Process process = new Process();
-            if (G.IsUnitTestingOrNotShowingGUI())
+
+            if (Globals.python)
+            {
+                process.StartInfo.FileName = G.GekkoExeFolder() + "\\gnuplot\\" + exe;
+            }
+            else if (G.IsUnitTestingOrNotShowingGUI())
             {
                 process.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
             }
@@ -1373,7 +1378,7 @@ namespace Gekko
             if (currentDir != null) Directory.SetCurrentDirectory(currentDir);            
 
             return fileName;
-        }
+        }        
 
         ///// <summary>
         ///// Scale a svg file. Example:

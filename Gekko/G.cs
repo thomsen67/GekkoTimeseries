@@ -5759,6 +5759,25 @@ namespace Gekko
             return -12345;  //hmm, probably never arrives here...!
         }
 
+        /// <summary>
+        /// Folder name, cf. GekkoExePath(). This ought to be a bullet proof way to find the folder of Gekko.exe, regardless of called from
+        /// Python, Excel, etc. etc.
+        /// </summary>
+        /// <returns></returns>
+        public static string GekkoExeFolder()
+        {
+            return Path.GetDirectoryName(G.GekkoExePath());
+        }
+
+        /// <summary>
+        /// This ought to be a bullet proof way to find the path of Gekko.exe, regardless of called from
+        /// Python, Excel, etc. etc.
+        /// </summary>
+        /// <returns></returns>
+        public static string GekkoExePath()
+        {
+            return System.Reflection.Assembly.GetExecutingAssembly().Location;
+        }
 
         /// <summary>
         /// For developer use/debugging. Will also be true if ExcelDna or hiding GUI is active.
