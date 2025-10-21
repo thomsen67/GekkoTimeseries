@@ -1,4 +1,4 @@
-# ![](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/PyGekko/Gekko.png) Gekko Timeseries And Modeling Software
+# ![](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/PyGekko/Gekko.png) PyGekko: Gekko Timeseries And Modeling Software for Python
 PyGekko is a Python package for Gekko. Gekko is open-source time-series oriented software for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. You may install the PyGekko package with the following (Windows, Python 3.11-3.13):
 
     pip install pygekko
@@ -35,11 +35,11 @@ The PyGekko 0.0.x versions are purely experimental, and use an experimental Gekk
 When you open up Gekko windows like for instance the plot window (for instance with `pg.run("plot x1, x2, x1/y;"`), you may put a `pg.wait()` at the end of your Python program to make the window(s) stay open (otherwise Python takes theses windows down when it finishes).
 
 ## Requirements
-The Gekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python 3.11 was released in October 2022). PyGekko uses the Python.NET package under the hood, which only works for Windows and does not yet support Python 3.14 (released in October 2025). PyGekko support for Python < 3.11 could be provided if there is sufficient interest. Windows 32-bit is no longer supported
+The PyGekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python 3.11 was released in October 2022). PyGekko uses the Python.NET package under the hood, which only works for Windows and does not yet support Python 3.14 (released in October 2025). PyGekko support for Python < 3.11 could be provided if there is sufficient interest. Windows 32-bit is no longer supported
 for newer Gekko versions 3.3.x, and hence is not supported for PyGekko either. PyGekko is set up
 to use the .NET Framework (not .NET Core) with version at least 4.6.1. If a normal
 Gekko version can run on your Windows 64-bit pc, so should PyGekko (because it uses the same
-.NET Framework).
+.NET Framework). PyGekko is self-contained regarding Gekko: it works completely independently of any Gekko installation.
 
 ## Gekko links
 * [Gekko main homepage](http://www.t-t.dk/gekko)

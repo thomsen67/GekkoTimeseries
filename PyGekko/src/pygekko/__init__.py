@@ -1,6 +1,6 @@
 # Functions that are directly callable
 
-__version__ = "0.0.4" # always increment with new upload to PyPI
+__version__ = "0.0.5" # always increment with new upload to PyPI
 
 from . import type_checks
 from .interface import run, wait

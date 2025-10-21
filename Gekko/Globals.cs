@@ -1149,7 +1149,7 @@ namespace Gekko
         public static int windowIntellisenseSuggestionsOffset1 = -12345;  //for variables start
         public static int windowIntellisenseSuggestionsOffset2 = -12345;  //for variables end
 
-        public static Table lastPrtOrMulprtTable = null; 
+        public static Table lastPrtOrMulprtTable = null;
         public static Table lastDecompTable = null;  //only used for unit tests
         public static bool showDecompTable = false;  //only used for unit tests
         public static bool showFind = false;  //only used for unit tests
