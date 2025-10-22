@@ -1,5 +1,5 @@
-# ![](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/PyGekko/Gekko.png) PyGekko: Gekko Timeseries And Modeling Software for Python
-PyGekko is a Python package for Gekko. Gekko is open-source time-series oriented software for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. You may install the PyGekko package with the following (Windows, Python 3.11-3.13):
+# ![](https://raw.githubusercontent.com/thomsen67/GekkoTimeseries/Gekko_3.3.x/PyGekko/Gekko.png) PyGekko: Gekko Timeseries And Modeling
+PyGekko is a Python package for Gekko. Gekko is open-source timeseries-oriented software for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. You may install the PyGekko package with the following (Windows, Python 3.11-3.13):
 
     pip install pygekko
 
@@ -19,12 +19,14 @@ pg.run("y = x1 + x2;")
 pg.run("prt x1, x2, x1/y;")
 ```
 
-In general, at the moment, you call Gekko through text strings containing Gekko statements, with the `.run()` function. Printed output will be shown in the Python terminal, in this case:
+In general, at the moment, you call Gekko through text strings containing Gekko statements, with the `run()` function. Printed output will be shown in the Python terminal, in this case:
 
                      x1         %             x2         %           x1/y         % 
     2021         2.0000         M         7.0000         M         0.2222         M
     2022         3.0000     50.00         5.0000    -28.57         0.3750     68.75
     2023         4.0000     33.33         6.0000     20.00         0.4000      6.67
+
+You may open the Gekko help system with `pg.run("help;")`.
 
 ## Looks
 The following is how the Gekko stand-alone application looks. PyGekko does not show the main Gekko window, but can show other windows like plot, decomp, flowgraph, data-trace viewer, etc. As mentioned later on, you may have to end your Python program with a `pg.wait()` to make the Gekko windows stay open.

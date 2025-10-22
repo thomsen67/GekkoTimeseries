@@ -4532,53 +4532,97 @@ namespace Gekko
         //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna2(string xllPath, string xlsmPath)
         {
-            if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna2() called with: " + xllPath + "  -----  " + xlsmPath);
-
-            PrepareExcelDna(xllPath); //necessary for it to run ANTLR etc.          
-
-            string note = null;
-
-            //See similar code used in in GuiStuff(), see: #09785932405
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            if (string.IsNullOrEmpty(Program.options.folder_working))
+            try
             {
-                if (string.IsNullOrEmpty(xlsmPath))
+                if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna2() called with: " + xllPath + "  -----  " + xlsmPath);
+
+                PrepareExcelDna(xllPath); //necessary for it to run ANTLR etc.          
+
+                string note = null;
+
+                //See similar code used in in GuiStuff(), see: #09785932405
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                if (string.IsNullOrEmpty(Program.options.folder_working))
                 {
-                    //probably happens very rarely
-                    Program.options.folder_working = desktop;
-                    note = "Gekcel working folder set to desktop folder, because Excel workbook folder could not be located.";
-                }
-                else
-                {
-                    try
+                    if (string.IsNullOrEmpty(xlsmPath))
                     {
-                        //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
-                        //detects if xlsm file is in read-only folder.
-                        Globals.screenOutput = new StreamWriter(xlsmPath + "\\" + Globals.funnyFileName, false, G.GetEncoding());
-                        Program.options.folder_working = xlsmPath;  //seems ok
-                    }
-                    catch (Exception e)
-                    {
+                        //probably happens very rarely
                         Program.options.folder_working = desktop;
-                        note = "Gekcel working folder set to desktop folder, because Excel workbook folder seems to be read-only.";
+                        note = "Gekcel working folder set to desktop folder, because Excel workbook folder could not be located.";
                     }
-                    Gui.GuiReadOnlyHelper(false);  //delete any funny file
+                    else
+                    {
+                        try
+                        {
+                            //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
+                            //detects if xlsm file is in read-only folder.
+                            Globals.screenOutput = new StreamWriter(xlsmPath + "\\" + Globals.funnyFileName, false, G.GetEncoding());
+                            Program.options.folder_working = xlsmPath;  //seems ok
+                        }
+                        catch (Exception e)
+                        {
+                            Program.options.folder_working = desktop;
+                            note = "Gekcel working folder set to desktop folder, because Excel workbook folder seems to be read-only.";
+                        }
+                        Gui.GuiReadOnlyHelper(false);  //delete any funny file
+                    }
                 }
-            }
 
-            SetupGekkoForNonGuiUse();
+                SetupGekkoForNonGuiUse();
 
-            //The stuff below does not get printed in Gekcel: wonder why?
-            if (true)
-            {
-                if (note != null)
+                //The stuff below does not get printed in Gekcel: wonder why?
+                if (true)
                 {
-                    //if working folder is set to desktop
-                    new Note(note);
+                    if (note != null)
+                    {
+                        //if working folder is set to desktop
+                        new Note(note);
+                    }
+                    new Writeln(G.GekkoInfo("short4"));
                 }
-                new Writeln(G.GekkoInfo("short4"));
             }
-        }        
+            catch (Exception ex)
+            {
+                //The method is the entry point of setting up Gekcel to use Gekko.
+                //Better handling if a .dll is missing or something like that
+                MessageBox.Show("Gekcel error: " + G.NL + GetExceptionDetails(ex));
+                throw;
+            }
+        }
+
+        public static string GetExceptionDetails(Exception ex)
+        {
+            StringBuilder sb = new StringBuilder();
+                        
+            sb.AppendLine("--- Exception Details ---");
+
+            // Start with the current/outer exception
+            Exception currentEx = ex;
+            int level = 0;
+
+            // Loop through the chain of InnerExceptions
+            while (currentEx != null)
+            {
+                // Use indentation for clarity
+                string prefix = new string(' ', level * 2);
+
+                sb.AppendLine($"{prefix}Level {level}: {currentEx.GetType().Name}");
+                sb.AppendLine($"{prefix}  Message: {currentEx.Message}");
+
+                // Optionally, print the full stack trace for the outermost exception
+                if (level == 0)
+                {
+                    sb.AppendLine("");
+                    sb.AppendLine($"{prefix}  Stack Trace:");
+                    sb.AppendLine(currentEx.StackTrace);
+                }
+
+                // Move to the next inner exception
+                currentEx = currentEx.InnerException;
+                level++;
+            }
+            return sb.ToString();
+        }
 
         /// <summary>
         /// Sets some objects up that are necessary when running Gekko without a GUI
