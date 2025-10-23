@@ -2270,7 +2270,7 @@ namespace Gekko
                 webBrowser.Visibility = Visibility.Collapsed;
                 scrollView1.Visibility = Visibility.Visible;
 
-                if (!Globals.python && G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == false)
+                if (Globals.batchType != EBatchType.PyGekko && G.IsUnitTestingOrNotShowingGUI() && Globals.showDecompTable == false)
                 {
                     Globals.lastDecompTable = decompOutput.table;
                 }

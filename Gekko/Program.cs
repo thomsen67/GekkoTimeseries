@@ -75,6 +75,14 @@ namespace Gekko
         ExcludeProcFuncIgnoreExistence //false, false        
     }
 
+    public enum EBatchType     
+    {
+        None, //default
+        Hide, //do not show output
+        Gekcel,        
+        PyGekko
+    }
+
     public enum EMasks
     {
         None,
@@ -4520,7 +4528,7 @@ namespace Gekko
         public static void PrepareExcelDna(string xllPath)
         {
             //if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna() called with: " + xllPath);
-            Globals.excelDna = true;
+            Globals.batchType = EBatchType.Gekcel;
             Globals.excelDnaPath = xllPath;
         }
 
@@ -5866,7 +5874,7 @@ namespace Gekko
 
                 if (file == null)
                 {
-                    if (!Globals.excelDna)  //because we Gekcel-cheat with IMPORT<xlsx>, so file == null, but should not report an error here
+                    if (Globals.batchType != EBatchType.Gekcel)  //because we Gekcel-cheat with IMPORT<xlsx>, so file == null, but should not report an error here
                     {
                         if (!open)
                         {
@@ -5901,7 +5909,7 @@ namespace Gekko
 
                 string hash = null;
 
-                bool copyLocal2 = copyLocal && !Globals.excelDna;
+                bool copyLocal2 = copyLocal && Globals.batchType != EBatchType.Gekcel;
 
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
@@ -6745,7 +6753,7 @@ namespace Gekko
             }
             else
             {
-                if (Globals.excelDna)
+                if (Globals.batchType == EBatchType.Gekcel)
                 {
                     if (Globals.excelDnaData == null || Globals.excelDnaData.tableLight == null)
                     {
@@ -10292,8 +10300,8 @@ namespace Gekko
 
             Globals.suggestions.Clear();  //to not fill out ram too much
 
-            if (Globals.excelDna || Globals.python || Globals.hideGui)
-            {
+            if (Globals.batchType == EBatchType.Gekcel || Globals.batchType == EBatchType.PyGekko || Globals.batchType == EBatchType.Hide)
+            {                
                 if (!Globals.nolog)
                 {
                     //if the below object is null, nothing is printed/written to it afterwards
@@ -12106,7 +12114,7 @@ namespace Gekko
             {
                 Process process = new Process();
                 string startup = null;
-                if (Globals.python)
+                if (Globals.batchType == EBatchType.PyGekko)
                 {
                     startup = G.GekkoExeFolder();
                 }
@@ -34998,7 +35006,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (Globals.excelDna)
+                    if (Globals.batchType == EBatchType.Gekcel)
                     {
                         fileNameWithPathPretty = "[Gekcel]";
                         fileNameWithoutPathPretty = "[Gekcel]";

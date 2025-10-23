@@ -535,7 +535,7 @@ namespace Gekko
 
                 Table tab2 = null;
 
-                if (Globals.excelDna)
+                if (Globals.batchType == EBatchType.Gekcel)
                 {
                     //transposing is easier here for ExcelDna than for Epplus.
                     if (G.Equal(o.opt_cols, "yes"))
@@ -584,7 +584,7 @@ namespace Gekko
                     seriesAreInRows = false;
                 }
 
-                if (Globals.excelDna)
+                if (Globals.batchType == EBatchType.Gekcel)
                 {
                     Program.PrtToExcelDna(printTable, false, false, null, hasNames, hasDates, seriesAreInRows, dateType, dateFormat);
                 }

@@ -297,7 +297,7 @@ namespace Gekko
             }
             catch { };
 
-            if (hideGui) Globals.hideGui = true;
+            if (hideGui) Globals.batchType = EBatchType.Hide;
 
             Application.EnableVisualStyles();
 
@@ -477,7 +477,7 @@ namespace Gekko
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             if (track) MessageBox.Show("8");
             
-            if (hideGui)  //for 3.2 --> include Globals.excelDna here, does not use GUI either
+            if (hideGui)  //for 3.2 --> include Globals.batchType == EBatchType.Gekcel here, does not use GUI either
             {
                 gui = null;
             }

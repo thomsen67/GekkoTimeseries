@@ -284,14 +284,21 @@ namespace Gekko
         public static List<string> unitTestLhsNotFoundInModel = null;
         public static List<string> unitTestLhsNotFoundInEq = null;
 
-        public static bool nolog = false;    //-nolog parameter for gekko.exe
-        public static bool hideGui = false;  //true for use without GUI window
-        public static bool excelDna = false; //true for use with ExcelDna solution
-        public static bool python = false;   //true for use with Python, calling C# (and Gekko) directly from Python --> is set true in Python.PreparePython()
+        // ============== batch stuff start ====================================================
+        public static EBatchType batchType = EBatchType.None;
         public static StringBuilder excelDnaOutput = null;
+        // =====================================================================================        
+        // .Hide
+        public static bool nolog = false;    //-nolog parameter for gekko.exe        
+        // -------------------------------------------------------------------------------------        
+        // .Gekcel        
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
-        public static ExcelDnaData excelDnaData = null;
         public static string excelDnaName = "Gekcel"; //probably unwise to delete this...
+        public static ExcelDnaData excelDnaData = null;        
+        // -------------------------------------------------------------------------------------        
+        // .PyGekko
+        public static bool pyGekkoRedirectOutput = true; //If false uses Console.Writeln(), works ok for normal VS Code terminal output, but not for interactive window (Jupyter)
+        // ============== batch stuff end =====================================================
 
         public static Application application; //for wpf in Python
         public static Thread thread; //for wpf in Python

@@ -104,18 +104,18 @@ namespace Gekko.Parser.Gek
             compilerParams.ReferencedAssemblies.Add("system.core.dll");
             if (addedAssembly != null) compilerParams.ReferencedAssemblies.Add(addedAssembly.Location);
 
-            if (Globals.excelDna)
+            if (Globals.batchType == EBatchType.Gekcel)
             {
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
             }
-            else if (Globals.hideGui)
+            else if (Globals.batchType == EBatchType.Hide)
             {
                 string xx = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
             }
-            else if (Globals.python)
+            else if (Globals.batchType == EBatchType.PyGekko)
             {
                 string xx = G.GekkoExeFolder();
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
@@ -462,7 +462,7 @@ namespace Gekko.Parser.Gek
                         //e.MainNewLineTight();
                     }
 
-                    if (Globals.python) MessageBox.Show(ce.FileName + " line " + ce.Line + ": " + ce.ErrorText);
+                    if (Globals.batchType == EBatchType.PyGekko) MessageBox.Show(ce.FileName + " line " + ce.Line + ": " + ce.ErrorText);
                 }
 
                 if (Globals.threadIsInProcessOfAborting)

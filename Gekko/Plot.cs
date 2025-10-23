@@ -1329,7 +1329,7 @@ namespace Gekko
 
             Process process = new Process();
 
-            if (Globals.python)
+            if (Globals.batchType == EBatchType.PyGekko)
             {
                 process.StartInfo.FileName = G.GekkoExeFolder() + "\\gnuplot\\" + exe;
             }
