@@ -5971,18 +5971,18 @@ namespace Gekko
                     {
                         if (Globals.batchType == EBatchType.PyGekko)
                         {
-                            if (Globals.pyGekkoRedirectOutput)
+                            if (Globals.pyGekkoStdout)
                             {
-                                if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
+                                Console.WriteLine(s);                                
                             }
                             else
                             {
-                                Console.WriteLine(s);
+                                if (Globals.gekkoOutputRecorder != null) Globals.gekkoOutputRecorder.AppendLine(s);
                             }
                         }
                         else if (Globals.batchType == EBatchType.Gekcel || Globals.batchType == EBatchType.Hide)
                         {
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
+                            if (Globals.gekkoOutputRecorder != null) Globals.gekkoOutputRecorder.AppendLine(s);
                         }
                         else
                         {
@@ -5994,18 +5994,18 @@ namespace Gekko
                     {
                         if (Globals.batchType == EBatchType.PyGekko)
                         {
-                            if (Globals.pyGekkoRedirectOutput)
+                            if (Globals.pyGekkoStdout)
                             {
-                                if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                                Console.Write(s);                                
                             }
                             else
                             {
-                                Console.Write(s);
+                                if (Globals.gekkoOutputRecorder != null) Globals.gekkoOutputRecorder.Append(s);
                             }
                         }
                         else if (Globals.batchType == EBatchType.Gekcel || Globals.batchType == EBatchType.Hide)
                         {
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                            if (Globals.gekkoOutputRecorder != null) Globals.gekkoOutputRecorder.Append(s);
                         }
                         else
                         {
@@ -6355,18 +6355,18 @@ namespace Gekko
                 {
                     if (Globals.batchType == EBatchType.PyGekko)
                     {
-                        if (Globals.pyGekkoRedirectOutput)
+                        if (Globals.pyGekkoStdout)
                         {
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                            Console.Write(s);                            
                         }
                         else
                         {
-                            Console.Write(s);
+                            if (Globals.gekkoOutputRecorder != null) Globals.gekkoOutputRecorder.Append(s);
                         }
                     }
                     else if (Globals.batchType == EBatchType.Gekcel || Globals.batchType == EBatchType.Hide)
                     {
-                        if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                        if (Globals.gekkoOutputRecorder != null) Globals.gekkoOutputRecorder.Append(s);
                     }
                     else
                     {

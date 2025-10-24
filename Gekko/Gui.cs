@@ -702,11 +702,11 @@ namespace Gekko
             {
                 if (gui == null)
                 {
-                    if (Globals.excelDnaOutput != null)
+                    if (Globals.gekkoOutputRecorder != null)
                     {
                         try
                         {
-                            File.WriteAllText(Path.Combine(Program.options.folder_working, "gekkooutput.txt"), Globals.excelDnaOutput.ToString(), G.GetEncoding());
+                            File.WriteAllText(Path.Combine(Program.options.folder_working, "gekkooutput.txt"), Globals.gekkoOutputRecorder.ToString(), G.GetEncoding());
                         }
                         catch { }
                     }

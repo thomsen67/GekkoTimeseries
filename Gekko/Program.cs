@@ -10306,7 +10306,7 @@ namespace Gekko
                 {
                     //if the below object is null, nothing is printed/written to it afterwards
                     //.nolog will be false for Gekcel, but may be true for gekko.exe call.
-                    Globals.excelDnaOutput = new StringBuilder();  //clears, and records everything from now on for use in Excel window            
+                    Globals.gekkoOutputRecorder = new StringBuilder();  //clears, and records everything from now on for use in Excel window            
                 }
             }
 

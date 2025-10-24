@@ -1898,8 +1898,6 @@ namespace Gekko
 
             if (!op.isRaw)
             {
-
-
                 if (Program.options.bugfix_decomp_jacobi)
                 {
                     try

@@ -2261,9 +2261,7 @@ namespace Gekko
                 else
                 {
                     webBrowser.Source = new Uri(svgFile1);
-                }
-
-                
+                }                
             }
             else
             {                

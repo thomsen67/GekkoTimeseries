@@ -286,7 +286,7 @@ namespace Gekko
 
         // ============== batch stuff start ====================================================
         public static EBatchType batchType = EBatchType.None;
-        public static StringBuilder excelDnaOutput = null;
+        public static StringBuilder gekkoOutputRecorder = null;
         // =====================================================================================        
         // .Hide
         public static bool nolog = false;    //-nolog parameter for gekko.exe        
@@ -297,7 +297,7 @@ namespace Gekko
         public static ExcelDnaData excelDnaData = null;        
         // -------------------------------------------------------------------------------------        
         // .PyGekko
-        public static bool pyGekkoRedirectOutput = true; //If false uses Console.Writeln(), works ok for normal VS Code terminal output, but not for interactive window (Jupyter)
+        public static bool pyGekkoStdout = false; //If true uses Console.Writeln(), corresponds to "stdout" stream, same concept on Windows/Linux/Mac. Using stdout works ok for normal VS Code terminal output, but not for interactive window (Jupyter), or Gekcel for that sake.
         // ============== batch stuff end =====================================================
 
         public static Application application; //for wpf in Python

@@ -47,5 +47,20 @@ def runfile(s: str):
 def wait():    
     """
     Used at the end of a .py file to keep Gekko windows open
-    """      
-    python.Wait()       
+    """          
+    python.Wait()    
+
+def stdout(b: bool):
+    """
+    Use stdout stream. This works for normal Python execution (also in VS Code), but not
+    for Jupyter setups including VS Code interactive window.
+    Is False per default. With default value, while Python runs a run() function, PyGekko
+    "records"/"remembers" Gekko-output, which is then printed by Python when the run() function
+    returns. Drawback: output for a run() command is only printed at the end of the command, but
+    Gekko command typically do not run for a long time individually.
+    """
+    if(b):
+        print("Python: stdout(True) = stdout stream (Standard Output) used for continuous Gekko output")
+    else:
+        print("Python: stdout(False) = Gekko output is 'recorded' for each run() call and printed by Python")
+    python.Stdout(b)
