@@ -20157,8 +20157,16 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Decomp_LagsLeads()
+        public void _Test_Decomp_EquationLagging()
         {
+            //
+            // This is a quite good test regarding an equation (e6) that needs to be lagged (or alternatively leaded) to
+            // decompose x1 for the current period. The test reproduces hand-calculated values.
+            // The MAKRO E_pk equation has pk[] only with 1 lead. 
+            // A test was carried out on decomp <2030 2060 m missing=zero expand> pK[iB,ene] from E_pK[iB,ene],
+            // where the file dict.txt was hand-edited so that all E_pk(ib,ene,YYYY) were leaded 1 year. Then a normal decomp
+            // was run, which for both <m> and <d> gave the same result as the in-built equation lagger using option bugfix decomp lagsleads
+            // and a non-edited model. Together with the test here, it is quite certain that the equation lagger works as it is supposed to.
             //
             // e2[t] $ (t0[t]) .. x2[t] = E = 7 * x1[t-1] + 100;
             // e3[t] $ (t0[t]) .. x3[t] = E = 7 * x1[t+1] + 100;
@@ -20171,6 +20179,7 @@ namespace UnitTests
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();            
             I("reset; time 2000 2005;");
+            I("option bugfix decomp lagsleads = yes;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
             I("model <gms> lagsleads.zip;");
             I("x1 = 10, 11, 12, 9, 13, 11;");
@@ -20193,17 +20202,27 @@ namespace UnitTests
             I("x7 = 3 * x1 + 7 * x1[-1] + 100;");
             I("prt <2000 2005 rn> x1, x2, x3, x4, x5, x6, x7;");
             I("time 2003 2003;");            
-            ShowDecompTable();  //will show the following decomp table and then abort            
-            //I("decomp <m> x1 from e4;");
+            //ShowDecompTable();  //will show the following decomp table and then abort                        
+            
             I("decomp <m> x1 from e6;");
+            Gekko.Table table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2003");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x1");
+            Assert.AreEqual(table.Get(2, 2).number, 1.0000, sharedTableDelta);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x1[-2]");
+            Assert.AreEqual(table.Get(3, 2).number, 9d / 7d, sharedTableDelta);  //calculated by hand
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "x6[-1]");
+            Assert.AreEqual(table.Get(4, 2).number, -2d / 7d, sharedTableDelta);  //calculated by hand
 
-            //Gekko.Table table = Globals.lastDecompTable;
-            //Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x2");
-            //Assert.AreEqual(table.Get(2, 2).number, -100d, 0.0001);
-            //Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x1");
-            //Assert.AreEqual(table.Get(3, 2).number, 0.6682d, 0.0001);
-
-
+            I("decomp <d> x1 from e6;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2003");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x1");
+            Assert.AreEqual(table.Get(2, 2).number, -7d, sharedTableDelta);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x1[-2]");
+            Assert.AreEqual(table.Get(3, 2).number, -7d * (3d * (8d - 12d)) / 49d, sharedTableDelta);  //calculated by hand
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "x6[-1]");
+            Assert.AreEqual(table.Get(4, 2).number, +7d * (194d - 255d) / 49d, sharedTableDelta); //calculated by hand
 
         }
         

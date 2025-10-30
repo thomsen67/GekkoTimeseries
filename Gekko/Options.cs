@@ -53,7 +53,7 @@ namespace Gekko
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
         public bool bugfix_score_even_with_res_vars = false;
-        public bool bugfix_decomp_lagsleads = true;
+        public bool bugfix_decomp_lagsleads = false;
 
         // ---
         //method options could look like the 2 following:
