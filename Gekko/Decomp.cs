@@ -1778,20 +1778,11 @@ namespace Gekko
 
                                 int add2 = 0;
 
-                                if (false && modelGamsScalar.isTimeless[dp.variable])
-                                {
-                                    if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
-                                    add2 = t.Subtract(modelGamsScalar.tBasis);
-                                    //problem is that exudl gets a dp.date that seems fixed to first period.
-                                    //check hos this .precedents[eqNumber] list is made, perhaps indicate
-                                    //with .date = -12345 that the variable is timeless????
-                                }                                
-
                                 int date = dp.date;
                                 int tt1 = date + add + add2;
                                 int tt2 = date + add + add2 - t.Subtract(modelGamsScalar.tBasis);
 
-                                if (true && modelGamsScalar.isTimeless[dp.variable])
+                                if (modelGamsScalar.isTimeless[dp.variable])
                                 {
                                     if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
                                     tt2 = 0;  //always show as if unlagged, even if it really points back to .tBasis.
@@ -1806,7 +1797,7 @@ namespace Gekko
 
                                 string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt1, modelGamsScalar.tBasis);
                                 string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt2);
-                                
+
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
                             }
@@ -2015,14 +2006,12 @@ namespace Gekko
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
 
-                    if (true)
+                    int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(G.Chop_RemoveBank(xname));
+                    if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
                     {
-                        int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(G.Chop_RemoveBank(xname));
-                        if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
-                        {
-                            xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
-                        }                        
+                        xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
                     }
+
                     string xnewName = ConvertToTurtleName(xname, xlag);
 
                     int ZERO = 0;
@@ -2031,13 +2020,13 @@ namespace Gekko
                     {
                         //???? Why is this ever necessary: are such variables not already done beforehand???                        
                         DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar, decompOptions2);
-                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);                        
+                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);
                     }
                     else
                     {
                         dd = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types);
                         Series ts2 = dd[xnewName];
-                        ts2.SetData(time, effect[row, col]);                        
+                        ts2.SetData(time, effect[row, col]);
                         if (col == 0)  //just once
                         {
                             Series ts3 = dd[enewName];
@@ -2050,22 +2039,22 @@ namespace Gekko
                                 else if (operatorOneOf3Types == EContribType.M) type = EStorage.cellsChangeM;
                                 Series ts = GetRealTimeseries2(decompDatas, enewName, type);
                                 double ddd2 = double.NaN;
-                                if (ts != null) ddd2 = ts.GetDataSimple(time);                                
+                                if (ts != null) ddd2 = ts.GetDataSimple(time);
                                 double ddd1 = mEndo3[row, row];  //IS THIS ALWAYS RIGHT??? Cannot be mEndo3[row, col] because mEndo2 is only over endo x endo.
-                                
+
                                 if (Globals.runningOnTTComputer)
                                 {
-                                    bool bad = false; 
-                                    if (ddd1 != ddd2) bad = true; 
+                                    bool bad = false;
+                                    if (ddd1 != ddd2) bad = true;
                                     if (G.IsBothNumericalError(ddd1, ddd2)) bad = false;
                                     if (bad) MessageBox.Show("Decomp problem, check that!");
                                 }
-                                
+
                                 ts3.SetData(time, ddd2);
                             }
                             else
                             {
-                                ts3.SetData(time, 1d);                             
+                                ts3.SetData(time, 1d);
                             }
                         }
                     }
