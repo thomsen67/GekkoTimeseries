@@ -53,6 +53,7 @@ namespace Gekko
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
         public bool bugfix_score_even_with_res_vars = false;
+        public bool bugfix_decomp_lagsleads = true;
 
         // ---
         //method options could look like the 2 following:
@@ -399,6 +400,7 @@ namespace Gekko
             Add("BUGFIX DISP INFLUENCES EQU", Globals.xbool);
             Add("BUGFIX PLOT", Globals.xbool);
             Add("BUGFIX SCORE EVEN WITH RES VARS", Globals.xbool);
+            Add("BUGFIX DECOMP LAGSLEADS", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

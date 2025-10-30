@@ -848,7 +848,7 @@ namespace Gekko
                         }
                         int i1 = -12345;
                         int i2 = aNumber;
-                        if ((Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2) && helper2.time.IsNull())  //reading .fx values
+                        if ((false || true) && helper2.time.IsNull())  //reading .fx values
                         {
                             i1 = 0;
                         }
@@ -896,7 +896,7 @@ namespace Gekko
                         new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
                     }
                     int i1 = -12345;
-                    if ((Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2) && helper2.time.IsNull()) //reading scalar data (not activated)
+                    if ((false || true) && helper2.time.IsNull()) //reading scalar data (not activated)
                     {
                         //TODO TODO TODO
                         //TODO TODO TODO what to do about these, if read from .fx lines
@@ -2529,7 +2529,7 @@ namespace Gekko
                 for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
                 {                    
                     PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
-                    if (Globals.runningOnTTComputer && Globals.decompFixTimelessProblem == 1)  //Just an assert here
+                    if (Globals.runningOnTTComputer && false)  //Just an assert here
                     {                        
                         bool b = modelGamsScalar.isTimeless[dp.variable];
                         if (b && dp.date != 0)
@@ -2537,7 +2537,7 @@ namespace Gekko
                             G.WarningInternal("TTH: Expected timeless .date = 0");
                         }
                     }
-                    else if (Globals.runningOnTTComputer && Globals.decompFixTimelessProblem == 2)  //Just an assert here
+                    else if (Globals.runningOnTTComputer && true)  //Just an assert here
                     {
                         bool b = modelGamsScalar.isTimeless[dp.variable];
                         if (b && dp.date != Globals.decompTimelessNumber)
@@ -2866,11 +2866,11 @@ namespace Gekko
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
 
                     int i1 = -12345;
-                    if (Globals.decompFixTimelessProblem == 1 && helper2.time.IsNull())
+                    if (false && helper2.time.IsNull())
                     {
                         i1 = 0;  // --> points to first period, this should contain data, is put into helper.endo[].
                     }
-                    else if (Globals.decompFixTimelessProblem == 2 && helper2.time.IsNull())
+                    else if (true && helper2.time.IsNull())
                     {
                         i1 = Globals.decompTimelessNumber; //signals timeless (-12345)
                     }

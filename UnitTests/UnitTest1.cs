@@ -20157,6 +20157,57 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Decomp_LagsLeads()
+        {
+            //
+            // e2[t] $ (t0[t]) .. x2[t] = E = 7 * x1[t-1] + 100;
+            // e3[t] $ (t0[t]) .. x3[t] = E = 7 * x1[t+1] + 100;
+            // e4[t] $ (t0[t]) .. x4[t] = E = 3 * x1[t] + 7 * x1[t-1] + 100;
+            // e5[t] $ (t0[t]) .. x5[t] = E = 3 * x1[t] + 7 * x1[t+1] + 100;
+            // e6[t] $ (t0[t]) .. x6[t] = E = 3 * x1[t-1] + 7 * x1[t+1] + 100;
+            // *When expanded, the RHS of the equation is identical to e4.
+            // e7[t] $ (t1[t]) .. x7[t + 1] = E = 3 * x1[t + 1] + 7 * x1[t] + 100;
+            //
+            Program.Flush(); //wipes out existing cached models
+            Globals.unitTestScreenOutput.Clear();            
+            I("reset; time 2000 2005;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
+            I("model <gms> lagsleads.zip;");
+            I("x1 = 10, 11, 12, 9, 13, 11;");
+            I("time 2001 2005;");
+            I("x2 = 7 * x1[-1] + 100;");
+            I("x3 = 7 * x1[+1] + 100;");
+            I("x4 = 3 * x1 + 7 * x1[-1] + 100;");
+            I("x5 = 3 * x1 + 7 * x1[+1] + 100;");
+            I("x6 = 3 * x1[-1] + 7 * x1[+1] + 100;");
+            I("x7 = 3 * x1 + 7 * x1[-1] + 100;");
+            I("clone;");
+            I("time 2000 2005;");
+            I("x1 = 12, 8, 17, 10, 10, 17;");
+            I("time 2001 2005;");
+            I("x2 = 7 * x1[-1] + 100;");
+            I("x3 = 7 * x1[+1] + 100;");
+            I("x4 = 3 * x1 + 7 * x1[-1] + 100;");
+            I("x5 = 3 * x1 + 7 * x1[+1] + 100;");
+            I("x6 = 3 * x1[-1] + 7 * x1[+1] + 100;");
+            I("x7 = 3 * x1 + 7 * x1[-1] + 100;");
+            I("prt <2000 2005 rn> x1, x2, x3, x4, x5, x6, x7;");
+            I("time 2003 2003;");            
+            ShowDecompTable();  //will show the following decomp table and then abort            
+            //I("decomp <m> x1 from e4;");
+            I("decomp <m> x1 from e6;");
+
+            //Gekko.Table table = Globals.lastDecompTable;
+            //Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x2");
+            //Assert.AreEqual(table.Get(2, 2).number, -100d, 0.0001);
+            //Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x1");
+            //Assert.AreEqual(table.Get(3, 2).number, 0.6682d, 0.0001);
+
+
+
+        }
+        
+        [TestMethod]
         public void _Test_Decomp_Scalar_Pivot1()
         {
             //TODO: Do some tests, also "expand etc."

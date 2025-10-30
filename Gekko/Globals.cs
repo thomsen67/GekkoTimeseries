@@ -108,7 +108,7 @@ namespace Gekko
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
                 
         public const string decompNullName = "________a";
-        public const string decompResidualName = "ZZZZZZZZ_residal";
+        public const string decompResidualName = "ZZZZZZZZ_residual";
         public const string decompResidualName2 = "Residual";
         public const string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";
@@ -179,8 +179,9 @@ namespace Gekko
         public const int startPrime = 1013;  //next is 1019.
         public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();
         public static bool greuHack = true;
-
-        public const int decompFixTimelessProblem = 2;  //1 or 2
+                
+        public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads
+        public static int decomp_MEGAHACK = 0;        
         public const bool decompFixMissingIgnoreProblem = true;
         public const string decompResidualPrefix = "res_";
         public const string decompErrorText = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";

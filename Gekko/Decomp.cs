@@ -965,6 +965,13 @@ namespace Gekko
 
             GekkoTime gt1 = t1.Add(deduct);
             GekkoTime gt2 = t2;
+
+            if (Program.options.bugfix_decomp_lagsleads)
+            {
+                gt1 = gt1.Add(-Globals.decomp_offset).Add(-Globals.decomp_MEGAHACK);
+                gt2 = gt2.Add(-Globals.decomp_offset).Add(Globals.decomp_MEGAHACK);
+            }
+
             if (modelGamsScalar.isPerpetualModel)
             {
                 gt1 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
@@ -1771,7 +1778,7 @@ namespace Gekko
 
                                 int add2 = 0;
 
-                                if (Globals.decompFixTimelessProblem == 1 && modelGamsScalar.isTimeless[dp.variable])
+                                if (false && modelGamsScalar.isTimeless[dp.variable])
                                 {
                                     if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
                                     add2 = t.Subtract(modelGamsScalar.tBasis);
@@ -1784,10 +1791,17 @@ namespace Gekko
                                 int tt1 = date + add + add2;
                                 int tt2 = date + add + add2 - t.Subtract(modelGamsScalar.tBasis);
 
-                                if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                if (true && modelGamsScalar.isTimeless[dp.variable])
                                 {
                                     if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
                                     tt2 = 0;  //always show as if unlagged, even if it really points back to .tBasis.
+                                }
+
+                                //int extraLag = 0;
+                                if (Program.options.bugfix_decomp_lagsleads)
+                                {
+                                    tt1 -= Globals.decomp_offset;
+                                    tt2 -= Globals.decomp_offset;
                                 }
 
                                 string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt1, modelGamsScalar.tBasis);
@@ -2001,7 +2015,7 @@ namespace Gekko
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
 
-                    if (Globals.decompFixTimelessProblem == 2)
+                    if (true)
                     {
                         int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(G.Chop_RemoveBank(xname));
                         if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
@@ -2015,9 +2029,9 @@ namespace Gekko
                     DecompDict dd = null;
                     if (op.isRaw)
                     {
-                        //???? Why is this ever necessary: are such variables not already done beforehand???
+                        //???? Why is this ever necessary: are such variables not already done beforehand???                        
                         DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar, decompOptions2);
-                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);
+                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);                        
                     }
                     else
                     {
@@ -2057,8 +2071,6 @@ namespace Gekko
                     }
                 }
             }
-
-            //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
         private static double InvertGetGradient(DecompData d, string x2, GekkoTime t, EContribType operatorOneOf3Types)
@@ -3180,11 +3192,14 @@ namespace Gekko
                 // TODO TODO TODO skip via a dictionary if already done
                 // TODO TODO TODO
                 // TODO TODO TODO
-                // TODO TODO TODO
+                // TODO TODO TODO                
 
                 int timeIndex1 = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
-                int timeIndex2 = -timeIndex1;
+                if (Program.options.bugfix_decomp_lagsleads) timeIndex1 += -Globals.decomp_offset;
+                
+                int timeIndex2 = -timeIndex1; //will be added to timeIndex1 later on
 
+                int offset = 0;
                 if (modelGamsScalar.isPerpetualModel)
                 {
                     ONE = 1;
@@ -3192,7 +3207,15 @@ namespace Gekko
                     timeIndex2 = modelGamsScalar.tBasis.Subtract(new GekkoTime(model.modelCommon.GetFreq(), Globals.decomp2000, 1));
                     tZero = t.Subtract(modelGamsScalar.perpetualT1) + timeIndex2;
                 }
-                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t));
+                else
+                {                    
+                    if (Program.options.bugfix_decomp_lagsleads)
+                    {
+                        offset = Globals.decomp_offset;
+                    }
+                }                
+                
+                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)));
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s);
                 if (eqNumber == -12345)
                 {
@@ -3235,9 +3258,13 @@ namespace Gekko
                         double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
                         double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
                         int lag2 = dp.date + timeIndex2;
-                        if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                        if (modelGamsScalar.isTimeless[dp.variable])
                         {
                             lag2 = 0;
+                        }
+                        else if (Program.options.bugfix_decomp_lagsleads)
+                        {
+                            lag2 -= Globals.decomp_offset;
                         }
                         string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                         d.cellsRef[name].SetData(t, x0);
@@ -3267,20 +3294,21 @@ namespace Gekko
                                 double x0_after = x0_before + eps;                                
                                 modelGamsScalar.SetData(dp.date, tZero, dp.variable, false, x0_after);                                
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
+
                                 double grad = (y0_after - y0a) / eps;
 
                                 //if (!G.IsNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
                                 if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
-                                    int lag2 = dp.date + timeIndex2;
-                                    if (Globals.decompFixTimelessProblem == 1 && modelGamsScalar.isTimeless[dp.variable])
+                                    int lag2 = dp.date + timeIndex2;                                    
+                                    if (modelGamsScalar.isTimeless[dp.variable])
                                     {
                                         lag2 = 0;
                                     }
-                                    else if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                    else if (Program.options.bugfix_decomp_lagsleads)
                                     {
-                                        lag2 = 0;
+                                        lag2 -= Globals.decomp_offset;
                                     }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
@@ -3323,9 +3351,13 @@ namespace Gekko
                                 if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
-                                    if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                    if (modelGamsScalar.isTimeless[dp.variable])
                                     {
                                         lag2 = 0;
+                                    }
+                                    else if (Program.options.bugfix_decomp_lagsleads)
+                                    {
+                                        lag2 -= Globals.decomp_offset;
                                     }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
@@ -3368,9 +3400,13 @@ namespace Gekko
                                 if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
-                                    if (Globals.decompFixTimelessProblem == 2 && modelGamsScalar.isTimeless[dp.variable])
+                                    if (modelGamsScalar.isTimeless[dp.variable])
                                     {
                                         lag2 = 0;
+                                    }
+                                    else if (Program.options.bugfix_decomp_lagsleads)
+                                    {
+                                        lag2 -= Globals.decomp_offset;
                                     }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before);
@@ -4250,7 +4286,7 @@ namespace Gekko
             if (Globals.runningOnTTComputer && !Globals.browser && hit != 1)
             {
                 MessageBox.Show("LHS problem: hit number is: " + hit);
-            }
+            }         
 
             // ------------------------------------------------------------------------------
             // Loop over PERIODS

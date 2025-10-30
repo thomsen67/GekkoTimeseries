@@ -35088,24 +35088,29 @@ namespace Gekko
 
                 if (Globals.gbkExtraMetadata)
                 {
+                    List<string> m = new List<string>();
                     if (!G.NullOrBlanks(this.user))
                     {
-                        tab.CurRow.SetText(1, "--User   : " + this.user);
-                        tab.CurRow.Next();
+                        m.Add("user: " + this.user);                        
                     }
                     if (!G.NullOrBlanks(this.branch))
                     {
-                        tab.CurRow.SetText(1, "--Branch : " + this.branch);
-                        tab.CurRow.Next();
+                        m.Add("branch: " + this.branch);                        
                     }
                     if (!G.NullOrBlanks(this.commit))
                     {
-                        tab.CurRow.SetText(1, "--Commit : " + this.commit);
+                        m.Add("commit: " + this.commit);                        
+                    }
+                    if (m.Count > 0)
+                    {
+                        string s5 = string.Join(", ", m);
+                        string s6 = G.FirstCharToUpper(s5);
+                        tab.CurRow.SetText(1, "Info     : " + s6);
                         tab.CurRow.Next();
                     }
                     if (!G.NullOrBlanks(this.gcm))
                     {
-                        tab.CurRow.SetText(1, "--Gcm    : " + this.gcm);
+                        tab.CurRow.SetText(1, "Gcm      : " + this.gcm);
                         tab.CurRow.Next();
                     }
                 }

@@ -1120,7 +1120,7 @@ namespace Gekko
         public GekkoTime Maybe2000GekkoTime(GekkoTime t0)
         {
             GekkoTime tTemp = t0;
-            if (this.isPerpetualModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
+            if (this.isPerpetualModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);            
             return tTemp;
         }
 
@@ -1169,7 +1169,7 @@ namespace Gekko
         public double GetData(int period, int t, int variable, bool missingAsZero, bool isRef)
         {
             //Beware: does missingAsZero==false still slow this down for simations??
-            if (Globals.decompFixTimelessProblem == 2 && this.isTimeless[variable])
+            if (true && this.isTimeless[variable])
             {
                 if (isRef)
                 {
@@ -1210,7 +1210,7 @@ namespace Gekko
         /// <param name="value"></param>
         public void SetData(int period, int t, int variable, bool isRef, double value)
         {
-            if (Globals.decompFixTimelessProblem == 2 && this.isTimeless[variable])
+            if (true && this.isTimeless[variable])
             {
                 if (isRef)
                 {
@@ -1493,7 +1493,7 @@ namespace Gekko
 
                     if (ts.type == ESeriesType.Timeless)
                     {
-                        if (Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2)
+                        if (false || true)
                         {
                             double data = ts.GetTimelessData();                            
                             a[Globals.decompTimelessNumber][i] = data;
@@ -2005,7 +2005,7 @@ namespace Gekko
                     int i1 = this.bb[eq][int.Parse(tokens[i + 4].s)];
                     int i2 = this.bb[eq][int.Parse(tokens[i + 12].s)];
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
-                    if ((Globals.decompFixTimelessProblem == 1 || Globals.decompFixTimelessProblem == 2) && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
+                    if ((false || true) && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
                     string varname = this.GetVarNameA(i2);
                     string varname2;
                     if (G.StartsWith(varname, Globals.decompResidualPrefix)) resName = varname;
