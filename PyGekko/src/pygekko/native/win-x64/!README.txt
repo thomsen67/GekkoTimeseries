@@ -1,1 +1,0 @@
-Contains files from the Gekko installation folder (Gekko.exe, ANTLR.dll, subfolder \gnuplot, and more)
