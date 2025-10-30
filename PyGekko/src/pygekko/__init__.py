@@ -1,9 +1,9 @@
 # Functions that are directly callable
 
-__version__ = "3.3.1" # always increment with new upload to PyPI
+__version__ = "3.3.1.post1" # always increment with new upload to PyPI
 
 from . import type_checks
-from .interface import run, wait
+from .interface import run, threads, wait, stdout
 
 # Regarding helper functions like decomp():
 # In C#.NET (Python.cs) there is this method: 
@@ -19,7 +19,7 @@ def decomp(*args, **kwargs):
     """  
     if False: 
         # A possible direct call...
-        interface.python.Decomp(*args, **kwargs)
+        interface.pygekko.Decomp(*args, **kwargs)
     else:        
         # Using a string call
         type_checks.length(args, 1); type_checks.is_string(args[0])

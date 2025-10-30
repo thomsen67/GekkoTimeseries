@@ -36,7 +36,7 @@ The following is how the Gekko stand-alone application looks. PyGekko does not s
 ## Disclaimers
 PyGekko is work in progress and quite immature as a package right now. Still, the string-based interface is expected to be stable and work as-is, also in the longer run.
 
-The PyGekko 3.3.1 version corresponds to the official Gekko 3.3.1 version, and moving forwards, these version numbers will match. Note that 'beta' releases for PyGekko are expected, for instance PyGekko 3.3.2b1, signifying work in progress towards an official PyGekko 3.3.2 version (beta versions are not installed by `pip install` unless the user explicitly asks for it).
+The PyGekko 3.3.1 version corresponds to the official Gekko 3.3.1 version, and moving forwards, these version numbers will match. Note that 'beta' releases for PyGekko are expected, for instance PyGekko 3.3.2b1, signifying work in progress towards an official PyGekko 3.3.2 version (beta versions are not installed by `pip install` unless the user explicitly asks for it). You may also encounter 'post' releases like 3.3.1.post1, where typically only very minor PyGekko interface problems are addressed.
 
 ## Requirements
 The PyGekko package only works for Python versions 3.11-3.13 under Windows 64-bit (Python 3.11 was released in October 2022). PyGekko uses the Python.NET package under the hood, which only works for Windows and does not yet support Python 3.14 (released in October 2025). PyGekko support for Python < 3.11 could be provided if there is sufficient interest. Windows 32-bit is no longer supported
@@ -46,7 +46,6 @@ Gekko version can run on your Windows 64-bit pc, so should PyGekko (because it u
 
 ## Known issues
 * It seems there can be some issues regarding scaling of the plot window. 
-* Printed output does not seem to be shown in an interactive Jupyter terminal. 
 * Loops and conditionals etc. (lines of Gekko code ending with an `end;`) cannot be directly transformed into corresponding lines of `pg.run()` calls. Using *one* glued-together string delimited with `;`'s will work though.
 * Talking to dataframes (Pandas/Polars etc.) containing timeseries data can be done through csv files, cf. Gekko's `import` and `export`. Gekko can write Apache Arrow files (`export<arrow>`) for easy consumption by Pandas/Polars, but cannot read arrow files (yet). (Gekko's `python_run` amounts to calling Python from Gekko, and would be bizarre to use in PyGekko).
 * When you open up Gekko windows like for instance the plot window (example: `pg.run("plot x1, x2, x1/y;"`), you may put a `pg.wait()` at the end of your Python program to make the window(s) stay open. Otherwise Python may take these windows down when it finishes its job.

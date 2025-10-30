@@ -7,16 +7,10 @@ import clr  # Python.NET (pythonnet)
 with importlib.resources.path("pygekko.native.win-x64", "Gekko.exe") as dll_path: clr.AddReference(str(dll_path))
 
 from Gekko import Python
-import threading
-from System import Object 
-from System.Threading import Thread, ThreadStart, ApartmentState, Monitor 
-from System.Windows import Application, Window
-_last_thread = None
-RUN_LOCK = Object()
-python = Python()
+from System.Threading import Thread, ThreadStart, ApartmentState
 
-def threads(b: bool):
-    settings.threads = b
+_last_thread = None
+pygekko = Python()
 
 def run(s: str):
     """
@@ -24,17 +18,22 @@ def run(s: str):
     executed by Gekko. The statement(s) is provided as a string.
     """
     type_checks.is_string(s)
+    output: string = None
     if settings.threads:
         # On some Python versions, it seems that the C#.NET windows only get smooth rendering when this is used.
+        # FIX this so it can handle string output from Gekko like in the else: statement
+        # Probably as a hack where the .Run() argument is a list with two string args... to get side effects, and then assign to output string
         global _last_thread
         if _last_thread is not None:
             _last_thread.Join()
-        thread = Thread(ThreadStart(lambda: python.Run(s)))
+        thread = Thread(ThreadStart(lambda: pygekko.Run(s)))
         thread.SetApartmentState(ApartmentState.STA)
         thread.Start()
         _last_thread = thread
     else:
-        python.Run(s)
+        output = pygekko.Run(s)
+    if (output is not None):
+        print(output, end="")    
 
 def runfile(s: str):
     """
@@ -42,25 +41,33 @@ def runfile(s: str):
     The file name is provided as a string.
     """
     type_checks.is_string(s)
-    python.RunFile(s)
+    pygekko.RunFile(s)
 
 def wait():    
     """
-    Used at the end of a .py file to keep Gekko windows open
+    Used at the end of a .py file to keep Gekko popup windows open
     """          
-    python.Wait()    
+    pygekko.Wait()    
 
 def stdout(b: bool):
     """
-    Use stdout stream. This works for normal Python execution (also in VS Code), but not
-    for Jupyter setups including VS Code interactive window.
-    Is False per default. With default value, while Python runs a run() function, PyGekko
-    "records"/"remembers" Gekko-output, which is then printed by Python when the run() function
+    Use stdout stream (default: False). This works for normal Python execution for instance in VS Code, and 
+    also for Jupyter setups including VS Code interactive window (REPL coding).
+    With False, while Python runs a run() function, PyGekko
+    "records"/"remembers" Gekko-output, which is then printed by Python at the end when the run() function
     returns. Drawback: output for a run() command is only printed at the end of the command, but
-    Gekko command typically do not run for a long time individually.
+    Gekko commands typically do not run for a long time individually. Use argument True to get
+    continuous output, which will probably not work for Jupyter or VS Code interactive windows.
     """
     if(b):
-        print("Python: stdout(True) = stdout stream (Standard Output) used for continuous Gekko output")
+        print("Python: stdout(True) --> stdout stream ('standard output') used for continuous Gekko output")
     else:
-        print("Python: stdout(False) = Gekko output is 'recorded' for each run() call and printed by Python")
-    python.Stdout(b)
+        print("Python: stdout(False) --> Gekko output is 'recorded' for each run() call and printed by Python")
+    pygekko.Stdout(b)
+
+def threads(b: bool):
+    """
+    Use threads (default: False) to call run() on a new thread. If Gekko popup windows like plot, decomp, etc. are
+    laggy, you may try this option.
+    """
+    settings.threads = b
