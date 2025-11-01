@@ -1413,7 +1413,8 @@ namespace Gekko
             DecompDict dd = new DecompDict();
             foreach (KeyValuePair<string, Series> kvp in this.storage)
             {
-                dd.storage.Add(kvp.Key, kvp.Value.DeepClone(0, null, null) as Series);
+                if (kvp.Value == null) dd.storage.Add(kvp.Key, null);
+                else dd.storage.Add(kvp.Key, kvp.Value.DeepClone(0, null, null) as Series);
             }
             return dd;
         }

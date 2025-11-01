@@ -2147,7 +2147,7 @@ img {border-style: none;
                         else decompOptions2.showErrors = false;
                         string residualName = Program.GetDecompResidualName(0, 1);
                         int funcCounter = 0;
-                        DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                        DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
                         decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
                         DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);

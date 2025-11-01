@@ -180,8 +180,8 @@ namespace Gekko
         public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();
         public static bool greuHack = true;
                 
-        public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads
-        public static int decomp_MEGAHACK = 0;        
+        public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads                
+
         public const bool decompFixMissingIgnoreProblem = true;
         public const string decompResidualPrefix = "res_";
         public const string decompErrorText = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";

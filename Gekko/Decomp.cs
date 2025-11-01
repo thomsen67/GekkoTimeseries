@@ -968,8 +968,8 @@ namespace Gekko
 
             if (Program.options.bugfix_decomp_lagsleads)
             {
-                gt1 = gt1.Add(-Globals.decomp_offset).Add(-Globals.decomp_MEGAHACK);
-                gt2 = gt2.Add(-Globals.decomp_offset).Add(Globals.decomp_MEGAHACK);
+                gt1 = gt1.Add(-Globals.decomp_offset);
+                gt2 = gt2.Add(-Globals.decomp_offset);
             }
 
             if (modelGamsScalar.isPerpetualModel)
@@ -1097,7 +1097,7 @@ namespace Gekko
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;  //will be = 0
-                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                     }
                 }
@@ -1677,6 +1677,7 @@ namespace Gekko
         {
             GekkoDictionaryBlanks<int> endo = new GekkoDictionaryBlanks<int>();
             GekkoDictionaryBlanks<int> exo = new GekkoDictionaryBlanks<int>();
+            GekkoDictionaryBlanks<int> all = new GekkoDictionaryBlanks<int>();  //all variables that are present in 1 or more equations
             Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
             Dictionary<int, string> exoReverse = new Dictionary<int, string>();  //just inverted
 
@@ -1693,7 +1694,7 @@ namespace Gekko
                         endoReverse.Add(c, x);
                     }
                 }
-            }
+            }            
 
             //residuals are not part of precedents here
 
@@ -1701,7 +1702,7 @@ namespace Gekko
             double[,] mEndo2 = null;  //gradients
             double[,] mEndo3 = null;  //differences
             double[,] mExo = null;
-            List<string> eqNames = new List<string>();
+            List<string> eqNames = new List<string>();            
 
             //The loop here actually runs 2 times (over k). First time it just gathers elements for exo and exoReverse,
             //because the size of exo is used the second time.
@@ -1751,7 +1752,7 @@ namespace Gekko
                     int jj = -1;
                     foreach (DecompStartHelper eqPeriods in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
-                        jj++;
+                        jj++;                        
                         DecompDict dd = null;
                         if (!op.isRaw) dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
 
@@ -1817,9 +1818,11 @@ namespace Gekko
                                     // First time
                                     // -----------
 
+                                    all.AddIfNotAlreadyThere(x1, -12345);
+
                                     if (exo.ContainsKey(x1) || endo.ContainsKey(x1))
                                     {
-                                        //endo                                
+                                        //endo or already in exo                                        
                                     }
                                     else
                                     {
@@ -1890,6 +1893,16 @@ namespace Gekko
             //TODO: check that number of endo and number of eqs match
 
             int n = endo.Count() + exo.Count();
+
+            List<string> problem = new List<string>();
+            foreach (string x in endo.GetKeys())
+            {
+                if (!all.ContainsKey(x)) problem.Add(x);
+            }
+            if (problem.Count > 0)
+            {
+                EndoVariableNotFoundInEquations(per1, per2, all, eqNames, problem);
+            }
 
             if (refreshObjects)
             {
@@ -2019,8 +2032,8 @@ namespace Gekko
                     if (op.isRaw)
                     {
                         //???? Why is this ever necessary: are such variables not already done beforehand???                        
-                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar, decompOptions2);
-                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);
+                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar, decompOptions2);                                            
+                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar, decompOptions2);                        
                     }
                     else
                     {
@@ -2060,6 +2073,47 @@ namespace Gekko
                     }
                 }
             }
+        }
+
+        private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, GekkoDictionaryBlanks<int> all, List<string> eqNames, List<string> problem)
+        {
+            for (int i = 0; i < problem.Count; i++)
+            {
+                problem[i] = G.Chop_RemoveBank(G.ReplaceTurtle(problem[i]));
+            }
+
+            List<string> all2 = new List<string>();
+            foreach (string s2 in all.GetKeys())
+            {
+                if (!s2.Contains(Globals.decompResidualName)) all2.Add(G.Chop_RemoveBank(G.ReplaceTurtle(s2)));
+            }
+
+            string extra0 = "For the period " + per1.ToString() + "-" + per2.ToString();
+            string extra3 = eqNames.Count > 0 ? "Equation" + G.S(eqNames.Count) + ": " + Stringlist.GetListWithCommas(eqNames) : null;
+            string extra5 = all2.Count > 0 ? "Variable" + G.S(all2.Count) + ": " + Stringlist.GetListWithCommas(all2) : null;
+            string extra1 = "not appear in any equations. You may possibly need to lag/lead one or more equations. " + G.NL + G.NL + extra3 + G.NL + G.NL + extra5;
+            string s = null;
+            if (problem.Count == 1)
+            {
+                s = extra0 + ", the endogenous variable " + Stringlist.GetListWithCommas(problem) + " does " + extra1;
+            }
+            else
+            {
+                s = extra0 + ", the endogenous variables: " + Stringlist.GetListWithCommas(problem) + " do " + extra1;
+            }
+
+            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
+            w.Height = 500;
+            w.Width = 800;
+            w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.TextWrapping = System.Windows.TextWrapping.Wrap;
+            w.textBox1.Text = s;
+            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+            w.textBox1.FontSize = 11;
+            w.ShowDialog();
+
+            new Error("DECOMP aborted");
         }
 
         private static double InvertGetGradient(DecompData d, string x2, GekkoTime t, EContribType operatorOneOf3Types)
@@ -2116,7 +2170,7 @@ namespace Gekko
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-
+            
             int lag2; string name2;
             ConvertFromTurtleName(name, true, out name2, out lag2);
 
@@ -2168,6 +2222,7 @@ namespace Gekko
                     // HACK HACK HACK HACK HACK
                     // Why taken from databank?
                     // HACK HACK HACK HACK HACK
+
                     Series ts = O.GetIVariableFromString(name2.Replace(DecompFirst() + ":", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
@@ -3155,7 +3210,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper eqPeriods, DecompOperator op, string residualName, ref int funcCounter, bool missingAsZero, Model model)
+        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, DecompStartHelper eqPeriods, DecompOperator op, string residualName, ref int funcCounter, bool missingAsZero, Model model)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
@@ -4273,8 +4328,8 @@ namespace Gekko
                 if (!ChopFullVariableName(lhs2, fullVariableName).isLhs) orderedNames.Add(fullVariableName);
             }
             if (Globals.runningOnTTComputer && !Globals.browser && hit != 1)
-            {
-                MessageBox.Show("LHS problem: hit number is: " + hit);
+            {                
+                MessageBox.Show("LHS problem: hit number is: " + hit);                
             }         
 
             // ------------------------------------------------------------------------------
@@ -6531,7 +6586,7 @@ namespace Gekko
             decompOptions2.showErrors = true;
             string residualName = Program.GetDecompResidualName(0, 1);
             int funcCounter = 0;
-            DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, 0, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
+            DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
             Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
             decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
             DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);

@@ -313,7 +313,7 @@ namespace Gekko
                     try
                     {
                         Globals.decompIsCalculatingButtonColors = true;  //so we will never get popups
-                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, decompOptionsTemp.decompOperator, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
+                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, dsh, decompOptionsTemp.decompOperator, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
                     }
                     finally
                     {
