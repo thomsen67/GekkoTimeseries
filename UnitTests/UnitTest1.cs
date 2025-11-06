@@ -20177,9 +20177,15 @@ namespace UnitTests
             // e7[t] $ (t1[t]) .. x7[t + 1] = E = 3 * x1[t + 1] + 7 * x1[t] + 100;
             //
             Program.Flush(); //wipes out existing cached models
-            Globals.unitTestScreenOutput.Clear();            
+            Globals.unitTestScreenOutput.Clear();
+
+            bool newWay = true;
+
             I("reset; time 2000 2005;");
-            I("option bugfix decomp lagsleads = yes;");
+            if (!newWay)
+            {
+                I("option bugfix decomp lagsleads = yes;");
+            }
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\';");
             I("model <gms> lagsleads.zip;");
             I("x1 = 10, 11, 12, 9, 13, 11;");
@@ -20202,9 +20208,16 @@ namespace UnitTests
             I("x7 = 3 * x1 + 7 * x1[-1] + 100;");
             I("prt <2000 2005 rn> x1, x2, x3, x4, x5, x6, x7;");
             I("time 2003 2003;");
-            ShowDecompTable();  //will show the following decomp table and then abort                        
+            //ShowDecompTable();  //will show the following decomp table and then abort                        
 
-            I("decomp <m> x1 from e6;");
+            if (newWay)
+            {
+                I("decomp <m> x1 from e6[-1];");
+            }
+            else
+            {
+                I("decomp <m> x1 from e6;");
+            }
             Gekko.Table table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2003");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x1");
@@ -20214,7 +20227,14 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "x6[-1]");
             Assert.AreEqual(table.Get(4, 2).number, -2d / 7d, sharedTableDelta);  //calculated by hand
 
-            I("decomp <d> x1 from e6;");
+            if (newWay)
+            {
+                I("decomp <d> x1 from e6[-1];");
+            }
+            else
+            {
+                I("decomp <d> x1 from e6;");
+            }
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2003");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "x1");
