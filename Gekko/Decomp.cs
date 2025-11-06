@@ -1364,14 +1364,16 @@ namespace Gekko
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in decompOptions2.new_from)
-            {                
-                if (s.Count(c => c == '[') > 2) new Error("More than two '[' encountered in equation name");
+            {
+                int n = s.Count(c => c == '[');
+
+                if (n > 2) new Error("More than two '[' encountered in equation name");
 
                 string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
 
                 G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
 
-                if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");
+                if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");                                
 
                 int i = 0;
                 if (indexes2 != null)
@@ -1383,12 +1385,19 @@ namespace Gekko
 
                 if (indexes1 == null) indexes1 = new string[0];  //a null array is standard way of saying "no indexes", like x having no dimensions unlike x[a,b].
 
+                string sWithoutLagsLeads = s;
+                int lastIndex = s.LastIndexOf('[');
+                if (lastIndex != -1)
+                {
+                    sWithoutLagsLeads = s.Substring(0, lastIndex);
+                }
+
                 //For each equation stated
                 //Actually there is no time extracted below: the s string hos no time element
                 //GekkoTime trash = GekkoTime.tNull;
                 //ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
 
-                Dictionary<MultidimItem, DecompStartHelper> elements = null;
+                Dictionary <MultidimItem, DecompStartHelper> elements = null;
                 equations.TryGetValue(name, out elements);
                 if (elements == null)
                 {
@@ -1414,7 +1423,7 @@ namespace Gekko
                     element.offset = i;
                     elements.Add(mmi, element);
                 }
-                FindEquationsForEachRelevantPeriod(per1, per2, s, name, mmi, element, operator1, showErrors, modelGamsScalar);
+                FindEquationsForEachRelevantPeriod(per1, per2, sWithoutLagsLeads, name, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
             int counter = -1;
@@ -3302,7 +3311,7 @@ namespace Gekko
 
                     if (eqPeriods.offset != 0)
                     {
-                        offset = eqPeriods.offset;
+                        offset = -eqPeriods.offset;
                     }
                 }                
                 
