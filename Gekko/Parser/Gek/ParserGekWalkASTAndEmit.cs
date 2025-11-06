@@ -1000,7 +1000,11 @@ namespace Gekko.Parser.Gek
 
                         if (true)
                         {
-                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            if (node[0]?[0]?.Text != null && node[0][0].Text == "ASTPLUS7")
+                            {
+                                node.Code.A(".Concat(null, new ScalarString(`+`))");
+                            }
+                            for (int i = 1; i < node.ChildrenCount(); i++)
                             {
                                 for (int j = 0; j < node[i].ChildrenCount(); j++)
                                 {

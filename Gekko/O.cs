@@ -4168,15 +4168,16 @@ namespace Gekko
                 {
                     new Error("Expected indexer to start with '[' and end with ']'");
                 }
-                indexes = rest.Substring(1, rest.Length - 2).Split(',');
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    indexes[i] = indexes[i].Trim();
-                }
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    indexes[i] = G.StripQuotes(indexes[i]);  //probably not relevant now, but may be later on
-                }
+                //indexes = rest.Substring(1, rest.Length - 2).Split(',');
+                //for (int i = 0; i < indexes.Length; i++)
+                //{
+                //    indexes[i] = indexes[i].Trim();
+                //}
+                //for (int i = 0; i < indexes.Length; i++)
+                //{
+                //    indexes[i] = G.StripQuotes(indexes[i]);  //probably not relevant now, but may be later on
+                //}
+                indexes = G.SplitIndexerIntoParts(rest);
             }
 
             //When it returns, all returned strings are guaranteed not to contain colon or !.
@@ -4197,6 +4198,26 @@ namespace Gekko
             freq = null;
             O.ChopFreq(varName, ref freq, ref varName);
         }
+
+        public static void Chop_Jagged(string input2, out string dbName, out string varName, out string freq, out string[] indexes1, out string[] indexes2)
+        {         
+            int i1 = input2.IndexOf('[');
+            if (i1 > -1)
+            {
+                int i2 = input2.IndexOf('[', i1 + 1);
+                if (i2 > -1)
+                {
+                    string part1 = input2.Substring(0, i2); //No need to trim
+                    Chop(part1, out dbName, out varName, out freq, out indexes1);
+                    string ss2 = input2.Substring(i2);
+                    indexes2 = G.SplitIndexerIntoParts(ss2);
+                    return;
+                }
+            }
+
+            Chop(input2, out dbName, out varName, out freq, out indexes1);
+            indexes2 = null;
+        }        
 
         /// <summary>
         /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (" ") or [a,b,c] (null)

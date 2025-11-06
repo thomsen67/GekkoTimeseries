@@ -20201,9 +20201,9 @@ namespace UnitTests
             I("x6 = 3 * x1[-1] + 7 * x1[+1] + 100;");
             I("x7 = 3 * x1 + 7 * x1[-1] + 100;");
             I("prt <2000 2005 rn> x1, x2, x3, x4, x5, x6, x7;");
-            I("time 2003 2003;");            
-            //ShowDecompTable();  //will show the following decomp table and then abort                        
-            
+            I("time 2003 2003;");
+            ShowDecompTable();  //will show the following decomp table and then abort                        
+
             I("decomp <m> x1 from e6;");
             Gekko.Table table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2003");

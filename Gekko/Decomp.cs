@@ -972,6 +972,12 @@ namespace Gekko
                 gt2 = gt2.Add(-Globals.decomp_offset);
             }
 
+            if (element.offset != 0)
+            {
+                gt1 = gt1.Add(element.offset);
+                gt2 = gt2.Add(element.offset);
+            }
+
             if (modelGamsScalar.isPerpetualModel)
             {
                 gt1 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
@@ -1358,41 +1364,63 @@ namespace Gekko
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in decompOptions2.new_from)
-            {
+            {                
+                if (s.Count(c => c == '[') > 2) new Error("More than two '[' encountered in equation name");
+
+                string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
+
+                G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
+
+                if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");
+
+                int i = 0;
+                if (indexes2 != null)
+                {
+                    if (indexes2.Length != 1) new Error("Expected second index to have 1 element");
+                    bool b = int.TryParse(indexes2[0], out i);                    
+                    if (!b) new Error("Expected second index to be integer");
+                }
+
+                if (indexes1 == null) indexes1 = new string[0];  //a null array is standard way of saying "no indexes", like x having no dimensions unlike x[a,b].
+
                 //For each equation stated
                 //Actually there is no time extracted below: the s string hos no time element
-                GekkoTime trash = GekkoTime.tNull;
-                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
+                //GekkoTime trash = GekkoTime.tNull;
+                //ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
 
                 Dictionary<MultidimItem, DecompStartHelper> elements = null;
-                equations.TryGetValue(helper.name, out elements);
+                equations.TryGetValue(name, out elements);
                 if (elements == null)
                 {
                     elements = new Dictionary<MultidimItem, DecompStartHelper>();
-                    equations.Add(helper.name, elements);
+                    equations.Add(name, elements);
                 }
 
-                MultidimItem mmi = new MultidimItem(helper.indexes.ToArray());
+                MultidimItem mmi = new MultidimItem(indexes1);
                 DecompStartHelper element = null;
                 elements.TryGetValue(mmi, out element);
                 if (element == null)
                 {
                     element = new DecompStartHelper();
-                    element.name = helper.name;
+                    element.name = name;
                     element.indexes = mmi;
+                    //
+                    // TODO: add [-1] or [+1] ???
+                    //                    
                     element.fullName = element.name + element.indexes.GetName();
                     int periods = GekkoTime.Observations(modelGamsScalar.absoluteT1, modelGamsScalar.absoluteT2);
                     if (modelGamsScalar.isPerpetualModel) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
+                    element.offset = i;
                     elements.Add(mmi, element);
                 }
-                FindEquationsForEachRelevantPeriod(per1, per2, s, helper.name, mmi, element, operator1, showErrors, modelGamsScalar);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, name, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
             int counter = -1;
             foreach (KeyValuePair<string, Dictionary<MultidimItem, DecompStartHelper>> kvp in equations)
             {
-                //for each equation name
+                //for each equation name                
                 counter++;
                 Link link = new Link();
                 link.GAMS_dsh = new List<DecompStartHelper>();
@@ -1794,6 +1822,12 @@ namespace Gekko
                                 {
                                     tt1 -= Globals.decomp_offset;
                                     tt2 -= Globals.decomp_offset;
+                                }
+
+                                if (eqPeriods.offset != 0)
+                                {
+                                    tt1 += eqPeriods.offset;
+                                    tt2 += eqPeriods.offset;
                                 }
 
                                 string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt1, modelGamsScalar.tBasis);
@@ -3239,7 +3273,15 @@ namespace Gekko
                 // TODO TODO TODO                
 
                 int timeIndex1 = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
-                if (Program.options.bugfix_decomp_lagsleads) timeIndex1 += -Globals.decomp_offset;
+                if (Program.options.bugfix_decomp_lagsleads)
+                {
+                    timeIndex1 += -Globals.decomp_offset;
+                }
+
+                if (eqPeriods.offset != 0)
+                {
+                    timeIndex1 += eqPeriods.offset;
+                }
                 
                 int timeIndex2 = -timeIndex1; //will be added to timeIndex1 later on
 
@@ -3256,6 +3298,11 @@ namespace Gekko
                     if (Program.options.bugfix_decomp_lagsleads)
                     {
                         offset = Globals.decomp_offset;
+                    }
+
+                    if (eqPeriods.offset != 0)
+                    {
+                        offset = eqPeriods.offset;
                     }
                 }                
                 
@@ -3310,6 +3357,10 @@ namespace Gekko
                         {
                             lag2 -= Globals.decomp_offset;
                         }
+                        else if (eqPeriods.offset != 0)
+                        {
+                            lag2 += eqPeriods.offset;
+                        }
                         string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                         d.cellsRef[name].SetData(t, x0);
                         d.cellsQuo[name].SetData(t, x1);
@@ -3353,6 +3404,10 @@ namespace Gekko
                                     else if (Program.options.bugfix_decomp_lagsleads)
                                     {
                                         lag2 -= Globals.decomp_offset;
+                                    }
+                                    else if (eqPeriods.offset != 0)
+                                    {
+                                        lag2 += eqPeriods.offset;
                                     }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
@@ -3403,6 +3458,10 @@ namespace Gekko
                                     {
                                         lag2 -= Globals.decomp_offset;
                                     }
+                                    else if (eqPeriods.offset != 0)
+                                    {
+                                        lag2 += eqPeriods.offset;
+                                    }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
@@ -3451,6 +3510,10 @@ namespace Gekko
                                     else if (Program.options.bugfix_decomp_lagsleads)
                                     {
                                         lag2 -= Globals.decomp_offset;
+                                    }
+                                    else if (eqPeriods.offset != 0)
+                                    {
+                                        lag2 += eqPeriods.offset;
                                     }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before);
@@ -6654,7 +6717,8 @@ namespace Gekko
         public string name = null; //the "x" in "x[a, b, <time>]"
         public string fullName = null; //the "x[a, b]" in "x[a, b, <time>]"
         public MultidimItem indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
-        public DecompStartHelperPeriod[] periods = null; //all the <time> periods found        
+        public DecompStartHelperPeriod[] periods = null; //all the <time> periods found
+        public int offset = 0;                                                 //
     }
 
     public class DecompStartHelperPeriod

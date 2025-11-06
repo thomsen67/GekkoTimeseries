@@ -3611,7 +3611,7 @@ namespace Gekko
         public string GetName()
         {
             string s = null;
-            if (this.parent != null) s = this.parent.name;
+            if (this.parent != null) s = this.parent.name;            
             return s + "[" + this.ToString() + "]";
         }
 

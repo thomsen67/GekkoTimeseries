@@ -25,6 +25,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
@@ -1530,8 +1531,22 @@ namespace Gekko
         /// <param name="varName"></param>
         /// <param name="freq"></param>
         /// <param name="indexes"></param>
-        public static void Chop_Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes) {
+        public static void Chop_Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes) 
+        {
             O.Chop(input2, out dbName, out varName, out freq, out indexes);
+        }
+
+        /// <summary>
+        /// For something like x[a,b][c,d] or x[i][-1] chops up into all components
+        /// </summary>
+        /// <param name="input2"></param>
+        /// <param name="dbName"></param>
+        /// <param name="varName"></param>
+        /// <param name="freq"></param>
+        /// <param name="indexes"></param>
+        public static void Chop_Chop_Jagged(string input2, out string dbName, out string varName, out string freq, out string[] indexes1, out string[] indexes2)
+        {
+            O.Chop_Jagged(input2, out dbName, out varName, out freq, out indexes1, out indexes2);
         }
 
         /// <summary>
@@ -1788,6 +1803,17 @@ namespace Gekko
         {
             //Problem is that char.IsLetter accepts זרו and others
             return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+        }
+
+        /// <summary>
+        /// For a string like " [a,b, c , 'd',e ]" it splits up into array "a", "b", "c", "d", "e". Quite robust.
+        /// Can also handle for instance "[-1]" or "[+1]".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string[] SplitIndexerIntoParts(string s)
+        {
+            return s.Trim().Trim('[', ']').Split(',').Select(x => G.StripQuotes(x.Trim())).ToArray();
         }
 
         /// <summary>

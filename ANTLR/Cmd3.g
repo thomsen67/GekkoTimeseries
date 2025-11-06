@@ -75,6 +75,7 @@ tokens {
 	ASTNAKEDLISTITEM;
 	ASTNAKEDLIST;
 	ASTL1;
+    ASTL2;
 	ASTGLOBAL;
 	ASTIN;
 	ASTASSIGNMENTEXPRESSION;
@@ -97,6 +98,7 @@ tokens {
 	ASTPERCENT;
 	ASTSEQ7;
 	ASTPLUS2;
+    ASTPLUS7;
 	ASTMINUS2;
 	ASTSTAR2;
 	ASTASSIGNMENTQUESTION;
@@ -2426,13 +2428,15 @@ seqItemNaked:                 MINUS seqItem7Naked 	(REP repN)?	-> ^(ASTNAKEDLIST
 							| ident leftParenGlue RIGHTPAREN -> ^(ASTNAKEDLISTMISS ident) //must catch m() or miss()
 						      ;
 
-seqItem7Naked:                bank7Naked? name7 freq7Naked? indexer7Naked? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7 freq7Naked?) ^(ASTPLACEHOLDER indexer7Naked?));
+seqItem7Naked:                bank7Naked? name7 freq7Naked? indexer7Naked? indexer7Naked1? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7 freq7Naked?) ^(ASTPLACEHOLDER indexer7Naked? indexer7Naked1?));
+indexer7Naked1:               indexer7Naked; //alias
+
 bank7Naked:					  AT GLUE -> ASTAT
 							| name7 COLON -> name7 ASTCOLON
 							  ;
 
 freq7Naked:				      GLUE EXCLAMATION GLUE name7 -> ASTEXCLAMATION name7;
-indexer7Naked:				  leftBracket (indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 indexerHelper7+);
+indexer7Naked:				  leftBracket (plus7? indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 ^(ASTL2 plus7?) indexerHelper7+);  //plus only works on the first element, for instance [+1].
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- flexible list --------------------------------------------------------------------------------
@@ -2451,14 +2455,17 @@ seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 						      ;
 
 seqItem7:                     listFile
-							| bank7? wildcard7 indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER indexer7?));
+							| bank7? wildcard7 indexer7? indexer71? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER indexer7? indexer71?));
+indexer71:                    indexer7;
 
 bank7:						  AT GLUE -> ASTAT
 							| wildcard7 COLON -> wildcard7 ASTCOLON
 							  ;
 
 freq7:						  GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
-indexer7:					  leftBracket (indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 indexerHelper7+);  
+
+indexer7:					  leftBracket (plus7? indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 ^(ASTL2 plus7?) indexerHelper7+);  //plus only works on the first element, for instance [+1].
+plus7:                        PLUS -> ASTPLUS7;
 
 indexerHelper7:				  
 						      wildcardIndexer7 -> ^(ASTL1 wildcardIndexer7)	 //stuff like x[a], x[a*b]						 					
@@ -4257,7 +4264,7 @@ filter:                     FILTER '=' (  no   -> ^(ASTPRTTIMEFILTER NO)
 						    ;
 						    
 fileName:                   name ':' fileNamePart -> ^(ASTLIBRARYNAME name fileNamePart)  //library call like lib1:nice.gpt
-						  | fileNameFirstPart (slashHelper1 fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)     //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
+						  | fileNameFirstPart (slashHelper1 fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)     //If special chars, you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
 						  | expression -> ^(ASTFILENAME expression)
 						    ;
 fileNameFirstPart:          fileNameFirstPart1                                                                                   //   c:\xx
@@ -4267,7 +4274,7 @@ fileNameFirstPart:          fileNameFirstPart1                                  
 fileNameFirstPart1:         name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);                        //For instance READ c:\a.b\c.d, cannot be c:a.b\c.d, ok to use name before colon, drive indicator should start with a letter.                            
 fileNameFirstPart2:         slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);                                      //For instance READ \a.b\c.d, cannot be READ\a.b\c.d                            
 fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);                                                   //For instance READ a.b							
-fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);      //stuff like 'a.7z' or 'a b.doc' or 'æøå.doc' must be in quotes.
+fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);      //stuff like 'a.7z' or 'a b.doc' or '<specialchars>.doc' must be in quotes.
 fileNamePartHelper:         name
 						  | identDigit  //cathes stuff like \05banker\bank etc.
 						  | doubleDot -> ASTPARENTDIRECTORY  //catches stuff like \..\bank
@@ -5625,7 +5632,5 @@ fragment W_:('w'|'W');
 fragment X_:('x'|'X');
 fragment Y_:('y'|'Y');
 fragment Z_:('z'|'Z');
-//fragment AE_:('æ'|'Æ');
-//fragment OE_:('ø'|'Ø');
-//fragment AA_:('å'|'Å');
+
 
