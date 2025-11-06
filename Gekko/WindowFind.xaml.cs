@@ -144,14 +144,17 @@ namespace Gekko
                 //do nothing here, will "select" the equation elsewhere.
             }
             else
-            {                
-                CallDecomp(item.fullName, decompFind.model);
+            {
+                string s = item.fullName;
+                if (Globals.findFix) s = item.EquationName;
+                CallDecomp(s, decompFind.model);
             }
         }
 
         private void CallDecomp(string fullName, Model model)
         {
-            string eqName = G.Chop_DimensionRemoveLast(fullName);
+            string eqName = fullName;
+            if (!Globals.findFix) G.Chop_DimensionRemoveLast(fullName);            
             DecompFind decompFind = this.decompFind;
             CallDecompHelper(eqName, decompFind, model);
         }

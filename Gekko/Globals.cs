@@ -180,7 +180,8 @@ namespace Gekko
         public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();
         public static bool greuHack = true;
                 
-        public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads                
+        public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads
+        public static bool findFix = true;                                     
 
         public const bool decompFixMissingIgnoreProblem = true;
         public const string decompResidualPrefix = "res_";

@@ -1029,16 +1029,24 @@ namespace Gekko
 
         /// <summary>
         /// For a name like "x" and a list like {"a", "b"}, time is added and returns like for instance "x[a,b,2001]".
-        /// Note no blanks.
+        /// Note no blanks. If separate==true, it becomes "x[a,b][2001]".
         /// </summary>
         /// <param name="name2"></param>
         /// <param name="indexes2"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        private static string AddTimeToIndexes(string name2, List<string> indexes2, GekkoTime time)
+        private static string AddTimeToIndexes(string name2, List<string> indexes2, GekkoTime time, bool separate)
         {
-            indexes2.Add(time.ToString());
-            string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), null);
+            string s2 = null;
+            if (separate)
+            {
+                s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), null) + "[" + time.ToString() + "]";
+            }
+            else
+            {
+                indexes2.Add(time.ToString());
+                s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), null);
+            }
             return s2;
         }
 
@@ -1752,7 +1760,8 @@ namespace Gekko
             double[,] mEndo2 = null;  //gradients
             double[,] mEndo3 = null;  //differences
             double[,] mExo = null;
-            List<string> eqNames = new List<string>();            
+            List<string> eqNames = new List<string>();
+            List<string> eqNamesPretty = new List<string>(); //Only used for an error message
 
             //The loop here actually runs 2 times (over k). First time it just gathers elements for exo and exoReverse,
             //because the size of exo is used the second time.
@@ -1816,8 +1825,13 @@ namespace Gekko
                             tTemp = modelGamsScalar.Maybe2000GekkoTime(t);
                             add = t.Subtract(tTemp);
 
-                            string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
-                            if (k == 0) eqNames.Add(eqName);
+                            string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp, false);
+                            if (k == 0)
+                            {
+                                eqNames.Add(eqName);
+                                string eqNamePretty = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp, true);
+                                eqNamesPretty.Add(eqNamePretty);
+                            }
                             int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(eqName);
 
                             List<TwoStrings> variables = new List<TwoStrings>();
@@ -1957,7 +1971,7 @@ namespace Gekko
             }
             if (problem.Count > 0)
             {
-                EndoVariableNotFoundInEquations(per1, per2, all, eqNames, problem);
+                EndoVariableNotFoundInEquations(per1, per2, all, eqNamesPretty, problem);
             }
 
             if (refreshObjects)
@@ -2134,28 +2148,52 @@ namespace Gekko
         private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, GekkoDictionaryBlanks<int> all, List<string> eqNames, List<string> problem)
         {
             for (int i = 0; i < problem.Count; i++)
-            {
-                problem[i] = G.Chop_RemoveBank(G.ReplaceTurtle(problem[i]));
+            {                
+                int idx = problem[i].LastIndexOf(':'); 
+                if (idx != -1) problem[i] = problem[i].Substring(idx + 1);
+                problem[i] = G.ReplaceTurtle(problem[i]).Replace(", ", ",");
             }
 
             List<string> all2 = new List<string>();
             foreach (string s2 in all.GetKeys())
             {
-                if (!s2.Contains(Globals.decompResidualName)) all2.Add(G.Chop_RemoveBank(G.ReplaceTurtle(s2)));
+                string s5 = G.ReplaceTurtle(s2);
+                //G.Chop... will not work because there may be two "["
+                int idx = s5.LastIndexOf(':'); 
+                if (idx != -1) s5 = s5.Substring(idx + 1);
+                s5 = G.ReplaceTurtle(s5).Replace(", ", ",");
+                if (!s2.Contains(Globals.decompResidualName)) all2.Add(s5);
             }
 
-            string extra0 = "For the period " + per1.ToString() + "-" + per2.ToString();
-            string extra3 = eqNames.Count > 0 ? "Equation" + G.S(eqNames.Count) + ": " + Stringlist.GetListWithCommas(eqNames) : null;
-            string extra5 = all2.Count > 0 ? "Variable" + G.S(all2.Count) + ": " + Stringlist.GetListWithCommas(all2) : null;
-            string extra1 = "not appear in any equations. You may possibly need to lag/lead one or more equations. " + G.NL + G.NL + extra3 + G.NL + G.NL + extra5;
+            string extra0 = "For the period " + per1.ToString() + "-" + per2.ToString();            
+            string extra3 = null;
+            if (eqNames.Count > 0)
+            {
+                extra3 = "Equation" + G.S(eqNames.Count) + ":" + G.NL;
+                foreach (string s6 in eqNames.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList())
+                {
+                    extra3 += "  " + s6 + G.NL;
+                }
+            }
+
+            string extra5 = null;
+            if (all2.Count > 0)
+            {
+                extra5 = "Variable" + G.S(all2.Count) + ":" + G.NL;
+                foreach (string s6 in all2.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList())
+                {
+                    extra5 += "  " + s6 + G.NL;
+                }                
+            }            
+            string extra1 = "not appear in any equations. You may possibly need to lag/lead one or more equations with a suffix like for instance '[-1]' or '[+1]'." + G.NL + G.NL + extra3 + G.NL + extra5;
             string s = null;
             if (problem.Count == 1)
             {
-                s = extra0 + ", the endogenous variable " + Stringlist.GetListWithCommas(problem) + " does " + extra1;
+                s = extra0 + ", the endogenous variable " + Stringlist.GetListWithCommas(problem.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList()) + " does " + extra1;
             }
             else
             {
-                s = extra0 + ", the endogenous variables: " + Stringlist.GetListWithCommas(problem) + " do " + extra1;
+                s = extra0 + ", the endogenous variables: " + Stringlist.GetListWithCommas(problem.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList()) + " do " + extra1;
             }
 
             WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
@@ -3328,7 +3366,7 @@ namespace Gekko
                     }
                 }                
                 
-                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)));
+                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)), false);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s);
                 if (eqNumber == -12345)
                 {
@@ -4292,10 +4330,10 @@ namespace Gekko
         /// <param name="s"></param>
         /// <returns></returns>
         public static string FullVariableNamePretty(string s, bool replaceResidualName)
-        {
-            //!!!!!!!!! do not feed with "x[a, b]" will become "x[a,  b]".
+        {            
             if (s == null) return s;
-            s = s.Replace("¤", "").Replace(",", ", ");
+            //s = s.Replace("¤", "").Replace(",", ", ");
+            s = s.Replace("¤", "");
             if (replaceResidualName) s = s.Replace(Globals.decompResidualName, Globals.decompResidualName2);
             return s;
         }
