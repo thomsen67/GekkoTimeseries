@@ -1375,7 +1375,7 @@ namespace Gekko
 
                 if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");
 
-                string sWithoutLagsLeads = s;
+                //string sWithoutLagsLeads = s;
                 int i = 0;
                 if (indexes2 != null)
                 {
@@ -1383,11 +1383,11 @@ namespace Gekko
                     if (indexes2.Length != 1) new Error("Expected second index to have 1 element");
                     if (!(indexes2[0].StartsWith("+") || indexes2[0].StartsWith("-"))) new Error("Expected second index to start with '+' or '-'");
                     bool b = int.TryParse(indexes2[0], out i);
-                    if (!b) new Error("Expected second index to be an integer lag/lead");                    
-                    sWithoutLagsLeads = s.Substring(0, s.LastIndexOf('[')); //removes lag/lead
+                    if (!b) new Error("Expected second index to be an integer lag/lead");
+                    //sWithoutLagsLeads = s.Substring(0, s.LastIndexOf('[')); //removes lag/lead
                     indexes2 = null;
                 }
-                else
+                else if (indexes1 != null)
                 {
                     //Something like e[a,b], but also e[-1]. We need to check if it is e[-{i}] or e[+{i}] where i is an integer >= 0.
                     //(here, e[-0] or e[+0] will point to the same equation as e, so why would anybody do that?).
@@ -1395,13 +1395,16 @@ namespace Gekko
                     {
                         bool b = int.TryParse(indexes1[0], out i);
                         if (!b) new Error("Expected index to be an integer lag/lead");
-                        sWithoutLagsLeads = s.Substring(0, s.LastIndexOf('[')); //removes lag/lead
+                        //sWithoutLagsLeads = s.Substring(0, s.LastIndexOf('[')); //removes lag/lead
                         indexes1 = null;
                     }
                 }
 
+                string sWithoutLagsLeads = name;
+                if (indexes1 != null) sWithoutLagsLeads += "[" + Stringlist.GetListWithCommas(indexes1, "") + "]";
+                if (indexes2 != null) sWithoutLagsLeads += "[" + Stringlist.GetListWithCommas(indexes2, "") + "]";
+
                 //if (indexes1 == null) indexes1 = new string[0];  //a null array is standard way of saying "no indexes", like x having no dimensions unlike x[a,b].
-                
                 //For each equation stated
                 //Actually there is no time extracted below: the s string hos no time element
                 //GekkoTime trash = GekkoTime.tNull;
