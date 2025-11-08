@@ -50,12 +50,20 @@ namespace Gekko
         }
 
         private void WindowKeyDown(object sender, KeyEventArgs e)
-        {
-            //var viewModel = DataContext as YourViewModel;
-            //viewModel.YourCommand.Execute(null);
+        {            
             if (e.Key == Key.Return)
             {
-                CallDecomp(this._activeEquation, decompFind.model);
+                EquationListItem item = null;
+                try
+                {
+                    FrameworkElement fe = e.OriginalSource as FrameworkElement;
+                    item = fe.DataContext as EquationListItem;
+                }
+                catch { }
+                if (item == null) return; //A scroll button click can trigger this method, but should be ignored
+
+                bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+                if (!isCtrl) CallDecomp(item.EquationName, decompFind.model);                     
             }
         }
 
@@ -128,7 +136,6 @@ namespace Gekko
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Click in DECOMP: #8fdskfesdfw            
-
             EquationListItem item = null;
             try
             {
@@ -136,19 +143,9 @@ namespace Gekko
                 item = fe.DataContext as EquationListItem;
             }
             catch { }
-            if (item == null) return; //A scroll button click can trigger this method, but should be ignored
-                                    
+            if (item == null) return; //A scroll button click can trigger this method, but should be ignored            
             bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-            if (isCtrl)
-            {
-                //do nothing here, will "select" the equation elsewhere.
-            }
-            else
-            {
-                string s = item.fullName;
-                if (Globals.findFix) s = item.EquationName;
-                CallDecomp(s, decompFind.model);
-            }
+            if (!isCtrl) CallDecomp(item.EquationName, decompFind.model);
         }
 
         private void CallDecomp(string fullName, Model model)
