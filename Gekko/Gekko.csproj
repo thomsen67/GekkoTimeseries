@@ -429,7 +429,7 @@
     <Compile Include="Plot.cs" />
     <Compile Include="Print.cs" />
     <Compile Include="Private.cs" />
-    <Compile Include="Python.cs" />
+    <Compile Include="PyGekko.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="RichTextBoxEx.cs">
       <SubType>Component</SubType>
