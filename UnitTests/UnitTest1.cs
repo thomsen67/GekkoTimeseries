@@ -23215,7 +23215,7 @@ namespace UnitTests
                 df1.Columns["AAA"][3] = 777d;  //--> not fed back to recordBatch1 it seems
             }
             Arrow.WriteArrow(recordBatch1, Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
-            RecordBatch recordBatch2 = Arrow.ReadArrow(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
+            RecordBatch recordBatch2 = Arrow.ReadArrowOld(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
             DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
             Databank db2 = new Databank(null);
             long rows = df2.Rows.Count;
@@ -23278,7 +23278,7 @@ namespace UnitTests
 
             //Arrow.WriteArrow(df1.ToArrowRecordBatches(), fileName);  //does not work properly when file is read again
 
-            RecordBatch rb2 = Arrow.ReadArrow(fileName);
+            RecordBatch rb2 = Arrow.ReadArrowOld(fileName);
             DataFrame df2 = DataFrame.FromArrowRecordBatch(rb2);
 
             var xx = (double)df2.Columns["Column B"][4];

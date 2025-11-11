@@ -2813,6 +2813,9 @@ namespace Gekko
                 //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
                 //new Writeln("0 --> " + M.Errorf(0d));
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
+                //                
+                
+                Arrow.RunReaderExample(@"c:\Thomas\Desktop\gekko\testing\mona.arrow").GetAwaiter().GetResult();
 
                 if (Globals.runningOnTTComputer)
                 {

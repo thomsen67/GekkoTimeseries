@@ -25,15 +25,29 @@ using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using System.IO;
 using Microsoft.Data.Analysis;
+using System.Threading.Tasks;
 
 namespace Gekko
 {
+    public class ArrowDataRow
+    {
+        public string Name { get; set; }
+        public string Freq { get; set; }
+        public int DimNumber { get; set; }
+        public double Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"Name: {Name}, Freq: {Freq}, Dims: {DimNumber}, Value: {Value}";
+        }
+    }
+
     /// <summary>
     /// This class is under construction...
     /// </summary>
     public class Arrow
     {
-        public static string _fileName = @"c:\Thomas\Desktop\gekko\testing\test.arrow";
+        public static string _fileName = @"c:\Thomas\Desktop\gekko\testing\test1.arrow";
 
         public static void Run()
         {
@@ -326,18 +340,18 @@ namespace Gekko
 
             if (true)
             {
-                dt1 = DateTime.Now;
-                RecordBatch rb = ReadArrow(_fileName);
-                DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
-                s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
-                G.Writeln(s3);
-                //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
+                //dt1 = DateTime.Now;
+                //RecordBatch rb = ReadArrow(_fileName);
+                //DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
+                //s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                //G.Writeln(s3);
+                ////IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
             }
 
             int ii = 1;
         }
 
-        public static RecordBatch ReadArrow(string filename)
+        public static RecordBatch ReadArrowOld(string filename)
         {
             using (var stream = File.OpenRead(filename))
             using (var reader = new ArrowFileReader(stream))
@@ -353,9 +367,83 @@ namespace Gekko
             }
         }
 
+        public static async Task RunReaderExample(string pathAndFilename)
+        {
+            // Ensure the WriteArrow method is called first to create the file
+            // Your existing code to write the file...
+
+            List<ArrowDataRow> data = await ReadArrow(pathAndFilename);
+
+            new Writeln($"Successfully read {data.Count} rows.");
+            foreach (var row in data.Take(50)) // Print the first 5 rows
+            {
+                new Writeln("" + row);
+            }
+        }
+
+        public static async Task<List<ArrowDataRow>> ReadArrow(string fileName)
+        {
+            // Check if the file exists
+            if (!File.Exists(fileName))
+            {
+                Console.WriteLine($"Error: File not found at {fileName}");
+                return new List<ArrowDataRow>();
+            }
+
+            using FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            using ArrowFileReader reader = new ArrowFileReader(fileStream);
+            
+            var dataList = new List<ArrowDataRow>();
+
+            int recordBatchCount = await reader.RecordBatchCountAsync();
+
+            // Iterate through all record batches in the file (your file has one)
+            for (int i = 0; i < recordBatchCount; i++)
+            {
+                // Read the record batch asynchronously
+                RecordBatch recordBatch = await reader.ReadNextRecordBatchAsync();
+
+                if (recordBatch == null) continue;
+
+                //var arrays = recordBatch.Arrays.ToList();
+
+                // Cast the arrays to their specific types for easy extraction
+                var nameArray = recordBatch.Arrays.ElementAt(0) as Apache.Arrow.StringArray;
+                var freqArray = recordBatch.Arrays.ElementAt(1) as Apache.Arrow.StringArray;
+                var dimsArray = recordBatch.Arrays.ElementAt(2) as Apache.Arrow.Int32Array;
+                //var valueArray = recordBatch.Arrays.ElementAt(3) as Apache.Arrow.DoubleArray;
+
+                // Ensure all arrays were successfully cast
+                if (nameArray == null || freqArray == null || dimsArray == null)
+                {
+                    new Error("Failed to cast one or more arrays to expected types.");
+                }
+
+                // Iterate over the rows and extract data
+                for (int j = 0; j < recordBatch.Length; j++)
+                {
+                    dataList.Add(new ArrowDataRow
+                    {
+                        Name = nameArray.GetString(j),
+                        Freq = freqArray.GetString(j),
+                        DimNumber = dimsArray.GetValue(j) ?? 0, // Handle potential null (though your write code implies non-null)
+                        //Value = valueArray.GetValue(j) ?? double.NaN // Handle potential null
+                    });
+                }
+            }
+
+            return dataList;
+        }
+
         public static void WriteArrowDatabank(List<Tuple<string, IVariable>> list2, GekkoTime t1, GekkoTime t2, string pathAndFilename)
         {
-            //Note that date formats are not yes supported when a .NET dataframe wraps around an arrow.
+            // TODO
+            // TODO
+            // TODO  Handle timeless series
+            // TODO
+            // TODO
+
+            //Note that date formats are not yet supported when a .NET dataframe wraps around an arrow.
             //therefore we postpone the use of dates.
             //We can use null for string and NaN for double, and they return with same values, nice!
             //cf. https://github.com/dotnet/corefxlab/blob/master/src/Microsoft.Data.Analysis/DataFrame.Arrow.cs
@@ -552,7 +640,7 @@ namespace Gekko
 
             if (false)
             {
-                RecordBatch recordBatch2 = Arrow.ReadArrow(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
+                RecordBatch recordBatch2 = Arrow.ReadArrowOld(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
                 DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
                 Databank db2 = new Databank(null);
             }
@@ -591,28 +679,5 @@ namespace Gekko
 
         }
 
-        public static void UnitTests()
-        {
-            //reset;
-            //time 2020 2022;
-            //x1 = 1, 2, 3;
-            //x2 = series(1);
-            //x2[a] = 2, 3, 4;
-            //x2[b] = 3, 4, 5;
-            //x3 = series(2);
-            //x3[i1, j1] = 4, 5, 6;
-            //x3[i1, j2] = 5, 6, 7;
-            //option freq q;
-            //time 2020q1 2020q3;
-            //x4 = 6, 7, 8;
-            //x5 = series(1);
-            //x5[a] = 8, 9, 10;
-            //x5[b] = 9, 10, 11;
-            //x6 = series(2);
-            //x6[i1, j1] = 10, 11, 12;
-            //x6[i1, j2] = 11, 12, 13;
-
-
-        }
     }
 }
