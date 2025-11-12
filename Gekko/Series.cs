@@ -2211,7 +2211,15 @@ namespace Gekko
             List<Tuple<string, IVariable>> vars3 = new List<Tuple<string, IVariable>>();
 
             List<Tuple<string, IVariable>> sorted = Program.GetNamesAndVariableObject(vars);
-            sorted.Sort((leftKvp, rightKvp) => G.CompareNaturalIgnoreCase(leftKvp.Item1, rightKvp.Item1));
+
+            if (!Program.options.bugfix_export_sort)
+            {
+                sorted.Sort((leftKvp, rightKvp) => G.CompareNaturalIgnoreCase(leftKvp.Item1, rightKvp.Item1));
+            }
+            else
+            {
+                sorted.Sort((leftKvp, rightKvp) => string.Compare(leftKvp.Item1, rightKvp.Item1, StringComparison.OrdinalIgnoreCase));
+            }
 
             foreach (Tuple<string, IVariable> tup in sorted)
             {
