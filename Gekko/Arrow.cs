@@ -340,12 +340,12 @@ namespace Gekko
 
             if (true)
             {
-                //dt1 = DateTime.Now;
-                //RecordBatch rb = ReadArrow(_fileName);
-                //DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
-                //s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
-                //G.Writeln(s3);
-                ////IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
+                dt1 = DateTime.Now;
+                RecordBatch rb = ReadArrowOld(_fileName);
+                DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
+                s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                G.Writeln(s3);
+                //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
             }
 
             int ii = 1;
@@ -652,32 +652,35 @@ namespace Gekko
 
         public static async void WriteArrow(RecordBatch recordBatch, string fileName)
         {
-            // Use a specific memory pool from which arrays will be allocated (optional)
-            File.Delete(fileName);
-            MemoryStream stream = new MemoryStream();
-            ArrowFileWriter writer = new ArrowFileWriter(stream, recordBatch.Schema, leaveOpen: true);
-            await writer.WriteRecordBatchAsync(recordBatch);
-            await writer.WriteEndAsync();
-            using (FileStream fileStream = new FileStream(fileName, FileMode.Create, System.IO.FileAccess.Write))
+            if (true)
             {
-                stream.WriteTo(fileStream);
-            }
-        }
-
-        public static void WriteArrow(IEnumerable<RecordBatch> batches, string fileName)
-        {
-            File.Delete(fileName);
-            using (var stream = File.OpenWrite(fileName))
-            using (var writer = new ArrowStreamWriter(stream, batches.First().Schema))
-            {
-                foreach (RecordBatch b in batches)
+                // Cannot get it to work without using a MemoryStream, which has a bit of overhead.
+                // Without it, the file blocks.
+                // Use a specific memory pool from which arrays will be allocated (optional)
+                File.Delete(fileName);
+                MemoryStream stream = new MemoryStream();
+                ArrowFileWriter writer = new ArrowFileWriter(stream, recordBatch.Schema, leaveOpen: true);
+                await writer.WriteRecordBatchAsync(recordBatch);
+                await writer.WriteEndAsync();
+                using (FileStream fileStream = new FileStream(fileName, FileMode.Create, System.IO.FileAccess.Write))
                 {
-                    writer.WriteRecordBatchAsync(b);
+                    stream.WriteTo(fileStream);
                 }
-                writer.WriteEndAsync();
-            }
-
+            }            
         }
 
+        //public static void WriteArrow(IEnumerable<RecordBatch> batches, string fileName)
+        //{
+        //    File.Delete(fileName);
+        //    using (var stream = File.OpenWrite(fileName))
+        //    using (var writer = new ArrowStreamWriter(stream, batches.First().Schema))
+        //    {
+        //        foreach (RecordBatch b in batches)
+        //        {
+        //            writer.WriteRecordBatchAsync(b);
+        //        }
+        //        writer.WriteEndAsync();
+        //    }
+        //}
     }
 }
