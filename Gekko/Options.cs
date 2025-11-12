@@ -40,6 +40,7 @@ namespace Gekko
         public bool bugfix_readfast = true;        //not mentioned in help.
         public bool bugfix_missingignore = true;   //not mentioned in help, is set true for Gekko 3.1.16.
         public bool bugfix_sas = false;            //not mentioned in help (used by KNR). For prn writes vars and name/date with CAPS and inside "", q and m are written as for instance 202003 instead of 2020q3. For csv, numbers are F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent). 
+        public bool bugfix_export_sort = false;    //not mentioned in help (used by KNR). With the option, for csv (and probably prn and xlsx) files writing, it does sort for instance x61y before x7y, even though the official Gekko 3.2 and 3.3.x sorts x61y AFTER x7y. This minor change fixes issues with JDemetra+, where a csv file is input without JDemetra+ using the series names at all. KNR lists the names in strict alphabetical order, which the official Gekko 3.2/3.3.x reorders regarding the variables td61fu, td61tu, td62fu, td62tu, td7fu, tdytu. With the option set yes, the csv file will have td7 AFTER td61.. and td62..
         public bool bugfix_lhs_dollar = true;      //not mentioned in help, if lhs condition is a series, just skips the 0 (false) values instead of setting them to 0. On the rhs, they are always set to 0. Does not affect non-series conditions like set membership.
         public bool bugfix_lhs_dollar_warning = true;  //see above...
         public bool bugfix_csv_missing = true;     ////not mentioned in help, uses #N/A or #I/T, and determines start/end dates better (also works for prn)
@@ -388,6 +389,7 @@ namespace Gekko
             Add("BUGFIX READFAST", Globals.xbool);
             Add("BUGFIX MISSINGIGNORE", Globals.xbool);
             Add("BUGFIX SAS", Globals.xbool);
+            Add("BUGFIX EXPORT SORT", Globals.xbool);
             Add("BUGFIX LHS DOLLAR", Globals.xbool);
             Add("BUGFIX LHS DOLLAR WARNING", Globals.xbool);
             Add("BUGFIX CSV MISSING", Globals.xbool);
