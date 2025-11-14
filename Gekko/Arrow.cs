@@ -21,11 +21,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Apache.Arrow;
+using Apache.Arrow.Types;
 using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using System.IO;
 using Microsoft.Data.Analysis;
 using System.Threading.Tasks;
+using Parquet;
+using Parquet.Data;
+
 
 namespace Gekko
 {
@@ -42,12 +46,107 @@ namespace Gekko
         }
     }
 
+    public class SimpleRecord
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public DateTime CreationDate { get; set; }
+        public double Value { get; set; }
+    }
+
     /// <summary>
     /// This class is under construction...
     /// </summary>
     public class Arrow
-    {
+    {        
         public static string _fileName = @"c:\Thomas\Desktop\gekko\testing\test1.arrow";
+
+
+
+        public static async Task Run2()
+        {
+
+            // 1. Define schema with FULL NAMES
+            var schema = new Parquet.Schema.ParquetSchema(
+                new Parquet.Schema.DataField<int>("id"),
+                new Parquet.Schema.DataField<string>("name")
+            );
+
+            // 2. Column data
+            int[] ids = { 1, 2, 3 };
+            string[] names = { "Alice", "Bob", "Charlie" };            
+
+            // 3. Write Parquet file
+            using (Stream fileStream = File.Create(@"c:\tools\simple.parquet"))
+            //using (var writer = new Parquet.ParquetWriter(schema, fileStream))
+            {
+                //var writer = await ParquetWriter.CreateAsync(schema, fileStream);
+
+                //writer.CompressionMethod = Parquet.CompressionMethod.Gzip;
+
+                using (Parquet.ParquetWriter writer = await Parquet.ParquetWriter.CreateAsync(schema, fileStream))
+                {
+
+                    using (Parquet.ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        await group.WriteColumnAsync(
+                            new Parquet.Data.DataColumn(schema.DataFields[0], ids));
+
+                        await group.WriteColumnAsync(
+                            new Parquet.Data.DataColumn(schema.DataFields[1], names));
+                    }
+                }
+            }
+
+            Console.WriteLine("Parquet file written.");
+
+        }
+
+        public static async Task ReadParquetFile()
+        {
+            string filePath = @"c:\tools\simple.parquet";
+
+            // 1. Open the file stream
+            using (Stream fileStream = File.OpenRead(filePath))
+            {
+                // 2. Create the async ParquetReader
+                using (var reader = await Parquet.ParquetReader.CreateAsync(fileStream))
+                {
+                    Parquet.Schema.ParquetSchema schema = reader.Schema;
+
+                    Console.WriteLine("Schema columns:");
+                    foreach (var field in schema.DataFields)
+                    {
+                        Console.WriteLine($"- {field.Name} ({field.ClrNullableIfHasNullsType.Name})");
+                    }
+
+                    // 3. Iterate through all row groups
+                    for (int rg = 0; rg < reader.RowGroupCount; rg++)
+                    {
+                        using (Parquet.ParquetRowGroupReader rowGroup = reader.OpenRowGroupReader(rg))
+                        {
+                            // Read columns asynchronously
+                            Parquet.Data.DataColumn idColumn =
+                                await rowGroup.ReadColumnAsync(schema.DataFields[0]);
+
+                            Parquet.Data.DataColumn nameColumn =
+                                await rowGroup.ReadColumnAsync(schema.DataFields[1]);
+
+                            int[] ids = idColumn.Data as int[];
+                            string[] names = nameColumn.Data as string[];
+
+                            // 4. Print rows
+                            for (int i = 0; i < ids.Length; i++)
+                            {
+                                new Writeln($"{ids[i]} - {names[i]}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
 
         public static void Run()
         {
