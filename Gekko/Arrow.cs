@@ -67,19 +67,26 @@ namespace Gekko
         {
 
             // First dataframe
-            int[] ids = { 1, 2, 3 };
-            string[] names = { "Alice", "Bob", "Charlie" };
-
-            // Second dataframe (different schema)
-            string[] codes = { "X", "Y" };
-            double[] values = { 10.5, 20.75 };
+            
+            string[] ids = { "x1!a", "x1!a", "x2!a", "x2!a" };
+            string[] names = { "x1", "x1", "x2", "x2" };
+            string[] freqs = { "a", "a", "a", "a" };
+            int?[] per1s = { 2021, 2022, 2021, 2022 };
+            double?[] values = { 101, 102, 201, 202 };
+            string[] labels = { "Serie 1", "Serie 2" };
+            string[] units = { "Mio. kr.", "Mia. kr." };
+            string[] ids_meta = { "x1!a", "x2!a" };
 
             // 1. Unified schema
             var schema = new Parquet.Schema.ParquetSchema(
-                new Parquet.Schema.DataField<int?>("id"),
+                new Parquet.Schema.DataField<string>("id"),
                 new Parquet.Schema.DataField<string>("name"),
-                new Parquet.Schema.DataField<string>("code"),
-                new Parquet.Schema.DataField<double?>("value")
+                new Parquet.Schema.DataField<string>("freq"),
+                new Parquet.Schema.DataField<int?>("per1"),
+                new Parquet.Schema.DataField<double?>("value"),
+                // ----
+                new Parquet.Schema.DataField<string>("label"),
+                new Parquet.Schema.DataField<string>("unit")
             );
 
             using (Stream fileStream = File.Create(@"c:\tools\multi.parquet"))
@@ -92,49 +99,44 @@ namespace Gekko
                 using (ParquetRowGroupWriter group1 = writer.CreateRowGroup())
                 {
                     // convert int[] -> int?[] to match DataField<int?> exactly
-                    var idsNullable = ids.Select(i => (int?)i).ToArray();
+                    // var idsNullable = ids.Select(i => (int?)i).ToArray();
 
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[0], idsNullable));
+                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[0], ids));
                     await group1.WriteColumnAsync(new DataColumn(schema.DataFields[1], names));
-
-                    // Missing columns must have length == rowCount1
-                    var codeNullsForGroup1 = Enumerable.Repeat<string?>(null, rowCount1).ToArray();
-                    var valueNullsForGroup1 = Enumerable.Repeat<double?>(null, rowCount1).ToArray();
-
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[2], codeNullsForGroup1));
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[3], valueNullsForGroup1));
+                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[2], freqs));
+                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[3], per1s));
+                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[4], values));
+                    //
+                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[5], Enumerable.Repeat<string?>(null, rowCount1).ToArray()));
+                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[6], Enumerable.Repeat<string?>(null, rowCount1).ToArray()));
                 }
 
                 // ROW GROUP 2 (second dataframe)
-                int rowCount2 = codes.Length;
+                int rowCount2 = labels.Length;
 
                 using (ParquetRowGroupWriter group2 = writer.CreateRowGroup())
                 {
-                    // Missing columns must have length == rowCount2
-                    var idNullsForGroup2 = Enumerable.Repeat<int?>(null, rowCount2).ToArray();
-                    var nameNullsForGroup2 = Enumerable.Repeat<string?>(null, rowCount2).ToArray();
-
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[0], idNullsForGroup2));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[1], nameNullsForGroup2));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[2], codes));
-                    // values is double[] but schema expects double? -> convert:
-                    var valuesNullable = values.Select(v => (double?)v).ToArray();
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[3], valuesNullable));
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[0], ids_meta));
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[1], Enumerable.Repeat<string?>(null, rowCount2).ToArray()));
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[2], Enumerable.Repeat<string?>(null, rowCount2).ToArray()));
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[3], Enumerable.Repeat<int?>(null, rowCount2).ToArray()));
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[4], Enumerable.Repeat<double?>(null, rowCount2).ToArray()));
+                    //
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[5], labels));
+                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[6], units));
                 }
-
-
             }
-
         }
 
         public static async Task ReadParquetFile()
         {
             string filePath = @"c:\tools\multi.parquet";
 
-            int[] ids;
+            string[] ids;
             string[] names;
-            string[] codes;
-            double[] values;
+            double?[] values;
+            string[] labels;
+            string[] ids_meta;
 
             using (Stream fileStream = File.OpenRead(filePath))
             using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
@@ -146,16 +148,15 @@ namespace Gekko
                 // ------------------------------
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
-                    var idField = reader.Schema.GetDataFields().First(f => f.Name == "id");
-                    var nameField = reader.Schema.GetDataFields().First(f => f.Name == "name");
+                    var ids2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"));
+                    ids = ((string[])ids2.Data).ToArray();
 
-                    var idColumn = await group.ReadColumnAsync(idField);
-                    var nameColumn = await group.ReadColumnAsync(nameField);
+                    var names2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"));
+                    names = ((string[])names2.Data).ToArray();
 
-                    ids = ((int?[])idColumn.Data).Select(x => x ?? 0).ToArray();
-                    names = ((string[])nameColumn.Data).ToArray();
+                    var values2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"));
+                    values = ((double?[])values2.Data).ToArray();
 
-                    Console.WriteLine($"Row group 0: {ids.Length} rows");
                 }
 
                 // ------------------------------
@@ -163,29 +164,14 @@ namespace Gekko
                 // ------------------------------
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(1))
                 {
-                    var codeField = reader.Schema.GetDataFields().First(f => f.Name == "code");
-                    var valueField = reader.Schema.GetDataFields().First(f => f.Name == "value");
+                    var ids_meta2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"));
+                    ids_meta = ((string[])ids_meta2.Data).ToArray();
 
-                    var codeColumn = await group.ReadColumnAsync(codeField);
-                    var valueColumn = await group.ReadColumnAsync(valueField);
-
-                    codes = ((string[])codeColumn.Data).ToArray();
-                    values = ((double?[])valueColumn.Data).Select(x => x ?? 0.0).ToArray();
-
-                    Console.WriteLine($"Row group 1: {codes.Length} rows");
-                }
+                    var labels2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"));
+                    labels = ((string[])labels2.Data).ToArray();
+                }   
             }
-
-            // ------------------------------
-            // Output check
-            // ------------------------------
-            Console.WriteLine("First dataframe:");
-            for (int i = 0; i < ids.Length; i++)
-                Console.WriteLine($"{ids[i]}, {names[i]}");
-
-            Console.WriteLine("\nSecond dataframe:");
-            for (int i = 0; i < codes.Length; i++)
-                Console.WriteLine($"{codes[i]}, {values[i]}");
+            
         }
 
 
