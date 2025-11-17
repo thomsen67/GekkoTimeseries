@@ -68,27 +68,43 @@ namespace Gekko
 
         public static async Task WriteParquetFile()
         {            
+            string[] ids2 = { "x1!a", "x2!a[a,b]", "x2!a[a,c]" };
+            string[] ids3 = { "x1!a", "x1!a", "x2!a[a,b]", "x2!a[a,b]", "x2!a[a,c]", "x2!a[a,c]" };
+            string[] parent_ids1 = { "x1!a", "x2!a" };
+            string[] parent_ids2 = { "x1!a", "x1!a", "x2!a" };
+            // ============================================================================
+            string[] names = { "x1", "x2" };
+            string[] freqs = { "a", "q" };
             string[] labels = { "Serie 1", "Serie 2" };
-            string[] sources = { "DST", "DST" };
+            string[] sources = { "DST", "NB" };
             string[] units = { "Mio. kr.", "Mia. kr." };
-            string[] ids_meta = { "x1!a", "x2!a" };
-            // ---
-            string[] ids = { "x1!a", "x1!a", "x2!a", "x2!a" };
-            string[] names = { "x1", "x1", "x2", "x2" };
-            string[] freqs = { "a", "a", "a", "a" };                   
-            DateTime?[] per1s = { UtcDateTime(2021, 1, 1), UtcDateTime(2022, 1, 1), UtcDateTime(2023, 1, 1), UtcDateTime(2024, 1, 1) };
-            double?[] values = { 101, 102, 201, 202 };            
+            int?[] dims = { 0, 2 };
+            // ---            
+            string[] dim1 = { null, "a", "a" };
+            string[] dim2 = { null, "b", "c" };
+            DateTime?[] date_starts = { UtcDateTime(1966, 1, 1), UtcDateTime(1980, 1, 1), UtcDateTime(1980, 1, 1) };
+            DateTime?[] date_ends = { UtcDateTime(2024, 1, 1), UtcDateTime(2024, 10, 1), UtcDateTime(2024, 10, 1) };
+            // ---            
+            DateTime?[] dates = { UtcDateTime(2021, 1, 1), UtcDateTime(2022, 1, 1), UtcDateTime(2021, 1, 1), UtcDateTime(2021, 4, 1), UtcDateTime(2021, 1, 1), UtcDateTime(2021, 4, 1) };
+            double?[] values = { 101, 102, 103, 104, 105, 106 };            
 
             // 1. Unified schema
             var schema = new Parquet.Schema.ParquetSchema(
                 new Parquet.Schema.DataField<string>("id"),
-                // ---
+                new Parquet.Schema.DataField<string>("parent_id"),
+                // ================================================
+                new Parquet.Schema.DataField<string>("name"),
+                new Parquet.Schema.DataField<string>("freq"),
                 new Parquet.Schema.DataField<string>("label"),
                 new Parquet.Schema.DataField<string>("source"),
                 new Parquet.Schema.DataField<string>("unit"),
+                new Parquet.Schema.DataField<int?>("dims"),
                 // ----                
-                new Parquet.Schema.DataField<string>("name"),
-                new Parquet.Schema.DataField<string>("freq"),                
+                new Parquet.Schema.DataField<string>("dim1"),
+                new Parquet.Schema.DataField<string>("dim2"),
+                new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
+                new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
+                // ----                
                 new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true), //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
                 new Parquet.Schema.DataField<double?>("value")                
             );
@@ -98,34 +114,68 @@ namespace Gekko
             {                
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    int rowCount = labels.Length;
+                    int rowCount = names.Length;
                     int i = -1;
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids_meta));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], parent_ids1));
                     //
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims));
                     //                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));                                    
                 }
                 
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    int rowCount = ids.Length;
-                    int i = -1;
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids));
+                    int rowCount = ids2.Length;
+                    int i = -1;                    
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], parent_ids2));
                     //
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));                    
                     //                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], per1s));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values));                                        
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dim1));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dim2));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));
+                }
+
+                using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                {
+                    int rowCount = ids3.Length;
+                    int i = -1;
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids3));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    //
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
+                    //                    
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values));
                 }
             }
         }
