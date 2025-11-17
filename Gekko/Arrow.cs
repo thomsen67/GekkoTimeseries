@@ -68,10 +68,10 @@ namespace Gekko
 
         public static async Task WriteParquetFile()
         {            
-            string[] ids2 = { "x1!a", "x2!a[a,b]", "x2!a[a,c]" };
-            string[] ids3 = { "x1!a", "x1!a", "x2!a[a,b]", "x2!a[a,b]", "x2!a[a,c]", "x2!a[a,c]" };
-            string[] parent_ids1 = { "x1!a", "x2!a" };
-            string[] parent_ids2 = { "x1!a", "x1!a", "x2!a" };
+            string[] ids1 = { "x1!a", "x2!q[a,b]", "x2!q[a,c]" };
+            string[] ids2 = { "x1!a", "x1!a", "x2!q[a,b]", "x2!q[a,b]", "x2!q[a,c]", "x2!q[a,c]" };
+            string[] parent_ids0 = { "x1!a", "x2!q" };
+            string[] parent_ids1 = { "x1!a", "x2!q", "x2!q" };
             // ============================================================================
             string[] names = { "x1", "x2" };
             string[] freqs = { "a", "q" };
@@ -84,6 +84,7 @@ namespace Gekko
             string[] dim2 = { null, "b", "c" };
             DateTime?[] date_starts = { UtcDateTime(1966, 1, 1), UtcDateTime(1980, 1, 1), UtcDateTime(1980, 1, 1) };
             DateTime?[] date_ends = { UtcDateTime(2024, 1, 1), UtcDateTime(2024, 10, 1), UtcDateTime(2024, 10, 1) };
+            DateTime?[] stamps = { UtcDateTime(2025, 11, 17), UtcDateTime(2025, 11, 15), UtcDateTime(2025, 11, 16) };
             // ---            
             DateTime?[] dates = { UtcDateTime(2021, 1, 1), UtcDateTime(2022, 1, 1), UtcDateTime(2021, 1, 1), UtcDateTime(2021, 4, 1), UtcDateTime(2021, 1, 1), UtcDateTime(2021, 4, 1) };
             double?[] values = { 101, 102, 103, 104, 105, 106 };            
@@ -91,7 +92,7 @@ namespace Gekko
             // 1. Unified schema
             var schema = new Parquet.Schema.ParquetSchema(
                 new Parquet.Schema.DataField<string>("id"),
-                new Parquet.Schema.DataField<string>("parent_id"),
+                new Parquet.Schema.DataField<string>("id_parent"),
                 // ================================================
                 new Parquet.Schema.DataField<string>("name"),
                 new Parquet.Schema.DataField<string>("freq"),
@@ -104,6 +105,7 @@ namespace Gekko
                 new Parquet.Schema.DataField<string>("dim2"),
                 new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
                 new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
+                new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
                 // ----                
                 new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true), //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
                 new Parquet.Schema.DataField<double?>("value")                
@@ -117,7 +119,7 @@ namespace Gekko
                     int rowCount = names.Length;
                     int i = -1;
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], parent_ids1));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], parent_ids0));
                     //
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs));
@@ -131,15 +133,17 @@ namespace Gekko
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    //                    
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));                                    
                 }
                 
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    int rowCount = ids2.Length;
+                    int rowCount = ids1.Length;
                     int i = -1;                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], parent_ids2));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], parent_ids1));
                     //
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
@@ -152,15 +156,17 @@ namespace Gekko
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dim2));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps));
+                    //                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));
                 }
 
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    int rowCount = ids3.Length;
+                    int rowCount = ids2.Length;
                     int i = -1;
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids3));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     //
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
@@ -174,38 +180,98 @@ namespace Gekko
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    //                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values));
                 }
             }
+
+            /* Works with this Python file
+             * 
+import pyarrow.parquet as pq
+import pandas as pd
+import matplotlib.pyplot as plt
+
+parquet_file = pq.ParquetFile("c:\\tools\\multi.parquet")
+df0 = parquet_file.read_row_group(0).to_pandas()
+df0 = df0[['id_parent', 'name', 'freq', 'label', 'source', 'unit', 'dims']] # Fjern null-kolonner
+df1 = parquet_file.read_row_group(1).to_pandas()
+df1 = df1[['id', 'id_parent', 'dim1', 'dim2', 'date_start', 'date_end']] # Fjern null-kolonner
+df2 = parquet_file.read_row_group(2).to_pandas()
+df2 = df2[['id', 'date', 'value']] # Fjern null-kolonner
+
+df_temp = df1.merge(df0, on="id_parent", how="left")
+df = df2.merge(df_temp, on="id", how="left")
+
+print(); print(df0)
+print(); print(df1)
+print(); print(df2)
+print(); print(df_temp)
+print(); print(df)
+
+# Plot
+for name, group in df.groupby("id"):
+    plt.plot(group["date"], group["value"], label=name, marker = 'o', markersize=4)
+plt.xlabel("Date")
+plt.ylabel("Value")
+plt.title("Plot")
+plt.legend()
+plt.xticks(rotation=45)
+plt.show()             
+             * */
         }
 
         public static async Task ReadParquetFile()
         {
             string filePath = @"c:\tools\multi.parquet";
-
-            string[] ids;
+            // -------------------------------            
+            string[] id_parents0;
+            string[] ids1;
+            string[] id_parents1;
+            string[] ids2;            
+            // --
             string[] names;
-            double?[] values;
-            DateTime?[] per1s;
+            string[] freqs;
             string[] labels;
-            string[] ids_meta;
+            string[] sources;
+            string[] units;
+            int?[] dims;
+            string[] dim1s;
+            string[] dim2s;
+            DateTime?[] date_starts;
+            DateTime?[] date_ends;
+            DateTime?[] stamps;
+            DateTime?[] dates;
+            double?[] values;
 
             using (Stream fileStream = File.OpenRead(filePath))
             using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
             {
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
-                    ids_meta = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
+                    id_parents0 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id_parent"))).Data).ToArray();
+                    names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray();
+                    freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray();
                     labels = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"))).Data).ToArray();
+                    sources = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "source"))).Data).ToArray();
+                    units = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "unit"))).Data).ToArray();
+                    dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray();
                 }
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(1))
                 {
-                    ids = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
-                    names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray();
+                    dim1s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim1"))).Data).ToArray();
+                    dim2s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim2"))).Data).ToArray();                    
+                    date_starts = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start"))).Data).ToArray();
+                    date_ends = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end"))).Data).ToArray();
+                    stamps = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp"))).Data).ToArray();
+                }
+
+                using (ParquetRowGroupReader group = reader.OpenRowGroupReader(2))
+                {                    
+                    dates = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray();
                     values = ((double?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"))).Data).ToArray();
-                    per1s = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray();
                 }
             }
         }
