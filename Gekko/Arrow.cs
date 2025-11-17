@@ -61,69 +61,71 @@ namespace Gekko
     {        
         public static string _fileName = @"c:\Thomas\Desktop\gekko\testing\test1.arrow";
 
-
+        public static DateTime UtcDateTime(int year, int month, int day)
+        {
+            return new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc); //Using DateTimeKind.Local will fail after a roundtrip (1 hour change). If called with (1970, 1, 1, ...), it *seems* there are 8-byte zero values for the dates in the parquet file.
+        }
 
         public static async Task WriteParquetFile()
-        {
-
-            // First dataframe
-            
-            string[] ids = { "x1!a", "x1!a", "x2!a", "x2!a" };
-            string[] names = { "x1", "x1", "x2", "x2" };
-            string[] freqs = { "a", "a", "a", "a" };
-            int?[] per1s = { 2021, 2022, 2021, 2022 };
-            double?[] values = { 101, 102, 201, 202 };
+        {            
             string[] labels = { "Serie 1", "Serie 2" };
+            string[] sources = { "DST", "DST" };
             string[] units = { "Mio. kr.", "Mia. kr." };
             string[] ids_meta = { "x1!a", "x2!a" };
+            // ---
+            string[] ids = { "x1!a", "x1!a", "x2!a", "x2!a" };
+            string[] names = { "x1", "x1", "x2", "x2" };
+            string[] freqs = { "a", "a", "a", "a" };                   
+            DateTime?[] per1s = { UtcDateTime(2021, 1, 1), UtcDateTime(2022, 1, 1), UtcDateTime(2023, 1, 1), UtcDateTime(2024, 1, 1) };
+            double?[] values = { 101, 102, 201, 202 };            
 
             // 1. Unified schema
             var schema = new Parquet.Schema.ParquetSchema(
                 new Parquet.Schema.DataField<string>("id"),
-                new Parquet.Schema.DataField<string>("name"),
-                new Parquet.Schema.DataField<string>("freq"),
-                new Parquet.Schema.DataField<int?>("per1"),
-                new Parquet.Schema.DataField<double?>("value"),
-                // ----
+                // ---
                 new Parquet.Schema.DataField<string>("label"),
-                new Parquet.Schema.DataField<string>("unit")
+                new Parquet.Schema.DataField<string>("source"),
+                new Parquet.Schema.DataField<string>("unit"),
+                // ----                
+                new Parquet.Schema.DataField<string>("name"),
+                new Parquet.Schema.DataField<string>("freq"),                
+                new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true), //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
+                new Parquet.Schema.DataField<double?>("value")                
             );
 
             using (Stream fileStream = File.Create(@"c:\tools\multi.parquet"))
             using (ParquetWriter writer = await ParquetWriter.CreateAsync(schema, fileStream))
-            {
-
-                // ROW GROUP 1 (first dataframe)
-                int rowCount1 = ids.Length;
-
-                using (ParquetRowGroupWriter group1 = writer.CreateRowGroup())
+            {                
+                using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    // convert int[] -> int?[] to match DataField<int?> exactly
-                    // var idsNullable = ids.Select(i => (int?)i).ToArray();
-
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[0], ids));
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[1], names));
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[2], freqs));
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[3], per1s));
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[4], values));
+                    int rowCount = labels.Length;
+                    int i = -1;
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids_meta));
                     //
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[5], Enumerable.Repeat<string?>(null, rowCount1).ToArray()));
-                    await group1.WriteColumnAsync(new DataColumn(schema.DataFields[6], Enumerable.Repeat<string?>(null, rowCount1).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units));
+                    //                    
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));                                    
                 }
-
-                // ROW GROUP 2 (second dataframe)
-                int rowCount2 = labels.Length;
-
-                using (ParquetRowGroupWriter group2 = writer.CreateRowGroup())
+                
+                using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[0], ids_meta));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[1], Enumerable.Repeat<string?>(null, rowCount2).ToArray()));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[2], Enumerable.Repeat<string?>(null, rowCount2).ToArray()));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[3], Enumerable.Repeat<int?>(null, rowCount2).ToArray()));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[4], Enumerable.Repeat<double?>(null, rowCount2).ToArray()));
+                    int rowCount = ids.Length;
+                    int i = -1;
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids));
                     //
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[5], labels));
-                    await group2.WriteColumnAsync(new DataColumn(schema.DataFields[6], units));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    //                    
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], per1s));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values));                                        
                 }
             }
         }
@@ -135,46 +137,28 @@ namespace Gekko
             string[] ids;
             string[] names;
             double?[] values;
+            DateTime?[] per1s;
             string[] labels;
             string[] ids_meta;
 
             using (Stream fileStream = File.OpenRead(filePath))
             using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
             {
-                Console.WriteLine($"File has {reader.RowGroupCount} row groups.");
-
-                // ------------------------------
-                // Row Group 0 → first dataframe
-                // ------------------------------
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
-                    var ids2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"));
-                    ids = ((string[])ids2.Data).ToArray();
-
-                    var names2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"));
-                    names = ((string[])names2.Data).ToArray();
-
-                    var values2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"));
-                    values = ((double?[])values2.Data).ToArray();
-
+                    ids_meta = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
+                    labels = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"))).Data).ToArray();
                 }
 
-                // ------------------------------
-                // Row Group 1 → second dataframe
-                // ------------------------------
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(1))
                 {
-                    var ids_meta2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"));
-                    ids_meta = ((string[])ids_meta2.Data).ToArray();
-
-                    var labels2 = await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"));
-                    labels = ((string[])labels2.Data).ToArray();
-                }   
+                    ids = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
+                    names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray();
+                    values = ((double?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"))).Data).ToArray();
+                    per1s = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray();
+                }
             }
-            
         }
-
-
 
         public static void Run()
         {
