@@ -6277,7 +6277,10 @@ namespace Gekko
                     Globals.itemHandler.Add(new EquationListItem(eqName3, " ", boolName, boolLhs, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
                 }
 
-                if (eqsNew == null || eqsNew.Count == 0) new Error("Could not find any equation(s) containing the variable '" + variableName + "'");
+                if (eqsNew == null || eqsNew.Count == 0)
+                {
+                    new Error("Could not find any equation(s) containing the variable '" + variableName + "'");
+                }
                 string firstEqName2 = eqsNew[0].eqName;
                 WindowFind windowFind = new WindowFind(o);
                 windowFind.Title = variableName + " - " + "Gekko equations";

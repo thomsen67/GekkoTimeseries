@@ -2768,7 +2768,10 @@ namespace Gekko
             List<string> rv = new List<string>();
             if (modelGams == null)
             {
-                rv.Add(eqName.Substring("e_".Length));
+                if (G.StartsWith(eqName, "e_"))
+                {
+                    rv.Add(eqName.Substring("e_".Length));
+                }
             }
             else
             {
@@ -2783,20 +2786,6 @@ namespace Gekko
                         }
                     }
                 }
-
-                //foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in modelGams.equationsByEqname)
-                //{
-                //    //Why is this not a simple dict lookup? Then modelGams.equationsByEqname should be a blank-dict??
-                //    //Oh well, this is probably pretty fast, because it is the raw model.
-                //    if (!G.EqualHandleBlanks(eqName, kvp.Key)) continue;
-                //    foreach (ModelGamsEquation equation in kvp.Value)  //Actually only 1 in these lists!
-                //    {
-                //        foreach (string s in equation.lhsVars)
-                //        {
-                //            rv.Add(s.Split('(')[0]);  //Indexes here look like x(i, j), not x[i, j].
-                //        }
-                //    }
-                //}
             }
             return rv;
         }

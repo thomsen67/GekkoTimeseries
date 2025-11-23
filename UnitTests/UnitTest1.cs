@@ -1158,6 +1158,21 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Timeposition()
+        {            
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("option model gams scalar data = yes;");
+            I("model <gms> timeposition.zip;");            
+            I("time 2001 2003;");
+            I("x2[a] = 20, 22, 24;");
+            I("x2[b] = 26, 28, 30;");
+            I("time 2002 2003;");
+            ShowDecompTable();
+            I("decomp x1[a];");
+        }
+
+        [TestMethod]
         public void _Test_ArraySeries1()
         {
             // ------------------------------------
