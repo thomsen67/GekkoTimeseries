@@ -10845,6 +10845,7 @@ namespace Gekko
             public string opt_flat = null;
             public string opt_python = null;
             public string opt_arrow = null;
+            public string opt_parquet = null;
             public string opt_cols = null;
             public string opt_respect = null;
             public string opt_op = null;

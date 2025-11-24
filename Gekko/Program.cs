@@ -1736,7 +1736,8 @@ namespace Gekko
         Gcm,
         Tsp,
         Python,
-        Arrow
+        Arrow,
+        Parquet
     }
 
     public enum EPrtCollapseTypes
@@ -23220,13 +23221,37 @@ namespace Gekko
                     {
                         if (e.Message.Contains("System.OutOfMemoryException"))
                         {
-                            G.Writeln2("Arrow writing ran out of memory. At the moment, the Arrow implementation", Color.Red);
-                            G.Writeln("in Gekko is not very fast or memory-efficient, but more of a proof of concept.", Color.Red);
-                            G.Writeln("In the longer run, we expect the Arrow interface to run very fast and efficiently", Color.Red);
-                            G.Writeln("in Gekko, since speed and efficiency are fundamental to the Arrow project.", Color.Red);
-                            G.Writeln();
-                            throw;
+                            G.Writeln2("Arrow writing ran out of memory. Consult the Gekko editor to get this investigated.");
+                            G.Writeln();                            
                         }
+                        throw;
+                    }
+                    return 0;
+                }
+                else if (o.opt_parquet != null)
+                {
+                    //RECORDS
+                    ErrorIfMatrix(variablesType);
+                    if (fileName == null || fileName.Trim() == "")
+                    {
+                        new Error("Please indicate a file name for EXPORT<parquet>");
+                    }
+                    CheckSomethingToWrite(list2.Count);
+                    string file = G.AddExtension(fileName, "." + "parquet");
+                    string pathAndFilename = CreateFullPathAndFileName(file);
+                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    try
+                    {
+                        Arrow.WriteParquetDatabank(list2, tStart, tEnd, pathAndFilename).Wait();
+                    }
+                    catch (Exception e)
+                    {
+                        if (e.Message.Contains("System.OutOfMemoryException"))
+                        {
+                            G.Writeln2("Parquet writing ran out of memory. Consult the Gekko editor to get this investigated.");
+                            G.Writeln();                            
+                        }
+                        throw;
                     }
                     return 0;
                 }
@@ -23352,6 +23377,7 @@ namespace Gekko
             else if (G.Equal(o.opt_flat, "yes")) writeType = EDatabankWriteType.Flat;
             else if (G.Equal(o.opt_python, "yes")) writeType = EDatabankWriteType.Python;
             else if (G.Equal(o.opt_arrow, "yes")) writeType = EDatabankWriteType.Arrow;
+            else if (G.Equal(o.opt_parquet, "yes")) writeType = EDatabankWriteType.Parquet;
             return writeType;
         }
 

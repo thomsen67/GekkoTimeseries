@@ -625,6 +625,7 @@ ASTOPT_STRING_X2ZEROAXIS;
 ASTOPT_STRING_LABEL;
 ASTOPT_STRING_META;
 ASTOPT_STRING_ARROW;
+ASTOPT_STRING_PARQUET;
 ASTOPT_STRING_LINETYPE;
 ASTOPT_STRING_DASHTYPE;
 ASTOPT_VAL_LINEWIDTH;
@@ -1030,6 +1031,7 @@ Y2MINSOFT             = 'Y2MINSOFT'                ;
 X2ZEROAXIS            = 'X2ZEROAXIS'               ;
 //LABEL                 = 'LABEL'                    ;
 ARROW                 = 'ARROW'                    ;
+PARQUET                 = 'PARQUET'                    ;
 //LINETYPE              = 'LINETYPE'                 ;
 DASHTYPE              = 'DASHTYPE'                 ;
 LINEWIDTH             = 'LINEWIDTH'                ;
@@ -1694,6 +1696,7 @@ d.Add("Y" ,Y);
 										d.Add("X2ZEROAXIS",X2ZEROAXIS);
 										//d.Add("LABEL",LABEL);
 										d.Add("ARROW",ARROW);
+                                        d.Add("PARQUET",PARQUET);
 										//d.Add("LINETYPE",LINETYPE);
 										d.Add("DASHTYPE",DASHTYPE);
 										d.Add("LINEWIDTH",LINEWIDTH);
@@ -3452,6 +3455,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | ARROW (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARROW yesNo?)
+                          | PARQUET (EQUAL yesNo)? -> ^(ASTOPT_STRING_PARQUET yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete						
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)						
@@ -3842,6 +3846,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | ARROW (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARROW yesNo?)
+                          | PARQUET (EQUAL yesNo)? -> ^(ASTOPT_STRING_PARQUET yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
@@ -4108,6 +4113,7 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
 						  | ARROW (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARROW yesNo?)
+                          | PARQUET (EQUAL yesNo)? -> ^(ASTOPT_STRING_PARQUET yesNo?)
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
 						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)						  
 						  | GCM (EQUAL yesNo)? -> ^(ASTOPT_STRING_GCM yesNo?)
@@ -4538,6 +4544,7 @@ ident2: 					Ident |
   OP|
   ARRAY|
   ARROW|
+  PARQUET|
   ASERIES|
   ASER|
   AS|
@@ -5013,6 +5020,7 @@ ident3: 					Ident |
   OP|
   ARRAY|
   ARROW|
+  PARQUET|
   ASERIES|
   ASER|
   AS|
