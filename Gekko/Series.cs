@@ -3362,7 +3362,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get units from series (or parent series)
+        /// Get timestamp from series (or parent series)
         /// </summary>
         /// <returns></returns>
         public string MetaGetStamp()

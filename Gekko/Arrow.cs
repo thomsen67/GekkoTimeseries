@@ -887,14 +887,16 @@ plt.show()
             bool allPeriods = t1.IsNull() && t2.IsNull();
             AllFreqsHelper allFreqs = null;
             if (!allPeriods) allFreqs = G.ConvertDateFreqsToAllFreqs(t1, t2);
-
-            //Databank db1 = Gekko.Program.databanks.GetFirst();
-            //int n = GekkoTime.Observations(t1, t2);
-            //int k = list2.Count + 1;
-
-            int npers = 0;
+            
             int ndims = 0;
-
+            foreach (Tuple<string, IVariable> tup in list2)
+            {
+                if (tup.Item2.Type() != EVariableType.Series) continue;  //skip             
+                Series ts = tup.Item2 as Series;
+                int dimensions = 0;
+                if (ts.IsArraySubSeries()) dimensions = ts.mmi.storage.Length;
+                ndims = Math.Max(ndims, dimensions);  //after loop, ndims can be 0 or larger
+            }
 
             List<string> ids1 = new List<string>();
             List<string> ids2 = new List<string>();
@@ -907,7 +909,7 @@ plt.show()
             List<string> units = new List<string>();
             List<int?> dims = new List<int?>();
             List<List<string>> dimss = new List<List<string>>();
-            List<string> dim2 = new List<string>();
+            for (int i = 0; i < ndims; i++) dimss.Add(new List<string>());
             List<DateTime?> date_starts = new List<DateTime?>();
             List<DateTime?> date_ends = new List<DateTime?>();
             List<DateTime?> stamps = new List<DateTime?>();
@@ -922,9 +924,9 @@ plt.show()
             m.Add(new Parquet.Schema.DataField<string>("name"));
             m.Add(new Parquet.Schema.DataField<string>("freq"));
             m.Add(new Parquet.Schema.DataField<int?>("dims"));
-            for (int ii = 0; ii < dimss.Count; ii++)
+            for (int ii = 0; ii < ndims; ii++)
             {
-                m.Add(new Parquet.Schema.DataField<int?>("dim" + (ii + 1)));
+                m.Add(new Parquet.Schema.DataField<string>("dim" + (ii + 1)));
             }            
             m.Add(new Parquet.Schema.DataField<string>("label"));
             m.Add(new Parquet.Schema.DataField<string>("source"));
@@ -935,43 +937,19 @@ plt.show()
             // ----                
             m.Add(new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true)); //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
             m.Add(new Parquet.Schema.DataField<double?>("value"));
-            Parquet.Schema.ParquetSchema schema = new Parquet.Schema.ParquetSchema(m);
-
-            //// 1. Unified schema
-            //var schema2 = new Parquet.Schema.ParquetSchema(
-            //    new Parquet.Schema.DataField<string>("id"),
-            //    // ================================================
-            //    new Parquet.Schema.DataField<string>("bank"),
-            //    new Parquet.Schema.DataField<string>("name"),
-            //    new Parquet.Schema.DataField<string>("freq"),
-            //    //for (int ii = 0; ii < dimss.Count; ii++)
-            //    //{
-            //    //new Parquet.Schema.DataField<int?>("dims"),
-            //    //}
-            //    new Parquet.Schema.DataField<string>("dim1"),
-            //    new Parquet.Schema.DataField<string>("dim2"),
-            //    new Parquet.Schema.DataField<string>("label"),
-            //    new Parquet.Schema.DataField<string>("source"),
-            //    new Parquet.Schema.DataField<string>("unit"),
-            //    new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
-            //    new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
-            //    new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
-            //    // ----                
-            //    new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true), //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
-            //    new Parquet.Schema.DataField<double?>("value")
-            //);
+            Parquet.Schema.ParquetSchema schema = new Parquet.Schema.ParquetSchema(m);           
 
             Dictionary<string, string> metadata = new Dictionary<string, string>();
             metadata.Add("software.name", "Gekko Timeseries and Modeling Software");
             metadata.Add("software.version", Globals.gekkoVersion);
-            metadata.Add("parquet.design.version", "1.0.0"); //Gekko's version of the Parquet schema.              
+            metadata.Add("parquet.design.version", gekkoParquetVersion); //Gekko's version of the Parquet schema.              
             metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
             metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks.");
             metadata.Add("column.bank.comment", "Gekko databank name, same as file name without extension (for future use, to store several databanks in 1 parquet file).");
             metadata.Add("column.name.comment", "The Gekko series name. Alphanumeric or underscore chars, lower or upper-case.");
             metadata.Add("column.freq.comment", "The Gekko frequency: a (annual), q (quarterly), m (monthly), w (weekly), d (daily), u (undated). Lower-case.");
             metadata.Add("column.dims.comment", "Number of dimensions of the given (array-) timeseries. Integer.");
-            for (int ii = 0; ii < dimss.Count; ii++)
+            for (int ii = 0; ii < ndims; ii++)
             {
                 metadata.Add("column.dim" + (ii + 1) + ".comment", "Dimension " + (ii + 1) + ". String.");
             }                            
@@ -988,38 +966,26 @@ plt.show()
             bool hasSubSeries = false;
             int seriesCounter = 0;
 
+            //SORT --> ?????
+            //SORT --> ?????
+            //SORT --> ?????
+
             //We first sort the series names, and if it is an array-series, we also sort the sub-series names
             //It is a little bit inefficient that we first sort and then look up by Dictionary, but the inefficienty
-            //is probably not critical, and fixing this would mean construction of special sortable objects (not worth the pain)
-
-            //List<string> namesWithFreq = new List<string>();
-            foreach (Tuple<string, IVariable> tup in list2)
-            {
-                if (tup.Item2.Type() != EVariableType.Series) continue;  //skip
-                //namesWithFreq.Add(kvp1.Key);
-                Series ts = tup.Item2 as Series;
-                //npers = Math.Max(npers, G.FreqType(ts));  //after loop, nfreqs can be 1, 2 or 3
-                int dimensions = 0;
-                if (ts.IsArraySubSeries() && ts.mmi.parent != null) dimensions = ts.mmi.parent.dimensions;
-                ndims = Math.Max(ndims, dimensions);  //after loop, ndims can be 0 or larger
-            }
-            //namesWithFreq.Sort(StringComparer.OrdinalIgnoreCase);
-
-            //for (int i = 0; i < npers; i++) pers.Add(new List<int>());
-            for (int i = 0; i < ndims; i++) dimss.Add(new List<string>());
-
+            //is probably not critical, and fixing this would mean construction of special sortable objects (not worth the pain)                       
+            
             string bank = Path.GetFileNameWithoutExtension(pathAndFilename);
 
             foreach (Tuple<string, IVariable> tup in list2)
             {
-                if (seriesCounter > 5) break;
+                //if (seriesCounter > 5) break;
 
-                seriesCounter++;                
+                seriesCounter++;
 
                 string fullName = G.Chop_AddBank(tup.Item1, bank).Replace(" ", "");
                 string freq = G.Chop_GetFreq(tup.Item1);
                 Series ts = tup.Item2 as Series;
-                MultidimItem mmi = ts.mmi;
+                //MultidimItem mmi = ts.mmi;
                 string varnameWithoutFreqAndIndex = G.Chop_GetName(tup.Item1);
                 string varnameWithoutIndex = G.Chop_GetNameAndFreq(tup.Item1);
 
@@ -1056,9 +1022,9 @@ plt.show()
                 {
                     if (ts.IsArraySubSeries()) //is an array-subseries
                     {
-                        if (i2 < mmi.storage.Length)
+                        if (i2 < ts.mmi.storage.Length)
                         {
-                            dimss[i2].Add(mmi.storage[i2]);                            
+                            dimss[i2].Add(ts.mmi.storage[i2]);
                         }
                         else
                         {
@@ -1074,35 +1040,60 @@ plt.show()
                 //labels.Add(Program.GetVariableExplanation1Line(varnameWithoutIndex)); //HMM?
                 labels.Add(ts.MetaGetLabel());
                 sources.Add(ts.MetaGetSource());
-                units.Add(ts.MetaGetUnits());                
-                
-                try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(ts.GetPeriodFirst(), O.GetDateChoices.FlexibleStart)); }
-                catch { date_starts.Add(null); }
-                
-                try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(ts.GetPeriodLast(), O.GetDateChoices.FlexibleStart)); }
-                catch { date_ends.Add(null); }
+                units.Add(ts.MetaGetUnits());
 
-                if (false)
+                bool b = false;
+                string xtimestamp = ts.MetaGetStamp();
+                if (xtimestamp != null && G.Count(xtimestamp, "-") == 2)
                 {
-                    string[] ss = ts.MetaGetStamp().Split('/');
-                    try { stamps.Add(new DateTime(int.Parse(ss[2]), int.Parse(ss[1]), int.Parse(ss[0]))); }
-                    catch { stamps.Add(null); }
+                    string[] ss = ts.MetaGetStamp().Split('-');
+                    int i0 = -12345; int.TryParse(ss[0], out i0);
+                    int i1 = -12345; int.TryParse(ss[1], out i1);
+                    int i2 = -12345; int.TryParse(ss[2], out i2);
+                    if (i0 != -12345 && i1 != -12345 && i2 != -12345)
+                    {
+                        if (i0 >= 1 && i0 <= 31 && i1 >= 1 && i1 <= 12 && G.IsYear(i2))
+                        {
+                            b = true;
+                            try { stamps.Add(new DateTime(i0, i1, i2)); }
+                            catch { b = false; }
+                        }
+                    }                    
+                }
+                if (!b) stamps.Add(null);
+
+                GekkoTime xt1 = ts.GetPeriodFirst();
+                if (!xt1.IsNull())
+                {
+                    try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(xt1, O.GetDateChoices.FlexibleStart)); }
+                    catch { date_starts.Add(null); }
+                }
+                else
+                {
+                    date_starts.Add(null);
                 }
 
-                stamps.Add(null);
+                GekkoTime xt2 = ts.GetPeriodLast();
+                if (!xt2.IsNull())
+                {
+                    try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(xt2, O.GetDateChoices.FlexibleStart)); }
+                    catch { date_ends.Add(null); }
+                }
+                else
+                {
+                    date_ends.Add(null);
+                }                
 
                 foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
                 {
                     valuesCounter++;
                     ids2.Add(fullName);
-                    dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
+                    dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));                    
                     values.Add(ts.GetDataSimple(t));
                 }
             }
 
-            int x = 2;
-
-            using (Stream fileStream = File.Create(pathAndFilename))
+            using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
             using (ParquetWriter writer = await ParquetWriter.CreateAsync(schema, fileStream))
             {
                 writer.CustomMetadata = metadata;
@@ -1117,7 +1108,7 @@ plt.show()
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims.ToArray()));
-                    for (int ii = 0; ii < dimss.Count; ii++)
+                    for (int ii = 0; ii < ndims; ii++)
                     {
                         i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray()));
                     }
@@ -1142,7 +1133,7 @@ plt.show()
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
-                    for (int ii = 0; ii < dimss.Count; ii++)
+                    for (int ii = 0; ii < ndims; ii++)
                     {
                         i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     }
@@ -1175,7 +1166,8 @@ plt.show()
                 ArrowFileWriter writer = new ArrowFileWriter(stream, recordBatch.Schema, leaveOpen: true);
                 await writer.WriteRecordBatchAsync(recordBatch);
                 await writer.WriteEndAsync();
-                using (FileStream fileStream = new FileStream(fileName, FileMode.Create, System.IO.FileAccess.Write))
+                //using (FileStream fileStream = new FileStream(fileName, FileMode.Create, System.IO.FileAccess.Write))
+                using (FileStream fileStream = Program.WaitForFileStream(fileName, null, Program.GekkoFileReadOrWrite.Write))                
                 {
                     stream.WriteTo(fileStream);
                 }
