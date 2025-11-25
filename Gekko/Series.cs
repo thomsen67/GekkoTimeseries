@@ -2205,6 +2205,12 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Will also sort by names.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="flatten"></param>
+        /// <returns></returns>
         public static List<Tuple<string, IVariable>> FlattenArraySeries(List<ToFrom> vars, bool flatten)
         {
             List<Tuple<string, IVariable>> vars3 = new List<Tuple<string, IVariable>>();

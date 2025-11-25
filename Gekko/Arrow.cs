@@ -192,32 +192,36 @@ import pyarrow.parquet as pq
 import pandas as pd
 import matplotlib.pyplot as plt
 
-parquet_file = pq.ParquetFile("c:\\tools\\multi.parquet")
-df0 = parquet_file.read_row_group(0).to_pandas()
-df0 = df0[['id_parent', 'name', 'freq', 'label', 'source', 'unit', 'dims']] # Fjern null-kolonner
-df1 = parquet_file.read_row_group(1).to_pandas()
-df1 = df1[['id', 'id_parent', 'dim1', 'dim2', 'date_start', 'date_end']] # Fjern null-kolonner
-df2 = parquet_file.read_row_group(2).to_pandas()
-df2 = df2[['id', 'date', 'value']] # Fjern null-kolonner
+# Tilpas filnavn...:
+# parquet_file = pq.ParquetFile("c:\\tools\\makro.parquet")
+parquet_file = pq.ParquetFile("c:\\tools\\mona.parquet")
 
-df_temp = df1.merge(df0, on="id_parent", how="left")
-df = df2.merge(df_temp, on="id", how="left")
+# cols = id, bank, name, freq, dims, dim1, dim2, dim3, ... , label, source, unit, date_start, date_end, stamp, date, value
+df0 = parquet_file.read_row_group(0).to_pandas()
+df0 = df0.drop(columns=['date', 'value']) # Fjern null-kolonner
+df1 = parquet_file.read_row_group(1).to_pandas()
+df1 = df1[['id', 'date', 'value']] # Fjern null-kolonner
+df = df1.merge(df0, on="id", how="left") # Sætter rowgroup0-dataframe (df0) ind i rowgroup1-dataframe (df1)
 
 print(); print(df0)
 print(); print(df1)
-print(); print(df2)
-print(); print(df_temp)
 print(); print(df)
 
 # Plot
+i = 0; max = 2
 for name, group in df.groupby("id"):
     plt.plot(group["date"], group["value"], label=name, marker = 'o', markersize=4)
+    if (i >= max - 1): break
+    i += 1
 plt.xlabel("Date")
 plt.ylabel("Value")
 plt.title("Plot")
 plt.legend()
 plt.xticks(rotation=45)
-plt.show()             
+plt.show()        
+
+print('Færdig')
+
              * */
         }
 
@@ -872,13 +876,15 @@ plt.show()
 
         }
 
-        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> list2, GekkoTime t1, GekkoTime t2, string pathAndFilename)
+        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename)
         {
             // TODO
             // TODO
-            // TODO  Handle timeless series
+            // TODO  Handle timeless series, and series with no data
             // TODO
             // TODO
+
+            //Note: the input list is already sorted by name
 
             string gekkoParquetVersion = "1.0.0";
 
@@ -889,7 +895,7 @@ plt.show()
             if (!allPeriods) allFreqs = G.ConvertDateFreqsToAllFreqs(t1, t2);
             
             int ndims = 0;
-            foreach (Tuple<string, IVariable> tup in list2)
+            foreach (Tuple<string, IVariable> tup in listSorted)
             {
                 if (tup.Item2.Type() != EVariableType.Series) continue;  //skip             
                 Series ts = tup.Item2 as Series;
@@ -965,18 +971,10 @@ plt.show()
             int valuesCounter = 0;
             bool hasSubSeries = false;
             int seriesCounter = 0;
-
-            //SORT --> ?????
-            //SORT --> ?????
-            //SORT --> ?????
-
-            //We first sort the series names, and if it is an array-series, we also sort the sub-series names
-            //It is a little bit inefficient that we first sort and then look up by Dictionary, but the inefficienty
-            //is probably not critical, and fixing this would mean construction of special sortable objects (not worth the pain)                       
             
             string bank = Path.GetFileNameWithoutExtension(pathAndFilename);
 
-            foreach (Tuple<string, IVariable> tup in list2)
+            foreach (Tuple<string, IVariable> tup in listSorted)
             {
                 if (tup.Item2.Type() != EVariableType.Series) continue;
                 Series ts = tup.Item2 as Series;

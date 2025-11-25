@@ -23110,8 +23110,8 @@ namespace Gekko
                 //TODO TODO TODO
                 List<ToFrom> listMaybeFilteredForCurrentFreq = FilterByFreq(list, isRecordsFormat, ref variablesType);
                 //list1 is used for methods that know how to handle an array-series (gdx, gbk). list2 for those that do not (csv, xlsx, etc.)                
-                List<Tuple<string, IVariable>> list1 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, false); //non-flattened
-                List<Tuple<string, IVariable>> list2 = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, true);  //flattened
+                List<Tuple<string, IVariable>> list1Sorted = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, false); //non-flattened
+                List<Tuple<string, IVariable>> list2Sorted = Series.FlattenArraySeries(listMaybeFilteredForCurrentFreq, true);  //flattened
 
                 if (tStart.IsNull() && tEnd.IsNull())
                 {
@@ -23122,7 +23122,7 @@ namespace Gekko
                     else
                     {
                         //will find that largest timespan of the databank series (flattened)
-                        GetDatabankPeriodFilteredForFreq(list2, ref tStart, ref tEnd);
+                        GetDatabankPeriodFilteredForFreq(list2Sorted, ref tStart, ref tEnd);
                         if (tStart.IsNull() && tEnd.IsNull())
                         {
                             //Happens if there are only timeless series, in which case
@@ -23144,14 +23144,14 @@ namespace Gekko
                     EdataFormat format = EdataFormat.Csv;
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
-                    CheckSomethingToWrite(list2.Count);
-                    return CsvPrnWrite(list2, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
+                    CheckSomethingToWrite(list2Sorted.Count);
+                    return CsvPrnWrite(list2Sorted, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
                 }
                 else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
                 {
                     //2D format
-                    CheckSomethingToWrite(list2.Count);
-                    WriteToExcel(fileName, tStart, tEnd, list2, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
+                    CheckSomethingToWrite(list2Sorted.Count);
+                    WriteToExcel(fileName, tStart, tEnd, list2Sorted, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
                     return 0;
                 }
                 else if (G.Equal(o.opt_gnuplot, "yes"))
@@ -23169,15 +23169,15 @@ namespace Gekko
                     //2015/04/01  1.0000000000E+00  2.0000000000E+00
                     //
                     ErrorIfMatrix(variablesType);
-                    CheckSomethingToWrite(list2.Count);
-                    return GnuplotWrite(list2, fileName, tStart, tEnd);
+                    CheckSomethingToWrite(list2Sorted.Count);
+                    return GnuplotWrite(list2Sorted, fileName, tStart, tEnd);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
                 {
                     //RECORDS
                     ErrorIfMatrix(variablesType);
-                    CheckSomethingToWrite(list2.Count);
-                    return Tspwrite(list2, fileName, tStart, tEnd, isCaps);
+                    CheckSomethingToWrite(list2Sorted.Count);
+                    return Tspwrite(list2Sorted, fileName, tStart, tEnd, isCaps);
                 }
                 else if (o.opt_gdx != null)
                 {
@@ -23187,17 +23187,17 @@ namespace Gekko
                     {
                         new Error("Please indicate a file name for EXPORT<gdx>");
                     }
-                    CheckSomethingToWrite(list2.Count);
+                    CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "gdx");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     if (Program.options.gams_fast)
                     {
-                        GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1); //probably cannot handle list2
+                        GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
                     else
                     {
-                        GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1); //probably cannot handle list2
+                        GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
                     return 0;
                 }
@@ -23209,13 +23209,13 @@ namespace Gekko
                     {
                         new Error("Please indicate a file name for EXPORT<arrow>");
                     }
-                    CheckSomethingToWrite(list2.Count);
+                    CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "arrow");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteArrowDatabank(list2, tStart, tEnd, pathAndFilename);
+                        Arrow.WriteArrowDatabank(list2Sorted, tStart, tEnd, pathAndFilename);
                     }
                     catch (Exception e)
                     {
@@ -23236,13 +23236,13 @@ namespace Gekko
                     {
                         new Error("Please indicate a file name for EXPORT<parquet>");
                     }
-                    CheckSomethingToWrite(list2.Count);
+                    CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "parquet");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteParquetDatabank(list2, tStart, tEnd, pathAndFilename).Wait();
+                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename).Wait();
                     }
                     catch (Exception e)
                     {
@@ -23271,11 +23271,11 @@ namespace Gekko
                     }
                     else if (writeType == EDatabankWriteType.Flat)
                     {
-                        return WriteFlat(list2, tStart, tEnd, fileName);
+                        return WriteFlat(list2Sorted, tStart, tEnd, fileName);
                     }
                     else if (writeType == EDatabankWriteType.Gcm)
                     {
-                        Program.WriteGcm(list2, tStart, tEnd, o.opt_op, fileName);
+                        Program.WriteGcm(list2Sorted, tStart, tEnd, o.opt_op, fileName);
                         return 0;
                     }
                     else
