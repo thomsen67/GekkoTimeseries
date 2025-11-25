@@ -23101,7 +23101,7 @@ namespace Gekko
                 }
 
                 //??? why is EWriteType not used in line below and elsewhere???
-                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes") || G.Equal(o.opt_gcm, "yes") || G.Equal(o.opt_arrow, "yes");
+                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes") || G.Equal(o.opt_gcm, "yes") || G.Equal(o.opt_arrow, "yes") || G.Equal(o.opt_parquet, "yes");
 
                 //TODO TODO TODO
                 //TODO TODO TODO

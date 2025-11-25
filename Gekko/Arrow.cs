@@ -956,10 +956,10 @@ plt.show()
             metadata.Add("column.label.comment", "The label of the given timeseries. String.");
             metadata.Add("column.source.comment", "The source of the given timeseries. String.");
             metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
-            metadata.Add("column.date_start.comment", "The date of the first value of the timeseries in the Gekko databank. Date format.");
-            metadata.Add("column.date_end.comment", "The date of the last value of the timeseries in the Gekko databank. Date format.");
-            metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format.");
-            metadata.Add("column.date.comment", "The date of the current data value (can represent a period like a full quarter). Date format.");
+            metadata.Add("column.date_start.comment", "The date of the first value of the timeseries in the Gekko databank. Date format, unix time. Quarters etc. are identified as their *first* day.");
+            metadata.Add("column.date_end.comment", "The date of the last value of the timeseries in the Gekko databank. Date format, unix time. Quarters etc. are identified as their *first* day");
+            metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format, unix time.");
+            metadata.Add("column.date.comment", "The date of the current data value (can represent a period like a full quarter). Date format, unit tme. Quarters etc. are identified as their *first* day.");
             metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
 
             int valuesCounter = 0;
@@ -978,13 +978,18 @@ plt.show()
 
             foreach (Tuple<string, IVariable> tup in list2)
             {
-                //if (seriesCounter > 5) break;
-
-                seriesCounter++;
-
-                string fullName = G.Chop_AddBank(tup.Item1, bank).Replace(" ", "");
-                string freq = G.Chop_GetFreq(tup.Item1);
+                if (tup.Item2.Type() != EVariableType.Series) continue;
                 Series ts = tup.Item2 as Series;
+                                
+                //HACK HACK HACK HACK HACK HACK 
+                //HACK HACK HACK HACK HACK HACK 
+                //HACK HACK HACK HACK HACK HACK 
+                //HACK HACK HACK HACK HACK HACK 
+                if (ts.type == ESeriesType.Timeless) continue;
+
+                string fullName = G.Chop_AddBank(tup.Item1, bank).Replace(" ", "").ToLower();            
+                string freq = G.Chop_GetFreq(tup.Item1);
+                
                 //MultidimItem mmi = ts.mmi;
                 string varnameWithoutFreqAndIndex = G.Chop_GetName(tup.Item1);
                 string varnameWithoutIndex = G.Chop_GetNameAndFreq(tup.Item1);
@@ -1001,7 +1006,16 @@ plt.show()
                     G.PickFromAllFreqs(allFreqs, ts.freq, out gt1, out gt2);
                 }
 
-                //string longVarnameWithoutFreq = varnameWithoutFreqAndIndex;
+                if (gt1.IsNull())
+                {
+                    //HACK HACK HACK HACK HACK HACK 
+                    //HACK HACK HACK HACK HACK HACK 
+                    //HACK HACK HACK HACK HACK HACK 
+                    //HACK HACK HACK HACK HACK HACK 
+                    continue; //has no values
+                }                
+
+                seriesCounter++;
 
                 ids1.Add(fullName);
                 banks.Add(bank);
@@ -1042,30 +1056,43 @@ plt.show()
                 sources.Add(ts.MetaGetSource());
                 units.Add(ts.MetaGetUnits());
 
+                // -------------------------------------------------------------------------------------------------------
+                // Note about UTC. Regarding the DateTime object, it only contains ticks + a flag regarding UTC or local.
+                // It seems that Parquet.NET ignores any UTC or not flag anyway.
+                // -------------------------------------------------------------------------------------------------------
+
                 bool b = false;
                 string xtimestamp = ts.MetaGetStamp();
-                if (xtimestamp != null && G.Count(xtimestamp, "-") == 2)
+                if (xtimestamp != null)
                 {
-                    string[] ss = ts.MetaGetStamp().Split('-');
-                    int i0 = -12345; int.TryParse(ss[0], out i0);
-                    int i1 = -12345; int.TryParse(ss[1], out i1);
-                    int i2 = -12345; int.TryParse(ss[2], out i2);
-                    if (i0 != -12345 && i1 != -12345 && i2 != -12345)
+                    int c1 = G.Count(xtimestamp, "-");
+                    int c2 = G.Count(xtimestamp, "/"); //older
+                    if (c1 == 2 || c2 == 2)
                     {
-                        if (i0 >= 1 && i0 <= 31 && i1 >= 1 && i1 <= 12 && G.IsYear(i2))
+                        string[] ss = null;
+                        if (c1 == 2) ss = ts.MetaGetStamp().Split('-');
+                        else ss = ts.MetaGetStamp().Split('/');                        
+                        int i0 = -12345; int.TryParse(ss[0], out i0);
+                        int i1 = -12345; int.TryParse(ss[1], out i1);
+                        int i2 = -12345; int.TryParse(ss[2], out i2);
+                        if (i0 != -12345 && i1 != -12345 && i2 != -12345)
                         {
-                            b = true;
-                            try { stamps.Add(new DateTime(i0, i1, i2)); }
-                            catch { b = false; }
+                            if (i2 >= 0 && i2 <= 99) i2 += 2000; //Gekko did not exist in year 19xx, so this should be safe regarding stamps.
+                            if (i0 >= 1 && i0 <= 31 && i1 >= 1 && i1 <= 12 && G.IsYear(i2))
+                            {
+                                b = true;                                
+                                try { stamps.Add(new DateTime(i2, i1, i0)); } //Non-UTC, but UtcDateTime(i2, i1, i0) does not change anything
+                                catch { b = false; }
+                            }
                         }
-                    }                    
+                    }
                 }
                 if (!b) stamps.Add(null);
 
                 GekkoTime xt1 = ts.GetPeriodFirst();
                 if (!xt1.IsNull())
                 {
-                    try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(xt1, O.GetDateChoices.FlexibleStart)); }
+                    try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(xt1, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
                     catch { date_starts.Add(null); }
                 }
                 else
@@ -1076,7 +1103,7 @@ plt.show()
                 GekkoTime xt2 = ts.GetPeriodLast();
                 if (!xt2.IsNull())
                 {
-                    try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(xt2, O.GetDateChoices.FlexibleStart)); }
+                    try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(xt2, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
                     catch { date_ends.Add(null); }
                 }
                 else
