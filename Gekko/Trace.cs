@@ -1338,9 +1338,9 @@ namespace Gekko
             if (!G.NullOrBlanks(item.Label)) text += " ('" + item.Label + "')";
             text += G.NL;
             text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;
-            text += "Stamp: " + item.StampDetailed + G.NL;
+            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) { text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames) + G.NL; }
             text += "File: " + item.FileDetailed + G.NL;
-            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames);
+            text += "Stamp: " + item.StampDetailed;
             return text;
         }
 
@@ -1594,10 +1594,13 @@ namespace Gekko
         public static void GetStampAsString(TraceID2 id, out string stamp, out string stampDetailed)
         {
             //The .stamp is in UTC time, so needs to be converted for printing
-            stamp = id.StampInLocalTime().ToString("d", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK));
+            System.Globalization.CultureInfo ci = System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK);
+            stamp = id.StampInLocalTime().ToString("d", ci);
             try
             {
-                stampDetailed = id.StampInLocalTime().ToString("HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;  //7 digits is 100 ns, which is limit anyway
+                //stampDetailed = id.StampInLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;  //7 digits is 100 ns, which is limit anyway                
+                stampDetailed = id.StampInLocalTime().ToString($"{ci.DateTimeFormat.ShortDatePattern} HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;  //7 digits is 100 ns, which is limit anyway
+                //
             }
             catch
             {

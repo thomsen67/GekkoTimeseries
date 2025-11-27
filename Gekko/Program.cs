@@ -2807,9 +2807,9 @@ namespace Gekko
 
                 //Arrow.RunReaderExample(@"c:\Thomas\Desktop\gekko\testing\mona.arrow").GetAwaiter().GetResult();
 
-                Arrow.WriteParquetFile().Wait();
+                //Arrow.WriteParquetFile().Wait();
 
-                Arrow.ReadParquetFile().Wait();
+                //Arrow.ReadParquetFile().Wait();
 
                 if (Globals.runningOnTTComputer)
                 {
