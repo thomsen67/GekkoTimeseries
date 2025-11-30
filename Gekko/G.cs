@@ -267,6 +267,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool StartsWith(string s1, string s2)
         {
+            if (s1 == null) return false;
             return s1.StartsWith(s2, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -278,6 +279,7 @@ namespace Gekko
         /// <returns>True if match</returns>
         public static bool Contains(string s1, string s2)
         {
+            if (s1 == null) return false;
             return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 

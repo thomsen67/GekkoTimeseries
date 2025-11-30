@@ -618,7 +618,24 @@ namespace Gekko
 
         public void DeepTrace(TraceHelper th, int depth)
         {
-            if (th.depthLimit != -12345 && depth >= th.depthLimit) return;
+            if (th.specialAdamStuff)
+            {
+                List<string> temp1 = new List<string>() { "work:ADAM_as_test!", "work:ADAM_ad_test!", "work:ADAM_av_test!", "work:ADAM_ax_fejl!", "work:ADAM_ax_test!" };
+                foreach (string s in temp1)
+                {
+                    if (G.StartsWith(this.traceContents.name, s)) return;
+                }
+
+                //List<string> temp2 = new List<string>() { "work:adambk_", "work:ADAM_s!", "work:ADAM_pension!", "work:ADAM_q!", "work:ADAM_bfr!", "work:adam_hq!", "work:ADAM_owp!", "work:ADAM_et!", "work:ADAM_IO!", "work:adam_tip!" };
+                //foreach (string s in temp2)
+                //{
+                //    if (G.StartsWith(this.traceContents.name, s)) { depth--; break; }
+                //}
+
+                if (G.StartsWith(this.traceContents.name, "work:adam_") || G.StartsWith(this.traceContents.name, "work:adambk_")) depth--;
+            }
+
+            if (th.depthLimit != -12345 && depth >= th.depthLimit) return;            
             if (th.type == ETraceHelper.GetAllMetasAndTraces)  //0 corresponds to direct effect from bank variable (e.g. "adambk:"), not indirect effect.
             {                
                 th.unittestTraceCountIncludeInvisible++; //only for testing
@@ -1337,10 +1354,10 @@ namespace Gekko
             text += "Name: " + item.NameDetailed;
             if (!G.NullOrBlanks(item.Label)) text += " ('" + item.Label + "')";
             text += G.NL;
-            text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;
-            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) { text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames) + G.NL; }
+            text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;            
             text += "File: " + item.FileDetailed + G.NL;
-            text += "Stamp: " + item.StampDetailed;
+            text += "Stamp: " + item.StampDetailed + G.NL;
+            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) { text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames); }
             return text;
         }
 
@@ -1813,6 +1830,8 @@ namespace Gekko
 
         // --- this is for traceadam2()
         public TraceBankHelpler helper = null;
+
+        public bool specialAdamStuff = false;
 
         /// <summary>
         /// Depth of traces. Returns -1 if no traces are found.

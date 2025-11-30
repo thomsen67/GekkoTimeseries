@@ -10844,7 +10844,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, bool direct, TraceBankHelpler helper)
+        public static GekkoDictionary<string, bool> TraceGetPrecedents(IVariable ivName, string bankname, int direct, TraceBankHelpler helper)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -10860,7 +10860,12 @@ namespace Gekko
                     }
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
-                    if (direct) th1.depthLimit = 1;
+                    if (direct == 1) th1.depthLimit = 1;
+                    else if (direct == 2)
+                    {
+                        th1.depthLimit = 1;
+                        th1.specialAdamStuff = true;
+                    }
                     ts.DeepTrace(th1);
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
@@ -10884,7 +10889,12 @@ namespace Gekko
                 if (ts == null) new Error("Expected input name to be a series name");
                 TraceHelper th1 = new TraceHelper();
                 th1.type = ETraceHelper.GetAllMetasAndTraces;
-                if (direct) th1.depthLimit = 1;
+                if (direct == 1) th1.depthLimit = 1;
+                else if (direct == 2)
+                {
+                    th1.depthLimit = 1;
+                    th1.specialAdamStuff = true;
+                }
                 ts.DeepTrace(th1);
                 foreach (Trace2 trace in th1.traces.Keys)
                 {
@@ -10981,7 +10991,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ts"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname, bool direct)
+        public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname, int direct)
         {
             GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);            
 
@@ -10997,7 +11007,7 @@ namespace Gekko
 
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
-                    if (direct) th1.depthLimit = 1;
+                    if (direct == 1) th1.depthLimit = 1;
                     ts.DeepTrace(th1);                    
 
                     foreach (Trace2 trace in th1.traces.Keys)
@@ -11027,7 +11037,7 @@ namespace Gekko
 
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
-                    if (direct) th1.depthLimit = 1;
+                    if (direct == 1) th1.depthLimit = 1;
                     ts.DeepTrace(th1);
 
                     foreach (Trace2 trace in th1.traces.Keys)

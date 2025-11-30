@@ -6216,7 +6216,7 @@ namespace Gekko
             GekkoDictionary<string, bool> dublets = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             //precedents
             TraceBankHelpler helper = new TraceBankHelpler();
-            found = Program.TraceGetPrecedents(null, "adambk", false, helper);
+            found = Program.TraceGetPrecedents(null, "adambk", 0, helper);
             if (true)
             {
                 using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "traceadam2.txt", null, Program.GekkoFileReadOrWrite.Write))
@@ -6251,9 +6251,9 @@ namespace Gekko
         public static void tracebanks(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             //1. argument: list of bank names
-            //2. argument: Direct (0/1), default = 0
+            //2. argument: Direct (0/1), default = 0 ((can set to 2, for special ADAM stuff))
             //3. argument: Show frequencies (0/1), default = 0
-            bool direct = false;            
+            int direct = 0;
             bool showFreq = false;
             int n = x.Length;
             if (n != 1 && n != 3) new Error("Expected 1 or 3 arguments");
@@ -6261,13 +6261,13 @@ namespace Gekko
             if (m == null) new Error("Expected first argument to be a list of banknames");
             if (n > 1)
             {
-                direct = O.ConvertToInt(x[1]) != 0;
+                direct = O.ConvertToInt(x[1]);
                 showFreq = O.ConvertToInt(x[2]) != 0;
             }            
             Helper_TraceAdam(m, direct, showFreq);  //direct and indirect effects only
         }
 
-        private static void Helper_TraceAdam(List m, bool direct, bool showFreq)
+        private static void Helper_TraceAdam(List m, int direct, bool showFreq)
         {
             //!Will remove frequencies in output
 
@@ -6288,16 +6288,16 @@ namespace Gekko
                 using (FileStream fs = Program.WaitForFileStream(fName, null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
-                    
-                    Dictionary<string, bool> found = Program.TraceGetPrecedents(null, bank, direct, null);  //ADAM-vars returned
-                    List<string> vars = found.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                    //found is for instance all the ADAM vars that are used for MAKRO vars
+                    //Dictionary<string, bool> found = Program.TraceGetPrecedents(null, bank, direct, null);  //ADAM-vars returned
+                    //List<string> vars = found.Keys.OrderBy(x1 => x1, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
 
                     GekkoDictionary<string, IVariable> flat = Program.databanks.GetFirst().StorageFlattenedArrayTimeseries();
                     //matrix1 is makroname --> adamnames
                     //matrix2 is adamname --> makronames
                     GekkoDictionary<string, GekkoDictionary<string, bool>> matrix1 = new GekkoDictionary<string, GekkoDictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
                     GekkoDictionary<string, GekkoDictionary<string, bool>> matrix2 = new GekkoDictionary<string, GekkoDictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
-
+                    
                     foreach (KeyValuePair<string, IVariable> kvp in flat)
                     {
                         if (kvp.Value.Type() != EVariableType.Series) continue;
@@ -6307,7 +6307,9 @@ namespace Gekko
 
                         //precedents
                         string name = ts.GetName();
-                        if (!showFreq) name = G.Chop_RemoveFreq(ts.GetName());
+                        //if (!showFreq) name = G.Chop_RemoveFreq(ts.GetName());
+
+                        //For instance: for each MAKRO variable name, find which ADAM variaables are used to construct the MAKRO variable.
                         GekkoDictionary<string, bool> found2 = Program.TraceGetPrecedents(new ScalarString(name), bank, direct, null);
 
                         matrix1.Add(name, found2); //not really used here
@@ -6335,8 +6337,17 @@ namespace Gekko
                     {
                         List<string> makrovars = matrix2[adamvar].Keys.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
                         string varNoFreq = adamvar;
-                        if (!showFreq) varNoFreq = G.Chop_RemoveFreq(adamvar);
-                        sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + Stringlist.GetListWithCommas(makrovars));
+                        List<string> varsNoFreq = makrovars;
+                        if (!showFreq)
+                        {
+                            varNoFreq = G.Chop_RemoveFreq(adamvar);
+                            varsNoFreq = new List<string>();
+                            foreach (string s in makrovars)
+                            {
+                                varsNoFreq.Add(G.Chop_RemoveFreq(s));
+                            }
+                        }
+                        sw.WriteLine(varNoFreq + G.Blanks(TWENTY - varNoFreq.Length) + Stringlist.GetListWithCommas(varsNoFreq));
                     }
 
                     sw.WriteLine();
@@ -6353,7 +6364,7 @@ namespace Gekko
             //bankname is always string.
             //name is normally string but can optionally be a series object, when calling with "precedents".
 
-            bool direct = false;  //normally
+            int direct = 0;  //normally
 
             if (x.Length == 0) new Error("Expected > 0 arguments to tracebank() function");
             List<string> names = new List<string>();
@@ -6384,7 +6395,7 @@ namespace Gekko
                 else if (G.Equal(precOrDep, "precedents1"))
                 {
                     type = ETraceBank.Precedents;
-                    direct = true;
+                    direct = 1;
                 }
                 else if (G.Equal(precOrDep, "dependents"))
                 {
@@ -6393,7 +6404,7 @@ namespace Gekko
                 else if (G.Equal(precOrDep, "dependents1"))
                 {
                     type = ETraceBank.Dependents;
-                    direct = true;
+                    direct = 1;
                 }
                 else new Error("Tracebank(): the type must be 'precedents', 'precedents1', 'dependents' or 'dependents1'");
 
@@ -6401,7 +6412,7 @@ namespace Gekko
                 if (G.Equal(bankname, "<special>"))
                 {
                     special = "";
-                    direct = true;
+                    direct = 1;
                     type = ETraceBank.Precedents;
                 }
 
@@ -6453,6 +6464,7 @@ namespace Gekko
                         
                         eqs.Add(special);
                     }
+
                     eqs.Sort(StringComparer.OrdinalIgnoreCase);
                                         
                     using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "datop.frm", null, Program.GekkoFileReadOrWrite.Write))

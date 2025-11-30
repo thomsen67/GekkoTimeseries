@@ -1827,7 +1827,7 @@ img {border-style: none;
                     GekkoDictionary<string, bool> found = null;
                     try
                     {
-                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk", false, null);
+                        found = Program.TraceGetPrecedents(new ScalarString("traces:" + variableName), "adambk", 0, null);
                     }
                     catch { };
                     if (found != null && found.Count > 0)

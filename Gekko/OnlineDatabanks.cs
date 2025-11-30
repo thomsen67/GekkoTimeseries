@@ -127,16 +127,14 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;
-                    bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
+                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;                    
                     //timeout errors and the like
                     using (Error error = new Error())
                     {
                         error.MainAdd("Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error: ");
                         error.MainAdd(e.Message + ".");
                         if (e.InnerException != null && e.InnerException.Message != null) error.MainAdd(e.InnerException.Message + ".");
-                        if (is405) error.MainAdd("This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'.");
-                        if (isTransport) error.MainAdd("The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
+                        if (is405) error.MainAdd("This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'.");                        
                     }
                 }
 
