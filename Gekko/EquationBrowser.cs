@@ -1204,18 +1204,208 @@ img {border-style: none;
 
         public static void BrowserNew()
         {
-            string path = @"c:\Thomas\Desktop\gekko\testing\browser";  //Normally something with "browser".
-            bool deleteFolder = true;  //if true, everything is wiped out first.
-            string subfolder = "vars";
+            bool isSimple = false;            
+            bool isDanish = true;
+            string browserFolder = "Browser";            
+            bool deleteFolder = true;  //if true, everything is wiped out first.            
 
             bool onlyHtml = false; //default: false
             bool onlyPlot = false; //default: false
             bool skip = false;  //only for debug            
-            
+
             bool small = false; //default: false, only few eqs.
             bool flush = false;  //Not necessary to set true anymore
             bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO, but what does this really do?           
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
+
+            string settings_index_filename = "index.html";
+            string settings_list_filename = "list.html";
+            string settings_find_filename = "find.html";
+            string settings_css_filename = "styles.css";            
+            string settings_icon_filename = null;
+            string settings_vars_foldername = "Vars";            
+            string settings_commands = null;
+            string settings_plot_start = Globals.globalPeriodStart.super.ToString();
+            string settings_plot_end = Globals.globalPeriodEnd.super.ToString();
+            string settings_plot_line = null;
+            string settings_print_start = Globals.globalPeriodStart.super.ToString();
+            string settings_print_end = Globals.globalPeriodEnd.super.ToString();
+            string settings_include_p_type = "yes";
+            bool settings_show_source = true;
+            object[] settings_ekstrafiler = null;
+
+            G.Writeln2("Starting html browser generation");
+            DateTime dt0 = DateTime.Now;
+
+            string pathAndFile = Program.options.folder_working + "\\" + "browser.json";
+            string jsonCode = null;
+            if (!File.Exists(pathAndFile))
+            {
+                isSimple = true;
+                isDanish = false;
+                new Note("A '" + pathAndFile + "' file does not seem to exist: because of this, a basic/default browser is generated");                
+            }
+            else
+            {
+                jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(pathAndFile));
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                Dictionary<string, object> jsonTree = null;
+                try
+                {
+                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                }
+                catch (Exception e)
+                {
+                    G.Warning("w4.1", "The .json file does not seem correctly formatted. " + e.Message);
+                }
+
+                // -------------------------------------------------------------
+
+                try { settings_index_filename = (string)jsonTree["index_filename"]; } catch { G.Warning("w4.3", "JSON: index_filename not found, used \"" + settings_index_filename + "\""); }
+                try { settings_list_filename = (string)jsonTree["list_filename"]; } catch { G.Warning("w4.3", "JSON: list_filename not found, used \"" + settings_list_filename + "\""); }
+                try { settings_find_filename = (string)jsonTree["find_filename"]; } catch { G.Warning("w4.3", "JSON: Find_filename not found, used \"" + settings_find_filename + "\""); }
+                //TODO: create css if not found as file
+                try { settings_css_filename = (string)jsonTree["css_filename"]; } catch { G.Warning("4.3", "JSON: css_filename not found, used \"" + settings_css_filename + "\""); }          
+                //TODO: what to do?
+                try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { G.Warning("4.3", "JSON: icon_filename not found"); }
+                try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { G.Warning("w4.3", "JSON: vars_foldername not found, used \"" + settings_vars_foldername + "\""); }
+                try { settings_commands = (string)jsonTree["commands"]; } catch { G.Warning("4.3", "JSON: commands not found, no commands used."); }
+                try { settings_plot_start = (string)jsonTree["plot_start"]; } catch { G.Warning("4.3", "JSON: plot_start not found, used \"" + settings_plot_start + "\""); }
+                try { settings_plot_end = (string)jsonTree["plot_end"]; } catch { G.Warning("4.3", "JSON: plot_end not found, used \"" + settings_plot_end + "\""); }
+                try { settings_plot_line = (string)jsonTree["plot_line"]; } catch { G.Warning("4.3", "JSON: plot_line not found, used \"" + settings_plot_line + "\""); }
+                try { settings_print_start = (string)jsonTree["print_start"]; } catch { G.Warning("4.3", "JSON: print_start not found, used \"" + settings_print_start + "\""); }
+                try { settings_print_end = (string)jsonTree["print_end"]; } catch { G.Warning("4.3", "JSON: print_end not found, used \"" + settings_print_end + "\""); }
+                try { settings_include_p_type = (string)jsonTree["include_p_type"]; } catch {G.Warning("4.3", "JSON: include_p_type not found, used \"" + settings_include_p_type + "\""); }                
+            }
+
+            // -------------------------------------------------------------
+            // -------------------------------------------------------------
+
+            string ss1 = "Søg";
+            string ss2 = "Hjem";
+            if (!isDanish)
+            {
+                ss1 = "Search";
+                ss2 = "Home";
+            }
+
+            string list_title = "Variabelliste (try Ctrl+F)";
+            if (!isDanish) list_title = "Variable list (try Ctrl+F)";            
+
+            List<string> files = new List<string>();
+            files.Add(settings_index_filename);
+            files.Add(settings_find_filename);
+            files.Add(settings_list_filename);
+            files.Add(settings_css_filename);
+            files.Add(settings_icon_filename);
+            files.Add(browserFolder);
+            files.Add(settings_vars_foldername);
+            foreach (string file in files)
+            {
+                if (file == null) continue;
+                if (file.Contains("/") || file.Contains("\\"))
+                {
+                    new Error("'" + file + "' should not contain '/' or '\\'");
+                }
+            }
+
+            string rootFolder = Program.options.folder_working + "\\" + browserFolder;
+            string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_vars_foldername;
+
+            BrowserCleanupFolders(rootFolder, subFolder);
+
+            if (!isSimple)
+            {
+
+                //index.html and styles.css is copied to root folder of browser system
+                List<string> filesToCopy = new List<string>();
+                filesToCopy.Add(settings_index_filename);
+                filesToCopy.Add(settings_css_filename);
+                filesToCopy.Add(settings_icon_filename);
+                if (settings_ekstrafiler != null)
+                {
+                    foreach (object o in settings_ekstrafiler)
+                    {
+                        string s = null;
+                        try
+                        {
+                            s = (string)o;
+                        }
+                        catch (Exception e)
+                        {
+                            new Error("JSON: ekstrafiler problem");
+                        }
+                        if (s != null) filesToCopy.Add(s);
+                    }
+                }
+
+                foreach (string fileToCopy in filesToCopy)
+                {
+                    if (fileToCopy == null) continue;
+                    string fileNameIndex = Program.options.folder_working + "\\" + fileToCopy;
+                    string fileNameIndex2 = rootFolder + "\\" + fileToCopy;
+                    if (!File.Exists(fileNameIndex))
+                    {
+                        new Error("'" + fileNameIndex + "' was not found");
+                    }
+                    File.Copy(fileNameIndex, fileNameIndex2, true);
+                }
+
+                Program.RunGekkoCommands(settings_commands, "", 0, new P());
+            }
+
+            int gap = 20;
+
+            GekkoTime plotStart = new GekkoTime(EFreq.A, G.IntParse(settings_plot_start), 1);
+            GekkoTime plotEnd = new GekkoTime(EFreq.A, G.IntParse(settings_plot_end), 1);
+            GekkoTime plot_line = GekkoTime.tNull;
+            if (isSimple) plot_line = plotStart.Add(-100); //-100 so it does not show up
+            else plot_line = new GekkoTime(EFreq.A, G.IntParse(settings_plot_line), 1);
+            GekkoTime print_start = new GekkoTime(EFreq.A, G.IntParse(settings_print_start), 1);
+            GekkoTime print_end = new GekkoTime(EFreq.A, G.IntParse(settings_print_end), 1);
+
+            string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPathPretty);
+            string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPathPretty);
+
+            List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
+            List<string> vars = Stringlist.GetListOfStringsFromIVariable(ml);
+
+            if (G.Equal(settings_include_p_type, "yes"))
+            {
+                GekkoDictionary<string, string> temp = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s in vars) temp.Add(s, null);
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsNotRunAtAll)
+                {
+                    if (eh.equationType != EEquationType.RevertedP) continue;
+                    if (!temp.ContainsKey(eh.lhs)) temp.Add(eh.lhs, null);
+                    foreach (string s12 in eh.precedentsWithLagIndicator.Keys)
+                    {
+                        string s13 = G.ExtractOnlyVariableIgnoreLag(s12);
+                        if (!temp.ContainsKey(s13)) temp.Add(s13, null);
+                    }
+                }
+                vars.Clear();
+                foreach (string s14 in temp.Keys) vars.Add(s14);
+            }
+
+            vars.Sort(StringComparer.OrdinalIgnoreCase);
+
+            //List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();
+            //GekkoDictionary<string, List<string>> datagen = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            //GekkoDictionary<string, List<Tuple<string, string>>> doc = new GekkoDictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase);
+            //GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+            // ====================================================================================================
+            // NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+            // NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+            // NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+            // NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+            // NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+            // ====================================================================================================
+
+
+
+            
 
             // --------------------------------------------------------------------------------------------------------
 
@@ -1227,7 +1417,7 @@ img {border-style: none;
             bh.freq = freq;
             bh.firstColWidth = 200;
             bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
-            // ---
+                                        // ---
             bh.type = EBrowserType.MakroIdentitiesText;
             bh.text = new StringBuilder();
 
@@ -1250,13 +1440,13 @@ img {border-style: none;
                 restrict.Add("qX[xTot]", false);
             }
 
-            if (deleteFolder && Directory.Exists(path))
+            if (deleteFolder && Directory.Exists(rootFolder))
             {
-                DialogResult result = MessageBox.Show("About to delete " + path + " and subfolders. It this ok?", "Deleting", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                DialogResult result = MessageBox.Show("About to delete " + rootFolder + " and subfolders. It this ok?", "Deleting", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result == DialogResult.Yes)
                 {
-                    G.DeleteFolder(path, true);
-                    new Writeln("Folder " + path + " deleted");
+                    G.DeleteFolder(rootFolder, true);
+                    new Writeln("Folder " + rootFolder + " and subfolders deleted");
                 }
                 else
                 {
@@ -1264,13 +1454,13 @@ img {border-style: none;
                 }
             }
 
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(rootFolder))
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(rootFolder);
             }
-            if (!Directory.Exists(Path.Combine(path, subfolder)))
+            if (!Directory.Exists(subFolder))
             {
-                Directory.CreateDirectory(Path.Combine(path, subfolder));
+                Directory.CreateDirectory(subFolder);
             }
 
             if (true)
@@ -1283,8 +1473,8 @@ img {border-style: none;
                 File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
                 File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
                 File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
-            }                        
-            
+            }
+
             Globals.browser = true;  //Do not change, internal TTH popup
             Program.options.databank_search = false;
 
@@ -1310,7 +1500,7 @@ img {border-style: none;
                 }
             }
 
-            if (skip) return;                        
+            if (skip) return;
 
             GekkoTime t1 = GekkoTime.tNull;
             GekkoTime t2 = GekkoTime.tNull;
@@ -2597,7 +2787,6 @@ img {border-style: none;
                             else
                             {
                                 new Error("User abort");
-                                //throw new GekkoException();
                             }
                         }
                     }
