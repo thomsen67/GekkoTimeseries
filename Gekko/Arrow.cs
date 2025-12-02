@@ -877,13 +877,7 @@ print('Færdig')
         }
 
         public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename)
-        {
-            // TODO
-            // TODO
-            // TODO  Handle timeless series, and series with no data
-            // TODO
-            // TODO
-
+        {            
             //Note: the input list is already sorted by name
 
             string gekkoParquetVersion = "1.0.0";
@@ -916,11 +910,15 @@ print('Færdig')
             List<int?> dims = new List<int?>();
             List<List<string>> dimss = new List<List<string>>();
             for (int i = 0; i < ndims; i++) dimss.Add(new List<string>());
+            List<bool?> timelesss = new List<bool?>();
             List<DateTime?> date_starts = new List<DateTime?>();
             List<DateTime?> date_ends = new List<DateTime?>();
+            List<string> period_starts = new List<string>();
+            List<string> period_ends = new List<string>();
             List<DateTime?> stamps = new List<DateTime?>();
             // ---            
             List<DateTime?> dates = new List<DateTime?>();
+            List<string> periods = new List<string>();
             List<double?> values = new List<double?>();
 
             // ================================================
@@ -933,15 +931,19 @@ print('Færdig')
             for (int ii = 0; ii < ndims; ii++)
             {
                 m.Add(new Parquet.Schema.DataField<string>("dim" + (ii + 1)));
-            }            
+            }
+            m.Add(new Parquet.Schema.DataField<bool?>("is_timeless"));
             m.Add(new Parquet.Schema.DataField<string>("label"));
             m.Add(new Parquet.Schema.DataField<string>("source"));
             m.Add(new Parquet.Schema.DataField<string>("unit"));
             m.Add(new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
-            m.Add(new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
+            m.Add(new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));            
+            m.Add(new Parquet.Schema.DataField<string>("period_start"));
+            m.Add(new Parquet.Schema.DataField<string>("period_end"));
             m.Add(new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
             // ----                
             m.Add(new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true)); //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
+            m.Add(new Parquet.Schema.DataField<string>("period"));
             m.Add(new Parquet.Schema.DataField<double?>("value"));
             Parquet.Schema.ParquetSchema schema = new Parquet.Schema.ParquetSchema(m);           
 
@@ -958,14 +960,18 @@ print('Færdig')
             for (int ii = 0; ii < ndims; ii++)
             {
                 metadata.Add("column.dim" + (ii + 1) + ".comment", "Dimension " + (ii + 1) + ". String.");
-            }                            
+            }
+            metadata.Add("column.is_timeless.comment", "True if the timeseries is constant for all periods. Boolean.");
             metadata.Add("column.label.comment", "The label of the given timeseries. String.");
             metadata.Add("column.source.comment", "The source of the given timeseries. String.");
-            metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
-            metadata.Add("column.date_start.comment", "The date of the first value of the timeseries in the Gekko databank. Date format, unix time. Quarters etc. are identified as their *first* day.");
-            metadata.Add("column.date_end.comment", "The date of the last value of the timeseries in the Gekko databank. Date format, unix time. Quarters etc. are identified as their *first* day");
-            metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format, unix time.");
-            metadata.Add("column.date.comment", "The date of the current data value (can represent a period like a full quarter). Date format, unit tme. Quarters etc. are identified as their *first* day.");
+            metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");            
+            metadata.Add("column.date_start.comment", "The date corresponding to the first value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day.");
+            metadata.Add("column.date_end.comment", "The date corresponding to the last value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day");
+            metadata.Add("column.period_start.comment", "The period corresponding to the first value of the timeseries in the Gekko databank. String format.");
+            metadata.Add("column.period_end.comment", "The period corresponding to the last value of the timeseries in the Gekko databank. String format.");
+            metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format, Unix time.");
+            metadata.Add("column.date.comment", "The date corresponding to the current data value. Date format, Unix time. Quarters etc. are identified as their *first* day.");
+            metadata.Add("column.period.comment", "The period corresponding to the current data value. String format.");
             metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
 
             int valuesCounter = 0;
@@ -979,11 +985,7 @@ print('Færdig')
                 if (tup.Item2.Type() != EVariableType.Series) continue;
                 Series ts = tup.Item2 as Series;
                                 
-                //HACK HACK HACK HACK HACK HACK 
-                //HACK HACK HACK HACK HACK HACK 
-                //HACK HACK HACK HACK HACK HACK 
-                //HACK HACK HACK HACK HACK HACK 
-                if (ts.type == ESeriesType.Timeless) continue;
+                bool isTimeless = ts.type == ESeriesType.Timeless;
 
                 string fullName = G.Chop_AddBank(tup.Item1, bank).Replace(" ", "").ToLower();            
                 string freq = G.Chop_GetFreq(tup.Item1);
@@ -994,24 +996,24 @@ print('Færdig')
 
                 GekkoTime gt1 = t1;
                 GekkoTime gt2 = t2;
-                if (allPeriods)
+
+                if (isTimeless)
                 {
-                    gt1 = ts.GetRealDataPeriodFirst();
-                    gt2 = ts.GetRealDataPeriodLast();
+                    gt1 = GekkoTime.tNull;
+                    gt2 = GekkoTime.tNull;
                 }
                 else
                 {
-                    G.PickFromAllFreqs(allFreqs, ts.freq, out gt1, out gt2);
+                    if (allPeriods)
+                    {
+                        gt1 = ts.GetRealDataPeriodFirst();
+                        gt2 = ts.GetRealDataPeriodLast();
+                    }
+                    else
+                    {
+                        G.PickFromAllFreqs(allFreqs, ts.freq, out gt1, out gt2);
+                    }
                 }
-
-                if (gt1.IsNull())
-                {
-                    //HACK HACK HACK HACK HACK HACK 
-                    //HACK HACK HACK HACK HACK HACK 
-                    //HACK HACK HACK HACK HACK HACK 
-                    //HACK HACK HACK HACK HACK HACK 
-                    continue; //has no values
-                }                
 
                 seriesCounter++;
 
@@ -1049,6 +1051,11 @@ print('Færdig')
                     }
                 }
 
+                timelesss.Add(isTimeless);
+
+                //
+                // HMMM: what about .frm file varlist, or varlist.dat ???
+                //
                 //labels.Add(Program.GetVariableExplanation1Line(varnameWithoutIndex)); //HMM?
                 labels.Add(ts.MetaGetLabel());
                 sources.Add(ts.MetaGetSource());
@@ -1086,35 +1093,56 @@ print('Færdig')
                     }
                 }
                 if (!b) stamps.Add(null);
-
-                GekkoTime xt1 = ts.GetPeriodFirst();
-                if (!xt1.IsNull())
+                                
+                if (!gt1.IsNull())
                 {
-                    try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(xt1, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
+                    try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(gt1, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
                     catch { date_starts.Add(null); }
+                    period_starts.Add(DateStringFormat(gt1));
                 }
                 else
                 {
                     date_starts.Add(null);
+                    period_starts.Add(null);
                 }
-
-                GekkoTime xt2 = ts.GetPeriodLast();
-                if (!xt2.IsNull())
+                
+                if (!gt2.IsNull())
                 {
-                    try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(xt2, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
+                    try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(gt2, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
                     catch { date_ends.Add(null); }
+                    period_ends.Add(DateStringFormat(gt2));
                 }
                 else
                 {
                     date_ends.Add(null);
-                }                
+                    period_ends.Add(null);
+                }
 
-                foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                if (gt1.IsNull() || gt2.IsNull())
                 {
                     valuesCounter++;
                     ids2.Add(fullName);
-                    dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));                    
-                    values.Add(ts.GetDataSimple(t));
+                    dates.Add(null);
+                    periods.Add(null);
+                    if (isTimeless)
+                    {
+                        values.Add(ts.GetTimelessData());
+                    }
+                    else
+                    {
+                        values.Add(null);
+                    }
+                }
+                else
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                    {
+                        valuesCounter++;
+                        ids2.Add(fullName);
+                        dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
+                        periods.Add(DateStringFormat(t));
+                        values.Add(ts.GetDataSimple(t));
+                    }
                 }
             }
 
@@ -1137,15 +1165,19 @@ print('Færdig')
                     {
                         i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray()));
                     }
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_ends.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps.ToArray()));
                     //                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));                    
                 }
 
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
@@ -1162,21 +1194,37 @@ print('Færdig')
                     {
                         i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     }
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     //                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], periods.ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray()));                    
                 }
             }
 
             string s = null; if (hasSubSeries) s = " (including array-subseries)";
             new Writeln("Wrote " + seriesCounter + " series" + s + " to parquet file with " + valuesCounter + " rows in two rowgroups in " + G.Seconds(dt));
 
+        }
+
+        private static string DateStringFormat(GekkoTime gt1)
+        {
+            //Output
+            return gt1.ToString();
+        }
+
+        private static GekkoTime DateStringFormat(string s)
+        {
+            //Input
+            return GekkoTime.FromStringToGekkoTime(s, true);
         }
 
         public static async void WriteArrow(RecordBatch recordBatch, string fileName)

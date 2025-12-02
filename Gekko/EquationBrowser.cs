@@ -1203,7 +1203,7 @@ img {border-style: none;
         }
 
         public static void BrowserNew()
-        {
+        {                        
             bool isSimple = false;            
             bool isDanish = true;
             string browserFolder = "Browser";            
@@ -1311,6 +1311,13 @@ img {border-style: none;
 
             string rootFolder = Program.options.folder_working + "\\" + browserFolder;
             string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_vars_foldername;
+
+            // ?????
+            // ?????
+            // ?????
+            // ?????
+            // ?????
+            string path = rootFolder;
 
             BrowserCleanupFolders(rootFolder, subFolder);
 
@@ -1465,14 +1472,14 @@ img {border-style: none;
 
             if (true)
             {
-                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\index.html", path + "\\" + "index.html");
-                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\styles.css", path + "\\" + "styles.css");
-                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\header_MAKRO.svg", path + "\\" + "header_MAKRO.svg");
-                File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\DREAM_logo_500x70px.svg", path + "\\" + "DREAM_logo_500x70px.svg");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
+                //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\index.html", path + "\\" + "index.html");
+                //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\styles.css", path + "\\" + "styles.css");
+                //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\header_MAKRO.svg", path + "\\" + "header_MAKRO.svg");
+                //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\DREAM_logo_500x70px.svg", path + "\\" + "DREAM_logo_500x70px.svg");
+                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
+                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
+                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
+                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
             }
 
             Globals.browser = true;  //Do not change, internal TTH popup
