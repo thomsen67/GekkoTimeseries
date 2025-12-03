@@ -225,9 +225,8 @@ print('Færdig')
              * */
         }
 
-        public static async Task ReadParquetFile()
-        {
-            string filePath = @"c:\tools\multi.parquet";
+        public static async Task ReadParquetFile(Databank databank, Program.ReadInfo readInfo, string filePath)
+        {        
             // -------------------------------                        
             string[] ids1;            
             string[] ids2;
@@ -235,16 +234,23 @@ print('Færdig')
             string[] banks;
             string[] names;
             string[] freqs;
-            string[] labels;
-            string[] sources;
-            string[] units;
             int?[] dims;
             string[] dim1s;
             string[] dim2s;
+            string[] dim3s;
+            string[] dim4s;
+            string[] dim5s;
+            string[] labels;
+            string[] sources;
+            string[] units;
+            bool?[] is_timelesss;            
             DateTime?[] date_starts;
             DateTime?[] date_ends;
+            string[] period_starts;
+            string[] period_ends;
             DateTime?[] stamps;
             DateTime?[] dates;
+            string[] periods;
             double?[] values;
 
             using (Stream fileStream = File.OpenRead(filePath))
@@ -260,13 +266,19 @@ print('Færdig')
                     names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray();
                     freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray();                    
                     dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray();
-                    dim1s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim1"))).Data).ToArray();
-                    dim2s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim2"))).Data).ToArray();
+                    try { dim1s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim1"))).Data).ToArray(); } catch { }
+                    try { dim2s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim2"))).Data).ToArray(); } catch { }
+                    try { dim3s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim3"))).Data).ToArray(); } catch { }
+                    try { dim4s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim4"))).Data).ToArray(); } catch { }
+                    try { dim5s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim5"))).Data).ToArray(); } catch { }
                     labels = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"))).Data).ToArray();
                     sources = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "source"))).Data).ToArray();
                     units = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "unit"))).Data).ToArray();
+                    is_timelesss = ((bool?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "is_timeless"))).Data).ToArray();
                     date_starts = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start"))).Data).ToArray();
                     date_ends = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end"))).Data).ToArray();
+                    period_starts = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start"))).Data).ToArray();
+                    period_ends = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end"))).Data).ToArray();
                     stamps = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp"))).Data).ToArray();
                 }
 
@@ -274,6 +286,7 @@ print('Færdig')
                 {
                     ids2 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
                     dates = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray();
+                    periods = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period"))).Data).ToArray();
                     values = ((double?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"))).Data).ToArray();
                 }
             }
@@ -931,11 +944,11 @@ print('Færdig')
             for (int ii = 0; ii < ndims; ii++)
             {
                 m.Add(new Parquet.Schema.DataField<string>("dim" + (ii + 1)));
-            }
-            m.Add(new Parquet.Schema.DataField<bool?>("is_timeless"));
+            }            
             m.Add(new Parquet.Schema.DataField<string>("label"));
             m.Add(new Parquet.Schema.DataField<string>("source"));
             m.Add(new Parquet.Schema.DataField<string>("unit"));
+            m.Add(new Parquet.Schema.DataField<bool?>("is_timeless"));
             m.Add(new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
             m.Add(new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));            
             m.Add(new Parquet.Schema.DataField<string>("period_start"));
@@ -960,11 +973,11 @@ print('Færdig')
             for (int ii = 0; ii < ndims; ii++)
             {
                 metadata.Add("column.dim" + (ii + 1) + ".comment", "Dimension " + (ii + 1) + ". String.");
-            }
-            metadata.Add("column.is_timeless.comment", "True if the timeseries is constant for all periods. Boolean.");
+            }            
             metadata.Add("column.label.comment", "The label of the given timeseries. String.");
             metadata.Add("column.source.comment", "The source of the given timeseries. String.");
-            metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");            
+            metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
+            metadata.Add("column.is_timeless.comment", "True if the timeseries is constant for all periods. Boolean.");
             metadata.Add("column.date_start.comment", "The date corresponding to the first value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day.");
             metadata.Add("column.date_end.comment", "The date corresponding to the last value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day");
             metadata.Add("column.period_start.comment", "The period corresponding to the first value of the timeseries in the Gekko databank. String format.");
@@ -1049,9 +1062,7 @@ print('Færdig')
                     {
                         dimss[i2].Add(null);
                     }
-                }
-
-                timelesss.Add(isTimeless);
+                }                
 
                 //
                 // HMMM: what about .frm file varlist, or varlist.dat ???
@@ -1060,6 +1071,8 @@ print('Færdig')
                 labels.Add(ts.MetaGetLabel());
                 sources.Add(ts.MetaGetSource());
                 units.Add(ts.MetaGetUnits());
+
+                timelesss.Add(isTimeless);
 
                 // -------------------------------------------------------------------------------------------------------
                 // Note about UTC. Regarding the DateTime object, it only contains ticks + a flag regarding UTC or local.
@@ -1164,11 +1177,11 @@ print('Færdig')
                     for (int ii = 0; ii < ndims; ii++)
                     {
                         i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray()));
-                    }
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray()));
+                    }                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray()));
@@ -1193,11 +1206,11 @@ print('Færdig')
                     for (int ii = 0; ii < ndims; ii++)
                     {
                         i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    }
+                    }                    
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));                    
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
                     i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));

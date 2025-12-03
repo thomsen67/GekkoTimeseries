@@ -6893,6 +6893,7 @@ namespace Gekko
             public string opt_array = null;
             public string opt_flat = null;
             public string opt_aremos = null;
+            public string opt_parquet = null;
             public string opt_cell = null;
             public string opt_datecell = null;
             public string opt_namecell = null;
@@ -6984,6 +6985,7 @@ namespace Gekko
                     if (G.Equal(this.opt_px, "yes")) oRead.Type = EDataFormat.Px;
                     if (G.Equal(this.opt_flat, "yes")) oRead.Type = EDataFormat.Flat;
                     if (G.Equal(this.opt_aremos, "yes")) oRead.Type = EDataFormat.Aremos;
+                    if (G.Equal(this.opt_parquet, "yes")) oRead.Type = EDataFormat.Parquet;
                     if (G.Equal(this.opt_cols, "yes")) oRead.Orientation = "cols";
                     if (G.Equal(this.opt_trace, "no")) oRead.trace = false;
 

@@ -6575,6 +6575,10 @@ namespace Gekko
                     {
                         Program.ReadAremos(databankTemp, readInfo, file);
                     }
+                    else if (oRead.Type == EDataFormat.Parquet)
+                    {
+                        Arrow.ReadParquetFile(databankTemp, readInfo, file);
+                    }
                     else
                     {
                         new Error("#78632432");
@@ -35743,7 +35747,8 @@ namespace Gekko
         Xlsx,
         Gdx,
         Aremos,
-        Sdf
+        Sdf,
+        Parquet
     }
 
     public enum EOpenType
