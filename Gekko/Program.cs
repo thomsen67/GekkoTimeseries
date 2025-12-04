@@ -6577,7 +6577,13 @@ namespace Gekko
                     }
                     else if (oRead.Type == EDataFormat.Parquet)
                     {
-                        Arrow.ReadParquetFile(databankTemp, readInfo, file);
+                        List<string> errors = new List<string>();
+                        try { Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors).Wait(); }
+                        catch
+                        {
+                            if (errors.Count > 0) new Error(string.Join(". ", errors));
+                            else new Error("The parquet data reader failed");
+                        }
                     }
                     else
                     {

@@ -225,71 +225,155 @@ print('Færdig')
              * */
         }
 
-        public static async Task ReadParquetFile(Databank databank, Program.ReadInfo readInfo, string filePath)
+        public static async Task ReadParquetDatabank(Databank databank, Program.ReadInfo readInfo, string filePath, List<string> errors)
         {        
             // -------------------------------                        
-            string[] ids1;            
-            string[] ids2;
+            string[] ids1 = null;
+            string[] ids2 = null;
             // --
-            string[] banks;
-            string[] names;
-            string[] freqs;
-            int?[] dims;
-            string[] dim1s;
-            string[] dim2s;
-            string[] dim3s;
-            string[] dim4s;
-            string[] dim5s;
-            string[] labels;
-            string[] sources;
-            string[] units;
-            bool?[] is_timelesss;            
-            DateTime?[] date_starts;
-            DateTime?[] date_ends;
-            string[] period_starts;
-            string[] period_ends;
-            DateTime?[] stamps;
-            DateTime?[] dates;
-            string[] periods;
-            double?[] values;
+            string[] banks = null;
+            string[] names = null;
+            string[] freqs = null;
+            int?[] dims = null;
+            string[][] dimis = null;
+            string[] labels = null;
+            string[] sources = null;
+            string[] units = null;
+            bool?[] is_timelesss = null;           
+            DateTime?[] date_starts = null;
+            DateTime?[] date_ends = null;
+            string[] period_starts = null;
+            string[] period_ends = null;
+            DateTime?[] stamps = null;
+            DateTime?[] dates = null;
+            string[] periods = null;
+            double?[] values = null;
+
+            if (!File.Exists(filePath))
+            {                
+                Error("Could not find file '" + filePath + "'", errors);
+            }
 
             using (Stream fileStream = File.OpenRead(filePath))
             using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
             {
-                Dictionary<string, string> metadata = reader.CustomMetadata;
-                string version = null; metadata.TryGetValue("version", out version);                               
+                string version = null;
+                try
+                {
+                    Dictionary<string, string> metadata = reader.CustomMetadata;
+                    metadata.TryGetValue("version", out version);
+                }
+                catch { Error("Metadata error", errors); }
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
-                    ids1 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
-                    banks = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank"))).Data).ToArray();
-                    names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray();
-                    freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray();                    
-                    dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray();
-                    try { dim1s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim1"))).Data).ToArray(); } catch { }
-                    try { dim2s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim2"))).Data).ToArray(); } catch { }
-                    try { dim3s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim3"))).Data).ToArray(); } catch { }
-                    try { dim4s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim4"))).Data).ToArray(); } catch { }
-                    try { dim5s = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim5"))).Data).ToArray(); } catch { }
-                    labels = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"))).Data).ToArray();
-                    sources = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "source"))).Data).ToArray();
-                    units = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "unit"))).Data).ToArray();
-                    is_timelesss = ((bool?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "is_timeless"))).Data).ToArray();
-                    date_starts = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start"))).Data).ToArray();
-                    date_ends = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end"))).Data).ToArray();
-                    period_starts = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start"))).Data).ToArray();
-                    period_ends = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end"))).Data).ToArray();
-                    stamps = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp"))).Data).ToArray();
+                    try { ids1 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'id'", errors); }
+                    try { banks = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'bank'", errors); }
+                    try { names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'name'", errors); }
+                    try { freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'freq'", errors); }
+                    try { dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'dims'", errors); }
+                    int dimMax = 0;
+                    foreach (int i in dims)
+                    {
+                        if (i < 0) Error("Rowgroup 0: Dims element with value " + i, errors);
+                        dimMax = Math.Max(dimMax, i);
+                    }
+                    dimis = new string[dimMax][];
+                    for (int i = 1; i <= dimMax; i++)
+                    {
+                        try { dimis[i - 1] = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim" + i))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column '" + "dim" + i + "'", errors); }
+                    }
+                    try { labels = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'label'", errors); }
+                    try { sources = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "source"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'source'", errors); }
+                    try { units = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "unit"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'unit'", errors); }
+                    try { is_timelesss = ((bool?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "is_timeless"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'is_timeless'", errors); }
+                    try { date_starts = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'date_start'", errors); }
+                    try { date_ends = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'date_end'", errors); }
+                    try { period_starts = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'period_start'", errors); }
+                    try { period_ends = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'period_end'", errors); }
+                    try { stamps = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'stamp'", errors); }
                 }
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(1))
                 {
-                    ids2 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray();
-                    dates = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray();
-                    periods = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period"))).Data).ToArray();
-                    values = ((double?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"))).Data).ToArray();
+                    try { ids2 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'id'", errors); }
+                    try { dates = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'date'", errors); }
+                    try { periods = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'period'", errors); }
+                    try { values = ((double?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'value'", errors); }
                 }
             }
+
+            Dictionary<string, int> vars = new Dictionary<string, int>();
+            for (int i = 0; i < ids1.Length; i++)
+            {
+                try
+                {
+                    string idTest = banks[i].ToLower() + ":" + names[i].ToLower() + "!" + freqs[i].ToLower();
+                    string index = null;
+                    string s = null;
+                    if (dims[i] > 0)
+                    {                        
+                        for (int ii = 0; ii < dims[i]; ii++)
+                        {
+                            if (ii > 0) s += ",";
+                            s += dimis[ii][i];
+                        }                        
+                    }
+                    if (s != null) idTest += "[" + s.ToLower() + "]";
+                    string id = ids1[i];
+                    if (id != idTest)
+                    {
+                        string s2 = null;
+                        if (dims[i] > 0)
+                        {
+                            s2 = ", " + s.Replace(",", ", ");
+                        }
+                        Error("Rowgroup 0: The id '" + id + "' is not compatible with bank, name, freq, dims and dim1..dimN (" + banks[i] + ", " + names[i] + ", " + freqs[i] + ", " + dims[i] + s2 + ")", errors);
+                    }
+                    vars.Add(id, i);
+                }
+                catch { Error("Rowgroup 0 row " + i + ": Problem with one of these columns: bank, name, freq, dims, dim1..dimN (check for null value)", errors); }
+            }
+
+            for (int i2 = 0; i2 < ids2.Length; i2++)
+            {
+                int i1 = -12345;
+                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }                
+                // ---
+                string bank = banks[i1];
+                string name = names[i1];
+                string freq = freqs[i1];
+                int? dim = dims[i1];
+                string[] dimsi = null;
+                if (dim > 0)
+                {
+                    dimsi = new string[(int)dim];
+                    for (int ii = 0; ii < dim; ii++)
+                    {
+                        dimsi[ii] = dimis[ii][i1];
+                    }                    
+                }
+                string label = labels[i1];
+                string source = sources[i1];
+                string unit = units[i1];
+                bool? is_timeless = is_timelesss[i1];
+                DateTime? date_start = date_starts[i1];
+                DateTime? date_end = date_ends[i1];
+                string period_start = period_starts[i1];
+                string period_end = period_ends[i1];
+                DateTime? stamp = stamps[i1];
+                // ---
+                DateTime? date = dates[i2];
+                string period = periods[i2];
+                double? value = values[i2];
+            }
+
+        }
+
+        private static void Error(string s, List<string> errors)
+        {
+            errors.Add(s);
+            throw new GekkoException();
         }
 
         public static void Run()
