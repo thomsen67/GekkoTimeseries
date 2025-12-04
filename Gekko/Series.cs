@@ -324,7 +324,6 @@ namespace Gekko
             else
             {
                 new Error("SERIES constructor 4");
-                //throw new GekkoException();
             }
         }
 

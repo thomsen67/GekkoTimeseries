@@ -6581,6 +6581,7 @@ namespace Gekko
                         try { Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors).Wait(); }
                         catch
                         {
+                            //Done like this because of async/await issues
                             if (errors.Count > 0) new Error(string.Join(". ", errors));
                             else new Error("The parquet data reader failed");
                         }

@@ -252,7 +252,7 @@ print('Færdig')
             if (!File.Exists(filePath))
             {                
                 Error("Could not find file '" + filePath + "'", errors);
-            }
+            }            
 
             using (Stream fileStream = File.OpenRead(filePath))
             using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
@@ -263,12 +263,23 @@ print('Færdig')
                     Dictionary<string, string> metadata = reader.CustomMetadata;
                     metadata.TryGetValue("version", out version);
                 }
-                catch { Error("Metadata error", errors); }
+                catch { Error("Metadata error", errors); }                
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
                     try { ids1 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'id'", errors); }
                     try { banks = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'bank'", errors); }
+                    if (banks.Length > 1)
+                    {
+                        string bankTest = banks[0];
+                        foreach (string s in banks)
+                        {
+                            if (!G.Equal(bankTest, s))
+                            {
+                                Error("Rowgroup 0: Some values in the column 'bank' are different: this is currently unsupported", errors);
+                            }
+                        }
+                    }
                     try { names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'name'", errors); }
                     try { freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'freq'", errors); }
                     try { dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'dims'", errors); }
@@ -303,12 +314,18 @@ print('Færdig')
                 }
             }
 
+            if (ids1 == null || ids1.Length == 0) Error("Rowgroup 1: Number of rows is = 0", errors);
+            if (ids2 == null || ids2.Length == 0) Error("Rowgroup 2: Number of rows is = 0", errors);
+
+            string[] namePrettys = new string[ids1.Length];
+
             Dictionary<string, int> vars = new Dictionary<string, int>();
             for (int i = 0; i < ids1.Length; i++)
             {
                 try
                 {
-                    string idTest = banks[i].ToLower() + ":" + names[i].ToLower() + "!" + freqs[i].ToLower();
+                    string id = ids1[i];
+                    string id2 = names[i] + "!" + freqs[i];
                     string index = null;
                     string s = null;
                     if (dims[i] > 0)
@@ -319,9 +336,9 @@ print('Færdig')
                             s += dimis[ii][i];
                         }                        
                     }
-                    if (s != null) idTest += "[" + s.ToLower() + "]";
-                    string id = ids1[i];
-                    if (id != idTest)
+                    if (s != null) id2 += "[" + s + "]";                    
+                    namePrettys[i] = id2;
+                    if (id != (banks[i] + ":" + id2).ToLower())
                     {
                         string s2 = null;
                         if (dims[i] > 0)
@@ -335,39 +352,108 @@ print('Færdig')
                 catch { Error("Rowgroup 0 row " + i + ": Problem with one of these columns: bank, name, freq, dims, dim1..dimN (check for null value)", errors); }
             }
 
+            string bank = null;
+            string name = null;
+            string freq = null;
+            int? dim = null;
+            string[] dimsi = null;            
+            string label = null;
+            string source = null;
+            string unit = null;
+            bool? is_timeless = null;
+            DateTime? date_start = null;
+            DateTime? date_end = null;
+            string period_start = null;
+            string period_end = null;
+            DateTime? stamp = null;
+            // -------------------------
+            Series ts = null;
+            string currentSeries = null;
             for (int i2 = 0; i2 < ids2.Length; i2++)
             {
                 int i1 = -12345;
-                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }                
-                // ---
-                string bank = banks[i1];
-                string name = names[i1];
-                string freq = freqs[i1];
-                int? dim = dims[i1];
-                string[] dimsi = null;
-                if (dim > 0)
+                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }
+                if (i2 == 91884)
                 {
-                    dimsi = new string[(int)dim];
-                    for (int ii = 0; ii < dim; ii++)
-                    {
-                        dimsi[ii] = dimis[ii][i1];
-                    }                    
                 }
-                string label = labels[i1];
-                string source = sources[i1];
-                string unit = units[i1];
-                bool? is_timeless = is_timelesss[i1];
-                DateTime? date_start = date_starts[i1];
-                DateTime? date_end = date_ends[i1];
-                string period_start = period_starts[i1];
-                string period_end = period_ends[i1];
-                DateTime? stamp = stamps[i1];
+                //G.Writeln(i2 + "  " + i1);
+                // ---
+
+                string namePretty = namePrettys[i1];
                 // ---
                 DateTime? date = dates[i2];
                 string period = periods[i2];
-                double? value = values[i2];
-            }
+                double? value = values[i2];                
 
+                if (currentSeries == null || currentSeries != namePretty)
+                {
+                    currentSeries = namePretty;              
+                    ts = databank.GetIVariableMayCreateSeries(namePretty) as Series;
+                    // ----
+                    bank = banks[i1];
+                    name = names[i1];
+                    freq = freqs[i1];
+                    dim = dims[i1];
+                    dimsi = null;
+                    if (dim > 0)
+                    {
+                        dimsi = new string[(int)dim];
+                        for (int ii = 0; ii < dim; ii++)
+                        {
+                            dimsi[ii] = dimis[ii][i1];
+                        }
+                    }
+                    label = labels[i1];
+                    source = sources[i1];
+                    unit = units[i1];
+                    is_timeless = is_timelesss[i1];
+                    date_start = date_starts[i1];
+                    date_end = date_ends[i1];
+                    period_start = period_starts[i1];
+                    period_end = period_ends[i1];
+                    stamp = stamps[i1];
+                    // ----
+                    if (ts.IsArraySubSeries())
+                    {
+                        //TODO: Handle metadata etc.
+                        //TODO: Handle metadata etc.
+                        //TODO: Handle metadata etc.
+                    }
+                    else
+                    {
+                        if (ts.meta == null) ts.meta = new SeriesMetaInformation();
+                        ts.meta.label = label;
+                        ts.meta.source = source;
+                        ts.meta.units = unit;
+                        //TODO: FIXME
+                        //TODO: FIXME format
+                        //TODO: FIXME
+                        ts.meta.stamp = stamp.ToString();
+                    }                    
+                }
+
+                GekkoTime gt = GekkoTime.tNull;
+
+                double d = double.NaN;
+                if (value != null)
+                {
+                    d = (double)value;                 
+                }
+                if (is_timeless == true)
+                {
+                    if (period != null) Error("Rowgroup 1 row " + i2 + ": For a timeless series, the 'period' value is expected to be null", errors);
+                    ts.type = ESeriesType.Timeless;
+                    ts.data.SetDataarray_ONLY_INTERNAL_USE(new double[1]);
+                    ts.data.GetDataArray_ONLY_INTERNAL_USE()[0] = d;
+                }
+                else
+                {
+                    //jvOffPrimInd!a har period == null, i række 91884.
+                    if (period == null) Error("Rowgroup 1 row " + i2 + ": For a non-timeless series, the 'period' value is expected to be <> null", errors);
+                    try { gt = GekkoTime.FromStringToGekkoTime(period); } catch { Error("Rowgroup 1 row " + i2 + ": Could not parse period '" + period + "'", errors); }
+                    ts.SetData(gt, d);
+                }
+            }
         }
 
         private static void Error(string s, List<string> errors)
