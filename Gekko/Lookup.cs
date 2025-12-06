@@ -2013,6 +2013,7 @@ namespace Gekko
                 {
                     if (o.opt_label != null) lhs_series.meta.label = o.opt_label;
                     if (o.opt_source != null) lhs_series.meta.source = o.opt_source;
+                    if (o.opt_unit != null) lhs_series.meta.units = o.opt_unit;
                     if (o.opt_units != null) lhs_series.meta.units = o.opt_units;
                     if (o.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override                                
                 }

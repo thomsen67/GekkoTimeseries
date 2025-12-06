@@ -551,7 +551,7 @@ namespace Gekko
         public const string Name = "Name";
         public const string Label = "Label";
         public const string Source = "Source";
-        public const string Units = "Units";
+        public const string Units = "Unit";
         public const string Stamp = "Stamp";
 
         public const string firstCheatString = "[FIRST]";

@@ -137,6 +137,7 @@ tokens {
 	ASTOPT_STRING_TOBANK;
     ASTOPT_STRING_VARLIST;
 	ASTOPT_STRING_FROMBANK;
+    ASTOPT_STRING_UNIT;
 	ASTOPT_STRING_UNITS;
 	ASTOPT_STRING_SORT;
 	ASTOPT_STRING_ALL;
@@ -1496,6 +1497,7 @@ Y2                    = 'Y2'                       ;
     TESTSIM          = 'TESTSIM'         ;
     TIME             = 'TIME'            ;
     TIMEFILTER         = 'TIMEFILTER'        ;
+    UNIT = 'UNIT'; 
 	UNITS = 'UNITS';
     TIMESPAN         = 'TIMESPAN'        ;
     TITLE         = 'TITLE'        ;
@@ -1727,7 +1729,8 @@ d.Add("Y" ,Y);
                                         d.Add("_GDIFF"             ,   UGDIFF     );
                                         d.Add("_LEV"    ,   ULEV     );
                                         d.Add("_PCH"    ,   UPCH     );
-										d.Add("UNITS"    ,   UNITS     );
+										d.Add("UNIT"    ,   UNIT     );
+                                        d.Add("UNITS"    ,   UNITS     );
                                         d.Add("a"       , A       );
 										d.Add("DEFAULT"       , DEFAULT       );
 										d.Add("LOGIC"       , LOGIC       );
@@ -2887,6 +2890,7 @@ seriesOpt1h:                D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
+                          | UNIT EQUAL expression -> ^(ASTOPT_STRING_UNIT expression)							  				
 					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
 						  | DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)							  
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
@@ -3166,6 +3170,7 @@ docOpt2:                    docOpt2h*;
 docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
+                          | UNIT EQUAL expression -> ^(ASTOPT_STRING_UNIT expression)	                          
 					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)	                          
 						    ;
 

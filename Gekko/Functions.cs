@@ -6845,7 +6845,7 @@ namespace Gekko
             {
                 return new ScalarDate(GekkoTime.FromDateTimeToGekkoTime(EFreq.D, Program.GetDateTimePrettyInverse(ts.MetaGetStamp())));
             }
-            else if (G.Equal(s2, "units"))
+            else if (G.Equal(s2, "unit") || G.Equal(s2, "units"))
             {
                 return new ScalarString(ts.MetaGetUnits());
             }

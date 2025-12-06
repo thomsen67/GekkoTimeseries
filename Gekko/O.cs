@@ -8435,6 +8435,7 @@ namespace Gekko
             public string opt_varlist = null;
             public string opt_label = null;
             public string opt_source = null;
+            public string opt_unit = null;
             public string opt_units = null;
             public string opt_stamp = null;
             public List names = null;
@@ -8464,7 +8465,8 @@ namespace Gekko
                             new Error("Only series are allowed as input varname");
                         }
                         if (opt_label != null) iv_series.meta.label = opt_label;
-                        if (opt_source != null) iv_series.meta.source = opt_source;
+                        if (opt_source != null) iv_series.meta.source = opt_source;                        
+                        if (opt_unit != null) iv_series.meta.units = opt_unit;
                         if (opt_units != null) iv_series.meta.units = opt_units;
                         if (opt_stamp != null) iv_series.meta.stamp = opt_stamp;
                         iv_series.meta.SetDirty(true);
@@ -8492,6 +8494,7 @@ namespace Gekko
             public IVariable label = null;
             public string opt_label = null;
             public string opt_source = null;
+            public string opt_unit = null;
             public string opt_units = null;
             public string opt_stamp = null;
             public string opt_dyn = null;
