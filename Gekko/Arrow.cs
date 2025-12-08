@@ -232,6 +232,11 @@ print('Færdig')
             //       The 4 start/end dates/periods are not used, and the DateTime date is not used.
             //
 
+            DateTime dt1 = DateTime.Now;
+            int yearMin = int.MaxValue;
+            int yearMax = int.MinValue;
+            GekkoDictionary<string, bool> nameCounter = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
             int dateWarnings1 = 0;
             int dateWarnings2 = 0;
 
@@ -354,8 +359,10 @@ print('Færdig')
                             s2 = ", " + s.Replace(",", ", ");
                         }
                         Error("Rowgroup 0: The id '" + id + "' is not compatible with bank, name, freq, dims and dim1..dimN (" + banks[i] + ", " + names[i] + ", " + freqs[i] + ", " + dims[i] + s2 + ")", errors);
-                    }
+                    }                    
                     vars.Add(id, i);
+                    string nameTemp = names[i];
+                    if (!nameCounter.ContainsKey(nameTemp)) nameCounter.Add(nameTemp, false);
                 }
                 catch { Error("Rowgroup 0 row " + i + ": Problem with one of these columns: bank, name, freq, dims, dim1..dimN (check for null value)", errors); }
             }
@@ -380,12 +387,7 @@ print('Færdig')
             for (int i2 = 0; i2 < ids2.Length; i2++)
             {
                 int i1 = -12345;
-                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }
-                //if (i2 == 91884)
-                //{
-                //}
-                //G.Writeln(i2 + "  " + i1);
-                // ---
+                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }                
 
                 string namePretty = namePrettys[i1];
                 // ---
@@ -449,8 +451,6 @@ print('Færdig')
                 }
                 else
                 {
-                    //jvOffPrimInd!a har period == null, i række 91884.
-
                     if (period == null)
                     {
                         if (value != null)
@@ -475,26 +475,50 @@ print('Færdig')
                     {
                         try
                         {
-                            gt = GekkoTime.FromStringToGekkoTime(period);
+                            //Allows K for Q, and U for W. Because numbers are parsed, 2020M01D01 or 2020U05 etc. are ok.
+                            //Aborts if error
+                            //Does not allow 98 for 1998.
+                            gt = GekkoTime.FromStringToGekkoTime(period, true, true, false);
                         }
                         catch { Error("Rowgroup 1 row " + i2 + ": Could not parse period '" + period + "'", errors); }
 
-                        try
+                        if (false)
                         {
-                            if (date != null && freq != null)
+                            //TODO
+                            //TODO
+                            //TODO Make an option to test for this
+                            //TODO
+                            //TODO
+                            try
                             {
-                                GekkoTime gt2 = GekkoTime.FromDateTimeToGekkoTime(G.ConvertFreq(freq), (DateTime)date);
-                                if (!gt.Equals(gt2)) dateWarnings1++;
+                                if (date != null && freq != null)
+                                {
+                                    GekkoTime gt2 = GekkoTime.FromDateTimeToGekkoTime(G.ConvertFreq(freq), (DateTime)date);
+                                    if (!gt.Equals(gt2)) dateWarnings1++;
+                                }
                             }
+                            catch { } //Do not fail on this
                         }
-                        catch { } //Do not fail on this
 
                         ts.SetData(gt, d);
+
+                        yearMin = Math.Min(yearMin, gt.super);
+                        yearMax = Math.Max(yearMax, gt.super);
                     }
                 }
             }
             if (dateWarnings1 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with non-matching 'date' and 'period' values");
             if (dateWarnings2 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with 'date' non-null and 'period' null");
+            
+            readInfo.startPerInFile = yearMin;
+            readInfo.endPerInFile = yearMax;
+            readInfo.nanCounter = 0;
+
+            readInfo.variables = nameCounter.Count;
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;
         }
 
         private static void Error(string s, List<string> errors)
@@ -1206,10 +1230,6 @@ print('Færdig')
 
             foreach (Tuple<string, IVariable> tup in listSorted)
             {
-                //if (tup.Item1 == "compalleco!w")
-                //{
-                //}
-
                 if (tup.Item2.Type() != EVariableType.Series) continue;
                 Series ts = tup.Item2 as Series;
                                 

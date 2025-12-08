@@ -55,6 +55,7 @@ namespace Gekko
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
         public bool bugfix_score_even_with_res_vars = false;
         public bool bugfix_decomp_lagsleads = false;
+        public bool bugfix_dates_fast = true;  //not mentioned in help, set false to use old date parser (on "2020", "2020q01", "2020m1d1", "2020u09" etc. etc.
 
         // ---
         //method options could look like the 2 following:
@@ -403,6 +404,7 @@ namespace Gekko
             Add("BUGFIX PLOT", Globals.xbool);
             Add("BUGFIX SCORE EVEN WITH RES VARS", Globals.xbool);
             Add("BUGFIX DECOMP LAGSLEADS", Globals.xbool);
+            Add("BUGFIX DATES FAST", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

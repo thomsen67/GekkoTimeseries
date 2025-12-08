@@ -534,13 +534,71 @@ namespace Gekko
             //trailing a or a1 accepted for annual: 2001a, 2001a1
             //trailing u accepted for undated: 2001u, 2001u1
             //k{i} may be accepted for dates (allowK...)
-            //u[i} may be accepted for dates (allowK...)
+            //u{i} may be accepted for dates (allowK...)
             //two digits like 98 are understood as annual 1998
             //else: 2001, 2001q1, 2001m1, 2001m1d15
+
+            if (Program.options.bugfix_dates_fast && !allowTwoDigits)
+            {                
+                if (s.Length < 4) new Error("Could not parse date '" + s + "'.");
+                int y = G.IntParse(s.Substring(0, 4));
+                if (y == -12345) new Error("Could not parse date '" + s + "'.");
+                if (s.Length == 4)
+                {
+                    return new GekkoTime(EFreq.A, y, 1);
+                }
+                int i4 = 4;
+                char c4 = s[i4];                
+                if (c4 == 'a' || c4 == 'A') 
+                {
+                    if (s.Length == 5 || (s.Length == 6 && s[i4 + 1] == '1'))
+                    {
+                        return new GekkoTime(EFreq.A, y, 1);
+                    }
+                }
+                else if (c4 == 'q' || c4 == 'Q' || c4 == 'k' || c4 == 'K') 
+                {
+                    int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));                    
+                    if (i2 == -12345 || i2 == 0) new Error("Could not parse date '" + s + "'.");
+                    return new GekkoTime(EFreq.Q, y, i2);
+                }                
+                else if (c4 == 'm' || c4 == 'M') 
+                {
+                    int i_d = -12345;
+                    for (int i = i4 + 1; i < s.Length; i++)
+                    {
+                        char c = s[i];                        
+                        if (c == 'd' || c == 'D') { i_d = i; break; }                        
+                    }
+                    if (i_d != -12345)
+                    {                        
+                        int i2 = G.IntParse(s.Substring(i4 + 1, i_d - i4 - 1));
+                        int i3 = G.IntParse(s.Substring(i_d + 1, s.Length - i_d - 1));
+                        if (i2 == -12345 || i2 == 0 || i3 == -12345 || i3 == 0) new Error("Could not parse date '" + s + "'.");
+                        return new GekkoTime(EFreq.D, y, i2, i3);
+                    }
+                    else
+                    {
+                        int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));
+                        if (i2 == -12345 || i2 == 0) new Error("Could not parse date '" + s + "'.");
+                        return new GekkoTime(EFreq.M, y, i2);
+                    }
+                }                                                
+                else if (c4 == 'w' || c4 == 'W' || c4 == 'u' || c4 == 'U')
+                {
+                    int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));                    
+                    if (i2 == -12345 || i2 == 0) new Error("Could not parse date '" + s + "'.");
+                    return new GekkoTime(EFreq.W, y, i2);
+                }                
+            }
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
+
+            //
+            // The following is quite slow, also because it seems date consistency ends up being checked two times.
+            //
 
             GekkoTime t = GekkoTime.tNull;
 
@@ -680,7 +738,6 @@ namespace Gekko
             }
             else if (s.Contains("m") || s.Contains("M"))
             {
-
                 int y1 = -12345;
                 int m1 = -12345;
                 string[] temp1 = s.Split(new char[] { 'm', 'M' });
