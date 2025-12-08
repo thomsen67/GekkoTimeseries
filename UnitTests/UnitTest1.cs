@@ -13553,6 +13553,122 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Parquet()
+        {
+            List<string> files = new List<string>() { "monadata.gbk", "monadata2.gbk", "monadata.tsdx", "monadata_extend.gbk", "pr2409.gbk", "pr2503.gbk", "dsbank_gekko.gbk", "dec24.gdx" };
+            foreach (string file in files)
+            {
+                I("reset;");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");                
+                if (file == "monadata.gbk") I("model mona.mar22.frm;");
+                string s = null; if (file.EndsWith(".gdx")) s = "<gdx>";
+                I("read " + s + " " + file + ";");
+                if (file == "monadata.gbk") I("doc <varlist>;");
+                I("write parquet_test1.gbk;");
+                I("write <parquet> parquet_test1;");
+                // ---
+                I("reset;");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("read <first parquet> parquet_test1;");
+                I("read <ref> parquet_test1.gbk;");
+                CompareTwoDatabanks();
+            }
+
+            //// -----------------------------
+
+            //I("reset;");
+            //I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            //I("option freq q;");
+            //I("model mona.mar22.frm;");
+            //I("read monadata;");
+            
+            //I("write parquet_test1.gbk;");
+            //I("write <parquet> parquet_test1;");
+            //I("reset;");
+            //I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            //I("read <first parquet> parquet_test1;");
+            //I("read <ref> parquet_test1.gbk;");            
+            //CompareTwoDatabanks();
+            //// ===================================
+
+            
+
+
+
+        }
+
+        private static void CompareTwoDatabanks()
+        {
+            List<string> f = new List<string>();
+            List<string> r = new List<string>();
+            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+            {
+                var temp = Series.FlattenArraySeries(kvp.Value as Series, true);
+                foreach (var temp2 in temp)
+                {
+                    f.Add(temp2.Item1);
+                }
+            }
+            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetRef().storage)
+            {
+                if (kvp.Value.Type() != EVariableType.Series) continue;
+                var temp = Series.FlattenArraySeries(kvp.Value as Series, true);
+                foreach (var temp2 in temp)
+                {
+                    r.Add(temp2.Item1);
+                }
+            }
+
+            var sortedF = f.OrderBy(s => s).ToArray();
+            var sortedR = r.OrderBy(s => s).ToArray();
+            Assert.IsTrue(sortedF.SequenceEqual(sortedR));
+            foreach (string s in sortedF)
+            {
+                Series ts1 = O.GetIVariableFromString("first:" + s, ECreatePossibilities.NoneReportError) as Series;
+                Series ts2 = O.GetIVariableFromString("ref:" + s, ECreatePossibilities.NoneReportError) as Series;
+
+                Assert.IsTrue(ts1.type == ts2.type);  //Checking for timeless
+
+                Assert.IsTrue(ts1.IsArraySubSeries() == ts2.IsArraySubSeries());
+
+                //From a super-series, these will end up in the subseries. We do not distinguish.
+                Assert.IsTrue(ts1.MetaGetLabel() == ts2.MetaGetLabel());
+                Assert.IsTrue(ts1.MetaGetSource() == ts2.MetaGetSource());
+                Assert.IsTrue(ts1.MetaGetUnits() == ts2.MetaGetUnits());
+                
+                GekkoTime gt1Start = ts1.GetRealDataPeriodFirst();
+                GekkoTime gt1End = ts1.GetRealDataPeriodLast();
+                GekkoTime gt2Start = ts2.GetRealDataPeriodFirst();
+                GekkoTime gt2End = ts2.GetRealDataPeriodLast();
+
+                if (ts1.type == ESeriesType.Timeless)
+                {
+                    Assert.IsTrue(gt1Start.IsNull());
+                    Assert.IsTrue(gt1End.IsNull());
+                    Assert.IsTrue(gt2Start.IsNull());
+                    Assert.IsTrue(gt2End.IsNull());
+                    Assert.AreEqual(ts1.GetTimelessData(), ts2.GetTimelessData());
+                }
+                else
+                {                    
+                    Assert.IsTrue(gt1Start.EqualsGekkoTime(gt2Start));
+                    Assert.IsTrue(gt1End.EqualsGekkoTime(gt2End));
+                    if (gt1Start.IsNull() && gt1End.IsNull())
+                    {
+                        //No data, this is accepted.
+                    }
+                    else
+                    {
+                        foreach (GekkoTime gt in new GekkoTimeIterator(gt1Start, gt1End))
+                        {
+                            Assert.AreEqual(ts1.GetDataSimple(gt), ts2.GetDataSimple(gt));
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
         public void _Test_IsWord()
         {
             Assert.IsTrue(G.Match("abcde", new List<string>() { "abcde" }));

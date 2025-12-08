@@ -226,7 +226,15 @@ print('Færdig')
         }
 
         public static async Task ReadParquetDatabank(Databank databank, Program.ReadInfo readInfo, string filePath, List<string> errors)
-        {        
+        {
+            //
+            // NOTE: regarding dates/periods, only the string period for each observation is used, together with the DateTime stamp.
+            //       The 4 start/end dates/periods are not used, and the DateTime date is not used.
+            //
+
+            int dateWarnings1 = 0;
+            int dateWarnings2 = 0;
+
             // -------------------------------                        
             string[] ids1 = null;
             string[] ids2 = null;
@@ -240,12 +248,12 @@ print('Færdig')
             string[] sources = null;
             string[] units = null;
             bool?[] is_timelesss = null;           
-            DateTime?[] date_starts = null;
-            DateTime?[] date_ends = null;
-            string[] period_starts = null;
-            string[] period_ends = null;
+            DateTime?[] date_starts = null; //Not used
+            DateTime?[] date_ends = null; //Not used
+            string[] period_starts = null; //Not used
+            string[] period_ends = null; //Not used
             DateTime?[] stamps = null;
-            DateTime?[] dates = null;
+            DateTime?[] dates = null; //Not used
             string[] periods = null;
             double?[] values = null;
 
@@ -373,21 +381,21 @@ print('Færdig')
             {
                 int i1 = -12345;
                 try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }
-                if (i2 == 91884)
-                {
-                }
+                //if (i2 == 91884)
+                //{
+                //}
                 //G.Writeln(i2 + "  " + i1);
                 // ---
 
                 string namePretty = namePrettys[i1];
                 // ---
-                DateTime? date = dates[i2];
+                DateTime? date = dates[i2]; //Not used
                 string period = periods[i2];
-                double? value = values[i2];                
+                double? value = values[i2];
 
                 if (currentSeries == null || currentSeries != namePretty)
                 {
-                    currentSeries = namePretty;              
+                    currentSeries = namePretty;
                     ts = databank.GetIVariableMayCreateSeries(namePretty) as Series;
                     // ----
                     bank = banks[i1];
@@ -407,29 +415,22 @@ print('Færdig')
                     source = sources[i1];
                     unit = units[i1];
                     is_timeless = is_timelesss[i1];
-                    date_start = date_starts[i1];
-                    date_end = date_ends[i1];
-                    period_start = period_starts[i1];
-                    period_end = period_ends[i1];
+                    date_start = date_starts[i1];  //Not used
+                    date_end = date_ends[i1]; //Not used
+                    period_start = period_starts[i1]; //Not used
+                    period_end = period_ends[i1]; //Not used
                     stamp = stamps[i1];
                     // ----
-                    if (ts.IsArraySubSeries())
-                    {
-                        //TODO: Handle metadata etc.
-                        //TODO: Handle metadata etc.
-                        //TODO: Handle metadata etc.
-                    }
-                    else
-                    {
-                        if (ts.meta == null) ts.meta = new SeriesMetaInformation();
-                        ts.meta.label = label;
-                        ts.meta.source = source;
-                        ts.meta.units = unit;
-                        //TODO: FIXME
-                        //TODO: FIXME format
-                        //TODO: FIXME
-                        ts.meta.stamp = stamp.ToString();
-                    }                    
+                    if (ts.meta == null) ts.meta = new SeriesMetaInformation();
+                    ts.meta.label = label;
+                    ts.meta.source = source;
+                    ts.meta.units = unit;
+                    if (stamp != null) ts.meta.stamp = ((DateTime)stamp).ToString("dd-MM-yyyy");  //This is the old Gekko format that we continue here
+
+                    //
+                    // NOTE: If label/source/unit is originally from an .ArraySuper, these will
+                    //       now be duplicated into each sub-series. We live with that.
+                    //
                 }
 
                 GekkoTime gt = GekkoTime.tNull;
@@ -449,11 +450,51 @@ print('Færdig')
                 else
                 {
                     //jvOffPrimInd!a har period == null, i række 91884.
-                    if (period == null) Error("Rowgroup 1 row " + i2 + ": For a non-timeless series, the 'period' value is expected to be <> null", errors);
-                    try { gt = GekkoTime.FromStringToGekkoTime(period); } catch { Error("Rowgroup 1 row " + i2 + ": Could not parse period '" + period + "'", errors); }
-                    ts.SetData(gt, d);
+
+                    if (period == null)
+                    {
+                        if (value != null)
+                        {
+                            Error("Rowgroup 1 row " + i2 + ": For a non-timeless series with a value, the 'period' value is expected to be <> null", errors);
+                        }
+                        if (date != null) //Ok if both period, date and value are == null
+                        {
+                            dateWarnings2++;
+                        }
+                    }
+                    else
+                    {
+                        if (value == null) Error("Rowgroup 1 row " + i2 + ": Null value for period", errors);
+                    }
+
+                    if (period == null && value == null)
+                    {
+                        //Do nothing: this is a series with no data
+                    }
+                    else
+                    {
+                        try
+                        {
+                            gt = GekkoTime.FromStringToGekkoTime(period);
+                        }
+                        catch { Error("Rowgroup 1 row " + i2 + ": Could not parse period '" + period + "'", errors); }
+
+                        try
+                        {
+                            if (date != null && freq != null)
+                            {
+                                GekkoTime gt2 = GekkoTime.FromDateTimeToGekkoTime(G.ConvertFreq(freq), (DateTime)date);
+                                if (!gt.Equals(gt2)) dateWarnings1++;
+                            }
+                        }
+                        catch { } //Do not fail on this
+
+                        ts.SetData(gt, d);
+                    }
                 }
             }
+            if (dateWarnings1 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with non-matching 'date' and 'period' values");
+            if (dateWarnings2 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with 'date' non-null and 'period' null");
         }
 
         private static void Error(string s, List<string> errors)
@@ -1237,7 +1278,7 @@ print('Færdig')
                 //
                 // HMMM: what about .frm file varlist, or varlist.dat ???
                 //
-                //labels.Add(Program.GetVariableExplanation1Line(varnameWithoutIndex)); //HMM?
+                //We do not use Program.GetVariableExplanation1Line()... --> user must do that manually with DOC<varlist>.
                 labels.Add(ts.MetaGetLabel());
                 sources.Add(ts.MetaGetSource());
                 units.Add(ts.MetaGetUnits());

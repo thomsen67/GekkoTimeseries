@@ -5782,6 +5782,11 @@ namespace Gekko
                     extension = "px";
                     isGbk = false;
                 }
+                if (oRead.Type == EDataFormat.Parquet)
+                {
+                    extension = "parquet";
+                    isGbk = false;
+                }
 
                 string originalFileNameWithExtension = G.AddExtension(originalFileName, "." + extension);  //just for error messages
 
@@ -19409,6 +19414,27 @@ namespace Gekko
 
         public static void ImportVarlist(string fileName)
         {
+            //
+            //AIH
+            //ACCUMULATED RESIDENTIAL NET INVESTMENTS DEFLATED BY HOUSE PRICES KP
+            //(---)
+            //Source: ---
+            //Equation: ---
+            //
+            //fIvbh
+            //Afgang af fast bruttorealkapital, boliger
+            //(mio.kr., 2010 - priser, kædede værdier)
+            //Beregning: Residual, jf.identitet for fIbh
+            //
+            //fKnbhr
+            //Andre mængdemæssige ændringer af fast nettorealkapital, boliger(typisk tab ved katastrofer)
+            //(mio.kr., 2010 - priser, kædede værdier)
+            //Kilde: Statbank: NABK10, K.3(med omvendt fortegn), deflateret med pinvbh
+            //
+            // NOTE: the lines have no format as such, but convention is the label after the name, then unit is often in (...),
+            // and the rest is source. Source may be "identifiers" like "kilde", "source", "beregning".
+            // "kilde", "beregning", 
+            //
             Model model = new Model();
             string warning = null;
 
@@ -19456,30 +19482,44 @@ namespace Gekko
                         if (G.NullOrBlanks(e)) continue;
                         if (i == 0)
                         {
-                            ts.meta.label = e;
+                            if (!G.NullOrBlanks(e))
+                            {
+                                ts.meta.label = e;
+                            }
                         }
                         else if (i == 1)
                         {
                             string e3 = e;
                             if (e3.StartsWith("(") && e3.EndsWith(")")) e3 = e3.Substring(1, e3.Length - 2);
-                            ts.meta.units = e3;
+                            if (!G.NullOrBlanks(e3))
+                            {
+                                ts.meta.units = e3;
+                            }
                         }
                         else
                         {
                             if (hasSeenSource)
                             {
-                                if (G.NullOrEmpty(ts.meta.source)) ts.meta.source = e;
-                                else
+                                if (!G.NullOrBlanks(e))
                                 {
-                                    if (ts.meta.source.EndsWith(".")) ts.meta.source += " " + e;
-                                    else ts.meta.source += ". " + e;
+                                    if (G.NullOrEmpty(ts.meta.source)) ts.meta.source = e;
+                                    else
+                                    {
+                                        if (ts.meta.source.EndsWith(".")) ts.meta.source += " " + e;
+                                        else ts.meta.source += ". " + e;
+                                    }
                                 }
                             }
                             else
                             {
                                 string e4 = e;
                                 if (e4.ToLower().StartsWith("kilde: ")) e4 = e4.Substring("kilde: ".Length).Trim();
-                                ts.meta.source = e4;
+                                if (e4.ToLower().StartsWith("source: ")) e4 = e4.Substring("source: ".Length).Trim();
+                                //identifier "beregning: " will be kept.
+                                if (!G.NullOrBlanks(e4))
+                                {
+                                    ts.meta.source = e4;
+                                }
                             }
                             hasSeenSource = true;
                         }
@@ -19487,7 +19527,7 @@ namespace Gekko
                 }
             }
             string note = null;
-            new Writeln("Inserted " + counter + " doc elements from varlist (which has " + counter2 + " elements). " + warning);
+            new Writeln("Inserted " + counter + " doc elements from varlist (with " + counter2 + " elements). " + warning);
         }
 
         /// <summary>

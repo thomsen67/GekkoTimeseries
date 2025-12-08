@@ -6871,7 +6871,6 @@ namespace Gekko
                 if (gt.IsNull())
                 {
                     new Error("'dataStart': The series has no data or is timeless");
-                    //throw new GekkoException();
                 }
                 return new ScalarDate(gt);
             }
@@ -6889,7 +6888,6 @@ namespace Gekko
                 if (xx1.IsNull())
                 {
                     new Error("'dataStartTruncate': The series has no data or is timeless");
-                    //throw new GekkoException();
                 }
 
                 GekkoTime yy1 = t1;
@@ -6926,7 +6924,6 @@ namespace Gekko
                 if (gt.IsNull())
                 {
                     new Error("'dataEnd': The series has no data or is timeless");
-                    //throw new GekkoException();
                 }
                 return new ScalarDate(gt);
             }
@@ -6944,7 +6941,6 @@ namespace Gekko
                 if (xx2.IsNull())
                 {
                     new Error("'dataEndTruncate': The series has no data or is timeless");
-                    //throw new GekkoException();
                 }
 
                 GekkoTime yy1 = t1;
