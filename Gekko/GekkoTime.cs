@@ -801,7 +801,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Freq convertion problem"); return System.DateTime.MinValue;
+                    new Error("Freq conversion problem"); return System.DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.Q)
@@ -817,7 +817,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Freq convertion problem"); return System.DateTime.MinValue;
+                    new Error("Freq conversion problem"); return System.DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.M)
@@ -832,7 +832,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Freq convertion problem"); return System.DateTime.MinValue;
+                    new Error("Freq conversion problem"); return System.DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.D)
@@ -840,9 +840,24 @@ namespace Gekko
                 //for daily, firstLast has no effect
                 return GekkoTime.DateTime(gt.super, gt.sub, gt.subsub);
             }
+            else if (gt.freq == EFreq.W)
+            {
+                if (firstLast == O.GetDateChoices.FlexibleStart)
+                {
+                    return ISOWeek.ToDateTime(gt, Globals.weeklyFirstDayWhenPrinting);
+                }
+                else if (firstLast == O.GetDateChoices.FlexibleEnd)
+                {
+                    return ISOWeek.ToDateTime(gt, Globals.weeklyLastDayWhenPrinting);
+                }
+                else
+                {
+                    new Error("Freq conversion problem"); return System.DateTime.MinValue;
+                }
+            }
             else
             {
-                new Error("Freq convertion problem"); return System.DateTime.MinValue;
+                new Error("Freq conversion problem"); return System.DateTime.MinValue;
             }            
         }
 

@@ -1206,6 +1206,10 @@ print('Færdig')
 
             foreach (Tuple<string, IVariable> tup in listSorted)
             {
+                //if (tup.Item1 == "compalleco!w")
+                //{
+                //}
+
                 if (tup.Item2.Type() != EVariableType.Series) continue;
                 Series ts = tup.Item2 as Series;
                                 

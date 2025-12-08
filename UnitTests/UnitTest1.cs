@@ -13555,22 +13555,40 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Parquet()
         {
-            List<string> files = new List<string>() { "monadata.gbk", "monadata2.gbk", "monadata.tsdx", "monadata_extend.gbk", "pr2409.gbk", "pr2503.gbk", "dsbank_gekko.gbk", "dec24.gdx" };
+            List<string> files = new List<string>() { "konj.gbk", "monadata.gbk", "monadata2.gbk", "monadata.tsdx", "monadata_extend.gbk", "pr2409.gbk", "pr2503.gbk", "dsbank_gekko.gbk", "dec24.gdx", "makrobk.gbk" };
+
+            //In testing folder, tried and verified on these: "ADAM2SMEC.gbk", "asf.gbk", "az.gbk", "b.gbk", "b1.gbk", "b10.gbk", "b3.gbk", "b4.gbk", "bank1.gbk", "bank2.gbk", "bankTemp.gbk", "bb1.gbk", "bb2.gbk", "bk1.gbk", "bk2.gbk", "calib_trunc.gbk", "data.gbk", "deleteme.gbk", "demo.gbk", "demo2.gbk", "denton.gbk", "dg.gbk", "dsbank_gekko.gbk", "f16.gbk", "financebk.gbk", "finance_datopbk.gbk", "first.gbk", "fpr.gbk", "gekko.gbk", "GENR.gbk", "hist1115.gbk", "hist1124_jul24_m__IO_EM.gbk", "HISTDATA.gbk", "hit1117.gbk", "hit1121.gbk", "jul05.gbk", "jul05a.gbk", "jul05trunc.gbk", "kadam.gbk", "kadamk.gbk", "konj.gbk", "kox.gbk", "lang100.gbk", "lang100a.gbk", "lang15.gbk", "lang19.gbk", "lilleq.gbk", "li_s.gbk", "m1.gbk", "makro.gbk", "makro0.gbk", "makro1.gbk", "makrobk.gbk", "makrobk_2023.gbk", "makrobk_2024.gbk", "mixed.gbk", "mma.gbk", "model2.gbk", "mona.gbk", "monadata.gbk", "monadata_extend.gbk", "mul.gbk", "mulbank.gbk", "mybank.gbk", "nasbnk.gbk", "nyny.gbk", "obk.gbk", "out.gbk", "pr2408.gbk", "qaz.gbk", "qdam.gbk", "reform2.gbk", "scramble.gbk", "sim.gbk", "simple.gbk", "sjetmig.gbk", "slet.gbk", "slet1.gbk", "slet2.gbk", "sletmig.gbk", "sletmig2.gbk", "sletmig5.gbk", "slettt.gbk", "smec.gbk", "struc.gbk", "temp.gbk", "temp1.gbk", "temp2.gbk", "test.gbk", "testdata3.gbk", "tmp.gbk", "trace2.gbk", "true_bank.gbk", "trunc.gbk", "truncate.gbk", "usmec.gbk", "v.gbk", "work.gbk", "x.gbk", "x1.gbk", "xdata.gbk", "xdata0.gbk", "xx.gbk", "xx1.gbk", "xyz.gbk", "y.gbk", "yes.gbk"            
+
+            int j = 1;
             foreach (string file in files)
             {
+                //j++;
+                //MessageBox.Show(file);
                 I("reset;");
-                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");                
+                I("tell 'FILE1 " + file + "';");
+                //I(@"option folder working = 'c:\Thomas\Desktop\gekko\testing';");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 if (file == "monadata.gbk") I("model mona.mar22.frm;");
                 string s = null; if (file.EndsWith(".gdx")) s = "<gdx>";
-                I("read " + s + " " + file + ";");
+                I("read " + s + " " + file + ";");                
+                
+                //int i = 0;
+                //foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+                //{
+                //    if ((kvp.Value as Series) != null) i++;
+                //}
+                //if (i == 0) continue;                
+                
                 if (file == "monadata.gbk") I("doc <varlist>;");
-                I("write parquet_test1.gbk;");
-                I("write <parquet> parquet_test1;");
+                I("write parquet_test" + j + ".gbk;");
+                I("write <parquet> parquet_test" + j + ".parquet;");
                 // ---
                 I("reset;");
+                I("tell 'FILE2 " + file + "';");
+                //I(@"option folder working = 'c:\Thomas\Desktop\gekko\testing';");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                I("read <first parquet> parquet_test1;");
-                I("read <ref> parquet_test1.gbk;");
+                I("read <first parquet> parquet_test" + j + ".parquet;");
+                I("read <ref> parquet_test" + j + ".gbk;");
                 CompareTwoDatabanks();
             }
 
