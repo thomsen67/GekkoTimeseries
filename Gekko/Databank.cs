@@ -606,6 +606,9 @@ namespace Gekko
         [ProtoMember(31)]
         public string gcm;
 
+        [ProtoMember(32)]
+        public int nTraces;
+
         // ================= COMPARE =======================================================
 
         /// <summary>

@@ -6059,6 +6059,15 @@ namespace Gekko
                                         tsImported.Truncate(dates);
                                         tsImported.meta.parentDatabank = databank;  //otherwise it will be null or point to some temp databank
                                         databank.AddIVariable(name, tsImported); //the sub-timeseries will follow automatically!
+                                        if (tsImported.dimensionsStorage != null)
+                                        {
+                                            foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in tsImported.dimensionsStorage.storage)
+                                            {
+                                                Series tsChild = kvp2.Value as Series;
+                                                string nameChild = tsChild.GetName();
+                                                HandleTraceForReadOrImport(nameChild, null, tsChild, dates, ffh.realPathAndFileName, isGbk, oRead.gekkocode, p);
+                                            }
+                                        }
                                     }
                                     else
                                     {
@@ -6104,7 +6113,7 @@ namespace Gekko
                                                 tsImported.meta.parentDatabank = databank;  //otherwise it will be null or point to some temp databank
                                                 databank.AddIVariableWithOverwrite(name, tsImported);  //the sub-timeseries will follow automatically!                                            
                                             }
-                                            else                                            
+                                            else
                                             {
                                                 string array = null;
                                                 if (tsExisting.dimensions > 0) array = tsExisting.dimensions + "-dimensional array-";
@@ -6488,6 +6497,7 @@ namespace Gekko
                         readInfo.databankVersion = databankTemp2.cacheParameters.databankVersion;
                         readInfo.info1 = databankTemp2.cacheParameters.info1;
                         readInfo.date = databankTemp2.cacheParameters.date;
+                        readInfo.nTraces = databankTemp2.cacheParameters.nTraces;
                         readInfo.modelName = databankTemp2.cacheParameters.modelName;
                         readInfo.modelInfo = databankTemp2.cacheParameters.modelInfo;
                         readInfo.modelDate = databankTemp2.cacheParameters.modelDate;
@@ -7365,6 +7375,15 @@ namespace Gekko
                                     {
                                         traces = ProtobufRead<List<Trace2>>(fileName2);
                                         success = true;
+                                        int n = 0;
+                                        if (traces != null)
+                                        {
+                                            foreach (Trace2 trace in traces)
+                                            {
+                                                if (trace.type == ETraceType.Normal) n++;
+                                            }
+                                        }
+                                        readInfo.nTraces = n;
                                     }
                                     catch { }
                                 }
@@ -7430,6 +7449,7 @@ namespace Gekko
                 cacheParameters.databankVersion = readInfo.databankVersion;
                 cacheParameters.info1 = readInfo.info1;
                 cacheParameters.date = readInfo.date;
+                cacheParameters.nTraces = readInfo.nTraces;
 
                 if (Globals.gbkExtraMetadata)
                 {
@@ -35035,8 +35055,7 @@ namespace Gekko
         [ProtoContract]  //Why?: it does not seem ReadInfo is ever protobuffed...
         public class ReadInfo
         {
-            public static GekkoTime tStart = GekkoTime.tNull;
-            public static GekkoTime tEnd = GekkoTime.tNull;
+            public int nTraces = 0;
             public string fileName = null;
             public string fileNamePretty = null;
             public string dbName = null; //internal name for the RAM databank (key in hashtable of databanks)            
@@ -35158,15 +35177,15 @@ namespace Gekko
                     tab.CurRow.Next();
                     tab.CurRow.SetText(1, "           " + this.dbName + " databank now contains " + total + " variables (" + this.startPerResultingBank + "-" + this.endPerResultingBank + ")");
                 }
-
+                
                 TraceHelper th = Trace2.CollectAllTraces(this.databank, ETraceHelper.GetAllMetasAndTraces);
-                if (th.traces.Count > 0)
+                if (this.nTraces > 0)
                 {
                     Action<GAO> a = (gao) =>
                     {
                         Functions.tracestats2(null, null, null, new ScalarString(this.databank.GetName()));
                     };
-                    tab.CurRow.SetText(1, "Trace    : " + th.traces.Count + " data-traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    tab.CurRow.SetText(1, "Trace    : " + this.nTraces + " data-traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                     tab.CurRow.Next();
                 }                
 

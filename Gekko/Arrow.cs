@@ -1300,13 +1300,11 @@ print('Færdig')
                 }                
 
                 //
-                // HMMM: what about .frm file varlist, or varlist.dat ???
-                //
-                //We do not use Program.GetVariableExplanation1Line()... --> user must do that manually with DOC<varlist>.
+                // A .frm file varlist, or varlist.dat must be loaded before writing with DOC<varlist>.
+                //                
                 labels.Add(ts.MetaGetLabel());
                 sources.Add(ts.MetaGetSource());
                 units.Add(ts.MetaGetUnits());
-
                 timelesss.Add(isTimeless);
 
                 // -------------------------------------------------------------------------------------------------------
