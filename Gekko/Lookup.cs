@@ -1997,25 +1997,30 @@ namespace Gekko
 
         private static void LookupHandleMetaStuff(Series lhs_series, bool isArraySubSeries, Assignment o)
         {
-            if (!isArraySubSeries)
+            bool isOk = !isArraySubSeries;
+            if (Program.options.bugfix_subseries_stamp) isOk = true; //always true, also for subseries
+            if (isOk)
             {
-                if (Program.options.bugfix_speed)
+                if (lhs_series.meta != null)
                 {
-                    //use UTC instead for Gekko 3.2
-                    lhs_series.meta.stamp = Globals.dateStamp; //Is done for every start thread, so normally ok unless it runs over midnight.
-                }
-                else
-                {
-                    lhs_series.meta.stamp = Program.GetDateStamp();  
-                }
+                    if (Program.options.bugfix_speed)
+                    {
+                        //use UTC instead for Gekko 3.2
+                        lhs_series.meta.stamp = Globals.dateStamp; //Is done for every start thread, so normally ok unless it runs over midnight.
+                    }
+                    else
+                    {
+                        lhs_series.meta.stamp = Program.GetDateStamp();
+                    }
 
-                if (o != null)
-                {
-                    if (o.opt_label != null) lhs_series.meta.label = o.opt_label;
-                    if (o.opt_source != null) lhs_series.meta.source = o.opt_source;
-                    if (o.opt_unit != null) lhs_series.meta.units = o.opt_unit;
-                    if (o.opt_units != null) lhs_series.meta.units = o.opt_units;
-                    if (o.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override                                
+                    if (o != null)
+                    {
+                        if (o.opt_label != null) lhs_series.meta.label = o.opt_label;
+                        if (o.opt_source != null) lhs_series.meta.source = o.opt_source;
+                        if (o.opt_unit != null) lhs_series.meta.units = o.opt_unit;
+                        if (o.opt_units != null) lhs_series.meta.units = o.opt_units;
+                        if (o.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override                                
+                    }
                 }
             }
         }
