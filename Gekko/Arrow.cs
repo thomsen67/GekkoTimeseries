@@ -29,6 +29,7 @@ using Microsoft.Data.Analysis;
 using System.Threading.Tasks;
 using Parquet;
 using Parquet.Data;
+using System.Globalization;
 
 
 namespace Gekko
@@ -120,7 +121,7 @@ namespace Gekko
                 Dictionary<string, string> metadata = new Dictionary<string, string>();                
                 metadata.Add("software.name", "Gekko Timeseries and Modeling Software");
                 metadata.Add("software.version", Globals.gekkoVersion);
-                metadata.Add("parquet.design.version", "1.0.0"); //Gekko's version of the Parquet schema.              
+                metadata.Add("parquet.design.version", "1.0.0"); //Gekko's version of the Parquet schema.
                 metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
                 metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks.");
                 metadata.Add("column.bank.comment", "Gekko databank name, same as file name without extension (for future use, to store several databanks in 1 parquet file).");
@@ -240,7 +241,12 @@ print('Færdig')
             int dateWarnings1 = 0;
             int dateWarnings2 = 0;
 
+            string fileVersion = null;
+            string fileTimestamp = null;
+            string fileInfo1 = null;
+
             // -------------------------------                        
+            // -------------------------------     
             string[] ids1 = null;
             string[] ids2 = null;
             // --
@@ -269,14 +275,15 @@ print('Færdig')
 
             using (Stream fileStream = File.OpenRead(filePath))
             using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
-            {
-                string version = null;
+            {                
                 try
                 {
                     Dictionary<string, string> metadata = reader.CustomMetadata;
-                    metadata.TryGetValue("version", out version);
+                    metadata.TryGetValue("parquet.design.version", out fileVersion);
+                    metadata.TryGetValue("export.timestamp", out fileTimestamp);
+                    metadata.TryGetValue("table.label", out fileInfo1);
                 }
-                catch { Error("Metadata error", errors); }                
+                catch { }
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
@@ -518,7 +525,15 @@ print('Færdig')
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
 
             readInfo.startPerResultingBank = readInfo.startPerInFile;
-            readInfo.endPerResultingBank = readInfo.endPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;            
+
+            DateTime parsedDate;            
+            bool success = DateTime.TryParseExact(fileTimestamp, "o", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsedDate);
+            if (success) readInfo.date = parsedDate.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss");
+
+            readInfo.databankVersion = "(vers: " + fileVersion + ")";
+
+            readInfo.info1 = fileInfo1;
         }
 
         private static void Error(string s, List<string> errors)
@@ -1124,11 +1139,11 @@ print('Færdig')
 
         }
 
-        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename)
+        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename, string hdg)
         {            
             //Note: the input list is already sorted by name
 
-            string gekkoParquetVersion = "1.0.0";
+            string gekkoParquetVersion = "1.0";
 
             DateTime dt = DateTime.Now;
 
@@ -1198,6 +1213,7 @@ print('Færdig')
             Dictionary<string, string> metadata = new Dictionary<string, string>();
             metadata.Add("software.name", "Gekko Timeseries and Modeling Software");
             metadata.Add("software.version", Globals.gekkoVersion);
+            if (hdg != null) metadata.Add("table.label", hdg);
             metadata.Add("parquet.design.version", gekkoParquetVersion); //Gekko's version of the Parquet schema.              
             metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
             metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks.");

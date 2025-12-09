@@ -23323,7 +23323,7 @@ namespace Gekko
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename).Wait();
+                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1).Wait();
                     }
                     catch (Exception e)
                     {
