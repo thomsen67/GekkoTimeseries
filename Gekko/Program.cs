@@ -5931,7 +5931,7 @@ namespace Gekko
                         file = localFileThatShouldBeDeletedPathAndFilename;
                     }
 
-                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, oRead.bankName, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
                     {
                         if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
@@ -6453,7 +6453,7 @@ namespace Gekko
         /// <param name="tempTsdxPath"></param>
         /// <param name="NaNCounter"></param>
         /// <returns></returns>
-        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, P p, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, string bankName, P p, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //file may be == null, if we are calling from Gekcel (import <xlsx> gekcel).
 
@@ -6593,7 +6593,7 @@ namespace Gekko
                     else if (oRead.Type == EDataFormat.Parquet)
                     {
                         List<string> errors = new List<string>();
-                        try { Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors).Wait(); }
+                        try { Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors, bankName).Wait(); }
                         catch
                         {
                             //Done like this because of async/await issues
@@ -23323,7 +23323,7 @@ namespace Gekko
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1).Wait();
+                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1, o.opt_bankname).Wait();
                     }
                     catch (Exception e)
                     {
@@ -35845,6 +35845,7 @@ namespace Gekko
         public string array = null;
         public string dateformat = null;
         public string datetype = null;
+        public string bankName = null;
         public string sheet = null;
         public bool isVariablecode = false;
         public string gekkocode;

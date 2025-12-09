@@ -6906,6 +6906,7 @@ namespace Gekko
             public string opt_datetype = null;
             public string opt_variablecode = null;
             public string opt_trace = "yes"; //default
+            public string opt_bankname = null; //for parquet only
 
             public P p = null;
             public void Exe()
@@ -6929,6 +6930,7 @@ namespace Gekko
                     oRead.gekkocode = this.gekkocode;
                     oRead.dateformat = this.opt_dateformat;
                     oRead.datetype = this.opt_datetype;
+                    oRead.bankName = this.opt_bankname;
                     oRead.sheet = this.opt_sheet;
 
                     bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
@@ -10859,7 +10861,7 @@ namespace Gekko
             public string opt_dateformat = null;
             public string opt_datetype = null;
             public string opt_trace = null;
-
+            public string opt_bankname = null; //for parquet only
 
             public void Exe()
             {

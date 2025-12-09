@@ -59,6 +59,7 @@ tokens {
 	ASTCOLON;
     ASTGEKKO;
     ASTVERSION;
+    ASTOPT_STRING_BANKNAME;
 	ASTOPT_STRING_DUMPOPTIONS;
 	ASTOPT_STRING_DATEFORMAT;
 	ASTOPT_STRING_DATETYPE;
@@ -1194,6 +1195,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    BANKNAME      = 'BANKNAME'     ;    
     FLOW      = 'FLOW'     ;   
     META = 'META';
     ECHO = 'ECHO';
@@ -1869,6 +1871,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("bankname"               , BANKNAME  );
                                         d.Add("flow"               , FLOW  );
                                         d.Add("meta"               , META  );
                                         d.Add("echo"               , ECHO  );
@@ -3868,6 +3871,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
 						  | VARIABLECODE (EQUAL yesNo)? -> ^(ASTOPT_STRING_VARIABLECODE yesNo?)
                           | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
+                          | BANKNAME '=' expression -> ^(ASTOPT_STRING_BANKNAME expression)
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4131,6 +4135,7 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)                          
                           | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
+                          | BANKNAME EQUAL expression -> ^(ASTOPT_STRING_BANKNAME expression)
 						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4428,6 +4433,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  BANKNAME|
   FLOW|
   META|
   ECHO|

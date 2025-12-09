@@ -226,20 +226,25 @@ print('Færdig')
              * */
         }
 
-        public static async Task ReadParquetDatabank(Databank databank, Program.ReadInfo readInfo, string filePath, List<string> errors)
+        public static async Task ReadParquetDatabank(Databank databank, Program.ReadInfo readInfo, string filePath, List<string> errors, string bankName2)
         {
             //
             // NOTE: regarding dates/periods, only the string period for each observation is used, together with the DateTime stamp.
             //       The 4 start/end dates/periods are not used, and the DateTime date is not used.
             //
 
+            string filterBankName = bankName2;
+            if (G.NullOrBlanks(bankName2)) filterBankName = null;
+
             DateTime dt1 = DateTime.Now;
             int yearMin = int.MaxValue;
             int yearMax = int.MinValue;
             GekkoDictionary<string, bool> nameCounter = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, bool> bankCounter = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
             int dateWarnings1 = 0;
             int dateWarnings2 = 0;
+            int dataCounter = 0;
 
             string fileVersion = null;
             string fileTimestamp = null;
@@ -288,18 +293,7 @@ print('Færdig')
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
                     try { ids1 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'id'", errors); }
-                    try { banks = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'bank'", errors); }
-                    if (banks.Length > 1)
-                    {
-                        string bankTest = banks[0];
-                        foreach (string s in banks)
-                        {
-                            if (!G.Equal(bankTest, s))
-                            {
-                                Error("Rowgroup 0: Some values in the column 'bank' are different: this is currently unsupported", errors);
-                            }
-                        }
-                    }
+                    try { banks = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'bank'", errors); }                    
                     try { names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'name'", errors); }
                     try { freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'freq'", errors); }
                     try { dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'dims'", errors); }
@@ -337,6 +331,23 @@ print('Færdig')
             if (ids1 == null || ids1.Length == 0) Error("Rowgroup 1: Number of rows is = 0", errors);
             if (ids2 == null || ids2.Length == 0) Error("Rowgroup 2: Number of rows is = 0", errors);
 
+            foreach (string s in banks)
+            {
+                if (!bankCounter.ContainsKey(s)) bankCounter.Add(s, false);                
+            }            
+
+            if (filterBankName == null)
+            {
+                if (bankCounter.Count > 1) Error("Rowgroup 0: Some values in the column 'bank' are different: use <bankname=...> option to select. Banks are: " + string.Join(", ", bankCounter.Keys.OrderBy(key => key).Select(key => $"'{key}'")), errors);
+            }
+            else
+            {
+                if (!bankCounter.ContainsKey(filterBankName))
+                {
+                    Error("Rowgroup 0: No values in the column 'bank' are identical to '" + filterBankName + "'. Possibilities are: " + string.Join(", ", bankCounter.Keys.OrderBy(key => key).Select(key => $"'{key}'")), errors);
+                }
+            }            
+
             string[] namePrettys = new string[ids1.Length];
 
             Dictionary<string, int> vars = new Dictionary<string, int>();
@@ -366,7 +377,8 @@ print('Færdig')
                             s2 = ", " + s.Replace(",", ", ");
                         }
                         Error("Rowgroup 0: The id '" + id + "' is not compatible with bank, name, freq, dims and dim1..dimN (" + banks[i] + ", " + names[i] + ", " + freqs[i] + ", " + dims[i] + s2 + ")", errors);
-                    }                    
+                    }
+                    if (vars.ContainsKey(id)) Error("Rowgroup 0: The id '" + id + "' appears > 1 time, which is not allowed.", errors);
                     vars.Add(id, i);
                     string nameTemp = names[i];
                     if (!nameCounter.ContainsKey(nameTemp)) nameCounter.Add(nameTemp, false);
@@ -394,7 +406,8 @@ print('Færdig')
             for (int i2 = 0; i2 < ids2.Length; i2++)
             {
                 int i1 = -12345;
-                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }                
+                try { i1 = vars[ids2[i2]]; } catch { Error("Rowgroup 1 row " + i2 + ": Cannot find id in rowgroup 0", errors); }
+                if (filterBankName != null && !G.Equal(filterBankName, banks[i1])) continue; //Do not load data for this "bank". Do not use bank instead of banks[i1].
 
                 string namePretty = namePrettys[i1];
                 // ---
@@ -404,10 +417,7 @@ print('Færdig')
 
                 if (currentSeries == null || currentSeries != namePretty)
                 {
-                    currentSeries = namePretty;
-                    ts = databank.GetIVariableMayCreateSeries(namePretty) as Series;
-                    // ----
-                    bank = banks[i1];
+                    bank = banks[i1];                    
                     name = names[i1];
                     freq = freqs[i1];
                     dim = dims[i1];
@@ -430,6 +440,8 @@ print('Færdig')
                     period_end = period_ends[i1]; //Not used
                     stamp = stamps[i1];
                     // ----
+                    currentSeries = namePretty;
+                    ts = databank.GetIVariableMayCreateSeries(namePretty) as Series;                    
                     if (ts.meta == null) ts.meta = new SeriesMetaInformation();
                     ts.meta.label = label;
                     ts.meta.source = source;
@@ -455,6 +467,7 @@ print('Færdig')
                     ts.type = ESeriesType.Timeless;
                     ts.data.SetDataarray_ONLY_INTERNAL_USE(new double[1]);
                     ts.data.GetDataArray_ONLY_INTERNAL_USE()[0] = d;
+                    dataCounter++;
                 }
                 else
                 {
@@ -507,16 +520,17 @@ print('Færdig')
                             catch { } //Do not fail on this
                         }
 
-                        ts.SetData(gt, d);
+                        ts.SetData(gt, d); dataCounter++;
 
                         yearMin = Math.Min(yearMin, gt.super);
                         yearMax = Math.Max(yearMax, gt.super);
                     }
                 }
             }
-            if (dateWarnings1 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with non-matching 'date' and 'period' values");
-            if (dateWarnings2 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with 'date' non-null and 'period' null");
-            
+            if (dateWarnings1 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with non-matching 'date' and 'period' values.");
+            if (dateWarnings2 > 0) G.Warning("w44.1", dateWarnings1 + " rows in rowgroup 1 with 'date' non-null and 'period' null.");
+            if (dataCounter == 0) G.Warning("w44.1", "No actual .parquet data was read.");
+
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;
             readInfo.nanCounter = 0;
@@ -1139,9 +1153,12 @@ print('Færdig')
 
         }
 
-        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename, string hdg)
-        {            
+        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename, string hdg, string bankName2)
+        {
             //Note: the input list is already sorted by name
+
+            string filterBankName = bankName2;
+            if (G.NullOrBlanks(bankName2)) filterBankName = null;
 
             string gekkoParquetVersion = "1.0";
 
@@ -1215,11 +1232,12 @@ print('Færdig')
             metadata.Add("software.version", Globals.gekkoVersion);
             if (hdg != null) metadata.Add("table.label", hdg);
             metadata.Add("parquet.design.version", gekkoParquetVersion); //Gekko's version of the Parquet schema.              
-            metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
-            metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks.");
-            metadata.Add("column.bank.comment", "Gekko databank name, same as file name without extension (for future use, to store several databanks in 1 parquet file).");
-            metadata.Add("column.name.comment", "The Gekko series name. Alphanumeric or underscore chars, lower or upper-case.");
-            metadata.Add("column.freq.comment", "The Gekko frequency: a (annual), q (quarterly), m (monthly), w (weekly), d (daily), u (undated). Lower-case.");
+            metadata.Add("parquet.design.url", "https://t-t.dk/gekko/docs/user-manual/index.html?appendix_parquet.htm");
+            metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
+            metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks. String.");
+            metadata.Add("column.bank.comment", "Gekko databank name, often same as file name without extension (for future use, to store several databanks in 1 parquet file). String.");
+            metadata.Add("column.name.comment", "The Gekko series name. Alphanumeric or underscore chars, lower or upper-case. String.");
+            metadata.Add("column.freq.comment", "The Gekko frequency: a (annual), q (quarterly), m (monthly), w (weekly), d (daily), u (undated). Lower-case. String.");
             metadata.Add("column.dims.comment", "Number of dimensions of the given (array-) timeseries. Integer.");
             for (int ii = 0; ii < ndims; ii++)
             {
@@ -1229,20 +1247,22 @@ print('Færdig')
             metadata.Add("column.source.comment", "The source of the given timeseries. String.");
             metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
             metadata.Add("column.is_timeless.comment", "True if the timeseries is constant for all periods. Boolean.");
-            metadata.Add("column.date_start.comment", "The date corresponding to the first value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day.");
-            metadata.Add("column.date_end.comment", "The date corresponding to the last value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day");
-            metadata.Add("column.period_start.comment", "The period corresponding to the first value of the timeseries in the Gekko databank. String format.");
-            metadata.Add("column.period_end.comment", "The period corresponding to the last value of the timeseries in the Gekko databank. String format.");
+            metadata.Add("column.date_start.comment", "The date corresponding to the first value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
+            metadata.Add("column.date_end.comment", "The date corresponding to the last value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
+            metadata.Add("column.period_start.comment", "The period corresponding to the first value of the timeseries in the Gekko databank. String format. Not used by Gekko when importing.");
+            metadata.Add("column.period_end.comment", "The period corresponding to the last value of the timeseries in the Gekko databank. String format. Not used by Gekko when importing.");
             metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format, Unix time.");
-            metadata.Add("column.date.comment", "The date corresponding to the current data value. Date format, Unix time. Quarters etc. are identified as their *first* day.");
-            metadata.Add("column.period.comment", "The period corresponding to the current data value. String format.");
+            metadata.Add("column.date.comment", "The date corresponding to the current data value. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
+            metadata.Add("column.period.comment", "The period corresponding to the current data value. String.");
             metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
 
             int valuesCounter = 0;
             bool hasSubSeries = false;
             int seriesCounter = 0;
-            
-            string bank = Path.GetFileNameWithoutExtension(pathAndFilename);
+
+            string bank = null;
+            if (filterBankName == null) bank = Path.GetFileNameWithoutExtension(pathAndFilename);
+            else bank = filterBankName;
 
             foreach (Tuple<string, IVariable> tup in listSorted)
             {

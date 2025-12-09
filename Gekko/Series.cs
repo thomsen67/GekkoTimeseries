@@ -3380,6 +3380,11 @@ namespace Gekko
             }
             else
             {
+                //HMMMM WHY?
+                //HMMMM WHY?
+                //HMMMM WHY?
+                //HMMMM WHY?
+                //HMMMM WHY?
                 if (this.IsArraySubSeries() && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.stamp))
                 {
                     stamp2 = this.mmi.parent.meta.stamp;
