@@ -13554,26 +13554,51 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Parquet2()
-        {
+        {            
+            //Some sanity roundtrip testing
+
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("option freq q; time 2001q2 2001q4;");
-            I("x0 = (-100, m(), 100);");
+            I("x0 <label = 'XXX1'> = (-100, m(), 100);");
             I("option freq d; time 2001m1d1 2001m1d3;");
             I("x1 = series(1);");
-            I("x1[a] = (-1000, m(), 1000);");            
+            I("x1[a] <source = 'XXX2'> = (-1000, m(), 1000);");            
             I("option freq w; time 2001w1 2001w3;");
             I("x1 = series(1);");
-            I("x1[a] = timeless(-10000);");
-            I("x1[b] =  (-100000, m(), 100000);");
+            I("x1[a] <unit = 'XXX3'> = timeless(-10000);");
+            I("x1[b] <label = 'XXX4'> =  (-100000, m(), 100000);");
             I("write <parquet> parquet_test2;");
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("read <parquet> parquet_test2;");
+
+            Series x0q = O.GetIVariableFromString("x0!q", ECreatePossibilities.NoneReportError) as Series;
+            Assert.AreEqual(x0q.meta.stamp, Globals.dateStamp); //May fail around midnight...!
+            Assert.AreEqual("XXX1", x0q.meta.label);
             _AssertSeries(First(), "x0!q", EFreq.Q, 2001, 2, -100d, sharedDelta);
             _AssertSeries(First(), "x0!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x0!q", EFreq.Q, 2001, 4, double.PositiveInfinity, sharedDelta);
+            _AssertSeries(First(), "x0!q", EFreq.Q, 2001, 4, 100d, sharedDelta);
 
+            Series x1da = O.GetIVariableFromString("x1!d[a]", ECreatePossibilities.NoneReportError) as Series;
+            Assert.AreEqual(x1da.meta.stamp, Globals.dateStamp); //May fail around midnight...!
+            Assert.AreEqual("XXX2", x1da.meta.source);
+            _AssertSeries(First(), "x1!d", new string[] { "a" }, EFreq.D, 2001, 1, 1, -1000d, sharedDelta);
+            _AssertSeries(First(), "x1!d", new string[] { "a" }, EFreq.D, 2001, 1, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!d", new string[] { "a" }, EFreq.D, 2001, 1, 3, 1000d, sharedDelta);
+
+            Series x1wa = O.GetIVariableFromString("x1!w[a]", ECreatePossibilities.NoneReportError) as Series;
+            Assert.IsTrue(x1wa.type == ESeriesType.Timeless);
+            Assert.AreEqual(x1wa.meta.stamp, Globals.dateStamp); //May fail around midnight...!
+            Assert.AreEqual("XXX3", x1wa.meta.units);
+            Series x1wb = O.GetIVariableFromString("x1!w[b]", ECreatePossibilities.NoneReportError) as Series;            
+            Assert.AreEqual(x1wb.meta.stamp, Globals.dateStamp); //May fail around midnight...!
+            Assert.AreEqual("XXX4", x1wb.meta.label);
+            
+            Assert.AreEqual(x1wa.GetTimelessData(), -10000d);
+            _AssertSeries(First(), "x1!w", new string[] { "b" }, EFreq.W, 2001, 1, -100000d, sharedDelta);
+            _AssertSeries(First(), "x1!w", new string[] { "b" }, EFreq.W, 2001, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!w", new string[] { "b" }, EFreq.W, 2001, 3, 100000d, sharedDelta);
 
         }
 
@@ -24799,6 +24824,11 @@ print(df2)
         private static void _AssertSeries(IBank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
         {
             _AssertSeries(db, s, indexes, freq, year, subper, 1, year, subper, 1, x, delta);
+        }
+
+        private static void _AssertSeries(IBank db, string s, string[] indexes, EFreq freq, int year, int subper, int subsubper, double x, double delta)
+        {
+            _AssertSeries(db, s, indexes, freq, year, subper, subsubper, year, subper, subsubper, x, delta);
         }
 
         private static void _AssertSeries(IBank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int subsub1, int year2, int sub2, int subsub2, double x, double delta)
