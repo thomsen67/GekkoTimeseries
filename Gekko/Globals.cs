@@ -38,7 +38,7 @@ namespace Gekko
 
     public class Globals
     {
-        public const string smpl = "§¤£";  //this line must be at top
+        public const string smpl = "§¤£";   //this line must be at top
         
         public static bool gdxReaderDebug = false;        
         public const string libraryDriveCheatString = "library___name___";        
