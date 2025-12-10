@@ -516,17 +516,17 @@ End Function
             {
                 //We have to catch this exception here, otherwise it ripples through to
                 //Excel itself with a strange error message there.
-                if (Globals.excelDnaOutput != null)
+                if (Globals.gekkoOutputRecorder != null)
                 {
-                    Globals.excelDnaOutput.AppendLine();
-                    Globals.excelDnaOutput.AppendLine(gekcelError1);
+                    Globals.gekkoOutputRecorder.AppendLine();
+                    Globals.gekkoOutputRecorder.AppendLine(gekcelError1);
                 }
             }
             finally
             {
-                if (Globals.excelDnaOutput != null)
+                if (Globals.gekkoOutputRecorder != null)
                 {
-                    rv = Globals.excelDnaOutput.ToString();
+                    rv = Globals.gekkoOutputRecorder.ToString();
                 }
             }
 
