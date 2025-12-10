@@ -6,11 +6,11 @@ import time
 import clr  # Python.NET (pythonnet)
 with importlib.resources.path("pygekko.native.win-x64", "Gekko.exe") as dll_path: clr.AddReference(str(dll_path))
 
-from Gekko import Python
+from Gekko import PyGekko
 from System.Threading import Thread, ThreadStart, ApartmentState
 
 _last_thread = None
-pygekko = Python()
+pygekko = PyGekko()
 
 def run(s: str):
     """
