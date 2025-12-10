@@ -66,167 +66,9 @@ namespace Gekko
         {
             return new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc); //Using DateTimeKind.Local will fail after a roundtrip (1 hour change). If called with (1970, 1, 1, ...), it *seems* there are 8-byte zero values for the dates in the parquet file.
         }
+        
 
-        public static async Task WriteParquetFile()
-        {            
-            string[] ids1 = { "mona:x1!a", "mona:x2!q[a,b]", "mona:x2!q[a,c]" };
-            string[] ids2 = { "mona:x1!a", "mona:x1!a", "mona:x2!q[a,b]", "mona:x2!q[a,b]", "mona:x2!q[a,c]", "mona:x2!q[a,c]" };            
-            // ============================================================================
-            string[] banks = { "mona", "mona", "mona" };
-            string[] names = { "x1", "x2", "x2" };
-            string[] freqs = { "a", "q", "q" };
-            string[] labels = { "Serie 1", "Serie 2", "Serie 2" };
-            string[] sources = { "DST", "NB", "NB" };
-            string[] units = { "Mio. kr.", "Mia. kr.", "Mia. kr." };
-            int?[] dims = { 0, 2, 2 };            
-            string[] dim1 = { null, "a", "a" };
-            string[] dim2 = { null, "b", "c" };
-            DateTime?[] date_starts = { UtcDateTime(1966, 1, 1), UtcDateTime(1980, 1, 1), UtcDateTime(1980, 1, 1) };
-            DateTime?[] date_ends = { UtcDateTime(2024, 1, 1), UtcDateTime(2024, 10, 1), UtcDateTime(2024, 10, 1) };
-            DateTime?[] stamps = { UtcDateTime(2025, 11, 17), UtcDateTime(2025, 11, 15), UtcDateTime(2025, 11, 16) };
-            // ---            
-            DateTime?[] dates = { UtcDateTime(2021, 1, 1), UtcDateTime(2022, 1, 1), UtcDateTime(2021, 1, 1), UtcDateTime(2021, 4, 1), UtcDateTime(2021, 1, 1), UtcDateTime(2021, 4, 1) };
-            double?[] values = { 101, 102, 103, 104, 105, 106 };
-
-            var idField = new Parquet.Schema.DataField<string>("id")
-            {
-                
-            };
-
-            // 1. Unified schema
-            var schema = new Parquet.Schema.ParquetSchema(
-                new Parquet.Schema.DataField<string>("id"),
-                // ================================================
-                new Parquet.Schema.DataField<string>("bank"),
-                new Parquet.Schema.DataField<string>("name"),
-                new Parquet.Schema.DataField<string>("freq"),                               
-                new Parquet.Schema.DataField<int?>("dims"),                
-                new Parquet.Schema.DataField<string>("dim1"),
-                new Parquet.Schema.DataField<string>("dim2"),
-                new Parquet.Schema.DataField<string>("label"),
-                new Parquet.Schema.DataField<string>("source"),
-                new Parquet.Schema.DataField<string>("unit"),
-                new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
-                new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
-                new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true),
-                // ----                
-                new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true), //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
-                new Parquet.Schema.DataField<double?>("value")                
-            );                        
-
-            using (Stream fileStream = File.Create(@"c:\tools\multi.parquet"))
-            using (ParquetWriter writer = await ParquetWriter.CreateAsync(schema, fileStream))
-            {             
-                                
-                Dictionary<string, string> metadata = new Dictionary<string, string>();                
-                metadata.Add("software.name", "Gekko Timeseries and Modeling Software");
-                metadata.Add("software.version", Globals.gekkoVersion);
-                metadata.Add("parquet.design.version", "1.0.0"); //Gekko's version of the Parquet schema.
-                metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
-                metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks.");
-                metadata.Add("column.bank.comment", "Gekko databank name, same as file name without extension (for future use, to store several databanks in 1 parquet file).");
-                metadata.Add("column.name.comment", "The Gekko series name. Alphanumeric or underscore chars, lower or upper-case.");
-                metadata.Add("column.freq.comment", "The Gekko frequency: a (annual), q (quarterly), m (monthly), w (weekly), d (daily), u (undated). Lower-case.");
-                metadata.Add("column.dims.comment", "Number of dimensions of the given (array-) timeseries. Integer.");
-                metadata.Add("column.dim1.comment", "Dimension 1. String.");
-                metadata.Add("column.dim2.comment", "Dimension 2. Possible dim3, dim3, etc., too. String.");
-                metadata.Add("column.label.comment", "The label of the given timeseries. String.");
-                metadata.Add("column.source.comment", "The source of the given timeseries. String.");
-                metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
-                metadata.Add("column.date_start.comment", "The date of the first value of the timeseries in the Gekko databank. Date format.");
-                metadata.Add("column.date_end.comment", "The date of the last value of the timeseries in the Gekko databank. Date format.");
-                metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format.");
-                metadata.Add("column.date.comment", "The date of the current data value (can represent a period like a full quarter). Date format.");
-                metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
-                writer.CustomMetadata = metadata;
-
-                using (ParquetRowGroupWriter group = writer.CreateRowGroup())
-                {
-                    int rowCount = names.Length;
-                    int i = -1;                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1));
-                    //
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs));                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dim1));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dim2));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps));                    
-                    //                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));                                    
-                }                
-
-                using (ParquetRowGroupWriter group = writer.CreateRowGroup())
-                {
-                    int rowCount = ids2.Length;
-                    int i = -1;
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2));                    
-                    //
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    //                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values));
-                }
-            }
-
-            /* Works with this Python file
-             * 
-import pyarrow.parquet as pq
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Tilpas filnavn...:
-# parquet_file = pq.ParquetFile("c:\\tools\\makro.parquet")
-parquet_file = pq.ParquetFile("c:\\tools\\mona.parquet")
-
-# cols = id, bank, name, freq, dims, dim1, dim2, dim3, ... , label, source, unit, date_start, date_end, stamp, date, value
-df0 = parquet_file.read_row_group(0).to_pandas()
-df0 = df0.drop(columns=['date', 'value']) # Fjern null-kolonner
-df1 = parquet_file.read_row_group(1).to_pandas()
-df1 = df1[['id', 'date', 'value']] # Fjern null-kolonner
-df = df1.merge(df0, on="id", how="left") # Sætter rowgroup0-dataframe (df0) ind i rowgroup1-dataframe (df1)
-
-print(); print(df0)
-print(); print(df1)
-print(); print(df)
-
-# Plot
-i = 0; max = 2
-for name, group in df.groupby("id"):
-    plt.plot(group["date"], group["value"], label=name, marker = 'o', markersize=4)
-    if (i >= max - 1): break
-    i += 1
-plt.xlabel("Date")
-plt.ylabel("Value")
-plt.title("Plot")
-plt.legend()
-plt.xticks(rotation=45)
-plt.show()        
-
-print('Færdig')
-
-             * */
-        }
-
-        public static async Task ReadParquetDatabank(Databank databank, Program.ReadInfo readInfo, string filePath, List<string> errors, string bankName2)
+        public static void ReadParquetDatabank(Databank databank, Program.ReadInfo readInfo, string filePath, List<string> errors, string bankName2)
         {
             //
             // NOTE: regarding dates/periods, only the string period for each observation is used, together with the DateTime stamp.
@@ -279,7 +121,7 @@ print('Færdig')
             }            
 
             using (Stream fileStream = File.OpenRead(filePath))
-            using (ParquetReader reader = await ParquetReader.CreateAsync(fileStream))
+            using (ParquetReader reader = ParquetReader.CreateAsync(fileStream).GetAwaiter().GetResult())
             {                
                 try
                 {
@@ -1153,7 +995,7 @@ print('Færdig')
 
         }
 
-        public static async Task WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename, string hdg, string bankName2)
+        public static void WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename, string hdg, string bankName2)
         {
             //Note: the input list is already sorted by name
 
@@ -1429,7 +1271,7 @@ print('Færdig')
             }
 
             using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
-            using (ParquetWriter writer = await ParquetWriter.CreateAsync(schema, fileStream))
+            using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).GetAwaiter().GetResult())
             {
                 writer.CustomMetadata = metadata;
 
@@ -1440,9 +1282,6 @@ print('Færdig')
                     int rowCount = seriesCounter;
                     int i = -1;
                     i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1.ToArray())).GetAwaiter().GetResult();
-
-
-
                     //
                     i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks.ToArray())).GetAwaiter().GetResult();
                     i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray())).GetAwaiter().GetResult();

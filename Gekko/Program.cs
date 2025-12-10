@@ -6593,10 +6593,12 @@ namespace Gekko
                     else if (oRead.Type == EDataFormat.Parquet)
                     {
                         List<string> errors = new List<string>();
-                        try { Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors, bankName).Wait(); }
+                        try 
+                        { 
+                            Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors, bankName); 
+                        }
                         catch
-                        {
-                            //Done like this because of async/await issues
+                        {                            
                             if (errors.Count > 0) new Error(string.Join(". ", errors));
                             else new Error("The parquet data reader failed");
                         }
@@ -23323,7 +23325,7 @@ namespace Gekko
                     Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
-                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1, o.opt_bankname).Wait();
+                        Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1, o.opt_bankname);
                     }
                     catch (Exception e)
                     {
