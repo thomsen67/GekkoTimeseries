@@ -292,11 +292,11 @@ print('Færdig')
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
                 {
-                    try { ids1 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'id'", errors); }
-                    try { banks = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'bank'", errors); }                    
-                    try { names = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'name'", errors); }
-                    try { freqs = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'freq'", errors); }
-                    try { dims = ((int?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'dims'", errors); }
+                    try { ids1 = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'id'", errors); }
+                    try { banks = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "bank")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'bank'", errors); }                    
+                    try { names = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'name'", errors); }
+                    try { freqs = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "freq")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'freq'", errors); }
+                    try { dims = ((int?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dims")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'dims'", errors); }
                     int dimMax = 0;
                     foreach (int i in dims)
                     {
@@ -306,25 +306,25 @@ print('Færdig')
                     dimis = new string[dimMax][];
                     for (int i = 1; i <= dimMax; i++)
                     {
-                        try { dimis[i - 1] = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim" + i))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column '" + "dim" + i + "'", errors); }
+                        try { dimis[i - 1] = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dim" + i)).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column '" + "dim" + i + "'", errors); }
                     }
-                    try { labels = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'label'", errors); }
-                    try { sources = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "source"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'source'", errors); }
-                    try { units = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "unit"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'unit'", errors); }
-                    try { is_timelesss = ((bool?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "is_timeless"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'is_timeless'", errors); }
-                    try { date_starts = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'date_start'", errors); }
-                    try { date_ends = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'date_end'", errors); }
-                    try { period_starts = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'period_start'", errors); }
-                    try { period_ends = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'period_end'", errors); }
-                    try { stamps = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp"))).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'stamp'", errors); }
+                    try { labels = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "label")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'label'", errors); }
+                    try { sources = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "source")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'source'", errors); }
+                    try { units = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "unit")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'unit'", errors); }
+                    try { is_timelesss = ((bool?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "is_timeless")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'is_timeless'", errors); }
+                    try { date_starts = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'date_start'", errors); }
+                    try { date_ends = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'date_end'", errors); }
+                    try { period_starts = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'period_start'", errors); }
+                    try { period_ends = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'period_end'", errors); }
+                    try { stamps = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 0: Could not find column 'stamp'", errors); }
                 }
 
                 using (ParquetRowGroupReader group = reader.OpenRowGroupReader(1))
                 {
-                    try { ids2 = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'id'", errors); }
-                    try { dates = ((DateTime?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'date'", errors); }
-                    try { periods = ((string[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'period'", errors); }
-                    try { values = ((double?[])(await group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value"))).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'value'", errors); }
+                    try { ids2 = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "id")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'id'", errors); }
+                    try { dates = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'date'", errors); }
+                    try { periods = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'period'", errors); }
+                    try { values = ((double?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "value")).GetAwaiter().GetResult()).Data).ToArray(); } catch { Error("Rowgroup 1: Could not find column 'value'", errors); }
                 }
             }
 
@@ -1435,60 +1435,66 @@ print('Færdig')
 
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
+                    //.ConfigureAwait(false) at the end...
+
                     int rowCount = seriesCounter;
                     int i = -1;
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1.ToArray()));
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1.ToArray())).GetAwaiter().GetResult();
+
+
+
                     //
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims.ToArray()));
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims.ToArray())).GetAwaiter().GetResult();
                     for (int ii = 0; ii < ndims; ii++)
                     {
-                        i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray()));
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray())).GetAwaiter().GetResult();
                     }                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_ends.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps.ToArray()));
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_ends.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps.ToArray())).GetAwaiter().GetResult();
                     //                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));                    
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    
                 }
 
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
                     int rowCount = valuesCounter;
                     int i = -1;
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2.ToArray()));
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2.ToArray())).GetAwaiter().GetResult();
                     //
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
                     for (int ii = 0; ii < ndims; ii++)
                     {
-                        i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
                     }                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
                     //                    
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], periods.ToArray()));
-                    i++; await group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray()));                    
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], periods.ToArray())).GetAwaiter().GetResult();
+                    i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray())).GetAwaiter().GetResult();
                 }
             }
 
