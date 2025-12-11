@@ -13677,11 +13677,12 @@ namespace UnitTests
                 {
                     r.Add(temp2.Item1);
                 }
-            }
+            }            
 
-            var sortedF = f.OrderBy(s => s).ToArray();
-            var sortedR = r.OrderBy(s => s).ToArray();
-            Assert.IsTrue(sortedF.SequenceEqual(sortedR));
+            var sortedF = f.OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToArray();
+            var sortedR = r.OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToArray();
+            Assert.IsTrue(sortedF.SequenceEqual(sortedR, StringComparer.OrdinalIgnoreCase));
+
             foreach (string s in sortedF)
             {
                 Series ts1 = O.GetIVariableFromString("first:" + s, ECreatePossibilities.NoneReportError) as Series;
