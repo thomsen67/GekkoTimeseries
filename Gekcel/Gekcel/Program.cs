@@ -499,6 +499,31 @@ End Function
     [ComVisible(false)]
     internal class ExcelAddin : IExcelAddIn
     {
+        static ExcelAddin()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveSystemMemory;
+        }
+
+        private static System.Reflection.Assembly ResolveSystemMemory(object sender, ResolveEventArgs args)
+        {
+            System.Collections.Generic.List<string> files = new System.Collections.Generic.List<string>();
+            //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
+            files.Add("System.Memory");
+            files.Add("System.Runtime.CompilerServices.Unsafe");
+            files.Add("System.Threading.Tasks.Extensions");
+
+            foreach (string file in files)
+            {
+                if (args.Name.StartsWith(file))
+                {
+                    string folder = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+                    string dllPath = Path.Combine(folder, file + ".dll");
+                    if (File.Exists(dllPath)) return System.Reflection.Assembly.LoadFrom(dllPath);
+                }
+            }
+            return null;
+        }
+
         private GekkoExcelComAddIn com_addin;
         public void AutoOpen()
         {
@@ -514,7 +539,7 @@ End Function
 
             ComServer.DllRegisterServer();
             IntelliSenseServer.Install();
-        }
+        }        
 
         public void AutoClose()
         {

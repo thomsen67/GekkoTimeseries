@@ -784,16 +784,21 @@ namespace Deploy2
                 }
             }
             if (fail) return;
+
+            //!!! Also change in same list below, #lkafas7df8. If new is added, it may have to be manually loaded in Gekcel, see the same hash there in Program.cs.
+            // ------------------------------------------------------
+            files.Add("Antlr3.Runtime.dll");
+            files.Add("EPPlus.dll");
+            files.Add("GAMS.net4.dll");
+            files.Add("MathNet.Numerics.dll");
+            files.Add("Parquet.dll"); //Needed for parquet files
             files.Add("protobuf-net.dll");
             files.Add("protobuf-net.Core.dll"); //needed for parallel protobuf
             files.Add("System.Buffers.dll"); //needed for parallel protobuf
             files.Add("System.Collections.Immutable.dll"); //needed for parallel protobuf
             files.Add("System.Memory.dll"); //needed for parallel protobuf
             files.Add("System.Runtime.CompilerServices.Unsafe.dll"); //needed for parallel protobuf
-            files.Add("GAMS.net4.dll");
-            files.Add("EPPlus.dll");
-            files.Add("Antlr3.Runtime.dll");
-            files.Add("Parquet.dll"); //Needed for parquet files
+            // ------------------------------------------------------
 
             foreach (string s in files)
             {
@@ -826,16 +831,23 @@ namespace Deploy2
                 }
             }
             if (fail) return;
+            
+            //!!! Also change in same list above, #lkafas7df8. If new is added, it may have to be manually loaded in Gekcel, see the same hash there in Program.cs.
+            // ------------------------------------------------------
+            files.Add(path1 + "Antlr3.Runtime.dll");
+            files.Add(path1 + "EPPlus.dll");
+            files.Add(path1 + "GAMS.net4.dll");
+            files.Add(path1 + "MathNet.Numerics.dll");
+            files.Add(path1 + "Parquet.dll");
             files.Add(path1 + "protobuf-net.dll");
             files.Add(path1 + "protobuf-net.Core.dll");
             files.Add(path1 + "System.Buffers.dll");
             files.Add(path1 + "System.Collections.Immutable.dll");
             files.Add(path1 + "System.Memory.dll");
             files.Add(path1 + "System.Runtime.CompilerServices.Unsafe.dll");
-            files.Add(path1 + "GAMS.net4.dll");
-            files.Add(path1 + "EPPlus.dll");
-            files.Add(path1 + "Antlr3.Runtime.dll");
-            files.Add(path1 + "Parquet.dll");
+            // ------------------------------------------------------
+
+
             //hmmmmmmmmmmm what about all the other files??
             files.Add(path1 + "demo.gbk");
             // -----
