@@ -35189,15 +35189,11 @@ namespace Gekko
                     };
                     tab.CurRow.SetText(1, "Trace    : " + this.nTraces + " data-traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                     tab.CurRow.Next();
-                }                
+                }
 
                 if (Globals.gbkExtraMetadata)
                 {
-                    List<string> m = new List<string>();
-                    if (!G.NullOrBlanks(this.user))
-                    {
-                        m.Add("user: " + this.user);                        
-                    }
+                    List<string> m = new List<string>();                    
                     if (!G.NullOrBlanks(this.branch))
                     {
                         m.Add("branch: " + this.branch);                        
@@ -35206,11 +35202,15 @@ namespace Gekko
                     {
                         m.Add("commit: " + this.commit);                        
                     }
+                    if (!G.NullOrBlanks(this.user))
+                    {
+                        m.Add("user: " + this.user);
+                    }
                     if (m.Count > 0)
                     {
                         string s5 = string.Join(", ", m);
                         string s6 = G.FirstCharToUpper(s5);
-                        tab.CurRow.SetText(1, "Info     : " + s6);
+                        tab.CurRow.SetText(1, "Meta     : " + s6);
                         tab.CurRow.Next();
                     }
                     if (!G.NullOrBlanks(this.gcm))
