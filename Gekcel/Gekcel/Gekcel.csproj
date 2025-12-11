@@ -92,6 +92,9 @@
     <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Parquet">
+      <HintPath>Diverse\ExternalDllFiles\Parquet.dll</HintPath>
+    </Reference>
     <Reference Include="protobuf-net">
       <HintPath>Diverse\ExternalDllFiles\protobuf-net.dll</HintPath>
     </Reference>

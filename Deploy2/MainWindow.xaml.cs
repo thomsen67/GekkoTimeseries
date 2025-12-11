@@ -172,35 +172,65 @@ namespace Deploy2
                 return;
             }
 
-            File.Delete(tools + @"\"+ bit32Or64() + @"\sha.txt"); //for safety
-
-            string sha1_32 = ComputeSha1(tools + @"\" + "32" + @"\InstallerForGekko.msi");
-            string sha2_32 = ComputeSha1(tools + @"\"+ "32" + @"\Setup.exe");
-            string sha3_32 = ComputeSha1(tools + @"\"+ "32" + @"\Gekko.zip");
-            string sha4_32 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "32" + @"\Gekcel.zip");
-            string sha1_64 = ComputeSha1(tools + @"\" + "64" + @"\InstallerForGekko.msi");
-            string sha2_64 = ComputeSha1(tools + @"\" + "64" + @"\Setup.exe");
-            string sha3_64 = ComputeSha1(tools + @"\" + "64" + @"\Gekko.zip");
-            string sha4_64 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "64" + @"\Gekcel.zip");
-
-            if (sha1_32 == null || sha2_32 == null || sha3_32 == null || sha4_32 == null || sha1_64 == null || sha2_64 == null || sha3_64 == null || sha4_64 == null)
-            {
-                MessageBox.Show("Problem with SHA1, not computed, aborting...");
-                return;
-            }
-
             string txt = null;
-            txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
-            txt += "<ul>" + "\r\n";
-            txt += "  <li>" + sha1_32 + "    " + "InstallerForGekko.msi (32-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha1_64 + "    " + "InstallerForGekko.msi (64-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha2_32 + "    " + "Setup.exe (32-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha2_64 + "    " + "Setup.exe (64-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha3_32 + "    " + "Gekko.zip (32-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha3_64 + "    " + "Gekko.zip (64-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha4_32 + "    " + "Gekcel.zip (32-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha4_64 + "    " + "Gekcel.zip (64-bit)" + "</li>" + "\r\n";
-            txt += "</ul>" + "\r\n";
+
+            if (true)
+            {
+                File.Delete(tools + @"\" + bit32Or64() + @"\sha.txt"); //for safety
+                
+                string sha1_64 = ComputeSha1(tools + @"\" + "64" + @"\InstallerForGekko.msi");
+                string sha2_64 = ComputeSha1(tools + @"\" + "64" + @"\Setup.exe");
+                string sha3_64 = ComputeSha1(tools + @"\" + "64" + @"\Gekko.zip");
+                string sha4_64 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "64" + @"\Gekcel.zip");
+
+                if (sha1_64 == null || sha2_64 == null || sha3_64 == null || sha4_64 == null)
+                {
+                    MessageBox.Show("Problem with SHA1, not computed, aborting...");
+                    return;
+                }
+                                
+                txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
+                txt += "<ul>" + "\r\n";                
+                txt += "  <li>" + sha1_64 + "    " + "InstallerForGekko.msi (64-bit)" + "</li>" + "\r\n";                
+                txt += "  <li>" + sha2_64 + "    " + "Setup.exe (64-bit)" + "</li>" + "\r\n";                
+                txt += "  <li>" + sha3_64 + "    " + "Gekko.zip (64-bit)" + "</li>" + "\r\n";                
+                txt += "  <li>" + sha4_64 + "    " + "Gekcel.zip (64-bit)" + "</li>" + "\r\n";
+                txt += "</ul>" + "\r\n";
+
+            }
+            else
+            {
+
+                File.Delete(tools + @"\" + bit32Or64() + @"\sha.txt"); //for safety
+
+                string sha1_32 = ComputeSha1(tools + @"\" + "32" + @"\InstallerForGekko.msi");
+                string sha2_32 = ComputeSha1(tools + @"\" + "32" + @"\Setup.exe");
+                string sha3_32 = ComputeSha1(tools + @"\" + "32" + @"\Gekko.zip");
+                string sha4_32 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "32" + @"\Gekcel.zip");
+                string sha1_64 = ComputeSha1(tools + @"\" + "64" + @"\InstallerForGekko.msi");
+                string sha2_64 = ComputeSha1(tools + @"\" + "64" + @"\Setup.exe");
+                string sha3_64 = ComputeSha1(tools + @"\" + "64" + @"\Gekko.zip");
+                string sha4_64 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "64" + @"\Gekcel.zip");
+
+                if (sha1_32 == null || sha2_32 == null || sha3_32 == null || sha4_32 == null || sha1_64 == null || sha2_64 == null || sha3_64 == null || sha4_64 == null)
+                {
+                    MessageBox.Show("Problem with SHA1, not computed, aborting...");
+                    return;
+                }
+                
+                txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
+                txt += "<ul>" + "\r\n";
+                txt += "  <li>" + sha1_32 + "    " + "InstallerForGekko.msi (32-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha1_64 + "    " + "InstallerForGekko.msi (64-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha2_32 + "    " + "Setup.exe (32-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha2_64 + "    " + "Setup.exe (64-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha3_32 + "    " + "Gekko.zip (32-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha3_64 + "    " + "Gekko.zip (64-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha4_32 + "    " + "Gekcel.zip (32-bit)" + "</li>" + "\r\n";
+                txt += "  <li>" + sha4_64 + "    " + "Gekcel.zip (64-bit)" + "</li>" + "\r\n";
+                txt += "</ul>" + "\r\n";
+
+            }            
 
             System.IO.File.WriteAllText(tools + @"\sha.txt", txt);
 
@@ -763,6 +793,7 @@ namespace Deploy2
             files.Add("GAMS.net4.dll");
             files.Add("EPPlus.dll");
             files.Add("Antlr3.Runtime.dll");
+            files.Add("Parquet.dll"); //Needed for parquet files
 
             foreach (string s in files)
             {
@@ -804,6 +835,7 @@ namespace Deploy2
             files.Add(path1 + "GAMS.net4.dll");
             files.Add(path1 + "EPPlus.dll");
             files.Add(path1 + "Antlr3.Runtime.dll");
+            files.Add(path1 + "Parquet.dll");
             //hmmmmmmmmmmm what about all the other files??
             files.Add(path1 + "demo.gbk");
             // -----
