@@ -35192,25 +35192,32 @@ namespace Gekko
                 }
 
                 if (Globals.gbkExtraMetadata)
-                {
-                    List<string> m = new List<string>();                    
+                {                    
+                    List<string> m = new List<string>();
+                    bool git = false;
+                    bool user = false;
                     if (!G.NullOrBlanks(this.branch))
                     {
-                        m.Add("branch: " + this.branch);                        
+                        m.Add("branch: " + this.branch);
+                        git = true;
                     }
                     if (!G.NullOrBlanks(this.commit))
                     {
-                        m.Add("commit: " + this.commit);                        
+                        m.Add("commit: " + this.commit);
+                        git = true;
                     }
                     if (!G.NullOrBlanks(this.user))
                     {
                         m.Add("user: " + this.user);
+                        user = true;
                     }
                     if (m.Count > 0)
                     {
                         string s5 = string.Join(", ", m);
                         string s6 = G.FirstCharToUpper(s5);
-                        tab.CurRow.SetText(1, "Meta     : " + s6);
+                        if (git && user) tab.CurRow.SetText(1, "Git/user : " + s6);
+                        else if (git && !user) tab.CurRow.SetText(1, "Git      : " + s6);
+                        else if (!git && user) tab.CurRow.SetText(1, "User     : " + s6.Replace("User: ", ""));
                         tab.CurRow.Next();
                     }
                     if (!G.NullOrBlanks(this.gcm))

@@ -198,7 +198,7 @@ namespace Gekko
                 try
                 {
                     string id = ids1[i];
-                    string id2 = names[i] + "!" + freqs[i];
+                    string id2 = names[i] + "!" + freqs[i].ToLower();  //We do not want abc.A as series name.
                     string index = null;
                     string s = null;
                     if (dims[i] > 0)

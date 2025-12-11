@@ -128,44 +128,11 @@ namespace Gekcel
       <tab id='tab1' label='Gekko'>        
         <group id='group3' label='Info'>   
           <button id='button3a' imageMso='Info' size='large' label='Gekcel " + GetVersionNumber() + @"' onAction='OnButtonPressed3' />  
-        </group>            
-<!-- 
-        <group id='group1' label='Gekko reading'>              
-          <button id='button1a' imageMso='FileOpen' size='large' label='Read' onAction='OnButtonPressed1' />                   
         </group>
-        <group id='group2' label='Gekko writing'>                            
-          <button id='button2a' imageMso='FileSave' size='large' label='Write' onAction='OnButtonPressed2' />
-        </group>            
--->
       </tab>
     </tabs>
   </ribbon>
 </customUI>";
-        }
-
-        public void OnButtonPressed1(IRibbonControl control)
-        {
-            MessageBox.Show("Read Gekko data // sets cell B2 = 12345");
-            Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;                  
-            Worksheet ws = (Worksheet)app.ActiveSheet;
-            if (ws != null)
-            {
-                Microsoft.Office.Interop.Excel.Range cells = (Microsoft.Office.Interop.Excel.Range)ws.Cells[2, 2];
-                cells.Value2 = 12345d;
-            }            
-        }
-
-        public void OnButtonPressed2(IRibbonControl control)
-        {            
-            Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;            
-            Worksheet ws = (Worksheet)app.ActiveSheet;
-            double d = double.NaN;
-            if (ws != null)
-            {
-                Microsoft.Office.Interop.Excel.Range cells = (Microsoft.Office.Interop.Excel.Range)ws.Cells[2, 2];
-                d = cells.Value2;                
-            }
-            MessageBox.Show("Write Gekko data // value of cell D2 is: " + d);
         }
 
         /// <summary>
@@ -221,12 +188,6 @@ namespace Gekcel
             InternalHelperMethods.Setup();
             return 1d;
         }
-
-        //[ExcelFunction(Name = "Gekko_Deleteme", Description = "Delete this")]
-        //public static string Gekko_Deleteme()
-        //{
-        //    return ExcelFunctionCalls.CallingFileName();
-        //}
 
         [ExcelFunction(Name = "Gekko_Get", Description = "Transfers data from a Gekko databank to sheet cells")]
         public static object[,] Gekko_Get()
@@ -284,29 +245,7 @@ namespace Gekcel
         public static string Gekko(string commands, string path)
         {
             return InternalHelperMethods.Run(commands, path);
-        }
-
-        ///// <summary>
-        ///// Taken from here: https://microsoft.public.excel.sdk.narkive.com/NJhRTpmT/obtaining-the-full-path-of-a-workbook-from-an-xll
-        ///// </summary>
-        ///// <returns></returns>
-        //[ExcelFunction(IsMacroType = true)]
-        //public static string CallingFileName()
-        //{
-        //    string s = null;
-        //    try
-        //    {
-        //        ExcelReference reference = (ExcelReference)XlCall.Excel(XlCall.xlfCaller);
-        //        string sheetName = (string)XlCall.Excel(XlCall.xlSheetNm, reference);
-        //        object o1 = XlCall.Excel(XlCall.xlfGetDocument, 2, sheetName);
-        //        object o2 = XlCall.Excel(XlCall.xlfGetDocument, 88, sheetName);
-        //        string s1 = (string)o1;
-        //        string s2 = (string)o2;
-        //        s = System.IO.Path.Combine(s1, s2);
-        //    }
-        //    catch { }
-        //    return s;
-        //}
+        }        
     }
 
     public static class InternalHelperMethods
@@ -465,6 +404,10 @@ Public Sub Gekko_Demo()
   Gekko ""import <xlsx> gekcel;""
   Gekko ""compare file=compare.txt;""
   Gekko ""edit compare.txt;""
+  Gekko ""write testing.gbk;""
+  Gekko ""read testing.gbk;""
+  Gekko ""write <parquet> testing.parquet;""
+  Gekko ""read <parquet> testing.parquet;""  
 End Sub
 
 'Handles NaN values in Excel
