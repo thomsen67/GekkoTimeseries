@@ -1292,6 +1292,7 @@ namespace Gekko
                 using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).GetAwaiter().GetResult())
                 {
                     writer.CustomMetadata = metadata;
+                                        
 
                     using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                     {
@@ -1355,7 +1356,8 @@ namespace Gekko
                     }
                 }
             }
-            else
+            
+            if (false)
             {
                 using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                 using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).GetAwaiter().GetResult())
@@ -1423,6 +1425,559 @@ namespace Gekko
                         i++; WriteColumnSync(group, new DataColumn(schema.DataFields[i], values.ToArray()));
                     }
                 }
+            }
+
+            if (false)
+            {
+                using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).GetAwaiter().GetResult())
+                {
+                    writer.CustomMetadata = metadata;
+
+                    // Helper method to write all columns sequentially
+                    async Task WriteColumnsAsync(ParquetRowGroupWriter group, List<DataColumn> columns)
+                    {
+                        foreach (var col in columns)
+                        {
+                            await group.WriteColumnAsync(col).ConfigureAwait(false);
+                        }
+                    }
+
+                    // First row group
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = seriesCounter;
+                        int i = -1;
+
+                        var columns = new List<DataColumn>
+        {
+            new DataColumn(schema.DataFields[++i], ids1.ToArray()),
+            new DataColumn(schema.DataFields[++i], banks.ToArray()),
+            new DataColumn(schema.DataFields[++i], names.ToArray()),
+            new DataColumn(schema.DataFields[++i], freqs.ToArray()),
+            new DataColumn(schema.DataFields[++i], dims.ToArray())
+        };
+
+                        for (int ii = 0; ii < ndims; ii++)
+                            columns.Add(new DataColumn(schema.DataFields[++i], dimss[ii].ToArray()));
+
+                        columns.AddRange(new[]
+                        {
+            new DataColumn(schema.DataFields[++i], labels.ToArray()),
+            new DataColumn(schema.DataFields[++i], sources.ToArray()),
+            new DataColumn(schema.DataFields[++i], units.ToArray()),
+            new DataColumn(schema.DataFields[++i], timelesss.ToArray()),
+            new DataColumn(schema.DataFields[++i], date_starts.ToArray()),
+            new DataColumn(schema.DataFields[++i], date_ends.ToArray()),
+            new DataColumn(schema.DataFields[++i], period_starts.ToArray()),
+            new DataColumn(schema.DataFields[++i], period_ends.ToArray()),
+            new DataColumn(schema.DataFields[++i], stamps.ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<double?>(null, rowCount).ToArray())
+        });
+
+                        // Run all writes sequentially inside one async flow
+                        WriteColumnsAsync(group, columns).GetAwaiter().GetResult();
+                    }
+
+                    // Second row group
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = valuesCounter;
+                        int i = -1;
+
+                        var columns = new List<DataColumn>
+        {
+            new DataColumn(schema.DataFields[++i], ids2.ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<int?>(null, rowCount).ToArray())
+        };
+
+                        for (int ii = 0; ii < ndims; ii++)
+                            columns.Add(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+
+                        columns.AddRange(new[]
+                        {
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()),
+            new DataColumn(schema.DataFields[++i], dates.ToArray()),
+            new DataColumn(schema.DataFields[++i], periods.ToArray()),
+            new DataColumn(schema.DataFields[++i], values.ToArray())
+        });
+
+                        WriteColumnsAsync(group, columns).GetAwaiter().GetResult();
+                    }
+                }
+
+            }
+
+            if (false)
+            {
+                // Fire-and-forget async task on a background thread
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        using (FileStream fileStream = Program.WaitForFileStream(
+                                   pathAndFilename,
+                                   null,
+                                   Program.GekkoFileReadOrWrite.Write))
+                        using (ParquetWriter writer = await ParquetWriter.CreateAsync(schema, fileStream).ConfigureAwait(false))
+                        {
+                            writer.CustomMetadata = metadata;
+
+                            // ------------------------
+                            // First row group
+                            // ------------------------
+                            using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                            {
+                                int i = -1;
+                                int rowCount = seriesCounter;
+
+                                // Write all columns sequentially inside a single async flow
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], ids1.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], banks.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], names.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], freqs.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], dims.ToArray())).ConfigureAwait(false);
+
+                                for (int ii = 0; ii < ndims; ii++)
+                                    await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], dimss[ii].ToArray())).ConfigureAwait(false);
+
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], labels.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], sources.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], units.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], timelesss.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], date_starts.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], date_ends.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], period_starts.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], period_ends.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], stamps.ToArray())).ConfigureAwait(false);
+
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<double?>(null, rowCount).ToArray())).ConfigureAwait(false);
+                            }
+
+                            // ------------------------
+                            // Second row group
+                            // ------------------------
+                            using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                            {
+                                int i = -1;
+                                int rowCount = valuesCounter;
+
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], ids2.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<int?>(null, rowCount).ToArray())).ConfigureAwait(false);
+
+                                for (int ii = 0; ii < ndims; ii++)
+                                    await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<bool?>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false);
+
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], dates.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], periods.ToArray())).ConfigureAwait(false);
+                                await group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], values.ToArray())).ConfigureAwait(false);
+                            }
+                        }
+                    } catch (Exception ex) { throw;  }
+}).ConfigureAwait(false); // optionally configure the outer task if awaited elsewhere
+
+            }
+
+            if (false)
+            {
+                using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                // FIX 1: Apply ConfigureAwait(false) to the writer creation
+                using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream)
+                                                    .ConfigureAwait(false)
+                                                    .GetAwaiter().GetResult())
+                {
+                    writer.CustomMetadata = metadata;
+
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = seriesCounter;
+                        int i = -1;
+
+                        // FIX 2: Apply ConfigureAwait(false) to all WriteColumnAsync calls in the first group
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        for (int ii = 0; ii < ndims; ii++)
+                        {
+                            i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray()))
+                                     .ConfigureAwait(false).GetAwaiter().GetResult();
+                        }
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_ends.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps.ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        // Null padding columns
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray()))
+                                 .ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+
+                    // Second Row Group
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = valuesCounter;
+                        int i = -1;
+
+                        // Actual data column
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2.ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        // Null padding columns
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        for (int ii = 0; ii < ndims; ii++)
+                        {
+                            i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        }
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+
+                        // Actual data columns
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates.ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], periods.ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray())).ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+                }
+            }
+
+            if (false)
+            {
+
+                using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).GetAwaiter().GetResult())
+                {
+                    writer.CustomMetadata = metadata;
+
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        //.ConfigureAwait(false) at the end...
+
+                        int rowCount = seriesCounter;
+                        int i = -1;
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1.ToArray())).GetAwaiter().GetResult();
+                        //
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims.ToArray())).GetAwaiter().GetResult();
+                        for (int ii = 0; ii < ndims; ii++)
+                        {
+                            i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dimss[ii].ToArray())).GetAwaiter().GetResult();
+                        }
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_ends.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps.ToArray())).GetAwaiter().GetResult();
+                        //                    
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+
+                    }
+
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = valuesCounter;
+                        int i = -1;
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2.ToArray())).GetAwaiter().GetResult();
+                        //
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        for (int ii = 0; ii < ndims; ii++)
+                        {
+                            i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        }
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())).GetAwaiter().GetResult();
+                        //                    
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], periods.ToArray())).GetAwaiter().GetResult();
+                        i++; group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray())).GetAwaiter().GetResult();
+                    }
+                }
+            }
+
+            if (false)
+            {
+                using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).GetAwaiter().GetResult())
+                {
+                    writer.CustomMetadata = metadata;
+
+                    writer.ConfigureAwait(false); //HMM
+
+                    // ------------------------
+                    // First row group
+                    // ------------------------
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = seriesCounter;
+                        int i = -1;
+
+                        // Collect all tasks in a list
+                        var tasks = new List<Task>();
+
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids1.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], banks.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], names.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], freqs.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dims.ToArray())));
+
+                        for (int ii = 0; ii < ndims; ii++)
+                            tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], dimss[ii].ToArray())));
+
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], labels.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], sources.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], units.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], timelesss.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_starts.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], date_ends.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_starts.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], period_ends.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], stamps.ToArray())));
+
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<double?>(null, rowCount).ToArray())));
+
+                        // Await all tasks **sequentially**, preserving Parquet.NET state
+                        for (int t = 0; t < tasks.Count; t++)
+                        {
+                            tasks[t].ConfigureAwait(false).GetAwaiter().GetResult();
+                        }
+                    }
+
+                    // ------------------------
+                    // Second row group
+                    // ------------------------
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = valuesCounter;
+                        int i = -1;
+                        var tasks = new List<Task>();
+
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], ids2.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<int?>(null, rowCount).ToArray())));
+
+                        for (int ii = 0; ii < ndims; ii++)
+                            tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<bool?>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<string>(null, rowCount).ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray())));
+
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], dates.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], periods.ToArray())));
+                        i++; tasks.Add(group.WriteColumnAsync(new DataColumn(schema.DataFields[i], values.ToArray())));
+
+                        for (int t = 0; t < tasks.Count; t++)
+                        {
+                            tasks[t].GetAwaiter().GetResult();
+                        }
+                    }
+                }
+            }
+
+            if (true)
+            {
+                using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream)
+                                                          .ConfigureAwait(false)
+                                                          .GetAwaiter()
+                                                          .GetResult())
+                {
+                    writer.CustomMetadata = metadata;
+
+                    // ------------------------------
+                    // ROW GROUP 1 (series metadata)
+                    // ------------------------------
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = seriesCounter;
+                        int i = -1;
+
+                        // helper writes one column safely
+                        void WriteCol(DataColumn col)
+                        {
+                            group.WriteColumnAsync(col)
+                                 .ConfigureAwait(false)
+                                 .GetAwaiter()
+                                 .GetResult();
+                        }
+
+                        WriteCol(new DataColumn(schema.DataFields[++i], ids1.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], banks.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], names.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], freqs.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], dims.ToArray()));
+
+                        // ndims dynamic dimension labels
+                        for (int ii = 0; ii < ndims; ii++)
+                        {
+                            WriteCol(new DataColumn(schema.DataFields[++i], dimss[ii].ToArray()));
+                        }
+
+                        WriteCol(new DataColumn(schema.DataFields[++i], labels.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], sources.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], units.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], timelesss.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], date_starts.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], date_ends.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], period_starts.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], period_ends.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], stamps.ToArray()));
+
+                        // null columns
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));
+                    }
+
+
+                    // ------------------------------
+                    // ROW GROUP 2 (values)
+                    // ------------------------------
+                    using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                    {
+                        int rowCount = valuesCounter;
+                        int i = -1;
+
+                        void WriteCol(DataColumn col)
+                        {
+                            group.WriteColumnAsync(col)
+                                 .ConfigureAwait(false)
+                                 .GetAwaiter()
+                                 .GetResult();
+                        }
+
+                        WriteCol(new DataColumn(schema.DataFields[++i], ids2.ToArray()));
+
+                        // null-filled metadata columns for the values group
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
+
+                        for (int ii = 0; ii < ndims; ii++)
+                        {
+                            WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        }
+
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+
+                        // actual values columns
+                        WriteCol(new DataColumn(schema.DataFields[++i], dates.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], periods.ToArray()));
+                        WriteCol(new DataColumn(schema.DataFields[++i], values.ToArray()));
+                    }
+                }
+
             }
 
             string s = null; if (hasSubSeries) s = " (including array-subseries)";
