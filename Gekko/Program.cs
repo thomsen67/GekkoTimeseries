@@ -25723,7 +25723,33 @@ namespace Gekko
                 Program.CreateTempFilesFolder2();
             }
             catch { }; //fail silently
-        }        
+
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveSystemMemory;
+        }
+
+        private static System.Reflection.Assembly ResolveSystemMemory(object sender, ResolveEventArgs args)
+        {
+            List<string> files = new List<string>();
+            //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
+            files.Add("System.Memory");
+            files.Add("System.Runtime.CompilerServices.Unsafe");
+            files.Add("System.Threading.Tasks.Extensions");
+
+            foreach (string file in files)
+            {
+                if (args.Name.StartsWith(file))
+                {
+                    //string folder = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+                    //string folder = AppDomain.CurrentDomain.BaseDirectory; //python folder
+                    //string folder = Application.StartupPath;
+                    string folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string dllPath = Path.Combine(folder, file + ".dll");
+                    MessageBox.Show("Trying to load: --> " + dllPath);
+                    if (File.Exists(dllPath)) return System.Reflection.Assembly.LoadFrom(dllPath);
+                }
+            }
+            return null;
+        }
 
         public static List<string> Add2Lists(List<string> x1, List<string> x2)
         {
