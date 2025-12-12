@@ -25724,28 +25724,36 @@ namespace Gekko
             }
             catch { }; //fail silently
 
-            AppDomain.CurrentDomain.AssemblyResolve += ResolveSystemMemory;
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveDll;
         }
 
-        private static System.Reflection.Assembly ResolveSystemMemory(object sender, ResolveEventArgs args)
+        private static System.Reflection.Assembly ResolveDll(object sender, ResolveEventArgs args)
         {
-            List<string> files = new List<string>();
-            //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
-            files.Add("System.Memory");
-            files.Add("System.Runtime.CompilerServices.Unsafe");
-            files.Add("System.Threading.Tasks.Extensions");
+            bool popup = false;
+            if (popup) MessageBox.Show("ResolveDll() called with " + args.Name);
 
-            foreach (string file in files)
+            foreach (string file in Globals.hardLoadedDlls)
             {
                 if (args.Name.StartsWith(file))
                 {
-                    //string folder = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-                    //string folder = AppDomain.CurrentDomain.BaseDirectory; //python folder
-                    //string folder = Application.StartupPath;
                     string folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     string dllPath = Path.Combine(folder, file + ".dll");
-                    MessageBox.Show("Trying to load: --> " + dllPath);
-                    if (File.Exists(dllPath)) return System.Reflection.Assembly.LoadFrom(dllPath);
+                    if (popup) MessageBox.Show("Hard-loading: --> " + dllPath);
+                    if (File.Exists(dllPath))
+                    {
+                        try
+                        {
+                            return System.Reflection.Assembly.LoadFrom(dllPath);                            
+                        }
+                        catch
+                        {
+                            if (popup) MessageBox.Show("FAIL1: --> " + dllPath);
+                        }
+                    }
+                    else
+                    {
+                        if (popup) MessageBox.Show("FAIL2: --> " + dllPath);
+                    }
                 }
             }
             return null;
