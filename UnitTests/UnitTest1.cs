@@ -13659,6 +13659,14 @@ namespace UnitTests
 
         private static void CompareTwoDatabanks()
         {
+            string Lower(string input)
+            {
+                int index = input.IndexOf('!');
+                string prefix = input.Substring(0, index + 1);
+                string suffix = input.Substring(index + 1);
+                return prefix + suffix.ToLower();
+            }
+
             List<string> f = new List<string>();
             List<string> r = new List<string>();
             foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
@@ -13666,7 +13674,7 @@ namespace UnitTests
                 var temp = Series.FlattenArraySeries(kvp.Value as Series, true);
                 foreach (var temp2 in temp)
                 {
-                    f.Add(temp2.Item1);
+                    f.Add(Lower(temp2.Item1));
                 }
             }
             foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetRef().storage)
@@ -13675,13 +13683,13 @@ namespace UnitTests
                 var temp = Series.FlattenArraySeries(kvp.Value as Series, true);
                 foreach (var temp2 in temp)
                 {
-                    r.Add(temp2.Item1);
+                    r.Add(Lower(temp2.Item1));
                 }
-            }            
+            }
 
-            var sortedF = f.OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToArray();
-            var sortedR = r.OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToArray();
-            Assert.IsTrue(sortedF.SequenceEqual(sortedR, StringComparer.OrdinalIgnoreCase));
+            var sortedF = f.OrderBy(s => s).ToArray();
+            var sortedR = r.OrderBy(s => s).ToArray();
+            Assert.IsTrue(sortedF.SequenceEqual(sortedR));
 
             foreach (string s in sortedF)
             {
