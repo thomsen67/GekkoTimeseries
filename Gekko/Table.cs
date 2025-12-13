@@ -2848,8 +2848,8 @@ namespace Gekko
                 bool ok = true;
                 try
                 {
-                    string stylesFile = Application.StartupPath + "\\images\\" + "styles.css";
-                    string tableIconFile = Application.StartupPath + "\\images\\" + "table.png";
+                    string stylesFile = G.GekkoExeFolder() + "\\images\\" + "styles.css";
+                    string tableIconFile = G.GekkoExeFolder() + "\\images\\" + "table.png";
                     Program.WaitForFileCopy(stylesFile, outputPath + "\\styles.css");
                     Program.WaitForFileCopy(tableIconFile, outputPath + "\\table.png");
                 }

@@ -2051,7 +2051,7 @@ namespace Gekko
                 //See #f8kd8sfdgksldgjf
                 //this will put green lights one after one. But impossible to make it appear
                 //at one, it always waits for recalc to finish, all sorts of threads tried.
-                BitmapImage bi = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\green.png"));
+                BitmapImage bi = new BitmapImage(new Uri(G.GekkoExeFolder() + "\\images\\green.png"));
                 System.Windows.Controls.Image i3 = new System.Windows.Controls.Image();
                 i3.Height = 12;
                 i3.Margin = new Thickness(0, 0, 25, 0);

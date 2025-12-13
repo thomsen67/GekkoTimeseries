@@ -76,12 +76,12 @@ namespace Gekko
                     // Choose the path for the shortcut
                     MyShortcut = (IWshRuntimeLibrary.IWshShortcut)WshShell.CreateShortcut(m_strFileName);
                     // Where the shortcut should point to
-                    MyShortcut.TargetPath = Application.StartupPath + "\\Gekko.exe"; // " + "display hejsa;display hovsa";
+                    MyShortcut.TargetPath = G.GekkoExeFolder() + "\\Gekko.exe";
                     // Description for the shortcut
-                    MyShortcut.WorkingDirectory = Application.StartupPath;
+                    MyShortcut.WorkingDirectory = G.GekkoExeFolder();
                     MyShortcut.Description = "Link to Gekko";
                     // Location for the shortcut's icon
-                    MyShortcut.IconLocation = Application.StartupPath + "\\Gekko.ico";
+                    MyShortcut.IconLocation = G.GekkoExeFolder() + "\\Gekko.ico";
                     // Create the shortcut at the given path
                     MyShortcut.Save();
                     G.Writeln("Short-cut to Gekko copied to your desktop folder");                    

@@ -2805,11 +2805,6 @@ namespace Gekko
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
                 //                
 
-                //Arrow.RunReaderExample(@"c:\Thomas\Desktop\gekko\testing\mona.arrow").GetAwaiter().GetResult();
-
-                //Arrow.WriteParquetFile().Wait();
-
-                //Arrow.ReadParquetFile().Wait();
 
                 if (Globals.runningOnTTComputer)
                 {
@@ -3412,20 +3407,7 @@ namespace Gekko
 
                     new Writeln("Alternative " + i + ", time ms = " + (DateTime.Now - dt0).TotalMilliseconds);
 
-
-                    if (text == "arrow")
-                    {
-                        //while (true)
-                        //{
-                        //    var codeToEval = Console.ReadLine();
-                        //    var result = await CSharpScript.EvaluateAsync(codeToEval);
-                        //    Console.WriteLine(result);
-                        //}
-
-                        //Arrow.Run();
-                        return;
-                    }
-                    else if (text == "test")
+                    if (text == "test")
                     {
                         Translate_2_4_to_3_0.TestTranslation();
                         return;
@@ -10596,7 +10578,7 @@ namespace Gekko
         /// </summary>
         public static void PlaySound()
         {
-            System.Media.SoundPlayer simpleSound = new System.Media.SoundPlayer(Application.StartupPath + "\\images\\" + Program.options.interface_sound_type + ".wav");
+            System.Media.SoundPlayer simpleSound = new System.Media.SoundPlayer(G.GekkoExeFolder() + "\\images\\" + Program.options.interface_sound_type + ".wav");
             simpleSound.Play();
         }
 
@@ -12170,7 +12152,7 @@ namespace Gekko
                 }
                 else
                 {
-                    startup = Application.StartupPath;
+                    startup = G.GekkoExeFolder();
                 }
 
                 process.StartInfo.FileName = startup + "\\X12A.EXE";
@@ -33969,7 +33951,7 @@ namespace Gekko
                     {
                         file = Program.options.folder_help + "\\gekko.chm";
                     }
-                    else file = Application.StartupPath + "\\helpfiles\\gekko.chm";
+                    else file = G.GekkoExeFolder() + "\\helpfiles\\gekko.chm";
                     if (File.Exists(file))
                     {
                         string tempPath = Globals.localTempFilesLocation + "\\" + "gekko.chm";

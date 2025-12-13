@@ -188,8 +188,6 @@ namespace Gekko
             panelOutputTab.Controls.Add(this.textBoxOutputTab);
             this.tabPageOutput.Controls.Add(panelOutputTab);
 
-
-
             // initialize delegates
             threadDelegateAddString = new DelegateAddString(this.AddString);
             threadDelegateThreadFinished = new DelegateThreadFinished(this.ThreadFinished);
@@ -207,10 +205,10 @@ namespace Gekko
 
             if (true)
             {
-                green = Image.FromFile(Application.StartupPath + "\\images\\green.png");
-                yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");
-                red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
-                target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
+                green = Image.FromFile(G.GekkoExeFolder() + "\\images\\green.png");
+                yellow = Image.FromFile(G.GekkoExeFolder() + "\\images\\yellow.png");
+                red = Image.FromFile(G.GekkoExeFolder() + "\\images\\red.png");
+                target = Image.FromFile(G.GekkoExeFolder() + "\\images\\target.png");
             }
 
             this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxMainTabUpper_LinkClicked);
@@ -2269,7 +2267,7 @@ namespace Gekko
                         {
                             try
                             {
-                                string stylesFile = Application.StartupPath + "\\images\\" + "styles.css";
+                                string stylesFile = G.GekkoExeFolder() + "\\images\\" + "styles.css";
                                 Program.WaitForFileCopy(stylesFile, path + "\\styles.css");
                             }
                             catch
@@ -2285,7 +2283,7 @@ namespace Gekko
                         {
                             try
                             {
-                                string tableIconFile = Application.StartupPath + "\\images\\" + "table.png";
+                                string tableIconFile = G.GekkoExeFolder() + "\\images\\" + "table.png";
                                 Program.WaitForFileCopy(tableIconFile, path + "\\table.png");
                             }
                             catch
@@ -2874,8 +2872,7 @@ namespace Gekko
         }
 
         private void manualToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //System.Windows.Forms.Help.ShowHelp(this, Application.StartupPath + "\\helpfiles\\gekko.chm", "i_overview.htm");
+        {            
             O.Help(Globals.helpStartPage);
         }
 

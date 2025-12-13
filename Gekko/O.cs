@@ -2243,7 +2243,7 @@ namespace Gekko
             }
             else
             {
-                folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
+                folders.Add(G.GekkoExeFolder() + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
             }            
 
             FindFileHelper ffh = Program.FindFile("gekko.chm", folders, true, false, false, true, null);  //calls CreateFullPathAndFileName()
@@ -10612,7 +10612,7 @@ namespace Gekko
                 string zfilename = Program.CreateFullPathAndFileName(G.AddExtension(this.fileName, "." + Globals.extensionPlot));
                 
                 Process p = new Process();
-                p.StartInfo.FileName = Application.StartupPath + "\\XmlNotepad\\XmlNotepad.exe";
+                p.StartInfo.FileName = G.GekkoExeFolder() + "\\XmlNotepad\\XmlNotepad.exe";
                 //NOTE: quotes added because this path may contain blanks                
                 p.StartInfo.Arguments = Globals.QT + zfilename + Globals.QT;
                 bool msg = false;

@@ -1339,7 +1339,7 @@ namespace Gekko
             }
             else
             {
-                process.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\" + exe;
+                process.StartInfo.FileName = G.GekkoExeFolder() + "\\gnuplot\\" + exe;
             }
 
             //NOTE: quotes added because this path may contain blanks
