@@ -7277,6 +7277,21 @@ namespace Gekko
             return Stringlist.CreateListFromStrings(Helper_DecomposeFullPath(s).ToArray());
         }
 
+        public static IVariable path(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {            
+            List<string> m = Stringlist.GetListOfStringsFromList(x);
+            string s = string.Join("\\", m);
+            return new ScalarString(s);
+        }
+
+        public static IVariable join(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            string sep = O.ConvertToString(x1);
+            List<string> m = Stringlist.GetListOfStringsFromList(x2);
+            string s = string.Join(sep, m);
+            return new ScalarString(s);
+        }
+
         public static IVariable Helper_Runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable[] vars)
         {
             string function = "runfolder";        
@@ -7312,8 +7327,9 @@ namespace Gekko
         /// <param name="path"></param>
         /// <returns></returns>
         public static List<string> Helper_DecomposeFullPath(string path)
-        {            
+        {
             // Check if the path is rooted (starts with C:\, \\server, etc.)
+            if (G.NullOrBlanks(path)) return new List<string>();
             bool isRooted = Path.IsPathRooted(path);
             // Get the root part (e.g., "c:\", "\\server\share\")
             string root = Path.GetPathRoot(path);

@@ -791,11 +791,12 @@ namespace Gekko
             //read unrolled equations line by line            
             if (settings.scalarMemoryModelProducedByGekko)
             {
+                //No need to taste: time is *always* last dimension
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.equations).ToString())));
                 ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref status, ref substatus, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
             }
             else
-            {
+            {                
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledModel.realPathAndFileName, settings.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (StreamReader sr = new StreamReader(fs))
                 {
@@ -2251,6 +2252,7 @@ namespace Gekko
             }
         }
 
+        
         /// <summary>
         /// Reads GAMS dictionary dict.txt (made by GAMS CONVERT)
         /// </summary>
