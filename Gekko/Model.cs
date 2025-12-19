@@ -1474,7 +1474,9 @@ namespace Gekko
 
             for (int i = 0; i < this.CountVars(2); i++)
             {
-                string name = this.dict_FromANumberToVarName[i];                
+                string name = this.dict_FromANumberToVarName[i];
+
+                if (Globals.greuHack && name.Contains("'")) continue;
 
                 Series ts = DatabankAHelperScalarModel(db, i, name, true, isRef, false);  //Later on, it is checked wheather the ts series is timeless or not. So ok to keep last argument false, since this has worked implicitly = false for a long time.
                 if (ts == null)

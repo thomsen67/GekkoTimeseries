@@ -41,6 +41,8 @@ namespace Gekko
 
         public static List<string> hardLoadedDlls = new List<string>() { "System.Memory", "System.Runtime.CompilerServices.Unsafe", "System.Threading.Tasks.Extensions" }; //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
 
+        public static bool greuHack = true;  //Year must be YYYY, digits
+
         public static bool gdxReaderDebug = false;        
         public const string libraryDriveCheatString = "library___name___";        
         public const string tempFileStart = "tempfile";
@@ -178,8 +180,7 @@ namespace Gekko
         public static bool bugfixLhsIsFunctionParameter = true;        
 
         public const int startPrime = 1013;  //next is 1019.
-        public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();
-        public static bool greuHack = true;
+        public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();        
                 
         public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads
         public static bool findFix = true;                                     
@@ -540,6 +541,7 @@ namespace Gekko
 
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
+        public const string runArgName = "run_xg7dke8cj_";  //collision probability = 0
 
         public static string startGekkoTimeIteratorCode = "{" + G.NL + "  t = t2; " + G.NL;
         public static string endGekkoTimeIteratorCode = "}" + G.NL + "t = GekkoTime.tNull; " + G.NL;

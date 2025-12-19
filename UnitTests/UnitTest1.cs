@@ -26137,6 +26137,21 @@ print(df2)
         [TestMethod]
         public void _Test_DatabankLocalGlobal()
         {
+            //Test that run can be called with a filename composed form a local: variable.
+
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("local:%s = 'testlocal';");
+            I("run {%s}.gcm;");
+            _AssertScalarVal(First(), "%x", 12345d);
+
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("function string f(string %s); return %s + '12345'; local:%s = 'zzz'; end;");
+            I("local:%s = 'testlocal';");
+            I("%s2 = f(%s);");
+            _AssertScalarString(First(), "%s2", "testlocal12345");
+
+            // -----------
+
             I("reset;");
             I("local:%x = 3;");
             I("function val f(val %z); return 2 * %z; end;");

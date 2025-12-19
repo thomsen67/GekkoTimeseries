@@ -5104,10 +5104,11 @@ ASTPLACEHOLDER [0]
                     break;
                 case "ASTRUN":
                     {
+                        string s = Globals.runArgName + ++Globals.counter;
+                        node.Code.A("string " + s + " = O.ConvertToString(" + node[0].Code + ");" + G.NL); //Otherwise we cannot use for instance run {%s}; where %s is from the local databank (wiped out in next line)
                         node.Code.A(LocalCode1(Num(node), null, null, null)); //see LocalCode2
-                        node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
-                        //HMMM is this right:
-                        node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
+                        node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);                        
+                        node.Code.A("o" + Num(node) + ".fileName = " + s + ";" + G.NL);
                         if (node[1] != null) node.Code.A(node[1].Code + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);                        
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);

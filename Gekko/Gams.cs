@@ -600,6 +600,7 @@ namespace Gekko
                         for (int j = 0; j < ss.Length; j++)
                         {
                             string s = ss[j].Trim();
+                            if (Globals.greuHack && (s.Length != 4 || !G.IsInteger(s, false, true))) continue;
                             GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
                             bool good = true;
                             //This would be easier if time was known to be always last...
@@ -845,6 +846,7 @@ namespace Gekko
                         int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
                         if (aNumber == -12345)
                         {
+                            if (Globals.greuHack) continue;
                             new Error("When reading fixed variable, could not find name '" + helper2.resultingFullName + "' in dictionary");
                         }
                         int i1 = -12345;
@@ -863,6 +865,7 @@ namespace Gekko
                         }
                         catch
                         {
+                            if (Globals.greuHack) continue;
                             new Error("Index out of range when finding fixed GAMS variable");
                         }
                     }                    
@@ -1126,7 +1129,13 @@ namespace Gekko
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+            List<int> eqNumbers = null;
+            if (Globals.greuHack)
+            {
+                //Why can .dependents be == null for GREU??
+            }
+            if (modelGamsScalar.dependents != null) modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+            
             if (eqNumbers == null)
             {
                 //G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers"); --> seems ok, occurs for exogenous vars it seems.
@@ -2425,6 +2434,9 @@ namespace Gekko
                 foreach (string part in parts)
                 {
                     counter++;
+                    if (G.Equal(part, "0600a") && counter == parts.Count - 1)
+                    {
+                    }                    
                     bool isTime = false;
 
                     if (freq == EFreq.A)
@@ -2533,11 +2545,19 @@ namespace Gekko
                     PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
                     if (Globals.runningOnTTComputer)  //Just an assert here
                     {
-                        bool b = modelGamsScalar.isTimeless[dp.variable];
-                        if (b && dp.date != Globals.decompTimelessNumber)
+                        if (dp.variable == -12345)
                         {
-                            G.WarningInternal("TTH: Expected timeless .date = " + Globals.decompTimelessNumber);
+                            if (!Globals.greuHack) G.WarningInternal("TTH: Variable number == -12345...");
                         }
+                        else
+                        {
+                            bool b = modelGamsScalar.isTimeless[dp.variable];
+                            if (b && dp.date != Globals.decompTimelessNumber)
+                            {
+                                if (!Globals.greuHack) G.WarningInternal("TTH: Expected timeless .date = " + Globals.decompTimelessNumber);
+                            }
+                        }
+                        if (Globals.greuHack) continue;
                     }
                     if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets
                 }
