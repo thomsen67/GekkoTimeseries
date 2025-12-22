@@ -2494,14 +2494,14 @@ namespace Gekko
                     tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
 
                     string tpe2 = "";
-                    if (tpe != null) tpe2 = " " + tpe.ToUpper();
+                    if (tpe != null) tpe2 = " " + tpe.ToLower();
                     G.Writeln2(db.name + " databank: " + counter + tpe2 + " scalar(s) found");
                     foreach (string s in tab.Print()) G.Writeln(s);
                 }
                 if (!foundSomething)
                 {
                     if (tpe == null) G.Writeln2("No scalars found in any open databank");
-                    else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found in any open databank");
+                    else G.Writeln2("No " + tpe.ToLower() + " scalar(s) found in any open databank");
                 }
             }
             else if (tpe == "ser" || tpe == "series")
@@ -2604,7 +2604,7 @@ namespace Gekko
                             value = matrix.DimensionsAsString();
                         }
 
-                        string type = a.Type().ToString().ToUpper();
+                        string type = a.Type().ToString().ToLower();
 
                         tab.Set(row, 1, type);
                         tab.Set(row, 2, s);
@@ -2615,12 +2615,12 @@ namespace Gekko
                     }
                     tab.SetBorder(row - 1, 1, row - 1, 4, BorderType.Bottom);
 
-                    G.Writeln2(db.name + " databank: " + counter + " " + tpe.ToUpper() + "s found");
+                    G.Writeln2(db.name + " databank: " + counter + " " + tpe.ToLower() + "s found");
                     foreach (string s in tab.Print()) G.Writeln(s);
                 }
                 if (!foundSomething)
                 {
-                    G.Writeln2("No " + tpe.ToUpper() + " variables found in any open databank");
+                    G.Writeln2("No " + tpe.ToLower() + " variables found in any open databank");
                 }
             }
         }

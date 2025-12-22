@@ -1319,8 +1319,8 @@ namespace Gekko
                             if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                             {
                                 Matrix m = rhs.DeepClone(0, null, null) as Matrix;
-                                if (o.opt_colnames != null) m.colnames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
-                                if (o.opt_rownames != null) m.rownames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
+                                if (o?.opt_colnames != null) m.colnames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
+                                if (o?.opt_rownames != null) m.rownames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
                                 if (isFunctionVariable)
                                 {
                                     rv = m;

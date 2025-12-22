@@ -28436,8 +28436,79 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln("MAP printing not implemented yet. But individual elements can");
-                        G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
+                        //G.Writeln("MAP printing not implemented yet. But individual elements can");
+                        //G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
+
+                        Gekko.Table tab = new Gekko.Table();
+                        int row = 1;
+                        tab.SetBorder(row, 1, row, 3, BorderType.Top);
+                        tab.Set(row, 1, "name    ");  //blanks to get some spacing
+                        tab.Set(row, 2, "type      ");                        
+                        tab.Set(row, 3, "value    ");
+                        tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
+                        row++;                        
+
+                        foreach (KeyValuePair<string, IVariable> kvp in map.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase))
+                        {
+
+                            string s5 = null;
+
+                            if (kvp.Value.Type() == EVariableType.Series)
+                            {
+                                Series ts = kvp.Value as Series;
+                                if (ts.type == ESeriesType.ArraySuper)
+                                {
+                                    s5 = "array-series";
+                                }
+                                else if (ts.type == ESeriesType.Timeless)
+                                {
+                                    s5 = "timeless = " + ValueAsString(ts.GetTimelessData());
+                                }
+                                else
+                                {
+                                    GekkoTime t1 = ts.GetRealDataPeriodFirst();
+                                    GekkoTime t2 = ts.GetRealDataPeriodLast();
+                                    if (t1.IsNull()) s5 = "no data";
+                                    else
+                                    {
+                                        s5 = t1.ToString() + "-" + t2.ToString();
+                                    }
+                                }
+                            }
+                            else if (kvp.Value.Type() == EVariableType.Date)
+                            {
+                                s5 = G.FromDateToString(kvp.Value.ConvertToDate(O.GetDateChoices.Strict));
+                            }
+                            else if (kvp.Value.Type() == EVariableType.String)
+                            {
+                                s5 = "'" + kvp.Value.ConvertToString() + "'";
+                            }
+                            else if (kvp.Value.Type() == EVariableType.Val)
+                            {                                
+                                s5 = ValueAsString(kvp.Value.ConvertToVal());
+                            }
+                            else if (kvp.Value.Type() == EVariableType.List)
+                            {
+                                int n = (kvp.Value as List).Count();
+                                s5 = n + " elements";
+                            }
+                            else if (kvp.Value.Type() == EVariableType.Map)
+                            {
+                                int n = (kvp.Value as Map).Count();
+                                s5 = n + " elements";
+                            }
+                            else if (kvp.Value.Type() == EVariableType.Matrix)
+                            {
+                                int n = (kvp.Value as Matrix).data.Length;
+                                s5 = n + " elements";
+                            }
+                            tab.Set(row, 1, kvp.Key);
+                            tab.Set(row, 2, kvp.Value.Type().ToString().ToLower());                            
+                            tab.Set(row, 3, s5);
+                            row++;
+                        }
+                        tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
+                        foreach (string s7 in tab.Print()) G.Writeln(s7);
                     }
                 }
                 else if (x.Type() == EVariableType.Null)
@@ -28511,6 +28582,14 @@ namespace Gekko
             }
             return s;
 
+        }
+
+        private static string ValueAsString(double d)
+        {
+            string s5 = d.ToString();
+            if (G.IsNumericalError(d)) s5 = "M";
+            else if (d == Globals.eps) s5 = "eps";
+            return s5;
         }
 
         private static void PrintLabel(string labelGiven)

@@ -6758,9 +6758,9 @@ namespace Gekko
             }
         }
 
-        public static IVariable currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        public static IVariable currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
-            return new ScalarString(Program.options.folder_working?.Trim());
+            return Helper_Currentfolder(smpl, _t1, _t2, vars);
         }
 
         public static IVariable filteredperiods(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
@@ -7297,22 +7297,48 @@ namespace Gekko
             string function = "runfolder";        
             if (vars.Length > 1) new Error("Funtion " + function + "() only accepts 0 or 1 arguments");
             string gcm = smpl?.p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence); //Since it is RUNfolder(), it must be okay to find an executing .gcm file, and not return a proc/func.
-            string gcmFolder = Path.GetDirectoryName(gcm);
+            string gcmFolder = Path.GetDirectoryName(gcm)?.Trim(); //null safe all the way
 
             if (vars.Length == 0)
             {                
-                return new ScalarString(gcmFolder?.Trim());                
+                return new ScalarString(gcmFolder);                
             }
             else
             {
                 if (G.Equal(vars[0].ConvertToString(), "rel"))
                 {
                     string root = Functions.root(smpl, _t1, _t2, new IVariable[] { }).ConvertToString();
-                    if (G.NullOrBlanks(gcmFolder)) new Error("Calling runfolder('rel'), the root.ini file is found at '" + root + "', but the location of the currently executing .gcm file cannot be determined. This my be because you are running Gekko code directly in the Gekko window, without calling/running any .gcm file (excluding .gcm files inside library .zip files).");
+                    if (G.NullOrBlanks(gcmFolder)) new Error("When calling runfolder('rel'), the root.ini file is found at '" + root + "', but the location of the currently executing .gcm file cannot be determined. This may be because you are running Gekko code directly in the Gekko window, without calling/running any .gcm file (excluding .gcm files inside library .zip files). See also the currentfolder() function.");
                     int index = gcmFolder.IndexOf(root, StringComparison.OrdinalIgnoreCase);
-                    if (index == -1) new Error("The root '" + root + "' is not contained inside the executing gcm '" + gcmFolder + "'");
-                    string gcm2 = gcmFolder.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
+                    if (index != 0) new Error("The root '" + root + "' is not at the start of the executing gcm '" + gcmFolder + "'");
+                    string gcm2 = gcmFolder.Remove(0, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
                     return new ScalarString(gcm2);                    
+                }
+                else new Error("Expected argument 'rel'");
+            }
+            new Error("Failure in " + function + "() function"); return null;  //We should never get to this line
+        }
+
+        public static IVariable Helper_Currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable[] vars)
+        {
+            string function = "currentfolder";
+            if (vars.Length > 1) new Error("Funtion " + function + "() only accepts 0 or 1 arguments");            
+            string gcmFolder = Program.options.folder_working?.Trim();
+            if (G.NullOrBlanks(gcmFolder)) new Error("When calling currentfolder(), the working folder (cf. option folder working) seems to be an empty string");
+
+            if (vars.Length == 0)
+            {
+                return new ScalarString(gcmFolder);
+            }
+            else
+            {
+                if (G.Equal(vars[0].ConvertToString(), "rel"))
+                {
+                    string root = Functions.root(smpl, _t1, _t2, new IVariable[] { }).ConvertToString();                    
+                    int index = gcmFolder.IndexOf(root, StringComparison.OrdinalIgnoreCase);
+                    if (index != 0) new Error("The root '" + root + "' is not at the start of the  the working folder '" + gcmFolder + "'");                    
+                    string gcm2 = gcmFolder.Remove(0, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
+                    return new ScalarString(gcm2);
                 }
                 else new Error("Expected argument 'rel'");
             }
