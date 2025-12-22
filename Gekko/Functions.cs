@@ -7308,6 +7308,7 @@ namespace Gekko
                 if (G.Equal(vars[0].ConvertToString(), "rel"))
                 {
                     string root = Functions.root(smpl, _t1, _t2, new IVariable[] { }).ConvertToString();
+                    if (G.NullOrBlanks(gcmFolder)) new Error("Calling runfolder('rel'), the root.ini file is found at '" + root + "', but the location of the currently executing .gcm file cannot be determined. This my be because you are running Gekko code directly in the Gekko window, without calling/running any .gcm file (excluding .gcm files inside library .zip files).");
                     int index = gcmFolder.IndexOf(root, StringComparison.OrdinalIgnoreCase);
                     if (index == -1) new Error("The root '" + root + "' is not contained inside the executing gcm '" + gcmFolder + "'");
                     string gcm2 = gcmFolder.Remove(index, root.Length).Trim().Trim(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });  //Remove any dir indicators at beginning or end                    
