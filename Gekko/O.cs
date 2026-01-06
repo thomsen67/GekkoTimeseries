@@ -1641,29 +1641,24 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("FOR ... = ... TO ... loop must begin with val or date, not " + start.Type().ToString().ToLower());
-                        //throw new GekkoException();
+                        new Error("FOR ... = ... TO ... loop must begin with val or date, not " + start.Type().ToString().ToLower());                        
                     }
                 }
                 else
                 {
-
                     if (start.Type() == EVariableType.List)
                     {
-
                         List start_list = start as List;
                         if (start_list.list.Count == 0)
                         {
-                            new Error("Empty list");
-                            //throw new GekkoException();
+                            //new Error("Empty list");                        
+                            return; //Now we just return --> such a loop on an empty list will now not execute the inside of the loop at all (without an error). 
                         }
                         x = start_list.list[0].DeepClone(0, null, null);//x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
-
                     }
                     else
                     {
-                        new Error("FOR ... = ... loop must have a list to iterate over, not a " + start.Type().ToString().ToLower());
-                        //throw new GekkoException();
+                        new Error("FOR ... = ... loop must have a list to iterate over, not a " + start.Type().ToString().ToLower());                        
                     }
                 }
             }

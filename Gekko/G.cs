@@ -174,7 +174,7 @@ namespace Gekko
         {
             string rv = null;
             foreach (string s2 in s3)
-            {                
+            {
                 if (G.EqualHandleBlanks(s1, s2))
                 {
                     return true;
@@ -224,6 +224,41 @@ namespace Gekko
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Gets files only in the specified directory (no subfolders).
+        /// </summary>
+        public static List<string> GetFiles(string path, string searchPattern)
+        {
+            try
+            {
+                // Directory.GetFiles defaults to TopDirectoryOnly
+                if (searchPattern == null) return Directory.GetFiles(path).ToList();
+                else return Directory.GetFiles(path, searchPattern).ToList();
+            }
+            catch (Exception ex)
+            {
+                new Error($"Error accessing path: {ex.Message}");
+                return null; //will never happen
+            }
+        }
+
+        /// <summary>
+        /// Gets immediate subdirectories only (no nested folders).
+        /// </summary>
+        public static List<string> GetFolders(string path, string searchPattern)
+        {
+            try
+            {
+                if (searchPattern == null) return Directory.GetDirectories(path).ToList();
+                return Directory.GetDirectories(path, searchPattern).ToList();
+            }
+            catch (Exception ex)
+            {
+                new Error($"Error accessing path: {ex.Message}");
+                return null; //will never happen
+            }
         }
 
         /// <summary>
@@ -5049,6 +5084,7 @@ namespace Gekko
             }
             catch (Exception e) { };
             return output;
+            
         }
 
         /// <summary>

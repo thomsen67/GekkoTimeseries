@@ -1,130 +1,53 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using
-System.Windows.Forms;
+using System.Windows.Forms;
 using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class
-    TranslatedCode
+    public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static
-        int labelCounter;
-        public static void C0(GekkoSmpl smpl, P p)
+        public static int labelCounter;
+        public static void C0(GekkoSmpl smpl, P p, ref IVariable xforloop_xe7dke6cj_3)
         {
-            //[[commandStart]]0
-            p.SetStack(@"�1"); O.InitSmpl(smpl, p);
+            IVariable forloop_xe7dke6cj_3 = xforloop_xe7dke6cj_3;
 
-            Func<GraphHelper, string> print0
-            = (gh) =>
-            {
-                O.Prt o0 = new O.Prt();
-                O.DatabankSearchHelper1();
-                labelCounter =
-    0; o0.guiGraphIsRefreshing = gh.isRefreshing;
-                o0.guiGraphOperator =
-    gh.operator2;
-                o0.guiGraphIsLogTransform = gh.isLogTransform;
-                o0.guiGraphFontScaling =
-    gh.fontScaling;
-                o0.guiGraphSizeScaling = gh.sizeScaling;
-                o0.guiGraphIsButton =
-    gh.isButton;
-                o0.prtType = "prt";
-                if (gh.isIndex != null)
-                {
-                    if (gh.isIndex == true)
-                    {
-                        o0.opt_i
-    = GekkoTime.tSimilarToNull;
-                    }
-                    else { o0.opt_i = GekkoTime.tNull; }
-                }
-                if (gh.isYoy != null)
-                {
-                    if (gh.isYoy == true) { o0.opt_yoy = "yes"; } else { o0.opt_yoy = "no"; }
-                }
-                if (gh.isPoints
-    != null)
-                {
-                    if (gh.isPoints == true) { o0.opt_linetype = "linespoints"; }
-                    else
-                    {
-                        o0.opt_linetype = "lines";
-                    }
-                }
-                if (gh.fileName != null)
-                {
-                    o0.opt_filename = gh.fileName;
-                }
-                O.GetPeriods2(o0, gh);
-                ESeriesMissing r1_0 = Program.options.series_array_print_missing;
-                ESeriesMissing r2_0 = Program.options.series_array_calc_missing; ESeriesMissing r3_0 =
-    Program.options.series_data_missing; try
-                {
-                    O.HandleOptionBankRef1(o0.opt_bank, o0.opt_ref);
-                    O.HandleMissing1(o0.opt_missing);
-                    {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope0 = new
-            O.Prt.Element();
-                        ope0.labelGiven = new List<string>()
-            {"x|[@2,4:4='x',<903>,1:4]|[@2,4:4='x',<903>,1:4]"};
-                        
-                        smpl = new GekkoSmpl(o0.t1, o0.t2, smpl); smpl.t0 =
-            smpl.t0.Add(-2);
-                        if (o0.opt_yoy != null && o0.opt_yoy.ToLower() == Globals.yes)
-                        {
-                            smpl.t0 =
-            smpl.t0.Add(-13);
-                        }
-                        Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out
-            ope0.operatorsFinalAll); bankNumbers = O.Prt.GetBankNumbers(null, ope0.operatorsFinal);
-                        for (int
-            bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber =
-                bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope0.variable[bankNumber] = O.Lookup(smpl,
-                null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null);
-                            if (bankNumberI == 0)
-                                O.PrtElementHandleLabel(smpl, ope0);
-                        }
-                        smpl.bankNumber =
-            0;
-                        o0.prtElements.Add(ope0);
-                    }
+            //[[commandStart]]1
+            p.SetStack(@"¤1"); O.InitSmpl(smpl, p);
 
-                    o0.printStorageAsFuncCounter = Globals.printStorageAsFunc.Count
-        - 1;
-                    o0.Exe();
-                }
-                finally
-                {
-                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_0, r2_0,
-        r3_0);
-                }
-                return o0.emfName;
-            };
-            Globals.printStorageAsFunc.Add(Globals.printStorageAsFunc.Count,
-            print0);
-            print0(new GraphHelper());
+            O.Tell o1 = new O.Tell();
+            o1.s = forloop_xe7dke6cj_3;
+            o1.Exe();
 
-            //[[commandEnd]]0
+            //[[commandEnd]]1
+            xforloop_xe7dke6cj_3 = forloop_xe7dke6cj_3;
+
         }
 
 
 
-        public static void CodeLines(P
-        p)
+        public static void CodeLines(P p)
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-            C0(smpl, p);
+            p.SetStack(@"¤1");
+
+
+            //[[commandSpecial]]0
+            IVariable forloop_xe7dke6cj_3 = null;
+            int counter4 = 0;
+            bool years5 = O.LoopYears("string", O.ELoopType.List, O.Lookup(smpl, null, null, "#m", null, null, new LookupSettings(), EVariableType.Var, null), null); for (O.IterateStart(years5, O.ELoopType.List, ref forloop_xe7dke6cj_3, O.Lookup(smpl, null, null, "#m", null, null, new LookupSettings(), EVariableType.Var, null)); O.IterateContinue(years5, O.ELoopType.List, forloop_xe7dke6cj_3, O.Lookup(smpl, null, null, "#m", null, null, new LookupSettings(), EVariableType.Var, null), null, null, ref counter4); O.IterateStep(years5, O.ELoopType.List, ref forloop_xe7dke6cj_3, O.Lookup(smpl, null, null, "#m", null, null, new LookupSettings(), EVariableType.Var, null), null, counter4))
+            {
+                ;
+                O.TypeCheck_string(forloop_xe7dke6cj_3, 0);
+
+                C0(smpl, p, ref forloop_xe7dke6cj_3);
+
+            };
+
+            //[[commandEnd]]0
 
 
 

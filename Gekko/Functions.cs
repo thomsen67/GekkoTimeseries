@@ -4998,12 +4998,60 @@ namespace Gekko
             else return Globals.scalarVal0;
         }
 
+        public static void deletefile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            if (!G.IsAbsolutePath(s1)) new Error("The file path '" + s1 + "' is not an absolute path (with drive letter)");
+            
+            if (!File.Exists(s1))
+            {
+                G.Warning("w10.3", "The file '" + s1 + "' does not exist for deletion");
+                return;
+            }
+
+            try
+            {
+                File.Delete(s1);
+            }
+            catch (Exception ex)
+            {
+                // Usually occurs if the file is in use by another process
+                new Error($"Function deletefile() on file '" + s1 + "' failed with the following error: {ex.Message}");
+            }
+        }
+
         public static IVariable existfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
             FindFileHelper ffh = Program.FindFile(s1, null, true, true, false, true, smpl.p);
             if (ffh.realPathAndFileName == null) return Globals.scalarVal0;
             return Globals.scalarVal1;
+        }
+
+        public static IVariable getfiles(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            return new List(G.GetFiles(s1, null));
+        }
+
+        public static IVariable getfiles(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            string s2 = O.ConvertToString(x2);
+            return new List(G.GetFiles(s1, s2));
+        }
+
+        public static IVariable getfolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            return new List(G.GetFolders(s1, null));
+        }
+
+        public static IVariable getfolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            string s2 = O.ConvertToString(x2);
+            return new List(G.GetFolders(s1, s2));
         }
 
         public static void writefile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable file1, IVariable x1)
