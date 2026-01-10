@@ -712,6 +712,10 @@ namespace Gekko
 
         }
 
+
+        /// <summary>
+        /// Writes a .parquet file with data, possibly with mixed frequencies, multiple dimensions, and from multiple databanks (timeless series are possible, too).
+        /// </summary>        
         public static void WriteParquetDatabank(List<Tuple<string, IVariable>> listSorted, GekkoTime t1, GekkoTime t2, string pathAndFilename, string hdg, string bankName2)
         {
             //Note: the input list is already sorted by name
@@ -761,59 +765,9 @@ namespace Gekko
             List<double?> values = new List<double?>();
 
             // ================================================
-            List<Parquet.Schema.DataField> m = new List<Parquet.Schema.DataField>();
-            m.Add(new Parquet.Schema.DataField<string>("id"));
-            m.Add(new Parquet.Schema.DataField<string>("bank"));
-            m.Add(new Parquet.Schema.DataField<string>("name"));
-            m.Add(new Parquet.Schema.DataField<string>("freq"));
-            m.Add(new Parquet.Schema.DataField<int?>("dims"));
-            for (int ii = 0; ii < ndims; ii++)
-            {
-                m.Add(new Parquet.Schema.DataField<string>("dim" + (ii + 1)));
-            }
-            m.Add(new Parquet.Schema.DataField<string>("label"));
-            m.Add(new Parquet.Schema.DataField<string>("source"));
-            m.Add(new Parquet.Schema.DataField<string>("unit"));
-            m.Add(new Parquet.Schema.DataField<bool?>("is_timeless"));
-            m.Add(new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
-            m.Add(new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
-            m.Add(new Parquet.Schema.DataField<string>("period_start"));
-            m.Add(new Parquet.Schema.DataField<string>("period_end"));
-            m.Add(new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
-            // ----                
-            m.Add(new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true)); //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
-            m.Add(new Parquet.Schema.DataField<string>("period"));
-            m.Add(new Parquet.Schema.DataField<double?>("value"));
-            Parquet.Schema.ParquetSchema schema = new Parquet.Schema.ParquetSchema(m);
 
-            Dictionary<string, string> metadata = new Dictionary<string, string>();
-            metadata.Add("software.name", "Gekko Timeseries and Modeling Software");
-            metadata.Add("software.version", Globals.gekkoVersion);
-            if (hdg != null) metadata.Add("table.label", hdg);
-            metadata.Add("parquet.design.version", gekkoParquetVersion); //Gekko's version of the Parquet schema.              
-            metadata.Add("parquet.design.url", "https://t-t.dk/gekko/docs/user-manual/index.html?appendix_parquet.htm");
-            metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
-            metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks. String.");
-            metadata.Add("column.bank.comment", "Gekko databank name, often same as file name without extension (for future use, to store several databanks in 1 parquet file). String.");
-            metadata.Add("column.name.comment", "The Gekko series name. Alphanumeric or underscore chars, lower or upper-case. String.");
-            metadata.Add("column.freq.comment", "The Gekko frequency: a (annual), q (quarterly), m (monthly), w (weekly), d (daily), u (undated). Lower-case. String.");
-            metadata.Add("column.dims.comment", "Number of dimensions of the given (array-) timeseries. Integer.");
-            for (int ii = 0; ii < ndims; ii++)
-            {
-                metadata.Add("column.dim" + (ii + 1) + ".comment", "Dimension " + (ii + 1) + ". String.");
-            }
-            metadata.Add("column.label.comment", "The label of the given timeseries. String.");
-            metadata.Add("column.source.comment", "The source of the given timeseries. String.");
-            metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
-            metadata.Add("column.is_timeless.comment", "True if the timeseries is constant for all periods. Boolean.");
-            metadata.Add("column.date_start.comment", "The date corresponding to the first value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
-            metadata.Add("column.date_end.comment", "The date corresponding to the last value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
-            metadata.Add("column.period_start.comment", "The period corresponding to the first value of the timeseries in the Gekko databank. String format. Not used by Gekko when importing.");
-            metadata.Add("column.period_end.comment", "The period corresponding to the last value of the timeseries in the Gekko databank. String format. Not used by Gekko when importing.");
-            metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format, Unix time.");
-            metadata.Add("column.date.comment", "The date corresponding to the current data value. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
-            metadata.Add("column.period.comment", "The period corresponding to the current data value. String.");
-            metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
+            Parquet.Schema.ParquetSchema schema = WriteParquetDatabankSchema(ndims);
+            Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);
 
             int valuesCounter = 0;
             bool hasSubSeries = false;
@@ -827,13 +781,9 @@ namespace Gekko
             {
                 if (tup.Item2.Type() != EVariableType.Series) continue;
                 Series ts = tup.Item2 as Series;
-
                 bool isTimeless = ts.type == ESeriesType.Timeless;
-
                 string fullName = G.Chop_AddBank(tup.Item1, bank).Replace(" ", "").ToLower();
                 string freq = G.Chop_GetFreq(tup.Item1);
-
-                //MultidimItem mmi = ts.mmi;
                 string varnameWithoutFreqAndIndex = G.Chop_GetName(tup.Item1);
                 string varnameWithoutIndex = G.Chop_GetNameAndFreq(tup.Item1);
 
@@ -904,60 +854,22 @@ namespace Gekko
 
                 // -------------------------------------------------------------------------------------------------------
                 // Note about UTC. Regarding the DateTime object, it only contains ticks + a flag regarding UTC or local.
-                // It seems that Parquet.NET ignores any UTC or not flag anyway.
+                // It seems that Parquet.NET ignores any 'UTC or not' flag anyway.
+                // Polars and parquet datetimes are unix utc ('naive'), only pandas allows to state a timezone, but that
+                // is inefficient for calculations. Better to keep the datetimes as utc, and only convert them when
+                // humans are *viewing* the datatimes.
                 // -------------------------------------------------------------------------------------------------------
 
-                bool b = false;
-                string xtimestamp = ts.MetaGetStamp();
-                if (xtimestamp != null)
-                {
-                    int c1 = G.Count(xtimestamp, "-");
-                    int c2 = G.Count(xtimestamp, "/"); //older
-                    if (c1 == 2 || c2 == 2)
-                    {
-                        string[] ss = null;
-                        if (c1 == 2) ss = ts.MetaGetStamp().Split('-');
-                        else ss = ts.MetaGetStamp().Split('/');
-                        int i0 = -12345; int.TryParse(ss[0], out i0);
-                        int i1 = -12345; int.TryParse(ss[1], out i1);
-                        int i2 = -12345; int.TryParse(ss[2], out i2);
-                        if (i0 != -12345 && i1 != -12345 && i2 != -12345)
-                        {
-                            if (i2 >= 0 && i2 <= 99) i2 += 2000; //Gekko did not exist in year 19xx, so this should be safe regarding stamps.
-                            if (i0 >= 1 && i0 <= 31 && i1 >= 1 && i1 <= 12 && G.IsYear(i2))
-                            {
-                                b = true;
-                                try { stamps.Add(new DateTime(i2, i1, i0)); } //Non-UTC, but UtcDateTime(i2, i1, i0) does not change anything
-                                catch { b = false; }
-                            }
-                        }
-                    }
-                }
-                if (!b) stamps.Add(null);
+                DateTime? pq_timestamp = WriteParquetDatabankGetTimestamp(ts.MetaGetStamp());
+                stamps.Add(pq_timestamp);
 
-                if (!gt1.IsNull())
-                {
-                    try { date_starts.Add(GekkoTime.FromGekkoTimeToDateTime(gt1, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
-                    catch { date_starts.Add(null); }
-                    period_starts.Add(DateStringFormat(gt1));
-                }
-                else
-                {
-                    date_starts.Add(null);
-                    period_starts.Add(null);
-                }
+                DateTime? pq_date_starts; string pq_period_starts;
+                WriteParquetDatabankPeriodStart(gt1, out pq_date_starts, out pq_period_starts);
+                date_starts.Add(pq_date_starts); period_starts.Add(pq_period_starts);
 
-                if (!gt2.IsNull())
-                {
-                    try { date_ends.Add(GekkoTime.FromGekkoTimeToDateTime(gt2, O.GetDateChoices.FlexibleStart)); } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
-                    catch { date_ends.Add(null); }
-                    period_ends.Add(DateStringFormat(gt2));
-                }
-                else
-                {
-                    date_ends.Add(null);
-                    period_ends.Add(null);
-                }
+                DateTime? pq_date_ends; string pq_period_ends;
+                gt2 = WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
+                date_ends.Add(pq_date_ends); period_ends.Add(pq_period_ends);
 
                 if (gt1.IsNull() || gt2.IsNull())
                 {
@@ -987,7 +899,176 @@ namespace Gekko
                 }
             }
 
+            WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, dimss, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata, valuesCounter, seriesCounter);
 
+            string s = null; if (hasSubSeries) s = " (including array-subseries)";
+            new Writeln("Wrote " + seriesCounter + " series" + s + " to parquet file with " + valuesCounter + " rows in two rowgroups in " + G.Seconds(dt));
+        }
+        
+        public static void WriteParquetPlot(PlotTable plotTable, List<O.Prt.Element> containerExplode, EFreq highestFreq)
+        {
+            string pathAndFilename = "c:\\tools\\plot.parquet";
+
+
+            string gekkoParquetVersion = "1.0";
+            DateTime dt = DateTime.Now;
+            int ndims = 0;
+            string hdg = "Data from Gekko PLOT statement";
+            
+            List<string> ids1 = new List<string>();
+            List<string> ids2 = new List<string>();
+            // ============================================================================
+            List<string> banks = new List<string>();
+            List<string> names = new List<string>();
+            List<string> freqs = new List<string>();
+            List<string> labels = new List<string>();
+            List<string> sources = new List<string>();
+            List<string> units = new List<string>();
+            List<int?> dims = new List<int?>();
+            List<bool?> timelesss = new List<bool?>();
+            List<DateTime?> date_starts = new List<DateTime?>();
+            List<DateTime?> date_ends = new List<DateTime?>();
+            List<string> period_starts = new List<string>();
+            List<string> period_ends = new List<string>();
+            List<DateTime?> stamps = new List<DateTime?>();
+            // ---            
+            List<DateTime?> dates = new List<DateTime?>();
+            List<string> periods = new List<string>();
+            List<double?> values = new List<double?>();
+
+            // ================================================
+
+            Parquet.Schema.ParquetSchema schema = WriteParquetDatabankSchema(ndims);
+            Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);
+
+            int valuesCounter = 0;
+            bool hasSubSeries = false;
+            int seriesCounter = 0;
+
+            string bank = null;
+
+            //We assume .values correspond
+            for (int i = 0; i < plotTable.dates.Count; i++)
+            {                
+                Series ts = null;
+                bool isTimeless = ts.type == ESeriesType.Timeless;
+                string fullName = "";
+                string freq = "";
+                string varnameWithoutFreqAndIndex = G.Chop_GetName("");
+                string varnameWithoutIndex = G.Chop_GetNameAndFreq("");
+
+                GekkoTime gt1 = GekkoTime.tNull;
+                GekkoTime gt2 = GekkoTime.tNull;
+
+                seriesCounter++;
+
+                ids1.Add(fullName);
+                banks.Add(bank);
+                names.Add(varnameWithoutFreqAndIndex);
+                freqs.Add(freq);                
+                dims.Add(0);      
+                labels.Add(ts.MetaGetLabel());
+                sources.Add(ts.MetaGetSource());
+                units.Add(ts.MetaGetUnits());
+                timelesss.Add(isTimeless);
+
+                // -------------------------------------------------------------------------------------------------------
+                // Note about UTC. Regarding the DateTime object, it only contains ticks + a flag regarding UTC or local.
+                // It seems that Parquet.NET ignores any 'UTC or not' flag anyway.
+                // Polars and parquet datetimes are unix utc ('naive'), only pandas allows to state a timezone, but that
+                // is inefficient for calculations. Better to keep the datetimes as utc, and only convert them when
+                // humans are *viewing* the datatimes.
+                // -------------------------------------------------------------------------------------------------------
+
+                DateTime? pq_timestamp = WriteParquetDatabankGetTimestamp(ts.MetaGetStamp());
+                stamps.Add(pq_timestamp);
+
+                DateTime? pq_date_starts; string pq_period_starts;
+                WriteParquetDatabankPeriodStart(gt1, out pq_date_starts, out pq_period_starts);
+                date_starts.Add(pq_date_starts); period_starts.Add(pq_period_starts);
+
+                DateTime? pq_date_ends; string pq_period_ends;
+                gt2 = WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
+                date_ends.Add(pq_date_ends); period_ends.Add(pq_period_ends);
+                
+                for (int j = 0; j < plotTable.dates[i].Count; j++)
+                {
+                    GekkoTime t = GekkoTime.tNull;
+                    valuesCounter++;
+                    ids2.Add(fullName);
+                    dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
+                    periods.Add(DateStringFormat(t));
+                    values.Add(ts.GetDataSimple(t));
+                }
+            }
+            
+            WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, null, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata, valuesCounter, seriesCounter);
+
+            string s = null; if (hasSubSeries) s = " (including array-subseries)";
+            new Writeln("Wrote " + seriesCounter + " series" + s + " to parquet file with " + valuesCounter + " rows in two rowgroups in " + G.Seconds(dt));
+
+        }        
+
+        private static GekkoTime WriteParquetDatabankPeriodEnd(GekkoTime gt2, out DateTime? pq_date_ends, out string pq_period_ends)
+        {
+            pq_date_ends = null;
+            pq_period_ends = null;
+            if (!gt2.IsNull())
+            {
+                try { pq_date_ends = GekkoTime.FromGekkoTimeToDateTime(gt2, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours                    
+                pq_period_ends = DateStringFormat(gt2);
+            }
+
+            return gt2;
+        }
+
+        private static void WriteParquetDatabankPeriodStart(GekkoTime gt1, out DateTime? pq_date_starts, out string pq_period_starts)
+        {
+            pq_date_starts = null;
+            pq_period_starts = null;
+            if (!gt1.IsNull())
+            {
+                try { pq_date_starts = GekkoTime.FromGekkoTimeToDateTime(gt1, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
+                pq_period_starts = DateStringFormat(gt1);
+            }
+        }
+
+        private static DateTime? WriteParquetDatabankGetTimestamp(string xtimestamp)
+        {
+            DateTime? pq_timestamp = null;
+            bool b = false;
+            if (xtimestamp != null)
+            {
+                int c1 = G.Count(xtimestamp, "-");
+                int c2 = G.Count(xtimestamp, "/"); //older
+                if (c1 == 2 || c2 == 2)
+                {
+                    string[] ss = null;
+                    if (c1 == 2) ss = xtimestamp.Split('-');
+                    else ss = xtimestamp.Split('/');
+                    int i0 = -12345; int.TryParse(ss[0], out i0);
+                    int i1 = -12345; int.TryParse(ss[1], out i1);
+                    int i2 = -12345; int.TryParse(ss[2], out i2);
+                    if (i0 != -12345 && i1 != -12345 && i2 != -12345)
+                    {
+                        if (i2 >= 0 && i2 <= 99) i2 += 2000; //Gekko did not exist in year 19xx, so this should be safe regarding stamps.
+                        if (i0 >= 1 && i0 <= 31 && i1 >= 1 && i1 <= 12 && G.IsYear(i2))
+                        {
+                            try { pq_timestamp = new DateTime(i2, i1, i0); /* stamps.Add(new DateTime(i2, i1, i0)); */ } //Non-UTC, but UtcDateTime(i2, i1, i0) does not change anything                             
+                            catch { }
+                        }
+                    }
+                }
+            }
+
+            return pq_timestamp;
+        }
+
+        /// <summary>
+        /// Physically write the parquet file (group 0 and 1)
+        /// </summary>        
+        private static void WriteParquetDatabankFile(List<string> ids1, List<string> ids2, List<string> banks, List<string> names, List<string> freqs, int ndims, List<int?> dims, List<List<string>> dimss, List<string> labels, List<string> sources, List<string> units, List<bool?> timelesss, List<DateTime?> date_starts, List<DateTime?> date_ends, List<string> period_starts, List<string> period_ends, List<DateTime?> stamps, List<DateTime?> dates, List<string> periods, List<double?> values, string pathAndFilename, Parquet.Schema.ParquetSchema schema, Dictionary<string, string> metadata, int valuesCounter, int seriesCounter)
+        {
             //Note: All this ConfigureAwait(false).GetAwaiter().GetResult() stuff is because Excel-Dna will
             //      not work without it. Without it it either only writes 1 column, or scrambles the columns.
             //      Apparently the problem is because of some flushing etc. when writing, but reading does not
@@ -1073,10 +1154,80 @@ namespace Gekko
                     WriteCol(group, new DataColumn(schema.DataFields[++i], values.ToArray()));
                 }
             }
+        }
 
-            string s = null; if (hasSubSeries) s = " (including array-subseries)";
-            new Writeln("Wrote " + seriesCounter + " series" + s + " to parquet file with " + valuesCounter + " rows in two rowgroups in " + G.Seconds(dt));
+        /// <summary>
+        /// Create the parquet schema (column types)
+        /// </summary>
+        /// <param name="ndims"></param>
+        /// <returns></returns>
+        private static Parquet.Schema.ParquetSchema WriteParquetDatabankSchema(int ndims)
+        {
+            List<Parquet.Schema.DataField> m = new List<Parquet.Schema.DataField>();
+            m.Add(new Parquet.Schema.DataField<string>("id"));
+            m.Add(new Parquet.Schema.DataField<string>("bank"));
+            m.Add(new Parquet.Schema.DataField<string>("name"));
+            m.Add(new Parquet.Schema.DataField<string>("freq"));
+            m.Add(new Parquet.Schema.DataField<int?>("dims"));
+            for (int ii = 0; ii < ndims; ii++)
+            {
+                m.Add(new Parquet.Schema.DataField<string>("dim" + (ii + 1)));
+            }
+            m.Add(new Parquet.Schema.DataField<string>("label"));
+            m.Add(new Parquet.Schema.DataField<string>("source"));
+            m.Add(new Parquet.Schema.DataField<string>("unit"));
+            m.Add(new Parquet.Schema.DataField<bool?>("is_timeless"));
+            m.Add(new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
+            m.Add(new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
+            m.Add(new Parquet.Schema.DataField<string>("period_start"));
+            m.Add(new Parquet.Schema.DataField<string>("period_end"));
+            m.Add(new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
+            // ----                
+            m.Add(new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true)); //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
+            m.Add(new Parquet.Schema.DataField<string>("period"));
+            m.Add(new Parquet.Schema.DataField<double?>("value"));
+            Parquet.Schema.ParquetSchema schema = new Parquet.Schema.ParquetSchema(m);
+            return schema;
+        }
 
+        /// <summary>
+        /// Create parquet metadata to write together with the normal data.
+        /// </summary>
+        /// <param name="ndims"></param>
+        /// <param name="hdg"></param>
+        /// <param name="gekkoParquetVersion"></param>
+        /// <returns></returns>
+        private static Dictionary<string, string> WriteParquetDatabankMetadata(int ndims, string hdg, string gekkoParquetVersion)
+        {
+            Dictionary<string, string> metadata = new Dictionary<string, string>();
+            metadata.Add("software.name", "Gekko Timeseries and Modeling Software");
+            metadata.Add("software.version", Globals.gekkoVersion);
+            if (hdg != null) metadata.Add("table.label", hdg);
+            metadata.Add("parquet.design.version", gekkoParquetVersion); //Gekko's version of the Parquet schema.              
+            metadata.Add("parquet.design.url", "https://t-t.dk/gekko/docs/user-manual/index.html?appendix_parquet.htm");
+            metadata.Add("export.timestamp", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
+            metadata.Add("column.id.comment", "An id corresponding to the Gekko name, for merging rowgroup1 into rowgroup2. Only lower-case, no blanks. String.");
+            metadata.Add("column.bank.comment", "Gekko databank name, often same as file name without extension (for future use, to store several databanks in 1 parquet file). String.");
+            metadata.Add("column.name.comment", "The Gekko series name. Alphanumeric or underscore chars, lower or upper-case. String.");
+            metadata.Add("column.freq.comment", "The Gekko frequency: a (annual), q (quarterly), m (monthly), w (weekly), d (daily), u (undated). Lower-case. String.");
+            metadata.Add("column.dims.comment", "Number of dimensions of the given (array-) timeseries. Integer.");
+            for (int ii = 0; ii < ndims; ii++)
+            {
+                metadata.Add("column.dim" + (ii + 1) + ".comment", "Dimension " + (ii + 1) + ". String.");
+            }
+            metadata.Add("column.label.comment", "The label of the given timeseries. String.");
+            metadata.Add("column.source.comment", "The source of the given timeseries. String.");
+            metadata.Add("column.unit.comment", "The unit of the given timeseries. String.");
+            metadata.Add("column.is_timeless.comment", "True if the timeseries is constant for all periods. Boolean.");
+            metadata.Add("column.date_start.comment", "The date corresponding to the first value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
+            metadata.Add("column.date_end.comment", "The date corresponding to the last value of the timeseries in the Gekko databank. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
+            metadata.Add("column.period_start.comment", "The period corresponding to the first value of the timeseries in the Gekko databank. String format. Not used by Gekko when importing.");
+            metadata.Add("column.period_end.comment", "The period corresponding to the last value of the timeseries in the Gekko databank. String format. Not used by Gekko when importing.");
+            metadata.Add("column.stamp.comment", "The timestamp corresponding to the last time the timeseries was changed in the Gekko databank. Date format, Unix time.");
+            metadata.Add("column.date.comment", "The date corresponding to the current data value. Date format, Unix time. Quarters etc. are identified as their *first* day. Not used by Gekko when importing.");
+            metadata.Add("column.period.comment", "The period corresponding to the current data value. String.");
+            metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
+            return metadata;
         }
 
 

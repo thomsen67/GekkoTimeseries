@@ -525,6 +525,13 @@ namespace Gekko
             {
                 PlotHelper plotHelper = new PlotHelper();                
                 string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, plotHelper, smpl.p);
+
+                if (Globals.runningOnTTComputer)
+                {
+                    //Parquet dump experiments
+                    //Arrow.WriteParquetPlot(plotTable, containerExplode, highestFreq);
+                }
+
                 if (Globals.browserPlotFiles != null) Globals.browserPlotFiles.Add(fileName);
                 if (G.NullOrEmpty(o.emfName)) o.emfName = fileName;  //Cannot hurt, o.emfName is never queried if it is == null
             }

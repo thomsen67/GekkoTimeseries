@@ -10,13 +10,14 @@ t1 = 1966
 t2 = 2023
 path = "c:\\Thomas\\Desktop\\gekko\\testing"
 gdx_file = "makrobk.gdx"
+gbk_file = "makrobk.gbk"
+parquet_file = "makrobk.parquet"
 png_file1 = "fig1.png"
 png_file2 = "fig2.png"
-png_file3 = "fig3.png"
 
-#dt.REFERENCE_DATABASE = dt.Gdx(f"{path}\{gdx_file}")
+# ------- gdx via dreamtools -----------
+
 s = dt.Gdx(f"{path}\{gdx_file}")
-
 dt.time(t1, t2)
 df1 = dt.DataFrame(
   [s.qBNP, s.vBNP],
@@ -25,24 +26,27 @@ df1 = dt.DataFrame(
 fig1 = df1.plot()
 dt.write_image(fig1, f"{path}\{png_file1}", scale=1)
 
-
-
-parquet_file = pq.ParquetFile("c:\\Thomas\\Desktop\\gekko\\testing\\makrobk.parquet") 
-gdf0 = parquet_file.read_row_group(0).to_pandas().drop(columns=['date', 'period', 'value'])
-gdf1 = parquet_file.read_row_group(1).to_pandas()[['id', 'date', 'period', 'value']]
-gdf = gdf0.merge(gdf1[['id']], on='id', how='right')
-gdf[['date', 'period', 'value']] = gdf1[['date', 'period', 'value']].values
-print(gdf) 
-
+# ------- parquet -----------
 
 import plotly.express as px
-#df3 = pd.DataFrame({
-#    "t": [2001, 2002, 2003],
-#    "x": [100, 110, 90]
-#})
-#fig3 = px.line(df3, x="t", y="x", title="Time Series of x over t")
-fig3 = px.line(gdf[gdf["id"] == "makrobk:qbnp!a"], x="date", y="value", title="Time Series of x over t")
-dt.write_image(fig3, f"{path}\{png_file3}", scale=1)
+
+pg.run(f"read {path}\{gbk_file};")
+pg.run(f"write <parquet> {path}\{parquet_file};")
+
+if True:
+    parquet_file = pq.ParquetFile(f"{path}\{parquet_file}") 
+    df2a = parquet_file.read_row_group(0).to_pandas().drop(columns=['date', 'period', 'value'])
+    df2b = parquet_file.read_row_group(1).to_pandas()[['id', 'date', 'period', 'value']]
+    df2 = df2a.merge(df2b[['id']], on='id', how='right')
+    df2[['date', 'period', 'value']] = df2b[['date', 'period', 'value']].values
+
+vars = ["makrobk:qbnp!a", "makrobk:vbnp!a"]
+fig2 = px.line(df2[df2["id"].isin(vars)], x="date", y="value", color="id")
+fig2.update_layout(xaxis_title="År", yaxis_title="", legend_title="")
+dt.write_image(fig2, f"{path}\{png_file2}", scale=1)
+
+
+
 
 i = 100
 

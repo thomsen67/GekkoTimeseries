@@ -1210,6 +1210,12 @@ namespace Gekko
         public string[] ss2 = null;
     }
 
+    /// <summary>
+    ///Structure of plotTable is:
+    ///There is a .dates and a .values field
+    ///First dimension of dates and values is the variable number, think of it as x1, ... x{n}, where x{i} can have any frequency
+    ///Second dimension is (for each variable number) the dates and the values, one by one.
+    ///</summary>
     public class PlotTable
     {
         public bool hasAtLeast1RealNumber = false;

@@ -260,15 +260,7 @@ namespace Gekko
 
             string fileData = path + "\\" + file1;
 
-            //List<string> tabLines = data.Print();
-
-            //structure of plotTable is (0 has 6 points, 1 has 3, 2 has 4).
-            //                dates[0]   dates[1]   dates[2]     values[0]   values[1]   values[2]
-            // i = 0             .          .         .              .          .            .
-            // i = 1             .          .         .              .          .            .
-            // i = 2             .          .         .              .          .            .
-            // i = 3             .                    .              .                       .
-            // i = 4             .                                   .                        
+            //List<string> tabLines = data.Print();            
 
             int max = int.MinValue;
             for (int j = 0; j < plotTable.dates.Count; j++)
