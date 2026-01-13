@@ -8131,7 +8131,6 @@ namespace Gekko
                 if (db == null)
                 {
                     new Error("Databank '" + this.bank + "' is not open, cf. OPEN command");
-                    //throw new GekkoException();
                 }
                 if (db.editable == true)
                 {
@@ -8140,6 +8139,7 @@ namespace Gekko
                 else
                 {
                     db.editable = true;
+                    db.isDirty = true;  //13-1-2026: The dirty logic has caused too much pain, so now we set it on any open<edit> databank. If nothing is changed, it is re-written, but so be it. See also #8yewefjkda.
                     G.Writeln2("Databank '" + this.bank + "' set editable");
                 }
             }
@@ -8212,7 +8212,6 @@ namespace Gekko
                     if (Program.databanks.GetDatabank(databank) == null)
                     {
                         new Error("Trying to close non-existing databank '" + databank + "'");
-                        //throw new GekkoException();
                     }
                     Databank removed = Program.databanks.RemoveDatabank(databank);
                     if (G.Equal(opt_save, "no"))

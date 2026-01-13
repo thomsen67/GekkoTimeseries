@@ -5673,7 +5673,6 @@ namespace Gekko
                     if (oRead.openType == EOpenType.Edit)
                     {
                         new Error("OPEN<edit> must be used with 1 databank");
-                        //throw new GekkoException();
                     }
                     else if (oRead.openType == EOpenType.Ref)
                     {
@@ -5974,7 +5973,11 @@ namespace Gekko
 
                     databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI, create); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                                                                
                     databank.editable = false;
-                    if (oRead.openType == EOpenType.Edit) databank.editable = true;
+                    if (oRead.openType == EOpenType.Edit)
+                    {
+                        databank.editable = true;
+                        databank.isDirty = true;  //13-1-2026: The dirty logic has caused too much pain, so now we set it on any open<edit> databank. If nothing is changed, it is re-written, but so be it. See also #8yewefjkda.
+                    }
                     databank.name = readInfo.dbName;
                 }
                 else
@@ -6165,7 +6168,7 @@ namespace Gekko
 
                 }
 
-                HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                    
+                HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                
 
                 if (Program.options.solve_data_create_auto == true)
                 {
@@ -6736,12 +6739,12 @@ namespace Gekko
 
         /// <summary>
         /// Technical helper method for reading databanks with array-series.
+        /// Because we are now always setting .dirty on open&lt;edit> and unlock, setting dirty=false here is not important any more!
         /// </summary>
         /// <param name="db"></param>
         /// <param name="merge"></param>
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
-        {
-            db.isDirty = false;
+        {            
             foreach (IVariable iv in db.storage.Values)
             {
                 Series ts = iv as Series;
