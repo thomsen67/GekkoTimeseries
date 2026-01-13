@@ -1053,7 +1053,6 @@ namespace Gekko
             else
             {
                 new Error("Internal error #726326283"); return -12345;
-                //throw new GekkoException();
             }
         }
 

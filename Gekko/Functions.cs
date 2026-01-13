@@ -5010,8 +5010,8 @@ namespace Gekko
             }
 
             try
-            {
-                File.Delete(s1);
+            {                
+                Program.WaitForFileDelete(s1);
             }
             catch (Exception ex)
             {
@@ -5026,6 +5026,14 @@ namespace Gekko
             FindFileHelper ffh = Program.FindFile(s1, null, true, true, false, true, smpl.p);
             if (ffh.realPathAndFileName == null) return Globals.scalarVal0;
             return Globals.scalarVal1;
+        }
+
+        public static IVariable existfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            bool b = Directory.Exists(s1);            
+            if (b) return Globals.scalarVal1;
+            return Globals.scalarVal0;
         }
 
         public static IVariable getfiles(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)

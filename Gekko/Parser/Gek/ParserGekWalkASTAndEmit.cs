@@ -2021,14 +2021,22 @@ namespace Gekko.Parser.Gek
                             CheckTypeInFunctionDefProcedureDefForDef("for-loop", type, varnames[0]);
 
                             int i = 0;
-                            string codeStart, codeEnd2, codeStep;
-                            GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
+                            string xcodeStart, xcodeEnd2, xcodeStep;
+                            GetCodes(node, i, out xcodeStart, out xcodeEnd2, out xcodeStep);
                             string temp = "counter" + ++Globals.counter;
+                            
+                            string tempStart = "xcodeStart" + ++Globals.counter;
+                            string tempEnd2 = "xcodeEnd2" + ++Globals.counter;
+                            string tempStep = "xcodeStep" + ++Globals.counter;
+                            node.Code.A("IVariable " + tempStart + " = " + xcodeStart).End();
+                            node.Code.A("IVariable " + tempEnd2 + " = " + xcodeEnd2).End();
+                            node.Code.A("IVariable " + tempStep + " = " + xcodeStep).End();
+
                             node.Code.A(node.forLoop[i].Item1 + " " + node.forLoop[i].Item2 + " = null").End();
                             node.Code.A("int " + temp + " = 0").End();
                             string loopType2 = "O.ELoopType." + loopType.ToString();
                             string y = "years" + ++Globals.counter;
-                            node.Code.A("bool " + y + " = O.LoopYears(`" + type + "`, " + loopType2 + ", " + codeStart + ", " + codeEnd2 + "); " + "for (O.IterateStart(" + y + ", " + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + y + ", " + loopType2 + ", " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + y + ", " + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
+                            node.Code.A("bool " + y + " = O.LoopYears(`" + type + "`, " + loopType2 + ", " + tempStart + ", " + tempEnd2 + "); " + "for (O.IterateStart(" + y + ", " + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + tempStart + "); O.IterateContinue(" + y + ", " + loopType2 + ", " + node.forLoop[i].Item2 + ", " + tempStart + ", " + tempEnd2 + ", " + tempStep + ", ref " + temp + "); O.IterateStep(" + y + ", " + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + tempStart + ", " + tempStep + ", " + temp + "))" + G.NL);
                             node.Code.A("{").End();
                             node.Code.A("O.TypeCheck_" + type.ToLower() + "(" + node.forLoop[i].Item2 + ", 0);" + G.NL);
                             node.Code.A(node[1].Code);

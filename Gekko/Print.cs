@@ -523,17 +523,18 @@ namespace Gekko
 
             if (type == EPrintTypes.Plot)
             {
-                PlotHelper plotHelper = new PlotHelper();                
-                string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, plotHelper, smpl.p);
-
-                if (Globals.runningOnTTComputer)
+                if (G.Equal(System.IO.Path.GetExtension(o.opt_filename), ".parquet"))
                 {
-                    //Parquet dump experiments
-                    //Arrow.WriteParquetPlot(plotTable, containerExplode, highestFreq);
+                    //Parquet file dump, instead of showing the plot
+                    Arrow.WriteParquetPlot(plotTable, containerExplode, highestFreq, o.opt_filename);
                 }
-
-                if (Globals.browserPlotFiles != null) Globals.browserPlotFiles.Add(fileName);
-                if (G.NullOrEmpty(o.emfName)) o.emfName = fileName;  //Cannot hurt, o.emfName is never queried if it is == null
+                else
+                {
+                    PlotHelper plotHelper = new PlotHelper();
+                    string fileName = Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, plotHelper, smpl.p);
+                    if (Globals.browserPlotFiles != null) Globals.browserPlotFiles.Add(fileName);
+                    if (G.NullOrEmpty(o.emfName)) o.emfName = fileName;  //Cannot hurt, o.emfName is never queried if it is == null
+                }                
             }
             else if (type == EPrintTypes.Sheet)
             {

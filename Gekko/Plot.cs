@@ -73,7 +73,7 @@ namespace Gekko
                 }
                 if (!G.Equal(extension, "emf") && !G.Equal(extension, "png") && !G.Equal(extension, "svg") && !G.Equal(extension, "pdf"))
                 {
-                    new Error("In PLOT, expected file type is emf, png, svg or pdf");
+                    new Error("In PLOT ... file = ..., expected file type is emf, png, parquet, pdf or svg.");
                 }
                 extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
             }
@@ -263,9 +263,9 @@ namespace Gekko
             //List<string> tabLines = data.Print();            
 
             int max = int.MinValue;
-            for (int j = 0; j < plotTable.dates.Count; j++)
+            for (int j = 0; j < plotTable.variables.Count; j++)
             {
-                max = Math.Max(max, plotTable.dates[j].Count);
+                max = Math.Max(max, plotTable.variables[j].data.Count);
             }
 
             using (FileStream fs = Program.WaitForFileStream(fileData, null, Program.GekkoFileReadOrWrite.Write))
@@ -285,22 +285,22 @@ namespace Gekko
                 for (int i = 0; i < max; i++)
                 {
                     //foreach (string s in tabLines) tw.WriteLine(s);                         
-                    for (int j = 0; j < plotTable.dates.Count; j++)
+                    for (int j = 0; j < plotTable.variables.Count; j++)
                     {
-                        if (i < plotTable.dates[j].Count)
+                        if (i < plotTable.variables[j].data.Count)
                         {
-                            tw.Write(string.Format("{0:0.#####}", plotTable.dates[j][i]) + " "); //width of 1 day is about 0.003 of a year. So 0.00001 is precise compared to that
+                            tw.Write(string.Format("{0:0.#####}", plotTable.variables[j].data[i].dateDouble) + " "); //width of 1 day is about 0.003 of a year. So 0.00001 is precise compared to that
                         }
                         else
                         {
                             tw.Write("M ");
                         }
                     }
-                    for (int j = 0; j < plotTable.values.Count; j++)
+                    for (int j = 0; j < plotTable.variables.Count; j++)
                     {
-                        if (i < plotTable.values[j].Count && !G.IsNumericalError(plotTable.values[j][i]))
+                        if (i < plotTable.variables[j].data.Count && !G.IsNumericalError(plotTable.variables[j].data[i].value))
                         {
-                            tw.Write(plotTable.values[j][i].ToString() + " ");
+                            tw.Write(plotTable.variables[j].data[i].value.ToString() + " ");
                         }
                         else
                         {
@@ -480,8 +480,9 @@ namespace Gekko
             {
                 double min2 = double.MaxValue;
                 double max2 = double.MinValue;
-                foreach (double d in plotTable.values[j])
+                for (int i = 0; i < plotTable.variables[j].data.Count; i++)
                 {
+                    double d = plotTable.variables[j].data[i].value;
                     if (!G.IsNumericalError(d))
                     {
                         min2 = Math.Min(min2, d);

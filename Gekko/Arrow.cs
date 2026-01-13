@@ -768,10 +768,8 @@ namespace Gekko
 
             Parquet.Schema.ParquetSchema schema = WriteParquetDatabankSchema(ndims);
             Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);
-
-            int valuesCounter = 0;
-            bool hasSubSeries = false;
-            int seriesCounter = 0;
+                        
+            bool hasSubSeries = false;            
 
             string bank = null;
             if (filterBankName == null) bank = Path.GetFileNameWithoutExtension(pathAndFilename);
@@ -807,8 +805,6 @@ namespace Gekko
                         G.PickFromAllFreqs(allFreqs, ts.freq, out gt1, out gt2);
                     }
                 }
-
-                seriesCounter++;
 
                 ids1.Add(fullName);
                 banks.Add(bank);
@@ -868,12 +864,11 @@ namespace Gekko
                 date_starts.Add(pq_date_starts); period_starts.Add(pq_period_starts);
 
                 DateTime? pq_date_ends; string pq_period_ends;
-                gt2 = WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
+                WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
                 date_ends.Add(pq_date_ends); period_ends.Add(pq_period_ends);
 
                 if (gt1.IsNull() || gt2.IsNull())
-                {
-                    valuesCounter++;
+                {                    
                     ids2.Add(fullName);
                     dates.Add(null);
                     periods.Add(null);
@@ -889,8 +884,7 @@ namespace Gekko
                 else
                 {
                     foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
-                    {
-                        valuesCounter++;
+                    {                        
                         ids2.Add(fullName);
                         dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
                         periods.Add(DateStringFormat(t));
@@ -899,17 +893,14 @@ namespace Gekko
                 }
             }
 
-            WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, dimss, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata, valuesCounter, seriesCounter);
+            WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, dimss, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata);
 
             string s = null; if (hasSubSeries) s = " (including array-subseries)";
-            new Writeln("Wrote " + seriesCounter + " series" + s + " to parquet file with " + valuesCounter + " rows in two rowgroups in " + G.Seconds(dt));
+            new Writeln("Wrote " + ids1.Count + " series" + s + " to parquet file with " + (ids1.Count + ids2.Count) + " rows in two rowgroups in " + G.Seconds(dt));
         }
         
-        public static void WriteParquetPlot(PlotTable plotTable, List<O.Prt.Element> containerExplode, EFreq highestFreq)
+        public static void WriteParquetPlot(PlotTable plotTable, List<O.Prt.Element> containerExplode, EFreq highestFreq, string pathAndFilename)
         {
-            string pathAndFilename = "c:\\tools\\plot.parquet";
-
-
             string gekkoParquetVersion = "1.0";
             DateTime dt = DateTime.Now;
             int ndims = 0;
@@ -939,48 +930,37 @@ namespace Gekko
             // ================================================
 
             Parquet.Schema.ParquetSchema schema = WriteParquetDatabankSchema(ndims);
-            Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);
-
-            int valuesCounter = 0;
-            bool hasSubSeries = false;
-            int seriesCounter = 0;
-
-            string bank = null;
-
-            //We assume .values correspond
-            for (int i = 0; i < plotTable.dates.Count; i++)
-            {                
-                Series ts = null;
-                bool isTimeless = ts.type == ESeriesType.Timeless;
-                string fullName = "";
-                string freq = "";
-                string varnameWithoutFreqAndIndex = G.Chop_GetName("");
-                string varnameWithoutIndex = G.Chop_GetNameAndFreq("");
+            Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);                        
+                        
+            for (int i = 0; i < plotTable.variables.Count; i++)
+            {
+                if (plotTable.variables[i].data.Count == 0) continue; //Can that ever happen?
+                string xNameWithoutFreq = "x" + (i + 1);
+                string freq = plotTable.variables[i].data[0].dateGekkoTime.freq.ToString().ToLower();
+                string xName = G.Chop_AddFreq(xNameWithoutFreq, freq);
+                string label = null;
+                try { label = containerExplode[i].labelOLD[0]; } catch { }
 
                 GekkoTime gt1 = GekkoTime.tNull;
                 GekkoTime gt2 = GekkoTime.tNull;
+                try
+                {
+                    gt1 = plotTable.variables[i].data[0].dateGekkoTime;
+                    gt2 = plotTable.variables[i].data[plotTable.variables[i].data.Count - 1].dateGekkoTime;
+                }
+                catch { }
 
-                seriesCounter++;
-
-                ids1.Add(fullName);
-                banks.Add(bank);
-                names.Add(varnameWithoutFreqAndIndex);
+                ids1.Add(xName);
+                banks.Add(null);
+                names.Add(xNameWithoutFreq);
                 freqs.Add(freq);                
                 dims.Add(0);      
-                labels.Add(ts.MetaGetLabel());
-                sources.Add(ts.MetaGetSource());
-                units.Add(ts.MetaGetUnits());
-                timelesss.Add(isTimeless);
+                labels.Add(label);
+                sources.Add(null);
+                units.Add(null);
+                timelesss.Add(false); //Even with "plot 2;", it is non-interesting that 2 is timeless.
 
-                // -------------------------------------------------------------------------------------------------------
-                // Note about UTC. Regarding the DateTime object, it only contains ticks + a flag regarding UTC or local.
-                // It seems that Parquet.NET ignores any 'UTC or not' flag anyway.
-                // Polars and parquet datetimes are unix utc ('naive'), only pandas allows to state a timezone, but that
-                // is inefficient for calculations. Better to keep the datetimes as utc, and only convert them when
-                // humans are *viewing* the datatimes.
-                // -------------------------------------------------------------------------------------------------------
-
-                DateTime? pq_timestamp = WriteParquetDatabankGetTimestamp(ts.MetaGetStamp());
+                DateTime? pq_timestamp = DateTime.UtcNow;  //Must be ok to give the stamp as the time where the transformation was done (could involve several timeseries: this is what a transformation like y = x1 + x2 does too, regardless of the stamps of x1 and x2).
                 stamps.Add(pq_timestamp);
 
                 DateTime? pq_date_starts; string pq_period_starts;
@@ -988,28 +968,25 @@ namespace Gekko
                 date_starts.Add(pq_date_starts); period_starts.Add(pq_period_starts);
 
                 DateTime? pq_date_ends; string pq_period_ends;
-                gt2 = WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
+                WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
                 date_ends.Add(pq_date_ends); period_ends.Add(pq_period_ends);
                 
-                for (int j = 0; j < plotTable.dates[i].Count; j++)
+                for (int j = 0; j < plotTable.variables[i].data.Count; j++)
                 {
-                    GekkoTime t = GekkoTime.tNull;
-                    valuesCounter++;
-                    ids2.Add(fullName);
+                    GekkoTime t = plotTable.variables[i].data[j].dateGekkoTime;
+                    ids2.Add(xName);
                     dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
                     periods.Add(DateStringFormat(t));
-                    values.Add(ts.GetDataSimple(t));
+                    values.Add(plotTable.variables[i].data[j].value);
                 }
             }
-            
-            WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, null, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata, valuesCounter, seriesCounter);
 
-            string s = null; if (hasSubSeries) s = " (including array-subseries)";
-            new Writeln("Wrote " + seriesCounter + " series" + s + " to parquet file with " + valuesCounter + " rows in two rowgroups in " + G.Seconds(dt));
+            WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, null, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata);
+            new Writeln("PLOT created file " + pathAndFilename + " with " + ids1.Count + " expression" + G.S(ids1.Count) + " and " + (ids1.Count + ids2.Count) + " rows in two rowgroups in " + G.Seconds(dt));
 
         }        
 
-        private static GekkoTime WriteParquetDatabankPeriodEnd(GekkoTime gt2, out DateTime? pq_date_ends, out string pq_period_ends)
+        private static void WriteParquetDatabankPeriodEnd(GekkoTime gt2, out DateTime? pq_date_ends, out string pq_period_ends)
         {
             pq_date_ends = null;
             pq_period_ends = null;
@@ -1018,8 +995,6 @@ namespace Gekko
                 try { pq_date_ends = GekkoTime.FromGekkoTimeToDateTime(gt2, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours                    
                 pq_period_ends = DateStringFormat(gt2);
             }
-
-            return gt2;
         }
 
         private static void WriteParquetDatabankPeriodStart(GekkoTime gt1, out DateTime? pq_date_starts, out string pq_period_starts)
@@ -1060,14 +1035,13 @@ namespace Gekko
                     }
                 }
             }
-
             return pq_timestamp;
         }
 
         /// <summary>
         /// Physically write the parquet file (group 0 and 1)
         /// </summary>        
-        private static void WriteParquetDatabankFile(List<string> ids1, List<string> ids2, List<string> banks, List<string> names, List<string> freqs, int ndims, List<int?> dims, List<List<string>> dimss, List<string> labels, List<string> sources, List<string> units, List<bool?> timelesss, List<DateTime?> date_starts, List<DateTime?> date_ends, List<string> period_starts, List<string> period_ends, List<DateTime?> stamps, List<DateTime?> dates, List<string> periods, List<double?> values, string pathAndFilename, Parquet.Schema.ParquetSchema schema, Dictionary<string, string> metadata, int valuesCounter, int seriesCounter)
+        private static void WriteParquetDatabankFile(List<string> ids1, List<string> ids2, List<string> banks, List<string> names, List<string> freqs, int ndims, List<int?> dims, List<List<string>> dimss, List<string> labels, List<string> sources, List<string> units, List<bool?> timelesss, List<DateTime?> date_starts, List<DateTime?> date_ends, List<string> period_starts, List<string> period_ends, List<DateTime?> stamps, List<DateTime?> dates, List<string> periods, List<double?> values, string pathAndFilename, Parquet.Schema.ParquetSchema schema, Dictionary<string, string> metadata)
         {
             //Note: All this ConfigureAwait(false).GetAwaiter().GetResult() stuff is because Excel-Dna will
             //      not work without it. Without it it either only writes 1 column, or scrambles the columns.
@@ -1085,7 +1059,7 @@ namespace Gekko
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
 
-                    int rowCount = seriesCounter;
+                    int rowCount = ids1.Count;
                     int i = -1;
 
                     WriteCol(group, new DataColumn(schema.DataFields[++i], ids1.ToArray()));
@@ -1122,7 +1096,7 @@ namespace Gekko
                 // ------------------------------
                 using (ParquetRowGroupWriter group = writer.CreateRowGroup())
                 {
-                    int rowCount = valuesCounter;
+                    int rowCount = ids2.Count;
                     int i = -1;
 
                     WriteCol(group, new DataColumn(schema.DataFields[++i], ids2.ToArray()));

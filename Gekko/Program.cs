@@ -1213,14 +1213,42 @@ namespace Gekko
     /// <summary>
     ///Structure of plotTable is:
     ///There is a .dates and a .values field
-    ///First dimension of dates and values is the variable number, think of it as x1, ... x{n}, where x{i} can have any frequency
-    ///Second dimension is (for each variable number) the dates and the values, one by one.
+    ///First dimension is the variable number, think of it as x1, ... x{n}, where x{i} can have any frequency.
+    ///Second dimension is (for each variable number) the "points".
     ///</summary>
     public class PlotTable
     {
         public bool hasAtLeast1RealNumber = false;
-        public List<List<double>> dates = null;
-        public List<List<double>> values = null;
+        public List<PlotTableData> variables = new List<PlotTableData>();
+
+        public PlotTable(int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                this.variables.Add(new PlotTableData());
+            }
+        }
+    }
+
+    /// <summary>
+    /// Contains the "points" for 1 plot series/expression.
+    /// </summary>
+    public class PlotTableData
+    {
+        public List<PlotTablePoints> data = new List<PlotTablePoints>();
+        public EFreq freq = EFreq.None;
+
+        public void Add(EFreq freqHere, GekkoTime t, double d)
+        {
+            this.data.Add(new PlotTablePoints() { dateGekkoTime = t, dateDouble = Program.PlotTableTime(freqHere, t), value = d });
+        }
+    }
+
+    public class PlotTablePoints 
+    {
+        public double dateDouble = double.NaN;
+        public GekkoTime dateGekkoTime = GekkoTime.tNull;
+        public double value = double.NaN;
     }
 
     public class OLSRekurInfo
@@ -24706,7 +24734,7 @@ namespace Gekko
             {
                 new Error("The folder " + dir + " does not exist for file copying");
             }
-
+            
             int gap = Globals.waitFileGap;  //2 second
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
@@ -24751,9 +24779,22 @@ namespace Gekko
                     {
                         new Warning(EWarningType.NoUsing, "File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
-                    System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
+                    Thread.Sleep(gap * 1000);
                     continue;
                 }
+                
+                if (type == "delete")
+                {                    
+                    Thread.Sleep(10); //0.01s just to prepare for the exists() check
+                    if (File.Exists(pathAndFilenameSource))
+                    {
+                        //Not sure why this can happen, but it can
+                        new Warning(EWarningType.NoUsing, "File '" + pathAndFilenameSource + "' seems non-deleted. Retrying... (" + (i * gap) + " seconds)");
+                        Thread.Sleep(gap * 1000);  //We try the same gap
+                        continue;
+                    }
+                }
+                
                 break;
             }
             if (success == false)
@@ -24766,7 +24807,6 @@ namespace Gekko
                 {
                     new Error("Gave up on deleting file '" + pathAndFilenameSource + "'. Is it opened/blocked by another program?");
                 }
-                //throw new GekkoException();
             }
             return;
         }
@@ -28215,14 +28255,7 @@ namespace Gekko
         /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
         {            
-            PlotTable plotTable = new PlotTable();
-            plotTable.dates = new List<List<double>>();
-            plotTable.values = new List<List<double>>();
-            for (int j = 0; j < n; j++)
-            {
-                plotTable.dates.Add(new List<double>());
-                plotTable.values.Add(new List<double>());
-            }
+            PlotTable plotTable = new PlotTable(n);            
 
             for (int j = 2; j < n + 2; j++)  //cols/variables starts at j=2. So for 3 variables we have 2, 3, 4.
             {
@@ -28261,9 +28294,7 @@ namespace Gekko
                     {
                         d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_yoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
-                    i++;
-
-                    double tt = PlotTableTime(freqHere, t);
+                    i++;                    
 
                     //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
                     //We skip the j=1 column, so the following logic applies, if there are n variables
@@ -28271,8 +28302,7 @@ namespace Gekko
                     //j=2 --> 1 and 1+n
                     //j=3 --> 2 and 2+n
 
-                    plotTable.dates[j - 2].Add(tt);
-                    plotTable.values[j - 2].Add(d);
+                    plotTable.variables[j - 2].Add(freqHere, t, d);
 
                     if (!plotTable.hasAtLeast1RealNumber && PlotMixedRangeOk(d, o))
                     {

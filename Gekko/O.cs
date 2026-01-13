@@ -1527,7 +1527,6 @@ namespace Gekko
                 else
                 {
                     new Error("Loop type problem");
-                    //throw new GekkoException();
                 }
             }
             else
