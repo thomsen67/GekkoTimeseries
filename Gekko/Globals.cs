@@ -41,7 +41,7 @@ namespace Gekko
 
         public static List<string> hardLoadedDlls = new List<string>() { "System.Memory", "System.Runtime.CompilerServices.Unsafe", "System.Threading.Tasks.Extensions" }; //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
 
-        public static bool greuHack = true;  //Year must be YYYY, digits
+        public static bool greuHack = false;  //Year must be YYYY, digits
 
         public static bool gdxReaderDebug = false;        
         public const string libraryDriveCheatString = "library___name___";        
