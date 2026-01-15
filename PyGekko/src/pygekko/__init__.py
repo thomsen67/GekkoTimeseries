@@ -61,6 +61,22 @@ def plot(*args, **kwargs):
         s = f"plot <{t} {op}> {vars};"
     interface.run(s)
 
+def read_parquet(path: str) -> pd.DataFrame:
+    """
+    From a Gekko-compatible parquet file (string path), it reads the parqet file and transforms it
+    into a Pandas dataframe. It merges the two rowgroups of the parquet file together into one
+    dataframe. Rowgroup 0 contains metadata etc. common to each timeseries, whereas rowgroup 1
+    contains the data itself (id, date, period, value). Storing everything in one rowgroup would
+    create a lot of duplicate data.
+    """    
+    import pyarrow.parquet as pq # pip install pyarrow
+    parquet_file = pq.ParquetFile(path) 
+    df0 = parquet_file.read_row_group(0).to_pandas().drop(columns=['date', 'period', 'value'])
+    df1 = parquet_file.read_row_group(1).to_pandas()[['id', 'date', 'period', 'value']]
+    df = df0.merge(df1[['id']], on='id', how='right')
+    df[['date', 'period', 'value']] = df1[['date', 'period', 'value']].values
+    return df
+
 def strings_or_values_to_string(x):
     """
     Transforms a single value (str, int, float) or a list of these values 
@@ -78,7 +94,6 @@ def strings_or_values_to_string(x):
     else:        
         raise TypeError(f"Input must be a string, integer, float, or a list thereof")
     return result
-
 
 def strings_to_string(x):
     """
@@ -98,6 +113,4 @@ def strings_to_string(x):
         raise TypeError(f"Input must be a string or a list thereof")
     return result
 
-
-    
 
