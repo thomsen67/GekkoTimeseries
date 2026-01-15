@@ -61,7 +61,7 @@ def plot(*args, **kwargs):
         s = f"plot <{t} {op}> {vars};"
     interface.run(s)
 
-def read_parquet(path: str) -> pd.DataFrame:
+def read_parquet(path: str): # -> pd.DataFrame:
     """
     From a Gekko-compatible parquet file (string path), it reads the parqet file and transforms it
     into a Pandas dataframe. It merges the two rowgroups of the parquet file together into one
