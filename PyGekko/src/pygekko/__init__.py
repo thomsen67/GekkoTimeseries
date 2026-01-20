@@ -1,9 +1,10 @@
 # Functions that are directly callable
 
-__version__ = "3.3.3" # always increment with new upload to PyPI
+__version__ = "3.3.3rc1" # always increment with new upload to PyPI, put for instance 3.3.3rc1 for a 3.3.3 pre-release 1.
 
 from . import type_checks
 from .interface import run, threads, wait, stdout
+import tempfile
 
 # Regarding helper functions like decomp():
 # In C#.NET (Python.cs) there is this method: 
@@ -60,6 +61,16 @@ def plot(*args, **kwargs):
             raise SyntaxError(f"Keyword '{key}' not implemented")
         s = f"plot <{t} {op}> {vars};"
     interface.run(s)
+
+def df_plot(s: str): # -> pd.DataFrame:
+  tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.parquet')
+  tmp.close()  
+  interface.run(f"plot {s} file={tmp.name};")
+  df = read_parquet(f"{tmp.name}") 
+  # Cannot get Python to delete the tmp.name file now...: it is unfortunately blocked.
+  # But python.net seems to dump .dll files in the same location too, so
+  # maybe the pollution is not that bad after all.
+  return df
 
 def read_parquet(path: str): # -> pd.DataFrame:
     """

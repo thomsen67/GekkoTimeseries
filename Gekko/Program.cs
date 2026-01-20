@@ -25454,6 +25454,9 @@ namespace Gekko
         {
             if (Program.IsDatabankDirty(removed))
             {
+                //If it is a non-gbk, we are not going to alter the databank no matter what
+                if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + "", StringComparison.OrdinalIgnoreCase)) return;
+
                 if (removed.save == false)
                 {
                     G.Writeln2("Databank '" + removed.name + "' closed, changes not written to file");
@@ -25893,7 +25896,7 @@ namespace Gekko
             bool skipWrite = false;
             GekkoTime tStart = GekkoTime.tNull;
             GekkoTime tEnd = GekkoTime.tNull;
-            if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
+            if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + "", StringComparison.OrdinalIgnoreCase))
             {
                 string fn5 = Path.GetFileName(removed.FileNameWithPath);
                 if (fn5.StartsWith(Globals.tempFileStart) && fn5.EndsWith(Globals.tempFileEnd))
