@@ -2177,8 +2177,8 @@ namespace Gekko
 
         private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
         {
-            EModelEquationsOrVariables status = 0;
-            int substatus = 0;
+            EModelEquationsOrVariables status = EModelEquationsOrVariables.None;
+            EEquationCountsOrVariableCounts substatus = EEquationCountsOrVariableCounts.None;
             string line = null;
             while ((line = sr.ReadLine()) != null)
             {
@@ -2203,13 +2203,13 @@ namespace Gekko
                         //start.Add(line);
                         if (line.StartsWith("* " + Globals.string_equation_counts))
                         {
-                            substatus = 1;
+                            substatus = EEquationCountsOrVariableCounts.EquationCounts;
                         }
                         else if (line.StartsWith("* " + Globals.string_variable_counts))
                         {
-                            substatus = 2;
+                            substatus = EEquationCountsOrVariableCounts.VariableCounts;
                         }
-                        if (substatus == 1)
+                        if (substatus == EEquationCountsOrVariableCounts.EquationCounts)
                         {
                             string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                             foreach (string sx in ss)
@@ -2217,12 +2217,12 @@ namespace Gekko
                                 if (G.IsInteger(sx))
                                 {
                                     eqCounts = int.Parse(sx);
-                                    substatus = 0;
+                                    substatus = EEquationCountsOrVariableCounts.None;
                                     break;
                                 }
                             }
                         }
-                        else if (substatus == 2)
+                        else if (substatus == EEquationCountsOrVariableCounts.VariableCounts)
                         {
                             string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                             foreach (string sx in ss)
@@ -2230,7 +2230,7 @@ namespace Gekko
                                 if (G.IsInteger(sx))
                                 {
                                     varCounts = int.Parse(sx);
-                                    substatus = 0;
+                                    substatus = EEquationCountsOrVariableCounts.None;
                                     break;
                                 }
                             }
