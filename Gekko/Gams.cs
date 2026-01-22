@@ -16,6 +16,19 @@ using System.Windows.Forms;
 
 namespace Gekko
 {
+    public enum EEquationsOrVariables 
+    {
+        None,
+        Equations,
+        Variables
+    }
+
+    public enum EEquationCountsOrVariableCounts 
+    {
+        None,
+        EquationCounts,
+        VariableCounts
+    }
 
     public enum EExtractTimeDimension
     {
@@ -600,7 +613,11 @@ namespace Gekko
                         for (int j = 0; j < ss.Length; j++)
                         {
                             string s = ss[j].Trim();
-                            if (Globals.greuHack && (s.Length != 4 || !G.IsInteger(s, false, true))) continue;
+                            if (Globals.greuHack && (s.Length != 4 || !G.IsInteger(s, false, true)))
+                            {
+                                fullName.Add(s);
+                                continue;
+                            }
                             GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
                             bool good = true;
                             //This would be easier if time was known to be always last...
@@ -707,7 +724,7 @@ namespace Gekko
             //  --> Sometimes seen it around 4.1 in debug mode (best release mode: around 3.40).
 
             //Note: cf. these interfaces from Python or Julia to GAMS: https://www.gams.com/blog/2020/06/new-and-improved-gams-links-for-pyomo-and-jump/
-
+            
             EqLineHelper helper = new EqLineHelper();
             helper.dict_FromEqNumberToEqName = null;
             helper.dict_FromVarNumberToVarName = null;
@@ -716,10 +733,8 @@ namespace Gekko
             DateTime dt1 = DateTime.Now;  //sub tasks
 
             string[] split = new string[] { ".fx", ".l", "=", ";" };
-            string[] split2 = new string[] { " " };
-                                    
-            int status2 = 0;
-            int substatus2 = 0;
+            string[] split2 = new string[] { " " };                                    
+            
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
             int fakeEqCounts2 = 0;
@@ -731,14 +746,14 @@ namespace Gekko
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
                 }
             }
 
@@ -2275,8 +2290,10 @@ namespace Gekko
         /// <param name="fakeEqCounts2"></param>
         /// <param name="fakeVarCounts2"></param>
         /// <param name="sr"></param>
-        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, EFreq gekkoModelFreq, ref bool res_variables, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
-        {            
+        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, EFreq gekkoModelFreq, ref bool res_variables, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
+        {
+            EEquationsOrVariables status2 = EEquationsOrVariables.None;            
+            EEquationCountsOrVariableCounts substatus2 = EEquationCountsOrVariableCounts.None;
             bool b = false;
             string line = null;
             while ((line = sr.ReadLine()) != null)
@@ -2284,14 +2301,14 @@ namespace Gekko
                 if (line.Trim() == "") continue;
                 if (G.Contains(line, Globals.string_equation_counts))
                 {
-                    substatus2 = 1;
+                    substatus2 = EEquationCountsOrVariableCounts.EquationCounts;
                 }
                 else if (G.Contains(line, Globals.string_variable_counts))
                 {
-                    substatus2 = 2;
+                    substatus2 = EEquationCountsOrVariableCounts.VariableCounts;
                 }
 
-                if (substatus2 == 1)
+                if (substatus2 == EEquationCountsOrVariableCounts.EquationCounts)
                 {
                     string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string sx in ss)
@@ -2306,7 +2323,7 @@ namespace Gekko
                         }
                     }
                 }
-                else if (substatus2 == 2)
+                else if (substatus2 == EEquationCountsOrVariableCounts.VariableCounts)
                 {
                     string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string sx in ss)
@@ -2323,15 +2340,15 @@ namespace Gekko
 
                 if (line.ToLower().StartsWith("equations "))
                 {
-                    status2 = 1;
+                    status2 = EEquationsOrVariables.Equations;
                     continue;
                 }
                 else if (line.ToLower().StartsWith("variables "))
                 {
-                    status2 = 2;
+                    status2 = EEquationsOrVariables.Variables;
                     continue;
                 }
-                if (status2 == 1)
+                if (status2 == EEquationsOrVariables.Equations)
                 {                    
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
@@ -2349,7 +2366,7 @@ namespace Gekko
                     helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count(), b);
                     helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
                 }
-                else if (status2 == 2)
+                else if (status2 == EEquationsOrVariables.Variables)
                 {                    
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
@@ -2374,6 +2391,7 @@ namespace Gekko
                             //We try to do it fast for YYYY annual type.
                             int i = G.IntParse(time);
                             if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);
+                            if (Globals.greuHack && !t.IsNull() && (t.super < 2020 || t.super < 2025)) continue;
                         }
                         else if (freq == EFreq.Q)
                         {
@@ -2433,10 +2451,7 @@ namespace Gekko
                 int counter = -1;
                 foreach (string part in parts)
                 {
-                    counter++;
-                    if (G.Equal(part, "0600a") && counter == parts.Count - 1)
-                    {
-                    }                    
+                    counter++;                    
                     bool isTime = false;
 
                     if (freq == EFreq.A)
@@ -2480,6 +2495,7 @@ namespace Gekko
                 {
                     if (timePart != parts.Count - 1)
                     {
+                        //Move time part last
                         string temp = parts[timePart];
                         parts[timePart] = parts[parts.Count - 1];
                         parts[parts.Count - 1] = temp;
