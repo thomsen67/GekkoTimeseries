@@ -1399,7 +1399,12 @@ namespace Gekko
             s = s1.Substring(a, b);
             return new ScalarString(s);
         }
-        
+
+        public static void greu(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] args)
+        {
+            Globals.greuHack = true;
+        }
+
         public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] args)
         {
             //7

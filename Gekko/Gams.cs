@@ -30,6 +30,14 @@ namespace Gekko
         VariableCounts
     }
 
+    public enum EModelEquationsOrVariables
+    {
+        None,
+        Equations,
+        Variables,
+        Done
+    }
+
     public enum EExtractTimeDimension
     {
         Full,
@@ -782,9 +790,7 @@ namespace Gekko
 
             List<string> eqs = new List<string>();      //1
             List<string> values = new List<string>();   //2
-            List<string> end = new List<string>();      //3
-            int status = 0;
-            int substatus = 0;
+            List<string> end = new List<string>();      //3            
             int eqCounts = -12345;
             int varCounts = -12345;
             int semis = 0;
@@ -809,14 +815,14 @@ namespace Gekko
             {
                 //No need to taste: time is *always* last dimension
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.equations).ToString())));
-                ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref status, ref substatus, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
+                ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
             }
             else
             {                
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledModel.realPathAndFileName, settings.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (StreamReader sr = new StreamReader(fs))
                 {
-                    ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref status, ref substatus, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
+                    ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
                 }
             }
             
@@ -2169,12 +2175,14 @@ namespace Gekko
             }
         }
 
-        private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int status, ref int substatus, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
-        {            
+        private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
+        {
+            EModelEquationsOrVariables status = 0;
+            int substatus = 0;
             string line = null;
             while ((line = sr.ReadLine()) != null)
             {
-                if (status == 0)
+                if (status == EModelEquationsOrVariables.None)
                 {
                     if (line.StartsWith("e1.."))
                     {
@@ -2188,16 +2196,16 @@ namespace Gekko
                             if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
                             eqLine = new StringBuilder();
                         }
-                        status = 1;
+                        status = EModelEquationsOrVariables.Equations;
                     }
                     else
                     {
                         //start.Add(line);
-                        if (line.StartsWith("* "+Globals.string_equation_counts))
+                        if (line.StartsWith("* " + Globals.string_equation_counts))
                         {
                             substatus = 1;
                         }
-                        else if (line.StartsWith("* "+Globals.string_variable_counts))
+                        else if (line.StartsWith("* " + Globals.string_variable_counts))
                         {
                             substatus = 2;
                         }
@@ -2229,12 +2237,12 @@ namespace Gekko
                         }
                     }
                 }
-                else if (status == 1)
+                else if (status == EModelEquationsOrVariables.Equations)
                 {
                     if (line.StartsWith("* set non-default bounds", StringComparison.OrdinalIgnoreCase) || line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase))
                     {
                         values.Add(line);
-                        status = 2;
+                        status = EModelEquationsOrVariables.Variables;
                     }
                     else
                     {
@@ -2257,12 +2265,12 @@ namespace Gekko
                         }
                     }
                 }
-                else if (status == 2)
+                else if (status == EModelEquationsOrVariables.Variables)
                 {
                     if (line.ToLower().StartsWith("model ")) //model m / all /;
                     {
                         end.Add(line);
-                        status = 3;
+                        status = EModelEquationsOrVariables.Done;
                     }
                     else
                     {
@@ -2338,12 +2346,12 @@ namespace Gekko
                     }
                 }
 
-                if (line.ToLower().StartsWith("equations "))
+                if (line.StartsWith(Globals.string_equations_1_to))
                 {
                     status2 = EEquationsOrVariables.Equations;
                     continue;
                 }
-                else if (line.ToLower().StartsWith("variables "))
+                else if (line.StartsWith(Globals.string_variables_1_to))
                 {
                     status2 = EEquationsOrVariables.Variables;
                     continue;
@@ -2353,6 +2361,12 @@ namespace Gekko
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
                     LineChopper(line, 'e', gekkoModelFreq, out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
+                                        
+                    if (Globals.greuHack)
+                    {
+                        int itime = G.IntParse(time);
+                        if (itime != -12345 && (itime < 2020 || itime > 2025)) continue;
+                    }
 
                     string eqName = nameWithIndexes;
                     if (G.Contains(eqName, Globals.scalarModelExtraVariable))
@@ -2371,7 +2385,13 @@ namespace Gekko
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
                     LineChopper(line, 'x', gekkoModelFreq, out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
-                                        
+
+                    if (Globals.greuHack)
+                    {
+                        int itime = G.IntParse(time);
+                        if (itime != -12345 && (itime < 2020 || itime > 2025)) continue;
+                    }
+
                     if (!res_variables && G.StartsWith(nameWithIndexes, Globals.decompResidualPrefix)) res_variables = true;                    
 
                     if (G.Contains(nameWithIndexes, Globals.scalarModelExtraVariable))
@@ -2390,8 +2410,7 @@ namespace Gekko
                         {
                             //We try to do it fast for YYYY annual type.
                             int i = G.IntParse(time);
-                            if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);
-                            if (Globals.greuHack && !t.IsNull() && (t.super < 2020 || t.super < 2025)) continue;
+                            if (i != -12345) t = new GekkoTime(EFreq.A, i, 1);                            
                         }
                         else if (freq == EFreq.Q)
                         {
@@ -2414,6 +2433,19 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Chops up a GAMS dictionary line like "x1  x(i, j, 2025)" into eq number (n), name variants, a list of strings of non-time dimensions, 
+        /// and lastly time (may be null). For annual, time must be 4 times 0..9 where the first is 1 or 2. Like 1990 or 2350.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="ex"></param>
+        /// <param name="gekkoModelFreq"></param>
+        /// <param name="n"></param>
+        /// <param name="nameWithIndex"></param>
+        /// <param name="nameWithIndexNoTime"></param>
+        /// <param name="nameWithoutIndex"></param>
+        /// <param name="parts"></param>
+        /// <param name="time"></param>
         private static void LineChopper(string line, char ex, EFreq gekkoModelFreq, out int n, out string nameWithIndex, out string nameWithIndexNoTime, out string nameWithoutIndex, out List<string> parts, out string time)
         {
             nameWithoutIndex = null;

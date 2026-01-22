@@ -389,6 +389,7 @@ namespace Gekko
         /// <returns></returns>
         public static int IntParse(string s)
         {
+            if (s == null) return -12345;
             int y = 0;
             for (int i = 0; i < s.Length; i++)
             {
