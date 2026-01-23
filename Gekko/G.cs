@@ -547,52 +547,7 @@ namespace Gekko
             }
 
             return result;
-        }
-
-        ///// <summary>
-        ///// Splits up "a,bb,'x,y',c" into "a", "bb", "x,y, "c"
-        ///// </summary>
-        ///// <param name="s"></param>
-        ///// <returns></returns>
-        //public static List<string> GetNonCommaRangesWithQuotes(string s)
-        //{
-        //    var result = new List<string>();
-        //    bool inQuotes = false;
-        //    int? start = null;
-
-        //    for (int i = 0; i < s.Length; i++)
-        //    {
-        //        char c = s[i];
-
-        //        if (c == '\'')
-        //        {
-        //            inQuotes = !inQuotes;
-        //            // If we’re entering a quoted block and not already in a range, start it
-        //            if (start == null) start = i;
-        //            // If we’re exiting quotes, keep going (don’t close yet)
-        //            continue;
-        //        }
-
-        //        if (!inQuotes && c == ',')
-        //        {
-        //            // End of a non-quoted range
-        //            if (start != null)
-        //            {
-        //                result.Add((start.Value, i - 1));
-        //                start = null;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // Start of a new range
-        //            if (start == null) start = i;
-        //        }
-        //    }
-
-        //    // If ended inside a range
-        //    if (start != null) result.Add((start.Value, s.Length - 1));
-        //    return result;
-        //}
+        }        
 
         /// <summary>
         /// Add 's' to plural word. For instance "0 files", "1 file", "2 files", ... . 
@@ -2590,6 +2545,36 @@ namespace Gekko
         public static bool ContainsZipPath(string pathAndFilename)
         {
             return pathAndFilename.ToLower().Contains(Globals.zip + "\\");
+        }
+
+        /// <summary>
+        /// With "xx(aa,'xx(aa)',AA)" and "aa" and "zz", it will become "xx(zz,'xx(aa)',zz)", not touching the inside.
+        /// The method is case-insensitive
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
+        public static string ReplaceIgnoreCaseIgnoreQuoted(string input, string s1, string s2)
+        {
+            if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(s1))
+                return input;
+
+            // Pattern: Matches anything in '...' (Group: ignore) OR the target s1
+            // Regex.Escape(s1) ensures the search string is treated as literal text
+            string pattern = $@"(?<ignore>'[^']*')|{Regex.Escape(s1)}";
+
+            return Regex.Replace(input, pattern, m =>
+            {
+                // If the match was caught by the 'ignore' group, return it exactly as-is
+                if (m.Groups["ignore"].Success)
+                {
+                    return m.Value;
+                }
+
+                // Otherwise, it's a case-insensitive match for s1; replace with s2
+                return s2;
+            }, RegexOptions.IgnoreCase);
         }
 
         /// <summary>

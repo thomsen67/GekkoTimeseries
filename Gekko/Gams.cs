@@ -35,6 +35,7 @@ namespace Gekko
         None,
         Equations,
         Variables,
+        IsIgnoringLines,
         Done
     }
 
@@ -120,15 +121,21 @@ namespace Gekko
                     code.AppendLine("{");
                     for (int i = chunk.int1; i < chunk.int2; i++)
                     {
-                        code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd, t) =>");
-                        code.AppendLine("{"); //start dynamic function
-                        code.AppendLine("int[] b = bb[i];");
-                        code.AppendLine("int[] d = dd[i];");
-                        code.AppendLine("double sum = 0d;");
-                        code.AppendLine(eqsCs[i]);
-                        code.AppendLine("return sum;");
-                        code.AppendLine("};");  //end dynamic function
-                        code.AppendLine();
+                        if (eqsCs[i] == null)
+                        {
+                        }
+                        else
+                        {
+                            code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd, t) =>");
+                            code.AppendLine("{"); //start dynamic function
+                            code.AppendLine("int[] b = bb[i];");
+                            code.AppendLine("int[] d = dd[i];");
+                            code.AppendLine("double sum = 0d;");
+                            code.AppendLine(eqsCs[i]);
+                            code.AppendLine("return sum;");
+                            code.AppendLine("};");  //end dynamic function
+                            code.AppendLine();
+                        }
                     }
                     code.AppendLine("}");  //method
                     code.AppendLine("}");  //end class
@@ -1845,6 +1852,7 @@ namespace Gekko
 
             foreach (string eq in eqs)
             {
+                if (eq == null) continue;
                 try
                 {                    
                     if (eq.Contains(Globals.scalarModelExtraVariable)) continue;
@@ -2178,7 +2186,7 @@ namespace Gekko
         private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
         {
             EModelEquationsOrVariables status = EModelEquationsOrVariables.None;
-            EEquationCountsOrVariableCounts substatus = EEquationCountsOrVariableCounts.None;
+            EEquationCountsOrVariableCounts substatus = EEquationCountsOrVariableCounts.None;            
             string line = null;
             while ((line = sr.ReadLine()) != null)
             {
@@ -2386,11 +2394,11 @@ namespace Gekko
                     List<string> parts; string time;
                     LineChopper(line, 'x', gekkoModelFreq, out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
 
-                    if (Globals.greuHack)
-                    {
-                        int itime = G.IntParse(time);
-                        if (itime != -12345 && (itime < 2020 || itime > 2025)) continue;
-                    }
+                    //if (Globals.greuHack)
+                    //{
+                    //    int itime = G.IntParse(time);
+                    //    if (itime != -12345 && (itime < 2020 || itime > 2025)) continue;
+                    //}
 
                     if (!res_variables && G.StartsWith(nameWithIndexes, Globals.decompResidualPrefix)) res_variables = true;                    
 
@@ -2467,8 +2475,8 @@ namespace Gekko
             {
                 new Error("Malformed " + ex + "... line integer: " + line);
             }
-            
-            nameWithIndex = G.Substring(line, idx7, line.Length - 1).Replace("(", "[").Replace(")", "]").Trim();
+
+            nameWithIndex = G.ReplaceIgnoreCaseIgnoreQuoted(G.ReplaceIgnoreCaseIgnoreQuoted(G.Substring(line, idx7, line.Length - 1), "(", "["), ")", "]");            
             nameWithIndexNoTime = nameWithIndex;
             int i = nameWithIndex.IndexOf('[');
             if (i != -1)
@@ -2585,6 +2593,15 @@ namespace Gekko
 
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
+                if (Globals.greuHack)
+                {
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == null)
+                    {
+                        modelGamsScalar.precedents.Add(null);
+                        continue;
+                    }
+                }
+                
                 ModelScalarEquation equ = new ModelScalarEquation();
                 modelGamsScalar.precedents.Add(equ);                
                 //foreach precedent variable
@@ -2614,6 +2631,14 @@ namespace Gekko
             //mapping from a varname to the equations it is part of                
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
+                if (Globals.greuHack)
+                {
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == null)
+                    {                        
+                        continue;
+                    }
+                }
+
                 //foreach precedent variable
                 foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
                 {
@@ -2735,7 +2760,14 @@ namespace Gekko
         private static void RemoveDoubleDots(EqLineHelper helper, List<string> output)
         {
             string s = helper.sb.ToString();
-            s = "r[i] = " + s.Replace("..", "").Replace("=E=", "-(").Replace(";", ");");            
+            if (s == "")
+            {
+                s = null;
+            }
+            else
+            {
+                s = "r[i] = " + s.Replace("..", "").Replace("=E=", "-(").Replace(";", ");");
+            }
             output.Add(s);
         }
 
@@ -2745,242 +2777,260 @@ namespace Gekko
             //cf. #af931klljaf89efw.            
             helper.Clear();
             int more = 2;
-            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqLine.ToString(), more);  //1 empty "" token
-            //probe, checking for **
-            for (int i = 0; i < tokens.Count() - more; i++)
-            {
-                if (tokens[i].s == "*" && tokens[i + 1].s == "*" && tokens[i + 1].leftblanks == 0)
-                {
-
-                    //Left
-                    int lefttype = int.MaxValue;  //-100 for word, positive for parenthesis
-                    if (i > 0 && (tokens[i - 1].type == ETokenType.Word || tokens[i - 1].type == ETokenType.Number))
-                    {
-                        lefttype = -100;
-                    }
-                    else if (i > 0 && tokens[i - 1].s == ")")
-                    {
-                        int counter = 1;
-                        for (int i2 = i - 2; i2 > 0; i2--)
-                        {
-                            if (tokens[i2].s == ")") counter++;
-                            else if (tokens[i2].s == "(") counter--;
-                            if (counter == 0)
-                            {
-                                lefttype = i2;
-                                break;
-                            }
-                        }
-                    }
-
-                    //Right
-                    int righttype = int.MaxValue;  //-100 for word, positive for parenthesis
-                    if (i < tokens.Count() && (tokens[i + 2].type == ETokenType.Word || tokens[i + 2].type == ETokenType.Number))
-                    {
-                        righttype = -100;
-                    }
-                    else if (i < tokens.Count() && tokens[i + 2].s == "(")
-                    {
-                        int counter = 1;
-                        for (int i2 = i + 3; i2 < tokens.Count(); i2++)
-                        {
-                            if (tokens[i2].s == "(") counter++;
-                            else if (tokens[i2].s == ")") counter--;
-                            if (counter == 0)
-                            {
-                                righttype = i2;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (lefttype == int.MaxValue || righttype == int.MaxValue) new Error("Problem resolving '**' power");
-
-                    helper.remove.Add(i, "");
-                    helper.remove.Add(i + 1, "");
-                    helper.addBefore.Add(i, ",");
-                    if (lefttype == -100) helper.addBefore.Add(i - 1, "M.Power(");
-                    else if (lefttype > 0) helper.addBefore.Add(lefttype, "M.Power(");
-                    if (righttype == -100) helper.addBefore.Add(i + 3, ")");
-                    else if (righttype > 0) helper.addBefore.Add(righttype + 1, ")");
-                }
-            }            
-
             bool knownPattern = true;
-            for (int i = 0; i < tokens.Count() - more; i++)
+            TokenList tokens = null;
+
+            string sEqLine = eqLine.ToString();
+            int iDot = sEqLine.IndexOf("..");            
+            int equationNumber = int.Parse(sEqLine.Substring(1, iDot - 1)) - 1; //0-based, ignoring the first 'e'                                       
+            if (helper.dict_FromEqNumberToEqName[equationNumber] != null)
             {
-                TokenHelper th2 = null;
-                TokenHelper th2Next = null;
-                if (tokensLast == null || i >= tokensLast.Count() - more)
+
+                tokens = StringTokenizer.GetTokensWithLeftBlanks(sEqLine, more);  //1 empty "" token
+                //probe, checking for **
+                for (int i = 0; i < tokens.Count() - more; i++)
                 {
-                    knownPattern = false;
-                }
-                else
-                {
-                    th2 = tokensLast[i];
-                    th2Next = tokensLast[i + 1];
-                }
-                TokenHelper th1 = tokens[i];
-                TokenHelper th1Next = tokens[i + 1];
-                if (IsNumber(th1))
-                {
-                    if (th2 != null && IsNumber(th2))
+                    if (tokens[i].s == "*" && tokens[i + 1].s == "*" && tokens[i + 1].leftblanks == 0)
                     {
-                        //do nothing
+
+                        //Left
+                        int lefttype = int.MaxValue;  //-100 for word, positive for parenthesis
+                        if (i > 0 && (tokens[i - 1].type == ETokenType.Word || tokens[i - 1].type == ETokenType.Number))
+                        {
+                            lefttype = -100;
+                        }
+                        else if (i > 0 && tokens[i - 1].s == ")")
+                        {
+                            int counter = 1;
+                            for (int i2 = i - 2; i2 > 0; i2--)
+                            {
+                                if (tokens[i2].s == ")") counter++;
+                                else if (tokens[i2].s == "(") counter--;
+                                if (counter == 0)
+                                {
+                                    lefttype = i2;
+                                    break;
+                                }
+                            }
+                        }
+
+                        //Right
+                        int righttype = int.MaxValue;  //-100 for word, positive for parenthesis
+                        if (i < tokens.Count() && (tokens[i + 2].type == ETokenType.Word || tokens[i + 2].type == ETokenType.Number))
+                        {
+                            righttype = -100;
+                        }
+                        else if (i < tokens.Count() && tokens[i + 2].s == "(")
+                        {
+                            int counter = 1;
+                            for (int i2 = i + 3; i2 < tokens.Count(); i2++)
+                            {
+                                if (tokens[i2].s == "(") counter++;
+                                else if (tokens[i2].s == ")") counter--;
+                                if (counter == 0)
+                                {
+                                    righttype = i2;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (lefttype == int.MaxValue || righttype == int.MaxValue) new Error("Problem resolving '**' power");
+
+                        helper.remove.Add(i, "");
+                        helper.remove.Add(i + 1, "");
+                        helper.addBefore.Add(i, ",");
+                        if (lefttype == -100) helper.addBefore.Add(i - 1, "M.Power(");
+                        else if (lefttype > 0) helper.addBefore.Add(lefttype, "M.Power(");
+                        if (righttype == -100) helper.addBefore.Add(i + 3, ")");
+                        else if (righttype > 0) helper.addBefore.Add(righttype + 1, ")");
                     }
-                    else
+                }
+                
+                for (int i = 0; i < tokens.Count() - more; i++)
+                {
+                    TokenHelper th2 = null;
+                    TokenHelper th2Next = null;
+                    if (tokensLast == null || i >= tokensLast.Count() - more)
                     {
                         knownPattern = false;
                     }
-
-                    string sNumber = th1.ToString().Trim();
-                    if (G.Equal(sNumber, "eps"))
-                    {
-                        sNumber = "0";
-                    }
-
-                    int i1 = helper.dict_Constants.Count;
-                    if (helper.dict_Constants.ContainsKey(sNumber))
-                    {
-                        i1 = helper.dict_Constants[sNumber];
-                    }
                     else
                     {
-                        helper.dict_Constants.Add(sNumber, i1);
+                        th2 = tokensLast[i];
+                        th2Next = tokensLast[i + 1];
+                    }
+                    TokenHelper th1 = tokens[i];
+                    TokenHelper th1Next = tokens[i + 1];
+                    if (IsNumber(th1))
+                    {
+                        if (th2 != null && IsNumber(th2))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            knownPattern = false;
+                        }
+
+                        string sNumber = th1.ToString().Trim();
+                        if (G.Equal(sNumber, "eps"))
+                        {
+                            sNumber = "0";
+                        }
+
+                        int i1 = helper.dict_Constants.Count;
+                        if (helper.dict_Constants.ContainsKey(sNumber))
+                        {
+                            i1 = helper.dict_Constants[sNumber];
+                        }
+                        else
+                        {
+                            helper.dict_Constants.Add(sNumber, i1);
+                            try
+                            {
+                                helper.exoValues.Add(double.Parse(sNumber));
+                            }
+                            catch
+                            {
+                                new Error("Could not parse the string '" + sNumber + "' as a value");
+                            }
+                        }
+                        HandleEqLineAppend(helper, i, "c[d[" + helper.exo.Count + "]]");
+                        helper.exo.Add(i1);
+                    }
+                    else if (IsEVariable(th1, th1Next))
+                    {
+                        if (th2 != null && IsEVariable(th2, th2Next))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            knownPattern = false;
+                        }
+
+                        int number = -12345;
+
                         try
                         {
-                            helper.exoValues.Add(double.Parse(sNumber));
+                            number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
                         }
                         catch
                         {
-                            new Error("Could not parse the string '" + sNumber + "' as a value");
+                            new Error("Could not parse integer part of the string '" + th1.s + "'");
+                            throw;
+                        }
+
+                        string eqname = helper.dict_FromEqNumberToEqName[number];
+
+                        if (eqname.StartsWith("e" + Globals.scalarModelExtraVariable))
+                        {
+                            //Such equations may be either (too many eqs or too few):                      
+
+                            //equation egekkoextra0; egekkoextra0 .. xgekkoextra0 + xgekkoextra1 + ... = E = 0;
+                            //
+                            // --or-- 
+                            //
+                            //equation egekkoextra0; egekkoextra0 .. sum(t, qBnp[t]) =E= 0;
+                            //equation egekkoextra1; egekkoextra1 .. sum(t, qBnp[t]) =E= 0;
+                            //...
+
+                            shouldBeIgnored = true;
+
+                            //#oijlksaa
+                        }
+
+                        string helper2 = "";
+                        HandleEqLineAppend(helper, i, helper2);
+                    }
+                    else if (IsXVariable(th1, th1Next))
+                    {
+                        if (th2 != null && IsXVariable(th2, th2Next))
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            knownPattern = false;
+                        }
+                        int number = -12345;
+                        try
+                        {
+                            number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+                        }
+                        catch
+                        {
+                            new Error("Could not parse integer part of the string '" + th1.s + "'");
+                        }
+                        string varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
+
+                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
+
+                        int i1 = -12345;
+                        if (helper2.time.IsNull())
+                        {
+                            i1 = Globals.decompTimelessNumber; //signals timeless (-12345)
+                        }
+                        else
+                        {
+                            i1 = helper2.time.Subtract(helper.tBasis);
+                        }
+
+                        int i2 = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+
+                        int ii1 = helper.endo.Count;
+                        int ii2 = helper.endo.Count + 1;
+
+                        bool seenBefore = false;
+
+                        HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]+t][b[" + ii2 + "]]");
+
+                        if (!seenBefore)
+                        {
+                            //avoid dublets in an equation (for instance y[2020] = x[2020] + x[2020]/z[2020])
+                            helper.endo.Add(i1);  //time
+                            helper.endo.Add(i2);  //variable
                         }
                     }
-                    HandleEqLineAppend(helper, i, "c[d[" + helper.exo.Count + "]]");
-                    helper.exo.Add(i1);
-                }
-                else if (IsEVariable(th1, th1Next))
+                    else
+                    {
+                        if (th2 != null && th1.s != th2.s) knownPattern = false;
+                        string s = th1.s;
+                        if (th1.type == ETokenType.Word && th1Next.s == "(")
+                        {
+                            //can be a function:                    
+                            s = RenameFunctions(th1, true);
+                        }
+                        HandleEqLineAppend(helper, i, s);
+                    }
+                }  //end of tokens loop
+
+                if (knownPattern)
                 {
-                    if (th2 != null && IsEVariable(th2, th2Next))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        knownPattern = false;
-                    }
-
-                    int number = -12345;
-
-                    try
-                    {
-                        number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
-                    }
-                    catch
-                    {
-                        new Error("Could not parse integer part of the string '" + th1.s + "'");
-                        throw;
-                    }
-
-                    string eqname = helper.dict_FromEqNumberToEqName[number];
-
-                    if (eqname.StartsWith("e" + Globals.scalarModelExtraVariable))
-                    {
-                        //Such equations may be either (too many eqs or too few):                      
-
-                        //equation egekkoextra0; egekkoextra0 .. xgekkoextra0 + xgekkoextra1 + ... = E = 0;
-                        //
-                        // --or-- 
-                        //
-                        //equation egekkoextra0; egekkoextra0 .. sum(t, qBnp[t]) =E= 0;
-                        //equation egekkoextra1; egekkoextra1 .. sum(t, qBnp[t]) =E= 0;
-                        //...
-
-                        shouldBeIgnored = true;
-
-                        //#oijlksaa
-                    } 
-
-                    string helper2 = "";
-                    HandleEqLineAppend(helper, i, helper2);
-                }
-                else if (IsXVariable(th1, th1Next))
-                {
-                    if (th2 != null && IsXVariable(th2, th2Next))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        knownPattern = false;
-                    }
-                    int number = -12345;
-                    try
-                    {
-                        number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
-                    }
-                    catch
-                    {
-                        new Error("Could not parse integer part of the string '" + th1.s + "'");
-                    }
-                    string varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
-
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
-
-                    int i1 = -12345;
-                    if (helper2.time.IsNull())
-                    {
-                        i1 = Globals.decompTimelessNumber; //signals timeless (-12345)
-                    }
-                    else
-                    {
-                        i1 = helper2.time.Subtract(helper.tBasis);
-                    }                    
-
-                    int i2 = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
-
-                    int ii1 = helper.endo.Count;
-                    int ii2 = helper.endo.Count + 1;
-
-                    bool seenBefore = false;
-
-                    HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]+t][b[" + ii2 + "]]");
-
-                    if (!seenBefore)
-                    {
-                        //avoid dublets in an equation (for instance y[2020] = x[2020] + x[2020]/z[2020])
-                        helper.endo.Add(i1);  //time
-                        helper.endo.Add(i2);  //variable
-                    }
+                    helper.known++;
                 }
                 else
                 {
-                    if (th2 != null && th1.s != th2.s) knownPattern = false;
-                    string s = th1.s;
-                    if (th1.type == ETokenType.Word && th1Next.s == "(")
-                    {
-                        //can be a function:                    
-                        s = RenameFunctions(th1, true);
-                    }
-                    HandleEqLineAppend(helper, i, s);
+                    //unseen equation type
+                    helper.unique++;
                 }
-            }  //end of tokens loop
+                helper.count++;
+                helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
+                helper.b.Add(helper.endo);  //also works as precedents
 
-            if (knownPattern)
-            {
-                helper.known++;
+                helper.c.AddRange(helper.exoValues);
+                helper.d.Add(helper.exo);
             }
             else
-            {
-                //unseen equation type
-                helper.unique++;
-            }            
-            helper.count++;
-            helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
-            helper.b.Add(helper.endo);  //also works as precedents
-            
-            helper.c.AddRange(helper.exoValues);            
-            helper.d.Add(helper.exo);
+            {                
+                helper.unique++;                
+                helper.count++;
+                helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
+                helper.b.Add(new List<int>());
+                //helper.c.AddRange(...);
+                helper.d.Add(new List<int>());
+            }           
 
             return tokens;  //to compare with next
         }

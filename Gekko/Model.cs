@@ -1538,7 +1538,8 @@ namespace Gekko
             if (type == 1) return this.dict_FromEqNumberToEqName.Length;            
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
-            {                
+            {
+                if (s2 == null) continue;
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
                 if (type == 2)
                 {
