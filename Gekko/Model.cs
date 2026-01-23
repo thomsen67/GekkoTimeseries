@@ -1539,7 +1539,7 @@ namespace Gekko
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
             {
-                if (s2 == null) continue;
+                if (Globals.greuHack && s2 == "") continue;
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
                 if (type == 2)
                 {

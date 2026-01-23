@@ -35,7 +35,6 @@ namespace Gekko
         None,
         Equations,
         Variables,
-        IsIgnoringLines,
         Done
     }
 
@@ -121,7 +120,7 @@ namespace Gekko
                     code.AppendLine("{");
                     for (int i = chunk.int1; i < chunk.int2; i++)
                     {
-                        if (eqsCs[i] == null)
+                        if (eqsCs[i] == "")
                         {
                         }
                         else
@@ -1148,6 +1147,8 @@ namespace Gekko
             List<EqInfoSimple> rv = new List<EqInfoSimple>();
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
+
+            if (Globals.greuHack) tHere = new GekkoTime(EFreq.A, 2022, 1, 1);
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
@@ -2334,6 +2335,12 @@ namespace Gekko
                             eqCounts2 = int.Parse(sx);
                             substatus2 = 0;
                             helper.dict_FromEqNumberToEqName = new string[eqCounts2];
+
+                            for (int i = 0; i < eqCounts2; i++)
+                            {
+                                helper.dict_FromEqNumberToEqName[i] = "";  //because of protobuf when truncating periods
+                            }
+
                             helper.dict_FromEqNumberToEqChunkNumber = new int[eqCounts2];
                             break;
                         }
@@ -2595,9 +2602,9 @@ namespace Gekko
             {
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == null)
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == "")
                     {
-                        modelGamsScalar.precedents.Add(null);
+                        modelGamsScalar.precedents.Add(new ModelScalarEquation());
                         continue;
                     }
                 }
@@ -2622,7 +2629,7 @@ namespace Gekko
                                 if (!Globals.greuHack) G.WarningInternal("TTH: Expected timeless .date = " + Globals.decompTimelessNumber);
                             }
                         }
-                        if (Globals.greuHack) continue;
+                        //if (Globals.greuHack) continue;
                     }
                     if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets
                 }
@@ -2633,7 +2640,7 @@ namespace Gekko
             {
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == null)
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == "")
                     {                        
                         continue;
                     }
@@ -2762,7 +2769,7 @@ namespace Gekko
             string s = helper.sb.ToString();
             if (s == "")
             {
-                s = null;
+                //keep it that way
             }
             else
             {
@@ -3879,7 +3886,6 @@ namespace Gekko
                 if (eqs == null || eqs.Count == 0)
                 {
                     new Error("Equation '" + eqname + "' was not found");
-                    //throw new GekkoException();
                 }
                 if (eqs.Count > 1)
                 {
