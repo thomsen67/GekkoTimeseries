@@ -2085,57 +2085,59 @@ proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //f
 functiondef               : FUNCTION functionDefLhsH1 uDotIdent leftParen functiondefRhsH1 rightParen SEMICOLON expressions? END -> ^({token("ASTFUNCTIONDEF", ASTFUNCTIONDEF, $FUNCTION.Line)} ^(ASTFUNCTIONDEFTYPE functionDefLhsH1) ^(ASTFUNCTIONDEFNAME uDotIdent) functiondefRhsH1 ^(ASTFUNCTIONDEFCODE expressions?));
 
 //xxx:                   xxx2 -> ^({token("ASTXXX¤"+($xxx2.text), ASTXXXE, input.LT(1).Line)} xxx2);
-genr                      : 						    				
+
+genr:|genr_1|genr_2|genr_3|genr_4|genr_5|genr_6|genr_7|genr_8|genr_9|genr_10|genr_11|genr_12|genr_13|genr_14|genr_15|genr_16|genr_17|genr_18|genr_19;
+
 							//------------------------- UPD with equal ------------------------------------------------------
                             // UPD: y1, y2 = 5; //at least 2 on lhs, and 1 or more on rhs
-						  | genr2 seriesOpt1? listItemsUpd2 EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd2 ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated )
-						  | genr2 seriesOpt1? listItemsUpd2 EQUAL updDataSimple -> ^(ASTUPD listItemsUpd2 ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)
+genr_1:						   genr2 seriesOpt1? listItemsUpd2 EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd2 ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated );
+genr_2:						   genr2 seriesOpt1? listItemsUpd2 EQUAL updDataSimple -> ^(ASTUPD listItemsUpd2 ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple);
 
 						    // UPD: y1, y2 = 5; //1 or more on lhs, and at least 2 on rhs
-					      | genr2 seriesOpt1? listItemsUpd EQUAL updDataComplicated2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated2)
+genr_3:					       genr2 seriesOpt1? listItemsUpd EQUAL updDataComplicated2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated2);
 						    // UPD: y1 = 1 2; //must have > 1 on rhs
 							// !NOTE: the one below is the one that can get confused with a genr-type, for instance if y = 1 -2 -3 -2, or y = 1 -2 -3 -2*2 (the last one chokes)
-						  | genr4 seriesOpt1? listItemsUpd EQUAL updDataSimple2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple2)			  						
+genr_4:						   genr4 seriesOpt1? listItemsUpd EQUAL updDataSimple2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple2)			  						;
 
 						    // UPD: #m = 5; // #m = ... ------> gets special treatment
-					      | genr3 seriesOpt1? listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)
+genr_5:					       genr3 seriesOpt1? listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated);
 						    // UPD: y1 = 1 2; //must have > 1 on rhs
-						  | genr3 seriesOpt1? listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						
+genr_6:						   genr3 seriesOpt1? listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						;
 
 						    // This is cheating, so we can handle these printcodes here, and not in the GENR section
 							// UPD: SERIES <p> y1 = 5; //cheat, catches with mandatory <p> or others
-					      | genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)						
-						  | genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						
+genr_7:					       genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)						;
+genr_8:						   genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						;
 
 						    //------------------------- UPD with non-equal ------------------------------------------------------
 							// UPD: y1, y2 % 2; //operator is not =, handles anyting
-						  | genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataComplicated)
+genr_9:						   genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataComplicated);
 						    // UPD: w:x1, w:x2 % 						
-						  | genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataSimple)						
+genr_10:						   genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataSimple)						;
 					
 						  						
 							//-------------------------------------------------------------------------------
 							//-------------------------------------------------------------------------------
 						    // For all the following, any "rep *2 is silently ignored
 							// GENR: #m[2] = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? listName leftBracketGlue expression RIGHTBRACKET EQUAL expression (REP star)* -> ^({token("ASTGENRLISTINDEXER", ASTGENRLISTINDEXER, $EQUAL.Line)}  ^(ASTDATES dates?) listName expression expression)
+genr_11:						   genr2 (leftAngle dates? RIGHTANGLE)? listName leftBracketGlue expression RIGHTBRACKET EQUAL expression (REP star)* -> ^({token("ASTGENRLISTINDEXER", ASTGENRLISTINDEXER, $EQUAL.Line)}  ^(ASTDATES dates?) listName expression expression);
 						    // GENR: #m[2][2010] = x1 + x2
-						  | genr2 listName leftBracketGlue expression RIGHTBRACKET leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRLISTINDEXER2", ASTGENRLISTINDEXER2, $EQUAL.Line)}  listName expression expression expression)						
+genr_12:						   genr2 listName leftBracketGlue expression RIGHTBRACKET leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRLISTINDEXER2", ASTGENRLISTINDEXER2, $EQUAL.Line)}  listName expression expression expression)						;
 						    // GENR: %n = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? scalarWithBank EQUAL expression  (REP star)* -> ^({token("ASTGENR", ASTGENR, $EQUAL.Line)}  ^(ASTDATES dates?) scalarWithBank expression)
+genr_13:						   genr2 (leftAngle dates? RIGHTANGLE)? scalarWithBank EQUAL expression  (REP star)* -> ^({token("ASTGENR", ASTGENR, $EQUAL.Line)}  ^(ASTDATES dates?) scalarWithBank expression);
 						    // GENR: pch(w:%n) = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue scalarWithBank RIGHTPAREN EQUAL expression (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) scalarWithBank expression)
+genr_14:						   genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue scalarWithBank RIGHTPAREN EQUAL expression (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) scalarWithBank expression);
 						    // GENR: w:%n[2020] = x1 + x2
-						  | genr2 scalarWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  scalarWithBank expression expression)												
+genr_15:						   genr2 scalarWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  scalarWithBank expression expression)												;
 						    // GENR: w:y = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? nameWithBank EQUAL expression  (REP star)* -> ^({token("ASTGENR", ASTGENR, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression)												  						  						
+genr_16:						   genr2 (leftAngle dates? RIGHTANGLE)? nameWithBank EQUAL expression  (REP star)* -> ^({token("ASTGENR", ASTGENR, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression)												  						  						;
 						    // GENR: pch(w:y) = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue nameWithBank RIGHTPAREN EQUAL expression  (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression ident)												
+genr_17:						   genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue nameWithBank RIGHTPAREN EQUAL expression  (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression ident)												;
 						    // GENR: w:y[2020] = x1 + x2
-						  | genr2 nameWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  nameWithBank expression expression)						
+genr_18:						   genr2 nameWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  nameWithBank expression expression)						;
 
-						  | genr2 question -> ASTSERIESQUESTION
-						  ;
+genr_19:						   genr2 question -> ASTSERIESQUESTION;
+						  
 
 genr2                     : SER | SERIES;
 genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
