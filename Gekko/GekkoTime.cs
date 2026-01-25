@@ -17,7 +17,9 @@ namespace Gekko
     {
         public static readonly int numberOfQuarters = 4;
         public static readonly int numberOfMonths = 12;
-    }  
+    } 
+    
+
     
     //GekkoTime is an immutable struct for fast looping. Structs should be < 16 bytes to be effective (we have 3 x 4 = 12 bytes here)
     public struct GekkoTime

@@ -347,6 +347,47 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+
+                    else if (ast.Text.StartsWith("ASTCOPY" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTCOLLAPSE" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTINTERPOLATE" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTDOWNLOAD" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTREBASE" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTSPLICE" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTREAD" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTRENAME" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTSMOOTH" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTTRUNCATE" + "¤"))
+                    {
+                        flag = true;
+                    }
                 }                
                 
                 if (flag)

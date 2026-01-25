@@ -1967,7 +1967,9 @@ closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 
 cls						  : CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
 						
-copy                      : COPY copyOpt1? listItemsWildRange0 (TO listItemsWildRange1)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} copyOpt1? listItemsWildRange0 listItemsWildRange1?);
+// !?!?
+copy:                   copy2 -> ^({token("ASTCOPY¤"+($copy2.text), ASTCOPY, input.LT(1).Line)} copy2);
+copy2                      : COPY copyOpt1? listItemsWildRange0 (TO listItemsWildRange1)? -> copyOpt1? listItemsWildRange0 listItemsWildRange1?;
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
@@ -1993,10 +1995,14 @@ docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						  | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)	
 						  ;
 
-collapse				  : COLLAPSE nameBankHelper '=' nameBankHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameBankHelper nameBankHelper collapseMethod?);
+// !?!?
+collapse:                   collapse2 -> ^({token("ASTCOLLAPSE¤"+($collapse2.text), ASTCOLLAPSE, input.LT(1).Line)} collapse2);
+collapse2				  : COLLAPSE nameBankHelper '=' nameBankHelper collapseMethod? -> nameBankHelper nameBankHelper collapseMethod?;
 collapseMethod			  : FIRST|LAST|AVG|TOTAL|COUNT;
 
-interpolate				  : INTERPOLATE nameBankHelper '=' nameBankHelper interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} nameBankHelper nameBankHelper interpolateMethod?);
+// !?!?
+interpolate:                   interpolate2 -> ^({token("ASTINTERPOLATE¤"+($interpolate2.text), ASTINTERPOLATE, input.LT(1).Line)} interpolate2);
+interpolate2				  : INTERPOLATE nameBankHelper '=' nameBankHelper interpolateMethod? -> nameBankHelper nameBankHelper interpolateMethod?;
 interpolateMethod		  : REPEAT | PRORATE;
 
 nameBankHelper 			  : name bankColon nameWithDot -> ^(ASTPLACEHOLDER name nameWithDot)
@@ -2078,6 +2084,7 @@ proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //f
 
 functiondef               : FUNCTION functionDefLhsH1 uDotIdent leftParen functiondefRhsH1 rightParen SEMICOLON expressions? END -> ^({token("ASTFUNCTIONDEF", ASTFUNCTIONDEF, $FUNCTION.Line)} ^(ASTFUNCTIONDEFTYPE functionDefLhsH1) ^(ASTFUNCTIONDEFNAME uDotIdent) functiondefRhsH1 ^(ASTFUNCTIONDEFCODE expressions?));
 
+//xxx:                   xxx2 -> ^({token("ASTXXX¤"+($xxx2.text), ASTXXXE, input.LT(1).Line)} xxx2);
 genr                      : 						    				
 							//------------------------- UPD with equal ------------------------------------------------------
                             // UPD: y1, y2 = 5; //at least 2 on lhs, and 1 or more on rhs
@@ -2181,7 +2188,9 @@ if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?
 expressions1              : expressions;
 expressions2              : expressions;  
 
-download                  : DOWNLOAD downloadOpt1? HTTP? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
+// !?!?
+download:                   download2 -> ^({token("ASTDOWNLOAD¤"+($download2.text), ASTDOWNLOAD, input.LT(1).Line)} download2);
+download2                  : DOWNLOAD downloadOpt1? HTTP? url fileName (DUMP '=' fileName)* -> ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?;
 downloadOpt1              : ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
 downloadOpt1h             : //FILE (EQUAL yesNo)? -> ^(ASTOPT_STRING_FILE yesNo?)	
 						  	ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
@@ -2262,7 +2271,9 @@ pause					  : PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, $PAUSE.Line)} 
 
 pipe					  : PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
 
-rebase                    : REBASE rebaseOpt1? listItemsWildRange rebaseDate1? rebaseDate2? -> ^({token("ASTREBASE", ASTREBASE, $REBASE.Line)} listItemsWildRange ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?);
+// !?!?
+rebase:                   rebase2 -> ^({token("ASTREBASE¤"+($rebase2.text), ASTREBASE, input.LT(1).Line)} rebase2);
+rebase2                    : REBASE rebaseOpt1? listItemsWildRange rebaseDate1? rebaseDate2? -> listItemsWildRange ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?;
 rebaseDate1               : expression;
 rebaseDate2               : expression;
 rebaseOpt1                : ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
@@ -2394,8 +2405,10 @@ prtOptCollapseHelper      : AVG -> ASTAVG
 						  | expression -> expression						
 						  ;
 
-splice                    : SPLICE listItems0 EQUAL listItems1 expression listItems2 -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2 expression     )
-                          | SPLICE listItems0 EQUAL listItems1 listItems2            -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2 )  //no date
+// !?!?
+splice:                   splice2 -> ^({token("ASTSPLICE¤"+($splice2.text), ASTSPLICE, input.LT(1).Line)} splice2);
+splice2                    : SPLICE listItems0 EQUAL listItems1 expression listItems2 -> listItems0 listItems1 listItems2 expression     
+                          | SPLICE listItems0 EQUAL listItems1 listItems2            -> listItems0 listItems1 listItems2   //no date
 						  ;
 spliceOpt1                : ISNOTQUAL
 						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
@@ -2403,9 +2416,11 @@ spliceOpt1                : ISNOTQUAL
 spliceOpt1h               : KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
 spliceOptions             : FIRST | LAST;
 
+// !?!?
+read:                   read2 -> ^({token("ASTREAD¤"+($read2.text), ASTREAD, input.LT(1).Line)} read2);
 						  //!!!Two identical lines ONLY because of token stuff
-read                      : READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
-                          | IMPORT readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+read2                      : READ   readOpt1? fileNameStar (TO identOrStar)? -> READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?)
+                          | IMPORT readOpt1? fileNameStar (TO identOrStar)? -> IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?)
 						  ;
 
 readOpt1                  : ISNOTQUAL
@@ -2456,7 +2471,9 @@ r_run  				      : R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, $R_RUN.Lin
 r_runOpt1			      : ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
 r_runOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
-rename                    : RENAME renameOpt1? listItems0 AS listItems1 -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} listItems0 listItems1 renameOpt1?);
+// !?!?
+rename:                   rename2 -> ^({token("ASTRENAME¤"+($rename2.text), ASTRENAME, input.LT(1).Line)} rename2);
+rename2                    : RENAME renameOpt1? listItems0 AS listItems1 -> listItems0 listItems1 renameOpt1?;
 renameOpt1                : ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
 renameOpt1h               : BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
 						  ;
@@ -2488,7 +2505,9 @@ simOpt1h                  : FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
 						  | RES (EQUAL yesNo)? -> ^(ASTOPT_STRING_RES yesNo?)
 						  ;
 
-smooth                    : SMOOTH listItems0 EQUAL listItems1 smoothOpt2? -> ^({token("ASTSMOOTH", ASTSMOOTH, $SMOOTH.Line)} listItems0 listItems1 smoothOpt2?);
+// !?!?
+smooth:                   smooth2 -> ^({token("ASTSMOOTH¤"+($smooth2.text), ASTSMOOTH, input.LT(1).Line)} smooth2);
+smooth2                    : SMOOTH listItems0 EQUAL listItems1 smoothOpt2? -> listItems0 listItems1 smoothOpt2?;
 
 stamp                     : STAMP -> ^({token("ASTSTAMP", ASTSTAMP, $STAMP.Line)});
 
@@ -2574,7 +2593,9 @@ translateOpt1h            : GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 ye
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
 						  ;						
 
-truncate                  : TRUNCATE truncateOpt1? listItemsWildRange -> ^({token("ASTTRUNCATE", ASTTRUNCATE, $TRUNCATE.Line)} ^(ASTOPT_ truncateOpt1?) listItemsWildRange);
+// !?!?
+truncate:                   truncate2 -> ^({token("ASTTRUNCATE¤"+($truncate2.text), ASTTRUNCATE, input.LT(1).Line)} truncate2);
+truncate2                  : TRUNCATE truncateOpt1? listItemsWildRange -> ^(ASTOPT_ truncateOpt1?) listItemsWildRange;
 
 udvalg					  : DECOMP (leftAngle dates? RIGHTANGLE)? udvalgElement -> ^({token("ASTDECOMP¤"+($udvalgElement.text), ASTDECOMP, $DECOMP.Line)} ^(ASTDATES dates?) ^(ASTDECOMPITEMS udvalgElement));
 

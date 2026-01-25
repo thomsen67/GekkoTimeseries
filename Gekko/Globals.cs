@@ -135,8 +135,8 @@ namespace Gekko
         public const string printCode_sn = "rn";
         public const string printCode_sp = "rp";
         public const string printCode_sd = "rd";
-        public const string printCode_sdp = "rdp";      
-                
+        public const string printCode_sdp = "rdp";        
+
         public List<Databank> bankOpen = new List<Databank>();
 
         public const bool laspchainHandleZero = false;  //for laspchain() ===> only affects when all microprices are == 0 for one and only one period. Disabled.
@@ -379,6 +379,7 @@ namespace Gekko
         public static int tempVarIndexCounter = 0;
 
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
+        public static long traceCounter = G.NextLong(Globals.random, 1, (long)(0.99d * (double)long.MaxValue)); //we are throwing half of these away...long.MaxValue is 9e18, so when starting, there are about 9e16 possible calculations before it would overflow. That should be enough!!
 
         public static string[] convergenceCheckVariables = new string[1];        
         public static bool initializeDataArrayWithNaN = true;

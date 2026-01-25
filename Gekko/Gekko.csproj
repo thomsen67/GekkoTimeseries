@@ -308,6 +308,7 @@
     <Compile Include="Task.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="TimeSeries.cs" />
+    <Compile Include="Trace.cs" />
     <Compile Include="Translator2.cs" />
     <Compile Include="Translators.cs" />
     <Compile Include="TspUtilitiesDataGui.cs">
