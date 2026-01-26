@@ -40,6 +40,8 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
+        public static ListUnique<TimeSeries> traceContainer = new ListUnique<TimeSeries>();
+
         public static string versionInternal = "";  // "v14";
 
         public static string isAProto = "Is_a_protobuffer_file";

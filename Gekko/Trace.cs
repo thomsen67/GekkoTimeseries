@@ -28,6 +28,23 @@ namespace Gekko
 
         [ProtoMember(3)]
         public readonly TraceContents2 traceContents = null;
+
+        public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2, bool nullPeriodAccepted)
+        {            
+            this.type = type;
+            TraceContents2 traceContents = new TraceContents2(t1, t2);
+            this.traceContents = traceContents;
+        }
+
+        public TraceContents2 GetContents()
+        {
+            return this.traceContents;
+        }
+
+        public TraceID2 GetId()
+        {
+            return this.traceContents.id;
+        }
     }
 
     public class Precedents2
@@ -89,7 +106,12 @@ namespace Gekko
         public TraceContents2()
         {
             //for protobuf
-        }        
+        }
+
+        public TraceContents2(GekkoTime t1, GekkoTime t2)
+        {
+            this.period = new GekkoTimeSpanSimple(t1, t2);
+        }
     }
 
     [ProtoContract]

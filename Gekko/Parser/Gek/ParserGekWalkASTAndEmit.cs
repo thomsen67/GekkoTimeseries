@@ -679,6 +679,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".v0 =  O.GetString(" + node[1][1].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);                            
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
@@ -696,6 +697,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".v0 =  O.GetString(" + node[1][1].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -727,6 +729,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Copy o" + Num(node) + " = new O.Copy();" + G.NL);
                             GetCodeFromAllChildren(node);
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -2398,6 +2401,7 @@ namespace Gekko.Parser.Gek
                             if (node[3] != null) node.Code.A(node[3].Code); //px file dump
                             if (node[4] != null) node.Code.A(node[4].Code); //options
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -2432,6 +2436,7 @@ namespace Gekko.Parser.Gek
                             }
                             if (node[2] != null) node.Code.A(node[2].Code);  //options
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3500,6 +3505,7 @@ namespace Gekko.Parser.Gek
                             if (node[2] != null) node.Code.A(node[2].Code); //options
                             //node.Code.A("o" + Num(node) + ".listItems2 = o" + Num(node) + ".listItems;" + G.NL;                            
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;                    
@@ -3562,6 +3568,7 @@ namespace Gekko.Parser.Gek
                             //}
                             GetCodeFromAllChildren(node);
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3576,6 +3583,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".date = O.GetDate(" + node[3].Code + ");" + G.NL);
                             }
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                         }
@@ -3700,6 +3708,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
                             GetCodeFromAllChildren(node);
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3893,6 +3902,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
                             node.Code.A(node[1].Code);  //list1                            
                             try { node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL); } catch { }
+                            try { node.Code.A("o" + Num(node) + ".p = p;" + G.NL); } catch { }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3961,7 +3971,10 @@ namespace Gekko.Parser.Gek
                             //TODO and what about 'xx' prefix? Maybe allow this for GENR too!
                             //TODO
                             //node.Code.A("O.Upd o" + Num(node) + " = new O.Upd();" + G.NL);
-                            node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);                            
+                            node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);
+
+                            node.Code.A("Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL);
+
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
 
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
@@ -4009,6 +4022,7 @@ namespace Gekko.Parser.Gek
                                 }
                             }                            
                             node.Code.A("o").A(Num(node)).A(".Exe();").A(G.NL);
+                            node.Code.A("Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL);
                             //G.Writeln(node.Code);
                         }
                         break;
@@ -4628,6 +4642,7 @@ namespace Gekko.Parser.Gek
         {
             string nodeCode = null;
             nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;
+            nodeCode += "Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL;
             nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
             nodeCode += childCodePeriod + G.NL;  //dates
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
@@ -4671,6 +4686,7 @@ namespace Gekko.Parser.Gek
                 nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
             }
             nodeCode += "o" + numNode + ".Exe();" + G.NL;
+            nodeCode += "Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL;
             return nodeCode;
         }
 

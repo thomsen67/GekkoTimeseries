@@ -37597,4 +37597,35 @@ write datatest;
         public TimeSeries ts;
         public bool hasColon = false;
     }
+
+    /// <summary>
+    /// Adds elements if those have not been seen before.
+    /// Beware about comparer comparisons, especially strings (use GekkoDictionary for those).
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class ListUnique<T>
+    {
+        private List<T> m = new List<T>();
+        private Dictionary<T, bool> d = new Dictionary<T, bool>();
+        public void Add(T iv)
+        {
+            if (iv == null) return;
+            if (!this.d.ContainsKey(iv))
+            {
+                this.d.Add(iv, false);
+                m.Add(iv);
+            }
+        }
+
+        public List<T> GetList()
+        {
+            return this.m;
+        }
+
+        public int Count()
+        {
+            return this.m.Count;
+        }
+    }
+
 }

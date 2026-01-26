@@ -651,6 +651,22 @@ namespace Gekko
             return GetPeriod(this.lastPeriodPositionInArray);
         }
 
+        /// <summary>
+        /// Returns a string like "b1:y2"
+        /// </summary>
+        /// <returns></returns>
+        public string GetNameAndParentDatabank()
+        {
+            string rv = null;
+            string name = this.variableName;
+            string parentDatabank = null;
+            Databank db = this.parentDatabank;
+            if (db != null) parentDatabank = db.aliasName;
+            if (parentDatabank == null) rv = name;
+            else rv = parentDatabank + ":" + name;
+            return rv;
+        }
+
         public GekkoTime GetRealDataPeriodFirst()
         {
             if (this.isTimeless)

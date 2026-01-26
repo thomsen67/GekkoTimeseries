@@ -246,6 +246,7 @@ namespace Gekko
             this.storage.Add(variable, ts);
             ts.parentDatabank = this;
             this.isDirty = true;
+            Globals.traceContainer.Add(ts);
         }
 
         public void AddVariableWithOverwrite(bool freqAddToName, EFreq frequency, TimeSeries ts, bool variableNameCheck)
@@ -263,6 +264,7 @@ namespace Gekko
             this.storage.Add(variable, ts);
             ts.parentDatabank = this;
             this.isDirty = true;
+            Globals.traceContainer.Add(ts);
         }
 
         public TimeSeries GetVariable(string variable)
@@ -274,6 +276,7 @@ namespace Gekko
         {            
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             TimeSeries x = null; this.storage.TryGetValue(variable, out x);
+            Globals.traceContainer.Add(x);
             return x;            
         }
 
@@ -281,6 +284,7 @@ namespace Gekko
         {
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             TimeSeries x = null; this.storage.TryGetValue(variable, out x);
+            Globals.traceContainer.Add(x);
             return x;
         }        
     }
