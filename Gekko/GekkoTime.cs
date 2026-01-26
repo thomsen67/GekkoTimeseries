@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProtoBuf;
 
 namespace Gekko
 {
@@ -17,16 +18,21 @@ namespace Gekko
     {
         public static readonly int numberOfQuarters = 4;
         public static readonly int numberOfMonths = 12;
-    } 
-    
+    }
 
-    
+
+
+    [Serializable]
+    [ProtoContract]
     //GekkoTime is an immutable struct for fast looping. Structs should be < 16 bytes to be effective (we have 3 x 4 = 12 bytes here)
     public struct GekkoTime
-    {        
+    {
         //use IsNull() to check for null.
+        [ProtoMember(1)]
         public readonly int super; //year, null object is emulated by setting super to -12345
+        [ProtoMember(2)]
         public readonly int sub;  //quarter or month     
+        [ProtoMember(3)]
         public readonly EFreq freq;
 
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even

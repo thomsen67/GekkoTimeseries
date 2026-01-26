@@ -4140,9 +4140,12 @@ namespace Gekko
                 {
                     G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
-                foreach (TimeSeries ts in Globals.traceContainer.GetList())
+                if (Program.options.databank_trace)
                 {
-                    G.Writeln2("--> " + ts.variableName);
+                    foreach (TimeSeries ts in Globals.traceContainer.GetList())
+                    {
+                        G.Writeln2("--> " + ts.variableName);
+                    }
                 }
             }            
         }
@@ -4357,23 +4360,42 @@ namespace Gekko
                         }
                         count++;
 
-
-                        try
-                        {                            
-                            Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast(), true);
-                            trace.GetContents().text = this.gekkocode + ";";                            
-                            trace.GetContents().name = tsNew.GetNameAndParentDatabank();
-                            trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(false);
-                            //Gekko.Trace2.PushIntoSeries(tsNew, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-
+                        if (Program.options.databank_trace)
+                        {
+                            try
+                            {
+                                Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
+                                trace.GetContents().text = this.gekkocode + ";";
+                                trace.GetContents().name = tsNew.GetNameAndParentDatabank();
+                                trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(false);                                                                
+                                PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts });
+                            }
+                            catch { }
                         }
-                        catch {}
-
 
                     }
                 }
                 G.Writeln2("Rebased " + count + " variables");
                 //if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
+            }
+
+            private static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss)
+            {
+                foreach (TimeSeries tsRhs in tsRhss)
+                {
+                    //List<Trace2> precedentsRhs = tsRhs.trace?.precedents;
+                    //if (precedentsRhs != null)
+                    //{
+                    //    if (precedentsLhs == null) precedentsLhs = new List<Trace2>();
+                    //    precedentsLhs.AddRange(precedentsRhs);
+                    //}                    
+                    if (tsRhs.trace != null)
+                    {
+                        if (traceLhs.precedents == null) traceLhs.precedents = new List<Trace2>();
+                        traceLhs.precedents.Add(tsRhs.trace);
+                    }
+                }         
+                tsLhs.trace = traceLhs;
             }
         }
 

@@ -20,17 +20,22 @@ namespace Gekko
     [ProtoContract]
     public class Trace2
     {
+
         [ProtoMember(1)]
-        private Precedents2 precedents = new Precedents2();  //be careful accessing it, use GetPrecedentsAndShadowedPeriods()
-                                                             //
+        public List<Trace2> precedents = null;
+
         [ProtoMember(2)]
         public readonly ETraceType type = ETraceType.Normal;  //default
 
         [ProtoMember(3)]
         public readonly TraceContents2 traceContents = null;
 
-        public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2, bool nullPeriodAccepted)
-        {            
+        public Trace2()
+        {
+        }
+
+        public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2)
+        {
             this.type = type;
             TraceContents2 traceContents = new TraceContents2(t1, t2);
             this.traceContents = traceContents;
@@ -85,7 +90,7 @@ namespace Gekko
         /// An extra char in a text string here will take up 2 bytes or 16 bits.
         /// </summary>        
         [ProtoMember(3)]
-        public string text = null;        
+        public string text = null;
 
         [ProtoMember(4)]
         public string name = null;  //with bank and freq
@@ -134,6 +139,11 @@ namespace Gekko
         {
             this.t1 = t1;
             this.t2 = t2;
+        }
+
+        public override string ToString()
+        {
+            return this.t1.ToString() + "-" + this.t2.ToString();
         }
     }
 
@@ -257,8 +267,5 @@ namespace Gekko
             return s;
         }
     }
-
-
-
 
 }

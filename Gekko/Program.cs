@@ -2638,10 +2638,10 @@ namespace Gekko
                         else
                         {
                             if (!databank.FileNameWithPath.Contains(Globals.isAProto))  //probably does not happen anymore
-                            {                                
+                            {
                                 //TT 30-11-2020: It SEEMS this IF above is right to put here, testing the there is not this phony stuff in path, which would make it fail anyway
                                 databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
-                            }                            
+                            }
                         }
                     }
                 }
@@ -8463,8 +8463,8 @@ write datatest;
             if (false)
             {
                 GAMSVariable xx = db.GetVariable("LMax");
-                
-            }            
+
+            }
 
             double[,,,] LMax = new double[3, 2, 85, 116];
             db.GetVariable("LMax").CopyToArray(LMax, 0);
@@ -9318,7 +9318,7 @@ write datatest;
                 bool skip = true;  //avoid the method and the R header in input
                 G.Writeln();
                 foreach (string s2 in ss)
-                {                    
+                {
                     if (!skip) G.Writeln(s2);
                     if (s2.Contains(def2)) skip = false;
                 }
@@ -9400,7 +9400,7 @@ write datatest;
 
             string meta = null;
             int counter = 0;
-                        
+
             for (int i = 0; i < o.listItems.Count; i++)
             {
                 //GetTimeSeriesFromStringWildcard() implicitly calls GetInfoFromStringWildcard() which we will call again later.
@@ -9431,7 +9431,7 @@ write datatest;
                     }
                 }
             }
-            
+
             using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + ".dta", GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -9636,7 +9636,7 @@ write datatest;
 
             } while (token.Kind != TokenKind.EOF);
 
-            if(removeComments)
+            if (removeComments)
             {
                 int n = a.Count - fat;
 
@@ -9683,7 +9683,7 @@ write datatest;
                             //skip '://'(web address)
                         }
                         else
-                        {                            
+                        {
                             //finding a '//'
                             a[i].s = "";
                             a[i + 1].s = "";
@@ -9741,7 +9741,7 @@ write datatest;
                 G.Writeln2("+++ WARNING: The .json file does not seem correctly formatted.");
                 G.Writeln("             " + e.Message);
                 //throw;
-            }           
+            }
 
             // -------------------------------------------------------------
 
@@ -9787,14 +9787,14 @@ write datatest;
                 G.Writeln2("*** ERROR: JSON: est_filename not found"); throw new GekkoException();
             }
 
-            string settings_flowchart_filename = null;  
+            string settings_flowchart_filename = null;
             try { settings_flowchart_filename = (string)jsonTree["flowchart_filename"]; } catch { }
             if (settings_flowchart_filename == null)
             {
                 G.Writeln2("*** ERROR: JSON: flowchart_filename not found"); throw new GekkoException();
             }
 
-            string settings_vars_foldername = null; 
+            string settings_vars_foldername = null;
             try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
             if (settings_vars_foldername == null)
             {
@@ -9835,7 +9835,7 @@ write datatest;
             {
                 G.Writeln2("*** ERROR: JSON: print_start not found"); throw new GekkoException();
             }
-            
+
             string settings_print_end = null;
             try { settings_print_end = (string)jsonTree["print_end"]; } catch { }
             if (settings_print_end == null)
@@ -9847,9 +9847,9 @@ write datatest;
             // -------------------------------------------------------------
 
             string list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
-            
+
             string browserFolder = "browser";
-            
+
             List<string> files = new List<string>();
             files.Add(settings_index_filename);
             files.Add(settings_find_filename);
@@ -9868,11 +9868,11 @@ write datatest;
                     G.Writeln2("*** ERROR: '" + file + "' should not contain '/' or '\\'");
                     throw new GekkoException();
                 }
-            }            
+            }
 
             string rootFolder = Program.options.folder_working + "\\" + browserFolder;
             string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_vars_foldername;
-            
+
             BrowserCleanupFolders(rootFolder, subFolder);
 
             //index.html and styles.css is copied to root folder of browser system
@@ -9896,12 +9896,12 @@ write datatest;
             Program.obeyCommandCalledFromGUI(settings_commands, new P());
 
             int gap = 20;
-            
+
             GekkoTime plotStart = new GekkoTime(EFreq.Annual, G.IntParse(settings_plot_start), 1);
             GekkoTime plotEnd = new GekkoTime(EFreq.Annual, G.IntParse(settings_plot_end), 1);
             GekkoTime plot_line = new GekkoTime(EFreq.Annual, G.IntParse(settings_plot_line), 1);
-            GekkoTime print_start = new GekkoTime(EFreq.Annual, G.IntParse(settings_print_start), 1);            
-            GekkoTime print_end = new GekkoTime(EFreq.Annual, G.IntParse(settings_print_end), 1);            
+            GekkoTime print_start = new GekkoTime(EFreq.Annual, G.IntParse(settings_print_start), 1);
+            GekkoTime print_end = new GekkoTime(EFreq.Annual, G.IntParse(settings_print_end), 1);
 
             string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
@@ -9915,7 +9915,7 @@ write datatest;
                 if (result == DialogResult.Yes)
                 {
                     vars = new List<string> { "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn" };
-                }                
+                }
             }
 
             vars.Sort(StringComparer.OrdinalIgnoreCase);
@@ -10124,7 +10124,7 @@ write datatest;
                     //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
                     string src2 = ts1.units.Trim();
                     if (src2 != "")
-                    {                        
+                    {
                         WriteHtml(sb, "Enheder: " + src2);
                     }
                 }
@@ -10471,7 +10471,7 @@ write datatest;
                 x.AppendLine("  // -->");
                 x.AppendLine("  </script >");
 
-                x.AppendLine("  <body>");                
+                x.AppendLine("  <body>");
                 x.Append(sb);
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
@@ -10699,7 +10699,7 @@ write datatest;
         }
 
         private static void BrowserCleanupFolders(string rootFolder, string varsFolder)
-        {            
+        {
             List<string> folders = new List<string> { rootFolder, varsFolder };
 
             foreach (string folder in folders)
@@ -10825,7 +10825,7 @@ write datatest;
                     else
                     {
                         //may be a composed name like x%i, x{%i}, x{i} or x[2000]
-                        int iEq = -12345;                        
+                        int iEq = -12345;
                         for (int i = startI; i < th.Count; i++)
                         {
                             if (th[i].s == "=")
@@ -10863,8 +10863,8 @@ write datatest;
                                         {
                                             rhsVars.Add(StripQuotes(th2[i2].s));
                                         }
-                                    }                                    
-                                    scalarsOnLhsInSerStatement[th2[1].s] = rhsVars;                                    
+                                    }
+                                    scalarsOnLhsInSerStatement[th2[1].s] = rhsVars;
                                 }
                             }
 
@@ -10901,7 +10901,7 @@ write datatest;
                                     for (int i = startI; i < th.Count; i++)
                                     {
                                         if (th[i].s == "{" && th[i + 1].s == Globals.symbolMemvar.ToString() && th[i + 2].type == "Word" && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.equal(th[i + 2].s, xx[0].Key))
-                                        {                                            
+                                        {
                                             s8 += th[i].leftblanks + listItem;  //with blanks
                                             i += 3;
                                         }
@@ -11010,7 +11010,7 @@ write datatest;
             try
             {
                 List<TokenHelper> a = GetTokensWithLeftBlanks(equationText, 20, false);
-                
+
                 int counter = -1;
                 for (int i = 0; i < a.Count; i++)
                 {
@@ -11039,7 +11039,7 @@ write datatest;
                             G.WriteLink(a[i].s, "disp:" + a[i].s);
                         }
                         else
-                        {                            
+                        {
                             sb.Append(HtmlLink(a[i].s));
                         }
                     }
@@ -11111,7 +11111,7 @@ write datatest;
                     c.cellType = CellType.Text;
                     c.CellText = new Gekko.Text();
                     c.CellText.TextData = new List<string> { a.rownames[i].Trim() };
-                    c.align = -1;                                   
+                    c.align = -1;
                 }
                 else
                 {
@@ -11289,8 +11289,42 @@ write datatest;
             catch
             {
                 //no need to fail on this
-            }
+            }            
             return ss;
+        }
+
+        private static void WalkTraces(Trace2 parent, int depth)
+        {
+            int widthRemember = Program.options.print_width;
+            int fileWidthRemember = Program.options.print_filewidth;
+            try
+            {                
+                Program.options.print_width = int.MaxValue;
+                Program.options.print_filewidth = int.MaxValue;
+
+                //  -----------------------------
+
+                string prec = null;
+                if (parent.traceContents.precedentsNames != null) prec = string.Join(", ", parent.traceContents.precedentsNames);
+                G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " || " + parent.traceContents.period + " || " + parent.traceContents.text + " || " + prec + " || " + parent.traceContents.commandFileAndLine + " || " + parent.traceContents.dataFile + " || " + parent.traceContents.id);
+                if (parent.precedents != null)
+                {
+                    foreach (Trace2 child in parent.precedents)
+                    {
+                        WalkTraces(child, depth + 1);
+                    }
+                }
+
+            }
+            finally
+            {
+
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+                Program.options.print_filewidth = fileWidthRemember;
+
+            }
+            
         }
 
         public static void DecompForFlowChart(string s, GekkoTime year, int maxDepth, double prune, double factor, int depth, Dictionary<string, int> counter, List<GekkoFlowChart.FlowArrow> sw, List<GekkoFlowChart.FlowNode> sw2, Dictionary<string, int> d, string code)
@@ -16253,6 +16287,22 @@ write datatest;
                             if (src2 != "")
                             {
                                 G.Writeln("Series units: " + src2);
+                            }
+                        }
+
+                        if (Program.options.databank_trace)
+                        {
+                            try
+                            {                                
+                                if (ts.trace != null)
+                                {
+                                    WalkTraces(ts.trace, 0);
+                                }
+
+                            }
+                            catch
+                            {
+                                //no need to fail on this
                             }
                         }
 

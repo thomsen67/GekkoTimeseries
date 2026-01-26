@@ -151,6 +151,9 @@ namespace Gekko
         [ProtoMember(15)]
         public string units;
 
+        [ProtoMember(16)]
+        public Trace2 trace = null;
+
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
 
