@@ -68,10 +68,7 @@ namespace Gekko
         /// An extra char in a text string here will take up 2 bytes or 16 bits.
         /// </summary>        
         [ProtoMember(3)]
-        public string text = null;
-        //if (o?.opt_trace != null) traceString = o.opt_trace; 
-        //fra parser: sb.A("o" + Num(node) + ".opt_trace = @`" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true) + "`;" + G.NL);
-        //node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true)) + "`;" + G.NL);
+        public string text = null;        
 
         [ProtoMember(4)]
         public string name = null;  //with bank and freq

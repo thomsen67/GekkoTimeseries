@@ -1944,6 +1944,8 @@ namespace Gekko
             public string opt_datecell = null;
             public string opt_all = null;
 
+            public string gekkocode = null;
+
             public string type = null;  //read or import
             
             
@@ -2254,6 +2256,7 @@ namespace Gekko
             public string fileName = null;  //json file
             public string fileName2 = null;  //dump file (for instance px)            
             public string opt_array = null;  //not in use
+            public string gekkocode = null;
             public void Exe()
             {
                 OnlineDatabanks.Download(this);
@@ -2684,6 +2687,7 @@ namespace Gekko
             public string opt_linear = null;
             public string opt_repeat = null;
             public P p = null;
+            public string gekkocode = null;
             public void Exe()
             {
                 //If the method fails, no timeseries are touched. That is good!
@@ -2831,6 +2835,8 @@ namespace Gekko
             public List<string> listItems0;
             public List<string> listItems1;
             public List<string> listItems2;
+
+            public string gekkocode = null;
 
             public GekkoTime date = Globals.tNull;
             public void Exe()
@@ -3412,6 +3418,7 @@ namespace Gekko
             public string opt_from = null;
             public string opt_to = null;
             public string opt_error = null;
+            public string gekkocode = null;
             public void Exe()
             {                
                 //------------ Types -----------------------------------------------------------------------------------------------
@@ -3737,6 +3744,7 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public List<string> listItems = null;
+            public string gekkocode = null;
             public void Exe()
             {
                 int counter = 0;
@@ -3761,6 +3769,7 @@ namespace Gekko
             public List<string> listItems0 = null;
             public List<string> listItems1 = null;
             public string opt_bank = null;
+            public string gekkocode = null;
             public void Exe()
             {
                 //listItems = null;  //just for safety, should not be used.
@@ -4227,6 +4236,7 @@ namespace Gekko
             public string opt_prefix = null;
             public string opt_bank = null;
             public double opt_index = 100d;
+            public string gekkocode = null;
             public void Exe()
             {
                 if (date1.IsNull())
@@ -4861,7 +4871,8 @@ namespace Gekko
             public string b1 = null;
             public string v0 = null;
             public string v1 = null;
-            public string type = null;            
+            public string type = null;
+            public string gekkocode = null;
             public void Exe()
             {
                 Program.Collapse(this.b1,this.v1, this.b0, this.v0, type);                
@@ -4875,6 +4886,7 @@ namespace Gekko
             public string v0 = null;
             public string v1 = null;
             public string type = null;
+            public string gekkocode = null;
             public void Exe()
             {
                 Program.Interpolate(this.b1, this.v1, this.b0, this.v0, type);

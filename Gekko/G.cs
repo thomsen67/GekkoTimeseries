@@ -1359,6 +1359,16 @@ namespace Gekko
             else return false;
         }
 
+        public static string StripQuotes(string s)
+        {
+            if (s == null) return null;
+            if (s.StartsWith("'") && s.EndsWith("'"))
+            {
+                s = s.Substring(1, s.Length - 2);
+            }
+            return s;
+        }
+
         /// <summary>
         /// Returns a random long from min (inclusive) to max (exclusive)
         /// </summary>
@@ -1548,11 +1558,19 @@ namespace Gekko
             s = Regex.Replace(s, "s____er", "ser", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____eries", "series", RegexOptions.IgnoreCase);
 
+            s = G.HandleQuoteInQuote(s);
+
             //s = s.Remove(
             //lengthDiff = length - s.Length;
             return s;
-        }        
-        
+        }
+
+        public static string HandleQuoteInQuote(string s)
+        {
+            s = s.Replace("\"", "\"\"");
+            return s;
+        }
+
         public static bool IsIdent(string s)
         {
             bool simple = true;
