@@ -41,14 +41,22 @@ namespace Gekko
             this.traceContents = traceContents;
         }
 
-        public TraceContents2 GetContents()
-        {
-            return this.traceContents;
-        }
-
         public TraceID2 GetId()
         {
             return this.traceContents.id;
+        }
+
+        public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss)
+        {
+            foreach (TimeSeries tsRhs in tsRhss)
+            {
+                if (tsRhs.trace != null)
+                {
+                    if (traceLhs.precedents == null) traceLhs.precedents = new List<Trace2>();
+                    traceLhs.precedents.Add(tsRhs.trace);
+                }
+            }
+            tsLhs.trace = traceLhs;
         }
     }
 

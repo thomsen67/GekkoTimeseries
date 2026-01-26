@@ -725,6 +725,31 @@ namespace Gekko
             return m;
         }
 
+        public static IVariable tracedelete(GekkoTime t, IVariable x1)
+        {
+            int n = 0;
+            Databank databank = Program.databanks.GetDatabank(O.GetString(x1));
+            if (databank == null)
+            {
+                G.Writeln2("*** ERROR: tracedelete(): databank " + O.GetString(x1) + " does not exist");
+                throw new GekkoException();
+            }
+            if (databank.protect)
+            {
+                G.Writeln2("*** ERROR: tracedelete(): databank " + databank.aliasName + " is not editable");
+                throw new GekkoException();
+            }            
+            GekkoDictionary<string, TimeSeries> databankWithFewerPeriods = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)
+            {
+                TimeSeries ts = kvp.Value;
+                if (ts.trace != null) n++;
+                ts.trace = null;
+            }            
+            return new ScalarString("Deleted " + n + " data-traces in databank " + databank.aliasName);
+        }
+
+
         public static IVariable sumr(GekkoTime t, IVariable x)
         {
             return SumHelper(t, x, ESumDim.Rows, ESumType.Sum);

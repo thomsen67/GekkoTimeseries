@@ -3882,7 +3882,7 @@ write datatest;
             int vars = -12345;
             GekkoTime startYear;
             GekkoTime endYear;
-            ReadPx(oRead.array, false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear);
+            ReadPx(oRead.array, false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear, oRead.gekkocode, oRead.p, file);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;
@@ -4284,7 +4284,7 @@ write datatest;
         }
 
 
-        public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd, string gekkocode, P p, string pxFile)
         {
 
             bool isArray = false; if (G.equal(array, "yes")) isArray = true;
@@ -4648,6 +4648,20 @@ write datatest;
                     if (gt1.IsNull()) gt1 = gt_end;
                     if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
                     if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
+
+                    if (Program.options.databank_trace)
+                    {
+                        try
+                        {
+                            Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
+                            trace.traceContents.text =  gekkocode + ";";
+                            trace.traceContents.name = ts.GetNameAndParentDatabank();
+                            trace.traceContents.commandFileAndLine = p?.GetExecutingGcmFile(false);
+                            trace.traceContents.dataFile = pxFile;
+                            Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { });
+                        }
+                        catch { }
+                    }
                 }
                 else
                 {
@@ -21539,6 +21553,27 @@ write datatest;
                     ts.source = s + o.meta;                    
                     ts.SetDirtyGhost(true, false);
                 }
+
+                if (Program.options.databank_trace)
+                {
+                    try
+                    {
+                        Trace2 trace = new Trace2(ETraceType.Normal, o.t1, o.t2);
+                        trace.traceContents.text = o.meta + ";";
+                        trace.traceContents.name = ts.GetNameAndParentDatabank();
+                        trace.traceContents.commandFileAndLine = o.p?.GetExecutingGcmFile(false);
+                        if (Globals.traceContainer.Count() > 0)
+                        {
+                            trace.traceContents.precedentsNames = new List<string>();
+                            foreach (TimeSeries child in Globals.traceContainer.GetList())
+                            {
+                                trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
+                            }
+                        }
+                        Trace2.PushIntoSeries(trace, ts, Globals.traceContainer.GetList());
+                    }
+                    catch { }
+                }
             }
         }
 
@@ -25155,7 +25190,7 @@ write datatest;
             G.Writeln("The collapsed series (" + G.GetFreqString(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
 
-        public static void Collapse(string b1, string ss1, string b0, string ss0, string method)
+        public static void Collapse(string b1, string ss1, string b0, string ss0, string method, O.Collapse o)
         {
             //ErrorIfDatabanksSwapped(); 
 
@@ -25300,11 +25335,25 @@ write datatest;
                     throw new GekkoException();
                 }
             }
+
+            if (Program.options.databank_trace)
+            {
+                try
+                {
+                    Trace2 trace = new Trace2(ETraceType.Normal, first, last);
+                    trace.traceContents.text = o.gekkocode + ";";
+                    trace.traceContents.name = ts1.GetNameAndParentDatabank();
+                    trace.traceContents.commandFileAndLine = o.p?.GetExecutingGcmFile(false);
+                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 });
+                }
+                catch { }
+            }
+
             G.Writeln("Collapsed '" + name1 + "' (" + eFreq1.ToString() + ") from '" + name0 + "' (" + eFreq0.ToString() + ")");
             return;
         }
 
-        public static void Interpolate(string b1, string ss1, string b0, string ss0, string method)
+        public static void Interpolate(string b1, string ss1, string b0, string ss0, string method, O.Interpolate o)
         {
             //ErrorIfDatabanksSwapped();            
 
@@ -25439,6 +25488,20 @@ write datatest;
                     throw new GekkoException();
                 }
             }
+
+            if (Program.options.databank_trace)
+            {
+                try
+                {
+                    Trace2 trace = new Trace2(ETraceType.Normal, first, last);
+                    trace.traceContents.text = o.gekkocode + ";";
+                    trace.traceContents.name = ts1.GetNameAndParentDatabank();
+                    trace.traceContents.commandFileAndLine = o.p?.GetExecutingGcmFile(false);
+                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 });
+                }
+                catch { }
+            }
+
             G.Writeln("Interpolated '" + name1 + "' (" + eFreq1.ToString() + ") from '" + name0 + "' (" + eFreq0.ToString() + ")");
             return;
         }
@@ -36595,6 +36658,9 @@ write datatest;
 
     public class ReadOpenMulbkHelper: O_OLD
     {
+        public string gekkocode = null;
+        public P p = null;
+
         public GekkoTime t1 = Globals.tNull;
         public GekkoTime t2 = Globals.tNull;
         public List<List<string>> openFileNames = null;

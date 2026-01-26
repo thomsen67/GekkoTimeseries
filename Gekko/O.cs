@@ -1976,6 +1976,8 @@ namespace Gekko
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                 hlp.t1 = this.t1;
                 hlp.t2 = this.t2;
+                hlp.gekkocode = this.gekkocode;
+                hlp.p = this.p;
                 
                 bool isRead = false; if (G.equal(this.type, "read")) isRead = true;
 
@@ -2829,6 +2831,19 @@ namespace Gekko
                     lhs.SetData(gt, newSeriesTemp.GetData(gt));
                 }
                 lhs.Stamp();
+
+                if (Program.options.databank_trace)
+                {
+                    try
+                    {
+                        Trace2 trace = new Trace2(ETraceType.Normal, realStart, realEnd);
+                        trace.traceContents.text = this.gekkocode + ";";
+                        trace.traceContents.name = lhs.GetNameAndParentDatabank();
+                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                        Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries });
+                    }
+                    catch { }
+                }
             }            
         }
 
@@ -2969,6 +2984,20 @@ namespace Gekko
                     }                    
                 }
                 ts3.Stamp();
+
+                if (Program.options.databank_trace)
+                {
+                    try
+                    {
+                        Trace2 trace = new Trace2(ETraceType.Normal, t1a, t2b);
+                        trace.traceContents.text = this.gekkocode + ";";
+                        trace.traceContents.name = ts1.GetNameAndParentDatabank();
+                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 });
+                    }
+                    catch { }
+                }
+
                 G.Writeln2("Spliced '" + ts3.variableName + "' by means of " + obs + " common observations");
             }
         }
@@ -3653,6 +3682,19 @@ namespace Gekko
                                 double[] values = ts.GetDataSequence(out index1, out index2, this.t1, this.t2);
                                 ts2.SetDataSequence(t1, t2, values, index1);
                                 ts2.Stamp();  //will get a new date stamp, since it is not cloning here
+
+                                if (Program.options.databank_trace)
+                                {
+                                    try
+                                    {
+                                        Trace2 trace = new Trace2(ETraceType.Normal, t1, t2);
+                                        trace.traceContents.text = this.gekkocode + ";";
+                                        trace.traceContents.name = ts2.GetNameAndParentDatabank();
+                                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
+                                    }
+                                    catch { }
+                                }
                             }
                             else
                             {
@@ -3662,6 +3704,19 @@ namespace Gekko
                                 ts2.variableName = newName;
                                 ts2.Truncate(this.t1, this.t2);
                                 toBank.AddVariable(ts2);
+
+                                if (Program.options.databank_trace)
+                                {
+                                    try
+                                    {
+                                        Trace2 trace = new Trace2(ETraceType.Normal, this.t1, this.t2);
+                                        trace.traceContents.text = this.gekkocode + ";";
+                                        trace.traceContents.name = ts2.GetNameAndParentDatabank();
+                                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
+                                    }
+                                    catch { }
+                                }
                             }
                         }
                         else
@@ -3685,7 +3740,20 @@ namespace Gekko
                                 //Type 4
                             }
                             toBank.AddVariable(ts2);
-                        }
+
+                            if (Program.options.databank_trace)
+                            {
+                                try
+                                {
+                                    Trace2 trace = new Trace2(ETraceType.Normal, ts2.GetRealDataPeriodFirst(), ts2.GetRealDataPeriodLast());
+                                    trace.traceContents.text = this.gekkocode + ";";
+                                    trace.traceContents.name = ts2.GetNameAndParentDatabank();
+                                    trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                    Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
+                                }
+                                catch { }
+                            }
+                        }                        
                     }
                 }
 
@@ -3763,6 +3831,19 @@ namespace Gekko
                         ts.Truncate(this.t1, this.t2);
                         counter++;
                         ts.Stamp();
+
+                        if (Program.options.databank_trace)
+                        {
+                            try
+                            {
+                                Trace2 trace = new Trace2(ETraceType.Normal, this.t1, this.t2);
+                                trace.traceContents.text = this.gekkocode + ";";
+                                trace.traceContents.name = ts.GetNameAndParentDatabank();
+                                trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                            }
+                            catch { }
+                        }
                     }                    
                 }
                 G.Writeln2("Truncated " + counter + " timeseries to " + t1 + "-" + t2 + "");
@@ -3825,6 +3906,19 @@ namespace Gekko
                         ts.variableName = s2;
                         ts.parentDatabank.AddVariable(ts);
                         counter++;
+
+                        if (Program.options.databank_trace)
+                        {
+                            try
+                            {
+                                Trace2 trace = new Trace2(ETraceType.Normal, Globals.tNull, Globals.tNull);
+                                trace.traceContents.text = this.gekkocode + ";";
+                                trace.traceContents.name = ts.GetNameAndParentDatabank();
+                                trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                            }
+                            catch { }
+                        }
                     }
                 }                
                 G.Writeln2("Renamed " + counter + " timeseries in Work databank");
@@ -4140,12 +4234,26 @@ namespace Gekko
                 {
                     G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
+
                 if (Program.options.databank_trace)
                 {
-                    foreach (TimeSeries ts in Globals.traceContainer.GetList())
+                    try
                     {
-                        G.Writeln2("--> " + ts.variableName);
+                        Trace2 trace = new Trace2(ETraceType.Normal, t1, t2);
+                        trace.traceContents.text = this.meta + ";";
+                        trace.traceContents.name = lhs.GetNameAndParentDatabank();
+                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                        if (Globals.traceContainer.Count() > 0)
+                        {
+                            trace.traceContents.precedentsNames = new List<string>();
+                            foreach (TimeSeries ts in Globals.traceContainer.GetList())
+                            {
+                                trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
+                            }
+                        }
+                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList());
                     }
+                    catch { }
                 }
             }            
         }
@@ -4365,38 +4473,18 @@ namespace Gekko
                             try
                             {
                                 Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
-                                trace.GetContents().text = this.gekkocode + ";";
-                                trace.GetContents().name = tsNew.GetNameAndParentDatabank();
-                                trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(false);                                                                
-                                PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts });
+                                trace.traceContents.text = this.gekkocode + ";";
+                                trace.traceContents.name = tsNew.GetNameAndParentDatabank();
+                                trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);                                                                
+                                Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts });
                             }
                             catch { }
                         }
-
                     }
                 }
                 G.Writeln2("Rebased " + count + " variables");
                 //if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
-            }
-
-            private static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss)
-            {
-                foreach (TimeSeries tsRhs in tsRhss)
-                {
-                    //List<Trace2> precedentsRhs = tsRhs.trace?.precedents;
-                    //if (precedentsRhs != null)
-                    //{
-                    //    if (precedentsLhs == null) precedentsLhs = new List<Trace2>();
-                    //    precedentsLhs.AddRange(precedentsRhs);
-                    //}                    
-                    if (tsRhs.trace != null)
-                    {
-                        if (traceLhs.precedents == null) traceLhs.precedents = new List<Trace2>();
-                        traceLhs.precedents.Add(tsRhs.trace);
-                    }
-                }         
-                tsLhs.trace = traceLhs;
-            }
+            }            
         }
 
         public class Count
@@ -4924,7 +5012,7 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                Program.Collapse(this.b1,this.v1, this.b0, this.v0, type);                
+                Program.Collapse(this.b1,this.v1, this.b0, this.v0, type, this);                
             }
         }
 
@@ -4939,7 +5027,7 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                Program.Interpolate(this.b1, this.v1, this.b0, this.v0, type);
+                Program.Interpolate(this.b1, this.v1, this.b0, this.v0, type, this);
             }
         }
 
