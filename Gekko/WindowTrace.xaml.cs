@@ -44,7 +44,7 @@ namespace Gekko
         private void SetupUI()
         {
             this.Title = "Gekko data-trace";
-            this.Width = 800;
+            this.Width = 900;
             this.Height = 600;
             this.Top = 20;
             this.Left = 150;
@@ -147,7 +147,7 @@ namespace Gekko
             // 1. Parse lines into objects
             for (int i = 0; i < rawLines.Count; i++)
             {
-                var parts = rawLines[i].Split(new[] { "¤" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
+                var parts = rawLines[i].Split(new[] { "|||" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
                 var item = new TreeRow
                 {
                     Depth = int.Parse(parts[0]),

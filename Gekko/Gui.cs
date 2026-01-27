@@ -1539,6 +1539,55 @@ namespace Gekko
                 {
                     Program.List(input, null, null);
                 }
+                else if (type == "trace")
+                {
+                    string var = Globals.linkContainer[long.Parse(input)].s;
+
+                    List<Databank> dbList = new List<Databank>();
+
+                    if (Program.options.databank_search)
+                    {
+                        //search for it, with the current frequency
+                        for (int i = 0; i < Program.databanks.storage.Count; i++)
+                        {
+                            if (i == 1) continue; //skip ref databank, just as when searching for series
+                            dbList.Add(Program.databanks.storage[i]);
+                        }
+                    }
+                    else
+                    {
+                        //In sim-mode do not search all 
+                        dbList.Add(Program.databanks.GetFirst());
+                    }
+
+                    TimeSeries ts = null;
+                    foreach (Databank db in dbList)
+                    {
+                        ts = db.GetVariable(var);
+                        if (ts == null) continue;
+                    }
+
+                    if (ts == null)
+                    {
+                        G.Writeln2("*** ERROR: Trace-viewer could not find series " + var);
+                        throw new GekkoException();
+                    }
+
+                    Trace2 trace = ts.trace;
+
+                    if (trace == null)
+                    {
+                        G.Writeln2("*** ERROR: Trace-viewer did not find any traces for series " + var);
+                        throw new GekkoException();
+                    }
+
+                    List<string> traceLines = new List<string>();
+                    Trace2.WalkTraces(trace, 0, traceLines, 0);
+                    WindowTrace wt = new WindowTrace(traceLines);
+                    wt.ShowDialog();
+                }
+
+
                 else
                 {
                     G.Writeln2("*** ERROR: strange error rgd. links");

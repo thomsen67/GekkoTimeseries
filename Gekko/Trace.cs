@@ -60,7 +60,7 @@ namespace Gekko
             tsLhs.trace = traceLhs;
         }
 
-        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines)
+        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type) //0 for viewer, 1 for printing
         {            
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
@@ -76,14 +76,32 @@ namespace Gekko
                 {
                     List<string> xx = new List<string>(parent.traceContents.precedentsNames);
                     xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
-                    prec = string.Join(", ", xx);
+                    prec = string.Join(", ", xx);                    
                 }
                 
                 //These must be short
                 string name = parent.traceContents.name;
                 string period = parent.traceContents.period.ToString().Split(' ')[0];
                 string code = RemoveNewlines(parent.traceContents.text);
-                string file = parent.traceContents.commandFileAndLine;
+                string file = null;
+                string fileDetailed = null;
+
+                if (!G.NullOrBlanks(parent.traceContents.commandFileAndLine))
+                {
+                    string[] ss = parent.traceContents.commandFileAndLine.Split('¤');
+                    if (ss.Length == 2)
+                    {
+                        file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
+                        fileDetailed = ss[0] + " line " + ss[1];
+                    }
+                    else
+                    {
+                        //fallback, should never happen
+                        file = parent.traceContents.commandFileAndLine;
+                        fileDetailed = parent.traceContents.commandFileAndLine;
+                    }
+                }
+
                 if (file != null && file.Contains(":"))
                 {
                     file = System.IO.Path.GetFileName(file);
@@ -95,15 +113,24 @@ namespace Gekko
                 }
                 string id = parent.traceContents.id.ToString().Split(' ')[0];
 
-                traceLines.Add(depth + "¤" + name + "¤" + period + "¤" + code + "¤" + prec + "¤" + file + "¤" + datafile + "¤" + id + "¤" + parent.traceContents.name + "¤" + parent.traceContents.period + "¤" + parent.traceContents.text + "¤" + prec + "¤" + parent.traceContents.commandFileAndLine + "¤" + parent.traceContents.dataFile + "¤" + parent.traceContents.id);
-
-                //G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);                
+                if (type == 0)
+                {
+                    string d = "|||";
+                    traceLines.Add(depth + d + name + d + period + d + code + d + prec + d + file + d + datafile + d + id + d + parent.traceContents.name + d + parent.traceContents.period + d + parent.traceContents.text + d + prec + d + parent.traceContents.commandFileAndLine + d + parent.traceContents.dataFile + d + parent.traceContents.id);
+                }
+                else
+                {
+                    if (depth == 0)
+                    {
+                        G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
+                    }
+                }
 
                 if (parent.precedents != null)
                 {
                     foreach (Trace2 child in parent.precedents)
                     {
-                        WalkTraces(child, depth + 1, traceLines);
+                        WalkTraces(child, depth + 1, traceLines, type);
                     }
                 }
 
@@ -184,7 +211,6 @@ namespace Gekko
 
         [ProtoMember(5)]
         public string commandFileAndLine = null;
-        //trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
 
         /// <summary>
         /// For instance the file from where data was imported. Will often be null.

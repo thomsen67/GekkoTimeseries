@@ -1780,7 +1780,7 @@ namespace Gekko
                                         Trace2 trace = new Trace2(ETraceType.Normal, per1, per2);
                                         trace.traceContents.text = oRead.gekkocode + ";";
                                         trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                        trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                                        trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
                                         Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
                                     }
                                     catch { }
@@ -1796,7 +1796,7 @@ namespace Gekko
                                         Trace2 trace = new Trace2(ETraceType.Normal, per1, per2);
                                         trace.traceContents.text = oRead.gekkocode + ";";
                                         trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                        trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                                        trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
                                         Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
                                     }
                                     catch { }
@@ -3880,7 +3880,7 @@ write datatest;
                                         Trace2 trace = new Trace2(ETraceType.Normal, gt1, gt2);
                                         trace.traceContents.text = oRead.gekkocode + ";";
                                         trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                        trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                                        trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
                                         Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
                                     }
                                     catch { }
@@ -4292,7 +4292,7 @@ write datatest;
                             Trace2 trace = new Trace2(ETraceType.Normal, gt1, gt2);
                             trace.traceContents.text = oRead.gekkocode + ";";
                             trace.traceContents.name = ts.GetNameAndParentDatabank();
-                            trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                            trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
                             Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
                         }
                         catch { }
@@ -4706,7 +4706,7 @@ write datatest;
                             Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
                             trace.traceContents.text =  gekkocode + ";";
                             trace.traceContents.name = ts.GetNameAndParentDatabank();
-                            trace.traceContents.commandFileAndLine = p?.GetExecutingGcmFile(false);
+                            trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                             trace.traceContents.dataFile = pxFile;
                             Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { });
                         }
@@ -16318,26 +16318,26 @@ write datatest;
                             {
                                 G.Writeln("Series units: " + src2);
                             }
-                        }
+                        }                        
                         
-                        if (Program.options.databank_trace)
+                        List<string> traceLines = new List<string>();
+                        try
                         {
-                            List<string> traceLines = new List<string>();
-                            try
-                            {                                
-                                if (ts.trace != null)
-                                {
-                                    Trace2.WalkTraces(ts.trace, 0, traceLines);
-                                    // ------------
-                                    WindowTrace wt = new WindowTrace(traceLines);
-                                    wt.ShowDialog();
-                                }
-                            }
-                            catch
+                            if (ts.trace != null)
                             {
-                                //no need to fail on this
+                                Trace2.WalkTraces(ts.trace, 0, traceLines, 1);
+
+                                LinkContainer lc2 = new LinkContainer(listItem);
+                                Globals.linkContainer.Add(lc2.counter, lc2);
+                                G.Write("See trace-viewer ");
+                                G.WriteLink("here", "trace:" + lc2.counter);
+                                G.Writeln("");                                
                             }
                         }
+                        catch
+                        {
+                            //no need to fail on this
+                        }                        
 
                         if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(var, clickedLink, 0);
 
@@ -21580,7 +21580,7 @@ write datatest;
                         Trace2 trace = new Trace2(ETraceType.Normal, o.t1, o.t2);
                         trace.traceContents.text = o.meta + ";";
                         trace.traceContents.name = ts.GetNameAndParentDatabank();
-                        trace.traceContents.commandFileAndLine = o.p?.GetExecutingGcmFile(false);
+                        trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
                         if (Globals.traceContainer.Count() > 0)
                         {
                             trace.traceContents.precedentsNames = new List<string>();
@@ -25362,7 +25362,7 @@ write datatest;
                     Trace2 trace = new Trace2(ETraceType.Normal, first, last);
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
-                    trace.traceContents.commandFileAndLine = o.p?.GetExecutingGcmFile(false);
+                    trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
                     Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 });
                 }
                 catch { }
@@ -25515,7 +25515,7 @@ write datatest;
                     Trace2 trace = new Trace2(ETraceType.Normal, first, last);
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
-                    trace.traceContents.commandFileAndLine = o.p?.GetExecutingGcmFile(false);
+                    trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
                     Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 });
                 }
                 catch { }
@@ -36822,6 +36822,7 @@ write datatest;
             string command = null;
             if (simple)
             {
+                //Probably includes procedures/functions
                 try
                 {
                     command = this.GetStack(this.GetDepth());
@@ -36831,6 +36832,7 @@ write datatest;
             }
             else
             {
+                //Checks for file existence... ?
                 try
                 {
                     int max = this.GetDepth();
@@ -36844,6 +36846,19 @@ write datatest;
                 catch { } //do not choke on this
                 return null;
             }
+        }
+
+        public string GetGcmTrace(string s)
+        {
+            //Possibly includes functions/procedures...?
+            //String may be used later on
+            string command = null;
+            try
+            {
+                command = this.GetStack(this.GetDepth());
+            }
+            catch { } //do not choke on this
+            return command;
         }
 
         public bool IsSimple() {

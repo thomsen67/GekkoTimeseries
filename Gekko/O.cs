@@ -2839,7 +2839,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, realStart, realEnd);
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = lhs.GetNameAndParentDatabank();
-                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                        trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                         Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries });
                     }
                     catch { }
@@ -2992,7 +2992,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, t1a, t2b);
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = ts1.GetNameAndParentDatabank();
-                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                        trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                         Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 });
                     }
                     catch { }
@@ -3690,7 +3690,7 @@ namespace Gekko
                                         Trace2 trace = new Trace2(ETraceType.Normal, t1, t2);
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
-                                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                        trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                                         Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
                                     }
                                     catch { }
@@ -3712,7 +3712,7 @@ namespace Gekko
                                         Trace2 trace = new Trace2(ETraceType.Normal, this.t1, this.t2);
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
-                                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                        trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                                         Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
                                     }
                                     catch { }
@@ -3748,7 +3748,7 @@ namespace Gekko
                                     Trace2 trace = new Trace2(ETraceType.Normal, ts2.GetRealDataPeriodFirst(), ts2.GetRealDataPeriodLast());
                                     trace.traceContents.text = this.gekkocode + ";";
                                     trace.traceContents.name = ts2.GetNameAndParentDatabank();
-                                    trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                    trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                                     Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
                                 }
                                 catch { }
@@ -3839,7 +3839,7 @@ namespace Gekko
                                 Trace2 trace = new Trace2(ETraceType.Normal, this.t1, this.t2);
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                                 Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
                             }
                             catch { }
@@ -3914,7 +3914,7 @@ namespace Gekko
                                 Trace2 trace = new Trace2(ETraceType.Normal, Globals.tNull, Globals.tNull);
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                                 Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
                             }
                             catch { }
@@ -4242,7 +4242,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, t1, t2);
                         trace.traceContents.text = this.meta + ";";
                         trace.traceContents.name = lhs.GetNameAndParentDatabank();
-                        trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);
+                        trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                         if (Globals.traceContainer.Count() > 0)
                         {
                             trace.traceContents.precedentsNames = new List<string>();
@@ -4475,7 +4475,7 @@ namespace Gekko
                                 Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = tsNew.GetNameAndParentDatabank();
-                                trace.traceContents.commandFileAndLine = this.p?.GetExecutingGcmFile(false);                                                                
+                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);                                                                
                                 Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts });
                             }
                             catch { }
