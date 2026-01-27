@@ -59,8 +59,8 @@ namespace Gekko
             tsLhs.trace = traceLhs;
         }
 
-        public static void WalkTraces(Trace2 parent, int depth)
-        {
+        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines)
+        {            
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
             try
@@ -77,12 +77,15 @@ namespace Gekko
                     xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
                     prec = string.Join(", ", xx);
                 }
-                G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
+                
+                //G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
+                traceLines.Add(depth + "¤" + parent.traceContents.name + "¤" + parent.traceContents.period + "¤" + parent.traceContents.text + "¤" + prec + "¤" + parent.traceContents.commandFileAndLine + "¤" + parent.traceContents.dataFile + "¤" + parent.traceContents.id);
+                
                 if (parent.precedents != null)
                 {
                     foreach (Trace2 child in parent.precedents)
                     {
-                        WalkTraces(child, depth + 1);
+                        WalkTraces(child, depth + 1, traceLines);
                     }
                 }
 
@@ -93,17 +96,19 @@ namespace Gekko
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
                 Program.options.print_filewidth = fileWidthRemember;
-            }
+            }            
+        }
 
-            WindowTrace wt = new WindowTrace();
-            wt.ShowDialog();
+        public static string RemoveNewlines(string s)
+        {
+            return s.Replace(G.NL, " ").Replace("  ", " ").Replace("  ", " ");
         }
 
         public static string Truncate(string s)
         {
             if (s == null) return s;
             int n = 60;
-            string s2 = s.Replace(G.NL, " ").Replace("  ", " ").Replace("  ", " ");
+            string s2 = RemoveNewlines(s);
             if (s2.Length > n)
             {
                 s2 = s2.Substring(0, n) + " ...";

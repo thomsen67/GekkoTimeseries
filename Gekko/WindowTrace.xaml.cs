@@ -41,20 +41,22 @@ namespace Gekko
     {
         private ObservableCollection<TreeRow> _visibleItems = new ObservableCollection<TreeRow>();
         private List<TreeRow> _allItems = new List<TreeRow>();
-        private TextBlock _detailsBlock;
+        private TextBox _detailsBlock;
 
-        public WindowTrace()
+        public WindowTrace(List<string> input)
         {
             InitializeComponent();
             SetupUI();
-            LoadData();
+            LoadData(input);
         }
 
         private void SetupUI()
         {
-            this.Title = "Explorer Tree View";
-            this.Width = 700;
-            this.Height = 500;
+            this.Title = "Gekko data-trace";
+            this.Width = 800;
+            this.Height = 600;
+            this.Top = 20;
+            this.Left = 150;
 
             Grid rootGrid = new Grid();
             rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
@@ -64,31 +66,43 @@ namespace Gekko
             // 1. ListView with GridView
             ListView listView = new ListView { ItemsSource = _visibleItems };
             listView.SelectionChanged += (s, e) => UpdateDetails(listView.SelectedItem as TreeRow);
-
+            
             GridView gridView = new GridView();
-
-            // Column 1: Country (with Tree Controls)
+                        
             gridView.Columns.Add(new GridViewColumn
             {
-                Header = "Country",
-                Width = 250,
-                CellTemplate = CreateTreeCellTemplate()
+                Header = "Name",
+                Width = 200,
+                CellTemplate = CreateTreeCellTemplate(),                
+                //DisplayMemberBinding = new Binding("Name")
+            });
+                        
+            gridView.Columns.Add(new GridViewColumn
+            {
+                Header = "Code",
+                Width = 400,
+                DisplayMemberBinding = new Binding("Code")
+            });
+                        
+            gridView.Columns.Add(new GridViewColumn
+            {
+                Header = "Period",
+                Width = 80,
+                DisplayMemberBinding = new Binding("Period")
+            });
+                        
+            gridView.Columns.Add(new GridViewColumn
+            {
+                Header = "Stamp",
+                Width = 80,
+                DisplayMemberBinding = new Binding("Stamp")
             });
 
-            // Column 2: Company
             gridView.Columns.Add(new GridViewColumn
             {
-                Header = "Company",
-                Width = 150,
-                DisplayMemberBinding = new Binding("Company")
-            });
-
-            // Column 3: Product
-            gridView.Columns.Add(new GridViewColumn
-            {
-                Header = "Product",
-                Width = 150,
-                DisplayMemberBinding = new Binding("Product")
+                Header = "File",
+                Width = 140,
+                DisplayMemberBinding = new Binding("File")
             });
 
             listView.View = gridView;
@@ -101,38 +115,42 @@ namespace Gekko
             rootGrid.Children.Add(sep);
 
             // 2. Details Area
-            _detailsBlock = new TextBlock { Padding = new Thickness(10), Background = Brushes.White };
+            _detailsBlock = new TextBox { Padding = new Thickness(10), Background = Brushes.LightYellow };
             Grid.SetRow(_detailsBlock, 2);
             rootGrid.Children.Add(_detailsBlock);
 
             this.Content = rootGrid;
         }
 
-        private void LoadData()
+        private void LoadData(List<string> rawLines)
         {
-            // Example data based on your format
-            var rawLines = new[] {
-                "0 -- Europe -- -- ",
-                "1 -- Germany -- Volkswagen -- Golf",
-                "2 -- Germany -- Volkswagen -- ID.4",
-                "1 -- France -- Renault -- Clio",
-                "0 -- Asia -- -- ",
-                "1 -- Japan -- Toyota -- Corolla",
-                "2 -- Japan -- Toyota -- Corolla Sport",
-                "1 -- Korea -- Hyundai -- Ioniq"
-            };
+            //// Example data based on your format
+            //var rawLines = new[] {
+            //    "0 -- Europe -- -- ",
+            //    "1 -- Germany -- Volkswagen -- Golf",
+            //    "2 -- Germany -- Volkswagen -- ID.4",
+            //    "1 -- France -- Renault -- Clio",
+            //    "0 -- Asia -- -- ",
+            //    "1 -- Japan -- Toyota -- Corolla",
+            //    "2 -- Japan -- Toyota -- Corolla Sport",
+            //    "1 -- Korea -- Hyundai -- Ioniq"
+            //};
 
             // 1. Parse lines into objects
-            for (int i = 0; i < rawLines.Length; i++)
+            for (int i = 0; i < rawLines.Count; i++)
             {
-                var parts = rawLines[i].Split(new[] { "--" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
+                var parts = rawLines[i].Split(new[] { "¤" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
                 var item = new TreeRow
                 {
                     Depth = int.Parse(parts[0]),
-                    Country = parts.Length > 1 ? parts[1] : "",
-                    Company = parts.Length > 2 ? parts[2] : "",
-                    Product = parts.Length > 3 ? parts[3] : "",
-                    IsExpanded = true // Default to expanded
+                    Name = parts.Length > 1 ? parts[1] : "",
+                    Period = parts.Length > 2 ? parts[2] : "",
+                    Code = parts.Length > 3 ? parts[3] : "",
+                    Variables = parts.Length > 4 ? parts[4] : "",
+                    File = parts.Length > 5 ? parts[5] : "",
+                    DataFile = parts.Length > 6 ? parts[6] : "",
+                    Stamp = parts.Length > 7 ? parts[7] : "",                    
+                    IsExpanded = false // Default to expanded
                 };
 
                 // Subscribe to expansion changes
@@ -180,8 +198,8 @@ namespace Gekko
         private void UpdateDetails(TreeRow selected)
         {
             if (selected == null) return;
-            _detailsBlock.Text = string.Format("Country: {0}\nCompany: {1}\nProduct: {2}",
-                selected.Country, selected.Company, selected.Product);
+            _detailsBlock.Text = string.Format("{0}\n--------------------------------------------------\nName: {1}\nPeriod: {2}\nFile: {3}\nDatafile: {4}\nStamp: {5}\nVars: {6}",
+                Trace2.RemoveNewlines(selected.Code), selected.Name, selected.Period, selected.File, selected.DataFile, selected.Stamp, selected.Variables);
         }
 
         private DataTemplate CreateTreeCellTemplate()
@@ -204,7 +222,7 @@ namespace Gekko
                             </Style>
                         </ToggleButton.Style>
                     </ToggleButton>
-                    <TextBlock Text='{Binding Country}' VerticalAlignment='Center' FontWeight='SemiBold'/>
+                    <TextBlock Text='{Binding Name}' VerticalAlignment='Center'/>
                 </StackPanel>
             </DataTemplate>";
             return (DataTemplate)System.Windows.Markup.XamlReader.Parse(xaml);
@@ -214,9 +232,13 @@ namespace Gekko
     public class TreeRow : INotifyPropertyChanged
     {
         public int Depth { get; set; }
-        public string Country { get; set; }
-        public string Company { get; set; }
-        public string Product { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
+        public string Period { get; set; }
+        public string Stamp { get; set; }
+        public string File { get; set; }
+        public string DataFile { get; set; }
+        public string Variables { get; set; }
         public bool HasChildren { get; set; }
 
         private bool _isExpanded;

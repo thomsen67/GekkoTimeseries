@@ -16319,14 +16319,18 @@ write datatest;
                                 G.Writeln("Series units: " + src2);
                             }
                         }
-
+                        
                         if (Program.options.databank_trace)
                         {
+                            List<string> traceLines = new List<string>();
                             try
                             {                                
                                 if (ts.trace != null)
                                 {
-                                    Trace2.WalkTraces(ts.trace, 0);
+                                    Trace2.WalkTraces(ts.trace, 0, traceLines);
+                                    // ------------
+                                    WindowTrace wt = new WindowTrace(traceLines);
+                                    wt.ShowDialog();
                                 }
 
                             }
