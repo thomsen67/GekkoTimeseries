@@ -42,6 +42,9 @@ namespace Gekko
     {
         public static ListUnique<TimeSeries> traceContainer = new ListUnique<TimeSeries>();
 
+        public const string languageDaDK = "da-DK";
+        public const string languageEnUS = "en-US";
+
         public static string versionInternal = "";  // "v14";
 
         public static string isAProto = "Is_a_protobuffer_file";

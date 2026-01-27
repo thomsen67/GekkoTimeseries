@@ -16332,7 +16332,6 @@ write datatest;
                                     WindowTrace wt = new WindowTrace(traceLines);
                                     wt.ShowDialog();
                                 }
-
                             }
                             catch
                             {

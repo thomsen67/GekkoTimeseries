@@ -12,30 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Media;
 
 namespace Gekko
-{
-    ///// <summary>
-    ///// Interaction logic for WindowTrace.xaml
-    ///// </summary>
-    //public partial class WindowTrace : UserControl
-    //{
-    //    public WindowTrace()
-    //    {
-    //        InitializeComponent();
-    //    }
-    //}
+{    
 
     public partial class WindowTrace : Window
     {
@@ -48,6 +30,15 @@ namespace Gekko
             InitializeComponent();
             SetupUI();
             LoadData(input);
+            this.KeyDown += MainWindow_KeyDown;
+        }
+
+        private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Escape)
+            {
+                this.Close();
+            }
         }
 
         private void SetupUI()
@@ -58,39 +49,50 @@ namespace Gekko
             this.Top = 20;
             this.Left = 150;
 
+            // 1. Define the Grid and Rows
             Grid rootGrid = new Grid();
-            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) });
 
-            // 1. ListView with GridView
-            ListView listView = new ListView { ItemsSource = _visibleItems };
+            // Top Row (Tree) - "*" means it takes available space
+            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star), MinHeight = 100 });
+
+            // Middle Row (The Splitter handle) - "Auto" fits the splitter's height
+            rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            // Bottom Row (Details) - Fixed initial height, but resizable
+            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(150), MinHeight = 50 });
+
+            // 2. The ListView (Tree View)
+            ListView listView = new ListView
+            {
+                ItemsSource = _visibleItems,
+                //FontFamily = new FontFamily("Segoe UI"),
+                //FontSize = 13
+            };
             listView.SelectionChanged += (s, e) => UpdateDetails(listView.SelectedItem as TreeRow);
-            
+
             GridView gridView = new GridView();
-                        
+
             gridView.Columns.Add(new GridViewColumn
             {
                 Header = "Name",
                 Width = 200,
-                CellTemplate = CreateTreeCellTemplate(),                
-                //DisplayMemberBinding = new Binding("Name")
+                CellTemplate = CreateTreeCellTemplate(),
             });
-                        
+
             gridView.Columns.Add(new GridViewColumn
             {
                 Header = "Code",
                 Width = 400,
                 DisplayMemberBinding = new Binding("Code")
             });
-                        
+
             gridView.Columns.Add(new GridViewColumn
             {
                 Header = "Period",
                 Width = 80,
                 DisplayMemberBinding = new Binding("Period")
             });
-                        
+
             gridView.Columns.Add(new GridViewColumn
             {
                 Header = "Stamp",
@@ -106,36 +108,42 @@ namespace Gekko
             });
 
             listView.View = gridView;
-            Grid.SetRow(listView, 0);
+
+            Grid.SetRow(listView, 0); // Put in Row 0
             rootGrid.Children.Add(listView);
 
-            // Separator
-            Separator sep = new Separator();
-            Grid.SetRow(sep, 1);
-            rootGrid.Children.Add(sep);
+            // 3. The GridSplitter (The Draggable Divider)
+            GridSplitter splitter = new GridSplitter
+            {
+                Height = 5,                          // Thickness of the handle
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.Gainsboro,      // Color of the bar
+                ShowsPreview = true                  // Shows a ghost line while dragging
+            };
+            Grid.SetRow(splitter, 1); // Put in Row 1
+            rootGrid.Children.Add(splitter);
 
-            // 2. Details Area
-            _detailsBlock = new TextBox { Padding = new Thickness(10), Background = Brushes.LightYellow };
-            Grid.SetRow(_detailsBlock, 2);
-            rootGrid.Children.Add(_detailsBlock);
+            // 4. The Details Area (Wrapped in a ScrollViewer in case text is long)
+            ScrollViewer scrollBox = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+            _detailsBlock = new TextBox
+            {
+                Padding = new Thickness(10),
+                Background = Brushes.LightYellow,
+                FontFamily = new FontFamily("Consolas"), // Monospace looks better for "Code: Value" pairs
+                FontSize = 12,
+                TextWrapping = TextWrapping.Wrap
+            };
+            scrollBox.Content = _detailsBlock;
+
+            Grid.SetRow(scrollBox, 2); // Put in Row 2
+            rootGrid.Children.Add(scrollBox);
 
             this.Content = rootGrid;
         }
 
         private void LoadData(List<string> rawLines)
         {
-            //// Example data based on your format
-            //var rawLines = new[] {
-            //    "0 -- Europe -- -- ",
-            //    "1 -- Germany -- Volkswagen -- Golf",
-            //    "2 -- Germany -- Volkswagen -- ID.4",
-            //    "1 -- France -- Renault -- Clio",
-            //    "0 -- Asia -- -- ",
-            //    "1 -- Japan -- Toyota -- Corolla",
-            //    "2 -- Japan -- Toyota -- Corolla Sport",
-            //    "1 -- Korea -- Hyundai -- Ioniq"
-            //};
-
             // 1. Parse lines into objects
             for (int i = 0; i < rawLines.Count; i++)
             {
@@ -149,7 +157,16 @@ namespace Gekko
                     Variables = parts.Length > 4 ? parts[4] : "",
                     File = parts.Length > 5 ? parts[5] : "",
                     DataFile = parts.Length > 6 ? parts[6] : "",
-                    Stamp = parts.Length > 7 ? parts[7] : "",                    
+                    Stamp = parts.Length > 7 ? parts[7] : "",
+                    // ---
+                    NameLong = parts.Length > 8 ? parts[8] : "",
+                    PeriodLong = parts.Length > 9 ? parts[9] : "",
+                    CodeLong = parts.Length > 10 ? parts[10] : "",
+                    VariablesLong = parts.Length > 11 ? parts[11] : "",
+                    FileLong = parts.Length > 12 ? parts[12] : "",
+                    DataFileLong = parts.Length > 13 ? parts[13] : "",
+                    StampLong = parts.Length > 14 ? parts[14] : "",
+                    // ---
                     IsExpanded = false // Default to expanded
                 };
 
@@ -197,9 +214,10 @@ namespace Gekko
 
         private void UpdateDetails(TreeRow selected)
         {
-            if (selected == null) return;
+            if (selected == null) return;            
+
             _detailsBlock.Text = string.Format("{0}\n--------------------------------------------------\nName: {1}\nPeriod: {2}\nFile: {3}\nDatafile: {4}\nStamp: {5}\nVars: {6}",
-                Trace2.RemoveNewlines(selected.Code), selected.Name, selected.Period, selected.File, selected.DataFile, selected.Stamp, selected.Variables);
+                selected.CodeLong, selected.NameLong, selected.PeriodLong, selected.FileLong, selected.DataFileLong, selected.StampLong, selected.VariablesLong);
         }
 
         private DataTemplate CreateTreeCellTemplate()
@@ -239,6 +257,19 @@ namespace Gekko
         public string File { get; set; }
         public string DataFile { get; set; }
         public string Variables { get; set; }
+
+        // -------
+                
+        public string NameLong { get; set; }
+        public string CodeLong { get; set; }
+        public string PeriodLong { get; set; }
+        public string StampLong { get; set; }
+        public string FileLong { get; set; }
+        public string DataFileLong { get; set; }
+        public string VariablesLong { get; set; }
+
+        // -------
+
         public bool HasChildren { get; set; }
 
         private bool _isExpanded;

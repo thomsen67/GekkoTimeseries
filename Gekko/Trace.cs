@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ProtoBuf;
 using ProtoBuf.Meta;
+using System.Text.RegularExpressions;
 
 namespace Gekko
 {
@@ -78,9 +79,26 @@ namespace Gekko
                     prec = string.Join(", ", xx);
                 }
                 
-                //G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
-                traceLines.Add(depth + "¤" + parent.traceContents.name + "¤" + parent.traceContents.period + "¤" + parent.traceContents.text + "¤" + prec + "¤" + parent.traceContents.commandFileAndLine + "¤" + parent.traceContents.dataFile + "¤" + parent.traceContents.id);
-                
+                //These must be short
+                string name = parent.traceContents.name;
+                string period = parent.traceContents.period.ToString().Split(' ')[0];
+                string code = RemoveNewlines(parent.traceContents.text);
+                string file = parent.traceContents.commandFileAndLine;
+                if (file != null && file.Contains(":"))
+                {
+                    file = System.IO.Path.GetFileName(file);
+                }
+                string datafile = parent.traceContents.dataFile;
+                if (datafile != null && datafile.Contains(":"))
+                {
+                    datafile = System.IO.Path.GetFileName(datafile);
+                }
+                string id = parent.traceContents.id.ToString().Split(' ')[0];
+
+                traceLines.Add(depth + "¤" + name + "¤" + period + "¤" + code + "¤" + prec + "¤" + file + "¤" + datafile + "¤" + id + "¤" + parent.traceContents.name + "¤" + parent.traceContents.period + "¤" + parent.traceContents.text + "¤" + prec + "¤" + parent.traceContents.commandFileAndLine + "¤" + parent.traceContents.dataFile + "¤" + parent.traceContents.id);
+
+                //G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);                
+
                 if (parent.precedents != null)
                 {
                     foreach (Trace2 child in parent.precedents)
@@ -99,9 +117,14 @@ namespace Gekko
             }            
         }
 
-        public static string RemoveNewlines(string s)
+        public static string RemoveNewlines(string input)
         {
-            return s.Replace(G.NL, " ").Replace("  ", " ").Replace("  ", " ");
+            //return s.Replace(G.NL, " ").Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").Replace("  ", " ");
+            if (string.IsNullOrEmpty(input)) return input;
+            // 1. \s+ matches any sequence of whitespace (tabs, newlines, spaces)
+            // 2. We replace that entire sequence with a single space " "
+            // 3. Trim() removes any leading or trailing spaces left over
+            return Regex.Replace(input, @"\s+", " ").Trim();
         }
 
         public static string Truncate(string s)
@@ -257,7 +280,20 @@ namespace Gekko
         }
         public override string ToString()
         {
-            return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + ", #" + this.counter;
+            System.Globalization.CultureInfo ci = System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK);
+            string stamp = this.StampInLocalTime().ToString("d", ci);
+            string stampDetailed = null;
+            try
+            {                
+                stampDetailed = this.StampInLocalTime().ToString($"{ci.DateTimeFormat.ShortDatePattern} HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + this.counter;  //7 digits is 100 ns, which is limit anyway
+                //
+            }
+            catch
+            {
+                stampDetailed = this.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + this.counter;
+            }
+            return stampDetailed;
+            //return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + ", #" + this.counter;
             //return this.StampInLocalTime().ToString("d/M yyyy HH:mm:ss", new System.Globalization.CultureInfo("da-DK")) + "|" + this.counter;
             //return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
         }
