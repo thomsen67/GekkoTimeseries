@@ -400,6 +400,9 @@
     <Compile Include="WindowTets.xaml.cs">
       <DependentUpon>WindowTets.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowTrace.xaml.cs">
+      <DependentUpon>WindowTrace.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XML_To_TreeView.xaml.cs">
       <DependentUpon>XML_To_TreeView.xaml</DependentUpon>
     </Compile>
@@ -551,6 +554,10 @@
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowTrace.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XML_To_TreeView.xaml">
       <SubType>Designer</SubType>

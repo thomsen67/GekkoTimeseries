@@ -94,6 +94,9 @@ namespace Gekko
                 Program.options.print_width = widthRemember;
                 Program.options.print_filewidth = fileWidthRemember;
             }
+
+            WindowTrace wt = new WindowTrace();
+            wt.ShowDialog();
         }
 
         public static string Truncate(string s)
@@ -249,7 +252,7 @@ namespace Gekko
         }
         public override string ToString()
         {
-            return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + ", #" + this.counter;
             //return this.StampInLocalTime().ToString("d/M yyyy HH:mm:ss", new System.Globalization.CultureInfo("da-DK")) + "|" + this.counter;
             //return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
         }
@@ -324,6 +327,8 @@ namespace Gekko
             if (s.EndsWith(", ")) s = s.Substring(0, s.Length - ", ".Length);
             return s;
         }
-    }   
+    }
+
+    
 
 }
