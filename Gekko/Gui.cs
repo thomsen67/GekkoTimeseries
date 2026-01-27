@@ -1573,7 +1573,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    Trace2 trace = ts.trace;
+                    Trace2 trace = ts.trace2;
 
                     if (trace == null)
                     {

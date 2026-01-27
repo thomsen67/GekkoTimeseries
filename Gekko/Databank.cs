@@ -76,6 +76,10 @@ namespace Gekko
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
         public GekkoDictionary<string, TimeSeries> storage;
+
+        [ProtoMember(2)]
+        public List<Trace2> traces = null; //when writing, this is where all the Trace's go.      
+
         public string aliasName = null;          
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
@@ -132,8 +136,8 @@ namespace Gekko
             this.storage = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);            
             this.aliasName = aliasName;
             //this.aliasNameOriginal = aliasName;
-        }     
-        
+        }        
+
         public void Clear() {
             if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
             //aliasName = null; --> keep that name when clearing

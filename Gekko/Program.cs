@@ -16323,9 +16323,9 @@ write datatest;
                         List<string> traceLines = new List<string>();
                         try
                         {
-                            if (ts.trace != null)
+                            if (ts.trace2 != null)
                             {
-                                Trace2.WalkTraces(ts.trace, 0, traceLines, 1);
+                                Trace2.WalkTraces(ts.trace2, 0, traceLines, 1);
 
                                 LinkContainer lc2 = new LinkContainer(listItem);
                                 Globals.linkContainer.Add(lc2.counter, lc2);

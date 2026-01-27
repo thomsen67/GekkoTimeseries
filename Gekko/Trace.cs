@@ -17,13 +17,52 @@ namespace Gekko
         Dangling  //not used?
     }
 
+    public enum ETraceHelper
+    {
+        GetAllMetasAndTraces,
+        OnlyGetMetas,
+        TrimWithTimeShadowing,
+        Scramble  //not actually used for traces
+    }
+
+    [ProtoContract]
+    public class Precedents2
+    {
+        [ProtoMember(1)]
+        public List<Trace2> storage = new List<Trace2>();
+
+        /// <summary>
+        /// Pretty innocuous: using this, we can set .storage = null before protobuf.
+        /// </summary>
+        [ProtoMember(2)]
+        public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general. Same size as .storagePeriodsTemporary
+
+        public void ToID()
+        {
+            this.storageIDTemporary = new List<TraceID2>();
+            if (this.storage.Count() > 0)
+            {
+                foreach (Trace2 trace in this.storage)
+                {
+                    TraceID2 temp = null;
+                    GekkoTimeSpansSimple temp2 = new GekkoTimeSpansSimple();  //protobuf cannot handle if an element is == null (for dividers)                    
+                    temp = trace.GetId();                    
+                    this.storageIDTemporary.Add(temp);
+                }
+            }
+            //this.SetStorage(null);  //breaks the references
+            this.storage = null;
+        }
+
+    }
+
     [Serializable]
     [ProtoContract]
     public class Trace2
     {
 
         [ProtoMember(1)]
-        public List<Trace2> precedents = null;
+        public Precedents2 precedents = null;
 
         [ProtoMember(2)]
         public readonly ETraceType type = ETraceType.Normal;  //default
@@ -51,13 +90,13 @@ namespace Gekko
         {
             foreach (TimeSeries tsRhs in tsRhss)
             {
-                if (tsRhs.trace != null)
+                if (tsRhs.trace2 != null)
                 {
-                    if (traceLhs.precedents == null) traceLhs.precedents = new List<Trace2>();
-                    traceLhs.precedents.Add(tsRhs.trace);
+                    if (traceLhs.precedents == null) traceLhs.precedents = new Precedents2();
+                    traceLhs.precedents.storage.Add(tsRhs.trace2);
                 }
             }
-            tsLhs.trace = traceLhs;
+            tsLhs.trace2 = traceLhs;
         }
 
         public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type) //0 for viewer, 1 for printing
@@ -128,7 +167,7 @@ namespace Gekko
 
                 if (parent.precedents != null)
                 {
-                    foreach (Trace2 child in parent.precedents)
+                    foreach (Trace2 child in parent.precedents.storage)
                     {
                         WalkTraces(child, depth + 1, traceLines, type);
                     }
@@ -165,26 +204,130 @@ namespace Gekko
             }
             return s2;
         }
+
+        public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type)
+        {
+            return CollectAllTraces(databank, type, double.NaN);
+        }
+
+        public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type, double scramble)
+        {
+            TraceHelper th1 = new TraceHelper();
+            th1.type = type;
+            th1.scramble = scramble;
+            foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)
+            {
+                kvp.Value.DeepTrace(th1);
+            }
+            return th1;
+        }
+
+        public void DeepTrace(TraceHelper th, int depth)
+        {            
+            if (th.depthLimit != -12345 && depth >= th.depthLimit) return;
+            if (th.type == ETraceHelper.GetAllMetasAndTraces)  //0 corresponds to direct effect from bank variable (e.g. "adambk:"), not indirect effect.
+            {
+                PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
+                if (temp == null)
+                {
+                    th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
+                }
+                else
+                {
+                    //has been seen before
+                    temp.depth = Math.Min(temp.depth, depth);
+                    return;
+                }
+
+                if (this.precedents.storage.Count() > 0)
+                {
+                    foreach (Trace2 trace in this.precedents.storage)
+                    {                        
+                        trace.DeepTrace(th, depth + 1);
+                    }
+                }
+            }            
+        }
+
+        /// <summary>
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
+        /// </summary>
+        /// <param name="databank"></param>
+        //public static void HandleTraceRead1(Databank databank)
+        //{
+        //    if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
+        //    {
+        //        try
+        //        {
+        //            TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
+        //            Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
+        //            foreach (Trace2 trace in databank.traces) dictInverted[trace.GetId()] = trace;
+        //            HandleTraceRead2(th.metas, dictInverted);
+        //        }
+        //        finally
+        //        {
+        //            if (databank != null) databank.traces = null;  //important!
+        //        }
+        //    }
+        //}
+
+        ///// <summary>
+        ///// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
+        ///// </summary>
+        //public static void HandleTraceRead2(List<SeriesMetaInformation> metas, Dictionary<TraceID2, Trace2> dict1Inverted)
+        //{
+        //    foreach (SeriesMetaInformation meta in metas)
+        //    {
+        //        meta.FromID(dict1Inverted);
+        //    }
+        //    foreach (Trace2 trace in dict1Inverted.Values)
+        //    {
+        //        trace.precedents.FromID(dict1Inverted);
+        //    }
+        //}
+
+        /// <summary>
+        /// Before serializing a protobuf gbk, this method removes trace connections, and kind of packs the connections into a flat list (databank.traces).
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="th"></param>
+        /// <param name="dict1Inverted"></param>
+        public static void HandleTraceWrite(Databank databank, out TraceHelper th, out Dictionary<TraceID2, Trace2> dict1Inverted)
+        {
+            //gather lists
+            th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
+            dict1Inverted = new Dictionary<TraceID2, Trace2>();
+            foreach (Trace2 trace in th.tracesDepth2.Keys)
+            {
+                dict1Inverted[trace.GetId()] = trace;
+                trace.precedents.ToID();  //remove links
+            }
+            foreach (TimeSeries meta in th.metas)
+            {
+                meta.ToID();
+            }
+            databank.traces = th.tracesDepth2.Keys.ToList();
+        }
     }
 
-    public class Precedents2
-    {
-        [ProtoMember(1)]
-        private List<TraceAndPeriods2> storage = null;
-    }
+    //public class Precedents2
+    //{
+    //    [ProtoMember(1)]
+    //    private List<TraceAndPeriods2> storage = null;
+    //}
 
-    public class TraceAndPeriods2
-    {
-        //At the moment, periods are just == null here, but in the longer run we can store them.
-        //Other fields like min and max period could also be added. But wait, that is just t1 from first period
-        //and t2 from last period. The periods are successive, no?
+    //public class TraceAndPeriods2
+    //{
+    //    //At the moment, periods are just == null here, but in the longer run we can store them.
+    //    //Other fields like min and max period could also be added. But wait, that is just t1 from first period
+    //    //and t2 from last period. The periods are successive, no?
 
-        [ProtoMember(1)]
-        public Trace2 trace = null;
+    //    [ProtoMember(1)]
+    //    public Trace2 trace = null;
 
-        [ProtoMember(2)]
-        public GekkoTimeSpansSimple periods = null;
-    }
+    //    [ProtoMember(2)]
+    //    public GekkoTimeSpansSimple periods = null;
+    //}
 
     [ProtoContract]
     public class TraceContents2  //Trace2 because it is experimental
@@ -396,6 +539,24 @@ namespace Gekko
         }
     }
 
-    
+    public class TraceHelper
+    {
+        public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
+        public double scramble = double.NaN;  //for scramble() function
+        public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
+        public List<TimeSeries> metas = new List<TimeSeries>();
+        public int depthLimit = -12345;
+        public Dictionary<Trace2, Precedents2> traces = new Dictionary<Trace2, Precedents2>();  //value is parent (may be null)
+        public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
+
+    }
+
+    public class PrecedentsAndDepth
+    {
+        public Precedents2 precedents = null;
+        public int depth = 0;
+    }
+
+
 
 }

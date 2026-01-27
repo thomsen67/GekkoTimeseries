@@ -152,7 +152,10 @@ namespace Gekko
         public string units;
 
         [ProtoMember(16)]
-        public Trace2 trace = null;
+        public Trace2 trace2 = null;
+
+        [ProtoMember(17)]
+        public TraceID2 traceID2 = null; //traceID2 because it is experimental
 
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
@@ -173,6 +176,25 @@ namespace Gekko
             this.freqEnum = frequency;
             this.frequency = G.GetFreq(frequency);
             this.variableName = variableName;
+        }
+
+        public void ToID()
+        {
+            if (this.trace2 != null)
+            {
+                this.traceID2 = this.trace2.GetId();
+                this.trace2 = null;
+            }
+        }
+
+
+        public void DeepTrace(TraceHelper th)
+        {
+            th.seriesObjectCount++;
+            if (this.trace2 != null)
+            {
+                this.trace2.DeepTrace(th, -1);
+            }
         }
 
         /// <summary>

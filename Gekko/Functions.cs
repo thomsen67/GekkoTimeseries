@@ -743,8 +743,8 @@ namespace Gekko
             foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)
             {
                 TimeSeries ts = kvp.Value;
-                if (ts.trace != null) n++;
-                ts.trace = null;
+                if (ts.trace2 != null) n++;
+                ts.trace2 = null;
             }            
             return new ScalarString("Deleted " + n + " data-traces in databank " + databank.aliasName);
         }
