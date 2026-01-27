@@ -1773,10 +1773,34 @@ namespace Gekko
                                 TimeSeries data2 = new TimeSeries(freqHere, varName);
                                 databank.AddVariable(data2);
                                 ts = data2;
+                                if (Program.options.databank_trace)
+                                {
+                                    try
+                                    {
+                                        Trace2 trace = new Trace2(ETraceType.Normal, per1, per2);
+                                        trace.traceContents.text = oRead.gekkocode + ";";
+                                        trace.traceContents.name = ts.GetNameAndParentDatabank();
+                                        trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                    }
+                                    catch { }
+                                }
                             }
                             else
                             {
                                 ts = databank.GetVariable(varName);
+                                if (Program.options.databank_trace)
+                                {
+                                    try
+                                    {
+                                        Trace2 trace = new Trace2(ETraceType.Normal, per1, per2);
+                                        trace.traceContents.text = oRead.gekkocode + ";";
+                                        trace.traceContents.name = ts.GetNameAndParentDatabank();
+                                        trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                    }
+                                    catch { }
+                                }
                             }
                         }
 
@@ -3530,7 +3554,7 @@ write datatest;
                 {
                     //also deals with merging (not clearing the databank first if merging)
 
-                    ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
+                    ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo, oRead);
 
                     readInfo.nanCounter = NaNCounter;
 
@@ -3594,7 +3618,7 @@ write datatest;
             return offset;
         }
 
-        private static void ReadAllTsdRecords(ReadDatesHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
+        private static void ReadAllTsdRecords(ReadDatesHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo, ReadOpenMulbkHelper oRead)
         {
             int smallWarnings = 0;
             int emptyWarnings = 0;
@@ -3848,6 +3872,19 @@ write datatest;
                                 }
                                 counter++;
                                 nextState = 1;
+
+                                if (Program.options.databank_trace)
+                                {
+                                    try
+                                    {
+                                        Trace2 trace = new Trace2(ETraceType.Normal, gt1, gt2);
+                                        trace.traceContents.text = oRead.gekkocode + ";";
+                                        trace.traceContents.name = ts.GetNameAndParentDatabank();
+                                        trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                    }
+                                    catch { }
+                                }
                             }
                         }
                     }  //end of readline from file
@@ -4247,6 +4284,19 @@ write datatest;
 
                     ts.SetDataSequence(gt1, gt2, tempArray);
                     ts.Trim();  //to save RAM
+
+                    if (Program.options.databank_trace)
+                    {
+                        try
+                        {
+                            Trace2 trace = new Trace2(ETraceType.Normal, gt1, gt2);
+                            trace.traceContents.text = oRead.gekkocode + ";";
+                            trace.traceContents.name = ts.GetNameAndParentDatabank();
+                            trace.traceContents.commandFileAndLine = oRead.p?.GetExecutingGcmFile(false);
+                            Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                        }
+                        catch { }
+                    }
 
 
                 }
@@ -11306,41 +11356,7 @@ write datatest;
             }            
             return ss;
         }
-
-        private static void WalkTraces(Trace2 parent, int depth)
-        {
-            int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
-            try
-            {                
-                Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
-
-                //  -----------------------------
-
-                string prec = null;
-                if (parent.traceContents.precedentsNames != null) prec = string.Join(", ", parent.traceContents.precedentsNames);
-                G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " || " + parent.traceContents.period + " || " + parent.traceContents.text + " || " + prec + " || " + parent.traceContents.commandFileAndLine + " || " + parent.traceContents.dataFile + " || " + parent.traceContents.id);
-                if (parent.precedents != null)
-                {
-                    foreach (Trace2 child in parent.precedents)
-                    {
-                        WalkTraces(child, depth + 1);
-                    }
-                }
-
-            }
-            finally
-            {
-
-                //resetting, also if there is an error
-                Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
-
-            }
-            
-        }
-
+        
         public static void DecompForFlowChart(string s, GekkoTime year, int maxDepth, double prune, double factor, int depth, Dictionary<string, int> counter, List<GekkoFlowChart.FlowArrow> sw, List<GekkoFlowChart.FlowNode> sw2, Dictionary<string, int> d, string code)
         {
             if (!Program.model.m2.endogenous.ContainsKey(s))
@@ -16310,7 +16326,7 @@ write datatest;
                             {                                
                                 if (ts.trace != null)
                                 {
-                                    WalkTraces(ts.trace, 0);
+                                    Trace2.WalkTraces(ts.trace, 0);
                                 }
 
                             }

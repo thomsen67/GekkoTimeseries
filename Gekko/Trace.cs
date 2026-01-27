@@ -58,13 +58,61 @@ namespace Gekko
             }
             tsLhs.trace = traceLhs;
         }
+
+        public static void WalkTraces(Trace2 parent, int depth)
+        {
+            int widthRemember = Program.options.print_width;
+            int fileWidthRemember = Program.options.print_filewidth;
+            try
+            {
+                Program.options.print_width = int.MaxValue;
+                Program.options.print_filewidth = int.MaxValue;
+
+                //  -----------------------------
+                
+                string prec = null;
+                if (parent.traceContents.precedentsNames != null)
+                {
+                    List<string> xx = new List<string>(parent.traceContents.precedentsNames);
+                    xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
+                    prec = string.Join(", ", xx);
+                }
+                G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
+                if (parent.precedents != null)
+                {
+                    foreach (Trace2 child in parent.precedents)
+                    {
+                        WalkTraces(child, depth + 1);
+                    }
+                }
+
+            }
+            finally
+            {
+
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+                Program.options.print_filewidth = fileWidthRemember;
+            }
+        }
+
+        public static string Truncate(string s)
+        {
+            if (s == null) return s;
+            int n = 60;
+            string s2 = s.Replace(G.NL, " ").Replace("  ", " ").Replace("  ", " ");
+            if (s2.Length > n)
+            {
+                s2 = s2.Substring(0, n) + " ...";
+            }
+            return s2;
+        }
     }
 
     public class Precedents2
     {
         [ProtoMember(1)]
         private List<TraceAndPeriods2> storage = null;
-
     }
 
     public class TraceAndPeriods2
@@ -201,7 +249,9 @@ namespace Gekko
         }
         public override string ToString()
         {
-            return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
+            return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //return this.StampInLocalTime().ToString("d/M yyyy HH:mm:ss", new System.Globalization.CultureInfo("da-DK")) + "|" + this.counter;
+            //return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
         }
 
         public override int GetHashCode()
@@ -274,6 +324,6 @@ namespace Gekko
             if (s.EndsWith(", ")) s = s.Substring(0, s.Length - ", ".Length);
             return s;
         }
-    }
+    }   
 
 }
