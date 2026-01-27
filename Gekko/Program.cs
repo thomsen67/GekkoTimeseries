@@ -22091,6 +22091,7 @@ write datatest;
                 RuntimeTypeModel serializer = TypeModel.Create();
                 serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                 string pathAndFilename2 = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal; //changed from .bin to .data
+                string pathAndFilename3 = tempTsdxPath + "\\" + "trace.data";
                 databank.Trim();  //to make it smaller, slack removed from each TimeSeries
 
                 //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
@@ -22150,6 +22151,22 @@ write datatest;
                         databank.Trim();  //to make it smaller, slack removed from each TimeSeries
                     }
 
+                    bool useTraces = Program.options.databank_trace;
+
+                    bool traceFail = false;
+                    TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
+                    List<Trace2> tracesToWrite = null;
+                    if (useTraces)
+                    {
+                        try
+                        {
+                            Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces                    
+                        }
+                        catch (Exception e) { traceFail = true; }
+                        tracesToWrite = databank.traces;
+                        databank.traces = null;
+                    }
+
                     using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
                     {
                         try
@@ -22157,14 +22174,33 @@ write datatest;
                             DateTime dt0 = DateTime.Now;
                             //ErrorIfDatabanksSwapped(); //for safety, this is also put here so that it is always near the protobuf serialize command.
                             serializer.Serialize(fs, databank);
-                            G.WritelnGray("Protobuf serialize: " + G.Seconds(dt0));
+                            G.WritelnGray("Protobuf serialize data: " + G.Seconds(dt0));
                             count = databank.storage.Count;
                         }
                         catch (Exception e)
                         {                            
-                            G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                            G.Writeln2("*** ERROR: Technical problem while writing databank data to " + Globals.extensionDatabank + " (protobuffers)");
                             G.Writeln("           Message: " + e.Message, Color.Red);
                             throw new GekkoException();
+                        }
+                    }
+
+                    if (useTraces)
+                    {
+                        using (FileStream fs = WaitForFileStream(pathAndFilename3, GekkoFileReadOrWrite.Write))
+                        {
+                            try
+                            {
+                                DateTime dt0 = DateTime.Now;
+                                serializer.Serialize(fs, tracesToWrite);
+                                G.WritelnGray("Protobuf serialize traces: " + G.Seconds(dt0));
+                            }
+                            catch (Exception e)
+                            {
+                                G.Writeln2("*** ERROR: Technical problem while writing databank traces to " + Globals.extensionDatabank + " (protobuffers)");
+                                G.Writeln("           Message: " + e.Message, Color.Red);
+                                throw new GekkoException();
+                            }
                         }
                     }
                 }

@@ -191,6 +191,7 @@ namespace Gekko
         public void DeepTrace(TraceHelper th)
         {
             th.seriesObjectCount++;
+            th.metas.Add(this);
             if (this.trace2 != null)
             {
                 this.trace2.DeepTrace(th, -1);

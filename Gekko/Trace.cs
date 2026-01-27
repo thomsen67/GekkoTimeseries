@@ -40,7 +40,7 @@ namespace Gekko
         public void ToID()
         {
             this.storageIDTemporary = new List<TraceID2>();
-            if (this.storage.Count() > 0)
+            //if (this.storage.Count() > 0)
             {
                 foreach (Trace2 trace in this.storage)
                 {
@@ -239,7 +239,7 @@ namespace Gekko
                     return;
                 }
 
-                if (this.precedents.storage.Count() > 0)
+                if (this.precedents != null && this.precedents.storage.Count() > 0)
                 {
                     foreach (Trace2 trace in this.precedents.storage)
                     {                        
@@ -300,7 +300,10 @@ namespace Gekko
             foreach (Trace2 trace in th.tracesDepth2.Keys)
             {
                 dict1Inverted[trace.GetId()] = trace;
-                trace.precedents.ToID();  //remove links
+                if (trace.precedents != null)
+                {
+                    trace.precedents.ToID();  //remove links
+                }
             }
             foreach (TimeSeries meta in th.metas)
             {
