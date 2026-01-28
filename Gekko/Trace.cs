@@ -79,7 +79,7 @@ namespace Gekko
     {
 
         [ProtoMember(1)]
-        public Precedents2 precedents = null;
+        public Precedents2 precedents = new Precedents2();
 
         [ProtoMember(2)]
         public readonly ETraceType type = ETraceType.Normal;  //default
@@ -108,8 +108,7 @@ namespace Gekko
             foreach (TimeSeries tsRhs in tsRhss)
             {
                 if (tsRhs.trace2 != null)
-                {
-                    if (traceLhs.precedents == null) traceLhs.precedents = new Precedents2();
+                {                    
                     traceLhs.precedents.storage.Add(tsRhs.trace2);
                 }
             }
@@ -182,14 +181,10 @@ namespace Gekko
                     }
                 }
 
-                if (parent.precedents != null)
+                foreach (Trace2 child in parent.precedents.storage)
                 {
-                    foreach (Trace2 child in parent.precedents.storage)
-                    {
-                        WalkTraces(child, depth + 1, traceLines, type);
-                    }
+                    WalkTraces(child, depth + 1, traceLines, type);
                 }
-
             }
             finally
             {
@@ -256,7 +251,7 @@ namespace Gekko
                     return;
                 }
 
-                if (this.precedents != null && this.precedents.storage.Count() > 0)
+                if (this.precedents.storage.Count() > 0)
                 {
                     foreach (Trace2 trace in this.precedents.storage)
                     {                        
@@ -298,11 +293,8 @@ namespace Gekko
                 meta.FromID(dict1Inverted);
             }
             foreach (Trace2 trace in dict1Inverted.Values)
-            {
-                if (trace.precedents != null)
-                {
-                    trace.precedents.FromID(dict1Inverted);
-                }
+            {                
+                trace.precedents.FromID(dict1Inverted);                
             }
         }
 
@@ -319,11 +311,8 @@ namespace Gekko
             dict1Inverted = new Dictionary<TraceID2, Trace2>();
             foreach (Trace2 trace in th.tracesDepth2.Keys)
             {
-                dict1Inverted[trace.GetId()] = trace;
-                if (trace.precedents != null)
-                {
-                    trace.precedents.ToID();  //remove links
-                }
+                dict1Inverted[trace.GetId()] = trace;                
+                trace.precedents.ToID();  //remove links                
             }
             foreach (TimeSeries meta in th.metas)
             {
