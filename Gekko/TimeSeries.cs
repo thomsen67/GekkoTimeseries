@@ -178,6 +178,16 @@ namespace Gekko
             this.variableName = variableName;
         }
 
+        public void FromID(Dictionary<TraceID2, Trace2> dict2)
+        {
+            if (this.traceID2 != null)
+            {
+                //this.trace2 = dict2[this.traceID2];    
+                Trace2 trace = null; dict2.TryGetValue(this.traceID2, out trace); //This will just fail silently. The trace is no longer known, may have been cut off for some reason.                  
+                if (trace != null) this.trace2 = trace;
+            }
+        }
+
         public void ToID()
         {
             if (this.trace2 != null)

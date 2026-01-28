@@ -37,6 +37,23 @@ namespace Gekko
         [ProtoMember(2)]
         public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general. Same size as .storagePeriodsTemporary
 
+        public void FromID(Dictionary<TraceID2, Trace2> dict2)
+        {
+            if (this.storageIDTemporary != null && this.storageIDTemporary.Count > 0)
+            {
+                this.storage = new List<Trace2>();
+                for (int i = 0; i < this.storageIDTemporary.Count; i++)
+                {
+                    TraceID2 id = this.storageIDTemporary[i];
+                    if (id.counter < 0) { G.Writeln2("This trace is not stored in the databank, but has been pruned off: " + id.ToString()); throw new GekkoException(); }
+                    Trace2 trace = null; dict2.TryGetValue(id, out trace);
+                    if (trace == null) { G.Writeln2("Could not find this trace in databank: " + id.ToString()); throw new GekkoException(); }
+                    this.storage.Add(trace);
+                }
+            }
+            this.storageIDTemporary = null;
+        }
+
         public void ToID()
         {
             this.storageIDTemporary = new List<TraceID2>();
@@ -253,38 +270,41 @@ namespace Gekko
         /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
         /// </summary>
         /// <param name="databank"></param>
-        //public static void HandleTraceRead1(Databank databank)
-        //{
-        //    if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
-        //    {
-        //        try
-        //        {
-        //            TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
-        //            Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
-        //            foreach (Trace2 trace in databank.traces) dictInverted[trace.GetId()] = trace;
-        //            HandleTraceRead2(th.metas, dictInverted);
-        //        }
-        //        finally
-        //        {
-        //            if (databank != null) databank.traces = null;  //important!
-        //        }
-        //    }
-        //}
+        public static void HandleTraceRead1(Databank databank)
+        {
+            if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
+            {
+                try
+                {
+                    TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
+                    Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
+                    foreach (Trace2 trace in databank.traces) dictInverted[trace.GetId()] = trace;
+                    HandleTraceRead2(th.metas, dictInverted);
+                }
+                finally
+                {
+                    if (databank != null) databank.traces = null;  //important!
+                }
+            }
+        }
 
-        ///// <summary>
-        ///// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
-        ///// </summary>
-        //public static void HandleTraceRead2(List<SeriesMetaInformation> metas, Dictionary<TraceID2, Trace2> dict1Inverted)
-        //{
-        //    foreach (SeriesMetaInformation meta in metas)
-        //    {
-        //        meta.FromID(dict1Inverted);
-        //    }
-        //    foreach (Trace2 trace in dict1Inverted.Values)
-        //    {
-        //        trace.precedents.FromID(dict1Inverted);
-        //    }
-        //}
+        /// <summary>
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
+        /// </summary>
+        public static void HandleTraceRead2(List<TimeSeries> metas, Dictionary<TraceID2, Trace2> dict1Inverted)
+        {
+            foreach (TimeSeries meta in metas)
+            {
+                meta.FromID(dict1Inverted);
+            }
+            foreach (Trace2 trace in dict1Inverted.Values)
+            {
+                if (trace.precedents != null)
+                {
+                    trace.precedents.FromID(dict1Inverted);
+                }
+            }
+        }
 
         /// <summary>
         /// Before serializing a protobuf gbk, this method removes trace connections, and kind of packs the connections into a flat list (databank.traces).

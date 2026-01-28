@@ -3419,136 +3419,167 @@ write datatest;
                         throw new GekkoException();
                     }
 
+                    string tracename = null;
+                    if (File.Exists(tempTsdxPath + "\\" + "trace.data")) tracename = tempTsdxPath + "\\" + "trace.data";  //legacy                    
+
+                    Databank temp = null;
                     using (FileStream fs = WaitForFileStream(name, GekkoFileReadOrWrite.Read))
                     {
-
-                        Databank temp = null;
+                                                
                         ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                         //RuntimeTypeModel serializer = TypeModel.Create();
                         //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                         try
                         {
                             DateTime dt3 = DateTime.Now;
-                            temp = Serializer.Deserialize<Databank>(fs);
+                            temp = Serializer.Deserialize<Databank>(fs);                            
                             readInfo.variables = temp.storage.Count;
-                            G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
+                            G.WritelnGray("Protobuf data deserialize took: " + G.Seconds(dt3));
                         }
                         catch (Exception e)
                         {
-                            G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
+                            G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank data in version 1.1 format (protobuffers)");
                             G.Writeln("           Message: " + e.Message, Color.Red);
                             G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                             throw new GekkoException();
                         }
+                    }
 
-                        int maxYearInProtobufFile = int.MinValue;
-                        int minYearInProtobufFile = int.MaxValue;
-                        int emptyWarnings = 0;
-                        foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
+                    if (Program.options.databank_trace && tracename != null)
+                    {
+                        using (FileStream fs = WaitForFileStream(tracename, GekkoFileReadOrWrite.Read))
                         {
-                            bool isGhost = tsTemp.IsGhost();
-                            //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
 
-                            if (IsNonsenseVariableName(tsTemp.variableName))
-                            {
-                                emptyWarnings++;
-                                continue;
-                            }
-
-                            int counter = 0;
-                            GekkoTime first = Globals.tNull;
-                            GekkoTime last = Globals.tNull;
-
-                            if (!tsTemp.IsTimeless())
-                            {
-                                first = tsTemp.GetPeriodFirst();
-                                last = tsTemp.GetPeriodLast();
-                            }
-
-                            if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
-                            {
-                                if (dates != null)
-                                {
-                                    GetFirstLastDates(dates, ref first, ref last);
-                                }
-
-                                int nob = GekkoTime.Observations(first, last);
-                                if (nob > 0)
-                                {
-                                    //ignore if nob < 1. This means that the time limit window is outside the data window 
-                                    TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freqEnum);
-                                    int index1;
-                                    int index2;
-                                    try
-                                    {
-                                        double[] data = tsTemp.GetDataSequence(out index1, out index2, first, last, true);
-                                        ts.SetDataSequence(first, last, data, index1);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
-                                        throw new GekkoException();
-                                    }
-
-                                    GekkoTime firstX = ts.GetPeriodFirst();
-                                    GekkoTime lastX = ts.GetPeriodLast();
-
-                                    if (!isGhost)
-                                    {
-                                        maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
-                                        minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (!isGhost)
-                                {
-                                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
-                                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
-                                }
-                            }
-                        }
-                        if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
-
-                        if (!mergeOrTimeLimit)
-                        {
                             try
                             {
-                                //discarding the old bank completely, and replacing with the new one
-                                temp.aliasName = databank.aliasName;
-                                Program.databanks.ReplaceDatabank(databank, temp);
-                                readInfo.databank = temp;  //since this pointer is altered
-                                databank = temp;  //since this pointer is altered
+                                DateTime dt3 = DateTime.Now;
+                                List<Trace2> traces = Serializer.Deserialize<List<Trace2>>(fs);
+                                if (Program.options.databank_trace)
+                                {
+                                    temp.traces = traces;
+                                    Trace2.HandleTraceRead1(temp);
+                                    temp.traces = null;
+                                }
+                                readInfo.variables = temp.storage.Count;
+                                G.WritelnGray("Protobuf trace deserialize took: " + G.Seconds(dt3));
                             }
                             catch (Exception e)
                             {
-                                G.Writeln2("*** ERROR: Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
+                                G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank traces in version 1.1 format (protobuffers)");
+                                G.Writeln("           Message: " + e.Message, Color.Red);
+                                G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                                 throw new GekkoException();
                             }
                         }
+                    }
 
-                        //See almost identical code below, and in readCsv()
-                        if (mergeOrTimeLimit)
+                    int maxYearInProtobufFile = int.MinValue;
+                    int minYearInProtobufFile = int.MaxValue;
+                    int emptyWarnings = 0;
+                    foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
+                    {
+                        bool isGhost = tsTemp.IsGhost();
+                        //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
+
+                        if (IsNonsenseVariableName(tsTemp.variableName))
                         {
-                            readInfo.startPerInFile = minYearInProtobufFile;
-                            readInfo.endPerInFile = maxYearInProtobufFile;
-                            readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
-                            readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
+                            emptyWarnings++;
+                            continue;
+                        }
+
+                        int counter = 0;
+                        GekkoTime first = Globals.tNull;
+                        GekkoTime last = Globals.tNull;
+
+                        if (!tsTemp.IsTimeless())
+                        {
+                            first = tsTemp.GetPeriodFirst();
+                            last = tsTemp.GetPeriodLast();
+                        }
+
+                        if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
+                        {
+                            if (dates != null)
+                            {
+                                GetFirstLastDates(dates, ref first, ref last);
+                            }
+
+                            int nob = GekkoTime.Observations(first, last);
+                            if (nob > 0)
+                            {
+                                //ignore if nob < 1. This means that the time limit window is outside the data window 
+                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freqEnum);
+                                int index1;
+                                int index2;
+                                try
+                                {
+                                    double[] data = tsTemp.GetDataSequence(out index1, out index2, first, last, true);
+                                    ts.SetDataSequence(first, last, data, index1);
+                                }
+                                catch (Exception e)
+                                {
+                                    G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
+                                    throw new GekkoException();
+                                }
+
+                                GekkoTime firstX = ts.GetPeriodFirst();
+                                GekkoTime lastX = ts.GetPeriodLast();
+
+                                if (!isGhost)
+                                {
+                                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
+                                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
+                                }
+                            }
                         }
                         else
                         {
-                            readInfo.startPerInFile = minYearInProtobufFile;
-                            readInfo.endPerInFile = maxYearInProtobufFile;
-                            readInfo.startPerResultingBank = readInfo.startPerInFile;
-                            readInfo.endPerResultingBank = readInfo.endPerInFile;
+                            if (!isGhost)
+                            {
+                                maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
+                                minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
+                            }
                         }
+                    }
+                    if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
 
-                        Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
-                        currentBank.yearStart = readInfo.startPerResultingBank;
-                        currentBank.yearEnd = readInfo.endPerResultingBank;
+                    if (!mergeOrTimeLimit)
+                    {
+                        try
+                        {
+                            //discarding the old bank completely, and replacing with the new one
+                            temp.aliasName = databank.aliasName;
+                            Program.databanks.ReplaceDatabank(databank, temp);
+                            readInfo.databank = temp;  //since this pointer is altered
+                            databank = temp;  //since this pointer is altered
+                        }
+                        catch (Exception e)
+                        {
+                            G.Writeln2("*** ERROR: Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
+                            throw new GekkoException();
+                        }
+                    }
 
-                    }  //end of using
+                    //See almost identical code below, and in readCsv()
+                    if (mergeOrTimeLimit)
+                    {
+                        readInfo.startPerInFile = minYearInProtobufFile;
+                        readInfo.endPerInFile = maxYearInProtobufFile;
+                        readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
+                        readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
+                    }
+                    else
+                    {
+                        readInfo.startPerInFile = minYearInProtobufFile;
+                        readInfo.endPerInFile = maxYearInProtobufFile;
+                        readInfo.startPerResultingBank = readInfo.startPerInFile;
+                        readInfo.endPerResultingBank = readInfo.endPerInFile;
+                    }
+
+                    Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+                    currentBank.yearStart = readInfo.startPerResultingBank;
+                    currentBank.yearEnd = readInfo.endPerResultingBank;
+
                 }
                 else  // not(isTsdx && isProtobuf), that is, a tsd file (possibly packed inside tsdx):
                 {
