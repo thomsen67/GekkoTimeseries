@@ -7135,7 +7135,9 @@ namespace Gekko
                         //See #987432529835
                         //isSimple can never be true with READ ... TO ...
                         //Do not do this with READ<first> or READ<ref>, only with READ.                    
+                        DateTime t0 = DateTime.Now;
                         Program.MulbkClone();
+                        if (Globals.runningOnTTComputer) new Writeln("TTH: Clone data took " + G.Seconds(t0));
                         if (G.GetModelSourceType() == EModelType.Gekko && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
                         {
                             //only in sim or mixed mode, if a model is existing

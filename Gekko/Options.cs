@@ -78,10 +78,11 @@ namespace Gekko
         public bool databank_trace_divide = false;
 
         // ---
+        public string decomp_equation_style = "gekko"; //gekko|gams
         public int decomp_flowgraph_depth = 2;
-        public int decomp_maxlag = 10;
-        public int decomp_maxlead = 10;
-        public int decomp_plot_zoom = 100; //Relative size        
+        public int decomp_maxlag = 10; //Mostly for obsolete GAMS non-scalar model, no?
+        public int decomp_maxlead = 10; //Mostly for obsolete GAMS non-scalar model, no?
+        public int decomp_plot_zoom = 100; //Relative size                
         public ESeriesMissing decomp_res_missing = ESeriesMissing.Zero;
         public ESeriesMissing decomp_array_calc_missing = ESeriesMissing.M;
         public ESeriesMissing decomp_data_missing = ESeriesMissing.M;
@@ -423,6 +424,7 @@ namespace Gekko
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 
             Add("DATABANK TRACE DIVIDE", Globals.xbool);
 
+            Add("DECOMP EQUATION STYLE", Globals.xnameOrString, "gekko", "gams");
             Add("DECOMP ARRAY CALC MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");
             Add("DECOMP DATA MISSING", Globals.xoptionSeriesMissing, "M", "ZERO");
             Add("DECOMP FLOWGRAPH DEPTH", Globals.xint);

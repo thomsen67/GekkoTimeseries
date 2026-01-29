@@ -1599,7 +1599,7 @@ namespace Gekko
 
         public static string Chop_DimensionAddLast(string inputName, string inputIndex)
         {
-            return Chop_DimensionAddLast(inputName, inputIndex, " ");
+            return Chop_DimensionAddLast(inputName, inputIndex, "");
         }
 
         /// <summary>
@@ -1663,18 +1663,27 @@ namespace Gekko
         /// <param name="t0"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string Chop_DimensionAddLag(string name, GekkoTime t0, GekkoTime t, bool merge)
+        public static string Chop_DimensionAddLag(string name, GekkoTime t0, GekkoTime t, bool merge, bool showT)
         {
             string name2;
             string slag = GekkoTime.GetLagString(t0, t);
             if (slag == null)
             {
-                name2 = name;
+                if (showT) name2 = G.Chop_DimensionAddLast(name, "t"); // name + "[t]";
+                else name2 = name;
             }
             else
             {
-                if (merge) name2 = G.Chop_DimensionAddLast(name, slag);
-                else name2 = name + "[" + slag + "]";
+                if (merge)
+                {
+                    if (showT) name2 = G.Chop_DimensionAddLast(name, "t" + slag);
+                    else name2 = G.Chop_DimensionAddLast(name, slag);
+                }
+                else
+                {
+                    if (showT) name2 = name + "[" + "t" + slag + "]";
+                    else name2 = name + "[" + slag + "]";
+                }
             }
             return name2;
         }
@@ -1688,9 +1697,9 @@ namespace Gekko
         /// <param name="t"></param>
         /// <param name="merge"></param>
         /// <returns></returns>
-        public static string Chop_DimensionConvertToLag(string name, GekkoTime t0, bool merge)
+        public static string Chop_DimensionConvertToLag(string name, GekkoTime t0, bool merge, bool showT)
         {
-            return Chop_DimensionAddLag(Chop_DimensionRemoveLast(name), t0, Chop_DimensionGetPeriod(name), merge);
+            return Chop_DimensionAddLag(Chop_DimensionRemoveLast(name), t0, Chop_DimensionGetPeriod(name), merge, showT);
         }
 
         /// <summary>

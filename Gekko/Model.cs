@@ -287,15 +287,26 @@ namespace Gekko
             {                
                 if (G.NullOrBlanks(rv.s_gekkoSyntax)) rv.s_gekkoSyntax = Globals.eqs2 + G.NL;
                 if (G.NullOrBlanks(rv.s_gamsOrFrnSyntax)) rv.s_gamsOrFrnSyntax = Globals.eqs2 + G.NL;
-                rv.resultingText += rv.s_gekkoSyntax + G.NL;
+                
                 string scalarText = rv.s_scalarModel;
                 if (false && Program.options.model_gams_scalar_normalize)
                 {
                     scalarText = Program.MathNormalize1(null, rv.s_scalarModelMathRename, rv.mathRename, rv.s_scalarModel);
                     //Maybe use GamsModel.ScoreEquationGivenVariable(), over incoming vars, to get the LHS variable???
                 }
-                rv.resultingText += Globals.eqs1 + G.NL + G.NL + scalarText + G.NL;
-                rv.resultingText += Globals.eqs3 + G.NL + G.NL + rv.s_gamsOrFrnSyntax + G.NL;
+
+                if (G.Equal(Program.options.decomp_equation_style, "gekko"))
+                {
+                    rv.resultingText += rv.s_gekkoSyntax + G.NL;
+                    rv.resultingText += Globals.eqs1 + G.NL + G.NL + scalarText + G.NL;
+                    rv.resultingText += Globals.eqs3 + G.NL + G.NL + rv.s_gamsOrFrnSyntax + G.NL;
+                }
+                else
+                {
+                    rv.resultingText += rv.s_gamsOrFrnSyntax + G.NL;
+                    rv.resultingText += Globals.eqs1 + G.NL + G.NL + scalarText + G.NL;
+                    rv.resultingText += Globals.eqs3a + G.NL + G.NL + rv.s_gekkoSyntax + G.NL;
+                }
             }            
             
             if (!hit) rv.hasHit = false;            
@@ -1100,6 +1111,7 @@ namespace Gekko
         public List<string> GetPrecedentsNames(int eqNumber, EquationTextHelper helper, GekkoTime t0)
         {
             List<string> precedents = new List<string>();
+            bool b = false; // G.Equal(Program.options.decomp_equation_style, "gams");
             foreach (PeriodAndVariable dp in this.precedents[eqNumber].vars)
             {
                 //see also #as7f3læaf9                
@@ -1111,7 +1123,7 @@ namespace Gekko
                 }
                 else
                 {                    
-                    name2 = G.Chop_DimensionAddLag(tup.Item1, this.Maybe2000GekkoTime(t0), tup.Item2, false);
+                    name2 = G.Chop_DimensionAddLag(tup.Item1, this.Maybe2000GekkoTime(t0), tup.Item2, b, b);
                 }
                 precedents.Add(name2);
             }
@@ -1898,6 +1910,8 @@ namespace Gekko
             // superfluous parentheses.
             // -------------------------------------------
 
+            bool b = G.Equal(Program.options.decomp_equation_style, "gams");
+
             List<string> mathRename = null;
             if (useMathRename) mathRename = new List<string>();
 
@@ -2018,7 +2032,7 @@ namespace Gekko
                     else
                     {
                         if (sd != null) new Error("Not showing time not expected");
-                        varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, false);
+                        varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, b, b);
                     }
                     if (mathRename != null)
                     {

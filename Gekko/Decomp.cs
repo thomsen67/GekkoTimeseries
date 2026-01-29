@@ -6617,10 +6617,12 @@ namespace Gekko
             List<string> temp = new List<string>();
             Flood f = colors[pv2];
 
+            bool b = false; // G.Equal(Program.options.decomp_equation_style, "gams");
+
             while (true)
             {
                 //#6irhwakery7
-                string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, false);
+                string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, b, b);
 
                 string label = Program.GetVariableExplanation1Line(name);
 

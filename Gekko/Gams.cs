@@ -1021,6 +1021,9 @@ namespace Gekko
                     modelGams = GamsModel.ReadGamsModelHelper(false, Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
                     if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
                     modelGams.rawGmsFile = text;
+
+                    //Model m = Program.model;
+
                 }
             }
 
@@ -1176,7 +1179,7 @@ namespace Gekko
             {
                 EqInfoSimple eqInfo = new EqInfoSimple();
                 eqInfo.eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                eqInfo.eqNameWithLag = G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false); ;
+                eqInfo.eqNameWithLag = G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false, false); //We preserve Gekko style for eqs, because the string is used when clicking
                 eqInfo.eqNumber = eqNumber;
                 ScoreEquationGivenVariable(eqInfo, variableName, model, modelGams, modelGamsScalar);
                 rv.Add(eqInfo);
