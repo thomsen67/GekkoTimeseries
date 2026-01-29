@@ -10455,6 +10455,8 @@ namespace Gekko
 
         public class Model
         {
+            public GekkoTime t1 = GekkoTime.tNull;
+            public GekkoTime t2 = GekkoTime.tNull;
             public string fileName = null;
             public string opt_info = null;
             public string opt_gms = null;

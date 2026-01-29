@@ -760,14 +760,14 @@ namespace Gekko
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(settings.t1, settings.t2, helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(settings.t1, settings.t2, helper, split2, timeless, model.modelCommon.GetRealFreq(), ref hasResVariables, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
                 }
             }
 
@@ -1026,7 +1026,10 @@ namespace Gekko
 
             dt1 = DateTime.Now;
 
-            ModelGamsScalar modelGamsScalar = new ModelGamsScalar(model);            
+            ModelGamsScalar modelGamsScalar = new ModelGamsScalar(model);
+
+            modelGamsScalar.t1 = settings.t1; //Local period from MODEL<%t1 %t2>...
+            modelGamsScalar.t2 = settings.t2; //Local period from MODEL<%t1 %t2>...
 
             // -------------- these can evaluate an equation --------
             modelGamsScalar.functions = functions;
@@ -1146,9 +1149,7 @@ namespace Gekko
             ModelGams modelGams = model.modelGams;
             List<EqInfoSimple> rv = new List<EqInfoSimple>();
 
-            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
-
-            if (Globals.greuHack) tHere = new GekkoTime(EFreq.A, 2022, 1, 1);
+            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());            
 
             int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
             if (aNumber == -12345)
@@ -2307,8 +2308,9 @@ namespace Gekko
         /// <param name="fakeEqCounts2"></param>
         /// <param name="fakeVarCounts2"></param>
         /// <param name="sr"></param>
-        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, EFreq gekkoModelFreq, ref bool res_variables, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
+        private static void ReadScalarModelEquationsDictionaryLines(GekkoTime t1, GekkoTime t2, EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, EFreq gekkoModelFreq, ref bool res_variables, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
         {
+            if ((!t1.IsNull() && !t2.IsNull()) && ( t1.freq != EFreq.A || t2.freq!=EFreq.A)) new Error("MODEL with time period only implemented for annual time periods");
             EEquationsOrVariables status2 = EEquationsOrVariables.None;            
             EEquationCountsOrVariableCounts substatus2 = EEquationCountsOrVariableCounts.None;
             bool b = false;
@@ -2376,11 +2378,18 @@ namespace Gekko
                     int n; string nameWithIndexes; string nameWithIndexesNoTime; string nameWithoutIndexes;
                     List<string> parts; string time;
                     LineChopper(line, 'e', gekkoModelFreq, out n, out nameWithIndexes, out nameWithIndexesNoTime, out nameWithoutIndexes, out parts, out time);
-                                        
-                    if (Globals.greuHack)
+
+                    if (time != null) //Could in principle be a timeless equation
                     {
-                        int itime = G.IntParse(time);
-                        if (itime != -12345 && (itime < 2020 || itime > 2025)) continue;
+                        if (!t1.IsNull() && !t2.IsNull())
+                        {
+                            int itime = G.IntParse(time);
+                            if (itime == -12345)
+                            {
+                                new Error("The MODEL statement uses local time period, but an equation has a non-annual time period ('" + time + "')");
+                            }
+                            if (itime < t1.super || itime > t2.super) continue; //skip eqs outside given annual period
+                        }
                     }
 
                     string eqName = nameWithIndexes;
@@ -2790,9 +2799,9 @@ namespace Gekko
             string sEqLine = eqLine.ToString();
             int iDot = sEqLine.IndexOf("..");            
             int equationNumber = int.Parse(sEqLine.Substring(1, iDot - 1)) - 1; //0-based, ignoring the first 'e'                                       
-            if (helper.dict_FromEqNumberToEqName[equationNumber] != null)
+            if (helper.dict_FromEqNumberToEqName[equationNumber] != "")
             {
-
+                if (Globals.runningOnTTComputer && helper.dict_FromEqNumberToEqName[equationNumber] == null) G.WarningInternal("Did not expect null in equation name");
                 tokens = StringTokenizer.GetTokensWithLeftBlanks(sEqLine, more);  //1 empty "" token
                 //probe, checking for **
                 for (int i = 0; i < tokens.Count() - more; i++)
@@ -3147,6 +3156,10 @@ namespace Gekko
             DateTime t = DateTime.Now;
 
             GAMSScalarModelSettings input = new GAMSScalarModelSettings();
+            input.t1 = o.t1;
+            input.t2 = o.t2;
+            if (!input.t1.IsNull() && input.t2.IsNull()) new Error("Expected both periods to be either null or non-null"); //Can probably not happen
+            
             input.zipFilePathAndName = fileName;
 
             DateTime t2 = DateTime.Now;
@@ -4675,7 +4688,7 @@ namespace Gekko
 
         private static string GetModelHashGams(List<string> lines)
         {
-            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString(), null, null); //Pretty unlikely that two different gams files could produce the same hash.
+            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString(), null, null, null); //Pretty unlikely that two different gams files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             return trueHash;
         }

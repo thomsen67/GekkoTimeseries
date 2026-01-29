@@ -5598,8 +5598,8 @@ namespace Gekko
             string md5_2 = null;
             System.Threading.Tasks.Parallel.ForEach(numbers, number =>   //TODO: could test chunks...?
             {
-                if (number == 0) md5_1 = G.GetMd5FromFile(p1);
-                else md5_2 = G.GetMd5FromFile(p2);                
+                if (number == 0) md5_1 = G.GetMd5FromFile(p1, null);
+                else md5_2 = G.GetMd5FromFile(p2, null);                
             });
             if (md5_1 == md5_2) return true;  //almost certainly identical            
             return false;
@@ -5610,9 +5610,8 @@ namespace Gekko
         /// </summary>
         /// <param name="fileNameWithPath"></param>
         /// <returns></returns>
-        public static string GetMd5FromFile(string fileNameWithPath)
-        {
-            string hash;
+        public static string GetMd5FromFile(string fileNameWithPath, string extraSalt)
+        {            
             //tried physically splitting file in n chunks --> 
             //has about same speed as MD5 itself... (0.6 s for a 176 MB file)                
             //also, copying the file with File.Copy is not that much slower than MD5 itself.
@@ -5634,14 +5633,54 @@ namespace Gekko
             //Two files with same exact size are often identical.
             //As a benefit we get to tell number of dublets.
 
-            using (MD5 md5Instance = MD5.Create())
+            string hash = null;
+
+            if (false)
             {
-                using (FileStream stream = File.OpenRead(fileNameWithPath))
+                //Old way, same result as new way if salt == null
+                using (MD5 md5Instance = MD5.Create())
                 {
-                    byte[] hash2 = md5Instance.ComputeHash(stream);
-                    //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
-                    //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
-                    hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                    using (FileStream stream = File.OpenRead(fileNameWithPath))
+                    {
+                        byte[] hash2 = md5Instance.ComputeHash(stream);
+                        hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                    }
+                }
+            }
+            else
+            {
+                using (MD5 md5Instance = MD5.Create())
+                {
+                    using (FileStream stream = File.OpenRead(fileNameWithPath))
+                    {
+
+                        string salt = extraSalt;
+                        if (salt == null) salt = "";
+                        byte[] saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
+                        byte[] buffer = new byte[4096]; // Read file in 4KB chunks
+                        int bytesRead;
+
+                        // 1. Feed the Salt into the hash
+                        md5Instance.TransformBlock(saltBytes, 0, saltBytes.Length, null, 0);
+
+                        // 2. Feed the File into the hash in chunks
+                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            md5Instance.TransformBlock(buffer, 0, bytesRead, null, 0);
+                        }
+
+                        // 3. Finalize the hash (must call TransformFinalBlock with an empty array or the last chunk)
+                        md5Instance.TransformFinalBlock(new byte[0], 0, 0);
+
+                        // 4. Get the resulting hash
+                        byte[] hash2 = md5Instance.Hash;
+
+                        // Your custom Base64 formatting
+                        hash = System.Convert.ToBase64String(hash2)
+                                     .Replace("=", "")
+                                     .Replace("+", "a")
+                                     .Replace("/", "b");
+                    }
                 }
             }
 
@@ -5678,15 +5717,16 @@ namespace Gekko
         /// </summary>
         /// <param name="inputText"></param>
         /// <returns></returns>
-        public static string GetMd5FromText(string inputText)
+        public static string GetMd5FromText(string inputText, string extraSalt)
         {
-            string hash;
+            string hash = null;
+            string salt = extraSalt;
+            if (salt == null) salt = "";
             // step 1, calculate MD5 hash from input            
             MD5 md5 = MD5.Create();
-            byte[] inputBytes = Encoding.UTF8.GetBytes(inputText);  //UTF8 seems best choice
+            byte[] inputBytes = Encoding.UTF8.GetBytes(inputText + salt);  //UTF8 seems best choice
             byte[] hash2 = md5.ComputeHash(inputBytes);
-            // step 2, convert byte array to hex string
-            StringBuilder sb = new StringBuilder();
+            // step 2, convert byte array to hex string            
             hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
             //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
             //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.

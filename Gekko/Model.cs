@@ -1033,6 +1033,12 @@ namespace Gekko
         [ProtoMember(35)]
         public int hasReadSomeData = 0; //if Program.options.model_gams_scalar_data == true, AND at least one data value was read from gams.gms.
 
+        [ProtoMember(36)]
+        public GekkoTime t1 = GekkoTime.tNull; //Local option MODEL<%t1 %t2>...
+
+        [ProtoMember(37)]
+        public GekkoTime t2 = GekkoTime.tNull; //Local option MODEL<%t1 %t2>...
+
         // =============================================
         // =============================================
         // =============================================
@@ -1539,7 +1545,7 @@ namespace Gekko
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
             {
-                if (Globals.greuHack && s2 == "") continue;
+                if (!this.t1.IsNull() && s2 == "") continue;
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
                 if (type == 2)
                 {
@@ -2116,7 +2122,15 @@ namespace Gekko
 
         public GekkoTime GetDecompT()
         {
-            return this.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
+            if (!this.t1.IsNull()) //Then .t2 is also non-null!
+            {
+                //A GAMS scalar model with local time period like MODEL<%t1 %t2>... --> we use %t2-1
+                return this.t2.Add(Globals.decompPeriodDistanceFromEndPeriod);
+            }
+            else
+            {                
+                return this.absoluteT2.Add(Globals.decompPeriodDistanceFromEndPeriod);
+            }            
         }
 
         /// <summary>

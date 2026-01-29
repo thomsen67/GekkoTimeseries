@@ -3416,7 +3416,13 @@ mode2:                      MIXED | SIM | DATA;
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 model:                      MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, input.LT(1).Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
-modelOpt1:                  ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle modelOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> modelOpt1h*  localOptions?;
+
+modelOpt1:                  ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) 
+                          | leftAngle           modelOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> modelOpt1h*  localOptions?
+                          | leftAngleNo2 dates? modelOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTDATES_TYPE2 dates?) modelOpt1h* localOptions?
+                            ;
+
 modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  |	GMS (EQUAL yesNo)? -> ^(ASTOPT_STRING_GMS yesNo?)
 						  |	DEP EQUAL expression -> ^(ASTOPT_VAR_DEP expression)
