@@ -2778,15 +2778,25 @@ namespace Gekko
             string s = helper.sb.ToString();
             if (s == "")
             {
-                //keep it that way
+                //ignore (may be date-truncated)
+                //output.Add(s);  //HMMMM, these are empty, but needed when compiling...?
             }
             else
             {
                 s = "r[i] = " + s.Replace("..", "").Replace("=E=", "-(").Replace(";", ");");
-            }
-            output.Add(s);
+                output.Add(s);
+            }            
         }
 
+        /// <summary>
+        /// Note: tokensLast is the last line that got tokenized, which is compared to the current line. Only if they differ the equation is added,
+        /// so that we do not add mathematically identical equation lines (they are often identical over time).
+        /// </summary>
+        /// <param name="eqLine"></param>
+        /// <param name="tokensLast"></param>
+        /// <param name="helper"></param>
+        /// <param name="shouldBeIgnored"></param>
+        /// <returns></returns>
         private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, EqLineHelper helper, ref bool shouldBeIgnored)
         {
             //Remember: the human readable code is derived from this, so beware if changes are made,
@@ -3040,12 +3050,15 @@ namespace Gekko
             }
             else
             {                
-                helper.unique++;                
-                helper.count++;
-                helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
+                //helper.unique++; //This is WRONG!          
+                helper.known++; //This is WRONG!          
+                helper.count++; //And this too
+                //helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
+                helper.eqPointers.Add(-12345);
                 helper.b.Add(new List<int>());
                 //helper.c.AddRange(...);
                 helper.d.Add(new List<int>());
+                tokens = tokensLast;  //Just pass this on: no equation tokens were added, so we just pass on the tokens of the last real equation.
             }           
 
             return tokens;  //to compare with next
