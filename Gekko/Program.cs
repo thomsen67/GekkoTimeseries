@@ -19628,13 +19628,13 @@ namespace Gekko
 
             //salted with subpers, so will end with "1" for annual, "4" for quarterly.
             string extraSalt = null;
-            if (!o.t1.IsNull() && !o.t2.IsNull())
+            if (!o.t1.IsNull() || !o.t2.IsNull())
             {
-                extraSalt = G.NL + o.t1.ToString() + "-" + o.t2.ToString() + G.NL;
+                if (!isGms) new Error("For the MODEL statement, stating a time period like \"model<2025 2030>...\" is only legal for GAMS scalar models");
             }
             else
             {
-                if (!isGms) new Error("For MODEL, stating a time period like \"model<2025 2030>...\" is only legal for GAMS scalar models");
+                extraSalt = G.NL + o.t1.ToString() + "-" + o.t2.ToString() + G.NL;
             }
             string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName, G.Subperiods(model.modelCommon.GetFreq()).ToString(), extraSalt);
 

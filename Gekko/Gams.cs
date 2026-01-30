@@ -2301,7 +2301,7 @@ namespace Gekko
 
         
         /// <summary>
-        /// Reads GAMS dictionary dict.txt (made by GAMS CONVERT)
+        /// Reads GAMS dictionary dict.txt (made by GAMS CONVERT). Beware that GAMS treats "..." or '...' as a string, and that "ab'cd" or 'ab"cd' are legal, representing ab'cd or ab"cd.
         /// </summary>
         /// <param name="helper"></param>
         /// <param name="split2"></param>
@@ -2508,7 +2508,7 @@ namespace Gekko
                 nameWithoutIndex = nameWithIndex.Substring(0, i).Trim();
                 string rest = nameWithIndex.Substring(i).Trim();
                 string rest2 = rest.Substring(1, rest.Length - 2);
-                parts = G.SplitIgnoringQuotedCommas(rest2);
+                parts = G.SplitIgnoringQuotedCommas(rest2, true);
                 int counter = -1;
                 foreach (string part in parts)
                 {
@@ -2614,6 +2614,9 @@ namespace Gekko
 
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
+                if (eqNumber == 36)
+                {
+                }
                 if (Globals.greuHack)
                 {
                     if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == "")

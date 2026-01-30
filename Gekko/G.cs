@@ -505,45 +505,111 @@ namespace Gekko
         /// </summary>
         /// <param name="input">The string to split (e.g., "a,bb,'x,y',c").</param>
         /// <returns>A List of strings (e.g., "a", "bb", "x,y", "c").</returns>
-        public static List<string> SplitIgnoringQuotedCommas(string input)
+        public static List<string> SplitIgnoringQuotedCommas(string input, bool sqlStyle)
         {
-            bool fixQuotesProblem = true;
-            var result = new List<string>();
-            // StringBuilder to build the current token/field
-            var currentToken = new StringBuilder();
-            // Flag to track if we are inside a single-quoted section
-            bool inQuotes = false;
-
-            foreach (char c in input)
+            List<string> result = null;
+            if (sqlStyle)
             {
-                if (c == '\'')
+                result = new List<string>();
+                if (string.IsNullOrWhiteSpace(input)) return result;
+
+                // Strip the outer brackets x[...] if present
+                int start = input.IndexOf('[') + 1;
+                int end = input.LastIndexOf(']');
+                if (start > 0 && end > start)
                 {
-                    // Toggle the inQuotes state when a single quote is encountered
-                    inQuotes = !inQuotes;                    
-                    currentToken.Append(c);
-                    continue;
+                    input = input.Substring(start, end - start);
                 }
 
-                if (c == ',' && !inQuotes)
+                StringBuilder currentElement = new StringBuilder();
+                bool inQuotes = false;
+                char? quoteChar = null;
+
+                for (int i = 0; i < input.Length; i++)
                 {
-                    // If we hit a comma *outside* of quotes, the current token is complete.
-                    // 1. Add the trimmed token to the result list.
-                    result.Add(currentToken.ToString().Trim());
-                    // 2. Clear the StringBuilder for the next token.
-                    currentToken.Clear();
+                    char c = input[i];
+
+                    if (!inQuotes)
+                    {
+                        if (c == '\'' || c == '\"')
+                        {
+                            inQuotes = true;
+                            quoteChar = c;
+                        }
+                        else if (c == ',')
+                        {
+                            result.Add(currentElement.ToString().Trim());
+                            currentElement.Clear();
+                        }
+                        else
+                        {
+                            currentElement.Append(c);
+                        }
+                    }
+                    else // We are inside quotes
+                    {
+                        // Check for escaped quotes ('' or "")
+                        if (c == quoteChar && i + 1 < input.Length && input[i + 1] == quoteChar)
+                        {
+                            currentElement.Append(c);
+                            i++; // Skip the second quote
+                        }
+                        // Check for the closing quote
+                        else if (c == quoteChar)
+                        {
+                            inQuotes = false;
+                            quoteChar = null;
+                        }
+                        else
+                        {
+                            currentElement.Append(c);
+                        }
+                    }
                 }
-                else
-                {
-                    // Otherwise (if it's not a quote, or it's a comma *inside* quotes, or any other character),
-                    // just append the character to the current token.
-                    currentToken.Append(c);
-                }
+
+                // Add the final element
+                result.Add(currentElement.ToString().Trim());
             }
-
-            // After the loop, the last token needs to be added to the list.
-            if (currentToken.Length > 0 || result.Count == 0)
+            else
             {
-                result.Add(currentToken.ToString().Trim());
+                bool fixQuotesProblem = true;
+                result = new List<string>();
+                // StringBuilder to build the current token/field
+                var currentToken = new StringBuilder();
+                // Flag to track if we are inside a single-quoted section
+                bool inQuotes = false;
+
+                foreach (char c in input)
+                {
+                    if (c == '\'')
+                    {
+                        // Toggle the inQuotes state when a single quote is encountered
+                        inQuotes = !inQuotes;
+                        currentToken.Append(c);
+                        continue;
+                    }
+
+                    if (c == ',' && !inQuotes)
+                    {
+                        // If we hit a comma *outside* of quotes, the current token is complete.
+                        // 1. Add the trimmed token to the result list.
+                        result.Add(currentToken.ToString().Trim());
+                        // 2. Clear the StringBuilder for the next token.
+                        currentToken.Clear();
+                    }
+                    else
+                    {
+                        // Otherwise (if it's not a quote, or it's a comma *inside* quotes, or any other character),
+                        // just append the character to the current token.
+                        currentToken.Append(c);
+                    }
+                }
+
+                // After the loop, the last token needs to be added to the list.
+                if (currentToken.Length > 0 || result.Count == 0)
+                {
+                    result.Add(currentToken.ToString().Trim());
+                }
             }
 
             return result;

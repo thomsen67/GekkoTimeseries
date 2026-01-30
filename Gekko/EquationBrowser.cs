@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace Gekko
 {
@@ -1508,9 +1509,18 @@ img {border-style: none;
                 }
                 else if (bh.type == EBrowserType.Greu)
                 {
+                    //TODO TODO
+                    //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
+                    //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
+                    //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
+                    //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
+                    //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
+                    //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
+                    List<string> filesToCopy = new List<string> { "styles.css", "index.html", "DREAM_logo_500x70px.svg", "header_MAKRO.svg" };
+                    foreach (string s in filesToCopy) File.Copy(@"c:\Tools\Xxx\styles.css", @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s);                    
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
-                    Program.RunGekkoCommands(f + "reset; greu(); option decomp equation style = gams; global:%t1 = 2023; global:%t2 = 2031; model <%t1 %t2 gms> GREU.zip; read <first gdx> main_CGE.gdx; time %t1+2 %t2-1;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; greu(); option decomp equation style = gams; global:%t1 = 2023; global:%t2 = 2027; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1537,7 +1547,7 @@ img {border-style: none;
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, ignoreMissing, false);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar, bh);
-
+                        
             if (onlyHtml && onlyPlot) new Error("Hov");
             if (onlyHtml)
             {
@@ -2147,6 +2157,9 @@ img {border-style: none;
             int n = modelGamsScalar.CountEqs(1);
             for (int i = 0; i < n; i++)
             {
+                if (i == 36)
+                {
+                }
                 //if (combos.Count > bh.maxPages) break;
                 string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
                 if (eqName == "") continue;
