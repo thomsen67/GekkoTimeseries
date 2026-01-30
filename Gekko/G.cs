@@ -1609,7 +1609,7 @@ namespace Gekko
         /// <param name="inputName"></param>
         /// <param name="inputIndex"></param>
         /// <returns></returns>
-        public static string Chop_DimensionRemoveLast(string inputName)
+        public static string Chop_DimensionRemoveLast(string inputName, string listBlanks)
         {
             string bank = null; string name = null; string freq = null; string[] indexes = null;
             G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
@@ -1623,7 +1623,7 @@ namespace Gekko
                 indexes2 = new string[indexes.Length - 1];
                 Array.Copy(indexes, indexes2, indexes2.Length);
             }
-            return G.Chop_Unchop(bank, name, freq, indexes2, " ");
+            return G.Chop_Unchop(bank, name, freq, indexes2, listBlanks);
         }
 
         /// <summary>
@@ -1663,21 +1663,21 @@ namespace Gekko
         /// <param name="t0"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string Chop_DimensionAddLag(string name, GekkoTime t0, GekkoTime t, bool merge, bool showT)
+        public static string Chop_DimensionAddLag(string name, GekkoTime t0, GekkoTime t, bool merge, bool showT, string listBlanks)
         {
             string name2;
             string slag = GekkoTime.GetLagString(t0, t);
             if (slag == null)
             {
-                if (showT) name2 = G.Chop_DimensionAddLast(name, "t"); // name + "[t]";
+                if (showT) name2 = G.Chop_DimensionAddLast(name, "t", listBlanks); // name + "[t]";
                 else name2 = name;
             }
             else
             {
                 if (merge)
                 {
-                    if (showT) name2 = G.Chop_DimensionAddLast(name, "t" + slag);
-                    else name2 = G.Chop_DimensionAddLast(name, slag);
+                    if (showT) name2 = G.Chop_DimensionAddLast(name, "t" + slag, listBlanks);
+                    else name2 = G.Chop_DimensionAddLast(name, slag, listBlanks);
                 }
                 else
                 {
@@ -1697,9 +1697,9 @@ namespace Gekko
         /// <param name="t"></param>
         /// <param name="merge"></param>
         /// <returns></returns>
-        public static string Chop_DimensionConvertToLag(string name, GekkoTime t0, bool merge, bool showT)
+        public static string Chop_DimensionConvertToLag(string name, GekkoTime t0, bool merge, bool showT, string listBlanks)
         {
-            return Chop_DimensionAddLag(Chop_DimensionRemoveLast(name), t0, Chop_DimensionGetPeriod(name), merge, showT);
+            return Chop_DimensionAddLag(Chop_DimensionRemoveLast(name, listBlanks), t0, Chop_DimensionGetPeriod(name), merge, showT, listBlanks);
         }
 
         /// <summary>
@@ -3552,7 +3552,14 @@ namespace Gekko
             else s = s.Replace("\"", "\"\"");
             return s;
         }
-        
+
+        public static string HandleQuoteInQuote2(string s)
+        {
+            if (s == null) return null;
+            //return s.Replace("\"", "\\\"").Replace("\\", "\\\\");            
+            return s.Replace("\"", "'").Replace("\\", "-");
+        }
+
         /// <summary>
         /// Helper method.
         /// </summary>

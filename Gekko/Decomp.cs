@@ -6237,7 +6237,7 @@ namespace Gekko
 
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 
-                List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, GekkoTime.tNull, model, false, true);
+                List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, GekkoTime.tNull, model, false, true, false);
 
                 List<string> firstList = new List<string>();
 
@@ -6622,7 +6622,7 @@ namespace Gekko
             while (true)
             {
                 //#6irhwakery7
-                string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, b, b);
+                string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, b, b, "");
 
                 string label = Program.GetVariableExplanation1Line(name);
 

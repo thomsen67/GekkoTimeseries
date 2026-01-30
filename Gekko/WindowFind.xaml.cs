@@ -151,7 +151,7 @@ namespace Gekko
         private void CallDecomp(string fullName, Model model)
         {
             string eqName = fullName;
-            if (!Globals.findFix) G.Chop_DimensionRemoveLast(fullName);            
+            if (!Globals.findFix) G.Chop_DimensionRemoveLast(fullName, " "); //qwerty
             DecompFind decompFind = this.decompFind;
             CallDecompHelper(eqName, decompFind, model);
         }
@@ -289,7 +289,7 @@ namespace Gekko
                     //!!! a bit of a waste of time, but is probably not significantly slowing
                     //    down the FIND window.                    
                     
-                    decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
+                    decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName, " ") }; //qwerty
                     Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, decompOptionsTemp.decompOperator, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]

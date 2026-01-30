@@ -594,6 +594,8 @@ namespace Gekko
         {
             //NOTE: just remove last argument soon...!
 
+            if (varname == "") return null;
+
             bool simple = false;
             ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
 
@@ -1131,7 +1133,7 @@ namespace Gekko
         /// E_qBNP is shown first because the equation contains the variable res_qBNP. The rest of the eqs are alphabetically sorted.
         /// </summary>     
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool onlySortFirstItem, bool abortIfError)
+        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool onlySortFirstItem, bool abortIfError, bool noBlanksEtc)
         {
             //            x1     x2     x3     x4    res_x1   res_x2   res_x3   res_x4
             // --------------------------------------------------------------------------
@@ -1179,7 +1181,7 @@ namespace Gekko
             {
                 EqInfoSimple eqInfo = new EqInfoSimple();
                 eqInfo.eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                eqInfo.eqNameWithLag = G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false, false); //We preserve Gekko style for eqs, because the string is used when clicking
+                eqInfo.eqNameWithLag = G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false, false, ""); //We preserve Gekko style for eqs, because the string is used when clicking
                 eqInfo.eqNumber = eqNumber;
                 ScoreEquationGivenVariable(eqInfo, variableName, model, modelGams, modelGamsScalar);
                 rv.Add(eqInfo);
@@ -1891,7 +1893,7 @@ namespace Gekko
                         EquationHelper2 eh = new EquationHelper2();
                         eh.eqMathScalar = helper22.s_scalarModel;
                         eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
-                        eh.eqName = G.Chop_DimensionRemoveLast(eq);
+                        eh.eqName = G.Chop_DimensionRemoveLast(eq, " "); //qwerty
                         batches[noIndex].Add(eh);
                     }
                 }

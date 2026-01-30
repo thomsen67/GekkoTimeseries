@@ -1123,7 +1123,7 @@ namespace Gekko
                 }
                 else
                 {                    
-                    name2 = G.Chop_DimensionAddLag(tup.Item1, this.Maybe2000GekkoTime(t0), tup.Item2, b, b);
+                    name2 = G.Chop_DimensionAddLag(tup.Item1, this.Maybe2000GekkoTime(t0), tup.Item2, b, b, " "); //qwerty
                 }
                 precedents.Add(name2);
             }
@@ -2032,7 +2032,7 @@ namespace Gekko
                     else
                     {
                         if (sd != null) new Error("Not showing time not expected");
-                        varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, b, b);
+                        varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, b, b, " "); //qwerty
                     }
                     if (mathRename != null)
                     {
