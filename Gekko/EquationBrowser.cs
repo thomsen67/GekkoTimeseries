@@ -2157,9 +2157,9 @@ img {border-style: none;
             int n = modelGamsScalar.CountEqs(1);
             for (int i = 0; i < n; i++)
             {
-                if (i == 36)
-                {
-                }
+                //if (i == 36)
+                //{
+                //}
                 //if (combos.Count > bh.maxPages) break;
                 string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
                 if (eqName == "") continue;

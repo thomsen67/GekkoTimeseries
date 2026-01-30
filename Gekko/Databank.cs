@@ -179,7 +179,7 @@ namespace Gekko
                     Series ts = kvp.Value as Series;
                     if (ts.type == ESeriesType.ArraySuper)
                     {
-                        foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
+                        foreach (KeyValuePair<MultidimElement, IVariable> kvp2 in ts.dimensionsStorage.storage)
                         {
                             Series ts2 = kvp2.Value as Series;
                             rv.Add(ts2.GetName(), ts2);
@@ -402,7 +402,7 @@ namespace Gekko
                         if (ats.dimensions != indexes.Length) new Error(indexes.Length + " dimensional index " + ats.name + Stringlist.GetIndexWithCommas(indexes) + " used on " + ats.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(ats.name));
                     }
                     ats.SetDirty(true);
-                    ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(indexes, ats), ts);
+                    ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimElement(indexes, ats), ts);
                     ts.name = Globals.seriesArraySubName + Globals.freqIndicator + freq;  //We have to overwrite it here, else it would be "x[a,b]!a"
 
                 }

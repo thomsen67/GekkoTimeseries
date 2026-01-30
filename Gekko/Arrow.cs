@@ -568,7 +568,7 @@ namespace Gekko
                                 
                 string freq = G.Chop_GetFreq(tup.Item1);
                 Series ts = tup.Item2 as Series;
-                MultidimItem mmi = ts.mmi;
+                MultidimElement mmi = ts.mmi;
                 string varnameWithoutFreqAndIndex = G.Chop_GetName(tup.Item1);                
 
                 GekkoTime gt1 = t1;

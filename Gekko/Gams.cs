@@ -2614,9 +2614,9 @@ namespace Gekko
 
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
-                if (eqNumber == 36)
-                {
-                }
+                //if (eqNumber == 36)
+                //{
+                //}
                 if (Globals.greuHack)
                 {
                     if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == "")
@@ -5182,7 +5182,7 @@ namespace Gekko
                                     //create it
                                     if (isMultiDim)
                                     {
-                                        MultidimItem mmi = new MultidimItem(dims.ToArray(), tsSuperseries);
+                                        MultidimElement mmi = new MultidimElement(dims.ToArray(), tsSuperseries);
                                         IVariable iv = null; tsSuperseries.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                         if (iv == null)
                                         {
@@ -5586,7 +5586,7 @@ namespace Gekko
 
                             if (ts.type == ESeriesType.ArraySuper)
                             {
-                                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                                foreach (KeyValuePair<MultidimElement, IVariable> kvp in ts.dimensionsStorage.storage)
                                 {
                                     string[] ss = kvp.Key.storage;
                                     WriteGdxHelper2(t1, t2, t1Timeless, t2Timeless, hasPrefix, gdx, kvp.Value as Series, ss, gdxValues, timelessProblems);
@@ -5838,7 +5838,7 @@ namespace Gekko
 
             if (ts.type == ESeriesType.ArraySuper)
             {
-                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimElement, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
                     string[] ss = kvp.Key.storage;
                     WriteGdxHelperSlow2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);

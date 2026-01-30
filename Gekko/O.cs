@@ -1377,7 +1377,7 @@ namespace Gekko
                                     databank.AddIVariable(ts.name, ts);
                                 }
 
-                                MultidimItem mmi = new MultidimItem(ss2.ToArray(), ts);
+                                MultidimElement mmi = new MultidimElement(ss2.ToArray(), ts);
                                 IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
                                 if (iv == null)
                                 {
@@ -2854,7 +2854,7 @@ namespace Gekko
 
                     Series existing = bank.GetIVariable(nameWithFreq) as Series;
                     if (existing == null) new Error("The series '" + nameWithFreq + "' from databank '" + bank.GetName() + "' does not exist, for putting a sub-series into");
-                    MultidimItem mmi = new MultidimItem(indexes, existing);
+                    MultidimElement mmi = new MultidimElement(indexes, existing);
 
                     if (existing.type != ESeriesType.ArraySuper)
                     {
@@ -3234,7 +3234,7 @@ namespace Gekko
                 {
                     //array-series
 
-                    MultidimItem mmi = new MultidimItem(indexes);
+                    MultidimElement mmi = new MultidimElement(indexes);
 
                     //now we know that the series exists
 
@@ -9881,9 +9881,9 @@ namespace Gekko
                 foreach (O.Prt.Element element in this.prtElements)
                 {
                     labelOriginal.Add(element.labelGiven[0]);
-                    List<List<MultidimItem>> check = new List<List<MultidimItem>>();
-                    check.Add(new List<MultidimItem>());
-                    check.Add(new List<MultidimItem>());
+                    List<List<MultidimElement>> check = new List<List<MultidimElement>>();
+                    check.Add(new List<MultidimElement>());
+                    check.Add(new List<MultidimElement>());
 
                     int firstVariableFoundInFirstOrRef = 0; //for each comma in PRT, counter is 1 when the first non-null variable is found (often in first, but could be in ref)
 
@@ -10088,10 +10088,10 @@ namespace Gekko
             /// <param name="bankNumber"></param>
             /// <param name="unfold"></param>
             /// <param name="labels"></param>
-            private static void FlattenArraySeriesHelper(Series tsFirst, List<List<MultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
+            private static void FlattenArraySeriesHelper(Series tsFirst, List<List<MultidimElement>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
             {
 
-                List<MultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+                List<MultidimElement> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
 
                 string[] domains = tsFirst.meta.domains;
 
@@ -10137,10 +10137,10 @@ namespace Gekko
                 {
                     new Error("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");                    
                 }
-                keys.Sort(Multidim.CompareMultidimItems);
+                keys.Sort(Multidim.CompareMultidimElements);
 
                 //List mm0 = new List();
-                foreach (MultidimItem key in keys)
+                foreach (MultidimElement key in keys)
                 {
                     if (restrict != null)
                     {

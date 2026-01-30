@@ -1667,7 +1667,7 @@ namespace Gekko
                                         lhs_series = rhs.DeepClone(0, null, null) as Series;
                                         lhs_series.name = varnameWithFreq;
                                         //!we need to make all the subseries point to the superseries, this pointer is used in DECOMP and other places
-                                        foreach (KeyValuePair<MultidimItem, IVariable> kvp in lhs_series.dimensionsStorage.storage)
+                                        foreach (KeyValuePair<MultidimElement, IVariable> kvp in lhs_series.dimensionsStorage.storage)
                                         {
                                             kvp.Key.parent = lhs_series;
                                             (kvp.Value as Series).mmi.parent = lhs_series;

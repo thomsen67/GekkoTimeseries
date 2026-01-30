@@ -270,11 +270,11 @@ namespace Gekko
             GekkoTime t2 = new GekkoTime(EFreq.A, 2024, 1, 1);
 
             List<FrameLightRow> data = new List<FrameLightRow>();
-            List<MultidimItem> keys1 = ts.dimensionsStorage.storage.Keys.ToList();
-            keys1.Sort(Multidim.CompareMultidimItems);
+            List<MultidimElement> keys1 = ts.dimensionsStorage.storage.Keys.ToList();
+            keys1.Sort(Multidim.CompareMultidimElements);
             for (int i = 0; i < keys1.Count; i++)
             {
-                MultidimItem mm1 = keys1[i];
+                MultidimElement mm1 = keys1[i];
                 Series sub1 = ts.dimensionsStorage.storage[mm1] as Series;
                 foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                 {
@@ -958,7 +958,7 @@ namespace Gekko
         /// <param name="element"></param>
         /// <param name="type"></param>
         /// <param name="doubleDif"></param>
-        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, DecompOperator op, bool showErrors, ModelGamsScalar modelGamsScalar)
+        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimElement mmi, DecompStartHelper element, DecompOperator op, bool showErrors, ModelGamsScalar modelGamsScalar)
         {
             int deduct = op.lagGradient[0];
             if (op.isRaw) deduct = op.lagData[0];
@@ -1370,7 +1370,7 @@ namespace Gekko
         public static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2, bool showErrors, ModelGamsScalar modelGamsScalar)
         {
             decompOptions2.link = new List<Link>();
-            GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Dictionary<MultidimElement, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimElement, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in decompOptions2.new_from)
             {
                 int n = s.Count(c => c == '[');
@@ -1418,15 +1418,15 @@ namespace Gekko
                 //GekkoTime trash = GekkoTime.tNull;
                 //ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
 
-                Dictionary <MultidimItem, DecompStartHelper> elements = null;
+                Dictionary <MultidimElement, DecompStartHelper> elements = null;
                 equations.TryGetValue(name, out elements);
                 if (elements == null)
                 {
-                    elements = new Dictionary<MultidimItem, DecompStartHelper>();
+                    elements = new Dictionary<MultidimElement, DecompStartHelper>();
                     equations.Add(name, elements);
                 }
 
-                MultidimItem mmi = new MultidimItem(indexes1 == null ? new string[0] : indexes1);
+                MultidimElement mmi = new MultidimElement(indexes1 == null ? new string[0] : indexes1);
                 DecompStartHelper element = null;
                 elements.TryGetValue(mmi, out element);
                 if (element == null)
@@ -1448,13 +1448,13 @@ namespace Gekko
             }
 
             int counter = -1;
-            foreach (KeyValuePair<string, Dictionary<MultidimItem, DecompStartHelper>> kvp in equations)
+            foreach (KeyValuePair<string, Dictionary<MultidimElement, DecompStartHelper>> kvp in equations)
             {
                 //for each equation name                
                 counter++;
                 Link link = new Link();
                 link.GAMS_dsh = new List<DecompStartHelper>();
-                foreach (KeyValuePair<MultidimItem, DecompStartHelper> kvp2 in kvp.Value)
+                foreach (KeyValuePair<MultidimElement, DecompStartHelper> kvp2 in kvp.Value)
                 {
                     //for each index combination
                     link.GAMS_dsh.Add(kvp2.Value);
@@ -6781,7 +6781,7 @@ namespace Gekko
     {
         public string name = null; //the "x" in "x[a, b, <time>]"
         public string fullName = null; //the "x[a, b]" in "x[a, b, <time>]"
-        public MultidimItem indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
+        public MultidimElement indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
         public DecompStartHelperPeriod[] periods = null; //all the <time> periods found
         public int offset = 0;                                                 //
     }

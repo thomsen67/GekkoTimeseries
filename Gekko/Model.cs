@@ -1800,7 +1800,7 @@ namespace Gekko
                     return ts;
                 }
 
-                MultidimItem mmi = new MultidimItem(dims.ToArray(), ats);
+                MultidimElement mmi = new MultidimElement(dims.ToArray(), ats);
                 IVariable iv = null;                
                 ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                 

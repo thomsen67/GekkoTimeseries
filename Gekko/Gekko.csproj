@@ -449,6 +449,7 @@
     <Compile Include="Map.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Model.cs" />
+    <Compile Include="MultiDim.cs" />
     <Compile Include="Nullable\AllowNullAttribute.cs" />
     <Compile Include="Nullable\DisallowNullAttribute.cs" />
     <Compile Include="Nullable\DoesNotReturnAttribute.cs" />

@@ -1455,7 +1455,7 @@ namespace UnitTests
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2004, 300d, sharedDelta);
-            IVariable temp3 = null; (First().GetIVariable("x3!a") as Series).dimensionsStorage.TryGetValue(new MultidimItem(new string[] { "a" }), out temp3);
+            IVariable temp3 = null; (First().GetIVariable("x3!a") as Series).dimensionsStorage.TryGetValue(new MultidimElement(new string[] { "a" }), out temp3);
             Assert.IsTrue((temp3 as Series).type == ESeriesType.Timeless);
 
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2000, double.NaN, sharedDelta);
@@ -1463,7 +1463,7 @@ namespace UnitTests
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2002, 400d, sharedDelta);
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2003, 400d, sharedDelta);
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2004, double.NaN, sharedDelta);
-            IVariable temp4 = null; (First().GetIVariable("x4!a") as Series).dimensionsStorage.TryGetValue(new MultidimItem(new string[] { "b" }), out temp4);
+            IVariable temp4 = null; (First().GetIVariable("x4!a") as Series).dimensionsStorage.TryGetValue(new MultidimElement(new string[] { "b" }), out temp4);
             Assert.IsTrue((temp4 as Series).type == ESeriesType.Normal);
 
             _AssertSeries(First(), "x5!a", 2000, double.NaN, sharedDelta);  //Because it was found a a normal series to begin with
@@ -8067,17 +8067,17 @@ namespace UnitTests
             Masks m = new Masks();
             for (int i = -300; i < 300; i++)
             {
-                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + i, 1));
+                m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + i, 1));
 
                 for (int ii = -500; ii <= 500; ii++)
                 {
                     if (ii >= -300 && ii <= i)
                     {
-                        Assert.IsTrue(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                        Assert.IsTrue(m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
                     }
                     else
                     {
-                        Assert.IsFalse(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                        Assert.IsFalse(m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
                     }
                 }
             }
@@ -8085,17 +8085,17 @@ namespace UnitTests
             m = new Masks();
             for (int i = 300; i >= -300; i--)
             {
-                m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + i, 1));
+                m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + i, 1));
 
                 for (int ii = -500; ii <= 500; ii++)
                 {
                     if (ii >= i && ii <= 300)
                     {
-                        Assert.IsTrue(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                        Assert.IsTrue(m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
                     }
                     else
                     {
-                        Assert.IsFalse(m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
+                        Assert.IsFalse(m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2000 + ii, 1)));
                     }
                 }
             }
@@ -13229,6 +13229,46 @@ namespace UnitTests
             Assert.AreEqual(EFreq.A, GekkoTime.LowestFreq(EFreq.A, EFreq.A));
             Assert.AreEqual(EFreq.Q, GekkoTime.LowestFreq(EFreq.Q, EFreq.Q));
             Assert.AreEqual(EFreq.M, GekkoTime.LowestFreq(EFreq.M, EFreq.M));
+        }
+
+        [TestMethod]
+        public void _Test_Decomp_Multidim2Element()
+        {
+            var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
+            d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
+            d.Add(new Multidim2Element(new List<string>() { "a", "c" }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "a", "b" })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { "a", "c" })]);
+            try { double d2 = d[new Multidim2Element(new List<string>() { "a", "b" })]; Assert.Fail(); } catch (Exception) { }
+            // ---
+            d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+            d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
+            d.Add(new Multidim2Element(new List<string>() { "A", "c" }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "a", "B" })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { "a", "c" })]);
+            // ---
+            d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
+            d.Add(new Multidim2Element(new List<string>() { "a", null }), 123d);
+            d.Add(new Multidim2Element(new List<string>() { null, null }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "a", null })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { null, null })]);
+            // ---
+            d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+            d.Add(new Multidim2Element(new List<string>() { "a", null }), 123d);
+            d.Add(new Multidim2Element(new List<string>() { null, null }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "A", null })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { null, null })]);
+            // ===
+            List<Multidim2Element> m = new List<Multidim2Element>();
+            m.Add(new Multidim2Element(new List<string>() { "a", "B2z" }));
+            m.Add(new Multidim2Element(new List<string>() { "a", "b10z" }));
+            m.Add(new Multidim2Element(new List<string>() { "a", "b1z" }));
+            var m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+            Assert.AreEqual("b1z", m2[0].storage[1]);
+            Assert.AreEqual("B2z", m2[1].storage[1]);
+            Assert.AreEqual("b10z", m2[2].storage[1]);
+
+
         }
 
 
@@ -24856,7 +24896,7 @@ print(df2)
                 Series tsGhost = db.GetIVariable(s) as Series;
                 if (tsGhost.type != ESeriesType.ArraySuper) throw new GekkoException();
                 if (tsGhost.dimensions == 0) throw new GekkoException();
-                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MultidimItem(indexes), out iv);
+                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MultidimElement(indexes), out iv);
                 ts = iv as Series;
             }
             else

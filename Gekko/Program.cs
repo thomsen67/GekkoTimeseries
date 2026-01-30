@@ -252,9 +252,9 @@ namespace Gekko
     public class Masks
     {
 
-        Dictionary<MultidimItem, MaskPeriods> storage = new Dictionary<MultidimItem, MaskPeriods>();
+        Dictionary<MultidimElement, MaskPeriods> storage = new Dictionary<MultidimElement, MaskPeriods>();
 
-        public bool Get(MultidimItem mmi, GekkoTime t)
+        public bool Get(MultidimElement mmi, GekkoTime t)
         {
             bool rv = false;
             MaskPeriods p = this.GetPeriods(mmi);
@@ -277,7 +277,7 @@ namespace Gekko
             return rv;
         }
 
-        public void Set(MultidimItem mmi, GekkoTime t)
+        public void Set(MultidimElement mmi, GekkoTime t)
         {
             int minEnlarge = 32;  //BitArray is internally an int[].
             MaskPeriods p = this.GetPeriods(mmi);
@@ -316,7 +316,7 @@ namespace Gekko
         /// </summary>
         /// <param name="mmi"></param>
         /// <returns></returns>
-        private MaskPeriods GetPeriods(MultidimItem mmi)
+        private MaskPeriods GetPeriods(MultidimElement mmi)
         {
             MaskPeriods p = null; this.storage.TryGetValue(mmi, out p);
             return p;
@@ -2834,6 +2834,15 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
+                d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
+                d.Add(new Multidim2Element(new List<string>() { "a", "c" }), 321d);
+                double dd = d[new Multidim2Element(new List<string>() { "a", "C" })];
+            }
+
+
+            if (Globals.runningOnTTComputer)
+            {
                 //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
                 //new Writeln("0 --> " + M.Errorf(0d));
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
@@ -2902,22 +2911,22 @@ namespace Gekko
                         new Writeln("Round(x2) " + Round(x2, rounding));
 
                         Masks m = new Masks();
-                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
-                        m.Set(new MultidimItem(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
+                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
+                        m.Set(new MultidimElement(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
 
-                        bool b1 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                        bool b2 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
-                        bool b3 = m.Get(new MultidimItem(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
+                        bool b1 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                        bool b2 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
+                        bool b3 = m.Get(new MultidimElement(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
 
-                        bool b4 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                        bool b5 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                        bool b4 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                        bool b5 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
 
-                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                        m.Set(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
 
-                        bool b6 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                        bool b7 = m.Get(new MultidimItem(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                        bool b6 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                        bool b7 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
                     }
 
                 }
@@ -5451,7 +5460,7 @@ namespace Gekko
                 //create it
                 if (isArray)
                 {
-                    MultidimItem mmi = new MultidimItem(dims.ToArray(), tsSuperseries);
+                    MultidimElement mmi = new MultidimElement(dims.ToArray(), tsSuperseries);
                     IVariable iv = null; tsSuperseries.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                     if (iv == null)
                     {
@@ -6080,7 +6089,7 @@ namespace Gekko
                                         databank.AddIVariable(name, tsImported); //the sub-timeseries will follow automatically!
                                         if (tsImported.dimensionsStorage != null)
                                         {
-                                            foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in tsImported.dimensionsStorage.storage)
+                                            foreach (KeyValuePair<MultidimElement, IVariable> kvp2 in tsImported.dimensionsStorage.storage)
                                             {
                                                 Series tsChild = kvp2.Value as Series;
                                                 string nameChild = tsChild.GetName();
@@ -6096,9 +6105,9 @@ namespace Gekko
                                             Multidim gmapExisting = tsExisting.dimensionsStorage;
                                             Multidim gmapProtobuf = tsImported.dimensionsStorage;
 
-                                            foreach (KeyValuePair<MultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
+                                            foreach (KeyValuePair<MultidimElement, IVariable> kvpGmap in gmapProtobuf.storage)
                                             {
-                                                MultidimItem nameDimProtobuf = kvpGmap.Key;
+                                                MultidimElement nameDimProtobuf = kvpGmap.Key;
                                                 Series tsDimProtobuf = kvpGmap.Value as Series;  //must be timeseries, no need to check that the type is so                                                
                                                 if (tsDimProtobuf?.mmi?.parent?.meta != null) tsDimProtobuf.mmi.parent.meta.parentDatabank = databank; //otherwise it will be null or point to some temp databank
                                                 IVariable ivDimExisting = null; gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
@@ -7585,7 +7594,7 @@ namespace Gekko
                         }
                     }
 
-                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(ss2, tsGhost), tsSub);
+                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MultidimElement(ss2, tsGhost), tsSub);
 
                 }
                 else
@@ -7670,7 +7679,7 @@ namespace Gekko
         /// <param name="dates"></param>
         /// <param name="tsProtobuf"></param>
         /// <param name="shouldOverwriteLaterOn"></param>
-        private static void MergeTwoTimeseriesWithDateWindowHelper(Multidim gmap, MultidimItem gmapItem, AllFreqsHelper dates, Series tsProtobuf, bool shouldOverwriteLaterOn)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(Multidim gmap, MultidimElement gmapItem, AllFreqsHelper dates, Series tsProtobuf, bool shouldOverwriteLaterOn)
         {
             if (shouldOverwriteLaterOn)
             {
@@ -9537,7 +9546,7 @@ namespace Gekko
                         split2[i] = split[2 * i + 2];
                     }
 
-                    tsArray.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(split2, tsArray), ts);
+                    tsArray.dimensionsStorage.AddIVariableWithOverwrite(new MultidimElement(split2, tsArray), ts);
                     tsArray.SetDirty(true);
 
                     if (Program.options.databank_trace)
@@ -12262,7 +12271,7 @@ namespace Gekko
                             db.AddIVariableWithOverwrite(ts);
 
                             ts.Stamp();
-                            //ts.SetDirty(true);  //already set with .AddIVariableWithOverwrite()
+                            //ts.SetDirty(true);  //already set with .AddWithOverwrite()
 
                             if (first) G.Writeln();
                             G.Writeln("Adjusted timeseries: " + db.name + ":" + varName);
@@ -12528,7 +12537,7 @@ namespace Gekko
                     string dimCount = null;
                     List<List<string>> elements = new List<List<string>>();
                     List<string> domains = new List<string>();
-                    List<MultidimItem> keys = parent.GetSortedDimensionKeys();
+                    List<MultidimElement> keys = parent.GetSortedDimensionKeys();
                     DispHelperArraySeries2(parent, keys, ref dimCount2, ref dimCount, elements, domains);
                     if (domains.Count > 0)
                     {
@@ -16372,7 +16381,7 @@ namespace Gekko
 
                 if (ts.type == ESeriesType.ArraySuper)
                 {
-                    List<MultidimItem> keys = ts.GetSortedDimensionKeys();
+                    List<MultidimElement> keys = ts.GetSortedDimensionKeys();
                     G.Writeln2("------------------------------------------------------------------------------------------");
                     DispHelperArraySeries(ts, keys, false);
                     G.Writeln("------------------------------------------------------------------------------------------");
@@ -16627,7 +16636,7 @@ namespace Gekko
                 }
 
                 bool eqsPrinted = false;
-                List<MultidimItem> keys = null;
+                List<MultidimElement> keys = null;
                 GekkoDictionary<string, string>[] temp = null;
                 if (ts.type == ESeriesType.ArraySuper)
                 {
@@ -17293,7 +17302,7 @@ namespace Gekko
         /// <param name="ts"></param>
         /// <param name="keys"></param>
         /// <param name="eqsPrinted"></param>
-        private static void DispHelperArraySeries(Series ts, List<MultidimItem> keys, bool eqsPrinted)
+        private static void DispHelperArraySeries(Series ts, List<MultidimElement> keys, bool eqsPrinted)
         {
             // --------------
             // Array-series
@@ -17347,7 +17356,7 @@ namespace Gekko
             }
             else
             {
-                MultidimItem mm = keys[0];
+                MultidimElement mm = keys[0];
                 string first = keys[0].ToString();
                 string last = keys[keys.Count - 1].ToString();
 
@@ -17364,7 +17373,7 @@ namespace Gekko
                 }
 
                 int countFix = 0;
-                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimElement, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
                     Series sub = kvp.Value as Series;
                     if (sub.meta.fix == EFixedType.Timeless || sub.meta.fix == EFixedType.Normal) countFix++;
@@ -17392,7 +17401,7 @@ namespace Gekko
         /// <param name="dimCount"></param>
         /// <param name="elements"></param>
         /// <param name="domains"></param>
-        public static void DispHelperArraySeries2(Series ts, List<MultidimItem> keys, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
+        public static void DispHelperArraySeries2(Series ts, List<MultidimElement> keys, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
         {
             GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
             for (int i = 0; i < ts.dimensions; i++)
@@ -17406,7 +17415,7 @@ namespace Gekko
                 //if (domain != null) domain = domain + ", ";
                 temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 int ii = 0;
-                foreach (MultidimItem key in keys)
+                foreach (MultidimElement key in keys)
                 {
                     if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
                     ii++;
@@ -21246,7 +21255,7 @@ namespace Gekko
 
                 if (ts.type == ESeriesType.ArraySuper)
                 {
-                    foreach (KeyValuePair<MultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
+                    foreach (KeyValuePair<MultidimElement, IVariable> kvpsub in ts.dimensionsStorage.storage)
                     {
                         Series sub = kvpsub.Value as Series;
                         l.Add(sub);
@@ -29883,7 +29892,7 @@ namespace Gekko
             return dt;
         }
 
-        public static DataTable GetDataTable(List<MultidimItem> input)
+        public static DataTable GetDataTable(List<MultidimElement> input)
         {
             if (input == null || input.Count == 0) new Error("Empty array-series: no elements to show.");
             DataTable dt = new DataTable();
@@ -29895,7 +29904,7 @@ namespace Gekko
             }
 
             int i = -1;
-            foreach (MultidimItem x2 in input)
+            foreach (MultidimElement x2 in input)
             {
                 i++;
                 var dtRow = dt.NewRow();
@@ -34889,7 +34898,7 @@ namespace Gekko
                     }
                     else
                     {
-                        foreach (KeyValuePair<MultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
+                        foreach (KeyValuePair<MultidimElement, IVariable> kvpsub in ts.dimensionsStorage.storage)
                         {
                             if (tsGrund.dimensionsStorage.storage.ContainsKey(kvpsub.Key))
                             {
@@ -34904,7 +34913,7 @@ namespace Gekko
                             }
                         }
 
-                        foreach (KeyValuePair<MultidimItem, IVariable> kvpsub in tsGrund.dimensionsStorage.storage)
+                        foreach (KeyValuePair<MultidimElement, IVariable> kvpsub in tsGrund.dimensionsStorage.storage)
                         {
                             if (ts.dimensionsStorage.storage.ContainsKey(kvpsub.Key))
                             {
