@@ -2838,6 +2838,17 @@ namespace Gekko
                 d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
                 d.Add(new Multidim2Element(new List<string>() { "a", "c" }), 321d);
                 double dd = d[new Multidim2Element(new List<string>() { "a", "C" })];
+
+
+                var key1 = new MultidimKey(new[] {
+    new KeyElement("a"),
+    new KeyElement(15),
+    new KeyElement("c"),
+    new KeyElement(-10) });
+    var d2 = new Dictionary<MultidimKey, double>(new Multidim2Comparer(false));
+
+
+            });
             }
 
 

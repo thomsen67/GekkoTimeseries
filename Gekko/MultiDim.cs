@@ -384,4 +384,91 @@ namespace Gekko
             return mmi;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public struct KeyElement
+    {
+        public readonly int IntValue;
+        public readonly string StringValue;
+
+        // Constructor for Int
+        public KeyElement(int value)
+        {
+            IntValue = value;
+            StringValue = null;
+        }
+
+        // Constructor for String
+        public KeyElement(string value)
+        {
+            IntValue = 0;
+            StringValue = value;
+        }
+
+        // High-speed equality
+        public bool Equals(KeyElement other)
+        {
+            // If one has a string and the other doesn't, they aren't equal
+            if ((StringValue == null) != (other.StringValue == null)) return false;
+
+            if (StringValue != null)
+                return string.Equals(StringValue, other.StringValue, StringComparison.Ordinal);
+
+            return IntValue == other.IntValue;
+        }
+    }
+
+    public sealed class MultidimKey
+    {
+        private readonly KeyElement[] _elements;
+        private readonly int _cachedHash;
+
+        public MultidimKey(KeyElement[] elements)
+        {
+            _elements = elements;
+
+            // Calculate hash once at birth
+            int hash = 17;
+            foreach (var el in _elements)
+            {
+                hash = hash * 31 + el.IntValue;
+                if (el.StringValue != null)
+                    hash = hash * 31 + StringComparer.Ordinal.GetHashCode(el.StringValue);
+            }
+            _cachedHash = hash;
+        }
+
+        public override int GetHashCode() => _cachedHash;
+
+        public override bool Equals(object obj) => Equals(obj as MultidimKey);
+
+        public bool Equals(MultidimKey other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null || _cachedHash != other._cachedHash) return false;
+            if (_elements.Length != other._elements.Length) return false;
+
+            for (int i = 0; i < _elements.Length; i++)
+            {
+                if (!_elements[i].Equals(other._elements[i])) return false;
+            }
+            return true;
+        }
+    }
 }
