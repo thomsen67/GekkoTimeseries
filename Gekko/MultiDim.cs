@@ -191,7 +191,7 @@ namespace Gekko
         {
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;
-            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false;
+            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but we keep it for now
             if (x._elements.Length != y._elements.Length) return false;            
             for (int i = 0; i < x._elements.Length; i++)
             {
@@ -240,16 +240,17 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return 0;
             if (x == null) return -1;
             if (y == null) return 1;
-            if (x._elements.Length != y._elements.Length) return -1;
-            //var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            if (x._elements.Length != y._elements.Length) return x._elements.Length.CompareTo(y._elements.Length);
+            
             for (int i = 0; i < x._elements.Length; i++)
             {
                 var elX = x._elements[i];
                 var elY = y._elements[i];
                 if (elX.isInt != elY.isInt) return elX.isInt.CompareTo(elY.isInt);                
                 if (elX.isInt)
-                {
-                    if (elX.IntValue < elY.IntValue) return -1;
+                {                    
+                    int cmp = elX.IntValue.CompareTo(elY.IntValue);
+                    if (cmp != 0) return cmp;
                 }
                 else
                 {
@@ -327,9 +328,6 @@ namespace Gekko
         /// </summary>
         /// <returns></returns>
         public Multidim2Element Clone() => new Multidim2Element(this._elements);
-               
-
-
     }
 
     public struct KeyElement
@@ -352,44 +350,7 @@ namespace Gekko
             IntValue = 0;
             StringValue = value;
         }
-
     }
 
-    public sealed class MultidimKey
-    {
-        private readonly KeyElement[] _elements;
-        private readonly int _cachedHash;
 
-        public MultidimKey(KeyElement[] elements)
-        {
-            _elements = elements;
-
-            // Calculate hash once at birth
-            int hash = 17;
-            foreach (var el in _elements)
-            {
-                hash = hash * 31 + el.IntValue;
-                if (el.StringValue != null)
-                    hash = hash * 31 + StringComparer.Ordinal.GetHashCode(el.StringValue);
-            }
-            _cachedHash = hash;
-        }
-
-        public override int GetHashCode() => _cachedHash;
-
-        public override bool Equals(object obj) => Equals(obj as MultidimKey);
-
-        public bool Equals(MultidimKey other)
-        {
-            if (ReferenceEquals(this, other)) return true;
-            if (other == null || _cachedHash != other._cachedHash) return false;
-            if (_elements.Length != other._elements.Length) return false;
-
-            for (int i = 0; i < _elements.Length; i++)
-            {
-                if (!_elements[i].Equals(other._elements[i])) return false;
-            }
-            return true;
-        }
-    }
 }
