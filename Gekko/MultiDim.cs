@@ -191,25 +191,28 @@ namespace Gekko
         {
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;
-            if (x.GetHashCode() != y.GetHashCode()) return false;
+            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false;
             if (x._elements.Length != y._elements.Length) return false;            
             for (int i = 0; i < x._elements.Length; i++)
             {
-                if (x._elements[i].isInt != y._elements[i].isInt) return false;
-                if (x._elements[i].isInt)
+                var elX = x._elements[i];
+                var elY = y._elements[i];
+
+                if (elX.isInt != elY.isInt) return false;
+                if (elX.isInt)
                 {
-                    if (x._elements[i].IntValue != y._elements[i].IntValue) return false;
+                    if (elX.IntValue != elY.IntValue) return false;
                 }
                 else
                 {
                     int result;
                     if (_ignoreCase)
                     {
-                        if (!string.Equals(x._elements[i].StringValue, y._elements[i].StringValue, StringComparison.OrdinalIgnoreCase)) return false;
+                        if (!string.Equals(elX.StringValue, elY.StringValue, StringComparison.OrdinalIgnoreCase)) return false;
                     }
                     else
                     {
-                        if (!string.Equals(x._elements[i].StringValue, y._elements[i].StringValue, StringComparison.Ordinal)) return false;
+                        if (!string.Equals(elX.StringValue, elY.StringValue, StringComparison.Ordinal)) return false;
                     }
                 }                
             }
@@ -218,7 +221,8 @@ namespace Gekko
 
         public int GetHashCode(Multidim2Element obj)
         {
-            return obj.GetHashCode();
+            if (obj == null) return 0;            
+            return obj.GetHashCode(_ignoreCase); //pick the right one
         }
     }
 
@@ -237,19 +241,21 @@ namespace Gekko
             if (x == null) return -1;
             if (y == null) return 1;
             if (x._elements.Length != y._elements.Length) return -1;
-            var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            //var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             for (int i = 0; i < x._elements.Length; i++)
             {
-                if (x._elements[i].isInt != y._elements[i].isInt) return -1;
-                if (x._elements[i].isInt)
+                var elX = x._elements[i];
+                var elY = y._elements[i];
+                if (elX.isInt != elY.isInt) return elX.isInt.CompareTo(elY.isInt);                
+                if (elX.isInt)
                 {
-                    if (x._elements[i].IntValue < y._elements[i].IntValue) return -1;
+                    if (elX.IntValue < elY.IntValue) return -1;
                 }
                 else
                 {
                     int result;
-                    if (_ignoreCase) result = G.CompareNatural(x._elements[i].StringValue, y._elements[i].StringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
-                    else result = G.CompareNatural(x._elements[i].StringValue, y._elements[i].StringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    if (_ignoreCase) result = G.CompareNatural(elX.StringValue, elY.StringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
+                    else result = G.CompareNatural(elX.StringValue, elY.StringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
                     if (result != 0) return result;
                 }
             }
@@ -264,7 +270,10 @@ namespace Gekko
         public readonly KeyElement[] _elements;
 
         [ProtoMember(2)]
-        private readonly int _cachedHash;
+        private readonly int _sensitiveHash;
+
+        [ProtoMember(3)]
+        private readonly int _insensitiveHash;
 
         private Multidim2Element()
         {
@@ -274,20 +283,34 @@ namespace Gekko
         public Multidim2Element(KeyElement[] elements)
         {
             _elements = elements;
+
             // Calculate hash once at birth
-            int hash = 17;
-            foreach (var el in _elements)
+            int sHash = 17;
+            int iHash = 17;
+
+            for (int i = 0; i < _elements.Length; i++)
             {
-                if (el.isInt) hash = hash * 31 + el.IntValue;
-                else
+                var el = _elements[i];
+                if (el.isInt)
                 {
-                    if (el.StringValue != null) hash = hash * 31 + StringComparer.Ordinal.GetHashCode(el.StringValue.ToLower());  //most use will be case-insensitive comparisons
+                    sHash = sHash * 31 + el.IntValue;
+                    iHash = iHash * 31 + el.IntValue;
+                }
+                else if (el.StringValue != null)
+                {                    
+                    sHash = sHash * 31 + StringComparer.Ordinal.GetHashCode(el.StringValue);
+                    iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(el.StringValue);
                 }
             }
-            _cachedHash = hash;
+            _sensitiveHash = sHash;
+            _insensitiveHash = iHash;
         }
 
-        public override int GetHashCode() => _cachedHash;
+        // Default to the common case
+        public override int GetHashCode() => _insensitiveHash;
+
+        // Allow the comparer to pick the right one
+        public int GetHashCode(bool ignoreCase) => ignoreCase ? _insensitiveHash : _sensitiveHash;
 
         public override string ToString()
         {
@@ -299,13 +322,12 @@ namespace Gekko
             return Stringlist.GetListWithCommas(temp, "");
         }
 
-        public Multidim2Element Clone()
-        {
-            string[] ss = new string[this._elements.Length];
-            Array.Copy(this._elements, ss, this._elements.Length);
-            Multidim2Element mmi = new Multidim2Element(_elements); //will compute hash again            
-            return mmi;
-        }
+        /// <summary>
+        /// The object is actually immutable anyway!!
+        /// </summary>
+        /// <returns></returns>
+        public Multidim2Element Clone() => new Multidim2Element(this._elements);
+               
 
 
     }
