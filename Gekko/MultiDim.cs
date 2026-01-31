@@ -246,17 +246,18 @@ namespace Gekko
             {
                 var xi = x.storage[i];
                 var yi = y.storage[i];
-                if (xi.isTime != yi.isTime) return -1;  //We say time comes before letter, like numbers are before letters
+                if (xi.isTime != yi.isTime) return xi.isTime ? -1 : 1;
                 if (xi.isTime)
-                {
-                    return xi.timeValue.CompareTo(yi.timeValue);
+                {                    
+                    int compare = xi.timeValue.CompareTo(yi.timeValue);
+                    if (compare != 0) return compare;
                 }
                 else
                 {
-                    int result;
-                    if (_ignoreCase) result = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
-                    else result = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
-                    if (result != 0) return result;
+                    int compare;
+                    if (_ignoreCase) compare = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
+                    else compare = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    if (compare != 0) return compare;
                 }
             }
             return 0;
@@ -293,8 +294,9 @@ namespace Gekko
                 var si = storage[i];
                 if (si.isTime)
                 {
-                    sHash = sHash * 31 + si.timeValue.GetHashCode();
-                    iHash = iHash * 31 + si.timeValue.GetHashCode();
+                    int tHash = si.timeValue.GetHashCode();
+                    sHash = sHash * 31 + tHash;
+                    iHash = iHash * 31 + tHash;
                 }
                 else if (si.stringValue != null)
                 {                    
@@ -320,13 +322,7 @@ namespace Gekko
                 temp.Add(s.ToString());
             }
             return Stringlist.GetListWithCommas(temp, "");
-        }
-
-        /// <summary>
-        /// The object is actually immutable anyway!!
-        /// </summary>
-        /// <returns></returns>
-        public Multidim2Element Clone() => new Multidim2Element(this.storage);
+        }        
     }
 
     public struct StringOrTime
@@ -347,6 +343,9 @@ namespace Gekko
             timeValue = GekkoTime.tNull;
             stringValue = value;
         }
+
+        public static implicit operator StringOrTime(string s) => new StringOrTime(s);
+        public static implicit operator StringOrTime(GekkoTime t) => new StringOrTime(t);
     }
 
 

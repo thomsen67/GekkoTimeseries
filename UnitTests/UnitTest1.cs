@@ -13235,57 +13235,57 @@ namespace UnitTests
         public void _Test_Multidim2Element()
         {
             var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b") }), 123d);
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("c") }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b") })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("c") })]);
-            try { double d2 = d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("B") })]; Assert.Fail(); } catch (Exception) { }
+            d.Add(new Multidim2Element(new StringOrTime[] { "a", "b" }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { "a", "c" }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "a", "b" })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { "a", "c" })]);
+            try { double d2 = d[new Multidim2Element(new StringOrTime[] { "a", "B" })]; Assert.Fail(); } catch (Exception) { }
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b") }), 123d);
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("A"), new StringOrTime("c") }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("B") })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("c") })]);
+            d.Add(new Multidim2Element(new StringOrTime[] { "a", "b" }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { "A", "c" }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "a", "B" })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { "a", "c" })]);
             {
                 // --- here with time instead of a            
                 d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("b") }), 1234d);
-                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("c") }), 4321d);
-                Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("B") })]);
-                Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("c") })]);
+                d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "b" }), 1234d);
+                d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "c" }), 4321d);
+                Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "B" })]);
+                Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "c" })]);
                 // --- more time
                 d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 4)), new StringOrTime("a") }), 1234d);
-                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2021, 1)), new StringOrTime("a") }), 4321d);
-                Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 4)), new StringOrTime("A") })]);
-                Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2021, 1)), new StringOrTime("A") })]);
+                d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 4), "a" }), 1234d);
+                d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2021, 1), "a" }), 4321d);
+                Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 4), "A" })]);
+                Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2021, 1), "A" })]);
             }
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(null) }), 123d);
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(null) })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) })]);
+            d.Add(new Multidim2Element(new StringOrTime[] { "a", null }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { null, null }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "a", null })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { null, null })]);
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(null) }), 123d);
-            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("A"), new StringOrTime(null) })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) })]);
+            d.Add(new Multidim2Element(new StringOrTime[] { "a", null }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { null, null }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "A", null })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { null, null })]);
             // ===
             List<Multidim2Element> m = new List<Multidim2Element>();
-            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("B2z") }));
-            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b10z") }));
-            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b1z") }));
+            m.Add(new Multidim2Element(new StringOrTime[] { "a", "B2z" }));
+            m.Add(new Multidim2Element(new StringOrTime[] { "a", "b10z" }));
+            m.Add(new Multidim2Element(new StringOrTime[] { "a", "b1z" }));
             var m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
             Assert.AreEqual("b1z", m2[0].storage[1].stringValue);
             Assert.AreEqual("B2z", m2[1].storage[1].stringValue);
             Assert.AreEqual("b10z", m2[2].storage[1].stringValue);
             // ===
             m = new List<Multidim2Element>();
-            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(new GekkoTime(EFreq.Q, 2025, 1)) }));
-            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(new GekkoTime(EFreq.Q, 2024, 4)) }));
-            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(new GekkoTime(EFreq.Q, 2024, 3)) }));
+            m.Add(new Multidim2Element(new StringOrTime[] { "a", new GekkoTime(EFreq.Q, 2025, 1) }));
+            m.Add(new Multidim2Element(new StringOrTime[] { "a", new GekkoTime(EFreq.Q, 2024, 4) }));
+            m.Add(new Multidim2Element(new StringOrTime[] { "a", new GekkoTime(EFreq.Q, 2024, 3) }));
             m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
             Assert.AreEqual(2024, m2[0].storage[1].timeValue.super);
             Assert.AreEqual(2024, m2[1].storage[1].timeValue.super);
