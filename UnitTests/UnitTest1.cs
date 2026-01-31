@@ -13232,44 +13232,44 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Decomp_Multidim2Element()
+        public void _Test_Multidim2Element()
         {
-            /*
+            //new KeyElement[] { new KeyElement(""), new KeyElement("") }
+
             var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-            d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
-            d.Add(new Multidim2Element(new List<string>() { "a", "c" }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "a", "b" })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { "a", "c" })]);
-            try { double d2 = d[new Multidim2Element(new List<string>() { "a", "b" })]; Assert.Fail(); } catch (Exception) { }
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") }), 123d);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("c") }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("c") })]);
+            try { double d2 = d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") })]; Assert.Fail(); } catch (Exception) { }
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-            d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
-            d.Add(new Multidim2Element(new List<string>() { "A", "c" }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "a", "B" })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { "a", "c" })]);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") }), 123d);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("A"), new KeyElement("c") }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("B") })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("c") })]);
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-            d.Add(new Multidim2Element(new List<string>() { "a", null }), 123d);
-            d.Add(new Multidim2Element(new List<string>() { null, null }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "a", null })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { null, null })]);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement(null) }), 123d);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement(null) })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) })]);
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-            d.Add(new Multidim2Element(new List<string>() { "a", null }), 123d);
-            d.Add(new Multidim2Element(new List<string>() { null, null }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new List<string>() { "A", null })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new List<string>() { null, null })]);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement(null) }), 123d);
+            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("A"), new KeyElement(null) })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) })]);
             // ===
             List<Multidim2Element> m = new List<Multidim2Element>();
-            m.Add(new Multidim2Element(new List<string>() { "a", "B2z" }));
-            m.Add(new Multidim2Element(new List<string>() { "a", "b10z" }));
-            m.Add(new Multidim2Element(new List<string>() { "a", "b1z" }));
-            var m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
-            Assert.AreEqual("b1z", m2[0].storage[1]);
-            Assert.AreEqual("B2z", m2[1].storage[1]);
-            Assert.AreEqual("b10z", m2[2].storage[1]);
-            */
 
+            m.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("B2z") }));
+            m.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b10z") }));
+            m.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b1z") }));
+            var m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+            Assert.AreEqual("b1z", m2[0]._elements[1].StringValue);
+            Assert.AreEqual("B2z", m2[1]._elements[1].StringValue);
+            Assert.AreEqual("b10z", m2[2]._elements[1].StringValue);
         }
 
 

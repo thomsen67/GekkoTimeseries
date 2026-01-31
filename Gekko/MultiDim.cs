@@ -306,12 +306,13 @@ namespace Gekko
             _sensitiveHash = sHash;
             _insensitiveHash = iHash;
         }
+        
+        public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
+        
+        public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
 
-        // Default to the common case
-        public override int GetHashCode() => _insensitiveHash;
-
-        // Allow the comparer to pick the right one
-        public int GetHashCode(bool ignoreCase) => ignoreCase ? _insensitiveHash : _sensitiveHash;
+        // 2. Your Custom Logic (The "Actual Work")
+        public int GetHashCode(bool ignoreCase) => ignoreCase ? _insensitiveHash : _sensitiveHash;        
 
         public override string ToString()
         {
