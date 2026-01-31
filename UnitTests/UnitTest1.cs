@@ -13234,42 +13234,66 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Multidim2Element()
         {
-            //new KeyElement[] { new KeyElement(""), new KeyElement("") }
-
             var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") }), 123d);
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("c") }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("c") })]);
-            try { double d2 = d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") })]; Assert.Fail(); } catch (Exception) { }
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b") }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("c") }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b") })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("c") })]);
+            try { double d2 = d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("B") })]; Assert.Fail(); } catch (Exception) { }
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b") }), 123d);
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("A"), new KeyElement("c") }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("B") })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("c") })]);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b") }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("A"), new StringOrTime("c") }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("B") })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("c") })]);
+            {
+                // --- here with time instead of a            
+                d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("b") }), 1234d);
+                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("c") }), 4321d);
+                Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("B") })]);
+                Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 1)), new StringOrTime("c") })]);
+                // --- more time
+                d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 4)), new StringOrTime("a") }), 1234d);
+                d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2021, 1)), new StringOrTime("a") }), 4321d);
+                Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2020, 4)), new StringOrTime("A") })]);
+                Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(new GekkoTime(EFreq.Q, 2021, 1)), new StringOrTime("A") })]);
+            }
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement(null) }), 123d);
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement(null) })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) })]);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(null) }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(null) })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) })]);
             // ---
             d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement(null) }), 123d);
-            d.Add(new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) }), 321d);
-            Assert.AreEqual(123d, d[new Multidim2Element(new KeyElement[] { new KeyElement("A"), new KeyElement(null) })]);
-            Assert.AreEqual(321d, d[new Multidim2Element(new KeyElement[] { new KeyElement(null), new KeyElement(null) })]);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(null) }), 123d);
+            d.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) }), 321d);
+            Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime("A"), new StringOrTime(null) })]);
+            Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { new StringOrTime(null), new StringOrTime(null) })]);
             // ===
             List<Multidim2Element> m = new List<Multidim2Element>();
-
-            m.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("B2z") }));
-            m.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b10z") }));
-            m.Add(new Multidim2Element(new KeyElement[] { new KeyElement("a"), new KeyElement("b1z") }));
+            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("B2z") }));
+            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b10z") }));
+            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime("b1z") }));
             var m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
-            Assert.AreEqual("b1z", m2[0]._elements[1].StringValue);
-            Assert.AreEqual("B2z", m2[1]._elements[1].StringValue);
-            Assert.AreEqual("b10z", m2[2]._elements[1].StringValue);
+            Assert.AreEqual("b1z", m2[0].storage[1].stringValue);
+            Assert.AreEqual("B2z", m2[1].storage[1].stringValue);
+            Assert.AreEqual("b10z", m2[2].storage[1].stringValue);
+            // ===
+            m = new List<Multidim2Element>();
+            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(new GekkoTime(EFreq.Q, 2025, 1)) }));
+            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(new GekkoTime(EFreq.Q, 2024, 4)) }));
+            m.Add(new Multidim2Element(new StringOrTime[] { new StringOrTime("a"), new StringOrTime(new GekkoTime(EFreq.Q, 2024, 3)) }));
+            m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+            Assert.AreEqual(2024, m2[0].storage[1].timeValue.super);
+            Assert.AreEqual(2024, m2[1].storage[1].timeValue.super);
+            Assert.AreEqual(2025, m2[2].storage[1].timeValue.super);
+            Assert.AreEqual(3, m2[0].storage[1].timeValue.sub);
+            Assert.AreEqual(4, m2[1].storage[1].timeValue.sub);
+            Assert.AreEqual(1, m2[2].storage[1].timeValue.sub);
+
         }
 
 

@@ -2831,14 +2831,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
-            if (Globals.runningOnTTComputer)
-            {
-                var dict = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
-                dict.Add(new Multidim2Element(new KeyElement[2] { new KeyElement("aB"), new KeyElement(500) }), 12.34d);
-                dict.Add(new Multidim2Element(new KeyElement[2] { new KeyElement("Cd"), new KeyElement(600) }), 23.45d);
-                double d = dict[new Multidim2Element(new KeyElement[2] { new KeyElement("ab"), new KeyElement(500) })];
-            }
+        {          
 
 
             if (Globals.runningOnTTComputer)

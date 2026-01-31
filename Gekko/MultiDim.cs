@@ -192,27 +192,27 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;
             if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but we keep it for now
-            if (x._elements.Length != y._elements.Length) return false;            
-            for (int i = 0; i < x._elements.Length; i++)
+            if (x.storage.Length != y.storage.Length) return false;            
+            for (int i = 0; i < x.storage.Length; i++)
             {
-                var elX = x._elements[i];
-                var elY = y._elements[i];
+                var elX = x.storage[i];
+                var elY = y.storage[i];
 
-                if (elX.isInt != elY.isInt) return false;
-                if (elX.isInt)
+                if (elX.isTime != elY.isTime) return false;
+                if (elX.isTime)
                 {
-                    if (elX.IntValue != elY.IntValue) return false;
+                    if (elX.timeValue.CompareTo(elY.timeValue) != 0) return false;
                 }
                 else
                 {
                     int result;
                     if (_ignoreCase)
                     {
-                        if (!string.Equals(elX.StringValue, elY.StringValue, StringComparison.OrdinalIgnoreCase)) return false;
+                        if (!string.Equals(elX.stringValue, elY.stringValue, StringComparison.OrdinalIgnoreCase)) return false;
                     }
                     else
                     {
-                        if (!string.Equals(elX.StringValue, elY.StringValue, StringComparison.Ordinal)) return false;
+                        if (!string.Equals(elX.stringValue, elY.stringValue, StringComparison.Ordinal)) return false;
                     }
                 }                
             }
@@ -240,23 +240,22 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return 0;
             if (x == null) return -1;
             if (y == null) return 1;
-            if (x._elements.Length != y._elements.Length) return x._elements.Length.CompareTo(y._elements.Length);
+            if (x.storage.Length != y.storage.Length) return x.storage.Length.CompareTo(y.storage.Length);
             
-            for (int i = 0; i < x._elements.Length; i++)
+            for (int i = 0; i < x.storage.Length; i++)
             {
-                var elX = x._elements[i];
-                var elY = y._elements[i];
-                if (elX.isInt != elY.isInt) return elX.isInt.CompareTo(elY.isInt);                
-                if (elX.isInt)
-                {                    
-                    int cmp = elX.IntValue.CompareTo(elY.IntValue);
-                    if (cmp != 0) return cmp;
+                var xi = x.storage[i];
+                var yi = y.storage[i];
+                if (xi.isTime != yi.isTime) return -1;  //We say time comes before letter, like numbers are before letters
+                if (xi.isTime)
+                {
+                    return xi.timeValue.CompareTo(yi.timeValue);
                 }
                 else
                 {
                     int result;
-                    if (_ignoreCase) result = G.CompareNatural(elX.StringValue, elY.StringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
-                    else result = G.CompareNatural(elX.StringValue, elY.StringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    if (_ignoreCase) result = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
+                    else result = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
                     if (result != 0) return result;
                 }
             }
@@ -268,7 +267,7 @@ namespace Gekko
     public class Multidim2Element
     {
         [ProtoMember(1)]
-        public readonly KeyElement[] _elements;
+        public readonly StringOrTime[] storage;
 
         [ProtoMember(2)]
         private readonly int _sensitiveHash;
@@ -281,26 +280,26 @@ namespace Gekko
             //only because protobuf needs it, not for outside use
         }
 
-        public Multidim2Element(KeyElement[] elements)
+        public Multidim2Element(StringOrTime[] elements)
         {
-            _elements = elements;
+            storage = elements;
 
             // Calculate hash once at birth
             int sHash = 17;
             int iHash = 17;
 
-            for (int i = 0; i < _elements.Length; i++)
+            for (int i = 0; i < storage.Length; i++)
             {
-                var el = _elements[i];
-                if (el.isInt)
+                var si = storage[i];
+                if (si.isTime)
                 {
-                    sHash = sHash * 31 + el.IntValue;
-                    iHash = iHash * 31 + el.IntValue;
+                    sHash = sHash * 31 + si.timeValue.GetHashCode();
+                    iHash = iHash * 31 + si.timeValue.GetHashCode();
                 }
-                else if (el.StringValue != null)
+                else if (si.stringValue != null)
                 {                    
-                    sHash = sHash * 31 + StringComparer.Ordinal.GetHashCode(el.StringValue);
-                    iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(el.StringValue);
+                    sHash = sHash * 31 + StringComparer.Ordinal.GetHashCode(si.stringValue);
+                    iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(si.stringValue);
                 }
             }
             _sensitiveHash = sHash;
@@ -310,14 +309,13 @@ namespace Gekko
         public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
         
         public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
-
-        // 2. Your Custom Logic (The "Actual Work")
+                
         public int GetHashCode(bool ignoreCase) => ignoreCase ? _insensitiveHash : _sensitiveHash;        
 
         public override string ToString()
         {
             List<string> temp = new List<string>();
-            foreach (KeyElement s in _elements)
+            foreach (StringOrTime s in storage)
             {
                 temp.Add(s.ToString());
             }
@@ -328,28 +326,26 @@ namespace Gekko
         /// The object is actually immutable anyway!!
         /// </summary>
         /// <returns></returns>
-        public Multidim2Element Clone() => new Multidim2Element(this._elements);
+        public Multidim2Element Clone() => new Multidim2Element(this.storage);
     }
 
-    public struct KeyElement
+    public struct StringOrTime
     {
-        public readonly bool isInt = false;
-        public readonly int IntValue;
-        public readonly string StringValue;
-
-        // Constructor for Int
-        public KeyElement(int value)
+        public readonly bool isTime = false;
+        public readonly GekkoTime timeValue;
+        public readonly string stringValue;
+                
+        public StringOrTime(GekkoTime value)
         {
-            IntValue = value;
-            StringValue = null;
-            this.isInt = true;
+            this.isTime = true;
+            timeValue = value;
+            stringValue = null;            
         }
-
-        // Constructor for String
-        public KeyElement(string value)
+                
+        public StringOrTime(string value)
         {
-            IntValue = 0;
-            StringValue = value;
+            timeValue = GekkoTime.tNull;
+            stringValue = value;
         }
     }
 

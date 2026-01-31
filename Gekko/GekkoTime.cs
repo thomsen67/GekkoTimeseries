@@ -2048,6 +2048,16 @@ namespace Gekko
             else if (this.StrictlySmallerThan(other)) return -1;
             else return 1;
         }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 23 + (int)this.freq;
+            hash = hash * 23 + this.super;
+            hash = hash * 23 + this.sub;
+            hash = hash * 23 + this.subsub;            
+            return hash;
+        }
     }
 
     public class GekkoTimeIterator : IEnumerable<GekkoTime>
