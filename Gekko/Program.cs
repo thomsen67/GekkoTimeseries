@@ -2834,21 +2834,10 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
-                d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
-                d.Add(new Multidim2Element(new List<string>() { "a", "c" }), 321d);
-                double dd = d[new Multidim2Element(new List<string>() { "a", "C" })];
-
-
-                var key1 = new MultidimKey(new[] {
-    new KeyElement("a"),
-    new KeyElement(15),
-    new KeyElement("c"),
-    new KeyElement(-10) });
-    var d2 = new Dictionary<MultidimKey, double>(new Multidim2Comparer(false));
-
-
-            });
+                var dict = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+                dict.Add(new Multidim2Element(new KeyElement[2] { new KeyElement("aB"), new KeyElement(500) }), 12.34d);
+                dict.Add(new Multidim2Element(new KeyElement[2] { new KeyElement("Cd"), new KeyElement(600) }), 23.45d);
+                double d = dict[new Multidim2Element(new KeyElement[2] { new KeyElement("ab"), new KeyElement(500) })];
             }
 
 

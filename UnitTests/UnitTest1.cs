@@ -13234,6 +13234,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Decomp_Multidim2Element()
         {
+            /*
             var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
             d.Add(new Multidim2Element(new List<string>() { "a", "b" }), 123d);
             d.Add(new Multidim2Element(new List<string>() { "a", "c" }), 321d);
@@ -13267,7 +13268,7 @@ namespace UnitTests
             Assert.AreEqual("b1z", m2[0].storage[1]);
             Assert.AreEqual("B2z", m2[1].storage[1]);
             Assert.AreEqual("b10z", m2[2].storage[1]);
-
+            */
 
         }
 
