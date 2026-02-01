@@ -374,6 +374,9 @@ namespace Gekko
                 
         public string GetName() => this.storage[this.posName].GetString();
 
+        public string GetNameWithWorkAndWithoutTurtle() => "Work:" + this.storage[this.posName].GetString().Replace("¤", "");
+        public string GetNameWithoutTurtle() => this.storage[this.posName].GetString().Replace("¤", "");
+
         //public string GetFreq() => this.storage[this.posFreq].GetString();
 
         public GekkoTime GetTime() => this.storage[this.timePosition].GetTime();
@@ -427,8 +430,8 @@ namespace Gekko
                         m.Add(s2);
                     }
                 }
-            }
-            return new DName(name, m.ToArray());
+            }            
+            return new DName(name.Replace("¤", ""), m.ToArray());
         }
 
         public bool HACKHASINDEX()

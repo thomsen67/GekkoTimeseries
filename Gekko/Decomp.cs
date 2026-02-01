@@ -1731,11 +1731,11 @@ namespace Gekko
         /// <param name="parentI"></param>
         public static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
-            GekkoDictionaryBlanks<int> endo = new GekkoDictionaryBlanks<int>();
-            GekkoDictionaryBlanks<int> exo = new GekkoDictionaryBlanks<int>();
-            GekkoDictionaryBlanks<int> all = new GekkoDictionaryBlanks<int>();  //all variables that are present in 1 or more equations
-            Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
-            Dictionary<int, string> exoReverse = new Dictionary<int, string>();  //just inverted
+            Dictionary<DName, int> endo = new Dictionary<DName, int>(new Multidim2Comparer(true));
+            Dictionary<DName, int> exo = new Dictionary<DName, int>(new Multidim2Comparer(true));
+            Dictionary<DName, int> all = new Dictionary<DName, int>(new Multidim2Comparer(true)); //all variables that are present in 1 or more equations
+            Dictionary<int, DName> endoReverse = new Dictionary<int, DName>();  //just inverted
+            Dictionary<int, DName> exoReverse = new Dictionary<int, DName>();  //just inverted
 
             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
             {
@@ -1743,11 +1743,11 @@ namespace Gekko
                 {
                     //Transforms from for instance Work:x¤[+1] into Work:x¤[2002].
                     string x = DecompFirst() + ":" + ConvertToTurtleName(s, 0, t);
-                    if (!endo.ContainsKey(x))
+                    if (!endo.ContainsKey(DName.HACK1(x)))
                     {
                         int c = endo.Count();
-                        endo.Add(x, c);
-                        endoReverse.Add(c, x);
+                        endo.Add(DName.HACK1(x), c);
+                        endoReverse.Add(c, DName.HACK1(x));
                     }
                 }
             }            
@@ -1787,12 +1787,12 @@ namespace Gekko
                             txt.MoreNewLineTight();
                             txt.MoreAdd(Stringlist.GetListWithCommas(temp2));
                             txt.MoreNewLine();
-                            List<string> temp1 = endo.GetKeys();
-                            for (int i = 0; i < temp1.Count; i++) { temp1[i] = temp1[i].Replace("¤", ""); }
-                            temp1.Sort(G.CompareNaturalIgnoreCase);
+                            List<DName> temp1 = endo.Keys.ToList();
+                            List<string> temp1a = temp1.Select(x => x.ToString().Replace("¤", "")).ToList();
+                            temp1a.Sort(G.CompareNaturalIgnoreCase);
                             txt.MoreAdd("There are the following " + endo.Count() + " endo variables given:");
                             txt.MoreNewLineTight();
-                            txt.MoreAdd(Stringlist.GetListWithCommas(temp1));
+                            txt.MoreAdd(Stringlist.GetListWithCommas(temp1a));
                         }
                     }
 
@@ -1879,16 +1879,21 @@ namespace Gekko
                             {
                                 string x1 = two.s1;
                                 string x2 = two.s2;
+                                DName dnX1 = DName.HACK1(x1);
 
                                 if (k == 0)
                                 {
                                     // -----------
                                     // First time
                                     // -----------
+                                                                        
+                                    if (!all.ContainsKey(dnX1))
+                                    {
+                                        all.Add(dnX1, -12345);
+                                    }
+                                    //all.AddIfNotAlreadyThere(x1, -12345);
 
-                                    all.AddIfNotAlreadyThere(x1, -12345);
-
-                                    if (exo.ContainsKey(x1) || endo.ContainsKey(x1))
+                                    if (exo.ContainsKey(dnX1) || endo.ContainsKey(dnX1))
                                     {
                                         //endo or already in exo                                        
                                     }
@@ -1896,8 +1901,8 @@ namespace Gekko
                                     {
                                         //exo
                                         int c = exo.Count();
-                                        exo.Add(x1, c);
-                                        exoReverse.Add(c, x1);
+                                        exo.Add(dnX1, c);
+                                        exoReverse.Add(c, dnX1);
                                     }
                                 }
                                 else
@@ -1907,9 +1912,9 @@ namespace Gekko
                                     // ------------
 
                                     //k == 1
-                                    if (endo.ContainsKey(x1))
+                                    if (endo.ContainsKey(dnX1))
                                     {
-                                        int col = endo.GetInt(x1);
+                                        int col = -12345; endo.TryGetValue(dnX1, out col);
                                         if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
@@ -1925,9 +1930,9 @@ namespace Gekko
                                         double d3 = InvertGetDifference(decompDatas.storage[ii][jj], x2, t, operatorOneOf3Types);
                                         mEndo3[row, col] = d3;
                                     }
-                                    else if (exo.ContainsKey(x1))
+                                    else if (exo.ContainsKey(dnX1))
                                     {
-                                        int col = exo.GetInt(x1);
+                                        int col = -12345; exo.TryGetValue(dnX1, out col);
                                         if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
@@ -1962,8 +1967,8 @@ namespace Gekko
 
             int n = endo.Count() + exo.Count();
 
-            List<string> problem = new List<string>();
-            foreach (string x in endo.GetKeys())
+            List<DName> problem = new List<DName>();
+            foreach (DName x in endo.Keys.ToList())
             {
                 if (!all.ContainsKey(x)) problem.Add(x);
             }
@@ -2070,18 +2075,32 @@ namespace Gekko
                 // but that is perhaps not
                 // necessary, since the period has already been filtered by the DECOMP time period.
                 GekkoTime gtNotUsed; string name;
-                ConvertFromTurtleName(endoReverse[row], true, out name, out gtNotUsed);
+                //ConvertFromTurtleName(endoReverse[row], true, out name, out gtNotUsed);
+                DName dn0 = endoReverse[row]; 
+                name = dn0.GetNameWithWorkAndWithoutTurtle();
+                gtNotUsed = dn0.GetTime();
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count(); col++)
                 {
-                    string endoName = endoReverse[row];
-                    GekkoTime etime; string ename;
-                    ConvertFromTurtleName(endoName, true, out ename, out etime);
+                    //string endoName = endoReverse[row];
+                    //GekkoTime etime; string ename;
+                    //ConvertFromTurtleName(endoName, true, out ename, out etime);
 
-                    string exoName = exoReverse[col];
+                    //Is this not so???
+                    GekkoTime etime; string ename;
+                    DName dn1 = endoReverse[row];
+                    ename = dn1.GetNameWithWorkAndWithoutTurtle();
+                    etime = dn1.GetTime();
+
+                    //string exoName = exoReverse[col];
+                    //GekkoTime xtime; string xname;
+                    //ConvertFromTurtleName(exoName, true, out xname, out xtime);
+
                     GekkoTime xtime; string xname;
-                    ConvertFromTurtleName(exoName, true, out xname, out xtime);
+                    DName dn2 = exoReverse[col];
+                    xname = dn2.GetNameWithWorkAndWithoutTurtle();
+                    xtime = dn2.GetTime();
 
                     string enewName = ConvertToTurtleName(ename, 0);
                     int xlag = xtime.Subtract(etime);
@@ -2129,7 +2148,8 @@ namespace Gekko
                                     bool bad = false;
                                     if (ddd1 != ddd2) bad = true;
                                     if (G.IsBothNumericalError(ddd1, ddd2)) bad = false;
-                                    if (bad) MessageBox.Show("Decomp problem, check that!");
+                                    if (bad) 
+                                        MessageBox.Show("Decomp problem, check that!");
                                 }
 
                                 ts3.SetData(time, ddd2);
@@ -2144,24 +2164,29 @@ namespace Gekko
             }
         }
 
-        private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, GekkoDictionaryBlanks<int> all, List<string> eqNames, List<string> problem)
+        private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, Dictionary<DName, int> all, List<string> eqNames, List<DName> problem)
         {
-            for (int i = 0; i < problem.Count; i++)
-            {                
-                int idx = problem[i].LastIndexOf(':'); 
-                if (idx != -1) problem[i] = problem[i].Substring(idx + 1);
-                problem[i] = G.ReplaceTurtle(problem[i]).Replace(", ", ",");
-            }
+            //for (int i = 0; i < problem.Count; i++)
+            //{                
+            //    int idx = problem[i].LastIndexOf(':'); 
+            //    if (idx != -1) problem[i] = problem[i].Substring(idx + 1);
+            //    problem[i] = G.ReplaceTurtle(problem[i]).Replace(", ", ",");
+            //}
 
             List<string> all2 = new List<string>();
-            foreach (string s2 in all.GetKeys())
+            //foreach (DName s2 in all.Keys.ToList())
+            //{
+            //    string s5 = G.ReplaceTurtle(s2);
+            //    //G.Chop... will not work because there may be two "["
+            //    int idx = s5.LastIndexOf(':'); 
+            //    if (idx != -1) s5 = s5.Substring(idx + 1);
+            //    s5 = G.ReplaceTurtle(s5).Replace(", ", ",");
+            //    if (!s2.Contains(Globals.decompResidualName)) all2.Add(s5);
+            //}
+
+            foreach (DName s2 in all.Keys.ToList())
             {
-                string s5 = G.ReplaceTurtle(s2);
-                //G.Chop... will not work because there may be two "["
-                int idx = s5.LastIndexOf(':'); 
-                if (idx != -1) s5 = s5.Substring(idx + 1);
-                s5 = G.ReplaceTurtle(s5).Replace(", ", ",");
-                if (!s2.Contains(Globals.decompResidualName)) all2.Add(s5);
+                if (!s2.GetName().Contains(Globals.decompResidualName)) all2.Add(s2.ToString());
             }
 
             string extra0 = "For the period " + per1.ToString() + "-" + per2.ToString();            
@@ -2187,12 +2212,12 @@ namespace Gekko
             string extra1 = "not appear in any equations. You may possibly need to lag/lead one or more equations with a suffix like for instance '[-1]' or '[+1]'." + G.NL + G.NL + extra3 + G.NL + extra5;
             string s = null;
             if (problem.Count == 1)
-            {
-                s = extra0 + ", the endogenous variable " + Stringlist.GetListWithCommas(problem.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList()) + " does " + extra1;
+            {                
+                s = extra0 + ", the endogenous variable " + Stringlist.GetListWithCommas(problem.Select(x => x.ToString()).ToList().OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList()) + " does " + extra1;
             }
             else
             {
-                s = extra0 + ", the endogenous variables: " + Stringlist.GetListWithCommas(problem.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList()) + " do " + extra1;
+                s = extra0 + ", the endogenous variables: " + Stringlist.GetListWithCommas(problem.Select(x => x.ToString()).ToList().OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList()) + " do " + extra1;
             }
 
             WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
