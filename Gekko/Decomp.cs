@@ -5242,44 +5242,50 @@ namespace Gekko
                         Cell c = table2.Get(i, j);
                         if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
                         double d = c.number;
-                        if (double.IsNaN(d))
+                        if (false)
                         {
-                            bool hit = false;
-                            List<string> xx = c.vars_hack;
-                            if (xx != null)
+                            //TODO
+                            //TODO Activate this to get 'N' instead of 'M' for a missing variable
+                            //TODO
+                            if (double.IsNaN(d))
                             {
-                                foreach (string s in xx)
+                                bool hit = false;
+                                List<string> xx = c.vars_hack;
+                                if (xx != null)
                                 {
-                                    int a = -12345; model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(s), out a);
-                                    if (a == -12345) continue;
-
-                                    bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-                                    bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-
-                                    if (b1) //first-position databank checked
+                                    foreach (string s in xx)
                                     {
-                                        if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                        int a = -12345; model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(s), out a);
+                                        if (a == -12345) continue;
+
+                                        bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                        bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                        if (b1) //first-position databank checked
                                         {
-                                            hit = true;
-                                            goto Lbl1;
+                                            if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                            {
+                                                hit = true;
+                                                goto Lbl1;
+                                            }
                                         }
-                                    }
 
-                                    if (b2) //ref databank checked
-                                    {
-                                        if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                        if (b2) //ref databank checked
                                         {
-                                            hit = true;
-                                            goto Lbl1;
+                                            if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                            {
+                                                hit = true;
+                                                goto Lbl1;
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        Lbl1:;
-                            if (hit)
-                            {
-                                //c.number = Globals.missingVariableArtificialNumber;
-                                c.numberShouldShowAsN = true;
+                            Lbl1:;
+                                if (hit)
+                                {
+                                    //c.number = Globals.missingVariableArtificialNumber;
+                                    c.numberShouldShowAsN = true;
+                                }
                             }
                         }
                     }
