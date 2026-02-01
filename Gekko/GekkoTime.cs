@@ -25,8 +25,8 @@ namespace Gekko
         None,     //used to signal non-freq variable, for instance a VAL   
         D,        //daily        
         W,        //weekly
-        Empty3,   // --------> this and the following can be filled/changed
-        Empty4,
+        Lag,      //used for lags, where the .super short can be negative.
+        Empty4,   // --------> this and the following can be filled/changed
         Empty5,
         Empty6,
         Empty7,
@@ -238,6 +238,21 @@ namespace Gekko
             FreqCheck();
         }
 
+        /// <summary>
+        /// This constructor can only be used for lags. Set 2 lags with GekkoTime(EFreq.Lag, -2).
+        /// </summary>
+        /// <param name="freq2"></param>
+        /// <param name="lag"></param>
+        public GekkoTime(EFreq freq2, int lag)
+        {
+            if (freq2 != EFreq.Lag) new Error("GekkoTime constructor can only be used for lags");
+            freq = freq2;
+            super = (short)lag;
+            sub = (short)1;
+            subsub = (short)1;
+            FreqCheck();
+        }
+
         private void FreqCheck()
         {
             //========================================================================================================
@@ -292,6 +307,10 @@ namespace Gekko
                 {
                     new Error("Freq 'u' cannot have subperiod > 1");
                 }
+            }
+            else if (freq == EFreq.Lag)
+            {
+                //do nothing
             }
         }
 

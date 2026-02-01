@@ -960,34 +960,42 @@ namespace Gekko
         //variable names without time dimension 
 
         [ProtoMember(14)]
-        public string[] dict_FromANumberToVarName = null;
+        //public string[] dict_FromANumberToVarName = null;
+        public Multidim2Element[] dict_FromANumberToVarName = null;
 
         [ProtoMember(15)]
-        public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
+        //public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
+        public Dictionary<Multidim2Element, int> dict_FromVarNameToANumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
 
         //eq numbers in raw model, corresponds to i/ii dimension
         [ProtoMember(16)]
-        public string[] dict_FromEqChunkNumberToEqName = null;
+        //public string[] dict_FromEqChunkNumberToEqName = null;
+        public Multidim2Element[] dict_FromEqChunkNumberToEqName = null;
 
         [ProtoMember(17)]
-        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
+        //public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
+        public Dictionary<Multidim2Element, int> dict_FromEqNameToEqChunkNumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
 
         //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
         [ProtoMember(18)]
-        public string[] dict_FromEqNumberToEqName = null;
+        //public string[] dict_FromEqNumberToEqName = null;
+        public Multidim2Element[] dict_FromEqNumberToEqName = null;
 
         [ProtoMember(19)]
-        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
+        //public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
+        public Dictionary<Multidim2Element, int> dict_FromEqNameToEqNumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
 
         //lowest level variable numbers (in unfolded/unrolled model)
         [ProtoMember(20)]
-        public string[] dict_FromVarNumberToVarName = null;
+        //public string[] dict_FromVarNumberToVarName = null;
+        public Multidim2Element[] dict_FromVarNumberToVarName = null;
 
         [ProtoMember(21)]
-        public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
+        //public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
+        public Dictionary<Multidim2Element, int> dict_FromVarNameToVarNumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
 
         //from lowest level equation number to chunk equations number
-        [ProtoMember(22)]
+        [ProtoMember(22)]        
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         [ProtoMember(23)]
@@ -1072,7 +1080,7 @@ namespace Gekko
         public int GetEqNumber(string eqName)
         {
             //TODO: handle errors
-            return this.dict_FromEqNameToEqNumber.GetInt(eqName);
+            return this.dict_FromEqNameToEqNumber[G.HACK1(eqName)];
         }
 
         /// <summary>
@@ -1084,7 +1092,7 @@ namespace Gekko
         public string GetEqName(int eqNumber)
         {
             //TODO: handle errors
-            return this.dict_FromEqNumberToEqName[eqNumber];
+            return this.dict_FromEqNumberToEqName[eqNumber].ToString();
         }
 
         /// <summary>
@@ -1096,7 +1104,7 @@ namespace Gekko
         public string GetVarNameA(int varNumber)
         {
             //TODO: handle errors
-            return this.dict_FromANumberToVarName[varNumber];
+            return this.dict_FromANumberToVarName[varNumber].ToString();
         }
 
         /// <summary>
@@ -1280,8 +1288,8 @@ namespace Gekko
         /// <param name="varnameWithoutFreq"></param>
         /// <returns></returns>
         public List<GekkoTime> GetFixedPeriods(string varnameWithoutFreq)
-        {            
-            int aNumber = this.dict_FromVarNameToANumber.GetInt(varnameWithoutFreq);
+        {
+            int aNumber = this.dict_FromVarNameToANumber[G.HACK1(varnameWithoutFreq)];
             List<GekkoTime> list = new List<GekkoTime>();
             for (int timeIndex = 0; timeIndex < this.fix.Length; timeIndex++)
             {
@@ -1416,7 +1424,7 @@ namespace Gekko
                 List<string> names = new List<string>();
                 foreach (int aNumber in list)
                 {
-                    names.Add(this.dict_FromANumberToVarName[aNumber]);
+                    names.Add(this.dict_FromANumberToVarName[aNumber].ToString());
                 }
                 names = names.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
                 foreach (string name in names)
@@ -1492,7 +1500,7 @@ namespace Gekko
 
             for (int i = 0; i < this.CountVars(2); i++)
             {
-                string name = this.dict_FromANumberToVarName[i];
+                string name = this.dict_FromANumberToVarName[i].ToString();
 
                 if (Globals.greuHack && name.Contains("'")) continue;
 
@@ -1555,10 +1563,10 @@ namespace Gekko
         {            
             if (type == 1) return this.dict_FromEqNumberToEqName.Length;            
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            foreach (string s2 in this.dict_FromEqNumberToEqName)
+            foreach (Multidim2Element s2 in this.dict_FromEqNumberToEqName)
             {
-                if (!this.t1.IsNull() && s2 == "") continue;
-                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                if (!this.t1.IsNull() && s2.ToString() == "") continue;
+                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2.ToString(), false);
                 if (type == 2)
                 {
                     if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
@@ -1582,15 +1590,17 @@ namespace Gekko
         {
             List<string> rv = null;
             if (type == 1)
-            {
-                rv = this.dict_FromEqNumberToEqName.ToList();
+            {                
+                rv = new List<string>();
+                foreach (Multidim2Element mm in this.dict_FromEqNumberToEqName) rv.Add(mm.ToString());
+                return rv;
             }
             else
             {
                 GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s2 in this.dict_FromEqNumberToEqName)
+                foreach (Multidim2Element s2 in this.dict_FromEqNumberToEqName)
                 {
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2.ToString(), false);
                     if (type == 2)
                     {
                         if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
@@ -1625,9 +1635,9 @@ namespace Gekko
             else if (type == 3)
             {
                 GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (string s2 in this.dict_FromVarNumberToVarName)
+                foreach (Multidim2Element s2 in this.dict_FromVarNumberToVarName)
                 {                    
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2.ToString(), false);
                     if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
                 }
                 return temp.Count;
@@ -1646,11 +1656,15 @@ namespace Gekko
             List<string> rv = null;
             if (type == 1)
             {
-                rv = this.dict_FromVarNumberToVarName.ToList();
+                rv = new List<string>();
+                foreach (Multidim2Element mm in this.dict_FromVarNumberToVarName) rv.Add(mm.ToString());
+                return rv;
             }
             else if (type == 2)
             {
-                return this.dict_FromANumberToVarName.ToList();
+                rv = new List<string>();
+                foreach (Multidim2Element mm in this.dict_FromANumberToVarName) rv.Add(mm.ToString());
+                return rv;                
             }
             else if (type == 3)
             {
@@ -1662,9 +1676,9 @@ namespace Gekko
                 else
                 {
                     GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s2 in this.dict_FromANumberToVarName)
+                    foreach (Multidim2Element s2 in this.dict_FromANumberToVarName)
                     {
-                        string name = G.Chop_GetName(s2);                        
+                        string name = G.Chop_GetName(s2.ToString());
                         if (!temp.ContainsKey(name)) temp.Add(name, 0);
                     }
                     rv = temp.Keys.ToList();
@@ -1702,7 +1716,7 @@ namespace Gekko
             string freq = G.ConvertFreq(Program.options.freq);
             for (int i = 0; i < this.CountVars(2); i++)
             {
-                string name = this.dict_FromANumberToVarName[i];
+                string name = this.dict_FromANumberToVarName[i].ToString();
                 Series ts = DatabankAHelperScalarModel(db, i, name, false, isRef, this.isTimeless[i]);
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
@@ -1915,7 +1929,7 @@ namespace Gekko
             List<string> mathRename = null;
             if (useMathRename) mathRename = new List<string>();
 
-            int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
+            int eq = this.dict_FromEqNameToEqNumber[G.HACK1(name)];
             if (eq == -12345)
             {
                 if (sd == null)

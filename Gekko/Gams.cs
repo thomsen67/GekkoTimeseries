@@ -1154,9 +1154,9 @@ namespace Gekko
             ModelGams modelGams = model.modelGams;
             List<EqInfoSimple> rv = new List<EqInfoSimple>();
 
-            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());            
+            if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
-            int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
+            int aNumber = modelGamsScalar.dict_FromVarNameToANumber[G.HACK1(variableName)];
             if (aNumber == -12345)
             {
                 return rv;
@@ -1979,7 +1979,7 @@ namespace Gekko
             List<IdentityHelper> eqs = new List<IdentityHelper>();
             for (int i = 0; i < n; i++)
             {
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i], false);
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i].ToString(), false);
                 var equationName = helper2.resultingFullName;
 
                 if (helper2.time.LargerThanOrEqual(t1) && helper2.time.SmallerThanOrEqual(t2))
@@ -2003,7 +2003,7 @@ namespace Gekko
                     if (c1 == c2)
                     {
                         a2++;
-                        string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i].ToString();
                         string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);
                         bool found = false;
                         foreach (IdentityHelper ih in eqs)
@@ -2517,36 +2517,18 @@ namespace Gekko
 
                     if (freq == EFreq.A)
                     {                        
-                        if (part.Length == 4 && (part[0] == '1' || part[0] == '2'))  //Must be 1xxx or 2xxx
+                        if (G.LooksLikeYear(part))
                         {
-                            bool good = true;
-                            for (int i2 = 1; i2 < part.Length; i2++)
-                            {
-                                if (!Char.IsDigit(part[i2])) { good = false; break; }
-                            }
-                            if (good)
-                            {
-                                if (timePart != -12345) new Error("2 time indexes found: " + nameWithIndex);
-                                timePart = counter;
-                            }
+                            if (timePart != -12345) new Error("2 time indexes found: " + nameWithIndex);
+                            timePart = counter;
                         }
                     }
                     else if (freq == EFreq.Q)
-                    {
-                        if (part.Length == 6 && (part[0] == '1' || part[0] == '2'))  //Must be 1xxxqx or 2xxxqx
+                    {                        
+                        if (G.LooksLikeQuarter(part))
                         {
-                            bool good = true;
-                            for (int i2 = 1; i2 < 4; i2++)
-                            {
-                                if (!Char.IsDigit(part[i2])) { good = false; break; }
-                            }
-                            if (part[4] != 'q' && part[4] != 'Q') { good = false; break; }
-                            if (part[5] != '1' && part[5] != '2' && part[5] != '3' && part[5] != '4') { good = false; break; }
-                            if (good)
-                            {
-                                if (timePart != -12345) new Error("2 time indexes found: " + nameWithIndex);
-                                timePart = counter;
-                            }
+                            if (timePart != -12345) new Error("2 time indexes found: " + nameWithIndex);
+                            timePart = counter;
                         }
                     }
                     else new Error("Model: only Annual and Quarterly supported at the moment");
@@ -2598,7 +2580,7 @@ namespace Gekko
             {
                 nameWithoutIndex = nameWithIndex;
             }
-        }
+        }        
 
         private static EFreq GetResultingFreq(EFreq gekkoModelFreq)
         {
@@ -2619,7 +2601,7 @@ namespace Gekko
                 //}
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == "")
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].ToString() == "")
                     {
                         modelGamsScalar.precedents.Add(new ModelScalarEquation());
                         continue;
@@ -2657,7 +2639,7 @@ namespace Gekko
             {
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == "")
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].ToString() == "")
                     {                        
                         continue;
                     }

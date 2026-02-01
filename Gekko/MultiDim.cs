@@ -271,10 +271,15 @@ namespace Gekko
         public readonly StringOrTime[] storage;
 
         [ProtoMember(2)]
-        private readonly int _sensitiveHash;
+        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time.
 
         [ProtoMember(3)]
-        private readonly int _insensitiveHash;
+        private readonly int sensitiveHash;
+
+        [ProtoMember(4)]
+        private readonly int insensitiveHash;
+
+        bool useFreq = false;
 
         private Multidim2Element()
         {
@@ -294,6 +299,8 @@ namespace Gekko
                 var si = storage[i];
                 if (si.isTime)
                 {
+                    if (this.timePosition != -1) new Error("Only 1 time element allowed");
+                    this.timePosition = i;
                     int tHash = si.timeValue.GetHashCode();
                     sHash = sHash * 31 + tHash;
                     iHash = iHash * 31 + tHash;
@@ -304,24 +311,27 @@ namespace Gekko
                     iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(si.stringValue);
                 }
             }
-            _sensitiveHash = sHash;
-            _insensitiveHash = iHash;
+            sensitiveHash = sHash;
+            insensitiveHash = iHash;
         }
         
         public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
         
         public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
                 
-        public int GetHashCode(bool ignoreCase) => ignoreCase ? _insensitiveHash : _sensitiveHash;        
+        public int GetHashCode(bool ignoreCase) => ignoreCase ? insensitiveHash : sensitiveHash;        
 
         public override string ToString()
         {
+            if (this.storage.Length == 0) new Error("hov");
+            string name = this.storage[0].GetString();
+            if (this.useFreq) name += "!a";
             List<string> temp = new List<string>();
-            foreach (StringOrTime s in storage)
+            for (int i = 1; i < this.storage.Length; i++)
             {
-                temp.Add(s.ToString());
+                temp.Add(this.storage[i].ToString());
             }
-            return Stringlist.GetListWithCommas(temp, "");
+            return name + "[" + Stringlist.GetListWithCommas(temp, "") + "]";
         }        
     }
 
@@ -344,9 +354,19 @@ namespace Gekko
             stringValue = value;
         }
 
+        public string GetString()
+        {
+            if (this.isTime) new Error("Hov");
+            return this.stringValue;
+        }
+
+        public GekkoTime GetTime()
+        {
+            if (!this.isTime) new Error("Hov");
+            return this.timeValue;
+        }
+
         public static implicit operator StringOrTime(string s) => new StringOrTime(s);
         public static implicit operator StringOrTime(GekkoTime t) => new StringOrTime(t);
     }
-
-
 }

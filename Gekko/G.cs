@@ -2904,6 +2904,50 @@ namespace Gekko
             return 0;
         }
 
+        public static bool HACKHASINDEX(Multidim2Element m) 
+        {
+            int i = 0; if (m.timePosition >= 0) i = 1;
+            if (m.storage.Length - i - 1 > 0) return true;
+            return false;
+        }
+
+        public static string HACKGETNAME(Multidim2Element m)
+        {
+            if (m.storage[0].isTime) new Error("Hov");
+            else return m.storage[0].stringValue;
+            return null;
+        }
+
+        /// <summary>
+        /// Hacky, try to get rid of it when scalar model dicts are done
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static Multidim2Element HACK1(string s) 
+        {
+            string bank; string name; string freq; string[] indexes;
+            G.Chop_Chop(s, out bank, out name, out freq, out indexes);
+            List<StringOrTime> m = new List<StringOrTime>();
+            string s3 = name;
+            if (freq != null) s3 += "!" + freq;
+            m.Add(s3);
+            if (indexes != null)
+            {
+                foreach (string s2 in indexes)
+                {
+                    if (G.LooksLikeYear(s2))
+                    {
+                        m.Add(GekkoTime.FromStringToGekkoTime(s2));
+                    }
+                    else
+                    {
+                        m.Add(s2);
+                    }
+                }
+            }
+            return new Multidim2Element(m.ToArray());
+        }
+
         public static int RoundUpToNearest32(int value)
         {
             int d = (value + 31) & ~31;
@@ -5938,6 +5982,36 @@ namespace Gekko
         public static string GekkoExeFolder()
         {
             return Path.GetDirectoryName(G.GekkoExePath());
+        }
+
+        public static bool LooksLikeYear(string s)
+        {
+            bool good = false;
+            if (s.Length == 4 && (s[0] == '1' || s[0] == '2'))  //Must be 1xxx or 2xxx
+            {
+                good = true;
+                for (int i2 = 1; i2 < s.Length; i2++)
+                {
+                    if (!Char.IsDigit(s[i2])) return false;
+                }
+            }
+            return good;
+        }
+
+        public static bool LooksLikeQuarter(string s)
+        {
+            bool good = false;
+            if (s.Length == 6 && (s[0] == '1' || s[0] == '2'))  //Must be 1xxxqx or 2xxxqx
+            {
+                good = true;
+                for (int i2 = 1; i2 < 4; i2++)
+                {
+                    if (!Char.IsDigit(s[i2])) return false;
+                }
+                if (s[4] != 'q' && s[4] != 'Q') return false;
+                else if (s[5] != '1' && s[5] != '2' && s[5] != '3' && s[5] != '4') return false;
+            }
+            return good;
         }
 
         /// <summary>
