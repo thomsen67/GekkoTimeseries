@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ProtoBuf;
 using System.Globalization;
+using System.Linq;
 
 namespace Gekko
 {
@@ -346,15 +347,100 @@ namespace Gekko
 
         public override string ToString()
         {
-            if (this.storage.Length == 0) new Error("hov");
-            string name = this.storage[0].GetString();
-            if (this.useFreq) name += "!a";
+            if (this.storage == null || this.storage.Length == 0) new Error("Hov");
             List<string> temp = new List<string>();
-            for (int i = 1; i < this.storage.Length; i++)
+            for (int i = 0; i < this.storage.Length; i++)
             {
                 temp.Add(this.storage[i].ToString());
             }
-            return name + "[" + Stringlist.GetListWithCommas(temp, "") + "]";
+            return Stringlist.GetListWithCommas(temp, " ");
+        }
+    }
+
+    
+    /// <summary>
+    /// Has no frequency. May or may not have time
+    /// </summary>
+    [ProtoContract]    
+    public class DName : Multidim2Element 
+    {
+        private readonly int posName = 0;
+        //private readonly int posFreq = 1;
+        private readonly int posIndex = 1;
+        
+        public DName() : base() { } // Protobuf only
+
+        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) { }
+                
+        public string GetName() => this.storage[this.posName].GetString();
+
+        //public string GetFreq() => this.storage[this.posFreq].GetString();
+
+        public GekkoTime GetTime() => this.storage[this.timePosition].GetTime();
+                
+        private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
+        {
+            int offset = 1;
+            var result = new StringOrTime[indexes.Length + offset];
+            result[0] = name;
+            //result[1] = freq;            
+            Array.Copy(indexes, 0, result, offset, indexes.Length);
+            return result;
+        }
+
+        public override string ToString()
+        {
+            if (this.storage == null || this.storage.Length == 0) new Error("Hov");
+            string name = this.storage[this.posName].GetString();
+            List<string> temp = new List<string>();
+            for (int i = this.posIndex; i < this.storage.Length; i++)
+            {
+                temp.Add(this.storage[i].ToString());
+            }
+            if (temp.Count == 0) return name;
+            else return name + "[" + Stringlist.GetListWithCommas(temp, "") + "]";
+        }
+
+        /// <summary>
+        /// Hacky, try to get rid of it when scalar model dicts are done
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static DName HACK1(string s)
+        {
+            string bank; string name; string freq; string[] indexes;
+            G.Chop_Chop(s, out bank, out name, out freq, out indexes);
+            List<StringOrTime> m = new List<StringOrTime>();
+            //string s3 = name;
+            //if (freq != null) s3 += "!" + freq;
+            //m.Add(s3);
+            if (indexes != null)
+            {
+                foreach (string s2 in indexes)
+                {
+                    if (G.LooksLikeYear(s2))
+                    {
+                        m.Add(GekkoTime.FromStringToGekkoTime(s2));
+                    }
+                    else
+                    {
+                        m.Add(s2);
+                    }
+                }
+            }
+            return new DName(name, m.ToArray());
+        }
+
+        public bool HACKHASINDEX()
+        {
+            if (this.storage.Length - 1 >= this.posIndex) return true;
+            return false;            
+        }
+
+        public string HACKGETNAME()
+        {            
+            return this.storage[0].GetString();
+            return null;
         }
     }
 
@@ -400,80 +486,14 @@ namespace Gekko
             return this.timeValue;
         }
 
+        public override string ToString()
+        {
+            if (this.isTime) return this.GetTime().ToString();
+            else return this.GetString();
+        }
+
         public static implicit operator StringOrTime(string s) => new StringOrTime(s);
         public static implicit operator StringOrTime(GekkoTime t) => new StringOrTime(t);
     }
 
-    /// <summary>
-    /// Has no frequency. May or may not have time
-    /// </summary>
-    [ProtoContract]    
-    public class DName : Multidim2Element 
-    {
-        private readonly int posName = 0;
-        //private readonly int posFreq = 1;
-        private readonly int posIndex = 1;
-        
-        public DName() : base() { } // Protobuf only
-
-        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) { }
-                
-        public string GetName() => this.storage[this.posName].GetString();
-
-        //public string GetFreq() => this.storage[this.posFreq].GetString();
-
-        public GekkoTime GetTime() => this.storage[this.timePosition].GetTime();
-                
-        private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
-        {
-            int offset = 1;
-            var result = new StringOrTime[indexes.Length + offset];
-            result[0] = name;
-            //result[1] = freq;            
-            Array.Copy(indexes, 0, result, offset, indexes.Length);
-            return result;
-        }
-
-        /// <summary>
-        /// Hacky, try to get rid of it when scalar model dicts are done
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static DName HACK1(string s)
-        {
-            string bank; string name; string freq; string[] indexes;
-            G.Chop_Chop(s, out bank, out name, out freq, out indexes);
-            List<StringOrTime> m = new List<StringOrTime>();
-            //string s3 = name;
-            //if (freq != null) s3 += "!" + freq;
-            //m.Add(s3);
-            if (indexes != null)
-            {
-                foreach (string s2 in indexes)
-                {
-                    if (G.LooksLikeYear(s2))
-                    {
-                        m.Add(GekkoTime.FromStringToGekkoTime(s2));
-                    }
-                    else
-                    {
-                        m.Add(s2);
-                    }
-                }
-            }
-            return new DName(name, m.ToArray());
-        }
-
-        public bool HACKHASINDEX()
-        {
-            if (this.storage.Length - 1 >= this.posIndex) return true;
-            return false;            
-        }
-
-        public string HACKGETNAME()
-        {            
-            return this.storage[0].GetString();
-            return null;
-        }
-    }
 }
