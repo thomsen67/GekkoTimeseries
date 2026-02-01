@@ -6,6 +6,13 @@ using System.Globalization;
 namespace Gekko
 {
 
+    public enum EMultiDimType
+    {
+        None,
+        NameAndIndexFreq,
+        NameAndIndexNoFreq
+    }
+
     [ProtoContract]
     public class Multidim
     {
@@ -192,36 +199,36 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;
             if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but we keep it for now
-            if (x.storage.Length != y.storage.Length) return false;            
+            if (x.storage.Length != y.storage.Length) return false;
             for (int i = 0; i < x.storage.Length; i++)
             {
                 var elX = x.storage[i];
                 var elY = y.storage[i];
 
-                if (elX.isTime != elY.isTime) return false;
-                if (elX.isTime)
+                if (elX.IsTime() != elY.IsTime()) return false;
+                if (elX.IsTime())
                 {
-                    if (elX.timeValue.CompareTo(elY.timeValue) != 0) return false;
+                    if (elX.GetTime().CompareTo(elY.GetTime()) != 0) return false;
                 }
                 else
                 {
                     int result;
                     if (_ignoreCase)
                     {
-                        if (!string.Equals(elX.stringValue, elY.stringValue, StringComparison.OrdinalIgnoreCase)) return false;
+                        if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.OrdinalIgnoreCase)) return false;
                     }
                     else
                     {
-                        if (!string.Equals(elX.stringValue, elY.stringValue, StringComparison.Ordinal)) return false;
+                        if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.Ordinal)) return false;
                     }
-                }                
+                }
             }
             return true;
         }
 
         public int GetHashCode(Multidim2Element obj)
         {
-            if (obj == null) return 0;            
+            if (obj == null) return 0;
             return obj.GetHashCode(_ignoreCase); //pick the right one
         }
     }
@@ -241,22 +248,22 @@ namespace Gekko
             if (x == null) return -1;
             if (y == null) return 1;
             if (x.storage.Length != y.storage.Length) return x.storage.Length.CompareTo(y.storage.Length);
-            
+
             for (int i = 0; i < x.storage.Length; i++)
             {
                 var xi = x.storage[i];
                 var yi = y.storage[i];
-                if (xi.isTime != yi.isTime) return xi.isTime ? -1 : 1;
-                if (xi.isTime)
-                {                    
-                    int compare = xi.timeValue.CompareTo(yi.timeValue);
+                if (xi.IsTime() != yi.IsTime()) return xi.IsTime() ? -1 : 1;
+                if (xi.IsTime())
+                {
+                    int compare = xi.GetTime().CompareTo(yi.GetTime());
                     if (compare != 0) return compare;
                 }
                 else
                 {
                     int compare;
-                    if (_ignoreCase) compare = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
-                    else compare = G.CompareNatural(xi.stringValue, yi.stringValue, CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    if (_ignoreCase) compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
+                    else compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.Ordinal);
                     if (compare != 0) return compare;
                 }
             }
@@ -268,27 +275,36 @@ namespace Gekko
     public class Multidim2Element
     {
         [ProtoMember(1)]
-        public readonly StringOrTime[] storage;
+        public readonly StringOrTime[] storage = null;
 
         [ProtoMember(2)]
         public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time.
 
         [ProtoMember(3)]
-        private readonly int sensitiveHash;
+        public readonly EMultiDimType type = EMultiDimType.None;
 
         [ProtoMember(4)]
+        private readonly int sensitiveHash;
+
+        [ProtoMember(5)]
         private readonly int insensitiveHash;
 
         bool useFreq = false;
 
-        private Multidim2Element()
+        public Multidim2Element()
         {
-            //only because protobuf needs it, not for outside use
+            //Empty object, kind of null
         }
 
-        public Multidim2Element(StringOrTime[] elements)
+        public Multidim2Element(StringOrTime[] elements) : this(elements, EMultiDimType.None)
         {
-            storage = elements;
+            //new Error("Forbidden at the moment");
+        }
+
+        public Multidim2Element(StringOrTime[] elements, EMultiDimType type)
+        {
+            this.storage = elements;
+            this.type = type;
 
             // Calculate hash once at birth
             int sHash = 17;
@@ -297,29 +313,35 @@ namespace Gekko
             for (int i = 0; i < storage.Length; i++)
             {
                 var si = storage[i];
-                if (si.isTime)
+                if (si.IsTime())
                 {
                     if (this.timePosition != -1) new Error("Only 1 time element allowed");
                     this.timePosition = i;
-                    int tHash = si.timeValue.GetHashCode();
+                    int tHash = si.GetTime().GetHashCode();
                     sHash = sHash * 31 + tHash;
                     iHash = iHash * 31 + tHash;
                 }
-                else if (si.stringValue != null)
-                {                    
-                    sHash = sHash * 31 + StringComparer.Ordinal.GetHashCode(si.stringValue);
-                    iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(si.stringValue);
+                else if (si.GetString() != null)
+                {
+                    sHash = sHash * 31 + StringComparer.Ordinal.GetHashCode(si.GetString());
+                    iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(si.GetString());
                 }
             }
             sensitiveHash = sHash;
             insensitiveHash = iHash;
         }
-        
+
+        public bool HasContents()
+        {
+            if (this.storage == null || this.storage.Length == 0) return false;
+            return true;
+        }
+
         public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
-        
+
         public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
-                
-        public int GetHashCode(bool ignoreCase) => ignoreCase ? insensitiveHash : sensitiveHash;        
+
+        public int GetHashCode(bool ignoreCase) => ignoreCase ? insensitiveHash : sensitiveHash;
 
         public override string ToString()
         {
@@ -332,26 +354,31 @@ namespace Gekko
                 temp.Add(this.storage[i].ToString());
             }
             return name + "[" + Stringlist.GetListWithCommas(temp, "") + "]";
-        }        
+        }
     }
 
     public struct StringOrTime
     {
-        public readonly bool isTime = false;
-        public readonly GekkoTime timeValue;
-        public readonly string stringValue;
-                
+        private readonly bool isTime = false;
+        private readonly GekkoTime timeValue;
+        private readonly string stringValue;
+
         public StringOrTime(GekkoTime value)
         {
             this.isTime = true;
             timeValue = value;
-            stringValue = null;            
+            stringValue = null;
         }
-                
+
         public StringOrTime(string value)
         {
             timeValue = GekkoTime.tNull;
             stringValue = value;
+        }
+
+        public bool IsTime()
+        {
+            return this.isTime;
         }
 
         public string GetString()
@@ -368,5 +395,78 @@ namespace Gekko
 
         public static implicit operator StringOrTime(string s) => new StringOrTime(s);
         public static implicit operator StringOrTime(GekkoTime t) => new StringOrTime(t);
+    }
+
+    /// <summary>
+    /// Has no frequency. May or may not have time
+    /// </summary>
+    [ProtoContract]
+    public class DName : Multidim2Element 
+    {
+        private readonly int posName = 0;
+        //private readonly int posFreq = 1;
+        private readonly int posIndex = 1;
+        
+        public DName() : base() { } // Protobuf only
+
+        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) { }
+                
+        public string GetName() => this.storage[this.posName].GetString();
+
+        //public string GetFreq() => this.storage[this.posFreq].GetString();
+
+        public GekkoTime GetTime() => this.storage[this.timePosition].GetTime();
+                
+        private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
+        {
+            int offset = 1;
+            var result = new StringOrTime[indexes.Length + offset];
+            result[0] = name;
+            //result[1] = freq;            
+            Array.Copy(indexes, 0, result, offset, indexes.Length);
+            return result;
+        }
+
+        /// <summary>
+        /// Hacky, try to get rid of it when scalar model dicts are done
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static DName HACK1(string s)
+        {
+            string bank; string name; string freq; string[] indexes;
+            G.Chop_Chop(s, out bank, out name, out freq, out indexes);
+            List<StringOrTime> m = new List<StringOrTime>();
+            //string s3 = name;
+            //if (freq != null) s3 += "!" + freq;
+            //m.Add(s3);
+            if (indexes != null)
+            {
+                foreach (string s2 in indexes)
+                {
+                    if (G.LooksLikeYear(s2))
+                    {
+                        m.Add(GekkoTime.FromStringToGekkoTime(s2));
+                    }
+                    else
+                    {
+                        m.Add(s2);
+                    }
+                }
+            }
+            return new DName(name, m.ToArray());
+        }
+
+        public bool HACKHASINDEX()
+        {
+            if (this.storage.Length - 1 >= this.posIndex) return true;
+            return false;            
+        }
+
+        public string HACKGETNAME()
+        {            
+            return this.storage[0].GetString();
+            return null;
+        }
     }
 }

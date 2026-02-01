@@ -1001,7 +1001,7 @@ namespace Gekko
 
                 string s2 = G.Chop_DimensionAddLast(s, time.ToString(), null);
 
-                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[G.HACK1(s2)];
+                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[DName.HACK1(s2)];
                 if (eqNumber == -12345)
                 {
                     string s3 = null;
@@ -1830,7 +1830,7 @@ namespace Gekko
                                 string eqNamePretty = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp, true);
                                 eqNamesPretty.Add(eqNamePretty);
                             }
-                            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[G.HACK1(eqName)];
+                            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[DName.HACK1(eqName)];
 
                             List<TwoStrings> variables = new List<TwoStrings>();
 
@@ -2087,7 +2087,7 @@ namespace Gekko
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
 
-                    int aNumber = modelGamsScalar.dict_FromVarNameToANumber[G.HACK1(xname)];
+                    int aNumber = modelGamsScalar.dict_FromVarNameToANumber[DName.HACK1(xname)];
                     if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
                     {
                         xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
@@ -3365,7 +3365,7 @@ namespace Gekko
                 }                
                 
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)), false);
-                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[G.HACK1(s)];
+                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[DName.HACK1(s)];
                 if (eqNumber == -12345)
                 {
                     new Error("Could not find equation '" + s + "'");
@@ -5249,7 +5249,7 @@ namespace Gekko
                             {
                                 foreach (string s in xx)
                                 {
-                                    int a = model.modelGamsScalar.dict_FromVarNameToANumber[G.HACK1(s)];
+                                    int a = model.modelGamsScalar.dict_FromVarNameToANumber[DName.HACK1(s)];
                                     if (a == -12345) continue;
 
                                     bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
@@ -6518,12 +6518,12 @@ namespace Gekko
             bool variableExists = false;
             bool variableExistsAndHasIndex = false;
             string error = null;
-            foreach (KeyValuePair<Multidim2Element, int> kvp in modelGamsScalar.dict_FromVarNameToANumber)
+            foreach (KeyValuePair<DName, int> kvp in modelGamsScalar.dict_FromVarNameToANumber)
             {
-                if (G.Equal(G.HACKGETNAME(G.HACK1(variableName)), G.HACKGETNAME(kvp.Key)))
+                if (G.Equal((DName.HACK1(variableName).HACKGETNAME()), kvp.Key.HACKGETNAME()))
                 {
                     variableExists = true;
-                    if (G.HACKHASINDEX(kvp.Key)) variableExistsAndHasIndex = true;
+                    if (kvp.Key.HACKHASINDEX()) variableExistsAndHasIndex = true;
                     break;
                 }
             }
@@ -6576,10 +6576,10 @@ namespace Gekko
 
             Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
 
-            int a1 = modelGamsScalar.dict_FromVarNameToANumber[G.HACK1(x1)];
+            int a1 = modelGamsScalar.dict_FromVarNameToANumber[DName.HACK1(x1)];
             if (a1 == -12345) new Error(NonFoundInModelError(x1, modelGamsScalar));
 
-            int a2 = modelGamsScalar.dict_FromVarNameToANumber[G.HACK1(x2)];
+            int a2 = modelGamsScalar.dict_FromVarNameToANumber[DName.HACK1(x2)];
             if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));
 
             PeriodAndVariable pv1 = new PeriodAndVariable(timeIndex, a1);

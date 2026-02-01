@@ -779,14 +779,14 @@ namespace Gekko
                 helper.isTimeless[i] = true;
             }
 
-            helper.dict_FromANumberToVarName = new string[helper.dict_FromVarNameToANumber.Count()];
-            foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber.GetDictionaryForIteration())
+            helper.dict_FromANumberToVarName = new DName[helper.dict_FromVarNameToANumber.Count()];
+            foreach (KeyValuePair<DName, int> kvp in helper.dict_FromVarNameToANumber)
             {
                 helper.dict_FromANumberToVarName[kvp.Value] = kvp.Key;
             }
 
-            helper.dict_FromEqChunkNumberToEqName = new string[helper.dict_FromEqNameToEqChunkNumber.Count()];
-            foreach (KeyValuePair<string, int> kvp in helper.dict_FromEqNameToEqChunkNumber.GetDictionaryForIteration())
+            helper.dict_FromEqChunkNumberToEqName = new DName[helper.dict_FromEqNameToEqChunkNumber.Count()];
+            foreach (KeyValuePair<DName, int> kvp in helper.dict_FromEqNameToEqChunkNumber)
             {
                 helper.dict_FromEqChunkNumberToEqName[kvp.Value] = kvp.Key;
             }
@@ -870,9 +870,9 @@ namespace Gekko
                             new Error("Could not parse integer part of the string '" + sFix + "'");
                         }
 
-                        string inputName = helper.dict_FromVarNumberToVarName[id];
+                        string inputName = helper.dict_FromVarNumberToVarName[id].GetName();
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
-                        int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+                        int aNumber = helper.dict_FromVarNameToANumber[DName.HACK1(helper2.resultingFullName)];
                         if (aNumber == -12345)
                         {
                             if (Globals.greuHack) continue;
@@ -920,10 +920,10 @@ namespace Gekko
                     {
                         new Error("Could not parse integer part of the string '" + ss[0] + "'");
                     }
-                    
-                    string inputName = helper.dict_FromVarNumberToVarName[id];
+
+                    string inputName = helper.dict_FromVarNumberToVarName[id].GetName();
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
-                    int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+                    int aNumber = helper.dict_FromVarNameToANumber[DName.HACK1(helper2.resultingFullName)];
                     if (aNumber == -12345)
                     {
                         new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
@@ -1156,7 +1156,7 @@ namespace Gekko
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
-            int aNumber = modelGamsScalar.dict_FromVarNameToANumber[G.HACK1(variableName)];
+            int aNumber = modelGamsScalar.dict_FromVarNameToANumber[DName.HACK1(variableName)];
             if (aNumber == -12345)
             {
                 return rv;
@@ -2341,11 +2341,11 @@ namespace Gekko
                         {
                             eqCounts2 = int.Parse(sx);
                             substatus2 = 0;
-                            helper.dict_FromEqNumberToEqName = new string[eqCounts2];
+                            helper.dict_FromEqNumberToEqName = new DName[eqCounts2];
 
                             for (int i = 0; i < eqCounts2; i++)
                             {
-                                helper.dict_FromEqNumberToEqName[i] = "";  //because of protobuf when truncating periods
+                                helper.dict_FromEqNumberToEqName[i] = new DName();  //because of protobuf when truncating periods
                             }
 
                             helper.dict_FromEqNumberToEqChunkNumber = new int[eqCounts2];
@@ -2362,7 +2362,7 @@ namespace Gekko
                         {
                             varCounts2 = int.Parse(sx);
                             substatus2 = 0;
-                            helper.dict_FromVarNumberToVarName = new string[varCounts2];
+                            helper.dict_FromVarNumberToVarName = new DName[varCounts2];
                             break;
                         }
                     }
@@ -2404,9 +2404,15 @@ namespace Gekko
                     }
                     
                     eqName = nameWithoutIndexes;
-                    helper.dict_FromEqNumberToEqName[n] = nameWithIndexes;
-                    helper.dict_FromEqNameToEqNumber.Add(nameWithIndexes, n, b);  //filling this out could be postponed until decomp if loading is slow                        
-                    helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count(), b);
+                    DName temp1 = DName.HACK1(nameWithIndexes);
+                    helper.dict_FromEqNumberToEqName[n] = temp1;
+                    helper.dict_FromEqNameToEqNumber.Add(temp1, n);  //filling this out could be postponed until decomp if loading is slow                        
+                    DName temp2 = DName.HACK1(eqName);
+                    if (!helper.dict_FromEqNameToEqChunkNumber.ContainsKey(temp2))
+                    {
+                        helper.dict_FromEqNameToEqChunkNumber.Add(temp2, helper.dict_FromEqNameToEqChunkNumber.Count());
+                    }
+                    
                     helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
                 }
                 else if (status2 == EEquationsOrVariables.Variables)
@@ -2428,8 +2434,9 @@ namespace Gekko
                         fakeVarCounts2++;
                     }
 
-                    helper.dict_FromVarNumberToVarName[n] = nameWithIndexes;
-                    helper.dict_FromVarNameToVarNumber.Add(nameWithIndexes, n, b);
+                    DName temp5 = DName.HACK1(nameWithIndexes);
+                    helper.dict_FromVarNumberToVarName[n] = temp5;
+                    helper.dict_FromVarNameToVarNumber.Add(temp5, n);
 
                     GekkoTime t = GekkoTime.tNull;
                     if (time != null)
@@ -2457,7 +2464,12 @@ namespace Gekko
                         if (helper.t1.IsNull() || t.StrictlySmallerThan(helper.t1)) helper.t1 = t;
                         if (helper.t2.IsNull() || t.StrictlyLargerThan(helper.t2)) helper.t2 = t;
                     }
-                    helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(nameWithIndexesNoTime, helper.dict_FromVarNameToANumber.Count(), b);
+                    //helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(nameWithIndexesNoTime, helper.dict_FromVarNameToANumber.Count(), b);
+                    DName temp = DName.HACK1(nameWithIndexesNoTime);
+                    if (!helper.dict_FromVarNameToANumber.ContainsKey(temp))
+                    {
+                        helper.dict_FromVarNameToANumber.Add(temp, helper.dict_FromVarNameToANumber.Count());
+                    }
                 }
             }
         }
@@ -2799,7 +2811,7 @@ namespace Gekko
             string sEqLine = eqLine.ToString();
             int iDot = sEqLine.IndexOf("..");            
             int equationNumber = int.Parse(sEqLine.Substring(1, iDot - 1)) - 1; //0-based, ignoring the first 'e'                                       
-            if (helper.dict_FromEqNumberToEqName[equationNumber] != "")
+            if (helper.dict_FromEqNumberToEqName[equationNumber].HasContents())
             {
                 if (Globals.runningOnTTComputer && helper.dict_FromEqNumberToEqName[equationNumber] == null) G.WarningInternal("Did not expect null in equation name");
                 tokens = StringTokenizer.GetTokensWithLeftBlanks(sEqLine, more);  //1 empty "" token
@@ -2938,7 +2950,7 @@ namespace Gekko
                             throw;
                         }
 
-                        string eqname = helper.dict_FromEqNumberToEqName[number];
+                        string eqname = helper.dict_FromEqNumberToEqName[number].GetName();
 
                         if (eqname.StartsWith("e" + Globals.scalarModelExtraVariable))
                         {
@@ -2979,7 +2991,7 @@ namespace Gekko
                         {
                             new Error("Could not parse integer part of the string '" + th1.s + "'");
                         }
-                        string varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
+                        string varname = helper.dict_FromVarNumberToVarName[number].GetName(); //#oijlksaa
 
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
 
@@ -2993,7 +3005,7 @@ namespace Gekko
                             i1 = helper2.time.Subtract(helper.tBasis);
                         }
 
-                        int i2 = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+                        int i2 = helper.dict_FromVarNameToANumber[DName.HACK1(helper2.resultingFullName)];
 
                         int ii1 = helper.endo.Count;
                         int ii2 = helper.endo.Count + 1;
@@ -6164,9 +6176,8 @@ namespace Gekko
         public int known = 0;
         public int unique = 0;
 
-        public string[] dict_FromANumberToVarName = null;
-        public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
-
+        public DName[] dict_FromANumberToVarName = null;        
+        public Dictionary<DName, int> dict_FromVarNameToANumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
         public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
         public byte[][] fix = null;  //fixed varibles, around 2.5 MB for 85 years and 30.000 variables. Not too much.
@@ -6175,12 +6186,12 @@ namespace Gekko
         public List<List<int>> d = new List<List<int>>();
         public List<int> eqPointers = new List<int>();        
 
-        public string[] dict_FromEqNumberToEqName = null;
-        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
-        public string[] dict_FromVarNumberToVarName = null;
-        public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
-        public string[] dict_FromEqChunkNumberToEqName = null;
-        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
+        public DName[] dict_FromEqNumberToEqName = null;        
+        public Dictionary<DName, int> dict_FromEqNameToEqNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
+        public DName[] dict_FromVarNumberToVarName = null;
+        public Dictionary<DName, int> dict_FromVarNameToVarNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
+        public DName[] dict_FromEqChunkNumberToEqName = null;
+        public Dictionary<DName, int> dict_FromEqNameToEqChunkNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         public bool[] isTimeless = null;

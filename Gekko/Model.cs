@@ -961,29 +961,29 @@ namespace Gekko
 
         [ProtoMember(14)]
         //public string[] dict_FromANumberToVarName = null;
-        public Multidim2Element[] dict_FromANumberToVarName = null;
+        public DName[] dict_FromANumberToVarName = null;
 
         [ProtoMember(15)]
         //public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
-        public Dictionary<Multidim2Element, int> dict_FromVarNameToANumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromVarNameToANumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //eq numbers in raw model, corresponds to i/ii dimension
         [ProtoMember(16)]
         //public string[] dict_FromEqChunkNumberToEqName = null;
-        public Multidim2Element[] dict_FromEqChunkNumberToEqName = null;
+        public DName[] dict_FromEqChunkNumberToEqName = null;
 
         [ProtoMember(17)]
         //public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
-        public Dictionary<Multidim2Element, int> dict_FromEqNameToEqChunkNumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromEqNameToEqChunkNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
         [ProtoMember(18)]
         //public string[] dict_FromEqNumberToEqName = null;
-        public Multidim2Element[] dict_FromEqNumberToEqName = null;
+        public DName[] dict_FromEqNumberToEqName = null;
 
         [ProtoMember(19)]
         //public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
-        public Dictionary<Multidim2Element, int> dict_FromEqNameToEqNumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromEqNameToEqNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //lowest level variable numbers (in unfolded/unrolled model)
         [ProtoMember(20)]
@@ -992,7 +992,7 @@ namespace Gekko
 
         [ProtoMember(21)]
         //public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
-        public Dictionary<Multidim2Element, int> dict_FromVarNameToVarNumber = new Dictionary<Multidim2Element, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromVarNameToVarNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //from lowest level equation number to chunk equations number
         [ProtoMember(22)]        
@@ -1080,7 +1080,7 @@ namespace Gekko
         public int GetEqNumber(string eqName)
         {
             //TODO: handle errors
-            return this.dict_FromEqNameToEqNumber[G.HACK1(eqName)];
+            return this.dict_FromEqNameToEqNumber[DName.HACK1(eqName)];
         }
 
         /// <summary>
@@ -1289,7 +1289,7 @@ namespace Gekko
         /// <returns></returns>
         public List<GekkoTime> GetFixedPeriods(string varnameWithoutFreq)
         {
-            int aNumber = this.dict_FromVarNameToANumber[G.HACK1(varnameWithoutFreq)];
+            int aNumber = this.dict_FromVarNameToANumber[DName.HACK1(varnameWithoutFreq)];
             List<GekkoTime> list = new List<GekkoTime>();
             for (int timeIndex = 0; timeIndex < this.fix.Length; timeIndex++)
             {
@@ -1929,7 +1929,7 @@ namespace Gekko
             List<string> mathRename = null;
             if (useMathRename) mathRename = new List<string>();
 
-            int eq = this.dict_FromEqNameToEqNumber[G.HACK1(name)];
+            int eq = this.dict_FromEqNameToEqNumber[DName.HACK1(name)];
             if (eq == -12345)
             {
                 if (sd == null)
