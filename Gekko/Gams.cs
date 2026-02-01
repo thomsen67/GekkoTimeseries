@@ -870,9 +870,9 @@ namespace Gekko
                             new Error("Could not parse integer part of the string '" + sFix + "'");
                         }
 
-                        string inputName = helper.dict_FromVarNumberToVarName[id].GetName();
+                        string inputName = helper.dict_FromVarNumberToVarName[id].ToString();
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
-                        int aNumber = helper.dict_FromVarNameToANumber[DName.HACK1(helper2.resultingFullName)];
+                        int aNumber = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber);
                         if (aNumber == -12345)
                         {
                             if (Globals.greuHack) continue;
@@ -921,9 +921,9 @@ namespace Gekko
                         new Error("Could not parse integer part of the string '" + ss[0] + "'");
                     }
 
-                    string inputName = helper.dict_FromVarNumberToVarName[id].GetName();
+                    string inputName = helper.dict_FromVarNumberToVarName[id].ToString();
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
-                    int aNumber = helper.dict_FromVarNameToANumber[DName.HACK1(helper2.resultingFullName)];
+                    int aNumber = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber);
                     if (aNumber == -12345)
                     {
                         new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
@@ -1156,7 +1156,7 @@ namespace Gekko
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
-            int aNumber = modelGamsScalar.dict_FromVarNameToANumber[DName.HACK1(variableName)];
+            int aNumber = -12345;  modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(variableName), out aNumber);
             if (aNumber == -12345)
             {
                 return rv;
@@ -2950,7 +2950,7 @@ namespace Gekko
                             throw;
                         }
 
-                        string eqname = helper.dict_FromEqNumberToEqName[number].GetName();
+                        string eqname = helper.dict_FromEqNumberToEqName[number].ToString();
 
                         if (eqname.StartsWith("e" + Globals.scalarModelExtraVariable))
                         {
@@ -2991,7 +2991,7 @@ namespace Gekko
                         {
                             new Error("Could not parse integer part of the string '" + th1.s + "'");
                         }
-                        string varname = helper.dict_FromVarNumberToVarName[number].GetName(); //#oijlksaa
+                        string varname = helper.dict_FromVarNumberToVarName[number].ToString(); //#oijlksaa
 
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
 
@@ -3005,7 +3005,7 @@ namespace Gekko
                             i1 = helper2.time.Subtract(helper.tBasis);
                         }
 
-                        int i2 = helper.dict_FromVarNameToANumber[DName.HACK1(helper2.resultingFullName)];
+                        int i2 = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out i2);
 
                         int ii1 = helper.endo.Count;
                         int ii2 = helper.endo.Count + 1;

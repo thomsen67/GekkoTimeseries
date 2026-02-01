@@ -1080,7 +1080,8 @@ namespace Gekko
         public int GetEqNumber(string eqName)
         {
             //TODO: handle errors
-            return this.dict_FromEqNameToEqNumber[DName.HACK1(eqName)];
+            int i = -12345; this.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(eqName), out i);
+            return i;
         }
 
         /// <summary>
@@ -1289,7 +1290,7 @@ namespace Gekko
         /// <returns></returns>
         public List<GekkoTime> GetFixedPeriods(string varnameWithoutFreq)
         {
-            int aNumber = this.dict_FromVarNameToANumber[DName.HACK1(varnameWithoutFreq)];
+            int aNumber = -12345; this.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(varnameWithoutFreq), out aNumber);
             List<GekkoTime> list = new List<GekkoTime>();
             for (int timeIndex = 0; timeIndex < this.fix.Length; timeIndex++)
             {
@@ -1929,7 +1930,7 @@ namespace Gekko
             List<string> mathRename = null;
             if (useMathRename) mathRename = new List<string>();
 
-            int eq = this.dict_FromEqNameToEqNumber[DName.HACK1(name)];
+            int eq = -12345; this.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(name), out eq);
             if (eq == -12345)
             {
                 if (sd == null)
