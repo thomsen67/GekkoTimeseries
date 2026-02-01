@@ -272,6 +272,7 @@ namespace Gekko
     }
 
     [ProtoContract]
+    [ProtoInclude(101, typeof(DName))] //101 to not collide with other member numbers
     public class Multidim2Element
     {
         [ProtoMember(1)]
@@ -357,10 +358,16 @@ namespace Gekko
         }
     }
 
+    [ProtoContract]
     public struct StringOrTime
     {
+        [ProtoMember(1)]
         private readonly bool isTime = false;
+
+        [ProtoMember(2)]
         private readonly GekkoTime timeValue;
+
+        [ProtoMember(3)]
         private readonly string stringValue;
 
         public StringOrTime(GekkoTime value)
@@ -400,7 +407,7 @@ namespace Gekko
     /// <summary>
     /// Has no frequency. May or may not have time
     /// </summary>
-    [ProtoContract]
+    [ProtoContract]    
     public class DName : Multidim2Element 
     {
         private readonly int posName = 0;
