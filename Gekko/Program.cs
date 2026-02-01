@@ -17126,9 +17126,9 @@ namespace Gekko
 
         public static List<string> FindDependentVars(string varnameWithoutFreq, Model model, ModelGams modelGams, ModelGamsScalar modelGamsScalar, List<EqInfoSimple> eqsContainingVariable)
         {            
-            string vars = null;
-            string dependentVars = null;
-            GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
+            //string vars = null;
+            //string dependentVars = null;
+            //GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
 
             GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (EqInfoSimple eqInfo in eqsContainingVariable)

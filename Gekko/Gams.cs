@@ -66,16 +66,16 @@ namespace Gekko
         public List<string> indexes = null;
     }
 
-    [ProtoContract]
-    public class EqHelper
-    {
-        [ProtoMember(1)]
-        public GekkoDictionaryBlanks<double> scores = new GekkoDictionaryBlanks<double>();
-        [ProtoMember(2)]
-        public int eqNumber = -12345;
-        [ProtoMember(3)]
-        public string eqName = null;
-    }
+    //[ProtoContract]
+    //public class EqHelper
+    //{
+    //    [ProtoMember(1)]
+    //    public GekkoDictionaryBlanks<double> scores = new GekkoDictionaryBlanks<double>();
+    //    [ProtoMember(2)]
+    //    public int eqNumber = -12345;
+    //    [ProtoMember(3)]
+    //    public string eqName = null;
+    //}
 
     public class EquationLhsPoints
     {
