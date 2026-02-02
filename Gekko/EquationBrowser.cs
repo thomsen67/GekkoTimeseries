@@ -1602,7 +1602,7 @@ img {border-style: none;
                 for (int i = 0; i < n; i++)
                 {
                     string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i].ToString();
-                    if (eqName == "") continue;
+                    if (eqName == null) continue;
                     ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
                     var equationName = helper2.resultingFullName;
 
@@ -2162,7 +2162,7 @@ img {border-style: none;
                 //}
                 //if (combos.Count > bh.maxPages) break;
                 string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i].ToString();
-                if (eqName == "") continue;
+                if (eqName == null) continue;
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
                 var equationName = helper2.resultingFullName;
 

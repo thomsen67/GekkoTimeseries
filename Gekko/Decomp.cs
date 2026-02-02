@@ -2074,39 +2074,26 @@ namespace Gekko
                 // The period of the variable is not checked/matched at all (only the name), 
                 // but that is perhaps not
                 // necessary, since the period has already been filtered by the DECOMP time period.
-                GekkoTime gtNotUsed; string name;
-                //ConvertFromTurtleName(endoReverse[row], true, out name, out gtNotUsed);
+                GekkoTime gtNotUsed; string name;                
                 DName dn0 = endoReverse[row]; 
                 name = dn0.GetNameWithWorkAndWithoutTurtle();
                 gtNotUsed = dn0.GetTime();
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count(); col++)
-                {
-                    //string endoName = endoReverse[row];
-                    //GekkoTime etime; string ename;
-                    //ConvertFromTurtleName(endoName, true, out ename, out etime);
-
-                    //Is this not so???
-                    GekkoTime etime; string ename;
+                {                 
                     DName dn1 = endoReverse[row];
-                    ename = dn1.GetNameWithWorkAndWithoutTurtle();
-                    etime = dn1.GetTime();
-
-                    //string exoName = exoReverse[col];
-                    //GekkoTime xtime; string xname;
-                    //ConvertFromTurtleName(exoName, true, out xname, out xtime);
-
-                    GekkoTime xtime; string xname;
+                    string ename = dn1.GetNameWithWorkAndWithoutTurtle();
+                    GekkoTime etime = dn1.GetTime();                 
+                                        
                     DName dn2 = exoReverse[col];
-                    xname = dn2.GetNameWithWorkAndWithoutTurtle();
-                    xtime = dn2.GetTime();
+                    string xname = dn2.GetNameWithWorkAndWithoutTurtle();
+                    GekkoTime xtime = dn2.GetTime();
 
                     string enewName = ConvertToTurtleName(ename, 0);
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
-
-                    //int ... = -12345; modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(...), out ...);
+                                        
                     int aNumber = -12345; modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(xname), out aNumber);
                     if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
                     {
@@ -2148,8 +2135,7 @@ namespace Gekko
                                     bool bad = false;
                                     if (ddd1 != ddd2) bad = true;
                                     if (G.IsBothNumericalError(ddd1, ddd2)) bad = false;
-                                    if (bad) 
-                                        MessageBox.Show("Decomp problem, check that!");
+                                    if (bad) MessageBox.Show("Decomp problem, check that!");
                                 }
 
                                 ts3.SetData(time, ddd2);
@@ -2166,29 +2152,11 @@ namespace Gekko
 
         private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, Dictionary<DName, int> all, List<string> eqNames, List<DName> problem)
         {
-            //for (int i = 0; i < problem.Count; i++)
-            //{                
-            //    int idx = problem[i].LastIndexOf(':'); 
-            //    if (idx != -1) problem[i] = problem[i].Substring(idx + 1);
-            //    problem[i] = G.ReplaceTurtle(problem[i]).Replace(", ", ",");
-            //}
-
             List<string> all2 = new List<string>();
-            //foreach (DName s2 in all.Keys.ToList())
-            //{
-            //    string s5 = G.ReplaceTurtle(s2);
-            //    //G.Chop... will not work because there may be two "["
-            //    int idx = s5.LastIndexOf(':'); 
-            //    if (idx != -1) s5 = s5.Substring(idx + 1);
-            //    s5 = G.ReplaceTurtle(s5).Replace(", ", ",");
-            //    if (!s2.Contains(Globals.decompResidualName)) all2.Add(s5);
-            //}
-
             foreach (DName s2 in all.Keys.ToList())
             {
                 if (!s2.GetName().Contains(Globals.decompResidualName)) all2.Add(s2.ToString());
             }
-
             string extra0 = "For the period " + per1.ToString() + "-" + per2.ToString();            
             string extra3 = null;
             if (eqNames.Count > 0)
@@ -3841,17 +3809,6 @@ namespace Gekko
             foreach (string s in frame.frameDimensionNames.Keys)
             {
                 decompOptions2.all.Add(s);
-            }
-
-            if (false)
-            {
-                int xlag = 0; string temp = null;
-                ConvertFromTurtleName(decompDataMAINClone.lhs, true, out temp, out xlag);
-                string normalizerVariableWithIndex = null;
-                if (temp != null)
-                {
-                    normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
-                }
             }
 
             GekkoDictionary<string, bool> rownames2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);

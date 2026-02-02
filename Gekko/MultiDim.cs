@@ -277,7 +277,7 @@ namespace Gekko
     public class Multidim2Element
     {
         [ProtoMember(1)]
-        public readonly StringOrTime[] storage = null;
+        public readonly StringOrTime[] storage = null; //The whole object is considered null if .storage is == null
 
         [ProtoMember(2)]
         public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time.
@@ -333,10 +333,11 @@ namespace Gekko
             insensitiveHash = iHash;
         }
 
-        public bool HasContents()
+        public bool IsNull()
         {
-            if (this.storage == null || this.storage.Length == 0) return false;
-            return true;
+            //if (this.storage == null || this.storage.Length == 0) return true;
+            if (this.storage == null) return true;
+            return false;
         }
 
         public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
@@ -347,7 +348,7 @@ namespace Gekko
 
         public override string ToString()
         {
-            if (this.storage == null || this.storage.Length == 0) new Error("Hov");
+            if (this.storage == null) return null;
             List<string> temp = new List<string>();
             for (int i = 0; i < this.storage.Length; i++)
             {
@@ -393,7 +394,7 @@ namespace Gekko
 
         public override string ToString()
         {
-            if (this.storage == null || this.storage.Length == 0) new Error("Hov");
+            if (this.storage == null) return null;
             string name = this.storage[this.posName].GetString();
             List<string> temp = new List<string>();
             for (int i = this.posIndex; i < this.storage.Length; i++)
@@ -479,13 +480,13 @@ namespace Gekko
 
         public string GetString()
         {
-            if (this.isTime) new Error("Hov");
+            if (this.isTime) new Error("Error_GetString");
             return this.stringValue;
         }
 
         public GekkoTime GetTime()
         {
-            if (!this.isTime) new Error("Hov");
+            if (!this.isTime) new Error("Error_GetTime");
             return this.timeValue;
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 
 namespace Gekko
-{
+{    
     public class Decomp_OLD
     {
 
@@ -1472,4 +1472,5 @@ namespace Gekko
 
 
     }
+    
 }

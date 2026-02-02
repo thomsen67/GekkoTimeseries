@@ -2613,7 +2613,7 @@ namespace Gekko
                 //}
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].ToString() == "")
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].IsNull())
                     {
                         modelGamsScalar.precedents.Add(new ModelScalarEquation());
                         continue;
@@ -2651,7 +2651,7 @@ namespace Gekko
             {
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].ToString() == "")
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].IsNull())
                     {                        
                         continue;
                     }
@@ -2811,7 +2811,7 @@ namespace Gekko
             string sEqLine = eqLine.ToString();
             int iDot = sEqLine.IndexOf("..");            
             int equationNumber = int.Parse(sEqLine.Substring(1, iDot - 1)) - 1; //0-based, ignoring the first 'e'                                       
-            if (helper.dict_FromEqNumberToEqName[equationNumber].HasContents())
+            if (!helper.dict_FromEqNumberToEqName[equationNumber].IsNull())
             {
                 if (Globals.runningOnTTComputer && helper.dict_FromEqNumberToEqName[equationNumber] == null) G.WarningInternal("Did not expect null in equation name");
                 tokens = StringTokenizer.GetTokensWithLeftBlanks(sEqLine, more);  //1 empty "" token
@@ -4451,7 +4451,7 @@ namespace Gekko
                                                 parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
 
                                             }
-                                            else throw new GekkoException("Hov");
+                                            else throw new GekkoException("Error_Walk_Tokens");
                                         }
                                         else
                                         {

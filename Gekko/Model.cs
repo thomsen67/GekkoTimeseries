@@ -1566,7 +1566,7 @@ namespace Gekko
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (Multidim2Element s2 in this.dict_FromEqNumberToEqName)
             {
-                if (!this.t1.IsNull() && s2.ToString() == "") continue;
+                if (!this.t1.IsNull() && s2.IsNull()) continue;
                 ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2.ToString(), false);
                 if (type == 2)
                 {
