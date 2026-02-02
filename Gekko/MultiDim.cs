@@ -6,14 +6,6 @@ using System.Linq;
 
 namespace Gekko
 {
-
-    public enum EMultiDimType
-    {
-        None,
-        NameAndIndexFreq,
-        NameAndIndexNoFreq
-    }
-
     [ProtoContract]
     public class Multidim
     {
@@ -279,36 +271,31 @@ namespace Gekko
         [ProtoMember(1)]
         public readonly StringOrTime[] storage = null; //The whole object is considered null if .storage is == null
 
+        //???????????????????????????????????????
+        //???????????????????????????????????????
+        // Should timePosition rather be in DName object??
+        // Probably yes, we may combine time with lag, and age might be "time" too
+        //???????????????????????????????????????
+        //???????????????????????????????????????
         [ProtoMember(2)]
         public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time.
 
         [ProtoMember(3)]
-        public readonly EMultiDimType type = EMultiDimType.None;
-
-        [ProtoMember(4)]
         private readonly int sensitiveHash;
 
-        [ProtoMember(5)]
-        private readonly int insensitiveHash;
-
-        bool useFreq = false;
+        [ProtoMember(4)]
+        private readonly int insensitiveHash;        
 
         public Multidim2Element()
         {
             //Empty object, kind of null
         }
 
-        public Multidim2Element(StringOrTime[] elements) : this(elements, EMultiDimType.None)
-        {
-            //new Error("Forbidden at the moment");
-        }
-
-        public Multidim2Element(StringOrTime[] elements, EMultiDimType type)
+        public Multidim2Element(StringOrTime[] elements)
         {
             this.storage = elements;
-            this.type = type;
 
-            // Calculate hash once at birth
+            //We now calculate hash once at birth, and .timePosition is also found (if any)
             int sHash = 17;
             int iHash = 17;
 
@@ -333,9 +320,8 @@ namespace Gekko
             insensitiveHash = iHash;
         }
 
-        public bool IsNull()
-        {
-            //if (this.storage == null || this.storage.Length == 0) return true;
+        public bool IsNull() //Same as .ToString() == null
+        {            
             if (this.storage == null) return true;
             return false;
         }
@@ -358,27 +344,34 @@ namespace Gekko
         }
     }
 
-    
+
     /// <summary>
     /// Has no frequency. May or may not have time
     /// </summary>
-    [ProtoContract]    
-    public class DName : Multidim2Element 
+    [ProtoContract]
+    public class DName : Multidim2Element
     {
         private readonly int posName = 0;
         //private readonly int posFreq = 1;
         private readonly int posIndex = 1;
-        
+
         public DName() : base() { } // Protobuf only
 
         public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) { }
-                
+
         public string GetName() => this.storage[this.posName].GetString();
 
-        public string GetNameWithWorkAndWithoutTurtle() => "Work:" + this.storage[this.posName].GetString().Replace("¤", "");
-        public string GetNameWithoutTurtle() => this.storage[this.posName].GetString().Replace("¤", "");
-
-        //public string GetFreq() => this.storage[this.posFreq].GetString();
+        public string HACK_ToStringWithoutTime()
+        {
+            List<string> temp = new List<string>();
+            for (int i = this.posIndex; i < this.storage.Length; i++)
+            {
+                if (i == this.timePosition) continue;
+                temp.Add(this.storage[i].ToString());
+            }
+            if (temp.Count == 0) return "Work:" + this.GetName();
+            else return "Work:" + this.GetName() + "[" + Stringlist.GetListWithCommas(temp, "") + "]";            
+        }        
 
         public GekkoTime GetTime() => this.storage[this.timePosition].GetTime();
                 
@@ -412,27 +405,50 @@ namespace Gekko
         /// <returns></returns>
         public static DName HACK1(string s)
         {
-            string bank; string name; string freq; string[] indexes;
-            G.Chop_Chop(s, out bank, out name, out freq, out indexes);
-            List<StringOrTime> m = new List<StringOrTime>();
-            //string s3 = name;
-            //if (freq != null) s3 += "!" + freq;
-            //m.Add(s3);
-            if (indexes != null)
+            if (s.Contains("¤"))
             {
-                foreach (string s2 in indexes)
+                string[] ss = s.Split('¤');
+                string s0 = ss[0].Trim();
+                string bank; string name; string freq; string[] indexes;
+                G.Chop_Chop(s0, out bank, out name, out freq, out indexes);
+
+                string s1 = ss[1].Trim();
+                if (!(s1.StartsWith("[") && s1.EndsWith("]"))) new Error("DName problem1");
+                string s1a = s1.Substring(1, s1.Length - 2);                
+                if (!G.LooksLikeYear(s1a)) new Error("DName problem2");                
+                List<StringOrTime> m = new List<StringOrTime>();
+                if (indexes != null)
                 {
-                    if (G.LooksLikeYear(s2))
+                    foreach (string s2 in indexes)
                     {
-                        m.Add(GekkoTime.FromStringToGekkoTime(s2));
-                    }
-                    else
-                    {
+                        if (G.LooksLikeYear(s2)) new Error("DName problem3");
                         m.Add(s2);
                     }
                 }
+                m.Add(new GekkoTime(EFreq.A, int.Parse(s1a), 1));
+                return new DName(name, m.ToArray());
+            }
+            else
+            {
+                string bank; string name; string freq; string[] indexes;
+                G.Chop_Chop(s, out bank, out name, out freq, out indexes);
+                List<StringOrTime> m = new List<StringOrTime>();
+                if (indexes != null)
+                {
+                    foreach (string s2 in indexes)
+                    {
+                        if (G.LooksLikeYear(s2))
+                        {
+                            m.Add(GekkoTime.FromStringToGekkoTime(s2));
+                        }
+                        else
+                        {
+                            m.Add(s2);
+                        }
+                    }
+                }
+                return new DName(name.Replace("¤", ""), m.ToArray());
             }            
-            return new DName(name.Replace("¤", ""), m.ToArray());
         }
 
         public bool HACKHASINDEX()

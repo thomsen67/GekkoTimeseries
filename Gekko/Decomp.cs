@@ -2076,18 +2076,18 @@ namespace Gekko
                 // necessary, since the period has already been filtered by the DECOMP time period.
                 GekkoTime gtNotUsed; string name;                
                 DName dn0 = endoReverse[row]; 
-                name = dn0.GetNameWithWorkAndWithoutTurtle();
+                name = dn0.HACK_ToStringWithoutTime();
                 gtNotUsed = dn0.GetTime();
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count(); col++)
                 {                 
                     DName dn1 = endoReverse[row];
-                    string ename = dn1.GetNameWithWorkAndWithoutTurtle();
+                    string ename = dn1.HACK_ToStringWithoutTime();
                     GekkoTime etime = dn1.GetTime();                 
                                         
                     DName dn2 = exoReverse[col];
-                    string xname = dn2.GetNameWithWorkAndWithoutTurtle();
+                    string xname = dn2.HACK_ToStringWithoutTime();
                     GekkoTime xtime = dn2.GetTime();
 
                     string enewName = ConvertToTurtleName(ename, 0);
