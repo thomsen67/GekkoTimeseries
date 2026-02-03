@@ -31,6 +31,8 @@ namespace Gekko
         public int plotTypes = 2;  //2 = n and p
         public bool removeTx0Dollar = false;
         public int maxPages = int.MaxValue;
+        public int restrict_maxDepth = -1;
+        public string restrict_varName = null;
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
         public StringBuilder text = null;
@@ -1392,6 +1394,8 @@ img {border-style: none;
                 bh.type = EBrowserType.Greu;
                 bh.text = new StringBuilder();
                 bh.maxPages = 5;
+                bh.restrict_maxDepth = 5;
+                bh.restrict_varName = "qC";
             }
             else
             {
@@ -1873,7 +1877,35 @@ img {border-style: none;
                 G.WritelnGray("Finished find.html");
             }
 
-            //new Error("Stop");
+            if (bh.restrict_maxDepth > -1)
+            {
+                Microsoft.Msagl.Drawing.Graph graph = null;                
+                WalkInfo walkInfo = new WalkInfo();
+                walkInfo.t1 = t1;
+                walkInfo.t2 = t1;  //Note: using t1 here too!
+                walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
+                walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
+                walkInfo.maxDepth = bh.restrict_maxDepth;
+                walkInfo.ignoreDJZ = true;
+                walkInfo.isGekkoModel = Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
+                walkInfo.operatorLower = "d";
+                walkInfo.ignore = 0d;
+                walkInfo.minLhsScore = double.MinValue;
+                walkInfo.removeSelfReferences = true;  //lags??
+                walkInfo.removeResidualIgnoredError = true;
+                walkInfo.ignoreLags = true;
+                string varName = bh.restrict_varName;
+                int depth = 0;
+                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
+                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                WindowFlow.WalkNodes(depth, graph, varName, eqName, walkInfo);
+
+
+
+
+
+            }
+
 
             foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos.Take(bh.maxPages))
             {
@@ -2190,7 +2222,7 @@ img {border-style: none;
             }
 
             return combos;
-        }
+        }        
 
         /// <summary>
         /// This is for mass-producing gnuplot files, for the html browser.

@@ -93,7 +93,9 @@ namespace Gekko
                 walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 walkInfo.ignoreDJZ = true;
                 walkInfo.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
-                walkInfo.decompFind = this.decompFind;
+                walkInfo.operatorLower = this.decompFind.decompOptions2.decompOperator.OperatorLower();
+                walkInfo.ignore = this.decompFind.decompOptions2.ignore;
+                walkInfo.minLhsScore = Globals.lhsScore2; //Only those with name checkbox in FIND window
                 walkInfo.removeSelfReferences = true;  //lags??
                 walkInfo.removeResidualIgnoredError = true;
                 walkInfo.ignoreLags = true;
@@ -116,7 +118,7 @@ namespace Gekko
             }
         }
 
-        private static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
+        public static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
         {
             // This works regarding depth, but is wasteful, because redoing a branch entails new decomp calls.
             // Better to keep the results of the decomps (FlowInfo basically), so there is no double work.
@@ -131,7 +133,7 @@ namespace Gekko
             if (!walkInfo.visitedDepths.ContainsKey(varName))
             {                
                 hasBeenSeenAlready = false;
-                arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);                
+                arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo);                
                 walkInfo.visitedDepths.Add(varName, arrowsFromTo);
             }
             else if (depth < walkInfo.visitedDepths.Get(varName).depth)
@@ -177,9 +179,9 @@ namespace Gekko
                     if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
                 }
 
-                if (!hasBeenSeenAlready)
+                if (!hasBeenSeenAlready && graph != null)
                 {
-
+                    
                     Edge e = graph.AddEdge(flowChild.from, flowChild.to);
                     e.Attr.Color = Color(share);
                     Node nodeFrom = graph.FindNode(flowChild.from);
@@ -199,7 +201,7 @@ namespace Gekko
                 
                 string varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varNameChild, GekkoTime.tNull, Program.model, true, false, false);
-                if (temp.Count > 0 && temp[0].score >= Globals.lhsScore2)  //Only eqs that are found with checkbox "Name" in FIND window. We also do not show res_... nodes
+                if (temp.Count > 0 && temp[0].score >= walkInfo.minLhsScore)  //For instance only eqs that are found with checkbox "Name" in FIND window. We also do not show res_... nodes
                 {
                     string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
                     WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);
@@ -211,7 +213,7 @@ namespace Gekko
                     //TODO TODO TODO Find out if the eq is not found (bad eq name) or it is a .fx variable. Color differently.
                     //TODO TODO TODO
                     //TODO TODO TODO
-                    if (!hasBeenSeenAlready)
+                    if (!hasBeenSeenAlready && graph != null)
                     {
                         Node n = graph.FindNode(flowChild.from);
                         n.Attr.FillColor = new Color(238, 238, 238);
@@ -520,7 +522,10 @@ namespace Gekko
         public int maxDepth;
         public bool ignoreDJZ;
         public bool isGekkoModel;
-        public DecompFind decompFind;
+        //public DecompFind decompFind;
+        public string operatorLower;
+        public double ignore;
+        public double minLhsScore = double.MinValue;
         public bool removeSelfReferences;
         public bool removeResidualIgnoredError;
         public bool ignoreLags;

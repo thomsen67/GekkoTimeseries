@@ -6662,7 +6662,7 @@ namespace Gekko
         /// <param name="equationName"></param>
         /// <param name="variableName"></param>
         /// <returns></returns>
-        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, DecompFind decompFind, WalkInfo walkInfo)
+        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, WalkInfo walkInfo)
         {            
             FlowInfo flowInfo = new FlowInfo();
 
@@ -6676,7 +6676,7 @@ namespace Gekko
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = t1;
             decompOptions2.t2 = t2;            
-            string op2 = decompFind.decompOptions2.decompOperator.OperatorLower().Replace("x", "");
+            string op2 = walkInfo.operatorLower.Replace("x", "");
             string op = "d";
             if (op2 == "m" || op2 == "q" || op2 == "mp") op = "m";
             decompOptions2.decompOperator = new DecompOperator(op);
@@ -6686,7 +6686,7 @@ namespace Gekko
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
             decompOptions2.expand = true;
-            decompOptions2.ignore = decompFind.decompOptions2.ignore;
+            decompOptions2.ignore = walkInfo.ignore;
             GekkoSmpl smpl = new GekkoSmpl(t1, t2);
             DecompDatas decompDatas = new DecompDatas();
             GekkoTime gt1, gt2;

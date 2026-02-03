@@ -1164,11 +1164,7 @@ namespace Gekko
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-            List<int> eqNumbers = null;
-            if (Globals.greuHack)
-            {
-                //Why can .dependents be == null for GREU??
-            }
+            List<int> eqNumbers = null;            
             if (modelGamsScalar.dependents != null) modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
             
             if (eqNumbers == null)
@@ -1477,7 +1473,7 @@ namespace Gekko
                     }
 
                     //if (eqNameChunks.Length >= 3) indexName = eqNameChunks[2];
-                    VariableDims m1 = GetScalarModelVariables(lhsName, eh);
+                    VariableDims m1 = GetScalarModelVariables(lhsName, eh); //qwerty
 
                     if (m1.storage.Count == 0)
                     {

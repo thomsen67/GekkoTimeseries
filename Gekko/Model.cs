@@ -2181,7 +2181,12 @@ namespace Gekko
             {
                 foreach (KeyValuePair<string, string> kvp in this.depNames)
                 {
-                    if (G.EqualHandleBlanks(kvp.Value, variableName))
+                    string s = kvp.Value;
+                    if (Globals.greuHack)
+                    {
+                        s = s.Replace("[t]", "").Replace(",t]", "]");
+                    }
+                    if (G.EqualHandleBlanks(s, variableName))
                     {
                         lhsEqs.Add(kvp.Key);
                     }
