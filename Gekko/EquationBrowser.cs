@@ -1517,10 +1517,14 @@ img {border-style: none;
                     //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
                     //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
                     List<string> filesToCopy = new List<string> { "styles.css", "index.html", "DREAM_logo_500x70px.svg", "header_MAKRO.svg" };
-                    foreach (string s in filesToCopy) File.Copy(@"c:\Tools\Xxx\styles.css", @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s);                    
+                    foreach (string s in filesToCopy)
+                    {
+                        string dest = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s;
+                        if (!File.Exists(dest)) File.Copy(@"c:\Tools\Xxx\" + s, dest);
+                    }
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
-                    Program.RunGekkoCommands(f + "reset; greu(); option decomp equation style = gams; global:%t1 = 2023; global:%t2 = 2027; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; greu(); option decomp equation style = gams; global:%t1 = 2023; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1555,12 +1559,12 @@ img {border-style: none;
             }
             else if (onlyPlot)
             {
-                BrowserNewPlots(combos, path, restrict);
+                BrowserNewPlots(combos, path, restrict, bh);
             }
             else
             {
                 BrowserNewHtml(t1, t2, path, restrict, combos, bh, model, modelGamsScalar);
-                BrowserNewPlots(combos, path, restrict);
+                BrowserNewPlots(combos, path, restrict, bh);
             }
 
             if (bh.type == EBrowserType.MakroIdentitiesText)
@@ -1875,6 +1879,10 @@ img {border-style: none;
             {
                 count++;
                 string variableName = kvp.Key;
+                if (Globals.greuHack)
+                {
+                    if (G.Equal(variableName, "submodel_template_test_variable")) continue;  //why does it have 12.000 dependents?
+                }
                 List<EquationNameAndNumber> equations = kvp.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
 
@@ -2189,7 +2197,7 @@ img {border-style: none;
         /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes &lt; 1 min, even in debug mode, so this is fast!
         /// </summary>
         /// <param name="combos"></param>
-        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict)
+        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict, BrowserHelper bh)
         {
             double yminhard = -100d;
             double ymaxhard = 100d;
@@ -2212,8 +2220,8 @@ img {border-style: none;
                     catch { }
 
                     //Generate 1 file for gnuplot to chew on
-                    O.Prt o0 = null;
-                    foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+                    O.Prt o0 = null;                    
+                    foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos.Take(bh.maxPages))
                     {
                         if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
 
