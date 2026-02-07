@@ -103,16 +103,26 @@ namespace Gekko
             return this.traceContents.id;
         }
 
-        public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss)
+        public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent)
         {
-            foreach (TimeSeries tsRhs in tsRhss)
+            if (newParent)
             {
-                if (tsRhs.trace2 != null)
-                {                    
-                    traceLhs.precedents.storage.Add(tsRhs.trace2);
+                foreach (TimeSeries tsRhs in tsRhss)
+                {
+                    if (!object.ReferenceEquals(tsRhs, tsLhs))
+                    {
+                        if (tsRhs.trace2 != null)
+                        {
+                            traceLhs.precedents.storage.Add(tsRhs.trace2);
+                        }
+                    }
                 }
+                tsLhs.trace2 = traceLhs;
             }
-            tsLhs.trace2 = traceLhs;
+            else
+            {
+
+            }
         }
 
         public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type) //0 for viewer, 1 for printing

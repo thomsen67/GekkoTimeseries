@@ -2840,7 +2840,7 @@ namespace Gekko
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = lhs.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                        Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries });
+                        Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries }, true);
                     }
                     catch { }
                 }
@@ -2993,7 +2993,7 @@ namespace Gekko
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = ts1.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 });
+                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 }, true);
                     }
                     catch { }
                 }
@@ -3691,7 +3691,7 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
+                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false);
                                     }
                                     catch { }
                                 }
@@ -3713,7 +3713,7 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
+                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, true);
                                     }
                                     catch { }
                                 }
@@ -3749,7 +3749,7 @@ namespace Gekko
                                     trace.traceContents.text = this.gekkocode + ";";
                                     trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                     trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                    Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts });
+                                    Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false);
                                 }
                                 catch { }
                             }
@@ -3840,7 +3840,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
                             }
                             catch { }
                         }
@@ -3915,7 +3915,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
                             }
                             catch { }
                         }
@@ -4251,7 +4251,7 @@ namespace Gekko
                                 trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList());
+                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList(), true);
                     }
                     catch { }
                 }
@@ -4476,7 +4476,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = tsNew.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);                                                                
-                                Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts });
+                                Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts }, true);
                             }
                             catch { }
                         }

@@ -1781,7 +1781,7 @@ namespace Gekko
                                         trace.traceContents.text = oRead.gekkocode + ";";
                                         trace.traceContents.name = ts.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
                                     }
                                     catch { }
                                 }
@@ -1797,7 +1797,7 @@ namespace Gekko
                                         trace.traceContents.text = oRead.gekkocode + ";";
                                         trace.traceContents.name = ts.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
                                     }
                                     catch { }
                                 }
@@ -3912,7 +3912,7 @@ write datatest;
                                         trace.traceContents.text = oRead.gekkocode + ";";
                                         trace.traceContents.name = ts.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                                        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, false); //qwerty: changed from true to false because probably sibling
                                     }
                                     catch { }
                                 }
@@ -4324,7 +4324,7 @@ write datatest;
                             trace.traceContents.text = oRead.gekkocode + ";";
                             trace.traceContents.name = ts.GetNameAndParentDatabank();
                             trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
-                            Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts });
+                            Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
                         }
                         catch { }
                     }
@@ -4739,7 +4739,7 @@ write datatest;
                             trace.traceContents.name = ts.GetNameAndParentDatabank();
                             trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                             trace.traceContents.dataFile = pxFile;
-                            Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { });
+                            Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { }, true);
                         }
                         catch { }
                     }
@@ -21620,7 +21620,7 @@ write datatest;
                                 trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, ts, Globals.traceContainer.GetList());
+                        Trace2.PushIntoSeries(trace, ts, Globals.traceContainer.GetList(), false); //qwerty
                     }
                     catch { }
                 }
@@ -25430,7 +25430,7 @@ write datatest;
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
                     trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
-                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 });
+                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true);
                 }
                 catch { }
             }
@@ -25583,7 +25583,7 @@ write datatest;
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
                     trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
-                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 });
+                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true);
                 }
                 catch { }
             }
