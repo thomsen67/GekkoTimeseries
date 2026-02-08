@@ -4251,7 +4251,7 @@ namespace Gekko
                                 trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList(), true);
+                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList(), false);
                     }
                     catch { }
                 }

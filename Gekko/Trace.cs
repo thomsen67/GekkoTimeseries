@@ -105,6 +105,10 @@ namespace Gekko
 
         public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent)
         {
+            if (tsLhs.trace2 == null)
+            {
+                tsLhs.trace2 = new Trace2(ETraceType.GluedToSeries, Globals.tNull, Globals.tNull);
+            }
             if (newParent)
             {
                 foreach (TimeSeries tsRhs in tsRhss)
@@ -116,12 +120,27 @@ namespace Gekko
                             traceLhs.precedents.storage.Add(tsRhs.trace2);
                         }
                     }
+                }                                
+                if (Globals.runningOnTTComputer && tsLhs.trace2.type != ETraceType.GluedToSeries)
+                {
+                    G.Writeln2("*** ERROR: Glued problem"); throw new GekkoException();
                 }
-                tsLhs.trace2 = traceLhs;
+                tsLhs.trace2.precedents.storage.Add(traceLhs);
             }
             else
             {
-
+                foreach (TimeSeries tsRhs in tsRhss)
+                {
+                    if (!object.ReferenceEquals(tsRhs, tsLhs))
+                    {
+                        if (tsRhs.trace2 != null)
+                        {
+                            traceLhs.precedents.storage.Add(tsRhs.trace2);
+                        }
+                    }
+                }
+                //tsLhs.trace2 = traceLhs; //
+                tsLhs.trace2.precedents.storage.Add(traceLhs);
             }
         }
 
