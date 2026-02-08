@@ -117,7 +117,8 @@ namespace Gekko
                     {
                         if (tsRhs.trace2 != null)
                         {
-                            traceLhs.precedents.storage.Add(tsRhs.trace2);
+                            //traceLhs.precedents.storage.Add(tsRhs.trace2);
+                            traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
                         }
                     }
                 }                                
@@ -135,7 +136,7 @@ namespace Gekko
                     {
                         if (tsRhs.trace2 != null)
                         {
-                            traceLhs.precedents.storage.Add(tsRhs.trace2);
+                            traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
                         }
                     }
                 }
@@ -197,14 +198,14 @@ namespace Gekko
                 }
                 string id = parent.traceContents.id.ToString().Split(' ')[0];
 
-                if (type == 0)
+                if (type == 0 && depth > 0)
                 {
                     string d = "|||";
-                    traceLines.Add(depth + d + name + d + period + d + code + d + prec + d + file + d + datafile + d + id + d + parent.traceContents.name + d + parent.traceContents.period + d + parent.traceContents.text + d + prec + d + parent.traceContents.commandFileAndLine + d + parent.traceContents.dataFile + d + parent.traceContents.id);
+                    traceLines.Add((depth - 1) + d + name + d + period + d + code + d + prec + d + file + d + datafile + d + id + d + parent.traceContents.name + d + parent.traceContents.period + d + parent.traceContents.text + d + prec + d + parent.traceContents.commandFileAndLine + d + parent.traceContents.dataFile + d + parent.traceContents.id);
                 }
                 else
                 {
-                    if (depth == 0)
+                    if (depth == 1)
                     {
                         G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
                     }
