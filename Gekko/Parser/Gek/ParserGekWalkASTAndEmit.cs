@@ -3750,6 +3750,13 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    case "ASTTRACE":
+                        {
+                            node.Code.A("O.Trace o" + Num(node) + " = new O.Trace();" + G.NL);
+                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
                     case "ASTR_FILE":
                         {
                             node.Code.A("O.R_file o" + Num(node) + " = new O.R_file();" + G.NL);

@@ -2840,7 +2840,7 @@ namespace Gekko
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = lhs.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                        Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries }, true);
+                        Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries }, true); //CERTAIN
                     }
                     catch { }
                 }
@@ -2993,7 +2993,7 @@ namespace Gekko
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = ts1.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 }, true);
+                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 }, true); //CERTAIN
                     }
                     catch { }
                 }
@@ -3691,7 +3691,7 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false);
+                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false); //COPY
                                     }
                                     catch { }
                                 }
@@ -3713,7 +3713,7 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, true);
+                                        Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false); //COPY
                                     }
                                     catch { }
                                 }
@@ -3749,7 +3749,7 @@ namespace Gekko
                                     trace.traceContents.text = this.gekkocode + ";";
                                     trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                     trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                    Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false);
+                                    Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false); //COPY
                                 }
                                 catch { }
                             }
@@ -3840,7 +3840,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
+                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true); //CERTAIN
                             }
                             catch { }
                         }
@@ -3915,7 +3915,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true);
+                                Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true); //CERTAIN
                             }
                             catch { }
                         }
@@ -4251,7 +4251,7 @@ namespace Gekko
                                 trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList(), false);
+                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList(), false); //ALMOST CERTAIN
                     }
                     catch { }
                 }
@@ -4476,7 +4476,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = tsNew.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);                                                                
-                                Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts }, true);
+                                Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts }, true); //CERTAIN
                             }
                             catch { }
                         }
@@ -5505,6 +5505,81 @@ namespace Gekko
             public void Exe()
             {
                 Program.X12a(this);
+            }
+        }
+
+        public class Trace
+        {
+            public GekkoTime t1 = Globals.globalPeriodStart;  //not used
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //not used
+            public List<string> listItems = null;
+            public void Exe()
+            {
+                if (listItems == null || listItems.Count < 1)
+                {
+                    G.Writeln2("*** ERROR: no variable given for TRACE command");
+                    throw new GekkoException();
+                }
+
+                if (listItems.Count > 1)
+                {
+                    G.Writeln2("*** ERROR: expected 1 variable for TRACE command");
+                    throw new GekkoException();
+                }
+
+                string var = listItems[0];
+
+                MetaTimeSeries mts = O.GetTimeSeries(var, 0);
+
+                //List<Databank> dbList = new List<Databank>();
+                //if (Program.options.databank_search)
+                //{
+                //    //search for it, with the current frequency
+                //    for (int i = 0; i < Program.databanks.storage.Count; i++)
+                //    {
+                //        if (i == 1) continue; //skip ref databank, just as when searching for series
+                //        dbList.Add(Program.databanks.storage[i]);
+                //    }
+                //}
+                //else
+                //{
+                //    //In sim-mode do not search all 
+                //    dbList.Add(Program.databanks.GetFirst());
+                //}
+
+                //TimeSeries ts = null;
+                //foreach (Databank db in dbList)
+                //{
+                //    ts = db.GetVariable(var);
+                //    if (ts == null) continue;
+                //}
+
+                if (mts == null)
+                {
+                    G.Writeln2("*** ERROR: Trace-viewer could not find series " + var);
+                    throw new GekkoException();
+                }
+
+                TimeSeries ts = mts.ts;
+
+                if (ts == null)
+                {
+                    G.Writeln2("*** ERROR: Trace-viewer could not find series " + var);
+                    throw new GekkoException();
+                }
+
+                Trace2 trace = ts.trace2;
+
+                if (trace == null)
+                {
+                    G.Writeln2("*** ERROR: Trace-viewer did not find any traces for series " + var);
+                    throw new GekkoException();
+                }
+
+                List<string> traceLines = new List<string>();
+                Trace2.WalkTraces(trace, 0, traceLines, 0);
+                WindowTrace wt = new WindowTrace(traceLines);
+                wt.ShowDialog();
             }
         }
 

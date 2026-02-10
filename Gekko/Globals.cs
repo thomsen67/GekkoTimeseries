@@ -554,7 +554,8 @@ namespace Gekko
 "VAL",
 "WRITE",
 "X12A",
-"XEDIT"
+"XEDIT",
+"TRACE"
 };
 
         public static bool showZero = true;

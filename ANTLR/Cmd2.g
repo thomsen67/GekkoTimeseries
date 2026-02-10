@@ -213,6 +213,7 @@ ASTOPT_STRING_ALL;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
     ASTFINDMISSINGDATA;
+    ASTTRACE;
     ASTGEKKO;
     ASTFLAT;
     ASTFOR;
@@ -937,6 +938,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+    TRACE      = 'TRACE'     ;
     GEKKO      = 'GEKKO'     ;
 	IMPORTEXPORT = 'IMPORTEXPORT';
     FIRST            = 'FIRST';
@@ -1512,6 +1514,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
                                         d.Add("findmissingdata"         , FINDMISSINGDATA);
+                                        d.Add("trace"         , TRACE);
                                         d.Add("gekko"         , GEKKO);
 										d.Add("IMPORTEXPORT", IMPORTEXPORT);
                                         d.Add("first"    , FIRST  );
@@ -1860,6 +1863,7 @@ expr2                     :
 						  | exo            SEMICOLON!
 						  | exit           SEMICOLON!
 						  | findmissingdata SEMICOLON!
+                          | trace SEMICOLON!
                           | for2
 						  | proceduredef   SEMICOLON!						
 						  | functiondef    SEMICOLON!						
@@ -2674,6 +2678,7 @@ x12aOpt1h                 : PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expr
 						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
 						  ;
 
+trace					  : TRACE listItemsWildRange -> ^({token("ASTTRACE", ASTTRACE, $TRACE.Line)} listItemsWildRange);
 
 //--------------------------------------------------------------------------------------
 
@@ -4080,6 +4085,7 @@ END|
 EXIT|
 EXO|
 FINDMISSINGDATA|
+TRACE|
 GEKKO|
 IMPORTEXPORT|
 FOR|

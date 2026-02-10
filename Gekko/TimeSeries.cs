@@ -694,14 +694,18 @@ namespace Gekko
         public string GetNameAndParentDatabank()
         {
             string rv = null;
-            string name = this.variableName;
-            string freq = G.GetFreq(this.freqEnum);
-            string nameAndFreq = name + "!" + freq; //Gekko 3.x style! But this method is only used for the new trace module anyway
-            string parentDatabank = null;
-            Databank db = this.parentDatabank;
-            if (db != null) parentDatabank = db.aliasName;
-            if (parentDatabank == null) rv = nameAndFreq;
-            else rv = parentDatabank + ":" + nameAndFreq;
+            try
+            {
+                string name = this.variableName;
+                string freq = G.GetFreq(this.freqEnum);
+                string nameAndFreq = name + "!" + freq; //Gekko 3.x style! But this method is only used for the new trace module anyway
+                string parentDatabank = null;
+                Databank db = this.parentDatabank;
+                if (db != null) parentDatabank = db.aliasName;
+                if (parentDatabank == null) rv = nameAndFreq;
+                else rv = parentDatabank + ":" + nameAndFreq;
+            }
+            catch { }
             return rv;
         }
 
