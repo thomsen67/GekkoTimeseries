@@ -21413,11 +21413,15 @@ namespace Gekko
 
             bool option_text = false;
             bool option_strict = false;
+            bool option_date = false;
             if (!G.NullOrBlanks(f4))
             {
                 if (G.ContainsWord(f4, "text")) option_text = true;
                 if (G.ContainsWord(f4, "strict")) option_strict = true;
+                if (G.ContainsWord(f4, "date")) option_date = true;
             }
+
+            if (option_strict && option_date) new Error("You cannot use 'strict' and 'date' at the same time");
 
             List<string> black = new List<string>();
             List<string> white = new List<string>();
@@ -21492,7 +21496,7 @@ namespace Gekko
                 string p1 = f1 + "\\" + s;
                 string p2 = f2 + "\\" + s;
 
-                bool identical = G.CompareFiles(p1, p2, option_strict);  //could speed up more by parallelizing the whole intersect list.
+                bool identical = G.CompareFiles(p1, p2, option_strict, option_date);  //could speed up more by parallelizing the whole intersect list.
 
                 if (!identical)
                 {
@@ -21652,6 +21656,13 @@ namespace Gekko
                 {
                     txt.MainAdd("Option 'strict': files dates not used in file comparison");
                     sb2.AppendLine("Option 'strict': files dates not used in file comparison");
+                    txt.MainNewLineTight();
+                }
+
+                if (option_date)
+                {
+                    txt.MainAdd("Option 'date': files dates rather than contents are used to compare files");
+                    sb2.AppendLine("Option 'date': files dates rather than contents are used to compare files");
                     txt.MainNewLineTight();
                 }
 
