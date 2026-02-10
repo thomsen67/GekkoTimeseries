@@ -6992,6 +6992,12 @@ namespace Gekko
                     if (isTo)
                     {
                         //READ...TO  ==> same as OPEN
+
+                        if (!G.Equal(Program.options.interface_mode, "sim"))
+                        {
+                            G.Warning("w11.1", "For non-sim mode, please use OPEN ... AS ... instead of READ ... TO ... for better readability.");
+                        }
+
                         if (this.opt_merge != null)
                         {
                             new Error("You cannot mix <merge> with TO keyword");

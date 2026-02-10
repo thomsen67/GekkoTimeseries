@@ -2841,7 +2841,6 @@ namespace Gekko
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
                 //                
 
-
                 if (Globals.runningOnTTComputer)
                 {
                     if (true)

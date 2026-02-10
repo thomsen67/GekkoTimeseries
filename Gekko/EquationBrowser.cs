@@ -1393,8 +1393,8 @@ img {border-style: none;
                 bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
                 bh.type = EBrowserType.Greu;
                 bh.text = new StringBuilder();
-                bh.maxPages = 5;
-                bh.restrict_maxDepth = 5;
+                bh.maxPages = int.MaxValue; //max, when we restrict depth
+                bh.restrict_maxDepth = 3;  //2=about 40 files
                 bh.restrict_varName = "qC";
             }
             else
@@ -1555,20 +1555,49 @@ img {border-style: none;
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, ignoreMissing, false);
 
             GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar, bh);
-                        
+
+            GekkoDictionaryBlanks<string> nodeNames = null;
+            if (bh.restrict_maxDepth > -1)
+            {
+                G.WritelnGray("TTH: maxDepth vars start");
+                Microsoft.Msagl.Drawing.Graph graph = null;
+                WalkInfo walkInfo = new WalkInfo();
+                walkInfo.t1 = t1;
+                walkInfo.t2 = t1;  //Note: using t1 here too!
+                walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
+                walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
+                walkInfo.maxDepth = bh.restrict_maxDepth;
+                walkInfo.ignoreDJZ = true;
+                walkInfo.isGekkoModel = Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
+                walkInfo.operatorLower = "d";
+                walkInfo.ignore = 0d;
+                walkInfo.minLhsScore = double.MinValue;
+                walkInfo.removeSelfReferences = true;  //lags??
+                walkInfo.removeResidualIgnoredError = true;
+                walkInfo.ignoreLags = true;
+                string varName = bh.restrict_varName;
+                int depth = 0;
+                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
+                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                WindowFlow.WalkNodes(depth, graph, varName, eqName, walkInfo);
+                nodeNames = walkInfo.nodeNames;
+                G.WritelnGray("TTH: maxDepth vars end (" + nodeNames.Count + ")");
+            }
+
+
             if (onlyHtml && onlyPlot) new Error("Hov");
             if (onlyHtml)
             {
-                BrowserNewHtml(t1, t2, path, restrict, combos, bh, model, modelGamsScalar);
+                BrowserNewHtml(t1, t2, path, restrict, nodeNames, combos, bh, model, modelGamsScalar);
             }
             else if (onlyPlot)
             {
-                BrowserNewPlots(combos, path, restrict, bh);
+                BrowserNewPlots(combos, path, restrict, nodeNames, bh);
             }
             else
             {
-                BrowserNewHtml(t1, t2, path, restrict, combos, bh, model, modelGamsScalar);
-                BrowserNewPlots(combos, path, restrict, bh);
+                BrowserNewHtml(t1, t2, path, restrict, nodeNames, combos, bh, model, modelGamsScalar);
+                BrowserNewPlots(combos, path, restrict, nodeNames, bh);
             }
 
             if (bh.type == EBrowserType.MakroIdentitiesText)
@@ -1584,7 +1613,7 @@ img {border-style: none;
             return;
         }
 
-        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, GekkoDictionary<string, bool> restrict, GekkoDictionary<string, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, GekkoDictionary<string, bool> restrict, GekkoDictionaryBlanks<string> nodeNames, GekkoDictionary<string, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
             //FIXME
             //FIXME
@@ -1600,7 +1629,7 @@ img {border-style: none;
             string sub = "vars";
 
             DateTime dt1 = DateTime.UtcNow;
-            int count = 0;
+            
             GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
 
             if (bh.type == EBrowserType.MakroIdentitiesText)
@@ -1876,52 +1905,20 @@ img {border-style: none;
                 }
                 G.WritelnGray("Finished find.html");
             }
-
-            if (bh.restrict_maxDepth > -1)
-            {
-                Microsoft.Msagl.Drawing.Graph graph = null;                
-                WalkInfo walkInfo = new WalkInfo();
-                walkInfo.t1 = t1;
-                walkInfo.t2 = t1;  //Note: using t1 here too!
-                walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
-                walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
-                walkInfo.maxDepth = bh.restrict_maxDepth;
-                walkInfo.ignoreDJZ = true;
-                walkInfo.isGekkoModel = Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
-                walkInfo.operatorLower = "d";
-                walkInfo.ignore = 0d;
-                walkInfo.minLhsScore = double.MinValue;
-                walkInfo.removeSelfReferences = true;  //lags??
-                walkInfo.removeResidualIgnoredError = true;
-                walkInfo.ignoreLags = true;
-                string varName = bh.restrict_varName;
-                int depth = 0;
-                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                WindowFlow.WalkNodes(depth, graph, varName, eqName, walkInfo);
-
-
-
-
-
-            }
-
-
-            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos.Take(bh.maxPages))
+            
+            int count = 0;
+            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
-                string variableName = kvp.Key;
-                if (Globals.greuHack)
-                {
-                    if (G.Equal(variableName, "submodel_template_test_variable")) continue;  //why does it have 12.000 dependents?
-                }
+                string variableName = kvp.Key;                
+                if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
                 List<EquationNameAndNumber> equations = kvp.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
 
-                string fileName1 = SimplerName(variableName) + ".html";                
+                string fileName1 = SimplerName(variableName) + ".html";
 
                 if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
-                
+
                 StringBuilder html1 = new StringBuilder();
 
                 foreach (EquationNameAndNumber equationHelper in equations)
@@ -2133,10 +2130,22 @@ img {border-style: none;
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
-            }                        
+            }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
             return;
+        }
+
+        private static bool ShouldSkip(BrowserHelper bh, GekkoDictionaryBlanks<string> nodeNames, int count, string variableName)
+        {
+            bool b = false;
+            if (Globals.greuHack)
+            {
+                if (count > bh.maxPages) b = true;
+                else if (G.Equal(variableName, "submodel_template_test_variable")) b = true; //why does it have 12.000 dependents?
+                else if (nodeNames != null && !nodeNames.ContainsKey(variableName)) b = true;
+            }
+            return b;
         }
 
         private static string SimplerName(string s)
@@ -2229,7 +2238,7 @@ img {border-style: none;
         /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes &lt; 1 min, even in debug mode, so this is fast!
         /// </summary>
         /// <param name="combos"></param>
-        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict, BrowserHelper bh)
+        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict, GekkoDictionaryBlanks<string> nodeNames, BrowserHelper bh)
         {
             double yminhard = -100d;
             double ymaxhard = 100d;
@@ -2252,9 +2261,17 @@ img {border-style: none;
                     catch { }
 
                     //Generate 1 file for gnuplot to chew on
-                    O.Prt o0 = null;                    
-                    foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos.Take(bh.maxPages))
+                    O.Prt o0 = null;
+
+
+
+
+                    int count = 0;
+                    foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
                     {
+                        count++;
+                        string variableName = kvp.Key;
+                        if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
                         if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
 
                         foreach (string s in new List<string>() { "gp", "dat" })
