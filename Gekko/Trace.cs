@@ -141,7 +141,28 @@ namespace Gekko
                     }
                 }
                 //tsLhs.trace2 = traceLhs; //
+
+                int hit = -12345;
+
+                for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
+                {
+                    Trace2 trace = tsLhs.trace2.precedents.storage[i];
+                    if (!trace.traceContents.period.t1.IsNull() && !trace.traceContents.period.t2.IsNull() && traceLhs.traceContents.period.t1.IsSamePeriod(trace.traceContents.period.t1) && traceLhs.traceContents.period.t2.IsSamePeriod(trace.traceContents.period.t2))
+                    {
+                        hit = i;
+                        break;
+                    }
+                }
+
+                if (hit != -12345)
+                {
+                    tsLhs.trace2.precedents.storage.RemoveAt(hit);                    
+                }
+
                 tsLhs.trace2.precedents.storage.Add(traceLhs);
+
+
+
             }
         }
 
@@ -211,7 +232,8 @@ namespace Gekko
                     }
                 }
 
-                foreach (Trace2 child in parent.precedents.storage)
+                //NOTE: list items are reversed!
+                foreach (Trace2 child in parent.precedents.storage.AsEnumerable().Reverse().ToList())
                 {
                     WalkTraces(child, depth + 1, traceLines, type);
                 }
