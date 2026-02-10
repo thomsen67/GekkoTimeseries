@@ -31,7 +31,7 @@ namespace Gekko
             SetupUI();
             LoadData(input);
             this.KeyDown += MainWindow_KeyDown;
-            _detailsBlock.Text = "Gekko 2.5.x trace viewer.\nNote that Gekko 2.5.x traces are quite rudimentary, not handling time periods particularly well.\nClick a trace to see details.";
+            _detailsBlock.Text = "Gekko 2.5.x trace viewer.\nNote that compared to Gekko 3.x, Gekko 2.5.x traces are quite rudimentary, not handling time period 'shadowing' particularly well.\nClick a trace to see details.";
         }
 
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

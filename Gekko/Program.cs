@@ -3634,18 +3634,25 @@ write datatest;
             {
                 try
                 {
-                    Trace2 trace = new Trace2(ETraceType.Normal, first, last);
-                    trace.traceContents.text = gekkocode + ";";
-                    trace.traceContents.dataFile = originalFilePath;
-                    trace.traceContents.name = name;
-                    trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                    if (bool_tsExisting)
+                    if (gekkocode == null && p == null)
                     {
-                        Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, false);
+                        //ignore it, may be an OPEN statement
                     }
                     else
                     {
-                        Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, true);
+                        Trace2 trace = new Trace2(ETraceType.Normal, first, last);
+                        trace.traceContents.text = gekkocode + ";";
+                        trace.traceContents.dataFile = originalFilePath;
+                        trace.traceContents.name = name;
+                        trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                        if (bool_tsExisting)
+                        {
+                            Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, false);
+                        }
+                        else
+                        {
+                            Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, true);
+                        }
                     }
                 }
                 catch { }
@@ -21658,12 +21665,12 @@ write datatest;
                         if (Globals.traceContainer.Count() > 0)
                         {
                             trace.traceContents.precedentsNames = new List<string>();
-                            foreach (TimeSeries child in Globals.traceContainer.GetList())
+                            foreach (TimeSeries child in Trace2.PrecedentsFromGlobals())
                             {
                                 trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, ts, Globals.traceContainer.GetList(), false); //ALMOST CERTAIN
+                        Trace2.PushIntoSeries(trace, ts, Trace2.PrecedentsFromGlobals(), false); //ALMOST CERTAIN
                     }
                     catch { }
                 }

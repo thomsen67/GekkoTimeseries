@@ -4246,12 +4246,12 @@ namespace Gekko
                         if (Globals.traceContainer.Count() > 0)
                         {
                             trace.traceContents.precedentsNames = new List<string>();
-                            foreach (TimeSeries ts in Globals.traceContainer.GetList())
+                            foreach (TimeSeries ts in Trace2.PrecedentsFromGlobals())
                             {
                                 trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, lhs, Globals.traceContainer.GetList(), false); //ALMOST CERTAIN
+                        Trace2.PushIntoSeries(trace, lhs, Trace2.PrecedentsFromGlobals(), false); //ALMOST CERTAIN
                     }
                     catch { }
                 }

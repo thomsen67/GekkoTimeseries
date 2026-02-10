@@ -103,6 +103,11 @@ namespace Gekko
             return this.traceContents.id;
         }
 
+        public static List<TimeSeries> PrecedentsFromGlobals()
+        {
+            return Globals.traceContainer.GetList().AsEnumerable().Reverse().ToList();
+        }
+
         public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent)
         {
             if (tsLhs.trace2 == null)
