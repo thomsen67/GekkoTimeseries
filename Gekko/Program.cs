@@ -1785,7 +1785,7 @@ namespace Gekko
                                 //    }
                                 //    catch { }
                                 //}
-                                HandleTraceForReadOrImport(per1, per2, false, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, oRead.FileName);
+                                HandleTraceForReadOrImport(per1, per2, false, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                             else
                             {
@@ -1802,7 +1802,7 @@ namespace Gekko
                                 //    }
                                 //    catch { }
                                 //}
-                                HandleTraceForReadOrImport(per1, per2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, oRead.FileName);
+                                HandleTraceForReadOrImport(per1, per2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                         }
 
@@ -3334,19 +3334,25 @@ write datatest;
                             else
                             {
                                 //must be normal then, cannot be light                                                                
-                                GekkoTime_1_2 t1 = xGekko3.GetPeriod(0);
-                                GekkoTime_1_2 t2 = xGekko3.GetPeriod(xGekko3.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
-                                GekkoTime gt1 = new GekkoTime(freq2, t1.super, t1.sub);
-                                GekkoTime gt2 = new GekkoTime(freq2, t2.super, t2.sub);
-                                foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                                if (xGekko3.data.GetDataArray_ONLY_INTERNAL_USE() != null) //not sure how it can be null, but it happens
                                 {
-                                    GekkoTime_1_2 t = new GekkoTime_1_2(xGekko3.freq, gt.super, gt.sub);
-                                    double v = xGekko3.GetDataSimple(t);
-                                    xGekko2.SetData(gt, v);
+                                    GekkoTime_1_2 t1 = xGekko3.GetPeriod(0);
+                                    GekkoTime_1_2 t2 = xGekko3.GetPeriod(xGekko3.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
+                                    GekkoTime gt1 = new GekkoTime(freq2, t1.super, t1.sub);
+                                    GekkoTime gt2 = new GekkoTime(freq2, t2.super, t2.sub);
+                                    foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                                    {
+                                        GekkoTime_1_2 t = new GekkoTime_1_2(xGekko3.freq, gt.super, gt.sub);
+                                        double v = xGekko3.GetDataSimple(t);
+                                        xGekko2.SetData(gt, v);
+                                    }
+                                    xGekko2.Trim();
+                                    minYearInProtobufFile = Math.Min(minYearInProtobufFile, gt1.super);
+                                    maxYearInProtobufFile = Math.Max(maxYearInProtobufFile, gt2.super);
                                 }
-                                xGekko2.Trim();
-                                minYearInProtobufFile = Math.Min(minYearInProtobufFile, gt1.super);
-                                maxYearInProtobufFile = Math.Max(maxYearInProtobufFile, gt2.super);
+                                else
+                                {
+                                }
                             }
                             databank.AddVariableWithOverwrite(false, xGekko2.freqEnum, xGekko2, false);
                             nSeries++;
@@ -3968,7 +3974,7 @@ write datatest;
                                 //    }
                                 //    catch { }
                                 //}
-                                HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, oRead.FileName);
+                                HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                         }
                     }  //end of readline from file
@@ -4003,7 +4009,7 @@ write datatest;
             int vars = -12345;
             GekkoTime startYear;
             GekkoTime endYear;
-            ReadPx(oRead.array, false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear, oRead.gekkocode, oRead.p, file);
+            ReadPx(oRead.array, false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear, oRead.gekkocode, oRead.p, file, readInfo.fileName);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;
@@ -4381,7 +4387,7 @@ write datatest;
                     //    }
                     //    catch { }
                     //}
-                    HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, oRead.FileName);
+                    HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
 
 
                 }
@@ -4419,7 +4425,7 @@ write datatest;
         }
 
 
-        public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd, string gekkocode, P p, string pxFile)
+        public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd, string gekkocode, P p, string pxFile, string realFileName)
         {
 
             bool isArray = false; if (G.equal(array, "yes")) isArray = true;
@@ -4797,7 +4803,7 @@ write datatest;
                     //    }
                     //    catch { }
                     //}
-                    HandleTraceForReadOrImport(gt_start, gt_end, true, ts, ts, ts.GetNameAndParentDatabank(), gekkocode, p, pxFile);
+                    HandleTraceForReadOrImport(gt_start, gt_end, true, ts, ts, ts.GetNameAndParentDatabank(), gekkocode, p, realFileName);
                 }
                 else
                 {

@@ -187,6 +187,7 @@ namespace Gekko
                 {
                     List<string> xx = new List<string>(parent.traceContents.precedentsNames);
                     xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
+                    xx.Reverse();
                     prec = string.Join(", ", xx);                    
                 }
                 

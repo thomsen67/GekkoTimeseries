@@ -720,13 +720,16 @@ namespace Gekko
             //returns tNull if all missing
             //DimensionCheck();
             GekkoTime realStart = Globals.tNull;
-            foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
+            if (this.dataArray != null)
             {
-                if (!G.isNumericalError(this.GetData(dt)))
+                foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
                 {
-                    //a real number, not missing or infinite
-                    realStart = dt;
-                    break;
+                    if (!G.isNumericalError(this.GetData(dt)))
+                    {
+                        //a real number, not missing or infinite
+                        realStart = dt;
+                        break;
+                    }
                 }
             }
             return realStart;
@@ -743,13 +746,16 @@ namespace Gekko
             //returns tNull if all missing
             //DimensionCheck();
             GekkoTime realEnd = Globals.tNull;
-            foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
+            if (this.dataArray != null)
             {
-                if (!G.isNumericalError(this.GetData(dt)))
+                foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
                 {
-                    //a real number, not missing or infinite
-                    realEnd = dt;
-                    break;
+                    if (!G.isNumericalError(this.GetData(dt)))
+                    {
+                        //a real number, not missing or infinite
+                        realEnd = dt;
+                        break;
+                    }
                 }
             }
             return realEnd;
