@@ -108,6 +108,18 @@ namespace Gekko
             return Globals.traceContainer.GetList().AsEnumerable().Reverse().ToList();
         }
 
+        public static void PrecedentsNames(Trace2 trace, List<TimeSeries> tss)
+        {
+            if (Globals.traceContainer.Count() > 0)
+            {
+                trace.traceContents.precedentsNames = new List<string>();
+                foreach (TimeSeries ts in tss)
+                {
+                    trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
+                }
+            }
+        }
+
         public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent, bool mySelf)
         {
             bool useMySelf = false;
@@ -166,28 +178,28 @@ namespace Gekko
                     }
                     //tsLhs.trace2 = traceLhs; //
 
-                    int hit = -12345;
-
-                    for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
-                    {
-                        Trace2 trace = tsLhs.trace2.precedents.storage[i];
-                        if (!trace.traceContents.period.t1.IsNull() && !trace.traceContents.period.t2.IsNull() && traceLhs.traceContents.period.t1.IsSamePeriod(trace.traceContents.period.t1) && traceLhs.traceContents.period.t2.IsSamePeriod(trace.traceContents.period.t2))
-                        {
-                            hit = i;
-                            break;
-                        }
-                    }
-
-                    if (hit != -12345)
-                    {
-                        tsLhs.trace2.precedents.storage.RemoveAt(hit);
-                    }
-
+                    MaybeRemoveShadowedTrace(traceLhs.traceContents.period.t1, traceLhs.traceContents.period.t2, tsLhs);
                     tsLhs.trace2.precedents.storage.Add(traceLhs);
-
-
-
                 }
+            }
+        }
+
+        private static void MaybeRemoveShadowedTrace(GekkoTime t1, GekkoTime t2, TimeSeries tsLhs)
+        {
+            if (t1.IsNull() || t2.IsNull()) return;
+            int hit = -12345;
+            for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
+            {
+                Trace2 trace = tsLhs.trace2.precedents.storage[i];
+                if (!trace.traceContents.period.t1.IsNull() && !trace.traceContents.period.t2.IsNull() && t1.IsSamePeriod(trace.traceContents.period.t1) && t2.IsSamePeriod(trace.traceContents.period.t2))
+                {
+                    hit = i;
+                    break;
+                }
+            }
+            if (hit != -12345)
+            {
+                tsLhs.trace2.precedents.storage.RemoveAt(hit);
             }
         }
 
@@ -213,7 +225,15 @@ namespace Gekko
                 
                 //These must be short
                 string name = parent.traceContents.name;
-                string period = parent.traceContents.period.ToString().Split(' ')[0];
+                string period = null;
+                if (parent.traceContents.period.t1.IsNull() || parent.traceContents.period.t2.IsNull())
+                {
+                    period = "<no period>";
+                }
+                else
+                {
+                    period = parent.traceContents.period.ToString().Split(' ')[0];
+                }
                 string code = RemoveNewlines(parent.traceContents.text);
                 string file = null;
                 string fileDetailed = null;
@@ -247,14 +267,14 @@ namespace Gekko
 
                 if (type == 0 && depth > 0)
                 {
-                    string d = "|||";
+                    string d = "{tce}";
                     traceLines.Add((depth - 1) + d + name + d + period + d + code + d + prec + d + file + d + datafile + d + id + d + parent.traceContents.name + d + parent.traceContents.period + d + parent.traceContents.text + d + prec + d + parent.traceContents.commandFileAndLine + d + parent.traceContents.dataFile + d + parent.traceContents.id);
                 }
                 else
                 {
                     if (depth == 1)
                     {
-                        G.Writeln("| " + G.Blanks(2 * depth) + parent.traceContents.name + " -- " + parent.traceContents.period + " -- " + Truncate(parent.traceContents.text) + " -- " + Truncate(prec) + " -- " + parent.traceContents.commandFileAndLine + " -- " + parent.traceContents.dataFile + " -- " + parent.traceContents.id, System.Drawing.Color.Gray);
+                        G.Writeln("| " + G.Blanks(2 * (depth - 1)) + code, System.Drawing.Color.Gray);
                     }
                 }
 

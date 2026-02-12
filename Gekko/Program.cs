@@ -3651,6 +3651,7 @@ write datatest;
                         trace.traceContents.dataFile = originalFilePath;
                         trace.traceContents.name = name;
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { tsImported }); } catch { }
                         if (bool_tsExisting)
                         {
                             Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, false, false);
@@ -16418,7 +16419,7 @@ write datatest;
                             if (ts.trace2 != null)
                             {
                                 Trace2.WalkTraces(ts.trace2, 0, traceLines, 1);                                
-                                G.Writeln("Use TRACE command to open the trace viewer");
+                                G.Writeln("Use TRACE command to open the trace viewer", System.Drawing.Color.Gray);
                             }
                         }
                         catch
@@ -21668,14 +21669,15 @@ write datatest;
                         trace.traceContents.text = o.meta + ";";
                         trace.traceContents.name = ts.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
-                        if (Globals.traceContainer.Count() > 0)
-                        {
-                            trace.traceContents.precedentsNames = new List<string>();
-                            foreach (TimeSeries child in Trace2.PrecedentsFromGlobals())
-                            {
-                                trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
-                            }
-                        }
+                        //if (Globals.traceContainer.Count() > 0)
+                        //{
+                        //    trace.traceContents.precedentsNames = new List<string>();
+                        //    foreach (TimeSeries child in Trace2.PrecedentsFromGlobals())
+                        //    {
+                        //        trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
+                        //    }
+                        //}
+                        try { Trace2.PrecedentsNames(trace, Trace2.PrecedentsFromGlobals()); } catch { }
                         Trace2.PushIntoSeries(trace, ts, Trace2.PrecedentsFromGlobals(), false, false); //ALMOST CERTAIN
                     }
                     catch { }
@@ -25488,6 +25490,7 @@ write datatest;
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
                     trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
+                    try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts0 }); } catch { }
                     Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true, false); //CERTAIN
                 }
                 catch { }
@@ -25644,6 +25647,7 @@ write datatest;
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
                     trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
+                    try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts0 }); } catch { }
                     Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true, false); //CERTAIN
                 }
                 catch { }

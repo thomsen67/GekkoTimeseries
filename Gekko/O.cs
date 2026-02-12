@@ -6,6 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Gekko
 {
@@ -2840,6 +2841,7 @@ namespace Gekko
                         trace.traceContents.text = this.gekkocode + ";";
                         trace.traceContents.name = lhs.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { oldSeries }); } catch { }
                         Trace2.PushIntoSeries(trace, lhs, new List<TimeSeries>() { oldSeries }, true, false); //CERTAIN
                     }
                     catch { }
@@ -2991,9 +2993,10 @@ namespace Gekko
                     {
                         Trace2 trace = new Trace2(ETraceType.Normal, t1a, t2b);
                         trace.traceContents.text = this.gekkocode + ";";
-                        trace.traceContents.name = ts1.GetNameAndParentDatabank();
+                        trace.traceContents.name = ts3.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts1, ts2 }, true, false); //CERTAIN
+                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts2, ts1 }); } catch { }
+                        Trace2.PushIntoSeries(trace, ts3, new List<TimeSeries>() { ts2, ts1 }, true, false); //CERTAIN
                     }
                     catch { }
                 }
@@ -3691,6 +3694,7 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                         Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false, false); //COPY
                                     }
                                     catch { }
@@ -3713,6 +3717,7 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                         Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false, false); //COPY
                                     }
                                     catch { }
@@ -3749,6 +3754,7 @@ namespace Gekko
                                     trace.traceContents.text = this.gekkocode + ";";
                                     trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                     trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                                    try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                     Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false, false); //COPY
                                 }
                                 catch { }
@@ -3840,6 +3846,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                                try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                 Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true, true); //CERTAIN
                             }
                             catch { }
@@ -3915,6 +3922,7 @@ namespace Gekko
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
                                 trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                                try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                 Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true, true); //CERTAIN
                             }
                             catch { }
@@ -4243,15 +4251,9 @@ namespace Gekko
                         trace.traceContents.text = this.meta + ";";
                         trace.traceContents.name = lhs.GetNameAndParentDatabank();
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                        if (Globals.traceContainer.Count() > 0)
-                        {
-                            trace.traceContents.precedentsNames = new List<string>();
-                            foreach (TimeSeries ts in Trace2.PrecedentsFromGlobals())
-                            {
-                                trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
-                            }
-                        }
-                        Trace2.PushIntoSeries(trace, lhs, Trace2.PrecedentsFromGlobals(), false, false); //ALMOST CERTAIN
+                        List<TimeSeries> tss = Trace2.PrecedentsFromGlobals();
+                        try { Trace2.PrecedentsNames(trace, tss); } catch { }
+                        Trace2.PushIntoSeries(trace, lhs, tss, false, false); //ALMOST CERTAIN
                     }
                     catch { }
                 }
@@ -4475,7 +4477,8 @@ namespace Gekko
                                 Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = tsNew.GetNameAndParentDatabank();
-                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);                                                                
+                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
+                                try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                 Trace2.PushIntoSeries(trace, tsNew, new List<TimeSeries>() { ts }, true, false); //CERTAIN
                             }
                             catch { }
@@ -5578,8 +5581,22 @@ namespace Gekko
 
                 List<string> traceLines = new List<string>();
                 Trace2.WalkTraces(trace, 0, traceLines, 0);
-                WindowTrace wt = new WindowTrace(traceLines);
-                wt.ShowDialog();
+                if (true)
+                {
+                    Thread sta = new Thread(delegate ()
+                    {
+                        WindowTrace wt = new WindowTrace(traceLines);
+                        wt.Show();
+                        System.Windows.Threading.Dispatcher.Run();
+                    });
+                    sta.SetApartmentState(ApartmentState.STA);
+                    sta.Start();
+                }
+                else
+                {
+                    WindowTrace wt = new WindowTrace(traceLines);
+                    wt.ShowDialog();
+                }
             }
         }
 

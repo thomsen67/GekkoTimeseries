@@ -31,7 +31,7 @@ namespace Gekko
             SetupUI();
             LoadData(input);
             this.KeyDown += MainWindow_KeyDown;
-            _detailsBlock.Text = "Gekko 2.5.x trace viewer.\nNote that compared to Gekko 3.x, Gekko 2.5.x traces are quite rudimentary, not handling time period 'shadowing' particularly well.\nClick a trace to see details.";
+            _detailsBlock.Text = "Gekko 2.5.x trace viewer (experimental).\nSome trace features from Gekko 3.x are ported, but bugs and limitations may occur.\nFor instance, time period 'shadowing' of traces is not handled well.\n\nClick a trace line to see details.";
         }
 
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -44,7 +44,7 @@ namespace Gekko
 
         private void SetupUI()
         {
-            this.Title = "Gekko data-trace";
+            this.Title = "Gekko data-trace (experimental)";
             this.Width = 900;
             this.Height = 600;
             this.Top = 20;
@@ -148,7 +148,7 @@ namespace Gekko
             // 1. Parse lines into objects
             for (int i = 0; i < rawLines.Count; i++)
             {
-                var parts = rawLines[i].Split(new[] { "|||" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
+                var parts = rawLines[i].Split(new[] { "{tce}" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
                 var item = new TreeRow
                 {
                     Depth = int.Parse(parts[0]),
@@ -216,9 +216,12 @@ namespace Gekko
         private void UpdateDetails(TreeRow selected)
         {
             if (selected == null) return;            
-
+            string[] ss = selected.FileLong.Split('¤');
+            string xx = ss[0];
+            if (ss.Length > 1) xx += " line " + ss[1];
+            xx = xx.Trim();
             _detailsBlock.Text = string.Format("{0}\n--------------------------------------------------\nName: {1}\nPeriod: {2}\nFile: {3}\nDatafile: {4}\nStamp: {5}\nVars: {6}",
-                selected.CodeLong, selected.NameLong, selected.PeriodLong, selected.FileLong, selected.DataFileLong, selected.StampLong, selected.VariablesLong);
+                selected.CodeLong, selected.NameLong, selected.PeriodLong, xx, selected.DataFileLong, selected.StampLong, selected.VariablesLong);
         }
 
         private DataTemplate CreateTreeCellTemplate()
