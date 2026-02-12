@@ -2208,6 +2208,7 @@ namespace Gekko.Parser.Gek
                     case "ASTGENRINDEXER":
                         {
                             //GENR fy[2015] = ...
+                            node.Code.A("Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL);
                             node.Code.A("Globals.hack_p = null;" + G.NL);
                             node.Code.A("Globals.hack_g = null;" + G.NL);
                             try
@@ -2221,6 +2222,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.GetTimeSeries(" + node[0].Code + ").Stamp();" + G.NL);
                             node.Code.A("}" + G.NL);
                             node.Code.A("finally {" + G.NL);
+                            node.Code.A("Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL);
                             node.Code.A("Globals.hack_p = null;" + G.NL);
                             node.Code.A("Globals.hack_g = null;" + G.NL);
                             node.Code.A("}" + G.NL);
