@@ -45,6 +45,9 @@ namespace Gekko
         public const string languageDaDK = "da-DK";
         public const string languageEnUS = "en-US";
 
+        public static P hack_p = null;
+        public static string hack_g = null;
+
         public static string versionInternal = "";  // "v14";
 
         public static string isAProto = "Is_a_protobuffer_file";

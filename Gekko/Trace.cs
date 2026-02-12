@@ -162,6 +162,7 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: Glued problem"); throw new GekkoException();
                     }
+                    try { MaybeRemoveShadowedTrace(traceLhs.traceContents.period.t1, traceLhs.traceContents.period.t2, tsLhs); } catch { }
                     tsLhs.trace2.precedents.storage.Add(traceLhs);
                 }
                 else
@@ -178,7 +179,7 @@ namespace Gekko
                     }
                     //tsLhs.trace2 = traceLhs; //
 
-                    MaybeRemoveShadowedTrace(traceLhs.traceContents.period.t1, traceLhs.traceContents.period.t2, tsLhs);
+                    try { MaybeRemoveShadowedTrace(traceLhs.traceContents.period.t1, traceLhs.traceContents.period.t2, tsLhs); } catch { }
                     tsLhs.trace2.precedents.storage.Add(traceLhs);
                 }
             }

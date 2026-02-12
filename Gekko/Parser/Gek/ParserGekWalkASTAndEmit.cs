@@ -2208,8 +2208,22 @@ namespace Gekko.Parser.Gek
                     case "ASTGENRINDEXER":
                         {
                             //GENR fy[2015] = ...
+                            node.Code.A("Globals.hack_p = null;" + G.NL);
+                            node.Code.A("Globals.hack_g = null;" + G.NL);
+                            try
+                            {
+                                node.Code.A("try { Globals.hack_p = p; } catch { }" + G.NL);
+                                node.Code.A("try { Globals.hack_g = `" + node.Parent.specialExpressionAndLabelInfo[1] + "`; } catch { }" + G.NL);
+                            }
+                            catch { }
+                            node.Code.A("try {" + G.NL);
                             node.Code.A("O.GetTimeSeries(" + node[0].Code + ").SetData(O.GetDate(" + node[1].Code + "), O.GetVal(" + node[2].Code + ", t));" + G.NL);
                             node.Code.A("O.GetTimeSeries(" + node[0].Code + ").Stamp();" + G.NL);
+                            node.Code.A("}" + G.NL);
+                            node.Code.A("finally {" + G.NL);
+                            node.Code.A("Globals.hack_p = null;" + G.NL);
+                            node.Code.A("Globals.hack_g = null;" + G.NL);
+                            node.Code.A("}" + G.NL);
                         }
                         break;
                     case "ASTMATRIXINDEXER":

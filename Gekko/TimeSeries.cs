@@ -461,6 +461,23 @@ namespace Gekko
                 }
                 this.SetDirtyGhost(true, false);
             }
+            if (Program.options.databank_trace)
+            {
+                try
+                {
+                    if (Globals.hack_p != null && Globals.hack_g != null)
+                    {
+                        Trace2 trace = new Trace2(ETraceType.Normal, t, t);
+                        trace.traceContents.text = Globals.hack_g; //this.gekkocode + ";";
+                        trace.traceContents.name = this.GetNameAndParentDatabank();
+                        trace.traceContents.commandFileAndLine = Globals.hack_p?.GetGcmTrace(null);
+                        List<TimeSeries> tss = Trace2.PrecedentsFromGlobals();
+                        try { Trace2.PrecedentsNames(trace, tss); } catch { }
+                        Trace2.PushIntoSeries(trace, this, tss, false, false); //ALMOST CERTAIN
+                    }
+                }
+                catch { }
+            }
         }
 
         /// <summary>
