@@ -108,66 +108,86 @@ namespace Gekko
             return Globals.traceContainer.GetList().AsEnumerable().Reverse().ToList();
         }
 
-        public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent)
+        public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent, bool mySelf)
         {
-            if (tsLhs.trace2 == null)
+            bool useMySelf = false;
+            if (mySelf && newParent && tsRhss.Count == 1 && object.ReferenceEquals(tsRhss[0], tsLhs)) useMySelf = true;
+
+            if (useMySelf)
             {
-                tsLhs.trace2 = new Trace2(ETraceType.GluedToSeries, Globals.tNull, Globals.tNull);
-            }
-            if (newParent)
-            {
-                foreach (TimeSeries tsRhs in tsRhss)
-                {
-                    if (!object.ReferenceEquals(tsRhs, tsLhs))
-                    {
-                        if (tsRhs.trace2 != null)
-                        {
-                            //traceLhs.precedents.storage.Add(tsRhs.trace2);
-                            traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
-                        }
-                    }
-                }                                
+                if (tsRhss[0].trace2 != null)
+                {                    
+                    traceLhs.precedents.storage.AddRange(tsRhss[0].trace2.precedents.storage);
+                }                
                 if (Globals.runningOnTTComputer && tsLhs.trace2.type != ETraceType.GluedToSeries)
                 {
                     G.Writeln2("*** ERROR: Glued problem"); throw new GekkoException();
                 }
+                tsLhs.trace2.precedents.storage.Clear();  //else it will be in two places
                 tsLhs.trace2.precedents.storage.Add(traceLhs);
             }
             else
             {
-                foreach (TimeSeries tsRhs in tsRhss)
+
+                if (tsLhs.trace2 == null)
                 {
-                    if (!object.ReferenceEquals(tsRhs, tsLhs))
+                    tsLhs.trace2 = new Trace2(ETraceType.GluedToSeries, Globals.tNull, Globals.tNull);
+                }
+                if (newParent)
+                {
+                    foreach (TimeSeries tsRhs in tsRhss)
                     {
-                        if (tsRhs.trace2 != null)
+                        if (!object.ReferenceEquals(tsRhs, tsLhs))
                         {
-                            traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
+                            if (tsRhs.trace2 != null)
+                            {
+                                //traceLhs.precedents.storage.Add(tsRhs.trace2);
+                                traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
+                            }
                         }
                     }
-                }
-                //tsLhs.trace2 = traceLhs; //
-
-                int hit = -12345;
-
-                for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
-                {
-                    Trace2 trace = tsLhs.trace2.precedents.storage[i];
-                    if (!trace.traceContents.period.t1.IsNull() && !trace.traceContents.period.t2.IsNull() && traceLhs.traceContents.period.t1.IsSamePeriod(trace.traceContents.period.t1) && traceLhs.traceContents.period.t2.IsSamePeriod(trace.traceContents.period.t2))
+                    if (Globals.runningOnTTComputer && tsLhs.trace2.type != ETraceType.GluedToSeries)
                     {
-                        hit = i;
-                        break;
+                        G.Writeln2("*** ERROR: Glued problem"); throw new GekkoException();
                     }
+                    tsLhs.trace2.precedents.storage.Add(traceLhs);
                 }
-
-                if (hit != -12345)
+                else
                 {
-                    tsLhs.trace2.precedents.storage.RemoveAt(hit);                    
+                    foreach (TimeSeries tsRhs in tsRhss)
+                    {
+                        if (!object.ReferenceEquals(tsRhs, tsLhs))
+                        {
+                            if (tsRhs.trace2 != null)
+                            {
+                                traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
+                            }
+                        }
+                    }
+                    //tsLhs.trace2 = traceLhs; //
+
+                    int hit = -12345;
+
+                    for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
+                    {
+                        Trace2 trace = tsLhs.trace2.precedents.storage[i];
+                        if (!trace.traceContents.period.t1.IsNull() && !trace.traceContents.period.t2.IsNull() && traceLhs.traceContents.period.t1.IsSamePeriod(trace.traceContents.period.t1) && traceLhs.traceContents.period.t2.IsSamePeriod(trace.traceContents.period.t2))
+                        {
+                            hit = i;
+                            break;
+                        }
+                    }
+
+                    if (hit != -12345)
+                    {
+                        tsLhs.trace2.precedents.storage.RemoveAt(hit);
+                    }
+
+                    tsLhs.trace2.precedents.storage.Add(traceLhs);
+
+
+
                 }
-
-                tsLhs.trace2.precedents.storage.Add(traceLhs);
-
-
-
             }
         }
 

@@ -3653,11 +3653,11 @@ write datatest;
                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
                         if (bool_tsExisting)
                         {
-                            Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, false);
+                            Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, false, false);
                         }
                         else
                         {
-                            Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, true);
+                            Gekko.Trace2.PushIntoSeries(trace, tsExisting, new List<TimeSeries>() { tsImported }, true, false);
                         }
                     }
                 }
@@ -21676,7 +21676,7 @@ write datatest;
                                 trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
                             }
                         }
-                        Trace2.PushIntoSeries(trace, ts, Trace2.PrecedentsFromGlobals(), false); //ALMOST CERTAIN
+                        Trace2.PushIntoSeries(trace, ts, Trace2.PrecedentsFromGlobals(), false, false); //ALMOST CERTAIN
                     }
                     catch { }
                 }
@@ -25482,11 +25482,13 @@ write datatest;
             {
                 try
                 {
-                    Trace2 trace = new Trace2(ETraceType.Normal, first, last);
+                    GekkoTime tt1 = ts1.GetRealDataPeriodFirst();
+                    GekkoTime tt2 = ts1.GetRealDataPeriodLast();
+                    Trace2 trace = new Trace2(ETraceType.Normal, tt1, tt2);
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
                     trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
-                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true); //CERTAIN
+                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true, false); //CERTAIN
                 }
                 catch { }
             }
@@ -25635,11 +25637,14 @@ write datatest;
             {
                 try
                 {
-                    Trace2 trace = new Trace2(ETraceType.Normal, first, last);
+                    GekkoTime tt1 = ts1.GetRealDataPeriodFirst();
+                    GekkoTime tt2 = ts1.GetRealDataPeriodLast();
+                    Trace2 trace = new Trace2(ETraceType.Normal, tt1, tt2);
+                    //Trace2 trace = new Trace2(ETraceType.Normal, first, last);
                     trace.traceContents.text = o.gekkocode + ";";
                     trace.traceContents.name = ts1.GetNameAndParentDatabank();
                     trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
-                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true); //CERTAIN
+                    Trace2.PushIntoSeries(trace, ts1, new List<TimeSeries>() { ts0 }, true, false); //CERTAIN
                 }
                 catch { }
             }
