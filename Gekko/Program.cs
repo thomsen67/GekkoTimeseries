@@ -16418,8 +16418,9 @@ write datatest;
                         {
                             if (ts.trace2 != null)
                             {
-                                Trace2.WalkTraces(ts.trace2, 0, traceLines, 1);                                
-                                G.Writeln("Use TRACE command to open the trace viewer", System.Drawing.Color.Gray);
+                                int cnt = 0;
+                                Trace2.WalkTraces(ts.trace2, 0, traceLines, 1, ref cnt);                                
+                                G.Writeln("Use 'trace x;' to explore the series 'x' in the trace viewer", System.Drawing.Color.Gray);
                             }
                         }
                         catch
@@ -21668,15 +21669,7 @@ write datatest;
                         Trace2 trace = new Trace2(ETraceType.Normal, o.t1, o.t2);
                         trace.traceContents.text = o.meta + ";";
                         trace.traceContents.name = ts.GetNameAndParentDatabank();
-                        trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);
-                        //if (Globals.traceContainer.Count() > 0)
-                        //{
-                        //    trace.traceContents.precedentsNames = new List<string>();
-                        //    foreach (TimeSeries child in Trace2.PrecedentsFromGlobals())
-                        //    {
-                        //        trace.traceContents.precedentsNames.Add(child.GetNameAndParentDatabank());
-                        //    }
-                        //}
+                        trace.traceContents.commandFileAndLine = o.p?.GetGcmTrace(null);                        
                         try { Trace2.PrecedentsNames(trace, Trace2.PrecedentsFromGlobals()); } catch { }
                         Trace2.PushIntoSeries(trace, ts, Trace2.PrecedentsFromGlobals(), false, false); //ALMOST CERTAIN
                     }

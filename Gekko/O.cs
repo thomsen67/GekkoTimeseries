@@ -5580,7 +5580,8 @@ namespace Gekko
                 }
 
                 List<string> traceLines = new List<string>();
-                Trace2.WalkTraces(trace, 0, traceLines, 0);
+                int cnt = 0;
+                Trace2.WalkTraces(trace, 0, traceLines, 0, ref cnt);
                 if (true)
                 {
                     Thread sta = new Thread(delegate ()

@@ -122,7 +122,7 @@ namespace Gekko
 
         public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent, bool mySelf)
         {
-            bool useMySelf = false;
+             bool useMySelf = false;
             if (mySelf && newParent && tsRhss.Count == 1 && object.ReferenceEquals(tsRhss[0], tsLhs)) useMySelf = true;
 
             if (useMySelf)
@@ -144,6 +144,13 @@ namespace Gekko
                 if (tsLhs.trace2 == null)
                 {
                     tsLhs.trace2 = new Trace2(ETraceType.GluedToSeries, Globals.tNull, Globals.tNull);
+                }
+                else
+                {
+                    try { traceLhs.precedents.storage.AddRange(tsLhs.trace2.precedents.storage); } catch { }
+                    //Precedents2 temp = tsLhs.trace2.precedents;
+                    //tsLhs.trace2 = new Trace2(ETraceType.GluedToSeries, Globals.tNull, Globals.tNull);
+                    //tsLhs.trace2.precedents = temp;
                 }
                 if (newParent)
                 {
@@ -204,7 +211,7 @@ namespace Gekko
             }
         }
 
-        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type) //0 for viewer, 1 for printing
+        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type, ref int counter) //0 for viewer, 1 for printing
         {            
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
@@ -275,14 +282,27 @@ namespace Gekko
                 {
                     if (depth == 1)
                     {
-                        G.Writeln("| " + G.Blanks(2 * (depth - 1)) + code, System.Drawing.Color.Gray);
+                        int max = 3;
+                        if (counter == max)
+                        {
+                            G.Writeln("| ...", System.Drawing.Color.Gray);
+                        }
+                        else if (counter >max)
+                        {
+                            //ignore
+                        }
+                        else
+                        {
+                            G.Writeln("| " + G.Blanks(2 * (depth - 1)) + code, System.Drawing.Color.Gray);
+                        }
+                        counter++;
                     }
                 }
 
                 //NOTE: list items are reversed!
                 foreach (Trace2 child in parent.precedents.storage.AsEnumerable().Reverse().ToList())
                 {
-                    WalkTraces(child, depth + 1, traceLines, type);
+                    WalkTraces(child, depth + 1, traceLines, type, ref counter);
                 }
             }
             finally
@@ -418,6 +438,11 @@ namespace Gekko
                 meta.ToID();
             }
             databank.traces = th.tracesDepth2.Keys.ToList();
+        }
+
+        public override string ToString()
+        {
+            return "<" + this.traceContents.period.ToString() + ">" + " " + this.traceContents.text;
         }
     }
 
