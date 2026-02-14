@@ -1785,7 +1785,8 @@ namespace Gekko
                                 //    }
                                 //    catch { }
                                 //}
-                                HandleTraceForReadOrImport(per1, per2, false, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                //HandleTraceForReadOrImport(per1, per2, false, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                HandleTraceForReadOrImport(per1, per2, false, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                             else
                             {
@@ -1802,7 +1803,8 @@ namespace Gekko
                                 //    }
                                 //    catch { }
                                 //}
-                                HandleTraceForReadOrImport(per1, per2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                //HandleTraceForReadOrImport(per1, per2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                HandleTraceForReadOrImport(per1, per2, true, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                         }
 
@@ -3468,7 +3470,15 @@ write datatest;
                                     Trace2.HandleTraceRead1(temp);
                                     temp.traces = null;
                                 }
-                                readInfo.variables = temp.storage.Count;
+                                int n = 0;
+                                if (traces != null)
+                                {
+                                    foreach (Trace2 trace in traces)
+                                    {
+                                        if (trace.type != ETraceType.GluedToSeries) n++;
+                                    }
+                                }
+                                readInfo.nTraces = n;
                                 G.WritelnGray("Protobuf trace deserialize took: " + G.Seconds(dt3));
                             }
                             catch (Exception e)
@@ -3975,7 +3985,8 @@ write datatest;
                                 //    }
                                 //    catch { }
                                 //}
-                                HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                //HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                HandleTraceForReadOrImport(gt1, gt2, true, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                         }
                     }  //end of readline from file
@@ -4388,9 +4399,8 @@ write datatest;
                     //    }
                     //    catch { }
                     //}
-                    HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
-
-
+                    //HandleTraceForReadOrImport(gt1, gt2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                    HandleTraceForReadOrImport(gt1, gt2, true, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                 }
             }
 
@@ -4804,7 +4814,8 @@ write datatest;
                     //    }
                     //    catch { }
                     //}
-                    HandleTraceForReadOrImport(gt_start, gt_end, true, ts, ts, ts.GetNameAndParentDatabank(), gekkocode, p, realFileName);
+                    ////HandleTraceForReadOrImport(gt_start, gt_end, true, ts, ts, ts.GetNameAndParentDatabank(), gekkocode, p, realFileName);
+                    HandleTraceForReadOrImport(gt_start, gt_end, true, ts, null, ts.GetNameAndParentDatabank(), gekkocode, p, realFileName);
                 }
                 else
                 {
@@ -22085,6 +22096,7 @@ write datatest;
         public static int Write(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
             //ErrorIfDatabanksSwapped();
+            int n = 0;
             if (databank.storage.Count == 0)
             {
                 if (isCloseCommand)
@@ -22177,7 +22189,7 @@ write datatest;
             }
 
             if (isTsdx && tsdxVersion == "1.1")
-            {
+            {                
                 //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                 RuntimeTypeModel serializer = TypeModel.Create();
                 serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
@@ -22246,7 +22258,7 @@ write datatest;
 
                     bool traceFail = false;
                     TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
-                    List<Trace2> tracesToWrite = null;
+                    List<Trace2> tracesToWrite = null;                    
                     if (useTraces)
                     {
                         try
@@ -22257,6 +22269,18 @@ write datatest;
                         tracesToWrite = databank.traces;
                         databank.traces = null;
                     }
+                    
+                    try
+                    {
+                        if (tracesToWrite != null)
+                        {
+                            foreach (Trace2 trace in tracesToWrite)
+                            {
+                                if (trace.type != ETraceType.GluedToSeries) n++;
+                            }
+                        }
+                    }
+                    catch { }
 
                     using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
                     {
@@ -22320,7 +22344,9 @@ write datatest;
             if (!Globals.setPrintMute)
             {
                 G.Writeln();
-                G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
+                string s = null;
+                if (n > 0) s = " and " + n + " data-traces";
+                G.Writeln("Wrote " + count + " variables" + s + " to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
                 if (isUsingOptionFolderBank)
                 {
                     if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
@@ -36269,6 +36295,7 @@ write datatest;
             public int variables;
             public int startPerInFile = -12345;
             public int endPerInFile = -12345;
+            public int nTraces = 0;
             public int startPerResultingBank = -12345;
             public int endPerResultingBank = -12345;
             public int createdVars;
@@ -36327,6 +36354,11 @@ write datatest;
                 tab.CurRow.Next();
                 tab.CurRow.SetText(1, "Period   : The file contains data from " + this.startPerInFile + "-" + this.endPerInFile);
                 tab.CurRow.Next();
+                if (this.nTraces > 0)
+                {                    
+                    tab.CurRow.SetText(1, "Traces   : The file contains " + this.nTraces + " data-traces");
+                    tab.CurRow.Next();
+                }
                 //#8572309572439
                 int total = Program.databanks.GetDatabank(this.dbName).storage.Count;  
                 if (this.shouldMerge)

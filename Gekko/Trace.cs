@@ -115,7 +115,7 @@ namespace Gekko
                 trace.traceContents.precedentsNames = new List<string>();
                 foreach (TimeSeries ts in tss)
                 {
-                    trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
+                    if (ts != null) trace.traceContents.precedentsNames.Add(ts.GetNameAndParentDatabank());
                 }
             }
         }
@@ -123,7 +123,7 @@ namespace Gekko
         public static void PushIntoSeries(Trace2 traceLhs, TimeSeries tsLhs, List<TimeSeries> tsRhss, bool newParent, bool mySelf)
         {
             bool useMySelf = false;
-            if (mySelf && newParent && tsRhss.Count == 1 && object.ReferenceEquals(tsRhss[0], tsLhs)) useMySelf = true;
+            if (mySelf && newParent && tsRhss.Count == 1 && tsRhss[0] != null && object.ReferenceEquals(tsRhss[0], tsLhs)) useMySelf = true;
 
             if (useMySelf)
             {
@@ -152,6 +152,7 @@ namespace Gekko
 
                 foreach (TimeSeries tsRhs in tsRhss)
                 {
+                    if (tsRhs == null) continue;
                     if (tsRhs.trace2 != null)
                     {
                         traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);

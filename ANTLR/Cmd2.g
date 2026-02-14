@@ -3294,6 +3294,7 @@ optionType :
 			 | DATABANK CREATE AUTO '='? yesNoSimple -> DATABANK CREATE AUTO ^(ASTBOOL yesNoSimple )
 			 | DATABANK CREATE MESSAGE '='? yesNoSimple -> DATABANK CREATE MESSAGE ^(ASTBOOL yesNoSimple )			
 			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )			
+             | DATABANK TRACE '='? yesNoSimple -> DATABANK TRACE ^(ASTBOOL yesNoSimple )			
 			 | DATABANK LOGIC '='? optionDatabankLogic -> DATABANK LOGIC ^(ASTSTRINGSIMPLE optionDatabankLogic )		
 
 			 | FOLDER question -> FOLDER question
