@@ -41,12 +41,11 @@ namespace Gekko
     public class Globals        
     {
         public static ListUnique<TimeSeries> traceContainer = new ListUnique<TimeSeries>();
-
-        public const string languageDaDK = "da-DK";
-        public const string languageEnUS = "en-US";
-
         public static P hack_p = null;
         public static string hack_g = null;
+        public static int hack_lhsOrRhs = 0;  // -1:left   0:unknown    1:right
+        public const string languageDaDK = "da-DK";
+        public const string languageEnUS = "en-US";
 
         public static string versionInternal = "";  // "v14";
 

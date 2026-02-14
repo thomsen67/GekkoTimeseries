@@ -3997,6 +3997,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);
 
                             node.Code.A("Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL);
+                            node.Code.A("Globals.hack_lhsOrRhs = 0;" + G.NL);
 
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
 
@@ -4046,6 +4047,7 @@ namespace Gekko.Parser.Gek
                             }                            
                             node.Code.A("o").A(Num(node)).A(".Exe();").A(G.NL);
                             node.Code.A("Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL);
+                            node.Code.A("Globals.hack_lhsOrRhs = 0;" + G.NL);
                             //G.Writeln(node.Code);
                         }
                         break;
@@ -4666,6 +4668,7 @@ namespace Gekko.Parser.Gek
             string nodeCode = null;
             nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;
             nodeCode += "Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL;
+            nodeCode += "Globals.hack_lhsOrRhs = 0;" + G.NL;
             nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
             nodeCode += childCodePeriod + G.NL;  //dates
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
@@ -4710,6 +4713,7 @@ namespace Gekko.Parser.Gek
             }
             nodeCode += "o" + numNode + ".Exe();" + G.NL;
             nodeCode += "Globals.traceContainer = new ListUnique<TimeSeries>();" + G.NL;
+            nodeCode += "Globals.hack_lhsOrRhs = 0;" + G.NL;
             return nodeCode;
         }
 

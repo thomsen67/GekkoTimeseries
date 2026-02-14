@@ -7530,100 +7530,109 @@ write datatest;
             //Looks for the timeseries, and if not existing it will be created if starting with 'xx'
             //Has an overload used for reading tsd and PCIM files etc.
 
-            if (variable.Contains("."))
+            if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Can) Globals.hack_lhsOrRhs = -1; //lhs
+            else Globals.hack_lhsOrRhs = 1; //rhs
+            try
             {
-                G.Writeln2("*** ERROR: Malformed name: '" + variable + "'");
-                G.Writeln("           Dot freqs like .q or .m are not supported yet, please use 'OPTION freq'", Color.Red);
-                throw new GekkoException();
-            }
 
-            TimeSeries ts = null;
-
-            if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Can || isLhsSoCanAutoCreate == O.ECreatePossibilities.Must)
-            {
-                //Is on left side of = in SERIES or UPD, for instance SERIES newts = ... or UPD newts = ...
-                //No matter if databank search is active or not
-                Databank db = Program.databanks.GetDatabank(bank);
-                if (db == null)
+                if (variable.Contains("."))
                 {
-                    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found.");
+                    G.Writeln2("*** ERROR: Malformed name: '" + variable + "'");
+                    G.Writeln("           Dot freqs like .q or .m are not supported yet, please use 'OPTION freq'", Color.Red);
                     throw new GekkoException();
                 }
-                ts = db.GetVariable(variable);
 
-                if (ts == null)
+                TimeSeries ts = null;
+
+                if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Can || isLhsSoCanAutoCreate == O.ECreatePossibilities.Must)
                 {
-                    //TODO: isReadingDatabank could be removed and replaced by .Must
-                    if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Must || isReadingDatabank || Program.options.databank_create_auto || variable.ToLower().StartsWith("xx"))
+                    //Is on left side of = in SERIES or UPD, for instance SERIES newts = ... or UPD newts = ...
+                    //No matter if databank search is active or not
+                    Databank db = Program.databanks.GetDatabank(bank);
+                    if (db == null)
                     {
-                        //See also similar code regarding CREATE
-                        ts = new TimeSeries(Program.options.freq, variable);
-                        //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
-                        //if (!Globals.globalPeriodStart.IsNull())
-                        //{
-                        //    //WHY is this done. For efficiency afterwards??
-                        //    //TO get start/end date??
-                        //    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
-                        //    {
-                        //        ts.SetData(gt, double.NaN);
-                        //    }
-                        //}
-                        //We know the timeseries does not already exist
-                        db.AddVariable(ts);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");
-                        G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
-                        G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
+                        G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found.");
                         throw new GekkoException();
                     }
-                }
-            }
-            else
-            {
-                //canAutoCreate = false
-                //So we are on the right hand side of = in SERIES, or in PRT or other.
-                //Here, searching is possible!
-                if (Program.options.databank_search && !hasColon)
-                {
-                    //So we are on the right side of = in GENR (or in PRT, ...), and the varible has no bank indicated
-                    //This means we can search the banks for the variable.
+                    ts = db.GetVariable(variable);
 
-                    for (int i = 0; i < Program.databanks.storage.Count; i++)
-                    {
-                        if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
-                        Databank db2 = Program.databanks.storage[i];
-                        ts = db2.GetVariable(variable);
-                        if (ts != null) break;
-                    }
                     if (ts == null)
                     {
-                        ts = HandleMissingVariable(null, variable);
+                        //TODO: isReadingDatabank could be removed and replaced by .Must
+                        if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Must || isReadingDatabank || Program.options.databank_create_auto || variable.ToLower().StartsWith("xx"))
+                        {
+                            //See also similar code regarding CREATE
+                            ts = new TimeSeries(Program.options.freq, variable);
+                            //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
+                            //if (!Globals.globalPeriodStart.IsNull())
+                            //{
+                            //    //WHY is this done. For efficiency afterwards??
+                            //    //TO get start/end date??
+                            //    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
+                            //    {
+                            //        ts.SetData(gt, double.NaN);
+                            //    }
+                            //}
+                            //We know the timeseries does not already exist
+                            db.AddVariable(ts);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");
+                            G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
+                            G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
+                            throw new GekkoException();
+                        }
                     }
                 }
                 else
                 {
-                    //simple
-                    Databank db = Program.databanks.GetDatabank(bank);
-                    if (db == null)
+                    //canAutoCreate = false
+                    //So we are on the right hand side of = in SERIES, or in PRT or other.
+                    //Here, searching is possible!
+                    if (Program.options.databank_search && !hasColon)
                     {
-                        string s = "*** ERROR: Databank '" + bank + "' could not be found.";
+                        //So we are on the right side of = in GENR (or in PRT, ...), and the varible has no bank indicated
+                        //This means we can search the banks for the variable.
+
+                        for (int i = 0; i < Program.databanks.storage.Count; i++)
                         {
-                            G.Writeln2(s);
-                            throw new GekkoException();
+                            if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
+                            Databank db2 = Program.databanks.storage[i];
+                            ts = db2.GetVariable(variable);
+                            if (ts != null) break;
+                        }
+                        if (ts == null)
+                        {
+                            ts = HandleMissingVariable(null, variable);
                         }
                     }
-                    ts = db.GetVariable(variable);
-                    if (ts == null)
+                    else
                     {
-                        ts = HandleMissingVariable(bank, variable);
+                        //simple
+                        Databank db = Program.databanks.GetDatabank(bank);
+                        if (db == null)
+                        {
+                            string s = "*** ERROR: Databank '" + bank + "' could not be found.";
+                            {
+                                G.Writeln2(s);
+                                throw new GekkoException();
+                            }
+                        }
+                        ts = db.GetVariable(variable);
+                        if (ts == null)
+                        {
+                            ts = HandleMissingVariable(bank, variable);
+                        }
                     }
                 }
+
+                return ts;
             }
-
-            return ts;
-
+            finally
+            {
+                Globals.hack_lhsOrRhs = 0;
+            }
         }
 
         private static TimeSeries HandleMissingVariable(string bank, string variable)

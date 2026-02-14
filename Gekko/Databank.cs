@@ -252,7 +252,7 @@ namespace Gekko
             this.isDirty = true;
             if (Program.options.databank_trace)
             {
-                Globals.traceContainer.Add(ts);
+                //Globals.traceContainer.Add(ts);
             }
         }
 
@@ -273,7 +273,7 @@ namespace Gekko
             this.isDirty = true;
             if (Program.options.databank_trace)
             {
-                Globals.traceContainer.Add(ts);
+                //Globals.traceContainer.Add(ts);
             }
         }
 
@@ -288,7 +288,10 @@ namespace Gekko
             TimeSeries x = null; this.storage.TryGetValue(variable, out x);
             if (Program.options.databank_trace)
             {
-                Globals.traceContainer.Add(x);
+                if (Globals.hack_lhsOrRhs == 1)
+                {
+                    Globals.traceContainer.Add(x);
+                }
             }
             return x;            
         }
@@ -299,7 +302,10 @@ namespace Gekko
             TimeSeries x = null; this.storage.TryGetValue(variable, out x);
             if (Program.options.databank_trace)
             {
-                Globals.traceContainer.Add(x);
+                if (Globals.hack_lhsOrRhs == 1)
+                {
+                    Globals.traceContainer.Add(x);
+                }
             }
             return x;
         }        
