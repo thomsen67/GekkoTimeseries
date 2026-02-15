@@ -634,7 +634,7 @@ namespace Gekko
                                 fullName.Add(s);
                                 continue;
                             }
-                            GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
+                            GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false, false);  //no error, no 2 digits year
                             bool good = true;
                             //This would be easier if time was known to be always last...
                             if (tt.IsNull()) good = false;

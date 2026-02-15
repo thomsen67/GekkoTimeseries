@@ -344,7 +344,6 @@ namespace Gekko
         }
     }
 
-
     /// <summary>
     /// Has no frequency. May or may not have time
     /// </summary>
@@ -352,7 +351,6 @@ namespace Gekko
     public class DName : Multidim2Element
     {
         private readonly int posName = 0;
-        //private readonly int posFreq = 1;
         private readonly int posIndex = 1;
 
         public DName() : base() { } // Protobuf only
@@ -414,18 +412,23 @@ namespace Gekko
 
                 string s1 = ss[1].Trim();
                 if (!(s1.StartsWith("[") && s1.EndsWith("]"))) new Error("DName problem1");
-                string s1a = s1.Substring(1, s1.Length - 2);                
-                if (!G.LooksLikeYear(s1a)) new Error("DName problem2");                
+                string s1a = s1.Substring(1, s1.Length - 2);
+                if (!G.LooksLikeYearOrQuarterOrMonth(s1a))
+                {
+                    new Error("DName problem2");
+                }
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(s1a, false, true, false);
                 List<StringOrTime> m = new List<StringOrTime>();
                 if (indexes != null)
                 {
                     foreach (string s2 in indexes)
                     {
-                        if (G.LooksLikeYear(s2)) new Error("DName problem3");
+                        if (G.LooksLikeYearOrQuarterOrMonth(s2)) new Error("DName problem3");
                         m.Add(s2);
                     }
                 }
-                m.Add(new GekkoTime(EFreq.A, int.Parse(s1a), 1));
+                //m.Add(new GekkoTime(EFreq.A, int.Parse(s1a), 1));
+                m.Add(gt);
                 return new DName(name, m.ToArray());
             }
             else
@@ -437,9 +440,9 @@ namespace Gekko
                 {
                     foreach (string s2 in indexes)
                     {
-                        if (G.LooksLikeYear(s2))
+                        if (G.LooksLikeYearOrQuarterOrMonth(s2))
                         {
-                            m.Add(GekkoTime.FromStringToGekkoTime(s2));
+                            m.Add(GekkoTime.FromStringToGekkoTime(s2, false, true, false));
                         }
                         else
                         {

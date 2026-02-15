@@ -1778,7 +1778,7 @@ namespace Gekko
             List<string> ss = Chop_GetIndex(name);
             if (ss == null) new Error("No index found");
             string time = ss[ss.Count - 1];
-            GekkoTime t = GekkoTime.FromStringToGekkoTime(time, false, false);  //does not report error, for instance if an equation like E_tIOy_tBase[d,s] does not have a time index. In that case, GekkoTime.tNull is returned.            
+            GekkoTime t = GekkoTime.FromStringToGekkoTime(time, false, false, false);  //does not report error, for instance if an equation like E_tIOy_tBase[d,s] does not have a time index. In that case, GekkoTime.tNull is returned.            
             return t;
         }
 
@@ -5952,6 +5952,55 @@ namespace Gekko
                 }
             }
             return good;
+        }
+
+        /// <summary>
+        /// Something like 2020, 2020q4, 2020m12. Will not allow 3020 or 4020 etc. but will
+        /// allow 2020q9 or 2020m99. But these still "look like dates".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static bool LooksLikeYearOrQuarterOrMonth(string s)
+        {
+            int start1 = -12345;
+            int end1 = -12345;
+            if (!(s[0] == '1' || s[0] == '2')) return false; //Must be 1xxx or 2xxx
+            if (s.Length == 4)
+            {
+                if (!G.AreDigits(s, 1, 3)) return false;
+                return true;
+            }
+            else if (s.Length == 6)
+            {
+                if (!(s[4] == 'q' || s[4] == 'Q' || s[4] == 'm' || s[4] == 'M')) return false;
+                if (!G.AreDigits(s, 1, 3)) return false;
+                if (!G.AreDigits(s, 5, 5)) return false;
+                return true;
+            }
+            else if (s.Length == 7)
+            {
+                if (!(s[4] == 'm' || s[4] == 'M')) return false;
+                if (!G.AreDigits(s, 1, 3)) return false;
+                if (!G.AreDigits(s, 5, 6)) return false;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks in string if index chars from i1 to i2 (both inclusive) are all 0..9. No bounds checks, beware.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
+        public static bool AreDigits(string s, int i1, int i2)
+        {
+            for (int i = i1; i <= i2; i++)
+            {
+                if (!Char.IsDigit(s[i])) return false;
+            }
+            return true;
         }
 
         public static bool LooksLikeQuarter(string s)

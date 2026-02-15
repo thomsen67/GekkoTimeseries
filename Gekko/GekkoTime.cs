@@ -547,7 +547,7 @@ namespace Gekko
         /// <param name="reportError"></param>
         /// <returns></returns>
         public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuartersAndUForWeeks, bool reportError, bool allowTwoDigits)
-        {
+        {            
             //To do the reverse: see G.FromDateToString()
 
             //trailing a or a1 accepted for annual: 2001a, 2001a1
@@ -558,7 +558,7 @@ namespace Gekko
             //else: 2001, 2001q1, 2001m1, 2001m1d15
 
             if (Program.options.bugfix_dates_fast && !allowTwoDigits)
-            {                
+            {
                 if (s.Length < 4) new Error("Could not parse date '" + s + "'.");
                 int y = G.IntParse(s.Substring(0, 4));
                 if (y == -12345) new Error("Could not parse date '" + s + "'.");
@@ -567,30 +567,30 @@ namespace Gekko
                     return new GekkoTime(EFreq.A, y, 1);
                 }
                 int i4 = 4;
-                char c4 = s[i4];                
-                if (c4 == 'a' || c4 == 'A') 
+                char c4 = s[i4];
+                if (c4 == 'a' || c4 == 'A')
                 {
                     if (s.Length == 5 || (s.Length == 6 && s[i4 + 1] == '1'))
                     {
                         return new GekkoTime(EFreq.A, y, 1);
                     }
                 }
-                else if (c4 == 'q' || c4 == 'Q' || c4 == 'k' || c4 == 'K') 
+                else if (IsQuarter(c4, allowKForQuartersAndUForWeeks))
                 {
-                    int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));                    
+                    int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));
                     if (i2 == -12345 || i2 == 0) new Error("Could not parse date '" + s + "'.");
                     return new GekkoTime(EFreq.Q, y, i2);
-                }                
-                else if (c4 == 'm' || c4 == 'M') 
+                }
+                else if (c4 == 'm' || c4 == 'M')
                 {
                     int i_d = -12345;
                     for (int i = i4 + 1; i < s.Length; i++)
                     {
-                        char c = s[i];                        
-                        if (c == 'd' || c == 'D') { i_d = i; break; }                        
+                        char c = s[i];
+                        if (c == 'd' || c == 'D') { i_d = i; break; }
                     }
                     if (i_d != -12345)
-                    {                        
+                    {
                         int i2 = G.IntParse(s.Substring(i4 + 1, i_d - i4 - 1));
                         int i3 = G.IntParse(s.Substring(i_d + 1, s.Length - i_d - 1));
                         if (i2 == -12345 || i2 == 0 || i3 == -12345 || i3 == 0) new Error("Could not parse date '" + s + "'.");
@@ -602,13 +602,13 @@ namespace Gekko
                         if (i2 == -12345 || i2 == 0) new Error("Could not parse date '" + s + "'.");
                         return new GekkoTime(EFreq.M, y, i2);
                     }
-                }                                                
-                else if (c4 == 'w' || c4 == 'W' || c4 == 'u' || c4 == 'U')
+                }
+                else if (IsWeek(c4, allowKForQuartersAndUForWeeks))
                 {
-                    int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));                    
+                    int i2 = G.IntParse(s.Substring(i4 + 1, s.Length - i4 - 1));
                     if (i2 == -12345 || i2 == 0) new Error("Could not parse date '" + s + "'.");
                     return new GekkoTime(EFreq.W, y, i2);
-                }                
+                }
             }
 
             //========================================================================================================
@@ -845,6 +845,30 @@ namespace Gekko
                 else return GekkoTime.tNull;
             }
             return t;
+        }
+
+        /// <summary>
+        /// Checks w/W and possibly u/U
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="allowKForQuartersAndUForWeeks"></param>
+        /// <returns></returns>
+        private static bool IsWeek(char c, bool allowKForQuartersAndUForWeeks)
+        {
+            if (allowKForQuartersAndUForWeeks) return c == 'w' || c == 'W' || c == 'u' || c == 'U';
+            else return c == 'w' || c == 'W';
+        }
+
+        /// <summary>
+        /// Checks q/Q and possibly k/K
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="allowKForQuartersAndUForWeeks"></param>
+        /// <returns></returns>
+        private static bool IsQuarter(char c, bool allowKForQuartersAndUForWeeks)
+        {
+            if (allowKForQuartersAndUForWeeks) return c == 'q' || c == 'Q' || c == 'k' || c == 'K';
+            else return c == 'q' || c == 'Q';
         }
 
         /// <summary>
