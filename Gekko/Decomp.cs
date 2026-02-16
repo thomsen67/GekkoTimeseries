@@ -6239,8 +6239,8 @@ namespace Gekko
                 foreach (EqInfoSimple eqHelper in eqsNew)
                 {
                     lineCounter++;                    
-                    string eqName = eqHelper.eqName;
-                    string eqName3 = eqHelper.eqNameWithLag;
+                    DName eqName = eqHelper.eqName;
+                    DName eqName3 = eqHelper.eqNameWithLag;
                     EquationTextHelper helper2 = new EquationTextHelper();
                     helper2.showTime = o.decompFind.decompOptions2.showTime;
                     List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqHelper.eqNumber, helper2, modelGamsScalar.GetDecompT());
@@ -6254,30 +6254,30 @@ namespace Gekko
                     string textColor = "Black";
                     if (o.decompFind.decompOptions2.new_from != null)
                     {
-                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3, StringComparer.OrdinalIgnoreCase))
+                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3.ToString(), StringComparer.OrdinalIgnoreCase))
                         {
                             textColor = "Gray";
                         }
                     }
                     //This is where the contents of each GUI line is set
                     //Hack that it is a global variable...
-                    Globals.itemHandler.Add(new EquationListItem(eqName3, " ", boolName, boolLhs, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName));
+                    Globals.itemHandler.Add(new EquationListItem(eqName3.ToString(), " ", boolName, boolLhs, tt, Stringlist.GetListWithCommas(precedents, " "), "Black", textColor, lineCounter == selectedRow, eqName.ToString()));
                 }
 
                 if (eqsNew == null || eqsNew.Count == 0)
                 {
                     new Error("Could not find any equation(s) containing the variable '" + variableName + "'");
                 }
-                string firstEqName2 = eqsNew[0].eqName;
+                DName firstEqName2 = eqsNew[0].eqName;
                 WindowFind windowFind = new WindowFind(o);
                 windowFind.Title = variableName + " - " + "Gekko equations";
-                windowFind.FindSetButtons(firstEqName2, firstList, model);
+                windowFind.FindSetButtons(firstEqName2.ToString(), firstList, model);
                 windowFind.FindSetLabel(variableName);
-                windowFind._activeEquation = firstEqName2;
+                windowFind._activeEquation = firstEqName2.ToString();
                 windowFind._activeVariable = null;
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = o.decompFind.decompOptions2.showTime;
-                windowFind.FindSetEquation(firstEqName2, helper, modelGamsScalar.GetDecompT(), model);
+                windowFind.FindSetEquation(firstEqName2.ToString(), helper, modelGamsScalar.GetDecompT(), model);
                 windowFind.decompFind.SetWindow(windowFind);
                 windowFind.ShowDialog();
 

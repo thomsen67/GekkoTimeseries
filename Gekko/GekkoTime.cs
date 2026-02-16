@@ -22,12 +22,12 @@ namespace Gekko
         Q,
         M,        
         U,        //Undated, also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
-        None,     //used to signal non-freq variable, for instance a VAL   
+        None,     //used to signal non-freq variable (usually something failing or not assigned, like "null")
         D,        //daily        
         W,        //weekly
-        Lag,      //used for lags, where the .super short can be negative.
-        Empty4,   // --------> this and the following can be filled/changed
-        Empty5,
+        Lag,      //used for time-lags, where the .super short can be negative.
+        Age,      //used for non-time short integers like age and the like, which can be calculated on (like x[18+1, 2020+1] for the cohort after the 18yo in 2020 (x[18, 2020]).
+        Empty5,   // --------> this and the following can be filled/changed
         Empty6,
         Empty7,
         Empty8,
@@ -1856,7 +1856,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Human-readable version for Gekko.
+        /// Human-readable version for Gekko. May return null for type .Lag is .super == 0 (else returns "[-1]", "[+1]", etc.
         /// </summary>
         /// <returns></returns>
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()
@@ -1893,6 +1893,19 @@ namespace Gekko
             else if (this.freq == EFreq.U)  
             {
                 return "" + super;  
+            }
+            else if (this.freq == EFreq.Lag)
+            {
+                //if (this.super < 0) return "[" + this.super + "]";
+                //else if (this.super > 0) return "[" + "+" + this.super + "]";
+                //else return null;
+                if (this.super < 0) return "" + this.super;
+                else if (this.super > 0) return "+" + this.super;
+                else return null;
+            }
+            else if (this.freq == EFreq.Age)
+            {
+                return "" + this.super;                
             }
             else
             {

@@ -1578,10 +1578,11 @@ img {border-style: none;
                 string varName = bh.restrict_varName;
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                WindowFlow.WalkNodes(depth, graph, varName, eqName, walkInfo);
+                //string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                DName eqName = temp[0].eqName.RemoveTime();
+                WindowFlow.WalkNodes(depth, graph, varName, eqName.ToString(), walkInfo);
                 nodeNames = walkInfo.nodeNames;
-                G.WritelnGray("TTH: maxDepth vars end (" + nodeNames.Count + ")");
+                G.WritelnGray("TTH: maxDepth vars end (" + nodeNames.Count() + ")");
             }
 
 
@@ -2364,8 +2365,9 @@ img {border-style: none;
                 count++;
                 table += "<tr>";
                 EquationTextHelper helper = new EquationTextHelper();
-                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName }, helper, tUsedHere);                
-                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.Replace(" ", ""), SimplerName(variableName) + ".html" + "#" + SimplerName(G.Chop_RemoveLagOrLead(eqHelper.eqNameWithLag)));
+                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName.ToString() }, helper, tUsedHere);                
+                //string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(G.Chop_RemoveLagOrLead(eqHelper.eqNameWithLag)));
+                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
                 if (count == 0) link ="<b>" + link + "</b>";
                 table += "<td style=`vertical-align:top`>";
                 table += link;

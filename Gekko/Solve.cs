@@ -847,7 +847,7 @@ namespace Gekko
                         for (int i = 0; i < modelGamsScalar.eqCounts - modelGamsScalar.fakeEqCounts; i++)
                         {
                             string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
-                            G.Chop_Chop(modelGamsScalar.GetEqName(i), out bank, out name2, out freq2, out indexes); //freq2 will be == null
+                            G.Chop_Chop(modelGamsScalar.GetEqName(i).ToString(), out bank, out name2, out freq2, out indexes); //freq2 will be == null
                             string name = o.opt_prefix + name2;
                             if (indexes == null)
                             {

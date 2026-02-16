@@ -6561,13 +6561,6 @@ namespace Gekko
             //NOTE: Does not include the invisible traces assigned to each series object
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
-            //int max = 10000;
-            //int[] depths = new int[max];
-            //foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
-            //{                
-            //    depths[Math.Min(kvp.Value.depth, max)]++;
-            //}
-
             SortedDictionary<int, int> depths = new SortedDictionary<int, int>();
             foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
             {
@@ -6615,68 +6608,7 @@ namespace Gekko
             if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
             if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
         }        
-
-        //public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
-        //{
-        //    //See _Test_GAMSScalar1()+2() unit tests
-        //    if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");
-        //    string input1 = O.ConvertToString(input[0]);
-        //    if (G.Equal(input1, "info"))
-        //    {
-        //        if (Program.model.modelGamsScalar == null) new Error("No scalar model loaded: did you forget a MODEL statement?");
-        //        //
-        //        // NB NB NB NB
-        //        //
-        //        GekkoTime t = new GekkoTime(EFreq.A, 2024, 1);
-        //        GekkoTime t1 = Program.model.modelGamsScalar.absoluteT1;
-        //        GekkoTime t2 = Program.model.modelGamsScalar.absoluteT2;
-        //        Zipper zipper = new Zipper("info.zip");
-        //        string[] x = Program.model.modelGamsScalar.dict_FromANumberToVarName.OrderBy(s => s, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToArray();
-        //        using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "vars.txt"), null, Program.GekkoFileReadOrWrite.Write))
-        //        using (StreamWriter sw = G.GekkoStreamWriter(fs))
-        //        {
-        //            foreach (string s in x)
-        //            {
-        //                if (G.StartsWith(s, Globals.decompResidualPrefix)) continue;  //do not show residuals
-        //                if (s.StartsWith("x_temp1")) continue;  //cf. gekko_equations.py
-        //                if (s.StartsWith("x_temp2")) continue;  //cf. gekko_equations.py
-        //                string label = "'" + Helper_GetLabel(s) + "'";
-        //                sw.WriteLine(s + G.Blanks(50 - s.Length) + " " + label);
-        //            }
-        //        }
-
-        //        EquationTextHelper helper = new EquationTextHelper();
-
-        //        using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "eqs.txt"), null, Program.GekkoFileReadOrWrite.Write))
-        //        using (StreamWriter sw = G.GekkoStreamWriter(fs))
-        //        {
-        //            foreach (string eq in Program.model.modelGamsScalar.dict_FromEqNumberToEqName)
-        //            {
-        //                if (!eq.Contains(t.ToString() + "]")) continue;
-        //                if (eq.StartsWith("e_temp1")) continue;  //cf. gekko_equations.py
-        //                if (eq.StartsWith("e_temp2")) continue;  //cf. gekko_equations.py
-        //                GetEquationTextHelper2 two = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t, null);
-        //                string eqText = two.s1 + " .. " + two.s2;
-        //                string lhs = "[unknown]";
-        //                if (two.s3 != null) lhs = G.Replace(two.s3, Globals.decompResidualPrefix, "", StringComparison.OrdinalIgnoreCase, 1);
-        //                string label = null;
-        //                if (lhs != "[unknown]") label = "'" + Helper_GetLabel(lhs) + "'";
-        //                sw.WriteLine();
-        //                string s2 = lhs + " from " + two.s1;
-        //                sw.WriteLine(s2);
-        //                sw.WriteLine(label);
-        //                sw.WriteLine();
-        //                sw.WriteLine(two.s2);
-        //                sw.WriteLine();
-        //                sw.WriteLine(" ------------------------------------------------------------------------------- ");                        
-        //            }
-        //        }
-        //        zipper.ZipAndCleanup();
-        //        new Writeln("Created info.zip with vars.txt and eqs.txt inside. Equations are from the year " + t.ToString());
-        //    }
-        //    else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");
-        //}
-
+        
         private static string Helper_GetLabel(string s)
         {
             Series ts = O.GetIVariableFromString(G.Chop_AddFreq(s, Program.options.freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;

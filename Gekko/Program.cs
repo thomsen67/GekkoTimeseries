@@ -2038,8 +2038,8 @@ namespace Gekko
 
     public class EqInfoSimple
     {
-        public string eqName = null;
-        public string eqNameWithLag = null;
+        public DName eqName = null; //E_qC_tot[2027]
+        public DName eqNameWithLag = null; //E_qC_tot[-1]
         public int eqNumber = -12345;
         public bool best = false;
         public double score = Globals.lhsScore0;  //rhs
@@ -16392,8 +16392,19 @@ namespace Gekko
                     {
                         new Writeln("Limit of 10 consecutive data-trace windows exceeded.");
                         break;
-                    }                    
-                    Trace2.CallTraceViewer(trace, int.MaxValue);
+                    }
+                    TraceViewerInfo info = new TraceViewerInfo();
+                    info.ts = ts;
+                    int n = -12345;
+                    try
+                    {
+                        TraceHelper th = new TraceHelper();
+                        trace.DeepTrace(th, Globals.traceDeepStartDepth);
+                        n = Trace2.CountWithoutInvisible(th.tracesDepth2);
+                    }
+                    catch { }
+                    info.n = n;
+                    Trace2.CallTraceViewer(trace, int.MaxValue, info);
                 }
             }
         }        
@@ -16619,7 +16630,7 @@ namespace Gekko
                 {
                     try
                     {
-                        Trace2.PrintTraceHelper(ts.meta.trace2, false);
+                        Trace2.PrintTraceHelper(ts.meta.trace2, false, ts);
                     }
                     catch
                     {
@@ -16943,9 +16954,9 @@ namespace Gekko
                 GekkoDictionaryBlanks<int> eqNamesWithIndexesNoTime = new GekkoDictionaryBlanks<int>();
                 foreach (EqInfoSimple eqHelper in eqsContainingVariable)
                 {
-                    string temp1 = G.Chop_RemoveIndex(eqHelper.eqName);
+                    string temp1 = eqHelper.eqName.GetName();
                     if (!eqNamesWithoutIndexesNoTime.ContainsKey(temp1)) eqNamesWithoutIndexesNoTime.Add(temp1, 0);
-                    string temp2 = G.Chop_DimensionRemoveLast_FASTER(eqHelper.eqName);
+                    string temp2 = eqHelper.eqName.RemoveTime().ToString();
                     if (!eqNamesWithIndexesNoTime.ContainsKey(temp2)) eqNamesWithIndexesNoTime.Add(temp2, 0);
                 }
                 eqNamesWithoutIndexesNoTimeList = eqNamesWithoutIndexesNoTime.GetKeys();
@@ -16966,12 +16977,12 @@ namespace Gekko
                 using (Writeln txt = new Writeln())
                 {
                     txt.MainOmitVeryFirstNewLine();
-                    txt.MainAdd("Equation " + G.Chop_RemoveIndex(bestEq.eqName) + ":");
+                    txt.MainAdd("Equation " + bestEq.eqName.GetName() + ":");
                 }
 
                 //Gets the equation text (raw)
                 EquationTextHelper helperA = new EquationTextHelper();                
-                GetEquationTextHelper helperA1 = Program.model.GetEquationText(new List<string>() { bestEq.eqName }, helperA, tUsedHere);
+                GetEquationTextHelper helperA1 = Program.model.GetEquationText(new List<string>() { bestEq.eqName.ToString() }, helperA, tUsedHere);
 
                 string eqTextA = helperA1.s_gekkoSyntax;                
 
@@ -17124,11 +17135,7 @@ namespace Gekko
         }
 
         public static List<string> FindDependentVars(string varnameWithoutFreq, Model model, ModelGams modelGams, ModelGamsScalar modelGamsScalar, List<EqInfoSimple> eqsContainingVariable)
-        {            
-            //string vars = null;
-            //string dependentVars = null;
-            //GekkoDictionaryBlanks<int> dependentVarsDict = new GekkoDictionaryBlanks<int>();
-
+        {
             GekkoDictionary<string, bool> deps = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (EqInfoSimple eqInfo in eqsContainingVariable)
             {

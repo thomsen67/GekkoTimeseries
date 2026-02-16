@@ -66,17 +66,6 @@ namespace Gekko
         public List<string> indexes = null;
     }
 
-    //[ProtoContract]
-    //public class EqHelper
-    //{
-    //    [ProtoMember(1)]
-    //    public GekkoDictionaryBlanks<double> scores = new GekkoDictionaryBlanks<double>();
-    //    [ProtoMember(2)]
-    //    public int eqNumber = -12345;
-    //    [ProtoMember(3)]
-    //    public string eqName = null;
-    //}
-
     public class EquationLhsPoints
     {
         public string eqname = null;
@@ -1177,7 +1166,7 @@ namespace Gekko
             {
                 EqInfoSimple eqInfo = new EqInfoSimple();
                 eqInfo.eqName = model.modelGamsScalar.GetEqName(eqNumber);
-                eqInfo.eqNameWithLag = G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false, false, ""); //We preserve Gekko style for eqs, because the string is used when clicking
+                eqInfo.eqNameWithLag = model.modelGamsScalar.GetEqName(eqNumber).ConvertToLag(tHere); // G.Chop_DimensionConvertToLag(eqInfo.eqName, tHere, false, false, ""); //We preserve Gekko style for eqs, because the string is used when clicking
                 eqInfo.eqNumber = eqNumber;
                 ScoreEquationGivenVariable(eqInfo, variableName, model, modelGams, modelGamsScalar);
                 rv.Add(eqInfo);
@@ -1221,7 +1210,7 @@ namespace Gekko
             }
             else
             {
-                eqsNewA = rv.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                eqsNewA = rv.OrderByDescending(x => x.score).ThenBy(x => x.eqNameWithLag.ToString(), new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
             }
 
             return eqsNewA;
@@ -1231,14 +1220,14 @@ namespace Gekko
         {
             if (modelGamsScalar.isPerpetualModel)
             {
-                if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, G.Chop_RemoveIndex(eqInfo.eqName)))
+                if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, eqInfo.eqName.GetName()))
                 {
                     eqInfo.score += Globals.lhsScore1 + Globals.lhsScore2;
                 }
             }
             else
             {
-                List<string> lhsVars = Program.BeforeEqualSign(G.Chop_RemoveIndex(eqInfo.eqName), modelGams);
+                List<string> lhsVars = Program.BeforeEqualSign(eqInfo.eqName.GetName(), modelGams);
                 bool hit2 = false;
                 foreach (string s in lhsVars)
                 {
@@ -1253,12 +1242,12 @@ namespace Gekko
                     extra = GetSortedEquationsByResVariable(eqInfo.eqNumber, variableName, modelGamsScalar);
                     //Regarding the call below, this does not look whether the var is LHS, this has been done above and will be added later on
                     //It only looks at the equation name and performs some magic. When res_... are present, not need to use that magic.
-                    if (Program.options.bugfix_score_even_with_res_vars && extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
+                    if (Program.options.bugfix_score_even_with_res_vars && extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName.ToString(), variableName, model, modelGamsScalar);
                 }
                 else
                 {
                     //eq names
-                    extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
+                    extra = GetSortedEquationsByEqName(eqInfo.eqName.ToString(), variableName, model, modelGamsScalar);
                 }
                 eqInfo.score += extra;
             }

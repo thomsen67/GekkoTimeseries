@@ -192,11 +192,11 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;
             if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but we keep it for now
-            if (x.storage.Length != y.storage.Length) return false;
-            for (int i = 0; i < x.storage.Length; i++)
+            if (x.GetLength() != y.GetLength()) return false;
+            for (int i = 0; i < x.GetLength(); i++)
             {
-                var elX = x.storage[i];
-                var elY = y.storage[i];
+                var elX = x.Get(i);
+                var elY = y.Get(i);
 
                 if (elX.IsTime() != elY.IsTime()) return false;
                 if (elX.IsTime())
@@ -240,12 +240,12 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return 0;
             if (x == null) return -1;
             if (y == null) return 1;
-            if (x.storage.Length != y.storage.Length) return x.storage.Length.CompareTo(y.storage.Length);
+            if (x.GetLength() != y.GetLength()) return x.GetLength().CompareTo(y.GetLength());
 
-            for (int i = 0; i < x.storage.Length; i++)
+            for (int i = 0; i < x.GetLength(); i++)
             {
-                var xi = x.storage[i];
-                var yi = y.storage[i];
+                var xi = x.Get(i);
+                var yi = y.Get(i);
                 if (xi.IsTime() != yi.IsTime()) return xi.IsTime() ? -1 : 1;
                 if (xi.IsTime())
                 {
@@ -269,26 +269,27 @@ namespace Gekko
     public class Multidim2Element
     {
         [ProtoMember(1)]
-        public readonly StringOrTime[] storage = null; //The whole object is considered null if .storage is == null
+        protected readonly StringOrTime[] storage = null; //The whole object is considered null if .storage is == null                       
 
-        //???????????????????????????????????????
-        //???????????????????????????????????????
-        // Should timePosition rather be in DName object??
-        // Probably yes, we may combine time with lag, and age might be "time" too
-        //???????????????????????????????????????
-        //???????????????????????????????????????
         [ProtoMember(2)]
-        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time.
-
-        [ProtoMember(3)]
         private readonly int sensitiveHash;
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         private readonly int insensitiveHash;        
 
         public Multidim2Element()
         {
             //Empty object, kind of null
+        }
+
+        public int GetLength()
+        {
+            return this.storage.Length;
+        }
+
+        public StringOrTime Get(int i)
+        {
+            return this.storage[i];
         }
 
         public Multidim2Element(StringOrTime[] elements)
@@ -303,9 +304,7 @@ namespace Gekko
             {
                 var si = storage[i];
                 if (si.IsTime())
-                {
-                    if (this.timePosition != -1) new Error("Only 1 time element allowed");
-                    this.timePosition = i;
+                {                    
                     int tHash = si.GetTime().GetHashCode();
                     sHash = sHash * 31 + tHash;
                     iHash = iHash * 31 + tHash;
@@ -326,6 +325,11 @@ namespace Gekko
             return false;
         }
 
+        private StringOrTime[] GetStorage()
+        {
+            return this.storage;
+        }
+
         public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
 
         public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
@@ -342,6 +346,11 @@ namespace Gekko
             }
             return Stringlist.GetListWithCommas(temp, " ");
         }
+
+        public StringOrTime[] DeepClone()
+        {
+            return (StringOrTime[])this.storage.Clone(); //Uses C# .Clone()
+        }
     }
 
     /// <summary>
@@ -350,47 +359,112 @@ namespace Gekko
     [ProtoContract]
     public class DName : Multidim2Element
     {
-        private readonly int posName = 0;
-        private readonly int posIndex = 1;
+        private readonly int posName = 0; //hardcoded
+        private readonly int posIndex = 1; //hardcoded
+        [ProtoMember(1)]
+        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 1)
 
         public DName() : base() { } // Protobuf only
 
-        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) { }
+        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) 
+        {
+            for(int i = 0;i<this.GetLength();i++)
+            {
+                if (this.Get(i).IsTime())
+                {
+                    GekkoTime t = this.Get(i).GetTime();
+                    if (t.freq == EFreq.None || t.freq == EFreq.Age)
+                    {
+                        //These are not considered "time" (neither are .Empty{i} enum slots if any)
+                    }
+                    else
+                    {
+                        if (this.timePosition != -1) new Error("Only 1 time element allowed for DName");
+                        this.timePosition = i;                        
+                    }
+                }
+            }
+        }
 
-        public string GetName() => this.storage[this.posName].GetString();
+        public string GetName() => this.Get(this.posName).GetString();
+
+        private StringOrTime[] DeepCloneExceptFirst()
+        {
+            //Should be ok fast
+            StringOrTime[] result = new StringOrTime[this.storage.Length - 1];
+            Array.Copy(this.storage, 1, result, 0, result.Length);
+            return result;
+        }
+
+        private StringOrTime[] DeepCloneExceptFirstAndTime()
+        {
+            //Should be ok fast
+            if (this.timePosition == -1)
+            {
+                return this.DeepCloneExceptFirst();
+            }
+            else
+            {
+                //StringOrTime[] result = new StringOrTime[this.storage.Length - 2];
+                List<StringOrTime> result = new List<StringOrTime>();
+                for (int i = 1; i < this.storage.Length; i++)
+                {
+                    StringOrTime element = this.storage[i];
+                    if (element.IsTime()) continue;
+                    result.Add(element);                    
+                }
+                return result.ToArray();
+            }            
+        }
+
+        public DName RemoveTime()
+        {
+            return new DName(this.GetName(), this.DeepCloneExceptFirstAndTime());
+        }
+
+        public DName ConvertToLag(GekkoTime t)
+        {
+            if (this.timePosition == -1) new Error("DName: cannot find time dimension to convert into lag/lead");
+            GekkoTime thisT = this.GetTime();
+            int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
+            StringOrTime[] elements = this.DeepCloneExceptFirst();
+            elements[this.timePosition - 1] = new GekkoTime(EFreq.Lag, lag);  //Note: -1 because elements has first element removed
+            DName name = new DName(this.Get(0).GetString(), elements);
+            return name;
+        }
 
         public string HACK_ToStringWithoutTime()
         {
             List<string> temp = new List<string>();
-            for (int i = this.posIndex; i < this.storage.Length; i++)
+            for (int i = this.posIndex; i < this.GetLength(); i++)
             {
                 if (i == this.timePosition) continue;
-                temp.Add(this.storage[i].ToString());
+                temp.Add(this.Get(i).ToString());
             }
             if (temp.Count == 0) return "Work:" + this.GetName();
             else return "Work:" + this.GetName() + "[" + Stringlist.GetListWithCommas(temp, "") + "]";            
         }        
 
-        public GekkoTime GetTime() => this.storage[this.timePosition].GetTime();
+        public GekkoTime GetTime() => this.Get(this.timePosition).GetTime();
                 
         private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
         {
             int offset = 1;
             var result = new StringOrTime[indexes.Length + offset];
             result[0] = name;
-            //result[1] = freq;            
             Array.Copy(indexes, 0, result, offset, indexes.Length);
             return result;
         }
 
         public override string ToString()
         {
-            if (this.storage == null) return null;
-            string name = this.storage[this.posName].GetString();
+            if (this.IsNull()) return null;
+            string name = this.Get(this.posName).GetString();
             List<string> temp = new List<string>();
-            for (int i = this.posIndex; i < this.storage.Length; i++)
+            for (int i = this.posIndex; i < this.GetLength(); i++)
             {
-                temp.Add(this.storage[i].ToString());
+                string s = this.Get(i).ToString();
+                if (s != null) temp.Add(s);
             }
             if (temp.Count == 0) return name;
             else return name + "[" + Stringlist.GetListWithCommas(temp, "") + "]";
@@ -456,13 +530,13 @@ namespace Gekko
 
         public bool HACKHASINDEX()
         {
-            if (this.storage.Length - 1 >= this.posIndex) return true;
+            if (this.GetLength() - 1 >= this.posIndex) return true;
             return false;            
         }
 
         public string HACKGETNAME()
         {            
-            return this.storage[0].GetString();
+            return this.Get(0).GetString();
             return null;
         }
     }

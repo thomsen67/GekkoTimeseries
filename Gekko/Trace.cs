@@ -1174,7 +1174,7 @@ namespace Gekko
             databank.traces = th.tracesDepth2.Keys.ToList();
         }        
 
-        public static void PrintTraceHelper(Trace2 trace, bool all)
+        public static void PrintTraceHelper(Trace2 trace, bool all, Series ts)
         {
             int widthRemember = Program.options.print_width;
             Program.options.print_width = int.MaxValue;
@@ -1190,7 +1190,10 @@ namespace Gekko
                     {
                         Action<GAO> a = (gao) =>
                         {
-                            CallTraceViewer(trace, int.MaxValue);
+                            TraceViewerInfo info = new TraceViewerInfo();
+                            info.ts = ts;
+                            info.n = count2;
+                            CallTraceViewer(trace, int.MaxValue, info);
                         };
                         s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                     }
@@ -1212,7 +1215,7 @@ namespace Gekko
         /// <param name="trace"></param>
         /// <param name="maxDepth"></param>
         /// <returns></returns>
-        public static int CallTraceViewer(Trace2 trace, int maxDepth)
+        public static int CallTraceViewer(Trace2 trace, int maxDepth, TraceViewerInfo info)
         {
             // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
             // with graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
@@ -1225,7 +1228,7 @@ namespace Gekko
             {
                 Thread sta = new Thread(delegate ()
                 {
-                    WindowTreeViewWithTable w = CallTraceViewerHelper(trace);
+                    WindowTreeViewWithTable w = CallTraceViewerHelper(trace, info);
                     w.Show();
                     System.Windows.Threading.Dispatcher.Run();
                 });
@@ -1235,7 +1238,7 @@ namespace Gekko
             return nn;
         }
 
-        private static WindowTreeViewWithTable CallTraceViewerHelper(Trace2 trace)
+        private static WindowTreeViewWithTable CallTraceViewerHelper(Trace2 trace, TraceViewerInfo info)
         {
             Globals.itemCounter = 0;
             TreeGridModel model = new TreeGridModel();
@@ -1284,7 +1287,7 @@ namespace Gekko
                 model.Add(item);
             }
 
-            WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+            WindowTreeViewWithTable w = new WindowTreeViewWithTable(model, info);
             Globals.windowsTrace.Add(w);
             w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
             string v = null;

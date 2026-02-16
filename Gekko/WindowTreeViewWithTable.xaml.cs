@@ -676,6 +676,12 @@ namespace Gekko
         }
     }
 
+    public class TraceViewerInfo
+    {
+        public Series ts = null;
+        public int n = -12345;
+    }
+
     public partial class WindowTreeViewWithTable : Window
     {
         private const int Levels = 3;
@@ -684,7 +690,7 @@ namespace Gekko
         private int value;
         public TreeGridModel model;
 
-        public WindowTreeViewWithTable(TreeGridModel model)
+        public WindowTreeViewWithTable(TreeGridModel model, TraceViewerInfo info)
         {
             bool demo = false;
 
@@ -700,8 +706,15 @@ namespace Gekko
             else
             {
                 // Initialize the component
-                InitializeComponent();           
-                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Click '>' to unfold sub-traces. Click a row to see more trace info.")));
+                InitializeComponent();
+
+                int n = info.n;
+                string s = null;                
+                if (n != -12345)
+                {
+                    s = " (" + n + " data-trace" + G.S(n) + ")";
+                }
+                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run(info.ts.GetNameAndParentDatabank() + s + "\n\nClick '>' to unfold sub-traces. Click a row to see more trace info.")));
 
                 // Set the model for the grid
                 grid.ItemsSource = model.FlatModel;

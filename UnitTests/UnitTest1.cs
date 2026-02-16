@@ -13278,21 +13278,21 @@ namespace UnitTests
             m.Add(new Multidim2Element(new StringOrTime[] { "a", "b10z" }));
             m.Add(new Multidim2Element(new StringOrTime[] { "a", "b1z" }));
             var m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
-            Assert.AreEqual("b1z", m2[0].storage[1].GetString());
-            Assert.AreEqual("B2z", m2[1].storage[1].GetString());
-            Assert.AreEqual("b10z", m2[2].storage[1].GetString());
+            Assert.AreEqual("b1z", m2[0].Get(1).GetString());
+            Assert.AreEqual("B2z", m2[1].Get(1).GetString());
+            Assert.AreEqual("b10z", m2[2].Get(1).GetString());
             // ===
             m = new List<Multidim2Element>();
             m.Add(new Multidim2Element(new StringOrTime[] { "a", new GekkoTime(EFreq.Q, 2025, 1) }));
             m.Add(new Multidim2Element(new StringOrTime[] { "a", new GekkoTime(EFreq.Q, 2024, 4) }));
             m.Add(new Multidim2Element(new StringOrTime[] { "a", new GekkoTime(EFreq.Q, 2024, 3) }));
             m2 = m.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
-            Assert.AreEqual(2024, m2[0].storage[1].GetTime().super);
-            Assert.AreEqual(2024, m2[1].storage[1].GetTime().super);
-            Assert.AreEqual(2025, m2[2].storage[1].GetTime().super);
-            Assert.AreEqual(3, m2[0].storage[1].GetTime().sub);
-            Assert.AreEqual(4, m2[1].storage[1].GetTime().sub);
-            Assert.AreEqual(1, m2[2].storage[1].GetTime().sub);
+            Assert.AreEqual(2024, m2[0].Get(1).GetTime().super);
+            Assert.AreEqual(2024, m2[1].Get(1).GetTime().super);
+            Assert.AreEqual(2025, m2[2].Get(1).GetTime().super);
+            Assert.AreEqual(3, m2[0].Get(1).GetTime().sub);
+            Assert.AreEqual(4, m2[1].Get(1).GetTime().sub);
+            Assert.AreEqual(1, m2[2].Get(1).GetTime().sub);
 
         }
 

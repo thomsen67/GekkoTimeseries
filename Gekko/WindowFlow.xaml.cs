@@ -102,7 +102,7 @@ namespace Gekko
                 string varName = this.decompFind.decompOptions2.guiFlowName;
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                string eqName = temp[0].eqName.RemoveTime().ToString();
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
                 if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
@@ -203,7 +203,7 @@ namespace Gekko
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varNameChild, GekkoTime.tNull, Program.model, true, false, false);
                 if (temp.Count > 0 && temp[0].score >= walkInfo.minLhsScore)  //For instance only eqs that are found with checkbox "Name" in FIND window. We also do not show res_... nodes
                 {
-                    string eqNameChild = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                    string eqNameChild = temp[0].eqName.RemoveTime().ToString();
                     WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);
                 }
                 else
@@ -339,7 +339,7 @@ namespace Gekko
                         decompFindHereChild.children.Clear(); //This and the next line so we are sure to get a blank state DECOMP window: not much sense in linking via flowgraphs...
                         decompFindHereChild.parent = null;
                         List<EqInfoSimple> temp = GamsModel.GetSortedEquations(name, GekkoTime.tNull, this.decompFind.model, false, false, false);
-                        string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                        string eqName = temp[0].eqName.RemoveTime().ToString();
                         decompFindHereChild.decompOptions2.new_select = new List<string> { G.HandleBlanksRemove(name) };
                         decompFindHereChild.decompOptions2.new_from = new List<string>() { G.HandleBlanksRemove(eqName) };
                         decompFindHereChild.decompOptions2.new_endo = new List<string>() { G.HandleBlanksRemove(name) };

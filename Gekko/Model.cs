@@ -960,38 +960,30 @@ namespace Gekko
         //variable names without time dimension 
 
         [ProtoMember(14)]
-        //public string[] dict_FromANumberToVarName = null;
         public DName[] dict_FromANumberToVarName = null;
 
         [ProtoMember(15)]
-        //public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
         public Dictionary<DName, int> dict_FromVarNameToANumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //eq numbers in raw model, corresponds to i/ii dimension
-        [ProtoMember(16)]
-        //public string[] dict_FromEqChunkNumberToEqName = null;
+        [ProtoMember(16)]        
         public DName[] dict_FromEqChunkNumberToEqName = null;
 
-        [ProtoMember(17)]
-        //public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
+        [ProtoMember(17)]        
         public Dictionary<DName, int> dict_FromEqNameToEqChunkNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
-        [ProtoMember(18)]
-        //public string[] dict_FromEqNumberToEqName = null;
+        [ProtoMember(18)]        
         public DName[] dict_FromEqNumberToEqName = null;
 
-        [ProtoMember(19)]
-        //public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
+        [ProtoMember(19)]        
         public Dictionary<DName, int> dict_FromEqNameToEqNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //lowest level variable numbers (in unfolded/unrolled model)
         [ProtoMember(20)]
-        //public string[] dict_FromVarNumberToVarName = null;
         public Multidim2Element[] dict_FromVarNumberToVarName = null;
 
-        [ProtoMember(21)]
-        //public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
+        [ProtoMember(21)]        
         public Dictionary<DName, int> dict_FromVarNameToVarNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
 
         //from lowest level equation number to chunk equations number
@@ -1090,10 +1082,10 @@ namespace Gekko
         /// </summary>
         /// <param name="eqNumber"></param>
         /// <returns></returns>
-        public string GetEqName(int eqNumber)
+        public DName GetEqName(int eqNumber)
         {
             //TODO: handle errors
-            return this.dict_FromEqNumberToEqName[eqNumber].ToString();
+            return this.dict_FromEqNumberToEqName[eqNumber];
         }
 
         /// <summary>
