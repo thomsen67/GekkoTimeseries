@@ -1731,9 +1731,9 @@ namespace Gekko
         /// <param name="parentI"></param>
         public static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
-            Dictionary<DName, int> endo = new Dictionary<DName, int>(new Multidim2Comparer(true));
-            Dictionary<DName, int> exo = new Dictionary<DName, int>(new Multidim2Comparer(true));
-            Dictionary<DName, int> all = new Dictionary<DName, int>(new Multidim2Comparer(true)); //all variables that are present in 1 or more equations
+            Dictionary<DName, int> endo = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
+            Dictionary<DName, int> exo = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
+            Dictionary<DName, int> all = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase); //all variables that are present in 1 or more equations
             Dictionary<int, DName> endoReverse = new Dictionary<int, DName>();  //just inverted
             Dictionary<int, DName> exoReverse = new Dictionary<int, DName>();  //just inverted
 
@@ -2076,18 +2076,18 @@ namespace Gekko
                 // necessary, since the period has already been filtered by the DECOMP time period.
                 GekkoTime gtNotUsed; string name;                
                 DName dn0 = endoReverse[row]; 
-                name = dn0.HACK_ToStringWithoutTime();
+                name = "Work:" + dn0.HACK_ToStringWithoutTime();
                 gtNotUsed = dn0.GetTime();
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count(); col++)
                 {                 
                     DName dn1 = endoReverse[row];
-                    string ename = dn1.HACK_ToStringWithoutTime();
+                    string ename = "Work:" + dn1.HACK_ToStringWithoutTime();
                     GekkoTime etime = dn1.GetTime();                 
                                         
                     DName dn2 = exoReverse[col];
-                    string xname = dn2.HACK_ToStringWithoutTime();
+                    string xname = "Work:" + dn2.HACK_ToStringWithoutTime();
                     GekkoTime xtime = dn2.GetTime();
 
                     string enewName = ConvertToTurtleName(ename, 0);
@@ -6222,7 +6222,7 @@ namespace Gekko
 
                 if (o.iv2 != null) { List<string> vars2 = O.Restrict(o.iv2, false, false, false, true); FindConnection(o.tSelected, vars[0], vars2[0], modelGamsScalar); return; }
 
-                string variableName = vars[0]; //.Replace(" ", "");  //no blanks
+                DName variableName = DName.HACK1(vars[0]); //.Replace(" ", "");  //no blanks
                 
                 List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, GekkoTime.tNull, model, false, true, false);
 
@@ -6266,13 +6266,13 @@ namespace Gekko
 
                 if (eqsNew == null || eqsNew.Count == 0)
                 {
-                    new Error("Could not find any equation(s) containing the variable '" + variableName + "'");
+                    new Error("Could not find any equation(s) containing the variable '" + variableName.ToString() + "'");
                 }
                 DName firstEqName2 = eqsNew[0].eqName;
                 WindowFind windowFind = new WindowFind(o);
-                windowFind.Title = variableName + " - " + "Gekko equations";
+                windowFind.Title = variableName.ToString() + " - " + "Gekko equations";
                 windowFind.FindSetButtons(firstEqName2.ToString(), firstList, model);
-                windowFind.FindSetLabel(variableName);
+                windowFind.FindSetLabel(variableName.ToString());
                 windowFind._activeEquation = firstEqName2.ToString();
                 windowFind._activeVariable = null;
                 EquationTextHelper helper = new EquationTextHelper();
@@ -6662,12 +6662,12 @@ namespace Gekko
         /// <param name="equationName"></param>
         /// <param name="variableName"></param>
         /// <returns></returns>
-        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, string variableName, string equationName, WalkInfo walkInfo)
+        public static FlowInfo GetFlowInfoFromDecomp(GekkoTime t1, GekkoTime t2, DName variableName, DName equationName, WalkInfo walkInfo)
         {            
             FlowInfo flowInfo = new FlowInfo();
 
-            flowInfo.variableName = variableName;
-            flowInfo.equationName = equationName;
+            flowInfo.variableName = variableName.ToString();
+            flowInfo.equationName = equationName.ToString();
             //flowInfo.period = t1.Add(offset);  //2030
 
             ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
@@ -6680,9 +6680,9 @@ namespace Gekko
             string op = "d";
             if (op2 == "m" || op2 == "q" || op2 == "mp") op = "m";
             decompOptions2.decompOperator = new DecompOperator(op);
-            decompOptions2.new_select = new List<string>() { variableName };
-            decompOptions2.new_from = new List<string>() { equationName };
-            decompOptions2.new_endo = new List<string>() { variableName };            
+            decompOptions2.new_select = new List<string>() { variableName.ToString() };
+            decompOptions2.new_from = new List<string>() { equationName.ToString() };
+            decompOptions2.new_endo = new List<string>() { variableName.ToString() };            
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
             decompOptions2.expand = true;
@@ -6744,8 +6744,8 @@ namespace Gekko
             foreach (KeyValuePair<string, double> kvp in poolingFrom)
             {
                 FlowItem flowItem = new FlowItem();
-                flowItem.from = kvp.Key;
-                flowItem.to = flowInfo.variableName;
+                flowItem.from = DName.HACK1(kvp.Key);
+                flowItem.to = DName.HACK1(flowInfo.variableName);
                 flowItem.v = kvp.Value;
                 flowInfo.children.Add(flowItem);
             }

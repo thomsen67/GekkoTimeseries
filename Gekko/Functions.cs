@@ -933,7 +933,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error(cfg + "Sublists must have exactly 4 elements");
+                        new Error(cfg + "Sublists must have max 4 elements");
                     }
                 }
             }

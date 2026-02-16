@@ -88,8 +88,8 @@ namespace Gekko
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = this.decompFind.decompOptions2.t1;
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
-                walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
-                walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
+                walkInfo.visitedDepths = new Dictionary<DName, FlowInfo>(Multidim2Comparer.IgnoreCase);
+                walkInfo.nodeNames = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
                 walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
                 walkInfo.ignoreDJZ = true;
                 walkInfo.isGekkoModel = this.decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
@@ -99,10 +99,10 @@ namespace Gekko
                 walkInfo.removeSelfReferences = true;  //lags??
                 walkInfo.removeResidualIgnoredError = true;
                 walkInfo.ignoreLags = true;
-                string varName = this.decompFind.decompOptions2.guiFlowName;
+                DName varName = DName.HACK1(this.decompFind.decompOptions2.guiFlowName);
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                string eqName = temp[0].eqName.RemoveTime().ToString();
+                DName eqName = temp[0].eqName.RemoveTime();
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
                 if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
@@ -118,7 +118,7 @@ namespace Gekko
             }
         }
 
-        public static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, string varName, string eqName, WalkInfo walkInfo)
+        public static void WalkNodes(int depth, Microsoft.Msagl.Drawing.Graph graph, DName varName, DName eqName, WalkInfo walkInfo)
         {
             // This works regarding depth, but is wasteful, because redoing a branch entails new decomp calls.
             // Better to keep the results of the decomps (FlowInfo basically), so there is no double work.
@@ -136,10 +136,10 @@ namespace Gekko
                 arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo);                
                 walkInfo.visitedDepths.Add(varName, arrowsFromTo);
             }
-            else if (depth < walkInfo.visitedDepths.Get(varName).depth)
+            else if (depth < walkInfo.visitedDepths[varName].depth)
             {
                 //It may have been seen before, but at a higher depth. If so, we try again.
-                arrowsFromTo = walkInfo.visitedDepths.GetDictionaryForIteration()[varName];                
+                arrowsFromTo = walkInfo.visitedDepths[varName];
                 hasBeenSeenAlready = true;
             }
             else
@@ -157,38 +157,38 @@ namespace Gekko
                 if (walkInfo.removeSelfReferences && G.Equal(flowChild.from, flowChild.to)) continue;
                 if (depth == 0) flowChild.to = arrowsFromTo.children[0].from;  //To get the first node capitalization right. The .to here will have wrong capitalization, but the .from has the correct one taken from eqs.
                 //Here, we do not want for instance "qbnp" to be a different node than "qBNP"
-                if (walkInfo.nodeNames.ContainsKey(flowChild.from)) flowChild.from = walkInfo.nodeNames.Get(flowChild.from);
+                if (walkInfo.nodeNames.ContainsKey(flowChild.from)) flowChild.from = walkInfo.nodeNames[flowChild.from];
                 else walkInfo.nodeNames.Add(flowChild.from, flowChild.from);
-                if (walkInfo.nodeNames.ContainsKey(flowChild.to)) flowChild.to = walkInfo.nodeNames.Get(flowChild.to);
+                if (walkInfo.nodeNames.ContainsKey(flowChild.to)) flowChild.to = walkInfo.nodeNames[flowChild.to];
                 else walkInfo.nodeNames.Add(flowChild.to, flowChild.to);                                
 
                 double share = flowChild.v / arrowsFromTo.children[0].v;
                 if (walkInfo.removeResidualIgnoredError)
                 {
-                    if (G.StartsWith(flowChild.from, "Error")) continue;
-                    if (G.StartsWith(flowChild.from, "Residual")) continue;
-                    if (G.StartsWith(flowChild.from, "Ignored")) continue;
-                    if (G.StartsWith(flowChild.from, Globals.decompResidualPrefix)) continue;
+                    if (G.StartsWith(flowChild.from.ToString(), "Error")) continue;
+                    if (G.StartsWith(flowChild.from.ToString(), "Residual")) continue;
+                    if (G.StartsWith(flowChild.from.ToString(), "Ignored")) continue;
+                    if (G.StartsWith(flowChild.from.ToString(), Globals.decompResidualPrefix)) continue;
                 }
                 if (walkInfo.isGekkoModel && walkInfo.ignoreDJZ && (G.IsNumericalError(share) || Math.Abs(share) <= 0.01d))
                 {
-                    if (G.Equal(flowChild.from, "d" + flowChild.to)) continue;
-                    if (G.Equal(flowChild.from, "j" + flowChild.to)) continue;
-                    if (G.Equal(flowChild.from, "jr" + flowChild.to)) continue;
-                    if (G.Equal(flowChild.from, "jd" + flowChild.to)) continue;
-                    if (G.Equal(flowChild.from, "z" + flowChild.to)) continue;
+                    if (G.Equal(flowChild.from.ToString(), "d" + flowChild.to.ToString())) continue;
+                    if (G.Equal(flowChild.from.ToString(), "j" + flowChild.to.ToString())) continue;
+                    if (G.Equal(flowChild.from.ToString(), "jr" + flowChild.to.ToString())) continue;
+                    if (G.Equal(flowChild.from.ToString(), "jd" + flowChild.to.ToString())) continue;
+                    if (G.Equal(flowChild.from.ToString(), "z" + flowChild.to.ToString())) continue;
                 }
 
                 if (!hasBeenSeenAlready && graph != null)
                 {
                     
-                    Edge e = graph.AddEdge(flowChild.from, flowChild.to);
+                    Edge e = graph.AddEdge(flowChild.from.ToString(), flowChild.to.ToString());
                     e.Attr.Color = Color(share);
-                    Node nodeFrom = graph.FindNode(flowChild.from);
+                    Node nodeFrom = graph.FindNode(flowChild.from.ToString());
                     nodeFrom.Attr.LabelMargin = 4;
                     nodeFrom.Attr.Color = Color(0.3);
 
-                    Node nodeTo = graph.FindNode(flowChild.to);
+                    Node nodeTo = graph.FindNode(flowChild.to.ToString());
                     nodeTo.Attr.LabelMargin = 4;
                     nodeTo.Attr.Color = Color(0.3);
 
@@ -199,11 +199,11 @@ namespace Gekko
                     }
                 }                
                 
-                string varNameChild = flowChild.from;
+                DName varNameChild = flowChild.from;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varNameChild, GekkoTime.tNull, Program.model, true, false, false);
                 if (temp.Count > 0 && temp[0].score >= walkInfo.minLhsScore)  //For instance only eqs that are found with checkbox "Name" in FIND window. We also do not show res_... nodes
                 {
-                    string eqNameChild = temp[0].eqName.RemoveTime().ToString();
+                    DName eqNameChild = temp[0].eqName.RemoveTime();
                     WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);
                 }
                 else
@@ -215,7 +215,7 @@ namespace Gekko
                     //TODO TODO TODO
                     if (!hasBeenSeenAlready && graph != null)
                     {
-                        Node n = graph.FindNode(flowChild.from);
+                        Node n = graph.FindNode(flowChild.from.ToString());
                         n.Attr.FillColor = new Color(238, 238, 238);
                     }
                 }
@@ -338,7 +338,7 @@ namespace Gekko
                         DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
                         decompFindHereChild.children.Clear(); //This and the next line so we are sure to get a blank state DECOMP window: not much sense in linking via flowgraphs...
                         decompFindHereChild.parent = null;
-                        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(name, GekkoTime.tNull, this.decompFind.model, false, false, false);
+                        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(DName.HACK1(name), GekkoTime.tNull, this.decompFind.model, false, false, false);
                         string eqName = temp[0].eqName.RemoveTime().ToString();
                         decompFindHereChild.decompOptions2.new_select = new List<string> { G.HandleBlanksRemove(name) };
                         decompFindHereChild.decompOptions2.new_from = new List<string>() { G.HandleBlanksRemove(eqName) };
@@ -517,8 +517,8 @@ namespace Gekko
     {
         public GekkoTime t1;
         public GekkoTime t2;        
-        public GekkoDictionaryBlanks<FlowInfo> visitedDepths;
-        public GekkoDictionaryBlanks<string> nodeNames;
+        public Dictionary<DName, FlowInfo> visitedDepths;
+        public Dictionary<DName, DName> nodeNames;
         public int maxDepth;
         public bool ignoreDJZ;
         public bool isGekkoModel;

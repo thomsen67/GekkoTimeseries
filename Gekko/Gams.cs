@@ -266,312 +266,18 @@ namespace Gekko
                 Compile2(d, cmdNodeChild, depth + 1, tokens, print);
             }
         }        
-
-        public static void Compile3(ASTNodeGAMS node, int depth, WalkHelper wh, Controlled controlled)
-        {            
-            foreach (ASTNodeGAMS child in node.ChildrenIterator())
-            {
-                Compile3(child, depth + 1, wh, controlled);
-            }
-            Compile3After(node, wh, controlled);
-        }        
-
-        private static void Compile3After(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
+                
+        /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
+        /// For a name without blanks and year time last, like "x[i,j,2025]", the method can return resultingFullName and time much faster (with name and indexes both = null).
+        /// With allowFast, it looks for a four-digit annual time as LAST index.
+        public static ExtractTimeDimensionHelper ExtractTimeDimensionNew(DName varname)
         {
-            switch (node.Text?.ToUpper())
-            {
-                case "ASTGAMS":
-                    {
-                        //No need to gather GAMS statements in one lump, we take it from the children
-                        //foreach (ASTNodeGAMS child in node.ChildrenIterator())
-                        //{
-                        //    node.Code.A(child.Code).End();
-                        //}
-                    }
-                    break;
-                case "ASTEXPRESSION":
-                    {
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTEQU":
-                    {                        
-                        node.Code.A("r[" + wh.eqNames.Count + "] = " + node[2].Code + "-(" + node[3].Code + ")");
-                        wh.eqNames.Add(node[1][0].Text);
-                    }
-                    break;
-                case "ASTEQU2":
-                    {
-                        //LHS
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTEQU3":
-                    {
-                        //RHS
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTVARWI":
-                    {
-                        //Can be both in ASTEQU -> ASTEQU1, and in ASTVALUE. The former case is more restricte syntax-wise.
-                        if (node.Parent.Text == "ASTEQU1")
-                        {
-                            List<string> sets = new List<string>();
-                            //equation definition, defining sets that the eq is looping over
-                            string eqName = node[1].Text;  //[2] is not used here
-                            ASTNodeGAMS child = node?[3]?[0]?[1]?[1];
-                            if (child != null && child.ChildrenCount() > 0)
-                            {
-                                //the equation has indexes (controlled sets)
-                                foreach (ASTNodeGAMS child2 in child.ChildrenIterator())
-                                {
-                                    if (child2.ChildrenCount() != 1)
-                                    {
-                                        new Error("In equation '" + eqName + "': expected simple all controlled sets to be simple names");
-                                    }
-                                    string s = child2?[0].Text;
-                                    if (G.IsIdent(s))
-                                    {
-                                        sets.Add(s);
-                                    }
-                                    else
-                                    {
-                                        new Error("Expected simple set name, not this: " + s);
-                                    }
-                                }
-                            }
-                            ASTNodeGAMS childDollar = node?[4]?[0]?[1];
-
-                            //Imagine we have e1[i, j] $ (i0(i) and (i.val > 30 or j.val > 40)) ..
-                            //The logical values are backed up, resulting into for instance
-                            //true and (false or true)
-
-                            //maybe get this as C# code, depending on i and j sets and returning true/false.
-                            //from List<string>sets, we can get the combinations of i and j elements.
-
-                        }
-                        else
-                        {
-                            //defining a variable or parameter (or even set condition like tx0(t))
-                            string varname = node[1][0].Text.Trim();
-                            string varname2 = varname;
-                            if (wh.dictVars != null)
-                            {
-                                try
-                                {
-                                    varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
-                                }
-                                catch
-                                {
-                                    new Error("Could not parse integer part of the string '" + varname + "'");
-                                }
-                            }
-                            
-                            ExtractTimeDimensionHelper helper = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname2, true);
-                            if (wh.time1.IsNull() || (helper.time.StrictlySmallerThan(wh.time1))) wh.time1 = helper.time;
-                            if (wh.time2.IsNull() || (helper.time.StrictlyLargerThan(wh.time2))) wh.time2 = helper.time;
-                            int i1 = helper.time.Subtract(wh.time0);
-                            int i2 = wh.dictA.Count;
-                            if (!wh.dictA.ContainsKey(helper.resultingFullName))
-                            {
-                                wh.dictA.Add(helper.resultingFullName, i2);
-                            }
-                            else
-                            {
-                                i2 = wh.dictA[helper.resultingFullName];
-                            }
-                            node.Code.A("a[" + i1 + "][" + i2 + "]");  //time can be tNull for timeless
-                        }
-                    }
-                    break;
-                case "ASTIDX":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "ASTIDXELEMENTS":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "ASTVARIABLEANDLEAD":
-                    {
-                        if (node.ChildrenCount() > 1)
-                        {
-                            //x[a+1], x[a-1]
-                            //control...
-                        }
-                        else
-                        {
-                            if (node.Text.StartsWith("'") || node.Text.StartsWith("\""))
-                            {
-                                //x['a'], x["a"]
-                                node.Code.A(node.Text.Substring(1, node.Text.Length - 2));
-                            }
-                            else
-                            {
-                                //control...
-                            }
-                        }
-                    }
-                    break;
-                case "ASTCONDITIONAL":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "OR":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "AND":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "NOT":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "NONEQUAL":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "LESSTHANOREQUAL":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "GREATERTHANOREQUAL":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "EQUAL":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "LESSTHAN":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "GREATERTHAN":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "+":
-                    {
-                        if (wh.useMFunctions) node.Code.A("M.Add(" + node[0].Code + ", " + node[1].Code + ")");
-                        else node.Code.A("(" + node[0].Code + " + " + node[1].Code + ")");
-                    }
-                    break;
-                case "-":
-                    {
-                        if (wh.useMFunctions) node.Code.A("M.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
-                        else node.Code.A("(" + node[0].Code + " - " + node[1].Code + ")");
-                    }
-                    break;
-                case "*":
-                    {
-                        if (wh.useMFunctions) node.Code.A("M.Multiply(" + node[0].Code + ", " + node[1].Code + ")");
-                        else node.Code.A("(" + node[0].Code + " * " + node[1].Code + ")");
-                    }
-                    break;
-                case "/":
-                    {
-                        if (wh.useMFunctions) node.Code.A("M.Divide(" + node[0].Code + ", " + node[1].Code + ")");
-                        else node.Code.A("(" + node[0].Code + " / " + node[1].Code + ")");
-                    }
-                    break;
-                case "**":
-                    {
-                        node.Code.A("M.Power(" + node[0].Code + ", " + node[1].Code + ")");
-                    }
-                    break;
-                case "NEGATE":
-                    {
-                        if (wh.useMFunctions) node.Code.A("M.Negate(" + node[0].Code + ")");
-                        else node.Code.A("(-" + node[0].Code + ")");
-                    }
-                    break;
-                case "ASTDOLLAREXPRESSION":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "ASTEXPRESSION1":
-                    {
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTEXPRESSION2":
-                    {
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTEXPRESSION3":
-                    {
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTVALUE":
-                    {
-                        node.Code.A(node[0].Code);
-                    }
-                    break;
-                case "ASTFUNCTION":
-                    {
-                        string fname = node[1][0].Text;
-                        string code = null;
-                        if (G.Equal(fname, "log")) code = "M.Log(";
-                        else if (G.Equal(fname, "exp")) code = "M.Exp(";
-                        else if (G.Equal(fname, "abs")) code = "M.Abs(";
-                        else if (G.Equal(fname, "max")) code = "M.Max(";
-                        else if (G.Equal(fname, "min")) code = "M.Min(";
-                        else if (G.Equal(fname, "power")) code = "M.Power(";
-                        else if (G.Equal(fname, "sqr")) code = "M.Sqr(";
-                        else if (G.Equal(fname, "sqrt")) code = "M.Sqrt(";
-                        else if (G.Equal(fname, "tanh")) code = "M.Tanh(";
-
-                        ASTNodeGAMS elements = node[2][0][1];
-                        foreach (ASTNodeGAMS child in elements.ChildrenIterator())
-                        {
-                            code += child.Code.ToString() + ", ";
-                        }
-                        code = code.Substring(0, code.Length - ", ".Length);
-                        code += ")";
-                        node.Code.A(code);
-                    }
-                    break;                
-                case "ASTSUM":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "ASTSUMCONTROLLED":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
-                case "ASTDOUBLE":
-                    {
-                        node.Code.A(node[0].Text);
-                    }
-                    break;
-                case "ASTINTEGER":
-                    {
-                        node.Code.A(node[0].Text);
-                    }
-                    break;
-
-            }
+            ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
+            helper.name = varname.GetName();
+            helper.resultingFullName = varname.HACK_ToStringWithoutTime();
+            helper.time = varname.GetTime();
+            helper.indexes = varname.HACK_IndexesWithoutTime();
+            return helper;
         }
 
         /// <summary>
@@ -859,8 +565,8 @@ namespace Gekko
                             new Error("Could not parse integer part of the string '" + sFix + "'");
                         }
 
-                        string inputName = helper.dict_FromVarNumberToVarName[id].ToString();
-                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
+                        DName inputName = helper.dict_FromVarNumberToVarName[id];
+                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
                         int aNumber = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber);
                         if (aNumber == -12345)
                         {
@@ -910,8 +616,8 @@ namespace Gekko
                         new Error("Could not parse integer part of the string '" + ss[0] + "'");
                     }
 
-                    string inputName = helper.dict_FromVarNumberToVarName[id].ToString();
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
+                    DName inputName = helper.dict_FromVarNumberToVarName[id];
+                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
                     int aNumber = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber);
                     if (aNumber == -12345)
                     {
@@ -1122,7 +828,7 @@ namespace Gekko
         /// E_qBNP is shown first because the equation contains the variable res_qBNP. The rest of the eqs are alphabetically sorted.
         /// </summary>     
         /// <returns></returns>
-        public static List<EqInfoSimple> GetSortedEquations(string variableName, GekkoTime tHere, Model model, bool onlySortFirstItem, bool abortIfError, bool noBlanksEtc)
+        public static List<EqInfoSimple> GetSortedEquations(DName variableName, GekkoTime tHere, Model model, bool onlySortFirstItem, bool abortIfError, bool noBlanksEtc)
         {
             //            x1     x2     x3     x4    res_x1   res_x2   res_x3   res_x4
             // --------------------------------------------------------------------------
@@ -1145,7 +851,7 @@ namespace Gekko
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
-            int aNumber = -12345;  modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(variableName), out aNumber);
+            int aNumber = -12345;  modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
             if (aNumber == -12345)
             {
                 return rv;
@@ -1216,11 +922,11 @@ namespace Gekko
             return eqsNewA;
         }
 
-        public static void ScoreEquationGivenVariable(EqInfoSimple eqInfo, string variableName, Model model, ModelGams modelGams, ModelGamsScalar modelGamsScalar)
+        public static void ScoreEquationGivenVariable(EqInfoSimple eqInfo, DName variableName, Model model, ModelGams modelGams, ModelGamsScalar modelGamsScalar)
         {
             if (modelGamsScalar.isPerpetualModel)
             {
-                if (G.Equal(Globals.decompGekkoEquationPrefix + variableName, eqInfo.eqName.GetName()))
+                if (G.Equal(Globals.decompGekkoEquationPrefix + variableName.ToString(), eqInfo.eqName.GetName()))
                 {
                     eqInfo.score += Globals.lhsScore1 + Globals.lhsScore2;
                 }
@@ -1231,7 +937,7 @@ namespace Gekko
                 bool hit2 = false;
                 foreach (string s in lhsVars)
                 {
-                    if (G.EqualHandleBlanks(variableName.Split('[')[0], s)) { hit2 = true; break; }
+                    if (G.EqualHandleBlanks(variableName.GetName(), s)) { hit2 = true; break; }
                 }
                 if (hit2) eqInfo.score += Globals.lhsScore1; //0.5                    
 
@@ -1242,29 +948,29 @@ namespace Gekko
                     extra = GetSortedEquationsByResVariable(eqInfo.eqNumber, variableName, modelGamsScalar);
                     //Regarding the call below, this does not look whether the var is LHS, this has been done above and will be added later on
                     //It only looks at the equation name and performs some magic. When res_... are present, not need to use that magic.
-                    if (Program.options.bugfix_score_even_with_res_vars && extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName.ToString(), variableName, model, modelGamsScalar);
+                    if (Program.options.bugfix_score_even_with_res_vars && extra == 0d) extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
                 }
                 else
                 {
                     //eq names
-                    extra = GetSortedEquationsByEqName(eqInfo.eqName.ToString(), variableName, model, modelGamsScalar);
+                    extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
                 }
                 eqInfo.score += extra;
             }
         }
 
-        private static double GetSortedEquationsByResVariable(int eqNumber, string variableName, ModelGamsScalar modelGamsScalar)
+        private static double GetSortedEquationsByResVariable(int eqNumber, DName variableName, ModelGamsScalar modelGamsScalar)
         {
             string dep = GetDependentVariable(eqNumber, modelGamsScalar);
             double extra = 0d;
-            if (G.EqualHandleBlanks(variableName, dep)) extra = Globals.lhsScore3;  //101
+            if (G.EqualHandleBlanks(variableName.ToString(), dep)) extra = Globals.lhsScore3;  //101
             return extra;
         }
 
-        private static double GetSortedEquationsByEqName(string eqName, string variableName, Model model, ModelGamsScalar modelGamsScalar)
+        private static double GetSortedEquationsByEqName(DName eqName, DName variableName, Model model, ModelGamsScalar modelGamsScalar)
         {
             double d = double.MaxValue;
-            string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName);  //Note: what about lagged/leaded equation???
+            string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName.ToString());  //Note: what about lagged/leaded equation???
             bool hit1 = false;
             //SLACK SLACK SLACK
             //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
@@ -1964,7 +1670,7 @@ namespace Gekko
             List<IdentityHelper> eqs = new List<IdentityHelper>();
             for (int i = 0; i < n; i++)
             {
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, modelGamsScalar.dict_FromEqNumberToEqName[i].ToString(), false);
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(modelGamsScalar.dict_FromEqNumberToEqName[i]);
                 var equationName = helper2.resultingFullName;
 
                 if (helper2.time.LargerThanOrEqual(t1) && helper2.time.SmallerThanOrEqual(t2))
@@ -2661,104 +2367,7 @@ namespace Gekko
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Real parsing of GAMS
-        /// </summary>
-        public static void GAMSParser()
-        {
-            DateTime dt0 = DateTime.Now;
-
-            ANTLRStringStream input = new ANTLRStringStream(Program.GetTextFromFileWithWait(@"c:\Thomas\Gekko\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model\cut.gms"));  //a newline for ease of use of ANTLR
-
-            List<string> errors = null;
-            CommonTree t = null;
-
-            // Create a lexer attached to that input
-            GAMSLexer lexer = new GAMSLexer(input);
-            // Create a stream of tokens pulled from the lexer
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            // Create a parser attached to the token stream
-            GAMSParser parser = new GAMSParser(tokens);
-            // Invoke the program rule in get return value
-            GAMSParser.gams_return gams = null;
-            DateTime t0 = DateTime.Now;
-
-            bool print = false;
-            ASTNodeGAMS root = new ASTNodeGAMS(null);
-
-            try
-            {
-                DateTime tt0 = DateTime.Now;
-                new Writeln("START CUT PARSE ANTLR");
-                gams = parser.gams();
-                new Writeln("END BUT PARSE ANTLR -- " + G.Seconds(tt0));
-                errors = parser.GetErrors();
-                t = (CommonTree)gams.Tree;
-                Compile2(t, root, 0, tokens, print);
-                new Writeln("END ASTNODES -- " + G.Seconds(tt0));
-                if (errors.Count > 0)
-                {
-                    G.Warning("w6.1", null);
-                }
-            }
-            catch (Exception e)
-            {
-                G.Warning("w6.2", null);
-            }
-        }
-
-        /// <summary>
-        /// GAMS GMO interface.
-        /// </summary>
-        public static void GamsGMO()
-        {
-            string msg2 = null;
-            string gams = null;
-            if (1 == 1)
-            {
-                gams = @"c:\GAMS\38\";
-            }
-            else if (1 == 0)
-            {
-                gams = @"c:\Program Files\GAMS\34.2\";
-            }
-            else if (1 == 0)
-            {
-                gams = @"c:\Program Files (x86)\GAMS\29.1\";
-            }
-            else throw new GekkoException();
-
-            Directory.SetCurrentDirectory(gams);  //necessary for some odd reason
-            string control = @"c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\225a\gamscntr.dat";
-            gevmcs gev = new gevmcs(gams, ref msg2);
-            gev.gevInitEnvironmentLegacy(control);
-            gmomcs gmo = new gmomcs(gams, ref msg2);
-            gmo.gmoRegisterEnvironment(gev.GetgevPtr(), ref msg2);
-            gmo.gmoLoadDataLegacy(ref msg2);
-
-            string varname0 = gmo.gmoGetVarNameOne(0);
-
-            int ncols = gmo.gmoN();
-            double[] x = new double[ncols];
-            gmo.gmoGetVarL(ref x);
-            for (int i = 0; i < ncols; i++)
-            {
-                string varname = gmo.gmoGetVarNameOne(i);
-            }
-
-            int nrows = gmo.gmoM();
-            int numerr = -12345;
-            double lhs = double.NaN;
-            for (int i = 0; i < nrows; i++)
-            {
-                gmo.gmoEvalFunc(i, x, ref lhs, ref numerr);
-                double rhs = gmo.gmoGetRhsOne(i);
-                double residual = lhs - rhs;
-                string eqname = gmo.gmoGetEquNameOne(i);
-            }
-        }
+        }        
 
         private static void RemoveDoubleDots(EqLineHelper helper, List<string> output)
         {
@@ -2976,9 +2585,9 @@ namespace Gekko
                         {
                             new Error("Could not parse integer part of the string '" + th1.s + "'");
                         }
-                        string varname = helper.dict_FromVarNumberToVarName[number].ToString(); //#oijlksaa
 
-                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
+                        DName varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
+                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(varname);
 
                         int i1 = -12345;
                         if (helper2.time.IsNull())
@@ -6162,7 +5771,7 @@ namespace Gekko
         public int unique = 0;
 
         public DName[] dict_FromANumberToVarName = null;        
-        public Dictionary<DName, int> dict_FromVarNameToANumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromVarNameToANumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
         public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
         public byte[][] fix = null;  //fixed varibles, around 2.5 MB for 85 years and 30.000 variables. Not too much.
@@ -6172,11 +5781,11 @@ namespace Gekko
         public List<int> eqPointers = new List<int>();        
 
         public DName[] dict_FromEqNumberToEqName = null;        
-        public Dictionary<DName, int> dict_FromEqNameToEqNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromEqNameToEqNumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
         public DName[] dict_FromVarNumberToVarName = null;
-        public Dictionary<DName, int> dict_FromVarNameToVarNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromVarNameToVarNumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
         public DName[] dict_FromEqChunkNumberToEqName = null;
-        public Dictionary<DName, int> dict_FromEqNameToEqChunkNumber = new Dictionary<DName, int>(new Multidim2Comparer(true));
+        public Dictionary<DName, int> dict_FromEqNameToEqChunkNumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         public bool[] isTimeless = null;

@@ -386,8 +386,8 @@ namespace Gekko
     /// </summary>
     public class FlowItem
     {
-        public string from = null;
-        public string to = null;
+        public DName from = null;
+        public DName to = null;
         public double v = 0d;
     }
 
@@ -16933,7 +16933,7 @@ namespace Gekko
             ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);
 
-            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(varnameWithoutFreq, tUsedHere, model, false, false, false);
+            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(DName.HACK1(varnameWithoutFreq), tUsedHere, model, false, false, false);
 
             if (eqsContainingVariable.Count == 0)
             {
@@ -17146,7 +17146,7 @@ namespace Gekko
                     //foreach precedent variable
                     string varName = modelGamsScalar.GetVarNameA(dp.variable);
                     EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
-                    GamsModel.ScoreEquationGivenVariable(eqInfoClone, varName, model, modelGams, modelGamsScalar);
+                    GamsModel.ScoreEquationGivenVariable(eqInfoClone, DName.HACK1(varName), model, modelGams, modelGamsScalar);
                     double score = eqInfoClone.score;
                     if (score > bestScore)
                     {
@@ -19759,10 +19759,7 @@ namespace Gekko
                             //No need to choke on this
                             new Note("The module that identifies dependent variables from equation names failed to load");
                         }
-                    }
-                    
-                    if (false) GamsModel.GAMSParser();
-                    if (false) GamsModel.GamsGMO();
+                    }                    
                     Program.model = model;
                 }
                 else new Error("No model defined");

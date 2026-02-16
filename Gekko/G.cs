@@ -77,6 +77,12 @@ namespace Gekko
             //return (string.Compare(s1, s2, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
+        public static bool Equal(DName name1, DName name2)
+        {            
+            Multidim2Comparer comparer = Multidim2Comparer.IgnoreCase;            
+            return comparer.Equals(name1, name2);
+        }        
+
         /// <summary>
         /// /// Compares two strings, ignoring case (so "aBc" == "Abc"). If one but not the other
         /// is null, it returns false. If both are null, it returns true. Blanks are ignored,

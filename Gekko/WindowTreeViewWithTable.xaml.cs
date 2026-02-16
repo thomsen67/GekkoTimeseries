@@ -708,13 +708,18 @@ namespace Gekko
                 // Initialize the component
                 InitializeComponent();
 
-                int n = info.n;
-                string s = null;                
-                if (n != -12345)
+                int n = -12345;
+                if (info != null) n = info.n;
+                string s = null;
+                if (n != -12345) s = " (" + n + " data-trace" + G.S(n) + ")";
+
+                string s2 = null;
+                if (info != null && info.ts != null)
                 {
-                    s = " (" + n + " data-trace" + G.S(n) + ")";
+                    s2 = info.ts.GetNameAndParentDatabank();
                 }
-                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run(info.ts.GetNameAndParentDatabank() + s + "\n\nClick '>' to unfold sub-traces. Click a row to see more trace info.")));
+                
+                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run(s2 + s + "\n\nClick '>' to unfold sub-traces. Click a row to see more trace info.")));
 
                 // Set the model for the grid
                 grid.ItemsSource = model.FlatModel;

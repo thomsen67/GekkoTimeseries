@@ -32,7 +32,7 @@ namespace Gekko
         public bool removeTx0Dollar = false;
         public int maxPages = int.MaxValue;
         public int restrict_maxDepth = -1;
-        public string restrict_varName = null;
+        public DName restrict_varName = null;
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
         public StringBuilder text = null;
@@ -1395,7 +1395,7 @@ img {border-style: none;
                 bh.text = new StringBuilder();
                 bh.maxPages = int.MaxValue; //max, when we restrict depth
                 bh.restrict_maxDepth = 3;  //2=about 40 files
-                bh.restrict_varName = "qC";
+                bh.restrict_varName = DName.HACK1("qC");
             }
             else
             {
@@ -1443,21 +1443,21 @@ img {border-style: none;
 
             // --------------------------------------------------------------------------------------------------------
 
-            GekkoDictionary<string, bool> restrict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<DName, bool> restrict = new Dictionary<DName, bool>(Multidim2Comparer.IgnoreCase);
             if (small)
             {
-                restrict.Add("qbnp", false);
-                restrict.Add("pbnp", false);
-                restrict.Add("vbnp", false);
-                restrict.Add("pC[cTot]", false);
-                restrict.Add("pG[gTot]", false);
-                restrict.Add("pI[iTot]", false);
-                restrict.Add("pM[tot]", false);
-                restrict.Add("pX[xTot]", false);
-                restrict.Add("qC[cTot]", false);
-                restrict.Add("qI[iTot]", false);
-                restrict.Add("qM[tot]", false);
-                restrict.Add("qX[xTot]", false);
+                restrict.Add(DName.HACK1("qbnp"), false);
+                restrict.Add(DName.HACK1("pbnp"), false);
+                restrict.Add(DName.HACK1("vbnp"), false);
+                restrict.Add(DName.HACK1("pC[cTot]"), false);
+                restrict.Add(DName.HACK1("pG[gTot]"), false);
+                restrict.Add(DName.HACK1("pI[iTot]"), false);
+                restrict.Add(DName.HACK1("pM[tot]"), false);
+                restrict.Add(DName.HACK1("pX[xTot]"), false);
+                restrict.Add(DName.HACK1("qC[cTot]"), false);
+                restrict.Add(DName.HACK1("qI[iTot]"), false);
+                restrict.Add(DName.HACK1("qM[tot]"), false);
+                restrict.Add(DName.HACK1("qX[xTot]"), false);
             }
 
             if (deleteFolder && Directory.Exists(rootFolder))
@@ -1554,9 +1554,9 @@ img {border-style: none;
             //BEWARE: should t1 have 2-3 periods subtraced for instance? But t1.Add(-3) does not seem to change anything.
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, ignoreMissing, false);
 
-            GekkoDictionary<string, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar, bh);
+            GekkoDictionary<DName, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar, bh);
 
-            GekkoDictionaryBlanks<string> nodeNames = null;
+            Dictionary<DName, DName> nodeNames = null;
             if (bh.restrict_maxDepth > -1)
             {
                 G.WritelnGray("TTH: maxDepth vars start");
@@ -1564,8 +1564,8 @@ img {border-style: none;
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = t1;
                 walkInfo.t2 = t1;  //Note: using t1 here too!
-                walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
-                walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
+                walkInfo.visitedDepths = new Dictionary<DName, FlowInfo>(Multidim2Comparer.IgnoreCase);
+                walkInfo.nodeNames = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
                 walkInfo.maxDepth = bh.restrict_maxDepth;
                 walkInfo.ignoreDJZ = true;
                 walkInfo.isGekkoModel = Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko;
@@ -1575,12 +1575,12 @@ img {border-style: none;
                 walkInfo.removeSelfReferences = true;  //lags??
                 walkInfo.removeResidualIgnoredError = true;
                 walkInfo.ignoreLags = true;
-                string varName = bh.restrict_varName;
+                DName varName = bh.restrict_varName;
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
                 //string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
                 DName eqName = temp[0].eqName.RemoveTime();
-                WindowFlow.WalkNodes(depth, graph, varName, eqName.ToString(), walkInfo);
+                WindowFlow.WalkNodes(depth, graph, varName, eqName, walkInfo);
                 nodeNames = walkInfo.nodeNames;
                 G.WritelnGray("TTH: maxDepth vars end (" + nodeNames.Count() + ")");
             }
@@ -1614,7 +1614,7 @@ img {border-style: none;
             return;
         }
 
-        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, GekkoDictionary<string, bool> restrict, GekkoDictionaryBlanks<string> nodeNames, GekkoDictionary<string, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, GekkoDictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
             //FIXME
             //FIXME
@@ -1639,9 +1639,9 @@ img {border-style: none;
                 int n = Program.model.modelGamsScalar.CountEqs(1);
                 for (int i = 0; i < n; i++)
                 {
-                    string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i].ToString();
+                    DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
                     if (eqName == null) continue;
-                    ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
+                    ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
                     var equationName = helper2.resultingFullName;
 
                     if (helper2.time.Equals(t1))
@@ -1698,17 +1698,16 @@ img {border-style: none;
                 x2.AppendLine(LinkHome(false));
                 WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
                 x2.AppendLine("<table style = `width:100%`>");
+                
+                List<DName> vars = combos.Keys.ToList().OrderBy(k => k, new MultidimSortComparer(true)).ToList();
 
-                List<string> vars = combos.Keys.ToList();
-                vars.Sort(G.CompareNaturalIgnoreCase);
-
-                foreach (string var2 in vars)
+                foreach (DName var2 in vars)
                 {
-                    if (G.StartsWith(var2, res)) continue;  //skip res_... variables.
-                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2));
+                    if (G.StartsWith(var2.ToString(), res)) continue;  //skip res_... variables.
+                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2.ToString()));
                     x2.Append("<tr>");
                     x2.Append("<td width = `20%`>");
-                    x2.Append(HtmlLink(var2, settings_vars_foldername + "/" + SimplerName(var2) + ".html"));
+                    x2.Append(HtmlLink(var2.ToString(), settings_vars_foldername + "/" + SimplerName(var2.ToString()) + ".html"));
                     x2.Append("</td>");
                     x2.Append("<td width = `80%` style=`color:gray`>");
                     x2.Append(expl);
@@ -1716,7 +1715,7 @@ img {border-style: none;
                     x2.AppendLine("</tr>");
 
                     EquationBrowserHelper ebh = new EquationBrowserHelper();
-                    ebh.s1 = var2;
+                    ebh.s1 = var2.ToString();
                     if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
                     ebh.s2 = G.ReplaceWhitespaceWith1Blank(expl);
                     if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
@@ -1908,15 +1907,15 @@ img {border-style: none;
             }
             
             int count = 0;
-            foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+            foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
-                string variableName = kvp.Key;                
+                DName variableName = kvp.Key;                
                 if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
                 List<EquationNameAndNumber> equations = kvp.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
 
-                string fileName1 = SimplerName(variableName) + ".html";
+                string fileName1 = SimplerName(variableName.ToString()) + ".html";
 
                 if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
 
@@ -1929,7 +1928,7 @@ img {border-style: none;
                     // TITLE
                     // ------------------------------------------------------
                     html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
-                    EquationBrowser.SpanHtmlColor(html1, variableName);
+                    EquationBrowser.SpanHtmlColor(html1, variableName.ToString());
                     html1.Append(" from equation ");
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
                     html1.Append("</p>");
@@ -1961,8 +1960,8 @@ img {border-style: none;
                     html1.AppendLine("<table class = `table1`>");
 
                     html1.AppendLine("<tr>");
-                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName, SimplerName(variableName) + ".html") + "</td>");
-                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)) + "</td>");
+                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName.ToString(), SimplerName(variableName.ToString()) + ".html") + "</td>");
+                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName.ToString())) + "</td>");
                     html1.AppendLine("</tr>");
 
                     EquationTextHelper helper2 = new EquationTextHelper();
@@ -1973,7 +1972,7 @@ img {border-style: none;
                     foreach (string variableName2 in precedent2)
                     {
                         string varnameWithoutLag = G.Chop_RemoveLagOrLead(variableName2);
-                        if (G.Equal(varnameWithoutLag, variableName)) continue;  //Shown at top
+                        if (G.Equal(varnameWithoutLag, variableName.ToString())) continue;  //Shown at top
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
                         html1.Append("<td>" + EquationBrowser.HtmlLink(varnameWithoutLag, SimplerName(varnameWithoutLag) + ".html") + "</td>");
@@ -1993,7 +1992,7 @@ img {border-style: none;
                     EquationBrowser.WriteHtmlBold(html1, "Related variables");
                     string s8 = null;
                     List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false, true);
-                    List<string> dependentVarsList = Program.FindDependentVars(variableName, model, model.modelGams, modelGamsScalar, eqsContainingVariable);
+                    List<string> dependentVarsList = Program.FindDependentVars(variableName.ToString(), model, model.modelGams, modelGamsScalar, eqsContainingVariable);
                     bool first2 = true;
                     foreach (string s in dependentVarsList)
                     {
@@ -2020,8 +2019,8 @@ img {border-style: none;
                     {
                         //only plot the series from Work                        
                         //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
-                        html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName) + ".svg" + "`>");
-                        if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName) + "__p.svg" + "`>");
+                        html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
+                        if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
                         html1.AppendLine("<p>");
                     }
                     catch
@@ -2037,7 +2036,7 @@ img {border-style: none;
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
-                    string table = BrowserDecompTable(t1, t2, variableName, equationHelper, model, modelGamsScalar);
+                    string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
                     if (table != null)
                     {
                         html1.AppendLine("<br>");
@@ -2061,7 +2060,7 @@ img {border-style: none;
                     Series ts = null;
                     try
                     {
-                        ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName, "traces"), bh.freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                        ts = O.GetIVariableFromString(G.Chop_AddFreq(G.Chop_AddBank(variableName.ToString(), "traces"), bh.freq), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     }
                     catch { }
 
@@ -2114,7 +2113,7 @@ img {border-style: none;
                 }
 
                 StringBuilder x; string js;
-                BrowserNewCssAndJs(variableName, bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, equations, true, out x, out js);
+                BrowserNewCssAndJs(variableName.ToString(), bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, equations, true, out x, out js);
 
                 x.AppendLine("  <body>");
                 x.Append(LinkHome(true));
@@ -2137,13 +2136,13 @@ img {border-style: none;
             return;
         }
 
-        private static bool ShouldSkip(BrowserHelper bh, GekkoDictionaryBlanks<string> nodeNames, int count, string variableName)
+        private static bool ShouldSkip(BrowserHelper bh, Dictionary<DName, DName> nodeNames, int count, DName variableName)
         {
             bool b = false;
             if (Globals.greuHack)
             {
                 if (count > bh.maxPages) b = true;
-                else if (G.Equal(variableName, "submodel_template_test_variable")) b = true; //why does it have 12.000 dependents?
+                else if (G.Equal(variableName.ToString(), "submodel_template_test_variable")) b = true; //why does it have 12.000 dependents?
                 else if (nodeNames != null && !nodeNames.ContainsKey(variableName)) b = true;
             }
             return b;
@@ -2200,9 +2199,9 @@ img {border-style: none;
         /// <param name="t"></param>
         /// <param name="modelGamsScalar"></param>
         /// <returns></returns>
-        public static GekkoDictionary<string, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar, BrowserHelper bh)
+        public static GekkoDictionary<DName, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar, BrowserHelper bh)
         {
-            GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
+            GekkoDictionary<DName, List<EquationNameAndNumber>> combos = new GekkoDictionary<DName, List<EquationNameAndNumber>>();  //key:varname, value:equation names            
 
             int n = modelGamsScalar.CountEqs(1);
             for (int i = 0; i < n; i++)
@@ -2211,9 +2210,9 @@ img {border-style: none;
                 //{
                 //}
                 //if (combos.Count > bh.maxPages) break;
-                string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i].ToString();
+                DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
                 if (eqName == null) continue;
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false);
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
                 var equationName = helper2.resultingFullName;
 
                 if (helper2.time.Equals(t))
@@ -2224,7 +2223,7 @@ img {border-style: none;
 
                     foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
                     {
-                        string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
+                        DName variableNameWithoutLagOrLead = DName.HACK1(G.Chop_RemoveLagOrLead(variableName));
                         if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
                         combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
                     }
@@ -2239,7 +2238,7 @@ img {border-style: none;
         /// Making around 15.000 svg files (from 15.000 .gp and .data files) takes &lt; 1 min, even in debug mode, so this is fast!
         /// </summary>
         /// <param name="combos"></param>
-        private static void BrowserNewPlots(GekkoDictionary<string, List<EquationNameAndNumber>> combos, string browserPath, GekkoDictionary<string, bool>restrict, GekkoDictionaryBlanks<string> nodeNames, BrowserHelper bh)
+        private static void BrowserNewPlots(Dictionary<DName, List<EquationNameAndNumber>> combos, string browserPath, Dictionary<DName, bool>restrict, Dictionary<DName, DName> nodeNames, BrowserHelper bh)
         {
             double yminhard = -100d;
             double ymaxhard = 100d;
@@ -2264,14 +2263,11 @@ img {border-style: none;
                     //Generate 1 file for gnuplot to chew on
                     O.Prt o0 = null;
 
-
-
-
                     int count = 0;
-                    foreach (KeyValuePair<string, List<EquationNameAndNumber>> kvp in combos)
+                    foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
                     {
                         count++;
-                        string variableName = kvp.Key;
+                        DName variableName = kvp.Key;
                         if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
                         if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
 
@@ -2309,14 +2305,14 @@ img {border-style: none;
                             extra = "__" + op;
                             extra2 = " (%)";
                         }
-                        o0.browserPath = browserPath + "\\vars\\" + SimplerName(kvp.Key) + extra + ".svg";
+                        o0.browserPath = browserPath + "\\vars\\" + SimplerName(kvp.Key.ToString()) + extra + ".svg";
                         o0.prtType = "plot";
                         o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
                         O.Prt.Element ope0 = new O.Prt.Element();
                         ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
                         ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
-                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
+                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key.ToString(), O.ECreatePossibilities.NoneReportError) as Series;
                         o0.prtElements.Add(ope0);
                         try
                         {
@@ -2346,16 +2342,16 @@ img {border-style: none;
             if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }
 
-        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, string variableName, GekkoTime tUsedHere, BrowserHelper th)
+        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, DName variableName, GekkoTime tUsedHere, BrowserHelper th)
         {
             List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false, true);
             StringBuilder html2 = new StringBuilder();
             html2.AppendLine("<div id = `no-hash` class=`content`>");            
             html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
-            EquationBrowser.SpanHtmlColor(html2, variableName);
+            EquationBrowser.SpanHtmlColor(html2, variableName.ToString());
             html2.Append("</p>");
             //EquationBrowser.WriteHtmlColor(html2, variableName);
-            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));            
+            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName.ToString())));            
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
             string table = "<table cellpadding=`5`>";
@@ -2367,7 +2363,7 @@ img {border-style: none;
                 EquationTextHelper helper = new EquationTextHelper();
                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName.ToString() }, helper, tUsedHere);                
                 //string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(G.Chop_RemoveLagOrLead(eqHelper.eqNameWithLag)));
-                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
+                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName.ToString()) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
                 if (count == 0) link ="<b>" + link + "</b>";
                 table += "<td style=`vertical-align:top`>";
                 table += link;

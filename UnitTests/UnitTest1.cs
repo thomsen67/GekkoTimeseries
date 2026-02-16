@@ -13234,40 +13234,40 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Multidim2Element()
         {
-            var d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
+            var d = new Dictionary<Multidim2Element, double>(Multidim2Comparer.MatchCase);
             d.Add(new Multidim2Element(new StringOrTime[] { "a", "b" }), 123d);
             d.Add(new Multidim2Element(new StringOrTime[] { "a", "c" }), 321d);
             Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "a", "b" })]);
             Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { "a", "c" })]);
             try { double d2 = d[new Multidim2Element(new StringOrTime[] { "a", "B" })]; Assert.Fail(); } catch (Exception) { }
             // ---
-            d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+            d = new Dictionary<Multidim2Element, double>(Multidim2Comparer.IgnoreCase);
             d.Add(new Multidim2Element(new StringOrTime[] { "a", "b" }), 123d);
             d.Add(new Multidim2Element(new StringOrTime[] { "A", "c" }), 321d);
             Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "a", "B" })]);
             Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { "a", "c" })]);
             {
                 // --- here with time instead of a            
-                d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+                d = new Dictionary<Multidim2Element, double>(Multidim2Comparer.IgnoreCase);
                 d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "b" }), 1234d);
                 d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "c" }), 4321d);
                 Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "B" })]);
                 Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 1), "c" })]);
                 // --- more time
-                d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+                d = new Dictionary<Multidim2Element, double>(Multidim2Comparer.IgnoreCase);
                 d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 4), "a" }), 1234d);
                 d.Add(new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2021, 1), "a" }), 4321d);
                 Assert.AreEqual(1234d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2020, 4), "A" })]);
                 Assert.AreEqual(4321d, d[new Multidim2Element(new StringOrTime[] { new GekkoTime(EFreq.Q, 2021, 1), "A" })]);
             }
             // ---
-            d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(false));
+            d = new Dictionary<Multidim2Element, double>(Multidim2Comparer.MatchCase);
             d.Add(new Multidim2Element(new StringOrTime[] { "a", null }), 123d);
             d.Add(new Multidim2Element(new StringOrTime[] { null, null }), 321d);
             Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "a", null })]);
             Assert.AreEqual(321d, d[new Multidim2Element(new StringOrTime[] { null, null })]);
             // ---
-            d = new Dictionary<Multidim2Element, double>(new Multidim2Comparer(true));
+            d = new Dictionary<Multidim2Element, double>(Multidim2Comparer.IgnoreCase);
             d.Add(new Multidim2Element(new StringOrTime[] { "a", null }), 123d);
             d.Add(new Multidim2Element(new StringOrTime[] { null, null }), 321d);
             Assert.AreEqual(123d, d[new Multidim2Element(new StringOrTime[] { "A", null })]);
@@ -16112,14 +16112,14 @@ namespace UnitTests
             Trace2 trace = q.meta.trace2;
 
             //No DAG identified
-            Assert.AreEqual(4, Trace2.CallTraceViewer(trace, 2));
-            Assert.AreEqual(11, Trace2.CallTraceViewer(trace, 3));
-            Assert.AreEqual(35, Trace2.CallTraceViewer(trace, 4));
-            Assert.AreEqual(134, Trace2.CallTraceViewer(trace, 5));
-            Assert.AreEqual(204, Trace2.CallTraceViewer(trace, 6));
-            Assert.AreEqual(397, Trace2.CallTraceViewer(trace, 7));
-            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, 8));
-            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, 9));
+            Assert.AreEqual(4, Trace2.CallTraceViewer(trace, 2, null));
+            Assert.AreEqual(11, Trace2.CallTraceViewer(trace, 3, null));
+            Assert.AreEqual(35, Trace2.CallTraceViewer(trace, 4, null));
+            Assert.AreEqual(134, Trace2.CallTraceViewer(trace, 5, null));
+            Assert.AreEqual(204, Trace2.CallTraceViewer(trace, 6, null));
+            Assert.AreEqual(397, Trace2.CallTraceViewer(trace, 7, null));
+            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, 8, null));
+            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, 9, null));
 
             ////DAG identified
             //Assert.AreEqual(4, Trace2.CallTraceViewer(trace, true, 2));

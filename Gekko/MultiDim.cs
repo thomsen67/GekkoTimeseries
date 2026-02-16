@@ -180,9 +180,12 @@ namespace Gekko
 
     public class Multidim2Comparer : IEqualityComparer<Multidim2Element>
     {
+        public static readonly Multidim2Comparer IgnoreCase = new Multidim2Comparer(true); //For faster reuse
+        public static readonly Multidim2Comparer MatchCase = new Multidim2Comparer(false); //For faster reuse
+
         private readonly bool _ignoreCase;
 
-        public Multidim2Comparer(bool ignoreCase)
+        private Multidim2Comparer(bool ignoreCase)
         {
             _ignoreCase = ignoreCase;
         }
@@ -435,15 +438,21 @@ namespace Gekko
 
         public string HACK_ToStringWithoutTime()
         {
+            List<string> temp = this.HACK_IndexesWithoutTime();            
+            if (temp.Count == 0) return this.GetName();
+            else return this.GetName() + "[" + Stringlist.GetListWithCommas(temp, "") + "]";            
+        }
+
+        public List<string> HACK_IndexesWithoutTime()
+        {
             List<string> temp = new List<string>();
             for (int i = this.posIndex; i < this.GetLength(); i++)
             {
                 if (i == this.timePosition) continue;
                 temp.Add(this.Get(i).ToString());
             }
-            if (temp.Count == 0) return "Work:" + this.GetName();
-            else return "Work:" + this.GetName() + "[" + Stringlist.GetListWithCommas(temp, "") + "]";            
-        }        
+            return temp;            
+        }
 
         public GekkoTime GetTime() => this.Get(this.timePosition).GetTime();
                 
