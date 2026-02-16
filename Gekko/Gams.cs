@@ -265,108 +265,22 @@ namespace Gekko
                 cmdNode.Add(cmdNodeChild);
                 Compile2(d, cmdNodeChild, depth + 1, tokens, print);
             }
-        }        
-                
-        /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
-        /// For a name without blanks and year time last, like "x[i,j,2025]", the method can return resultingFullName and time much faster (with name and indexes both = null).
-        /// With allowFast, it looks for a four-digit annual time as LAST index.
+        }
+
+
+
+        /// <summary>
+        /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].        
+        /// </summary>
+        /// <param name="varname"></param>
+        /// <returns></returns>
         public static ExtractTimeDimensionHelper ExtractTimeDimensionNew(DName varname)
         {
             ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
-            helper.name = varname.GetName();
-            helper.resultingFullName = varname.HACK_ToStringWithoutTime();
+            helper.name = varname.GetName();            
             helper.time = varname.GetTime();
+            helper.resultingFullName = varname.HACK_ToStringWithoutTime();
             helper.indexes = varname.HACK_IndexesWithoutTime();
-            return helper;
-        }
-
-        /// <summary>
-        /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
-        /// For a name without blanks and year time last, like "x[i,j,2025]", the method can return resultingFullName and time much faster (with name and indexes both = null).
-        /// With allowFast, it looks for a four-digit annual time as LAST index.
-        /// </summary>
-        public static ExtractTimeDimensionHelper ExtractTimeDimension(bool allowFast, EExtractTimeDimension settings, string varname, bool errorIfTimeNotFound)
-        {
-            //NOTE: just remove last argument soon...!
-
-            if (varname == "") return null;
-
-            bool simple = false;
-            ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
-
-            //fast chop up of stuff like x[a,b,2022], with no blanks.
-            if (allowFast)
-            {
-                simple = ExtractTimeDimensionHelper2(settings, varname, helper);
-            }
-
-            if (!simple)
-            {                
-                List<string> fullName = new List<string>();
-                string start = null;
-                int i = varname.IndexOf('[');
-                if (i >= 1)
-                {
-                    //with index (...)
-                    if (true)
-                    {
-                        // IS THIS USED BY ANYONE?
-                        // IS THIS USED BY ANYONE?
-                        // IS THIS USED BY ANYONE?
-                        //For some reason, this is really slow (will only be for non-annual)
-                        //It is ok for a quarterly scalar-timeless model from .frm, but not  
-                        //for instance 1 million quarterly equations.
-                        start = varname.Substring(0, i).Trim();
-                        string rest = varname.Substring(i).Trim();
-                        string rest2 = rest.Substring(1, rest.Length - 2);
-                        string[] ss = rest2.Split(',');
-                        int int2 = -12345;
-                        for (int j = 0; j < ss.Length; j++)
-                        {
-                            string s = ss[j].Trim();
-                            if (Globals.greuHack && (s.Length != 4 || !G.IsInteger(s, false, true)))
-                            {
-                                fullName.Add(s);
-                                continue;
-                            }
-                            GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false, false);  //no error, no 2 digits year
-                            bool good = true;
-                            //This would be easier if time was known to be always last...
-                            if (tt.IsNull()) good = false;
-                            if (s.Length < 4) good = false; //avoid the 18 in x[18, 2020q2] is a hit.
-                            if (tt.super < 1900 || tt.super > 4000) good = false; //sensible?
-                            if (!(tt.freq == EFreq.A || tt.freq == EFreq.Q || tt.freq == EFreq.M)) good = false;
-
-                            if (good)
-                            {
-                                //Time is in this index
-                                if (!helper.time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
-                                helper.time = tt;
-                            }
-
-                            if (helper.time.IsNull())  //Presupposes it is last?????!!!!!
-                            {
-                                fullName.Add(s);
-                            }
-                            else
-                            {
-                                //not part of indexes
-                            }
-                        }
-                    }
-
-                    if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
-                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, null) + "]";
-                }
-                else
-                {
-                    start = varname;
-                    helper.resultingFullName = varname;
-                }
-                helper.indexes = fullName;
-                helper.name = start;
-            }
-
             return helper;
         }
 

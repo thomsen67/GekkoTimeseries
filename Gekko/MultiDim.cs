@@ -389,7 +389,10 @@ namespace Gekko
             }
         }
 
-        public string GetName() => this.Get(this.posName).GetString();
+        public string GetName()
+        {
+            return this.Get(this.posName).GetString();
+        }
 
         private StringOrTime[] DeepCloneExceptFirst()
         {
@@ -452,10 +455,18 @@ namespace Gekko
                 temp.Add(this.Get(i).ToString());
             }
             return temp;            
+        }        
+
+        /// <summary>
+        /// May return GekkoTime.tNull if no time present.
+        /// </summary>
+        /// <returns></returns>
+        public GekkoTime GetTime()
+        {
+            if (this.timePosition == -1) return GekkoTime.tNull;            
+            return this.Get(this.timePosition).GetTime();            
         }
 
-        public GekkoTime GetTime() => this.Get(this.timePosition).GetTime();
-                
         private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
         {
             int offset = 1;
