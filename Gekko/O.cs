@@ -5534,29 +5534,6 @@ namespace Gekko
 
                 MetaTimeSeries mts = O.GetTimeSeries(var, 0);
 
-                //List<Databank> dbList = new List<Databank>();
-                //if (Program.options.databank_search)
-                //{
-                //    //search for it, with the current frequency
-                //    for (int i = 0; i < Program.databanks.storage.Count; i++)
-                //    {
-                //        if (i == 1) continue; //skip ref databank, just as when searching for series
-                //        dbList.Add(Program.databanks.storage[i]);
-                //    }
-                //}
-                //else
-                //{
-                //    //In sim-mode do not search all 
-                //    dbList.Add(Program.databanks.GetFirst());
-                //}
-
-                //TimeSeries ts = null;
-                //foreach (Databank db in dbList)
-                //{
-                //    ts = db.GetVariable(var);
-                //    if (ts == null) continue;
-                //}
-
                 if (mts == null)
                 {
                     G.Writeln2("*** ERROR: Trace-viewer could not find series " + var);
@@ -5580,24 +5557,16 @@ namespace Gekko
                 }
 
                 List<string> traceLines = new List<string>();
-                int cnt = 0;
-                Trace2.WalkTraces(trace, 0, traceLines, 0, ref cnt);
-                if (true)
+                int cnt = 0; int cntA = 0;
+                Trace2.WalkTraces(trace, 0, traceLines, 0, ref cnt, ref cntA);
+                Thread sta = new Thread(delegate ()
                 {
-                    Thread sta = new Thread(delegate ()
-                    {
-                        WindowTrace wt = new WindowTrace(traceLines);
-                        wt.Show();
-                        System.Windows.Threading.Dispatcher.Run();
-                    });
-                    sta.SetApartmentState(ApartmentState.STA);
-                    sta.Start();
-                }
-                else
-                {
-                    WindowTrace wt = new WindowTrace(traceLines);
-                    wt.ShowDialog();
-                }
+                    WindowTrace wt = new WindowTrace(traceLines, ts.GetNameAndParentDatabank());
+                    wt.Show();
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+                sta.SetApartmentState(ApartmentState.STA);
+                sta.Start();
             }
         }
 

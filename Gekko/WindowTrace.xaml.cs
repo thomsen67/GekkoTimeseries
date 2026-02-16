@@ -25,13 +25,13 @@ namespace Gekko
         private List<TreeRow> _allItems = new List<TreeRow>();
         private TextBox _detailsBlock;
 
-        public WindowTrace(List<string> input)
+        public WindowTrace(List<string> input, string nameEtc)
         {
             InitializeComponent();
             SetupUI();
             LoadData(input);
             this.KeyDown += MainWindow_KeyDown;
-            _detailsBlock.Text = "Gekko 2.5.x trace viewer (experimental).\nSome trace features from Gekko 3.x are ported, but bugs and limitations may occur.\nFor instance, time period 'shadowing' of existing traces is not handled well.\n\nClick '[+]' to unfold sub-traces. Click a row to see more trace info.";
+            _detailsBlock.Text = nameEtc + " (" + input.Count + " data-traces)\n\nGekko 2.5.x trace viewer (experimental). Frequencies are indicated with '!'.\nSome trace features from Gekko 3.x are ported, but bugs and limitations may occur.\nFor instance, time period 'shadowing' of existing traces is not handled well.\n\nClick '[+]' to unfold sub-traces. Click a row to see more trace info.";
         }
 
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

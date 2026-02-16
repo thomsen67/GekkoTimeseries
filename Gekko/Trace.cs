@@ -200,7 +200,7 @@ namespace Gekko
             }
         }
 
-        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type, ref int counter) //0 for viewer, 1 for printing
+        public static void WalkTraces(Trace2 parent, int depth, List<string>traceLines, int type, ref int counter, ref int counterAll) //0 for viewer, 1 for printing
         {            
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
@@ -262,6 +262,11 @@ namespace Gekko
                 }
                 string id = parent.traceContents.id.ToString().Split(' ')[0];
 
+                if (depth > 0)
+                {
+                    counterAll++;
+                }
+
                 if (type == 0 && depth > 0)
                 {
                     string d = "{tce}";
@@ -291,7 +296,7 @@ namespace Gekko
                 //NOTE: list items are reversed!
                 foreach (Trace2 child in parent.precedents.storage.AsEnumerable().Reverse().ToList())
                 {
-                    WalkTraces(child, depth + 1, traceLines, type, ref counter);
+                    WalkTraces(child, depth + 1, traceLines, type, ref counter, ref counterAll);
                 }
             }
             finally
