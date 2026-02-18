@@ -33,6 +33,7 @@ namespace Gekko
         public int maxPages = int.MaxValue;
         public int restrict_maxDepth = -1;
         public DName restrict_varName = null;
+        public bool showTraces = true;
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
         public StringBuilder text = null;
@@ -1384,23 +1385,25 @@ img {border-style: none;
             {
                 //GREU
                 bh = new BrowserHelper();
+                bh.type = EBrowserType.Greu;
                 bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
                 bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
                 bh.pixels = 20;
                 bh.pixelsAfterArrow = 12;
                 bh.freq = freq;
                 bh.firstColWidth = 200;
-                bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
-                bh.type = EBrowserType.Greu;
+                bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"                
                 bh.text = new StringBuilder();
                 bh.maxPages = int.MaxValue; //max, when we restrict depth
-                bh.restrict_maxDepth = 3;  //2=about 40 files
-                bh.restrict_varName = DName.HACK1("qC");
+                //bh.restrict_maxDepth = 2;  //2=about 40 files
+                //bh.restrict_varName = DName.HACK1("qC");
+                bh.showTraces = false;
             }
             else
             {
                 //MAKRO
                 bh = new BrowserHelper();
+                bh.type = EBrowserType.MakroIdentitiesText;
                 bh.depthMax = 3;   //4. MaxValue can easily produce > 500 MB files.
                 bh.counterMax = int.MaxValue;  //traces, not good --> gives a lot of non-opening folders that are non-deep
                 bh.pixels = 20;
@@ -1408,8 +1411,8 @@ img {border-style: none;
                 bh.freq = freq;
                 bh.firstColWidth = 200;
                 bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
-                bh.type = EBrowserType.MakroIdentitiesText;
-                bh.text = new StringBuilder();
+                bh.showTraces = false;                
+                bh.text = new StringBuilder();                
             }
 
             if (bh.type==EBrowserType.Adam && G.Equal(settings_include_p_type, "yes"))
@@ -1489,10 +1492,10 @@ img {border-style: none;
                 //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\styles.css", path + "\\" + "styles.css");
                 //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\header_MAKRO.svg", path + "\\" + "header_MAKRO.svg");
                 //File.Copy(@"c:\Thomas\Gekko\regres\Doc_browser\MAKRO\DREAM_logo_500x70px.svg", path + "\\" + "DREAM_logo_500x70px.svg");
-                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
-                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
-                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
-                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked.png", path + "\\vars\\" + "checked.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal.png", path + "\\vars\\" + "normal.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\checked_red.png", path + "\\vars\\" + "checked_red.png");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Release\images\normal_red.png", path + "\\vars\\" + "normal_red.png");
             }
 
             Globals.browser = true;  //Do not change, internal TTH popup
@@ -1520,15 +1523,17 @@ img {border-style: none;
                     //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
                     //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
                     //USE THIS: G.GekkoExeFolder() + "\\images\\images.zip"
-                    List<string> filesToCopy = new List<string> { "styles.css", "index.html", "DREAM_logo_500x70px.svg", "header_MAKRO.svg" };
+                    List<string> filesToCopy = new List<string> { "styles_GreenREFORM.css", "index_GreenREFORM.html", "DREAM_logo_500x70px.svg", "header_GreenREFORM.svg" };
                     foreach (string s in filesToCopy)
                     {
-                        string dest = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s;
+                        string s2 = s;
+                        if (!s.StartsWith("header_")) s2 = s2.Replace("_GreenREFORM", "");
+                        string dest = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s2;
                         if (!File.Exists(dest)) File.Copy(@"c:\Tools\Xxx\" + s, dest);
-                    }
+                    }                    
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
-                    Program.RunGekkoCommands(f + "reset; greu(); option decomp equation style = gams; global:%t1 = 2023; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1554,9 +1559,11 @@ img {border-style: none;
             //BEWARE: should t1 have 2-3 periods subtraced for instance? But t1.Add(-3) does not seem to change anything.
             model.modelGamsScalar.MaybeLoadDataIntoModel(0, t1, t2, ignoreMissing, false);
 
-            GekkoDictionary<DName, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar, bh);
+            Dictionary<DName, List<EquationNameAndNumber>> combos = BrowserNewGetVariableAndEquationCombos(t1, modelGamsScalar, bh);
 
-            Dictionary<DName, DName> nodeNames = null;
+            G.WritelnGray("TTH: Walknodes start");
+
+            Dictionary<DName, DName> nodeNames = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
             if (bh.restrict_maxDepth > -1)
             {
                 G.WritelnGray("TTH: maxDepth vars start");
@@ -1585,6 +1592,7 @@ img {border-style: none;
                 G.WritelnGray("TTH: maxDepth vars end (" + nodeNames.Count() + ")");
             }
 
+            G.WritelnGray("TTH: Walknodes end");
 
             if (onlyHtml && onlyPlot) new Error("Hov");
             if (onlyHtml)
@@ -1614,13 +1622,14 @@ img {border-style: none;
             return;
         }
 
-        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, GekkoDictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, Dictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
             //FIXME
             //FIXME
             //FIXME
             //FIXME
-            //FIXME            
+            //FIXME
+            G.WritelnGray("TTH: HTML start");
             string settings_css_filename = "style.css";
             string settings_vars_foldername = "vars";
             string modelFrequencyString = "a";
@@ -1640,7 +1649,7 @@ img {border-style: none;
                 for (int i = 0; i < n; i++)
                 {
                     DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                    if (eqName == null) continue;
+                    if (eqName.IsNull()) continue;
                     ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
                     var equationName = helper2.resultingFullName;
 
@@ -1992,6 +2001,9 @@ img {border-style: none;
                     EquationBrowser.WriteHtmlBold(html1, "Related variables");
                     string s8 = null;
                     List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false, true);
+                    if (count == 3)
+                    {
+                    }
                     List<string> dependentVarsList = Program.FindDependentVars(variableName.ToString(), model, model.modelGams, modelGamsScalar, eqsContainingVariable);
                     bool first2 = true;
                     foreach (string s in dependentVarsList)
@@ -2054,7 +2066,7 @@ img {border-style: none;
                     html1.Append("</div>");
                 }
 
-                if (true)
+                if (bh.showTraces)
                 {
                     //Traces
                     Series ts = null;
@@ -2088,7 +2100,7 @@ img {border-style: none;
                     }
                 }
 
-                if (true)
+                if (bh.showTraces)
                 {
                     //ADAMBK-precedents
                     GekkoDictionary<string, bool> found = null;
@@ -2143,7 +2155,7 @@ img {border-style: none;
             {
                 if (count > bh.maxPages) b = true;
                 else if (G.Equal(variableName.ToString(), "submodel_template_test_variable")) b = true; //why does it have 12.000 dependents?
-                else if (nodeNames != null && !nodeNames.ContainsKey(variableName)) b = true;
+                else if (nodeNames.Count > 0 && !nodeNames.ContainsKey(variableName)) b = true;
             }
             return b;
         }
@@ -2199,9 +2211,9 @@ img {border-style: none;
         /// <param name="t"></param>
         /// <param name="modelGamsScalar"></param>
         /// <returns></returns>
-        public static GekkoDictionary<DName, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar, BrowserHelper bh)
+        public static Dictionary<DName, List<EquationNameAndNumber>> BrowserNewGetVariableAndEquationCombos(GekkoTime t, ModelGamsScalar modelGamsScalar, BrowserHelper bh)
         {
-            GekkoDictionary<DName, List<EquationNameAndNumber>> combos = new GekkoDictionary<DName, List<EquationNameAndNumber>>();  //key:varname, value:equation names            
+            Dictionary<DName, List<EquationNameAndNumber>> combos = new Dictionary<DName, List<EquationNameAndNumber>>(Multidim2Comparer.IgnoreCase);  //key:varname, value:equation names            
 
             int n = modelGamsScalar.CountEqs(1);
             for (int i = 0; i < n; i++)
@@ -2211,7 +2223,7 @@ img {border-style: none;
                 //}
                 //if (combos.Count > bh.maxPages) break;
                 DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                if (eqName == null) continue;
+                if (eqName.IsNull()) continue;
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
                 var equationName = helper2.resultingFullName;
 
@@ -2240,6 +2252,7 @@ img {border-style: none;
         /// <param name="combos"></param>
         private static void BrowserNewPlots(Dictionary<DName, List<EquationNameAndNumber>> combos, string browserPath, Dictionary<DName, bool>restrict, Dictionary<DName, DName> nodeNames, BrowserHelper bh)
         {
+            G.WritelnGray("TTH: Plots start");
             double yminhard = -100d;
             double ymaxhard = 100d;
             DateTime dt0 = DateTime.UtcNow;
@@ -2673,32 +2686,6 @@ img {border-style: none;
         {
             return depth >= th.depthMax || th.counter >= th.counterMax;
         }
-
-        ///// <summary>
-        ///// Finds equations that contain the given variable name.
-        ///// </summary>
-        ///// <param name="variableName"></param>
-        ///// <param name="tUsedHere"></param>
-        ///// <param name="model"></param>
-        ///// <param name="modelGamsScalar"></param>
-        ///// <returns></returns>
-        //public static List<EqInfoSimple> GetRelatedEquations(string variableName, GekkoTime tUsedHere, Model model)
-        //{
-        //    List<EqInfoSimple> eqsNew = new List<EqInfoSimple>();
-        //    ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
-        //    int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
-        //    if (aNumber == -12345) return eqsNew;
-        //    int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(tUsedHere));
-        //    PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-        //    List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-        //    if (eqNumbers == null)
-        //    {
-        //        G.WarningInternal("Eq browser: '" + variableName + "' returns 'null' for eqNumbers");
-        //        eqNumbers = new List<int>();
-        //    }
-        //    eqsNew = Gekko.Decomp.FindEquationsThatContainGivenVariableSorted(variableName, tUsedHere, eqNumbers, model);
-        //    return eqsNew;
-        //}
 
         private static string BrowserGetVariable(List<TokenHelper> a)
         {

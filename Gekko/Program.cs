@@ -17141,7 +17141,7 @@ namespace Gekko
             {
                 double bestScore = double.MinValue;
                 string bestVar = "<not found>";
-                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars)
+                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars) //can have 840...
                 {
                     //foreach precedent variable
                     string varName = modelGamsScalar.GetVarNameA(dp.variable);
