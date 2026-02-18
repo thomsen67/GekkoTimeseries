@@ -37,6 +37,8 @@ namespace Gekko
 
     public class Globals
     {
+        public static bool greu = true;
+        
         public const string smpl = "§¤£";   //this line must be at top
 
         public static List<string> hardLoadedDlls = new List<string>() { "System.Memory", "System.Runtime.CompilerServices.Unsafe", "System.Threading.Tasks.Extensions" }; //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.

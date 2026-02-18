@@ -885,6 +885,7 @@ namespace Gekko
         {
             double d = double.MaxValue;
             string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName.ToString());  //Note: what about lagged/leaded equation???
+
             bool hit1 = false;
             //SLACK SLACK SLACK
             //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?

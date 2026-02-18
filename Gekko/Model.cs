@@ -1038,7 +1038,7 @@ namespace Gekko
         [ProtoMember(33)]  //(32) is above
         public bool hasResVariables = false;  //if a variable res_... is encountered
 
-        [ProtoMember(34)]  //Only used when there are no res_... and 
+        [ProtoMember(34)]  //Only used when there are no res_... Has equation name as keys and LHS variable name as value
         public GekkoDictionary<string, string> depNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         [ProtoMember(35)]

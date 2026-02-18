@@ -1642,279 +1642,16 @@ img {border-style: none;
             
             GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
 
-            if (bh.type == EBrowserType.MakroIdentitiesText)
+            if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }
+
+            if (!Globals.greu) //list.html and find.html
             {
-                List<TwoStrings> list = new List<TwoStrings>();
-                int n = Program.model.modelGamsScalar.CountEqs(1);
-                for (int i = 0; i < n; i++)
-                {
-                    DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                    if (eqName.IsNull()) continue;
-                    ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
-                    var equationName = helper2.resultingFullName;
-
-                    if (helper2.time.Equals(t1))
-                    {
-                        string s5, s6;
-                        EquationNameAndNumber equationHelper5 = new EquationNameAndNumber();
-                        //equationHelper5.name = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false).resultingFullName;
-                        equationHelper5.name = helper2.resultingFullName;
-                        equationHelper5.i = i;
-                        GetEquationText(t1, bh, equationHelper5, modelGamsScalar, tUsedHere, out s5, out s6);
-
-                        EquationTextHelper helper = new EquationTextHelper();
-                        helper.showTime = false;
-                        List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t1);
-                        GekkoDictionary<string, bool> precedentsDict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                        foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
-                        {                            
-                            string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
-                            if (G.StartsWith(variableNameWithoutLagOrLead, res)) variableNameWithoutLagOrLead = "zzzzzzzzzz_" + variableNameWithoutLagOrLead;
-                            if (!precedentsDict.ContainsKey(variableNameWithoutLagOrLead)) precedentsDict.Add(variableNameWithoutLagOrLead, false);
-                        }
-                        List<string> precedents = precedentsDict.Keys.ToList();
-                        precedents.Sort(G.CompareNaturalIgnoreCase);                        
-                        precedents = precedents.Select(s => s.Replace("zzzzzzzzzz_", "")).ToList();
-
-                        StringBuilder text2 = new StringBuilder();
-                        text2.AppendLine();
-                        text2.AppendLine("EQUATION: " + equationHelper5.name);
-                        text2.AppendLine();
-                        text2.AppendLine(System.Text.RegularExpressions.Regex.Replace(s5.Replace("\r\n", " "), @"\s+", " "));  // 2 or more blanks --> 1 blank
-                        text2.AppendLine();
-                        text2.AppendLine(System.Text.RegularExpressions.Regex.Replace(s6.Replace("\r\n", " "), @"\s+", " "));  // 2 or more blanks --> 1 blank
-                        text2.AppendLine();
-                        text2.AppendLine("VARIABLES: " + Stringlist.GetListWithCommas(precedents));
-                        text2.AppendLine();
-                        text2.AppendLine("-------------------------------------------------------");
-                        list.Add(new TwoStrings(equationHelper5.name, text2.ToString()));
-                    }
-                }
-                List<TwoStrings> sortedList = list.OrderBy(o => o.s1).ToList();
-                foreach (TwoStrings two in sortedList)
-                {
-                    bh.text.Append(two.s2);
-                }
-                return;
+                List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res);
+                BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);                
             }
 
-            if (true) //list.html and find.html
-            {
-                List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();
-                StringBuilder x2 = new StringBuilder();
-                foreach (string s in CreateCss(false)) x2.AppendLine(s);
-                x2.AppendLine("<body>");
-                x2.AppendLine(LinkHome(false));
-                WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
-                x2.AppendLine("<table style = `width:100%`>");
-                
-                List<DName> vars = combos.Keys.ToList().OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+            G.WritelnGray("Starting individual html pages");
 
-                foreach (DName var2 in vars)
-                {
-                    if (G.StartsWith(var2.ToString(), res)) continue;  //skip res_... variables.
-                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2.ToString()));
-                    x2.Append("<tr>");
-                    x2.Append("<td width = `20%`>");
-                    x2.Append(HtmlLink(var2.ToString(), settings_vars_foldername + "/" + SimplerName(var2.ToString()) + ".html"));
-                    x2.Append("</td>");
-                    x2.Append("<td width = `80%` style=`color:gray`>");
-                    x2.Append(expl);
-                    x2.Append("</td>");
-                    x2.AppendLine("</tr>");
-
-                    EquationBrowserHelper ebh = new EquationBrowserHelper();
-                    ebh.s1 = var2.ToString();
-                    if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
-                    ebh.s2 = G.ReplaceWhitespaceWith1Blank(expl);
-                    if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
-                    vars2.Add(ebh);
-                }
-                x2.AppendLine("</table>");
-
-                x2.AppendLine("  </p>");
-                x2.AppendLine("  </body>");
-                x2.AppendLine("</html>");
-
-                using (FileStream fs = Program.WaitForFileStream(path + "\\" + "list.html", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(x2.Replace('`', '\"'));
-                }
-
-                G.WritelnGray("Finished list.html");
-
-                // ------------------------------------------------------------
-                // ----------------- find -------------------------------------
-                // ------------------------------------------------------------
-
-                var sorted = vars2.OrderBy(o => o.s1, new G.NaturalComparer(G.NaturalComparerOptions.Default));
-
-                StringBuilder x3 = new StringBuilder();
-                x3.AppendLine("<html>");
-                x3.AppendLine("<head>");
-                x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
-                //x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
-                x3.AppendLine("</head>");                
-
-                foreach (string s in CreateCss(false)) x3.AppendLine(s);
-
-                x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
-
-                StringBuilder s1 = new StringBuilder(); s1.AppendLine();
-                StringBuilder s2 = new StringBuilder(); s2.AppendLine();
-                foreach (EquationBrowserHelper s in sorted)
-                {
-                    s1.AppendLine("\"" + G.HandleQuoteInQuote2(s.s1) + "\"" + ", ");
-                    s2.AppendLine("\"" + G.HandleQuoteInQuote2(s.s2) + "\"" + ", ");
-                }
-
-                string write = null;
-                string join = null;
-                write = "document.write";
-
-                string js = @"
-
-            function varnames() {
-                var varname = [" + s1.ToString() + @"];
-                return varname;
-            }
-
-            function describes() {
-                var describe = [" + s2.ToString() + @"];
-                return describe;
-            }
-
-            // A function to convert the wildcard pattern to a regular expression
-            function createRegexFromWildcard(pattern) {
-                let regexPattern = pattern.replace(/[.+^${}()|[\]\\]/g, `\\$&`).replace(/\*/g, `.*`).replace(/\?/g, `.`);                
-                return new RegExp(`^` + regexPattern + `$`, 'i');
-            }
-
-            function SimplerName(s) {                                
-                if (!s) return ``;
-                return s.replace(/ /g, `-`).replace(/[^a-zA-Z0-9\-_\[\],]/g, ``).toLowerCase();
-            }
-
-            //Note: almost same as below
-            function findvarname(){
-              event.preventDefault(); // Prevents the page from reloading
-              const resultsContainer = document.getElementById('results-container');              
-              var content = [];
-              var varname = varnames();
-              var describe = describes();
-              number = varname.length;
-              text = new String;
-              text1 = new String;
-              text = document.form1.text.value;
-              found = 0;
-
-              const myRegex = createRegexFromWildcard(text.replace(/ /g, '')); /* replace blanks with nothing, so that x[i, j, *] becomes x[i,j,*]. */
-              
-              let html = '';
-              for (var i = 0; i < number; i++)
-                {
-                    text1 = varname[i];
-                    //alert(text + '...' + text1);
-                    if (myRegex.test(text1))
-                    {
-                        found++;
-                        html += '<tr><td width = `20%`><a href =' + 'vars/' + SimplerName(varname[i]) + '.html>' + varname[i] + '</a></td><td width = `80 %` style =`color: gray`> ' + describe[i] + '</td></tr>';
-                    } //endif
-               } //endfor
-               html += '</table>';
-                if (found == 0)
-                {
-                  resultsContainer.innerHTML = '<br><hr><br><p style =`color:gray` > ...No results found...</p>';
-                }
-                else {
-                  s = '';
-                  if(found != 1) s = 's';
-                  resultsContainer.innerHTML = '<br><hr><br><p>Found ' + found + ' matching variable' +s+ '</p>' + '<table style = `width:100%` > ' + html;
-                }
-            } 
-
-            //Note: almost same as above
-            function finddescribe(){
-              event.preventDefault(); // Prevents the page from reloading
-              const resultsContainer = document.getElementById('results-container');              
-              var content = [];
-              var varname = varnames();
-              var describe = describes();
-              number = describe.length;
-              text = new String;
-              text1 = new String;
-              text = document.form2.text.value;
-              text = '*' + text + '*';  //Extra wildcards
-              found = 0;
-
-              const myRegex = createRegexFromWildcard(text);
-              
-              let html = '';
-              for (var i = 0; i < number; i++)
-                {
-                    text1 = describe[i];
-                    //alert(text + '...' + text1);
-                    if (myRegex.test(text1))
-                    {
-                        found++;
-                        html += '<tr><td width = `20%`><a href =' + 'vars/' + SimplerName(varname[i]) + '.html>' + varname[i] + '</a></td><td width = `80 %` style =`color: gray`> ' + describe[i] + '</td></tr>';
-                    } //endif
-               } //endfor
-               html += '</table>';
-                if (found == 0)
-                {
-                  resultsContainer.innerHTML = '<br><hr><br><p style =`color:gray` > ...No results found...</p>';
-                }
-                else {
-                  s = '';
-                  if(found != 1) s = 's';
-                  resultsContainer.innerHTML = '<br><hr><br><p>Found ' + found + ' matching variable' +s+ '</p>' + '<table style = `width:100%` > ' + html;
-                }
-            } 
-
-        function check(event) {
-            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-            if (charCode == 13) findvarname();
-        }          
-
-        function check2(event) {
-            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) finddescribe();
-        }  // endfunction
-
-        ";
-
-                x3.AppendLine(js);
-                x3.AppendLine("// -->");
-                x3.AppendLine("</script>");
-                x3.AppendLine("<body onload = `document.form1.text.focus()`>");                
-                x3.AppendLine(LinkHome(false));
-                x3.AppendLine("<p style = `font-weight: bold;`>Search</p>");
-                x3.AppendLine("");                
-                x3.AppendLine("Search variable names (wildcards: * or ?):");
-                x3.AppendLine("<FORM NAME = `form1`>");
-                x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
-                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Search` onClick=`findvarname()`>");
-                x3.AppendLine("</FORM>");                
-                x3.AppendLine("Free text search in variable descriptions:");
-                x3.AppendLine("<FORM NAME = `form2`>");
-                x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
-                x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Search` onClick=`finddescribe()`>");
-                x3.AppendLine("</FORM></center>");
-                x3.AppendLine("<div id = `results-container`></div>");  
-                x3.AppendLine("</body>");
-                x3.AppendLine("</html>");
-
-                string pathAndFilename3 = path + "\\" + settings_find_filename;
-                using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(x3.Replace('`', '\"'));
-                }
-                G.WritelnGray("Finished find.html");
-            }
-            
             int count = 0;
             foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
             {
@@ -1926,7 +1663,8 @@ img {border-style: none;
 
                 string fileName1 = SimplerName(variableName.ToString()) + ".html";
 
-                if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                if(Globals.greu) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                else if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
 
                 StringBuilder html1 = new StringBuilder();
 
@@ -2145,6 +1883,282 @@ img {border-style: none;
             }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
+            return;
+        }
+
+        private static void BrowserNewHtmlFind(string path, string settings_css_filename, string settings_find_filename, List<EquationBrowserHelper> vars2)
+        {
+            // ------------------------------------------------------------
+            // ----------------- find -------------------------------------
+            // ------------------------------------------------------------
+
+            var sorted = vars2.OrderBy(o => o.s1, new G.NaturalComparer(G.NaturalComparerOptions.Default));
+
+            StringBuilder x3 = new StringBuilder();
+            x3.AppendLine("<html>");
+            x3.AppendLine("<head>");
+            x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
+            //x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
+            x3.AppendLine("</head>");
+
+            foreach (string s in CreateCss(false)) x3.AppendLine(s);
+
+            x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
+
+            StringBuilder s1 = new StringBuilder(); s1.AppendLine();
+            StringBuilder s2 = new StringBuilder(); s2.AppendLine();
+            foreach (EquationBrowserHelper s in sorted)
+            {
+                s1.AppendLine("\"" + G.HandleQuoteInQuote2(s.s1) + "\"" + ", ");
+                s2.AppendLine("\"" + G.HandleQuoteInQuote2(s.s2) + "\"" + ", ");
+            }
+
+            string write = null;
+            string join = null;
+            write = "document.write";
+
+            string js = @"
+
+            function varnames() {
+                var varname = [" + s1.ToString() + @"];
+                return varname;
+            }
+
+            function describes() {
+                var describe = [" + s2.ToString() + @"];
+                return describe;
+            }
+
+            // A function to convert the wildcard pattern to a regular expression
+            function createRegexFromWildcard(pattern) {
+                let regexPattern = pattern.replace(/[.+^${}()|[\]\\]/g, `\\$&`).replace(/\*/g, `.*`).replace(/\?/g, `.`);                
+                return new RegExp(`^` + regexPattern + `$`, 'i');
+            }
+
+            function SimplerName(s) {                                
+                if (!s) return ``;
+                return s.replace(/ /g, `-`).replace(/[^a-zA-Z0-9\-_\[\],]/g, ``).toLowerCase();
+            }
+
+            //Note: almost same as below
+            function findvarname(){
+              event.preventDefault(); // Prevents the page from reloading
+              const resultsContainer = document.getElementById('results-container');              
+              var content = [];
+              var varname = varnames();
+              var describe = describes();
+              number = varname.length;
+              text = new String;
+              text1 = new String;
+              text = document.form1.text.value;
+              found = 0;
+
+              const myRegex = createRegexFromWildcard(text.replace(/ /g, '')); /* replace blanks with nothing, so that x[i, j, *] becomes x[i,j,*]. */
+              
+              let html = '';
+              for (var i = 0; i < number; i++)
+                {
+                    text1 = varname[i];
+                    //alert(text + '...' + text1);
+                    if (myRegex.test(text1))
+                    {
+                        found++;
+                        html += '<tr><td width = `20%`><a href =' + 'vars/' + SimplerName(varname[i]) + '.html>' + varname[i] + '</a></td><td width = `80 %` style =`color: gray`> ' + describe[i] + '</td></tr>';
+                    } //endif
+               } //endfor
+               html += '</table>';
+                if (found == 0)
+                {
+                  resultsContainer.innerHTML = '<br><hr><br><p style =`color:gray` > ...No results found...</p>';
+                }
+                else {
+                  s = '';
+                  if(found != 1) s = 's';
+                  resultsContainer.innerHTML = '<br><hr><br><p>Found ' + found + ' matching variable' +s+ '</p>' + '<table style = `width:100%` > ' + html;
+                }
+            } 
+
+            //Note: almost same as above
+            function finddescribe(){
+              event.preventDefault(); // Prevents the page from reloading
+              const resultsContainer = document.getElementById('results-container');              
+              var content = [];
+              var varname = varnames();
+              var describe = describes();
+              number = describe.length;
+              text = new String;
+              text1 = new String;
+              text = document.form2.text.value;
+              text = '*' + text + '*';  //Extra wildcards
+              found = 0;
+
+              const myRegex = createRegexFromWildcard(text);
+              
+              let html = '';
+              for (var i = 0; i < number; i++)
+                {
+                    text1 = describe[i];
+                    //alert(text + '...' + text1);
+                    if (myRegex.test(text1))
+                    {
+                        found++;
+                        html += '<tr><td width = `20%`><a href =' + 'vars/' + SimplerName(varname[i]) + '.html>' + varname[i] + '</a></td><td width = `80 %` style =`color: gray`> ' + describe[i] + '</td></tr>';
+                    } //endif
+               } //endfor
+               html += '</table>';
+                if (found == 0)
+                {
+                  resultsContainer.innerHTML = '<br><hr><br><p style =`color:gray` > ...No results found...</p>';
+                }
+                else {
+                  s = '';
+                  if(found != 1) s = 's';
+                  resultsContainer.innerHTML = '<br><hr><br><p>Found ' + found + ' matching variable' +s+ '</p>' + '<table style = `width:100%` > ' + html;
+                }
+            } 
+
+        function check(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+            if (charCode == 13) findvarname();
+        }          
+
+        function check2(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) finddescribe();
+        }  // endfunction
+
+        ";
+
+            x3.AppendLine(js);
+            x3.AppendLine("// -->");
+            x3.AppendLine("</script>");
+            x3.AppendLine("<body onload = `document.form1.text.focus()`>");
+            x3.AppendLine(LinkHome(false));
+            x3.AppendLine("<p style = `font-weight: bold;`>Search</p>");
+            x3.AppendLine("");
+            x3.AppendLine("Search variable names (wildcards: * or ?):");
+            x3.AppendLine("<FORM NAME = `form1`>");
+            x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Search` onClick=`findvarname()`>");
+            x3.AppendLine("</FORM>");
+            x3.AppendLine("Free text search in variable descriptions:");
+            x3.AppendLine("<FORM NAME = `form2`>");
+            x3.AppendLine("<INPUT NAME=`text` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Search` onClick=`finddescribe()`>");
+            x3.AppendLine("</FORM></center>");
+            x3.AppendLine("<div id = `results-container`></div>");
+            x3.AppendLine("</body>");
+            x3.AppendLine("</html>");
+
+            string pathAndFilename3 = path + "\\" + settings_find_filename;
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x3.Replace('`', '\"'));
+            }
+        }
+
+        private static List<EquationBrowserHelper> BrowserNewHtmlList(string path, Dictionary<DName, List<EquationNameAndNumber>> combos, string settings_vars_foldername, string res)
+        {
+            List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();
+            StringBuilder x2 = new StringBuilder();
+            foreach (string s in CreateCss(false)) x2.AppendLine(s);
+            x2.AppendLine("<body>");
+            x2.AppendLine(LinkHome(false));
+            WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
+            x2.AppendLine("<table style = `width:100%`>");
+
+            List<DName> vars = combos.Keys.ToList().OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+
+            foreach (DName var2 in vars)
+            {
+                if (G.StartsWith(var2.ToString(), res)) continue;  //skip res_... variables.
+                string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2.ToString()));
+                x2.Append("<tr>");
+                x2.Append("<td width = `20%`>");
+                x2.Append(HtmlLink(var2.ToString(), settings_vars_foldername + "/" + SimplerName(var2.ToString()) + ".html"));
+                x2.Append("</td>");
+                x2.Append("<td width = `80%` style=`color:gray`>");
+                x2.Append(expl);
+                x2.Append("</td>");
+                x2.AppendLine("</tr>");
+
+                EquationBrowserHelper ebh = new EquationBrowserHelper();
+                ebh.s1 = var2.ToString();
+                if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
+                ebh.s2 = G.ReplaceWhitespaceWith1Blank(expl);
+                if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
+                vars2.Add(ebh);
+            }
+            x2.AppendLine("</table>");
+
+            x2.AppendLine("  </p>");
+            x2.AppendLine("  </body>");
+            x2.AppendLine("</html>");
+
+            using (FileStream fs = Program.WaitForFileStream(path + "\\" + "list.html", null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x2.Replace('`', '\"'));
+            }
+
+            G.WritelnGray("Finished list.html");
+            return vars2;
+        }
+
+        private static void Identities(GekkoTime t1, BrowserHelper bh, ModelGamsScalar modelGamsScalar, string res, GekkoTime tUsedHere)
+        {
+            List<TwoStrings> list = new List<TwoStrings>();
+            int n = Program.model.modelGamsScalar.CountEqs(1);
+            for (int i = 0; i < n; i++)
+            {
+                DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                if (eqName.IsNull()) continue;
+                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
+                var equationName = helper2.resultingFullName;
+
+                if (helper2.time.Equals(t1))
+                {
+                    string s5, s6;
+                    EquationNameAndNumber equationHelper5 = new EquationNameAndNumber();
+                    //equationHelper5.name = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false).resultingFullName;
+                    equationHelper5.name = helper2.resultingFullName;
+                    equationHelper5.i = i;
+                    GetEquationText(t1, bh, equationHelper5, modelGamsScalar, tUsedHere, out s5, out s6);
+
+                    EquationTextHelper helper = new EquationTextHelper();
+                    helper.showTime = false;
+                    List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, helper, t1);
+                    GekkoDictionary<string, bool> precedentsDict = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
+                    {
+                        string variableNameWithoutLagOrLead = G.Chop_RemoveLagOrLead(variableName);
+                        if (G.StartsWith(variableNameWithoutLagOrLead, res)) variableNameWithoutLagOrLead = "zzzzzzzzzz_" + variableNameWithoutLagOrLead;
+                        if (!precedentsDict.ContainsKey(variableNameWithoutLagOrLead)) precedentsDict.Add(variableNameWithoutLagOrLead, false);
+                    }
+                    List<string> precedents = precedentsDict.Keys.ToList();
+                    precedents.Sort(G.CompareNaturalIgnoreCase);
+                    precedents = precedents.Select(s => s.Replace("zzzzzzzzzz_", "")).ToList();
+
+                    StringBuilder text2 = new StringBuilder();
+                    text2.AppendLine();
+                    text2.AppendLine("EQUATION: " + equationHelper5.name);
+                    text2.AppendLine();
+                    text2.AppendLine(System.Text.RegularExpressions.Regex.Replace(s5.Replace("\r\n", " "), @"\s+", " "));  // 2 or more blanks --> 1 blank
+                    text2.AppendLine();
+                    text2.AppendLine(System.Text.RegularExpressions.Regex.Replace(s6.Replace("\r\n", " "), @"\s+", " "));  // 2 or more blanks --> 1 blank
+                    text2.AppendLine();
+                    text2.AppendLine("VARIABLES: " + Stringlist.GetListWithCommas(precedents));
+                    text2.AppendLine();
+                    text2.AppendLine("-------------------------------------------------------");
+                    list.Add(new TwoStrings(equationHelper5.name, text2.ToString()));
+                }
+            }
+            List<TwoStrings> sortedList = list.OrderBy(o => o.s1).ToList();
+            foreach (TwoStrings two in sortedList)
+            {
+                bh.text.Append(two.s2);
+            }
             return;
         }
 
