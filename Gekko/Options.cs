@@ -47,6 +47,8 @@ Additionally, there are model, solve, equation options.
         
         public bool bugfix_px = true;
         public bool bugfix_download = true;
+        public bool bugfix_trace = false;        
+        public bool bugfix_trace_skip = false;
 
         public bool databank_create_auto = false;
         public bool databank_create_message = true;  //this option could be removed now

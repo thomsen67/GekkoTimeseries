@@ -3279,6 +3279,8 @@ optionType :
 
 			 | BUGFIX PX '='? yesNoSimple -> BUGFIX PX ^(ASTBOOL yesNoSimple)
 			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
+             | BUGFIX TRACE '='? yesNoSimple -> BUGFIX TRACE ^(ASTBOOL yesNoSimple)
+             | BUGFIX TRACE SKIP '='? yesNoSimple -> BUGFIX TRACE SKIP ^(ASTBOOL yesNoSimple)
 
              | CALC question -> CALC question
              | CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR

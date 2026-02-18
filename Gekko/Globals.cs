@@ -45,7 +45,7 @@ namespace Gekko
         public static string hack_g = null;
         public static int hack_lhsOrRhs = 0;  // -1:left   0:unknown    1:right
         public const string languageDaDK = "da-DK";
-        public const string languageEnUS = "en-US";
+        public const string languageEnUS = "en-US";        
 
         public static string versionInternal = "";  // "v14";
 

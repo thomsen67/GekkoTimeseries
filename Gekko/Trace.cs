@@ -58,12 +58,13 @@ namespace Gekko
         {
             this.storageIDTemporary = new List<TraceID2>();
             //if (this.storage.Count() > 0)
+            if (this.storage != null && this.storage.Count > 0)
             {
                 foreach (Trace2 trace in this.storage)
                 {
                     TraceID2 temp = null;
                     GekkoTimeSpansSimple temp2 = new GekkoTimeSpansSimple();  //protobuf cannot handle if an element is == null (for dividers)                    
-                    temp = trace.GetId();                    
+                    temp = trace.GetId();
                     this.storageIDTemporary.Add(temp);
                 }
             }
@@ -293,10 +294,13 @@ namespace Gekko
                     }
                 }
 
-                //NOTE: list items are reversed!
-                foreach (Trace2 child in parent.precedents.storage.AsEnumerable().Reverse().ToList())
+                if (parent.precedents.storage != null)
                 {
-                    WalkTraces(child, depth + 1, traceLines, type, ref counter, ref counterAll);
+                    //NOTE: list items are reversed!
+                    foreach (Trace2 child in parent.precedents.storage.AsEnumerable().Reverse().ToList())
+                    {
+                        WalkTraces(child, depth + 1, traceLines, type, ref counter, ref counterAll);
+                    }
                 }
             }
             finally
@@ -364,11 +368,14 @@ namespace Gekko
                     return;
                 }
 
-                if (this.precedents.storage.Count() > 0)
+                if (this.precedents.storage != null)
                 {
-                    foreach (Trace2 trace in this.precedents.storage)
-                    {                        
-                        trace.DeepTrace(th, depth + 1);
+                    if (this.precedents.storage.Count() > 0)
+                    {
+                        foreach (Trace2 trace in this.precedents.storage)
+                        {
+                            trace.DeepTrace(th, depth + 1);
+                        }
                     }
                 }
             }            
@@ -432,6 +439,36 @@ namespace Gekko
                 meta.ToID();
             }
             databank.traces = th.tracesDepth2.Keys.ToList();
+
+            if (Program.options.bugfix_trace)
+            {
+                try
+                {
+                    for (int i = 0; i < databank.traces.Count; i++)
+                    {
+                        if (databank.traces[i] == null) databank.traces[i] = new Trace2();
+                        else
+                        {
+                            Trace2 tce = databank.traces[i];
+                            if (tce.traceContents.precedentsNames != null)
+                            {
+                                for (int i2 = 0; i2 < tce.traceContents.precedentsNames.Count; i2++)
+                                {
+                                    if (tce.traceContents.precedentsNames[i2] == null) tce.traceContents.precedentsNames[i2] = "";
+                                }
+                            }
+                            if (tce.precedents.storage != null)
+                            {
+                                for (int i2 = 0; i2 < tce.precedents.storage.Count; i2++)
+                                {
+                                    if (tce.precedents.storage[i] == null) tce.precedents.storage[i] = new Trace2();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
         public override string ToString()
@@ -488,7 +525,7 @@ namespace Gekko
         /// <summary>
         /// For instance the file from where data was imported. Will often be null.
         /// </summary>
-        [ProtoMember(6)]
+        [ProtoMember(6)]        
         public string dataFile = null;
 
         [ProtoMember(7)]

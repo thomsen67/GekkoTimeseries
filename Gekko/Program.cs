@@ -1768,43 +1768,40 @@ namespace Gekko
 
                             string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
                             variableCounter++;
+
+                            GekkoTime xt1 = per1;
+                            GekkoTime xt2 = per2;
+                            try
+                            {
+                                if (true && dates != null)
+                                {
+                                    if (freqHere == EFreq.Annual)
+                                    {
+                                        xt1 = dates.t1Annual; xt2 = dates.t2Annual;
+                                    }
+                                    else if (freqHere == EFreq.Quarterly)
+                                    {
+                                        xt1 = dates.t1Quarterly; xt2 = dates.t2Quarterly;
+                                    }
+                                    else if (freqHere == EFreq.Monthly)
+                                    {
+                                        xt1 = dates.t1Monthly; xt2 = dates.t2Monthly;
+                                    }
+                                }
+                            }
+                            catch { }
+
                             if (!databank.ContainsVariable(varName))
                             {
                                 TimeSeries data2 = new TimeSeries(freqHere, varName);
                                 databank.AddVariable(data2);
                                 ts = data2;
-                                //if (Program.options.databank_trace)
-                                //{
-                                //    try
-                                //    {
-                                //        Trace2 trace = new Trace2(ETraceType.Normal, per1, per2);
-                                //        trace.traceContents.text = oRead.gekkocode + ";";
-                                //        trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                //        trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
-                                //        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true); //??
-                                //    }
-                                //    catch { }
-                                //}
-                                //HandleTraceForReadOrImport(per1, per2, false, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
-                                HandleTraceForReadOrImport(per1, per2, false, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                HandleTraceForReadOrImport(xt1, xt2, false, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                             else
                             {
                                 ts = databank.GetVariable(varName);
-                                //if (Program.options.databank_trace)
-                                //{
-                                //    try
-                                //    {
-                                //        Trace2 trace = new Trace2(ETraceType.Normal, per1, per2);
-                                //        trace.traceContents.text = oRead.gekkocode + ";";
-                                //        trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                //        trace.traceContents.commandFileAndLine = oRead.p?.GetGcmTrace(null);
-                                //        Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true); //??
-                                //    }
-                                //    catch { }
-                                //}
-                                //HandleTraceForReadOrImport(per1, per2, true, ts, ts, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
-                                HandleTraceForReadOrImport(per1, per2, true, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
+                                HandleTraceForReadOrImport(xt1, xt2, true, ts, null, ts.GetNameAndParentDatabank(), oRead.gekkocode, oRead.p, readInfo.fileName);
                             }
                         }
 
@@ -22267,6 +22264,17 @@ write datatest;
                         }
                         catch (Exception e) { traceFail = true; }
                         tracesToWrite = databank.traces;
+                        if (Program.options.bugfix_trace)
+                        {
+                            if (tracesToWrite != null)
+                            {
+                                for (int i2 = 0; i2 < tracesToWrite.Count; i2++)
+                                {
+                                    if (tracesToWrite[i2] == null) 
+                                        tracesToWrite[i2] = new Trace2();
+                                }
+                            }
+                        }
                         databank.traces = null;
                     }
                     
@@ -22300,13 +22308,13 @@ write datatest;
                         }
                     }
 
-                    if (useTraces)
+                    if (useTraces && tracesToWrite != null && !Program.options.bugfix_trace_skip)
                     {
                         using (FileStream fs = WaitForFileStream(pathAndFilename3, GekkoFileReadOrWrite.Write))
                         {
                             try
                             {
-                                DateTime dt0 = DateTime.Now;
+                                DateTime dt0 = DateTime.Now;                                
                                 serializer.Serialize(fs, tracesToWrite);
                                 G.WritelnGray("Protobuf serialize traces: " + G.Seconds(dt0));
                             }
@@ -22318,11 +22326,29 @@ write datatest;
                             }
                         }
                     }
+
+                    if (true)
+                    {
+                        //Restore traces
+                        try
+                        {
+                            databank.traces = tracesToWrite;
+                            Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.                    
+                        }
+                        catch (Exception e)
+                        {
+                            traceFail = true;
+                        }
+                        finally
+                        {
+                            if (databank != null) databank.traces = null;  //important!
+                        }
+                    }
                 }
                 finally
                 {
                     //so we are sure it always gets pointed back to its real Dictionary<>!
-                    databank.storage = storageOriginal;
+                    databank.storage = storageOriginal;                    
                 }
             }
 
