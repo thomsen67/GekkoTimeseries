@@ -5666,8 +5666,13 @@ namespace Gekko
         /// <param name="p2"></param>
         /// <param name="option_strict"></param>
         /// <returns></returns>
-        public static bool CompareFiles(string p1, string p2, bool option_strict)
-        {
+        public static bool CompareFiles(string p1, string p2, bool option_strict, bool option_date)
+        {            
+            if (option_date)
+            {
+                if (G.FilesHaveSameWriteTime(p1, p2)) return true;
+                else return false;
+            }
             if ((new FileInfo(p1)).Length != (new FileInfo(p2)).Length) return false;
             if (!option_strict && G.FilesHaveSameWriteTime(p1, p2)) return true;
             //This is about 4x slower than the other way below
