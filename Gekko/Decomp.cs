@@ -5234,59 +5234,63 @@ namespace Gekko
             // Show non-existing variables as N, not M
             // ----------------------------------------------
 
-            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+            if (false) //This has given som problem, so it is now (february 2026 switched off).
             {
-                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
                 {
-                    try
+                    for (int j = 2; j <= table2.GetColMaxNumber(); j++)
                     {
-                        Cell c = table2.Get(i, j);
-                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
-                        double d = c.number;
-                        if (double.IsNaN(d))
+                        try
                         {
-                            bool hit = false;
-                            List<string> xx = c.vars_hack;
-                            if (xx != null)
+                            Cell c = table2.Get(i, j);
+                            if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
+                            double d = c.number;
+
+                            if (double.IsNaN(d))
                             {
-                                foreach (string s in xx)
+                                bool hit = false;
+                                List<string> xx = c.vars_hack;
+                                if (xx != null)
                                 {
-                                    int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
-                                    if (a == -12345) continue;
-
-                                    bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-                                    bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-
-                                    if (b1) //first-position databank checked
+                                    foreach (string s in xx)
                                     {
-                                        if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                        int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
+                                        if (a == -12345) continue;
+
+                                        bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                        bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                        if (b1) //first-position databank checked
                                         {
-                                            hit = true;
-                                            goto Lbl1;
+                                            if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                            {
+                                                hit = true;
+                                                goto Lbl1;
+                                            }
                                         }
-                                    }
 
-                                    if (b2) //ref databank checked
-                                    {
-                                        if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                        if (b2) //ref databank checked
                                         {
-                                            hit = true;
-                                            goto Lbl1;
+                                            if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                            {
+                                                hit = true;
+                                                goto Lbl1;
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        Lbl1:;
-                            if (hit)
-                            {
-                                //c.number = Globals.missingVariableArtificialNumber;
-                                c.numberShouldShowAsN = true;
+                            Lbl1:;
+                                if (hit)
+                                {
+                                    //c.number = Globals.missingVariableArtificialNumber;
+                                    c.numberShouldShowAsN = true;
+                                }
                             }
                         }
-                    }
-                    catch
-                    {
-                        //if this fails, never mind, just a M instead of a N.
+                        catch
+                        {
+                            //if this fails, never mind, just a M instead of a N.
+                        }
                     }
                 }
             }
