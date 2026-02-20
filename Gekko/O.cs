@@ -3694,7 +3694,9 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
+                                        string traceName = null; try { traceName = ts.GetNameAndParentDatabank(); } catch { }
+                                        try { if (trace.traceContents.precedentsNames == null) trace.traceContents.precedentsNames = new List<string>(); if (traceName != null) trace.traceContents.precedentsNames.Add(traceName); } catch { }
+                                        //try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                         Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false, false); //COPY
                                     }
                                     catch { }
@@ -3717,7 +3719,9 @@ namespace Gekko
                                         trace.traceContents.text = this.gekkocode + ";";
                                         trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                         trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                        try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
+                                        string traceName = null; try { traceName = ts.GetNameAndParentDatabank(); } catch { }
+                                        try { if (trace.traceContents.precedentsNames == null) trace.traceContents.precedentsNames = new List<string>(); if (traceName != null) trace.traceContents.precedentsNames.Add(traceName); } catch { }
+                                        //try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
                                         Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false, false); //COPY
                                     }
                                     catch { }
@@ -3754,7 +3758,9 @@ namespace Gekko
                                     trace.traceContents.text = this.gekkocode + ";";
                                     trace.traceContents.name = ts2.GetNameAndParentDatabank();
                                     trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                    try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
+                                    //try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
+                                    string traceName = null; try { traceName = ts.GetNameAndParentDatabank(); } catch { }
+                                    try { if (trace.traceContents.precedentsNames == null) trace.traceContents.precedentsNames = new List<string>(); if (traceName != null) trace.traceContents.precedentsNames.Add(traceName); } catch { }
                                     Trace2.PushIntoSeries(trace, ts2, new List<TimeSeries>() { ts }, false, false); //COPY
                                 }
                                 catch { }
@@ -3909,8 +3915,7 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Databank " + ts.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
                             throw new GekkoException();
                         }
-                        string traceName = null;
-                        try { traceName = ts.GetNameAndParentDatabank(); } catch { }
+                        string traceName = null; try { traceName = ts.GetNameAndParentDatabank(); } catch { }
                         ts.parentDatabank.RemoveVariable(ts.variableName);                        
                         ts.variableName = s2;
                         ts.parentDatabank.AddVariable(ts);
