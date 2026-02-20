@@ -867,7 +867,7 @@ namespace Gekko
                 else
                 {
                     //eq names
-                    extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);
+                    extra = GetSortedEquationsByEqName(eqInfo.eqName, variableName, model, modelGamsScalar);                    
                 }
                 eqInfo.score += extra;
             }
@@ -883,21 +883,43 @@ namespace Gekko
 
         private static double GetSortedEquationsByEqName(DName eqName, DName variableName, Model model, ModelGamsScalar modelGamsScalar)
         {
-            double d = double.MaxValue;
-            string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName.ToString());  //Note: what about lagged/leaded equation???
-
-            bool hit1 = false;
-            //SLACK SLACK SLACK
-            //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
-            //SLACK SLACK SLACK
-            List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
-            foreach (string s in lhsEqs)
-            {
-                if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+            if (Globals.greu && model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+            {                
+                DName eqNameWithoutLast = eqName.HACK_NameWithoutLast(null);
+                //DName variableNameWithoutLast = variableName.HACK_NameWithoutLast("t");
+                DName variableNameWithExtraT = variableName.HACK_AddIndex("t");
+                List<DName> temp = null; modelGamsScalar.depNames2Inverted.TryGetValue(variableName, out temp);
+                List<DName> temp2 = null; modelGamsScalar.depNames2Inverted.TryGetValue(variableNameWithExtraT, out temp2);
+                bool hit1 = false;
+                if (temp != null)
+                {
+                    foreach (DName varName in temp)
+                    {
+                        if (G.Equal(varName, eqNameWithoutLast)) { hit1 = true; break; }
+                    }
+                }
+                double extra = 0d;
+                if (hit1) extra = Globals.lhsScore2; //100
+                return extra;
             }
-            double extra = 0d;
-            if (hit1) extra = Globals.lhsScore2; //100
-            return extra;
+            else
+            {
+
+                string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName.ToString());  //Note: what about lagged/leaded equation???
+
+                bool hit1 = false;
+                //SLACK SLACK SLACK
+                //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
+                //SLACK SLACK SLACK
+                List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
+                foreach (string s in lhsEqs)
+                {
+                    if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+                }
+                double extra = 0d;
+                if (hit1) extra = Globals.lhsScore2; //100
+                return extra;
+            }            
         }
 
         /// <summary>
@@ -1020,7 +1042,7 @@ namespace Gekko
             List<string> varsNoIndex2 = model.modelGamsScalar.GetVars(3);
             foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);
 
-            GekkoDictionary<string, string> lhsEquations = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, string> lhsEquationsStrings = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);            
 
             //For each equation name (without indexes)
             foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
@@ -1270,13 +1292,27 @@ namespace Gekko
 
                         if (names.Length > 0) lhsName += "[" + Stringlist.GetListWithCommas(names) + "]";
 
-                        if (Globals.runningOnTTComputer && lhsEquations.ContainsKey(G.HandleBlanksRemove(eh.eqName)))
+                        if (Globals.greu)
                         {
-                            MessageBox.Show("Hovsa6"); //Not possible?
+                            if (Globals.runningOnTTComputer && lhsEquationsStrings.ContainsKey(G.HandleBlanksHacky(eh.eqName)))
+                            {
+                                MessageBox.Show("Hovsa6"); //Not possible?
+                            }
+                            else
+                            {
+                                lhsEquationsStrings.Add(G.HandleBlanksHacky(eh.eqName), G.HandleBlanksHacky(lhsName));                                
+                            }
                         }
                         else
                         {
-                            lhsEquations.Add(G.HandleBlanksRemove(eh.eqName), G.HandleBlanksRemove(lhsName));
+                            if (Globals.runningOnTTComputer && lhsEquationsStrings.ContainsKey(G.HandleBlanksRemove(eh.eqName)))
+                            {
+                                MessageBox.Show("Hovsa6"); //Not possible?
+                            }
+                            else
+                            {
+                                lhsEquationsStrings.Add(G.HandleBlanksRemove(eh.eqName), G.HandleBlanksRemove(lhsName));
+                            }
                         }
                     }
                     else
@@ -1309,12 +1345,12 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel.Count + ", notFoundInEq = " + notFoundInEq.Count + "). EqDict = " + lhsEquations.Count() + ". Time: " + G.Seconds(t0));
+                new Writeln("TTH: nAll = " + nAll + ", nFail = " + nFail + " (notFoundInModel = " + notFoundInModel.Count + ", notFoundInEq = " + notFoundInEq.Count + "). EqDict = " + lhsEquationsStrings.Count() + ". Time: " + G.Seconds(t0));
 
                 if (createProtobufferFileForUnitTests)
                 {
                     //To find where this file is used in unit tests, go here: #tbjjjdf7hdsfas
-                    Program.ProtobufWrite(lhsEquations, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
+                    Program.ProtobufWrite(lhsEquationsStrings, Globals.ttPath2 + @"\regres\Models\Decomp\decompfind_equations.data");
                 }
             }
 
@@ -1322,9 +1358,9 @@ namespace Gekko
             {
                 Globals.unitTestLhsNotFoundInModel = notFoundInModel;
                 Globals.unitTestLhsNotFoundInEq = notFoundInEq;
-            }
+            }            
 
-            return lhsEquations;
+            return lhsEquationsStrings;
         }        
 
         private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, List<string> writer)

@@ -2454,6 +2454,11 @@ namespace Gekko
             return G.HandleBlanks(s, false);
         }
 
+        public static string HandleBlanksHacky(string s)
+        {
+            return s.Replace(", ", ",");
+        }
+
         /// <summary>
         /// Removes a string like for instance "x[i, j]" in the list of strings "a", "b", "X[i,j]", "c", because
         /// blanks are ignored and case does not matter.

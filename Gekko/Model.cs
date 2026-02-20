@@ -1041,6 +1041,10 @@ namespace Gekko
         [ProtoMember(34)]  //Only used when there are no res_... Has equation name as keys and LHS variable name as value
         public GekkoDictionary<string, string> depNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+        //These are not protobuffed for now, used to speed up html browser etc. and perhaps flowgraph
+        public Dictionary<DName, DName> depNames2 = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
+        public Dictionary<DName, List<DName>> depNames2Inverted = new Dictionary<DName, List<DName>>(Multidim2Comparer.IgnoreCase);
+
         [ProtoMember(35)]
         public int hasReadSomeData = 0; //if Program.options.model_gams_scalar_data == true, AND at least one data value was read from gams.gms.
 

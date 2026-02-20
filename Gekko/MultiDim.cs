@@ -243,10 +243,20 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return 0;
             if (x == null) return -1;
             if (y == null) return 1;
-            if (x.GetLength() != y.GetLength()) return x.GetLength().CompareTo(y.GetLength());
+            //if (x.GetLength() != y.GetLength()) return x.GetLength().CompareTo(y.GetLength());
 
-            for (int i = 0; i < x.GetLength(); i++)
+            int xLen = x.GetLength();
+            int yLen = y.GetLength();
+            int maxLength = Math.Max(xLen, yLen);
+
+            for (int i = 0; i < maxLength; i++)
             {
+                // 2. If we are past the end of x, but y still has values
+                if (i >= xLen) return -1; // x is shorter
+
+                // 3. If we are past the end of y, but x still has values
+                if (i >= yLen) return 1;  // y is shorter
+
                 var xi = x.Get(i);
                 var yi = y.Get(i);
                 if (xi.IsTime() != yi.IsTime()) return xi.IsTime() ? -1 : 1;
@@ -455,7 +465,41 @@ namespace Gekko
                 temp.Add(this.Get(i).ToString());
             }
             return temp;            
-        }        
+        }
+
+        //Removes last index if s==null. If s != null last index is removed if it is == s.
+        public DName HACK_NameWithoutLast(string s)
+        {
+            List<StringOrTime> temp = new List<StringOrTime>();            
+            for (int i = this.posIndex; i < this.GetLength() - 1; i++)
+            {
+                temp.Add(this.Get(i));
+            }
+            if (s != null)
+            {
+                StringOrTime xx = this.Get(this.GetLength() - 1);
+                if (xx.IsString() && G.Equal(s, xx.GetString()))
+                {
+                    //do not add it
+                }
+                else
+                {
+                    temp.Add(xx);
+                }
+            }
+            return new DName(this.GetName(), temp.ToArray());
+        }
+
+        public DName HACK_AddIndex(StringOrTime element)
+        {
+            List<StringOrTime> temp = new List<StringOrTime>();
+            for (int i = this.posIndex; i < this.GetLength(); i++)
+            {
+                temp.Add(this.Get(i));
+            }
+            temp.Add(element);
+            return new DName(this.GetName(), temp.ToArray());
+        }
 
         /// <summary>
         /// May return GekkoTime.tNull if no time present.
@@ -589,6 +633,11 @@ namespace Gekko
         public bool IsTime()
         {
             return this.isTime;
+        }
+
+        public bool IsString()
+        {
+            return !this.isTime;
         }
 
         public string GetString()

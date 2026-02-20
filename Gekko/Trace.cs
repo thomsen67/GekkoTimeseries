@@ -247,9 +247,7 @@ namespace Gekko
         public static void AddRangeFromSeries1(Trace2 lhsTrace, Series rhs)
         {                        
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
-
             if (lhsTrace.GetContents().precedentsNames == null) lhsTrace.GetContents().precedentsNames = new List<string>();
-
             lhsTrace.GetContents().precedentsNames.Add(TraceGetNameDecorated(rhs, hasTrace));
 
             if (hasTrace && rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
@@ -405,8 +403,8 @@ namespace Gekko
         /// <param name="rhs"></param>
         /// <param name="hasTrace"></param>
         /// <returns></returns>
-        private static string TraceGetNameDecorated(Series rhs, bool hasTrace)  //See #9khsigra7ioau
-        {
+        public static string TraceGetNameDecorated(Series rhs, bool hasTrace)  //See #9khsigra7ioau
+        {            
             string prefix = null;            
             string databankName = rhs.GetParentDatabank()?.GetName();  //databank may be null, for instance an imported series
             bool isFirst = G.Equal(databankName, Program.databanks.GetFirst().GetName());

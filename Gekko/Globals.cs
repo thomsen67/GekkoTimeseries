@@ -38,6 +38,7 @@ namespace Gekko
     public class Globals
     {
         public static bool greu = true;
+        public static bool traceFixCopy = true;
         
         public const string smpl = "§¤£";   //this line must be at top
 

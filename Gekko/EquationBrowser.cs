@@ -1229,7 +1229,7 @@ img {border-style: none;
             string settings_find_filename = "find.html";
             string settings_css_filename = "styles.css";            
             string settings_icon_filename = null;
-            string settings_vars_foldername = "Vars";            
+            string settings_vars_foldername = "vars";            
             string settings_commands = null;
             string settings_plot_start = Globals.globalPeriodStart.super.ToString();
             string settings_plot_end = Globals.globalPeriodEnd.super.ToString();
@@ -1644,15 +1644,19 @@ img {border-style: none;
 
             if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }
 
-            if (!Globals.greu) //list.html and find.html
+            if (Globals.greu) //list.html and find.html
             {
                 List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res);
-                BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);                
+                BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);
+                return; //qwerty
             }
 
             G.WritelnGray("Starting individual html pages");
 
             int count = 0;
+
+            double lastMs = 0d;
+
             foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
@@ -1663,9 +1667,16 @@ img {border-style: none;
 
                 string fileName1 = SimplerName(variableName.ToString()) + ".html";
 
-                if(Globals.greu) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                if (Globals.greu)
+                {
+                    if (lastMs > 2000) //2 s
+                    {
+                        new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                    }
+                }
                 else if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
 
+                DateTime t0 = DateTime.Now;
                 StringBuilder html1 = new StringBuilder();
 
                 foreach (EquationNameAndNumber equationHelper in equations)
@@ -1689,7 +1700,8 @@ img {border-style: none;
                     html1.AppendLine("<br style=`line-height: 0.2rem;`>");
                     ToggleLink(html1, "Equation", "To see such equations in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                    html1.AppendLine("model &lt;gms> makro.zip;");
+                    if (Globals.greu) html1.AppendLine("model &lt;gms> greu.zip;");
+                    else html1.AppendLine("model &lt;gms> makro.zip;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
                     html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
                     html1.AppendLine();
@@ -1700,6 +1712,11 @@ img {border-style: none;
                     html1.Append("<hr>");
                     EquationBrowser.WriteHtmlPreCode(html1, s6);
                     html1.Append("<hr>");
+                    if (Globals.greu)
+                    {
+                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: the first equation is in raw form, where sets are stated without quotes and elements with quotes." + "</span>");
+                        html1.Append("<br>");
+                    }
 
                     html1.Append("<br>");
                     EquationBrowser.WriteHtmlBold(html1, "Variables");
@@ -1786,21 +1803,25 @@ img {border-style: none;
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
-                    string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
-                    if (table != null)
+                    if (!Globals.greu)
                     {
-                        html1.AppendLine("<br>");
-                        ToggleLink(html1, "Time-decomposition", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
-                        html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                        html1.AppendLine("model &lt;gms> makro.zip;");
-                        html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + "; //&lt;p> for growth, &lt;errors> for errors");
-                        html1.AppendLine();
-                        html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
-                        html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()                            
-                        html1.AppendLine(table);
+                        string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
+                        if (table != null)
+                        {
+                            html1.AppendLine("<br>");
+                            ToggleLink(html1, "Time-decomposition", "To see this decomposition in Gekko 3.x, you may use the following statements (or similar):");
+                            html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                            if (Globals.greu) html1.AppendLine("model &lt;gms> greu.zip;");
+                            else html1.AppendLine("model &lt;gms> makro.zip;");
+                            html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                            html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + "; //&lt;p> for growth, &lt;errors> for errors");
+                            html1.AppendLine();
+                            html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
+                            html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()                            
+                            html1.AppendLine(table);
+                        }
+                        // ------------------------------------------------------
                     }
-                    // ------------------------------------------------------
                     html1.Append("</div>");
                 }
 
@@ -1880,6 +1901,8 @@ img {border-style: none;
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
+
+                lastMs = (DateTime.Now - t0).TotalMilliseconds;
             }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
@@ -2068,7 +2091,8 @@ img {border-style: none;
             WriteHtmlBold(x2, "Alphabetical list of variables (use Ctrl+F to search).");
             x2.AppendLine("<table style = `width:100%`>");
 
-            List<DName> vars = combos.Keys.ToList().OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+            List<DName> input = combos.Keys.ToList();
+            List<DName> vars = input.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
 
             foreach (DName var2 in vars)
             {

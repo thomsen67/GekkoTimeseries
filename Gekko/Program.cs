@@ -2836,6 +2836,19 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
+
+                //List<DName> xx = new List<DName>();
+                //xx.Add(new DName("bb", new StringOrTime[] { "b", "a", "c" }));
+                //xx.Add(new DName("bb", new StringOrTime[] { "b", "a", "b" }));
+                //xx.Add(new DName("bb", new StringOrTime[] { "a", "x", "z" }));
+                //xx.Add(new DName("bb", new StringOrTime[] { "a", "x", "y" }));
+                //xx.Add(new DName("aa", new StringOrTime[] { "b", "a", "c" }));
+                //xx.Add(new DName("aa", new StringOrTime[] { "b", "a", "b" }));
+                //xx.Add(new DName("aa", new StringOrTime[] { "a", "x", "z" }));
+                //xx.Add(new DName("aa", new StringOrTime[] { "a", "x", "y" }));
+                //List<DName> vars = xx.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
+
+
                 //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
                 //new Writeln("0 --> " + M.Errorf(0d));
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
@@ -17843,7 +17856,7 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = o.gekkocode + ";";
                         trace.GetContents().name = ts.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
+                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);                        
                         Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
@@ -17993,7 +18006,7 @@ namespace Gekko
                                     Trace2 trace = new Trace2(ETraceType.Normal, truncateTemp.t1, truncateTemp.t2, true);
                                     trace.GetContents().text = o.gekkocode + ";";
                                     trace.GetContents().name = existing_series.GetNameAndParentDatabank();
-                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
+                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);                                    
                                     trace.AddRangeFromSeries2(existing_series, iv_series);
                                     Gekko.Trace2.PushIntoSeries(existing_series, trace, ETracePushType.Sibling, false);
                                     Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
@@ -18032,6 +18045,11 @@ namespace Gekko
                             newTrace.GetContents().text = o.gekkocode + ";";
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
                             newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
+                            if (Globals.traceFixCopy)
+                            {
+                                if (newTrace.GetContents().precedentsNames == null) newTrace.GetContents().precedentsNames = new List<string>();
+                                newTrace.GetContents().precedentsNames.Add(Trace2.TraceGetNameDecorated(iv as Series, (iv as Series)?.meta?.trace2 != null));
+                            }                            
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                             Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
@@ -19782,6 +19800,22 @@ namespace Gekko
 
             //if not put here, info will not be printed when loading from cache
             if (model.modelGekko != null) model.modelGekko.modelInfo.Print(model.modelCommon);
+
+            if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+            {
+                if (model.modelGamsScalar.depNames != null)
+                {
+                    //Not in protobuf for now, maybe at some point
+                    foreach (KeyValuePair<string, string> kvp in model.modelGamsScalar.depNames)
+                    {
+                        DName key = DName.HACK1(kvp.Key);
+                        DName value = DName.HACK1(kvp.Value);
+                        if (!model.modelGamsScalar.depNames2.ContainsKey(key)) model.modelGamsScalar.depNames2.Add(key, value);
+                        if (!model.modelGamsScalar.depNames2Inverted.ContainsKey(value)) model.modelGamsScalar.depNames2Inverted.Add(value, new List<DName>() { key });
+                        else model.modelGamsScalar.depNames2Inverted[value].Add(key);
+                    }
+                }
+            }
 
         }
 
