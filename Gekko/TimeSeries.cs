@@ -236,7 +236,7 @@ namespace Gekko
             if (this.units != null) tsCopy.units = string.Copy(this.units); //using string.Copy() probably not be necessary, but we use it for extra safety                        
             if (this.stamp != null) tsCopy.stamp = string.Copy(this.stamp); //using string.Copy() probably not be necessary, but we use it for extra safety                        
             tsCopy.isGhost = this.isGhost;
-            tsCopy.isTimeless = this.isTimeless;            
+            tsCopy.isTimeless = this.isTimeless;
             return tsCopy;
         }
 

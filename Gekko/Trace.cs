@@ -9,6 +9,12 @@ using System.Text.RegularExpressions;
 
 namespace Gekko
 {
+
+    public class CloneHelper
+    {
+        public Dictionary<object, object> dict = new Dictionary<object, object>();
+    }
+
     public enum ETraceType
     {
         Normal,
@@ -153,8 +159,19 @@ namespace Gekko
                 }
 
                 foreach (TimeSeries tsRhs in tsRhss)
-                {
+                {                    
                     if (tsRhs == null) continue;
+                    //
+                    // HMMM: 
+                    // y = 20;
+                    // xx = y + 1; (*)
+                    // xx = xx + 1
+                    // xx = xx + 1
+                    // xx = xx + 1
+                    //
+                    // ----> The shown trace(s) must not be forgotten.
+                    //
+                    if (Globals.mirrorfix && object.ReferenceEquals(tsLhs, tsRhs)) continue;  //Something like x[%t] = x[%t+1] - 1, no hall of mirrors
                     if (tsRhs.trace2 != null)
                     {
                         traceLhs.precedents.storage.AddRange(tsRhs.trace2.precedents.storage);
@@ -176,6 +193,7 @@ namespace Gekko
             GekkoTime t2 = traceLhs.traceContents.period.t2;
             if (t1.IsNull() || t2.IsNull()) return;
             int hit = -12345;
+            int timeDifPrecision = 1; 
             for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
             {
                 Trace2 traceExisting = tsLhs.trace2.precedents.storage[i];
@@ -188,7 +206,7 @@ namespace Gekko
                     && traceLhs.traceContents.commandFileAndLine == traceExisting.traceContents.commandFileAndLine
                     && GekkoTime.Observations(traceLhs.traceContents.period.t1, traceLhs.traceContents.period.t2) == 1
                     && GekkoTime.Observations(traceExisting.traceContents.period.t1, traceExisting.traceContents.period.t2) == 1
-                    && Math.Abs(GekkoTime.Observations(traceLhs.traceContents.period.t1, traceExisting.traceContents.period.t1)-1) == 1 //note: 2020,2019 gives 0, and 2019,2020 gives 2.
+                    && Math.Abs(GekkoTime.Observations(traceLhs.traceContents.period.t1, traceExisting.traceContents.period.t1)-1) == timeDifPrecision //note: 2020,2019 gives 0, and 2019,2020 gives 2.
                     && traceLhs.traceContents.id.counter - traceExisting.traceContents.id.counter < 1000
                     )
                 {
@@ -224,6 +242,10 @@ namespace Gekko
                 
                 //These must be short
                 string name = parent.traceContents.name;
+                if (name != null && name.Contains(":"))
+                {
+                    name = name.Split(':')[1];
+                }
                 string period = null;
                 if (parent.traceContents.period.t1.IsNull() || parent.traceContents.period.t2.IsNull())
                 {
@@ -381,7 +403,7 @@ namespace Gekko
                 }
             }            
         }
-
+        
         /// <summary>
         /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
         /// </summary>

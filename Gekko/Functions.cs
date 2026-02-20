@@ -749,6 +749,50 @@ namespace Gekko
             return new ScalarString("Deleted " + n + " data-traces in databank " + databank.aliasName);
         }
 
+        public static IVariable tracestats(GekkoTime t)
+        {
+            return tracestats(t, null);
+        }
+
+        public static IVariable tracestats(GekkoTime t, IVariable x)
+        {
+            //NOTE: Does not include the invisible traces assigned to each series object
+            string bank = null;
+            if (x != null) bank = (x as ScalarString)._string2;
+            Databank db = null;
+            if (bank != null) db = Program.databanks.GetDatabank(bank);
+            else db = Program.databanks.GetFirst();
+            if (db == null)
+            {
+                G.Writeln2("Databank '" + bank + "' not found");
+                throw new GekkoException();
+            }
+            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
+            SortedDictionary<int, int> depths = new SortedDictionary<int, int>();
+            foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
+            {
+                int key = kvp.Value.depth;
+                if (!depths.ContainsKey(key)) depths.Add(key, 1);
+                else depths[key]++;
+            }
+
+            bool hasDepth1 = false;
+
+            int hit = 0;
+            G.Writeln("Databank: " + db.aliasName);
+            foreach (KeyValuePair<int, int> kvp in depths)
+            {
+                string extra = null;
+                if (kvp.Key == -1) continue;  //do not print GluedToSeries
+                hit += kvp.Value;
+                G.Writeln(extra + "--> depth: " + kvp.Key + ", traces: " + kvp.Value);
+                if (kvp.Key > 0) hasDepth1 = true;
+            }
+            if (hit == 0) G.Writeln("No traces found");
+            else G.Writeln(hit + " traces in all");
+            return new ScalarString("");
+        }
+
 
         public static IVariable sumr(GekkoTime t, IVariable x)
         {

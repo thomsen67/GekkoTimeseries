@@ -22245,7 +22245,11 @@ write datatest;
                             TimeSeries ts = kvp.Value;
                             TimeSeries tsClone = ts.Clone();
                             tsClone.Truncate(yr1, yr2);
-                            databankWithFewerPeriods.Add(kvp.Key, tsClone);
+                            if (Globals.clonefix)
+                            {
+                                try { if (ts.trace2 != null) tsClone.trace2 = ts.trace2; } catch { }
+                            }
+                            databankWithFewerPeriods.Add(kvp.Key, tsClone); //Here, tsClone is never used more and soon discarded, so ok the traces were cloned.
                         }
                         databank.storage = databankWithFewerPeriods;
                         databank.Trim();  //to make it smaller, slack removed from each TimeSeries
