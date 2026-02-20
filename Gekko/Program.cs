@@ -17835,7 +17835,13 @@ namespace Gekko
 
             foreach (ToFrom output in outputs)
             {
+                string traceNameHelper = null;
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);  //no search
+                if (iv.Type() == EVariableType.Series)
+                {
+                    //We cannot do this later on, because the series changes name (in-place change)
+                    traceNameHelper = Trace2.TraceGetNameDecorated(iv as Series, (iv as Series)?.meta?.trace2 != null);
+                }
                 if (type != EVariableType.Var && type != iv.Type()) continue; //skip it                
                 O.RemoveIVariableFromString(output.s1, true);  //get it out of dictionary
                 Series iv_series = iv as Series;
@@ -17856,7 +17862,12 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = o.gekkocode + ";";
                         trace.GetContents().name = ts.GetNameAndParentDatabank();
-                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);                        
+                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
+                        if (Globals.traceFixCopy)
+                        {
+                            if (trace.GetContents().precedentsNames == null) trace.GetContents().precedentsNames = new List<string>();
+                            trace.GetContents().precedentsNames.Add(traceNameHelper);
+                        }
                         Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }

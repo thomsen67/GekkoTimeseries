@@ -1647,8 +1647,7 @@ img {border-style: none;
             if (Globals.greu) //list.html and find.html
             {
                 List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res);
-                BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);
-                return; //qwerty
+                BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);                
             }
 
             G.WritelnGray("Starting individual html pages");
