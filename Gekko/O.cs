@@ -3909,6 +3909,8 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Databank " + ts.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
                             throw new GekkoException();
                         }
+                        string traceName = null;
+                        try { traceName = ts.GetNameAndParentDatabank(); } catch { }
                         ts.parentDatabank.RemoveVariable(ts.variableName);                        
                         ts.variableName = s2;
                         ts.parentDatabank.AddVariable(ts);
@@ -3921,8 +3923,8 @@ namespace Gekko
                                 Trace2 trace = new Trace2(ETraceType.Normal, Globals.tNull, Globals.tNull);
                                 trace.traceContents.text = this.gekkocode + ";";
                                 trace.traceContents.name = ts.GetNameAndParentDatabank();
-                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);
-                                try { Trace2.PrecedentsNames(trace, new List<TimeSeries>() { ts }); } catch { }
+                                trace.traceContents.commandFileAndLine = p?.GetGcmTrace(null);                                
+                                try { if (trace.traceContents.precedentsNames == null) trace.traceContents.precedentsNames = new List<string>(); if(traceName != null) trace.traceContents.precedentsNames.Add(traceName); } catch { }
                                 Trace2.PushIntoSeries(trace, ts, new List<TimeSeries>() { ts }, true, true); //CERTAIN
                             }
                             catch { }

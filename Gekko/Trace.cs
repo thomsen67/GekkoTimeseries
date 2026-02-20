@@ -132,6 +132,7 @@ namespace Gekko
                 {
                     traceLhs.precedents.storage.AddRange(tsRhss[0].trace2.precedents.storage);
                 }
+                if (tsLhs.trace2 == null) tsLhs.trace2 = new Trace2(ETraceType.GluedToSeries, Globals.tNull, Globals.tNull); //Hack, unsure why this happens...
                 if (Globals.runningOnTTComputer && tsLhs.trace2.type != ETraceType.GluedToSeries)
                 {
                     G.Writeln2("*** ERROR: Glued problem"); throw new GekkoException();
