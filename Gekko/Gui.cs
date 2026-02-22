@@ -1708,6 +1708,7 @@ namespace Gekko
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
             Globals.numberOfSkippedLines = 0;
+            Globals.mirrorError = 0;
             Globals.threadIsInProcessOfAborting = false;  //clearing this
             Globals.applicationIsInProcessOfAborting = false;  //clearing this
             Globals.errorMemory = null;  //so that it is not recording all the time.
@@ -1980,6 +1981,10 @@ namespace Gekko
 
         public static void PrintTotalErrors(P p)
         {
+            if (Globals.mirrorError > 0)
+            {
+                G.Writeln2("Internal note: There was " + Globals.mirrorError + " trace problems", Color.Gray);
+            }
             if (Globals.numberOfWarnings + Globals.numberOfErrors > 0)
             {
                 G.Writeln();
@@ -1997,7 +2002,7 @@ namespace Gekko
                 {
                     if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the command");
                     else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the command");
-                }
+                }                
             }
 
             if (p.hasBeenCmdFile)

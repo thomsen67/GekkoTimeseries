@@ -3281,6 +3281,7 @@ optionType :
 			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
              | BUGFIX TRACE '='? yesNoSimple -> BUGFIX TRACE ^(ASTBOOL yesNoSimple)
              | BUGFIX TRACE SKIP '='? yesNoSimple -> BUGFIX TRACE SKIP ^(ASTBOOL yesNoSimple)
+             | BUGFIX TRACE SET '='? Integer -> BUGFIX TRACE SET ^(ASTINTEGER Integer)
 
              | CALC question -> CALC question
              | CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR

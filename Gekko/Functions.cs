@@ -747,7 +747,7 @@ namespace Gekko
                 ts.trace2 = null;
             }            
             return new ScalarString("Deleted " + n + " data-traces in databank " + databank.aliasName);
-        }
+        }        
 
         public static IVariable tracestats(GekkoTime t)
         {
@@ -779,7 +779,7 @@ namespace Gekko
             bool hasDepth1 = false;
 
             int hit = 0;
-            G.Writeln("Databank: " + db.aliasName);
+            G.Writeln2("Databank: " + db.aliasName);
             foreach (KeyValuePair<int, int> kvp in depths)
             {
                 string extra = null;
@@ -790,6 +790,42 @@ namespace Gekko
             }
             if (hit == 0) G.Writeln("No traces found");
             else G.Writeln(hit + " traces in all");
+            return new ScalarString("");
+        }
+
+        public static IVariable tracevars(GekkoTime t)
+        {
+            return tracevars(t, null);
+        }
+
+        public static IVariable tracevars(GekkoTime t, IVariable x)
+        {
+            //NOTE: Does not include the invisible traces assigned to each series object
+            string bank = null;
+            if (x != null) bank = (x as ScalarString)._string2;
+            Databank db = null;
+            if (bank != null) db = Program.databanks.GetDatabank(bank);
+            else db = Program.databanks.GetFirst();
+            if (db == null)
+            {
+                G.Writeln2("Databank '" + bank + "' not found");
+                throw new GekkoException();
+            }
+
+            G.Writeln2("Prints maximal trace depth for each variable in databank '" + db.aliasName + "'");
+            foreach (KeyValuePair<string, TimeSeries> kvp in db.storage.OrderBy(pair => pair.Key).ToList())
+            {
+                TraceHelper th = new TraceHelper(); th.type = ETraceHelper.GetAllMetasAndTraces;
+                kvp.Value.DeepTrace(th);
+                int max = int.MinValue;
+                foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp2 in th.tracesDepth2)
+                {
+                    max = Math.Max(max, kvp2.Value.depth);
+                }
+                if (max == int.MinValue) continue;
+                G.Writeln(kvp.Key + " --> " + max);
+            }
+            G.Writeln("");
             return new ScalarString("");
         }
 

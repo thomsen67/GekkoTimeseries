@@ -48,6 +48,8 @@ namespace Gekko
         public const string languageEnUS = "en-US";
         public const bool clonefix = true;
         public const bool mirrorfix = false;
+        public const bool mirrorfix2 = true;
+        public static int mirrorError = 0;
 
         public static string versionInternal = "";  // "v14";
 

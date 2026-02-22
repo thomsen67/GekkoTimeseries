@@ -16436,8 +16436,9 @@ write datatest;
                             if (ts.trace2 != null)
                             {
                                 int cnt = 0; int cntA = 0;
-                                Trace2.WalkTraces(ts.trace2, 0, traceLines, 1, ref cnt, ref cntA);
-                                G.Writeln(cntA + " data-traces. Use 'trace x;' to explore a series 'x' in the trace viewer", System.Drawing.Color.Gray);
+                                Trace2.WalkTraces(ts.trace2, 0, 2, traceLines, 1, ref cnt, ref cntA);
+                                //G.Writeln(cntA + " data-traces. Use 'trace x;' to explore a series 'x' in the trace viewer", System.Drawing.Color.Gray);
+                                G.Writeln("Data-traces: use 'trace x;' to explore a series 'x' in the trace viewer", System.Drawing.Color.Gray);
                             }
                         }
                         catch

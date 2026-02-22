@@ -31,7 +31,7 @@ namespace Gekko
             SetupUI();
             LoadData(input);
             this.KeyDown += MainWindow_KeyDown;
-            _detailsBlock.Text = nameEtc + " (" + input.Count + " data-traces, possibly with dublets)\n\nGekko 2.5.4+ trace viewer (experimental). Frequencies are indicated with '!'.\nSome trace features from Gekko 3.x are ported, but bugs and limitations may occur.\nFor instance, time period 'shadowing' of existing traces is not handled well.\n\nClick '[+]' to unfold sub-traces. Click a row to see more trace info.";
+            _detailsBlock.Text = nameEtc + " (" + input.Count + " data-traces, possibly with dublets)\n\nGekko 2.5.4+ trace viewer (experimental). Some trace features from Gekko 3.x are ported, but bugs and limitations may occur, for instance there is limited time period 'shadowing' of existing traces. Traces with the LHS variable on the RHS (like x = x + y, x = x[-1] + y) may be somewhat scrambled trace-wise, and traces originating from the inside of a loop (like x[%t] = x[%t+1] * b[%t]) may only show one of the periods. All in all, the data-traces are probably useful, but should be taken as hints rather than the truth.\n\nClick '[+]' to unfold sub-traces. Click a row to see more trace info. Frequencies are indicated with '!'.";
         }
 
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

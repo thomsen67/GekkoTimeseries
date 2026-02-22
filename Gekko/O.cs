@@ -5565,7 +5565,9 @@ namespace Gekko
 
                 List<string> traceLines = new List<string>();
                 int cnt = 0; int cntA = 0;
-                Trace2.WalkTraces(trace, 0, traceLines, 0, ref cnt, ref cntA);
+                int ii = int.MaxValue;
+                if (Program.options.bugfix_trace_set != -1) ii = Program.options.bugfix_trace_set;                
+                Trace2.WalkTraces(trace, 0, ii, traceLines, 0, ref cnt, ref cntA);
                 Thread sta = new Thread(delegate ()
                 {
                     WindowTrace wt = new WindowTrace(traceLines, ts.GetNameAndParentDatabank());
