@@ -17,229 +17,141 @@ using System.ComponentModel;
 using System.Windows.Controls.Primitives;
 
 namespace Gekko
-{    
+{
 
     public partial class WindowTrace : Window
     {
         private ObservableCollection<TreeRow> _visibleItems = new ObservableCollection<TreeRow>();
-        private List<TreeRow> _allItems = new List<TreeRow>();
         private TextBox _detailsBlock;
 
-        public WindowTrace(List<string> input, string nameEtc)
+        public WindowTrace(Trace2 rootNode, string nameEtc)
         {
-            InitializeComponent();
             SetupUI();
-            LoadData(input);
-            this.KeyDown += MainWindow_KeyDown;
-            _detailsBlock.Text = nameEtc + " (" + input.Count + " data-traces, possibly with dublets)\n\nGekko 2.5.4+ trace viewer (experimental). Some trace features from Gekko 3.x are ported, but bugs and limitations may occur, for instance there is limited time period 'shadowing' of existing traces. Traces with the LHS variable on the RHS (like x = x + y, x = x[-1] + y) may be somewhat scrambled trace-wise, and traces originating from the inside of a loop (like x[%t] = x[%t+1] * b[%t]) may only show one of the periods. All in all, the data-traces are probably useful, but should be taken as hints rather than the truth.\n\nClick '[+]' to unfold sub-traces. Click a row to see more trace info. Frequencies are indicated with '!'.";
-        }
 
-        private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Escape)
+            if (true)
             {
-                this.Close();
-            }
-        }
-
-        private void SetupUI()
-        {
-            this.Title = "Gekko data-trace (experimental)";
-            this.Width = 900;
-            this.Height = 600;
-            this.Top = 20;
-            this.Left = 150;
-
-            // 1. Define the Grid and Rows
-            Grid rootGrid = new Grid();
-
-            // Top Row (Tree) - "*" means it takes available space
-            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star), MinHeight = 100 });
-
-            // Middle Row (The Splitter handle) - "Auto" fits the splitter's height
-            rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-            // Bottom Row (Details) - Fixed initial height, but resizable
-            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(150), MinHeight = 50 });
-
-            // 2. The ListView (Tree View)
-            ListView listView = new ListView
-            {
-                ItemsSource = _visibleItems,
-                //FontFamily = new FontFamily("Segoe UI"),
-                //FontSize = 13
-            };
-            listView.SelectionChanged += (s, e) => UpdateDetails(listView.SelectedItem as TreeRow);
-
-            GridView gridView = new GridView();
-
-            gridView.Columns.Add(new GridViewColumn
-            {
-                Header = "Name",
-                Width = 200,
-                CellTemplate = CreateTreeCellTemplate(),
-            });
-
-            gridView.Columns.Add(new GridViewColumn
-            {
-                Header = "Code",
-                Width = 400,
-                DisplayMemberBinding = new Binding("Code")
-            });
-
-            gridView.Columns.Add(new GridViewColumn
-            {
-                Header = "Period",
-                Width = 80,
-                DisplayMemberBinding = new Binding("Period")
-            });
-
-            gridView.Columns.Add(new GridViewColumn
-            {
-                Header = "Stamp",
-                Width = 80,
-                DisplayMemberBinding = new Binding("Stamp")
-            });
-
-            gridView.Columns.Add(new GridViewColumn
-            {
-                Header = "File",
-                Width = 140,
-                DisplayMemberBinding = new Binding("File")
-            });
-
-            listView.View = gridView;
-
-            Grid.SetRow(listView, 0); // Put in Row 0
-            rootGrid.Children.Add(listView);
-
-            // 3. The GridSplitter (The Draggable Divider)
-            GridSplitter splitter = new GridSplitter
-            {
-                Height = 5,                          // Thickness of the handle
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.Gainsboro,      // Color of the bar
-                ShowsPreview = true                  // Shows a ghost line while dragging
-            };
-            Grid.SetRow(splitter, 1); // Put in Row 1
-            rootGrid.Children.Add(splitter);
-
-            // 4. The Details Area (Wrapped in a ScrollViewer in case text is long)
-            ScrollViewer scrollBox = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-            _detailsBlock = new TextBox
-            {
-                Padding = new Thickness(10),
-                Background = Brushes.LightYellow,
-                FontFamily = new FontFamily("Consolas"), // Monospace looks better for "Code: Value" pairs
-                FontSize = 12,
-                TextWrapping = TextWrapping.Wrap
-            };
-            scrollBox.Content = _detailsBlock;
-
-            Grid.SetRow(scrollBox, 2); // Put in Row 2
-            rootGrid.Children.Add(scrollBox);
-
-            this.Content = rootGrid;
-        }
-
-        private void LoadData(List<string> rawLines)
-        {
-            // 1. Parse lines into objects
-            for (int i = 0; i < rawLines.Count; i++)
-            {
-                var parts = rawLines[i].Split(new[] { "{tce}" }, StringSplitOptions.None).Select(p => p.Trim()).ToArray();
-                var item = new TreeRow
+                // Check if the root has children
+                if (rootNode?.precedents?.storage != null)
                 {
-                    Depth = int.Parse(parts[0]),
-                    Name = parts.Length > 1 ? parts[1] : "",
-                    Period = parts.Length > 2 ? parts[2] : "",
-                    Code = parts.Length > 3 ? parts[3] : "",
-                    Variables = parts.Length > 4 ? parts[4] : "",
-                    File = parts.Length > 5 ? parts[5] : "",
-                    DataFile = parts.Length > 6 ? parts[6] : "",
-                    Stamp = parts.Length > 7 ? parts[7] : "",
-                    // ---
-                    NameLong = parts.Length > 8 ? parts[8] : "",
-                    PeriodLong = parts.Length > 9 ? parts[9] : "",
-                    CodeLong = parts.Length > 10 ? parts[10] : "",
-                    VariablesLong = parts.Length > 11 ? parts[11] : "",
-                    FileLong = parts.Length > 12 ? parts[12] : "",
-                    DataFileLong = parts.Length > 13 ? parts[13] : "",
-                    StampLong = parts.Length > 14 ? parts[14] : "",
-                    // ---
-                    IsExpanded = false // Default to expanded
-                };
-
-                // Subscribe to expansion changes
-                item.PropertyChanged += (s, e) => {
-                    if (e.PropertyName == "IsExpanded") RefreshVisibleItems();
-                };
-
-                _allItems.Add(item);
-            }
-
-            // 2. Determine if items have children (if the NEXT item is deeper)
-            for (int i = 0; i < _allItems.Count; i++)
-            {
-                if (i + 1 < _allItems.Count)
-                    _allItems[i].HasChildren = _allItems[i + 1].Depth > _allItems[i].Depth;
-            }
-
-            RefreshVisibleItems();
-        }
-
-        private void RefreshVisibleItems()
-        {
-            _visibleItems.Clear();
-            int skipUntilDepth = -1;
-
-            foreach (var item in _allItems)
-            {
-                // If we are currently skipping children of a collapsed parent
-                if (skipUntilDepth != -1)
-                {
-                    if (item.Depth > skipUntilDepth) continue;
-                    else skipUntilDepth = -1; // We reached a sibling or a higher parent
+                    foreach (Trace2 child in rootNode.precedents.storage)
+                    {
+                        // Add children at Depth 0 so they appear at the left margin
+                        _visibleItems.Add(CreateRowFromNode(child, 0));
+                    }
                 }
+            }
+            else
+            {
+                // Convert the starting node into the first visible row
+                _visibleItems.Add(CreateRowFromNode(rootNode, 0));
+            }            
 
-                _visibleItems.Add(item);
+            _detailsBlock.Text = nameEtc + "\n\nDynamic Object-Tree Viewer. Click [+] to expand children nodes stored in the TraceNode structure.";
 
-                // If this item has children but is collapsed, skip everything until we hit same depth
-                if (item.HasChildren && !item.IsExpanded)
+            this.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Escape) this.Close(); };
+        }
+
+        private TreeRow CreateRowFromNode(Trace2 node, int depth)
+        {
+            var row = new TreeRow
+            {
+                Depth = depth,
+                SourceNode = node, // Keep a reference to the data
+                Name = node.traceContents.name,
+                Code = node.traceContents.text,
+                Period = node.traceContents.period.ToString(),
+                HasChildren = node.precedents.storage != null && node.precedents.storage.Count > 0,
+                IsExpanded = false
+            };
+
+            // Hook into expansion logic
+            row.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "IsExpanded")
                 {
-                    skipUntilDepth = item.Depth;
+                    if (row.IsExpanded) Expand(row);
+                    else Collapse(row);
                 }
+            };
+
+            return row;
+        }
+
+        private void Expand(TreeRow parentRow)
+        {
+            int index = _visibleItems.IndexOf(parentRow);
+            if (index == -1) return;
+
+            // Get children directly from the TraceNode object
+            List<Trace2> childrenNodes = parentRow.SourceNode.precedents.storage;
+
+            for (int i = 0; i < childrenNodes.Count; i++)
+            {
+                var childRow = CreateRowFromNode(childrenNodes[i], parentRow.Depth + 1);
+                _visibleItems.Insert(index + 1 + i, childRow);
+            }
+        }
+
+        private void Collapse(TreeRow parentRow)
+        {
+            int index = _visibleItems.IndexOf(parentRow);
+            if (index == -1) return;
+
+            int removeAt = index + 1;
+            while (removeAt < _visibleItems.Count && _visibleItems[removeAt].Depth > parentRow.Depth)
+            {
+                _visibleItems.RemoveAt(removeAt);
             }
         }
 
         private void UpdateDetails(TreeRow selected)
         {
-            if (selected == null) return;            
-            string[] ss = selected.FileLong.Split('¤');
-            string xx = ss[0];
-            if (ss.Length > 1) xx += " line " + ss[1];
-            xx = xx.Trim();
-            _detailsBlock.Text = string.Format("{0}\n--------------------------------------------------\nName: {1}\nPeriod: {2}\nFile: {3}\nDatafile: {4}\nStamp: {5}\nVars: {6}",
-                selected.CodeLong, selected.NameLong, selected.PeriodLong, xx, selected.DataFileLong, selected.StampLong, selected.VariablesLong);
+            if (selected?.SourceNode == null) return;
+            Trace2 n = selected.SourceNode;
+            _detailsBlock.Text = $"Name: {n.traceContents.name}\nCode: {n.traceContents.text}\nPeriod: {n.traceContents.period.ToString()}\nFile: {n.traceContents.commandFileAndLine}\nStamp: {n.traceContents.id.ToString()}";
+        }
+
+        private void SetupUI()
+        {
+            this.Title = "Gekko data-trace viewer";
+            this.Width = 900; this.Height = 600;
+
+            Grid rootGrid = new Grid();
+            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(150) });
+
+            ListView lv = new ListView { ItemsSource = _visibleItems };
+            lv.SelectionChanged += (s, e) => UpdateDetails(lv.SelectedItem as TreeRow);
+
+            GridView gv = new GridView();
+            gv.Columns.Add(new GridViewColumn { Header = "Name", Width = 250, CellTemplate = CreateTreeCellTemplate() });
+            gv.Columns.Add(new GridViewColumn { Header = "Code", Width = 450, DisplayMemberBinding = new Binding("Code") });
+            lv.View = gv;
+
+            Grid.SetRow(lv, 0); rootGrid.Children.Add(lv);
+
+            GridSplitter gs = new GridSplitter { Height = 4, HorizontalAlignment = HorizontalAlignment.Stretch, Background = Brushes.Gray };
+            Grid.SetRow(gs, 1); rootGrid.Children.Add(gs);
+
+            _detailsBlock = new TextBox { IsReadOnly = true, Background = Brushes.LightYellow, TextWrapping = TextWrapping.Wrap, Padding = new Thickness(10) };
+            Grid.SetRow(_detailsBlock, 2); rootGrid.Children.Add(_detailsBlock);
+
+            this.Content = rootGrid;
         }
 
         private DataTemplate CreateTreeCellTemplate()
         {
-            // Note: TwoWay binding on IsExpanded is crucial for the ToggleButton to work
             string xaml = @"
             <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>
                 <StackPanel Orientation='Horizontal' Margin='{Binding IndentMargin}'>
-                    <ToggleButton Width='18' Height='18' Margin='0,0,5,0' 
-                                  IsChecked='{Binding IsExpanded, Mode=TwoWay}' 
-                                  Visibility='{Binding ExpanderVisibility}'>
+                    <ToggleButton Width='18' Height='18' IsChecked='{Binding IsExpanded, Mode=TwoWay}' 
+                                  Visibility='{Binding ExpanderVisibility}' Margin='0,0,5,0'>
                         <ToggleButton.Style>
                             <Style TargetType='ToggleButton'>
                                 <Setter Property='Content' Value='+'/>
                                 <Style.Triggers>
-                                    <Trigger Property='IsChecked' Value='True'>
-                                        <Setter Property='Content' Value='-'/>
-                                    </Trigger>
+                                    <Trigger Property='IsChecked' Value='True'><Setter Property='Content' Value='-'/></Trigger>
                                 </Style.Triggers>
                             </Style>
                         </ToggleButton.Style>
@@ -253,48 +165,24 @@ namespace Gekko
 
     public class TreeRow : INotifyPropertyChanged
     {
+        public Trace2 SourceNode { get; set; } // The real data object
         public int Depth { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
         public string Period { get; set; }
-        public string Stamp { get; set; }
-        public string File { get; set; }
-        public string DataFile { get; set; }
-        public string Variables { get; set; }
-
-        // -------
-                
-        public string NameLong { get; set; }
-        public string CodeLong { get; set; }
-        public string PeriodLong { get; set; }
-        public string StampLong { get; set; }
-        public string FileLong { get; set; }
-        public string DataFileLong { get; set; }
-        public string VariablesLong { get; set; }
-
-        // -------
-
         public bool HasChildren { get; set; }
 
         private bool _isExpanded;
         public bool IsExpanded
         {
-            get { return _isExpanded; }
+            get => _isExpanded;
             set { _isExpanded = value; OnPropertyChanged("IsExpanded"); }
         }
 
-        // UI Helpers
-        public Thickness IndentMargin { get { return new Thickness(Depth * 20, 0, 0, 0); } }
-
-        public Visibility ExpanderVisibility
-        {
-            get { return HasChildren ? Visibility.Visible : Visibility.Hidden; }
-        }
+        public Thickness IndentMargin => new Thickness(Depth * 20, 0, 0, 0);
+        public Visibility ExpanderVisibility => HasChildren ? Visibility.Visible : Visibility.Hidden;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string name)
-        {
-            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(name));
-        }
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

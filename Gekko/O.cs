@@ -5563,14 +5563,17 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
+                /*
                 List<string> traceLines = new List<string>();
                 int cnt = 0; int cntA = 0;
                 int ii = int.MaxValue;
                 if (Program.options.bugfix_trace_set != -1) ii = Program.options.bugfix_trace_set;                
                 Trace2.WalkTraces(trace, 0, ii, traceLines, 0, ref cnt, ref cntA);
+                */
                 Thread sta = new Thread(delegate ()
                 {
-                    WindowTrace wt = new WindowTrace(traceLines, ts.GetNameAndParentDatabank());
+                    //WindowTrace wt = new WindowTrace(traceLines, ts.GetNameAndParentDatabank());
+                    WindowTrace wt = new WindowTrace(trace, ts.GetNameAndParentDatabank());
                     wt.Show();
                     System.Windows.Threading.Dispatcher.Run();
                 });
