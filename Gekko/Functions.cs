@@ -6581,7 +6581,7 @@ namespace Gekko
                 foreach (KeyValuePair<int, int> kvp in depths)
                 {
                     string extra = null;
-                    if (Globals.runningOnTTComputer || G.IsUnitTestingOrNotShowingGUI())
+                    if (G.IsUnitTestingOrNotShowingGUI())
                     {
                         if (kvp.Key == -1) extra = "TTH: ";
                     }
@@ -6605,8 +6605,8 @@ namespace Gekko
                     }
                 }
             }
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
-            if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
+            //if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
+            //if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
         }        
         
         private static string Helper_GetLabel(string s)
