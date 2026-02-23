@@ -1534,6 +1534,7 @@ img {border-style: none;
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
+                    onlyHtml = true;
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1642,13 +1643,7 @@ img {border-style: none;
             
             GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
 
-            if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }
-
-            if (Globals.greu) //list.html and find.html
-            {
-                List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res);
-                BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);                
-            }
+            if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }            
 
             G.WritelnGray("Starting individual html pages");
 
@@ -1656,26 +1651,28 @@ img {border-style: none;
 
             double lastMs = 0d;
 
+            System.Diagnostics.Stopwatch stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            TimeSpan reportInterval = TimeSpan.FromMinutes(1);
+
             foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
+                
+                if (count == 4) break;
+
                 DName variableName = kvp.Key;                
                 if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
                 List<EquationNameAndNumber> equations = kvp.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
 
-                string fileName1 = SimplerName(variableName.ToString()) + ".html";
+                string fileName1 = SimplerName(variableName.ToString()) + ".html";                                
 
-                if (Globals.greu)
+                if (stopWatch.Elapsed >= reportInterval)
                 {
-                    if (lastMs > 2000) //2 s
-                    {
-                        new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
-                    }
-                }
-                else if (count % 1000 == 0) new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
-
-                DateTime t0 = DateTime.Now;
+                    new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
+                    stopWatch.Restart();
+                }                
+                
                 StringBuilder html1 = new StringBuilder();
 
                 foreach (EquationNameAndNumber equationHelper in equations)
@@ -1684,7 +1681,7 @@ img {border-style: none;
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
-                    html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
+                    html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.                    
                     EquationBrowser.SpanHtmlColor(html1, variableName.ToString());
                     html1.Append(" from equation ");
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
@@ -1719,7 +1716,6 @@ img {border-style: none;
 
                     html1.Append("<br>");
                     EquationBrowser.WriteHtmlBold(html1, "Variables");
-                    string vars2 = null;
                     html1.AppendLine("<table class = `table1`>");
 
                     html1.AppendLine("<tr>");
@@ -1900,11 +1896,14 @@ img {border-style: none;
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
-
-                lastMs = (DateTime.Now - t0).TotalMilliseconds;
             }
 
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Starting list");
+            List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Starting find");
+            BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);            
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
+            
             return;
         }
 
@@ -2316,9 +2315,8 @@ img {border-style: none;
                     int count = 0;
                     foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
                     {
-                        count++;
-                        DName variableName = kvp.Key;
-                        if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
+                        count++;                        
+                        if (ShouldSkip(bh, nodeNames, count, kvp.Key)) continue; //Change for plots too, if something changed here
                         if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
 
                         foreach (string s in new List<string>() { "gp", "dat" })
@@ -2358,8 +2356,9 @@ img {border-style: none;
                         o0.browserPath = browserPath + "\\vars\\" + SimplerName(kvp.Key.ToString()) + extra + ".svg";
                         o0.prtType = "plot";
                         o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
-                        O.Prt.Element ope0 = new O.Prt.Element();
-                        ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
+                        O.Prt.Element ope0 = new O.Prt.Element();                        
+                        string label = kvp.Key.ToStringWithQuotes(Globals.greu);                        
+                        ope0.labelGiven = new List<string>() { label + extra2 };
                         ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
                         ope0.variable[0] = O.GetIVariableFromString(kvp.Key.ToString(), O.ECreatePossibilities.NoneReportError) as Series;

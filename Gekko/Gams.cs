@@ -935,7 +935,7 @@ namespace Gekko
             foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
             {
                 //foreach precedent variable
-                string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);
                 if (G.StartsWith(varName, Globals.decompResidualPrefix))
                 {
                     dep = varName.Substring(Globals.decompResidualPrefix.Length);

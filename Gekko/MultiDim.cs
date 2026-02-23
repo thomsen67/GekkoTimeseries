@@ -522,12 +522,23 @@ namespace Gekko
 
         public override string ToString()
         {
+            return this.ToStringWithQuotes(false);
+        }
+
+        public string ToStringWithQuotes(bool quotes)
+        {
             if (this.IsNull()) return null;
             string name = this.Get(this.posName).GetString();
             List<string> temp = new List<string>();
             for (int i = this.posIndex; i < this.GetLength(); i++)
             {
-                string s = this.Get(i).ToString();
+                string s = null;
+                StringOrTime sot = this.Get(i);
+                if (quotes && sot.IsString())
+                {
+                    s = "'" + sot.ToString() + "'";
+                }
+                else s = sot.ToString();
                 if (s != null) temp.Add(s);
             }
             if (temp.Count == 0) return name;

@@ -1098,10 +1098,22 @@ namespace Gekko
         /// </summary>
         /// <param name="varNumber"></param>
         /// <returns></returns>
-        public string GetVarNameA(int varNumber)
+        public string GetVarNameA_OLD(int varNumber)
         {
             //TODO: handle errors
             return this.dict_FromANumberToVarName[varNumber].ToString();
+        }
+
+        /// <summary>
+        /// Here, varNumber is number without time dimension, used in the a array.
+        /// The string does not contain blanks around commas.
+        /// </summary>
+        /// <param name="varNumber"></param>
+        /// <returns></returns>
+        public DName GetVarNameA(int varNumber)
+        {
+            //TODO: handle errors
+            return this.dict_FromANumberToVarName[varNumber];
         }
 
         /// <summary>
@@ -2033,23 +2045,30 @@ namespace Gekko
                     int i2 = this.bb[eq][int.Parse(tokens[i + 12].s)];
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
                     if (this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
-                    string varname = this.GetVarNameA(i2);
-                    string varname2;
-                    if (G.StartsWith(varname, Globals.decompResidualPrefix)) resName = varname;
+                    DName dName= this.GetVarNameA(i2);
+                    DName dName2 = null;
+
+                    string varname = null; //this.GetVarNameA_OLD(i2);
+                    string varname2 = null;
+                    if (G.StartsWith(dName.GetName(), Globals.decompResidualPrefix)) resName = varname;
                     if (helper.showTime)
                     {
-                        varname2 = G.Chop_DimensionAddLast(varname, gt.ToString(), "");  //No dim blanks, so we get "x[a,b,c,2025]".
+                        dName2 = dName.HACK_AddIndex(gt);
+                        varname2 = dName2.ToString();
                     }
                     else
                     {
                         if (sd != null) new Error("Not showing time not expected");
-                        varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, b, b, " "); //qwerty
+                        dName2 = dName.HACK_AddIndex(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
+                        varname2 = dName2.ToStringWithQuotes(Globals.greu);
                     }
+                    
                     if (mathRename != null)
                     {
                         varname2 = Program.MathPutIntoDict(mathRename, varname2);
                     }
-                    if (sd != null)
+                    
+                    if (sd != null) //Used for special identities model
                     {
                         if (!sd.vars.ContainsKey(varname2))
                         {

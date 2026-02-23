@@ -1837,7 +1837,7 @@ namespace Gekko
                             foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
                             {
                                 //foreach precedent variable
-                                string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                                string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);
 
                                 int add2 = 0;
 
@@ -3381,7 +3381,7 @@ namespace Gekko
                     // --------------------------------------------
 
                     i++;
-                    string varName = modelGamsScalar.GetVarNameA(dp.variable);                    
+                    string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);                    
 
                     if (op.isRaw)
                     {
@@ -6807,7 +6807,7 @@ namespace Gekko
         /// <returns></returns>
         public Tuple<string, GekkoTime> GetVariableAndPeriod(ModelGamsScalar modelGamsScalar)
         {
-            string varName = modelGamsScalar.GetVarNameA(this.variable);
+            string varName = modelGamsScalar.GetVarNameA_OLD(this.variable);
             GekkoTime gt = modelGamsScalar.FromTimeIntegerToGekkoTime(this.date);
             Tuple<string, GekkoTime> tup = new Tuple<string, GekkoTime>(varName, gt);
             return tup;

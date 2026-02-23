@@ -17157,7 +17157,7 @@ namespace Gekko
                 foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars) //can have 840...
                 {
                     //foreach precedent variable
-                    string varName = modelGamsScalar.GetVarNameA(dp.variable);
+                    string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);
                     EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
                     GamsModel.ScoreEquationGivenVariable(eqInfoClone, DName.HACK1(varName), model, modelGams, modelGamsScalar);
                     double score = eqInfoClone.score;
