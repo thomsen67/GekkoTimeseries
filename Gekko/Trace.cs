@@ -394,61 +394,9 @@ namespace Gekko
                 Program.options.print_filewidth = int.MaxValue;
 
                 //  -----------------------------
-                
-                string prec = null;
-                if (parent.traceContents.precedentsNames != null)
-                {
-                    List<string> xx = new List<string>(parent.traceContents.precedentsNames);
-                    //xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
-                    xx.Reverse();
-                    prec = string.Join(", ", xx);                    
-                }
-                
-                //These must be short
-                string name = parent.traceContents.name;
-                if (name != null && name.Contains(":"))
-                {
-                    name = name.Split(':')[1];
-                }
-                string period = null;
-                if (parent.traceContents.period.t1.IsNull() || parent.traceContents.period.t2.IsNull())
-                {
-                    period = "<no period>";
-                }
-                else
-                {
-                    period = parent.traceContents.period.ToString().Split(' ')[0];
-                }
-                string code = RemoveNewlines(parent.traceContents.text);
-                string file = null;
-                string fileDetailed = null;
 
-                if (!G.NullOrBlanks(parent.traceContents.commandFileAndLine))
-                {
-                    string[] ss = parent.traceContents.commandFileAndLine.Split('¤');
-                    if (ss.Length == 2)
-                    {
-                        file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
-                        fileDetailed = ss[0] + " line " + ss[1];
-                    }
-                    else
-                    {
-                        //fallback, should never happen
-                        file = parent.traceContents.commandFileAndLine;
-                        fileDetailed = parent.traceContents.commandFileAndLine;
-                    }
-                }
-
-                if (file != null && file.Contains(":"))
-                {
-                    file = System.IO.Path.GetFileName(file);
-                }
-                string datafile = parent.traceContents.dataFile;
-                if (datafile != null && datafile.Contains(":"))
-                {
-                    datafile = System.IO.Path.GetFileName(datafile);
-                }
-                string id = parent.traceContents.id.ToString().Split(' ')[0];
+                string prec, name, period, code, file, datafile, id;
+                TracePretty(parent, out prec, out name, out period, out code, out file, out datafile, out id);
 
                 if (depth > 0)
                 {
@@ -469,7 +417,7 @@ namespace Gekko
                         {
                             G.Writeln("| ...", System.Drawing.Color.Gray);
                         }
-                        else if (counter >max)
+                        else if (counter > max)
                         {
                             //ignore
                         }
@@ -498,6 +446,77 @@ namespace Gekko
                 Program.options.print_filewidth = fileWidthRemember;
             }            
         }
+
+        public static void TracePretty(Trace2 parent, out string prec, out string name, out string period, out string code, out string file, out string datafile, out string id)
+        {
+            prec = null;
+            if (parent.traceContents.precedentsNames != null)
+            {
+                List<string> xx = new List<string>(parent.traceContents.precedentsNames);
+                //xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
+                xx.Reverse();
+                prec = string.Join(", ", xx);
+            }
+
+            //These must be short
+            name = parent.traceContents.name;
+            if (name != null && name.Contains(":"))
+            {
+                name = name.Split(':')[1];
+            }
+            period = null;
+            if (parent.traceContents.period.t1.IsNull() || parent.traceContents.period.t2.IsNull())
+            {
+                period = "<no period>";
+            }
+            else
+            {
+                period = parent.traceContents.period.ToString().Split(' ')[0];
+            }
+            code = RemoveNewlines(parent.traceContents.text);
+            file = null;
+            string fileDetailed = null;
+
+            if (!G.NullOrBlanks(parent.traceContents.commandFileAndLine))
+            {
+                string[] ss = parent.traceContents.commandFileAndLine.Split('¤');
+                if (ss.Length == 2)
+                {
+                    file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
+                    fileDetailed = ss[0] + " line " + ss[1];
+                }
+                else
+                {
+                    //fallback, should never happen
+                    file = parent.traceContents.commandFileAndLine;
+                    fileDetailed = parent.traceContents.commandFileAndLine;
+                }
+            }
+
+            if (file != null && file.Contains(":"))
+            {
+                file = System.IO.Path.GetFileName(file);
+            }
+            datafile = parent.traceContents.dataFile;
+            if (datafile != null && datafile.Contains(":"))
+            {
+                datafile = System.IO.Path.GetFileName(datafile);
+            }
+            id = parent.traceContents.id.ToString().Split(' ')[0];
+        }
+
+        public static void GetNumberOfTracesAndDepth(Trace2 rootNode, out int max, out int n)
+        {
+            TraceHelper th = new TraceHelper(); th.type = ETraceHelper.GetAllMetasAndTraces;
+            rootNode.DeepTrace(th, -1);
+            max = int.MinValue;
+            n = th.tracesDepth2.Count - 1;
+            foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp2 in th.tracesDepth2)
+            {
+                max = Math.Max(max, kvp2.Value.depth);
+            }
+        }
+
 
         public static string RemoveNewlines(string input)
         {

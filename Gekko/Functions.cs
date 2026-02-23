@@ -725,10 +725,17 @@ namespace Gekko
             return m;
         }
 
+        public static IVariable tracedelete(GekkoTime t)
+        {
+            return tracedelete(t, null);
+        }
+
         public static IVariable tracedelete(GekkoTime t, IVariable x1)
         {
             int n = 0;
-            Databank databank = Program.databanks.GetDatabank(O.GetString(x1));
+            Databank databank = null;
+            if (x1 == null) databank = Program.databanks.GetFirst();
+            else databank = Program.databanks.GetDatabank(O.GetString(x1));
             if (databank == null)
             {
                 G.Writeln2("*** ERROR: tracedelete(): databank " + O.GetString(x1) + " does not exist");
@@ -746,6 +753,7 @@ namespace Gekko
                 if (ts.trace2 != null) n++;
                 ts.trace2 = null;
             }            
+            databank.isDirty = true;
             return new ScalarString("Deleted " + n + " data-traces in databank " + databank.aliasName);
         }        
 
@@ -792,6 +800,36 @@ namespace Gekko
             else G.Writeln(hit + " traces in all");
             return new ScalarString("");
         }
+
+        //public static IVariable tracedelete(GekkoTime t)
+        //{
+        //    return tracedelete(t, null);
+        //}
+
+        //public static IVariable tracedelete(GekkoTime t, IVariable x)
+        //{
+        //    //NOTE: Does not include the invisible traces assigned to each series object
+        //    string bank = null;
+        //    if (x != null) bank = (x as ScalarString)._string2;
+        //    Databank db = null;
+        //    if (bank != null) db = Program.databanks.GetDatabank(bank);
+        //    else db = Program.databanks.GetFirst();
+        //    if (db == null)
+        //    {
+        //        G.Writeln2("Databank '" + bank + "' not found");
+        //        throw new GekkoException();
+        //    }
+        //    if (db.protect) G.Writeln2("*** ERROR: Databank " + db.aliasName + " is not editable");
+        //    TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
+        //    foreach (TimeSeries meta in th.metas)
+        //    {
+        //        if (meta == null) continue;  //is this even possible?
+        //        meta.trace2 = null;
+        //    }
+        //    G.Writeln("Deleted " + th.metas.Count + " data-traces from databank " + db.aliasName);
+        //    db.isDirty = true;
+        //    return new ScalarString("");
+        //}
 
         public static IVariable tracevars(GekkoTime t)
         {
