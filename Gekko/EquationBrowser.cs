@@ -42,7 +42,7 @@ namespace Gekko
     public class EquationNameAndNumber
     {
         public int i;
-        public string name;
+        public DName name;
     }
 
     public class EquationBrowserHelper
@@ -1677,14 +1677,14 @@ img {border-style: none;
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
-                    html1.Append("<div id = `#" + SimplerName(equationHelper.name) + "-1` class=`content`>");
+                    html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-1` class=`content`>");
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
                     html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.                    
-                    EquationBrowser.SpanHtmlColor(html1, variableName.ToString());
+                    EquationBrowser.SpanHtmlColor(html1, variableName.ToStringWithQuotes(Globals.greu));
                     html1.Append(" from equation ");
-                    EquationBrowser.SpanHtmlColor(html1, equationHelper.name);
+                    EquationBrowser.SpanHtmlColor(html1, equationHelper.name.ToStringWithQuotes(Globals.greu));
                     html1.Append("</p>");
                     // ------------------------------------------------------
 
@@ -1710,7 +1710,8 @@ img {border-style: none;
                     html1.Append("<hr>");
                     if (Globals.greu)
                     {
-                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: the first equation is in raw form, where sets are stated without quotes and elements with quotes." + "</span>");
+                        //html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: the first equation is in raw form, where sets are stated without quotes and elements with quotes." + "</span>");
+                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: except for the first raw GAMS equation, the time dimension is generally suppressed. Lags/leads are shown as for instance suffix [-1] or [+1]." + "</span>");
                         html1.Append("<br>");
                     }
 
@@ -1719,7 +1720,7 @@ img {border-style: none;
                     html1.AppendLine("<table class = `table1`>");
 
                     html1.AppendLine("<tr>");
-                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName.ToString(), SimplerName(variableName.ToString()) + ".html") + "</td>");
+                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName.ToStringWithQuotes(Globals.greu), SimplerName(variableName.ToString()) + ".html") + "</td>");
                     html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName.ToString())) + "</td>");
                     html1.AppendLine("</tr>");
 
@@ -1734,7 +1735,7 @@ img {border-style: none;
                         if (G.Equal(varnameWithoutLag, variableName.ToString())) continue;  //Shown at top
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
-                        html1.Append("<td>" + EquationBrowser.HtmlLink(varnameWithoutLag, SimplerName(varnameWithoutLag) + ".html") + "</td>");
+                        html1.Append("<td>" + EquationBrowser.HtmlLink(DName.HACK1(varnameWithoutLag).ToStringWithQuotes(Globals.greu), SimplerName(varnameWithoutLag) + ".html") + "</td>");
                         html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
                         html1.AppendLine("</tr>");
                         dict.Add(varnameWithoutLag, false);
@@ -1759,7 +1760,8 @@ img {border-style: none;
                     foreach (string s in dependentVarsList)
                     {
                         string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s));
-                        string link = EquationBrowser.HtmlLink(s, SimplerName(s) + ".html", tooltip);
+                        string s2 = DName.HACK1(s).ToStringWithQuotes(Globals.greu);
+                        string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
                         if (!first2) s8 += ", ";
                         s8 += link;
                         first2 = false;
@@ -1793,7 +1795,7 @@ img {border-style: none;
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
-                    html1.Append("<div id = `#" + SimplerName(equationHelper.name) + "-2` class=`content`>");
+                    html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
@@ -2144,7 +2146,7 @@ img {border-style: none;
                     string s5, s6;
                     EquationNameAndNumber equationHelper5 = new EquationNameAndNumber();
                     //equationHelper5.name = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false).resultingFullName;
-                    equationHelper5.name = helper2.resultingFullName;
+                    equationHelper5.name = DName.HACK1(helper2.resultingFullName);
                     equationHelper5.i = i;
                     GetEquationText(t1, bh, equationHelper5, modelGamsScalar, tUsedHere, out s5, out s6);
 
@@ -2173,7 +2175,7 @@ img {border-style: none;
                     text2.AppendLine("VARIABLES: " + Stringlist.GetListWithCommas(precedents));
                     text2.AppendLine();
                     text2.AppendLine("-------------------------------------------------------");
-                    list.Add(new TwoStrings(equationHelper5.name, text2.ToString()));
+                    list.Add(new TwoStrings(equationHelper5.name.ToString(), text2.ToString()));
                 }
             }
             List<TwoStrings> sortedList = list.OrderBy(o => o.s1).ToList();
@@ -2206,7 +2208,9 @@ img {border-style: none;
 
         private static void GetEquationText(GekkoTime t1, BrowserHelper bh, EquationNameAndNumber equationHelper, ModelGamsScalar modelGamsScalar, GekkoTime tUsedHere, out string s5, out string s6)
         {            
-            string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
+            //string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
+            DName dName2 = equationHelper.name.HACK_AddIndex(tUsedHere);
+            string s2 = dName2.ToString();
             EquationTextHelper helper = new EquationTextHelper();
             GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
             s5 = helper22.s_gamsOrFrnSyntax;
@@ -2273,7 +2277,7 @@ img {border-style: none;
                     {
                         DName variableNameWithoutLagOrLead = DName.HACK1(G.Chop_RemoveLagOrLead(variableName));
                         if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
-                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
+                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = DName.HACK1(equationName) });
                     }
                 }
             }
@@ -2397,12 +2401,12 @@ img {border-style: none;
             StringBuilder html2 = new StringBuilder();
             html2.AppendLine("<div id = `no-hash` class=`content`>");            
             html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
-            EquationBrowser.SpanHtmlColor(html2, variableName.ToString());
+            EquationBrowser.SpanHtmlColor(html2, variableName.ToStringWithQuotes(Globals.greu));
             html2.Append("</p>");
             //EquationBrowser.WriteHtmlColor(html2, variableName);
             EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName.ToString())));            
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
-            EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
+            EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName.ToStringWithQuotes(Globals.greu) + ":");
             string table = "<table cellpadding=`5`>";
             int count = -1;
             foreach (EqInfoSimple eqHelper in eqsNew)
@@ -2412,7 +2416,7 @@ img {border-style: none;
                 EquationTextHelper helper = new EquationTextHelper();
                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName.ToString() }, helper, tUsedHere);                
                 //string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(G.Chop_RemoveLagOrLead(eqHelper.eqNameWithLag)));
-                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName.ToString()) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
+                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToStringWithQuotes(Globals.greu), SimplerName(variableName.ToString()) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
                 if (count == 0) link ="<b>" + link + "</b>";
                 table += "<td style=`vertical-align:top`>";
                 table += link;
@@ -2438,7 +2442,7 @@ img {border-style: none;
 
         private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, string variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
         {
-            string equationName = equationHelper.name;
+            string equationName = equationHelper.name.ToString();
             string equationNameHash = "#" + SimplerName(equationName);
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = t1;
@@ -3343,7 +3347,7 @@ img {border-style: none;
             string s = null;
             foreach (EquationNameAndNumber equation in equations)
             {
-                s += "updateTable('#" + SimplerName(equation.name) + "');" + G.NL;  //activate checkbox listeners for each decomp table
+                s += "updateTable('#" + SimplerName(equation.name.ToString()) + "');" + G.NL;  //activate checkbox listeners for each decomp table
             }
 
             string up = null;
