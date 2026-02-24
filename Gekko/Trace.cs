@@ -292,35 +292,35 @@ namespace Gekko
                 }
 
                 Trace2 isMirror = null;
-                if (Globals.mirrorfix)
-                {
-                    foreach (TimeSeries tsRhs in tsRhss)
-                    {
-                        if (tsRhs == null || tsRhs.trace2 == null) continue;
-                        foreach (Trace2 xxx in tsRhs.trace2.precedents.storage)
-                        {
-                            if (object.ReferenceEquals(tsLhs, tsRhs))
-                            {
-                                //We do not even check time here. Anything with same code and same file+line, and done 
-                                //in the same session (probably loop) is ignored. If this in a time loop, only the first
-                                //trace is shown.
-                                if (traceLhs.traceContents.text == xxx.traceContents.text
-                                    && traceLhs.traceContents.commandFileAndLine == xxx.traceContents.commandFileAndLine
-                                    && traceLhs.traceContents.id.counter - xxx.traceContents.id.counter < 1000000)
-                                {
-                                    return; //trace will not be added, actually ignored like the line had never run.
-                                }
-                            }
-                        }
-                    }
-                }
+
+                //if (Globals.mirrorfix)
+                //{
+                //    foreach (TimeSeries tsRhs in tsRhss)
+                //    {
+                //        if (tsRhs == null || tsRhs.trace2 == null) continue;
+                //        foreach (Trace2 xxx in tsRhs.trace2.precedents.storage)
+                //        {
+                //            if (object.ReferenceEquals(tsLhs, tsRhs))
+                //            {
+                //                //We do not even check time here. Anything with same code and same file+line, and done 
+                //                //in the same session (probably loop) is ignored. If this in a time loop, only the first
+                //                //trace is shown.
+                //                if (traceLhs.traceContents.text == xxx.traceContents.text
+                //                    && traceLhs.traceContents.commandFileAndLine == xxx.traceContents.commandFileAndLine
+                //                    && traceLhs.traceContents.id.counter - xxx.traceContents.id.counter < 1000000)
+                //                {
+                //                    return; //trace will not be added, actually ignored like the line had never run.
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
 
                 if (Globals.mirrorfix2)
                 {
                     foreach (TimeSeries tsRhs in tsRhss)
                     {
-                        if (tsRhs == null || tsRhs.trace2 == null) continue;
-                        //TimeSeries rhs = tsRhs;                                                
+                        if (tsRhs == null || tsRhs.trace2 == null) continue;                     
                         try { Trace2.AddRangeFromSeries1(traceLhs, tsRhs); } catch 
                         {
                             Globals.mirrorError++; //reported at the end, so null problems can get fixed.
@@ -355,15 +355,17 @@ namespace Gekko
             GekkoTime t1 = traceLhs.traceContents.period.t1;
             GekkoTime t2 = traceLhs.traceContents.period.t2;
             if (t1.IsNull() || t2.IsNull()) return;
-            int hit = -12345;
-            int timeDifPrecision = 1; 
+            //int hit = -12345;
+            int timeDifPrecision = 1;
+            List<int> elementsToRemove = new List<int>();
             for (int i = 0; i < tsLhs.trace2.precedents.storage.Count; i++)
             {
                 Trace2 traceExisting = tsLhs.trace2.precedents.storage[i];
-                if (!traceExisting.traceContents.period.t1.IsNull() && !traceExisting.traceContents.period.t2.IsNull() && t1.IsSamePeriod(traceExisting.traceContents.period.t1) && t2.IsSamePeriod(traceExisting.traceContents.period.t2))
+                if (!traceExisting.traceContents.period.t1.IsNull() && !traceExisting.traceContents.period.t2.IsNull() && t1.SmallerThanOrEqual(traceExisting.traceContents.period.t1) && t2.LargerThanOrEqual(traceExisting.traceContents.period.t2))
                 {
-                    hit = i; //A time period hit, where a newer trace replaces an older
-                    break;
+                    elementsToRemove.Add(i);
+                    //hit = i; //A time period hit, where a newer trace replaces an older
+                    //break;
                 }
                 //if (traceLhs.traceContents.text == traceExisting.traceContents.text
                 //    && traceLhs.traceContents.commandFileAndLine == traceExisting.traceContents.commandFileAndLine
@@ -377,9 +379,13 @@ namespace Gekko
                 //    break;
                 //}
             }
-            if (hit != -12345)
+            if (elementsToRemove.Count > 0)
             {
-                tsLhs.trace2.precedents.storage.RemoveAt(hit);
+                //tsLhs.trace2.precedents.storage.RemoveAt(hit);
+                foreach (var index in elementsToRemove.OrderByDescending(i => i))
+                {
+                    tsLhs.trace2.precedents.storage.RemoveAt(index); //Backwards, forwards will not work
+                }
             }
         }
 
