@@ -24,6 +24,7 @@ namespace Gekko
         public int depthMax = -1;
         public int counter = 0;
         public int counterMax = -1;
+        public int nMax = int.MaxValue;
         public int pixels = 0;
         public int pixelsAfterArrow = 30;
         public int firstColWidth = 200;
@@ -1534,7 +1535,8 @@ img {border-style: none;
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
-                    onlyHtml = true;
+                    //onlyHtml = true;
+                    bh.nMax = 4;
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1657,8 +1659,8 @@ img {border-style: none;
             foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
-                
-                if (count == 4) break;
+               
+                if (count >= bh.nMax) break;
 
                 DName variableName = kvp.Key;                
                 if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
@@ -2319,7 +2321,8 @@ img {border-style: none;
                     int count = 0;
                     foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
                     {
-                        count++;                        
+                        count++;
+                        if (count >= bh.nMax) break;
                         if (ShouldSkip(bh, nodeNames, count, kvp.Key)) continue; //Change for plots too, if something changed here
                         if (restrict.Count > 0 && !restrict.ContainsKey(kvp.Key)) continue;
 
