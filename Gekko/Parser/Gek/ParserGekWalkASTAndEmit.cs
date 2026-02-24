@@ -2152,7 +2152,7 @@ namespace Gekko.Parser.Gek
                             nodeCode += "o" + numNode + ".p = p;" + G.NL;
                             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
                             nodeCode += GekkoTimeIteratorStartCode(w, node);
-                            
+
                             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
                             nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
                                                                                                                                                      //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
@@ -4673,6 +4673,12 @@ namespace Gekko.Parser.Gek
             nodeCode += childCodePeriod + G.NL;  //dates
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
             nodeCode += "o" + numNode + ".p = p;" + G.NL;
+            //qwerty
+            if (childCodeRhs.ToLower().Contains("uproc.kaedepris2("))
+            {
+                //nodeCode += "Program.Kaedepris2a(p);" + G.NL;
+                nodeCode += "var megahack" + numNode + " = Globals.traceContainer;" + G.NL;
+            }
             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
             nodeCode += GekkoTimeIteratorStartCode(w, node);
             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
@@ -4705,6 +4711,13 @@ namespace Gekko.Parser.Gek
                 throw new GekkoException();
             }
             nodeCode += GekkoTimeIteratorEndCode();
+
+            //qwerty
+            if (childCodeRhs.ToLower().Contains("uproc.kaedepris2("))
+            {
+                //nodeCode += "Program.Kaedepris2b(p);" + G.NL;
+                nodeCode += "Globals.traceContainer = megahack" + numNode + ";" + G.NL; //reverting everything to what it was before calling kaedepris2()
+            }
 
             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
             {

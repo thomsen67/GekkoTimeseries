@@ -36308,6 +36308,16 @@ write datatest;
             return text;
         }
 
+        public static void Kaedepris2a(P p) 
+        {
+            var xx = Globals.traceContainer;
+        }
+
+        public static void Kaedepris2b(P p)
+        {
+            var xx = Globals.traceContainer;
+        }
+
         public static void makeBatFileForAremos()
         {
             GuiDialogMakeBatfile xx = new GuiDialogMakeBatfile(true);
