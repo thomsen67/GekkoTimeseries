@@ -759,8 +759,8 @@ namespace Gekko.Parser.Gek
                     case "ASTCREATEEXPRESSION":
                         {
                             node.Code.A("O.CreateExpression o" + Num(node) + " = new O.CreateExpression();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);                                                        
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;
                         }
@@ -1557,7 +1557,18 @@ namespace Gekko.Parser.Gek
                             if (method.EndsWith(", ")) method = method.Substring(0, method.Length - 2);  //we remove the last ", "
                             method += ") {" + G.NL;
 
+                            int cc = ++Globals.counter;
+                            if (w.uFunctionsHelper.functionName.ToLower() == "kaedepris2")
+                            {
+                                method += "var megahack" + cc + " = Globals.traceContainer; bool b" + cc + " = Program.options.databank_trace; Program.options.databank_trace = false; try { " + G.NL;
+                            }
+
                             method += node[3].Code + G.NL;  //expressions, should always be subnode #4                            
+                                                        
+                            if (w.uFunctionsHelper.functionName.ToLower() == "kaedepris2")
+                            {
+                                method += "} finally {Globals.traceContainer = megahack" + cc + "; Program.options.databank_trace = b" + cc + "; }" + G.NL;
+                            }
 
                             method += "}" + G.NL;
 
@@ -4672,13 +4683,7 @@ namespace Gekko.Parser.Gek
             nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
             nodeCode += childCodePeriod + G.NL;  //dates
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
-            nodeCode += "o" + numNode + ".p = p;" + G.NL;
-            //qwerty
-            if (childCodeRhs.ToLower().Contains("uproc.kaedepris2("))
-            {
-                //nodeCode += "Program.Kaedepris2a(p);" + G.NL;
-                nodeCode += "var megahack" + numNode + " = Globals.traceContainer;" + G.NL;
-            }
+            nodeCode += "o" + numNode + ".p = p;" + G.NL;            
             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
             nodeCode += GekkoTimeIteratorStartCode(w, node);
             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
@@ -4710,14 +4715,7 @@ namespace Gekko.Parser.Gek
                 G.Writeln("           Legal functions are log, dlog, pch, dif or diff");
                 throw new GekkoException();
             }
-            nodeCode += GekkoTimeIteratorEndCode();
-
-            //qwerty
-            if (childCodeRhs.ToLower().Contains("uproc.kaedepris2("))
-            {
-                //nodeCode += "Program.Kaedepris2b(p);" + G.NL;
-                nodeCode += "Globals.traceContainer = megahack" + numNode + ";" + G.NL; //reverting everything to what it was before calling kaedepris2()
-            }
+            nodeCode += GekkoTimeIteratorEndCode();           
 
             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
             {

@@ -3956,7 +3956,7 @@ namespace Gekko
             public IVariable lhs = null;
             public IVariable rhs = null;
             public void Exe()
-            {
+            {                
                 TimeSeries tlhs = O.GetTimeSeries(lhs);
 
                 Databank bankName = tlhs.parentDatabank;
@@ -3968,8 +3968,20 @@ namespace Gekko
                 bankName.RemoveVariable(varName);
                 bankName.AddVariable(trhs);
 
-                trhs.Stamp(); //for instance chain index function results in new date stamp                
+                trhs.Stamp(); //for instance chain index function results in new date stamp
 
+                try
+                {
+                    //Weird enough, but the RHS is actually morphed into the LHS name and added to bank.
+                    Trace2 trace = new Trace2(ETraceType.Normal, trhs.GetRealDataPeriodFirst(), trhs.GetRealDataPeriodLast());
+                    trace.traceContents.text = "[This is a CREATE statement with RHS expression, possibly using kaedepris2(). To get better traces, consider using SERIES instead of CREATE.]";
+                    trace.traceContents.name = tlhs.GetNameAndParentDatabank();
+                    trace.traceContents.commandFileAndLine = "[Unknown file and line]";
+                    List<TimeSeries> tss = Trace2.PrecedentsFromGlobals();
+                    try { Trace2.PrecedentsNames(trace, tss); } catch { }
+                    Trace2.PushIntoSeries(trace, trhs, tss, false, false); //OK
+                }
+                catch { }
             }
         }
 

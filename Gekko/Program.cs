@@ -15959,7 +15959,9 @@ write datatest;
                 G.Writeln2("*** ERROR: You cannot use LIBRARY *;");
                 throw new GekkoException();
             }
-            AddAbstract(fileName, true, true, p);
+            Program.Kaedepris2Fix1(p);
+            AddAbstract(fileName, true, true, p); //this messes with P objects, therefore the fix
+            Program.Kaedepris2Fix2(p);
         }        
 
         public static void Ini(P p)
@@ -16013,6 +16015,22 @@ write datatest;
             }
 
             Globals.dependencyTracking.FencingWarning();
+        }
+
+        public static void Kaedepris2Fix1(P p)
+        {
+            Globals.kaedepris2Fix1 = (string[])p.stack.Clone();
+            Globals.kaedepris2Fix2 = (string[])p.stackCommandFileText.Clone();
+            Globals.kaedepris2Fix3 = (string[])p.stackFileSentToAntlr.Clone();
+            Globals.kaedepris2Fix0 = p.counter;
+        }
+
+        public static void Kaedepris2Fix2(P p)
+        {
+            p.stack = Globals.kaedepris2Fix1;
+            p.stackCommandFileText = Globals.kaedepris2Fix2;
+            p.stackFileSentToAntlr = Globals.kaedepris2Fix3;
+            p.counter = Globals.kaedepris2Fix0;
         }
 
         public static void AddAbstract(string s, bool run, bool isLibrary, P p)
@@ -36308,16 +36326,6 @@ write datatest;
             return text;
         }
 
-        public static void Kaedepris2a(P p) 
-        {
-            var xx = Globals.traceContainer;
-        }
-
-        public static void Kaedepris2b(P p)
-        {
-            var xx = Globals.traceContainer;
-        }
-
         public static void makeBatFileForAremos()
         {
             GuiDialogMakeBatfile xx = new GuiDialogMakeBatfile(true);
@@ -37002,11 +37010,11 @@ write datatest;
     {
         public bool hasWrittenRunTimeErrorOnce = false;  //bit hacky
         public EHasShownErrorHandling hasShownErrorHandling = EHasShownErrorHandling.False;
-        private int counter = 0;  //1 gets added soon enough
+        public int counter = 0;  //1 gets added soon enough
         //private Q[] stackQ = new Q[200]; //contains arguments to different methods, new object put in here every time a new .cmd file is run.
-        private string[] stack = new string[200];  //2000 nested cmd files -- should be enough
-        private string[] stackCommandFileText = new string[200];
-        private string[] stackFileSentToAntlr = new string[200];
+        public string[] stack = new string[200];  //2000 nested cmd files -- should be enough
+        public string[] stackCommandFileText = new string[200];
+        public string[] stackFileSentToAntlr = new string[200];
         public string lastFileSentToANTLR = null;
         public bool isOneLinerFromGui = false;
         public bool hasBeenCmdFile = false;

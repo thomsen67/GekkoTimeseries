@@ -50,6 +50,10 @@ namespace Gekko
         public const bool mirrorfix = false;
         public const bool mirrorfix2 = true;
         public static int mirrorError = 0;
+        public static string[] kaedepris2Fix1 = null;
+        public static string[] kaedepris2Fix2 = null;
+        public static string[] kaedepris2Fix3 = null;
+        public static int kaedepris2Fix0 = 0;
 
         public static string versionInternal = "";  // "v14";
 
