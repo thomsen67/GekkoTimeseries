@@ -871,52 +871,7 @@ img {border-style: none;
                     // html print data values of series
                     // --------------------------------
 
-                    StringBuilder sb3 = new StringBuilder();
-                    string extra = ""; if (modelFrequencyString != "a") extra = "  ";  //for instance, 2020q3 is 6 chars, 2020 is only 4. Will not work good for months...
-                    sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
-                    sb3.AppendLine();
-                    if (ts1 == null && ts2 == null)
-                    {
-                        //do nothing
-                    }
-                    else if (ts1 == null || ts2 == null)
-                    {
-                        sb3.AppendLine("Period" + extra + "        value        %  ");
-                    }
-                    else
-                    {
-                        sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
-                    }
-                    int counter6 = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
-                    {
-                        counter6++;
-                        if (hasFilter)  //some periods are set via TIMEFILTER
-                        {
-                            if (Program.ShouldFilterPeriod(gt)) continue;
-                        }
-
-                        int counter2 = -1;
-                        foreach (Series ts in new List<Series> { ts1, ts2 })
-                        {
-                            counter2++;
-                            if (ts == null)
-                            {
-                                //ignore it
-                            }
-                            else
-                            {
-                                BrowserWritePrintLine(ts, sb3, gt);
-                                if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
-                            }
-                        }
-
-                        sb3.AppendLine();
-                        if (gt.freq == EFreq.Q && gt.sub == Globals.freqQSubperiods) sb3.AppendLine();  //prettier
-                        if (gt.freq == EFreq.M && gt.sub == Globals.freqMSubperiods) sb3.AppendLine();  //prettier
-                    }
-
-                    WriteHtmlPreCode(sb, sb3.ToString());
+                    HtmlPrintVariable(null, gap, print_start, print_end, bank1, bank2, modelFrequencyString, sb, ts1, ts2, hasFilter);
                 }
                 else
                 {
@@ -1199,6 +1154,57 @@ img {border-style: none;
 
             new Writeln("End of html browser generation, " + G.Seconds(dt0));
 
+        }
+
+        private static void HtmlPrintVariable(string varname, int gap, GekkoTime print_start, GekkoTime print_end, string bank1, string bank2, string modelFrequencyString, StringBuilder sb, Series ts1, Series ts2, bool hasFilter)
+        {
+            StringBuilder sb3 = new StringBuilder();
+            string extra = ""; if (modelFrequencyString != "a") extra = "  ";  //for instance, 2020q3 is 6 chars, 2020 is only 4. Will not work good for months...
+            if (varname != null) sb3.AppendLine(varname);
+            if (bank1 != "") sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
+            sb3.AppendLine();
+            if (ts1 == null && ts2 == null)
+            {
+                //do nothing
+            }
+            else if (ts1 == null || ts2 == null)
+            {
+                sb3.AppendLine("Period" + extra + "        value        %  ");
+            }
+            else
+            {
+                sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
+            }
+            int counter6 = 0;
+            foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
+            {
+                counter6++;
+                if (hasFilter)  //some periods are set via TIMEFILTER
+                {
+                    if (Program.ShouldFilterPeriod(gt)) continue;
+                }
+
+                int counter2 = -1;
+                foreach (Series ts in new List<Series> { ts1, ts2 })
+                {
+                    counter2++;
+                    if (ts == null)
+                    {
+                        //ignore it
+                    }
+                    else
+                    {
+                        BrowserWritePrintLine(ts, sb3, gt);
+                        if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
+                    }
+                }
+
+                sb3.AppendLine();
+                if (gt.freq == EFreq.Q && gt.sub == Globals.freqQSubperiods) sb3.AppendLine();  //prettier
+                if (gt.freq == EFreq.M && gt.sub == Globals.freqMSubperiods) sb3.AppendLine();  //prettier
+            }
+
+            WriteHtmlPreCode(sb, sb3.ToString());
         }
 
         public static string Language(bool isDanish, string q1, string q2)
@@ -1536,7 +1542,7 @@ img {border-style: none;
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                     //onlyHtml = true;
-                    bh.nMax = 4;
+                    //bh.nMax = 4;
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1701,7 +1707,7 @@ img {border-style: none;
                     if (Globals.greu) html1.AppendLine("model &lt;gms> greu.zip;");
                     else html1.AppendLine("model &lt;gms> makro.zip;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + ";");
+                    html1.AppendLine("decomp &lt;d> " + variableName.ToStringWithQuotes(Globals.greu) + " from " + equationHelper.name.ToStringWithQuotes(Globals.greu) + ";");
                     html1.AppendLine();
                     html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
@@ -1713,7 +1719,7 @@ img {border-style: none;
                     if (Globals.greu)
                     {
                         //html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: the first equation is in raw form, where sets are stated without quotes and elements with quotes." + "</span>");
-                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: except for the first raw GAMS equation, the time dimension is generally suppressed. Lags/leads are shown as for instance suffix [-1] or [+1]." + "</span>");
+                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: except for the upper raw GAMS equation, the time dimension is generally suppressed. Lags/leads are shown as for instance suffix [-1] or [+1]." + "</span>");
                         html1.Append("<br>");
                     }
 
@@ -1774,13 +1780,17 @@ img {border-style: none;
 
                 if (true)
                 {
-                    html1.AppendLine("<div id = `hash-1` class=`content`>");
-                    html1.Append("<br>");
-                    ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
-                    html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                    html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("plot " + variableName + "; //plot&lt;p> for growth");
-                    html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
+                    if (true) //plot
+                    {
+                        html1.AppendLine("<div id = `hash-1` class=`content`>");
+                        html1.Append("<br>");
+                        ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
+                        html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                        html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                        html1.AppendLine("plot " + variableName.ToStringWithQuotes(Globals.greu) + "; //plot&lt;p> for growth");
+                        html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
+                    }                    
+
                     try
                     {
                         //only plot the series from Work                        
@@ -1792,6 +1802,18 @@ img {border-style: none;
                     catch
                     {
                     }
+
+                    if (true) //print
+                    {
+                        Series ts = null;
+                        try { ts = O.GetIVariableFromString("work:" + kvp.Key.ToStringWithQuotes(true), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
+                        if (ts != null)
+                        {
+                            html1.AppendLine("<p>");
+                            HtmlPrintVariable(variableName.ToStringWithQuotes(true), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
+                        }
+                    }
+
                     html1.AppendLine("</div>");
                 }
 
@@ -1802,7 +1824,7 @@ img {border-style: none;
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
-                    if (!Globals.greu)
+                    if (true)
                     {
                         string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
                         if (table != null)
@@ -1813,11 +1835,12 @@ img {border-style: none;
                             if (Globals.greu) html1.AppendLine("model &lt;gms> greu.zip;");
                             else html1.AppendLine("model &lt;gms> makro.zip;");
                             html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                            html1.AppendLine("decomp &lt;d> " + variableName + " from " + equationHelper.name + "; //&lt;p> for growth, &lt;errors> for errors");
+                            html1.AppendLine("decomp &lt;d> " + variableName.ToStringWithQuotes(Globals.greu) + " from " + equationHelper.name.ToStringWithQuotes(Globals.greu) + "; //&lt;p> for growth, &lt;errors> for errors");
                             html1.AppendLine();
                             html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
                             html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()                            
                             html1.AppendLine(table);
+                            html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: The element names are without quotes and may appear without blanks etc. A [*] indicates aggregation." + "</span>");
                         }
                         // ------------------------------------------------------
                     }
@@ -1844,8 +1867,8 @@ img {border-style: none;
                         ToggleLink(html1, "Data-traces", "To see these data-traces in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read makrobk.gbk; //.gdx has no data-traces");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("trace " + variableName + ";");
-                        html1.AppendLine("disp " + variableName + "; //click the trace link");
+                        html1.AppendLine("trace " + variableName.ToStringWithQuotes(Globals.greu) + ";");
+                        html1.AppendLine("disp " + variableName.ToStringWithQuotes(Globals.greu) + "; //click the trace link");
                         html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
 
                         GekkoTimeSpansSimple gtss = null;
@@ -1880,7 +1903,7 @@ img {border-style: none;
                         EquationBrowser.WriteHtml(html1, s);
                         html1.AppendLine("</div>");
                     }
-                }
+                }                
 
                 StringBuilder x; string js;
                 BrowserNewCssAndJs(variableName.ToString(), bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, equations, true, out x, out js);
@@ -2511,7 +2534,7 @@ img {border-style: none;
                         table += "<thead>" + G.NL;
                         string percent = null;
                         if (combo_op == "p") percent = "<span style=`margin-right: 0.75em`>%</span>";
-                        table += "<tr><th style=`text-align: right`>" + percent + "</th>" + G.NL;
+                        table += "<tr><th style=`text-align: right; width: 400px;`>" + percent + "</th>" + G.NL;
                         for (int j2 = 2; j2 <= decompTable.GetColMaxNumber(); j2++)
                         {
                             double d = WindowDecomp.RedLampValue(decompOutput.red, j2 - 2, null);
@@ -2563,17 +2586,7 @@ img {border-style: none;
                                 titleHtml = " title=`" + Globals.decompResidualText1 + Globals.decompResidualText2 + "`";
                             }
                             table += "<tr>";                           
-                            table += "<th" + titleHtml + ">";
-
-
-
-
-
-
-
-
-
-
+                            table += "<th style=`white-space: nowrap`" + titleHtml + ">";
 
                             List<List<string>> black = decompOutput.black;
                             bool view = false;
@@ -2598,17 +2611,6 @@ img {border-style: none;
                                     imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.0; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
                                 }
                             }
-
-
-
-
-
-
-
-
-
-
-
 
                             if (i2 == 2) table += imgBlack + "<span style=`font-weight:bold`>" + name + "</span>";  //first data row
                             else table += imgBlack + name;
@@ -2636,7 +2638,7 @@ img {border-style: none;
             catch
             {
                 table = null;
-            }
+            }            
             return table;
         }
 
