@@ -35,6 +35,7 @@ namespace Gekko
         public int restrict_maxDepth = -1;
         public DName restrict_varName = null;
         public bool showTraces = true;
+        public bool showOnly1DecompTable = false;
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
         public StringBuilder text = null;
@@ -1543,6 +1544,7 @@ img {border-style: none;
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                     //onlyHtml = true;
                     //bh.nMax = 4;
+                    bh.showOnly1DecompTable = true;
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1599,7 +1601,7 @@ img {border-style: none;
                 WindowFlow.WalkNodes(depth, graph, varName, eqName, walkInfo);
                 nodeNames = walkInfo.nodeNames;
                 G.WritelnGray("TTH: maxDepth vars end (" + nodeNames.Count() + ")");
-            }
+            }            
 
             G.WritelnGray("TTH: Walknodes end");
 
@@ -1817,14 +1819,22 @@ img {border-style: none;
                     html1.AppendLine("</div>");
                 }
 
+                DName bestEquation = null;
+                if (bh.showOnly1DecompTable)
+                {
+                    //This runs ok fast now, for GREU
+                    List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false, true);
+                    if (eqsNew.Count > 0) bestEquation = eqsNew[0].eqNameWithLag.RemoveTime(); //the DName we are comparing with does not have lags: here there is a lag = 0 probably always
+                }
+
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
                     html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
-                    //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());
-                    if (true)
+                    //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());                    
+                    if (!bh.showOnly1DecompTable || (bestEquation != null && G.Equal(equationHelper.name, bestEquation)))
                     {
                         string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
                         if (table != null)
@@ -2437,6 +2447,13 @@ img {border-style: none;
             int count = -1;
             foreach (EqInfoSimple eqHelper in eqsNew)
             {
+                if (Globals.greu)
+                {
+                    if (eqHelper.eqNameWithLag.GetTime().super != 0)
+                    {
+                        continue; //Hacky, cheks for [-1], [+1]
+                    }
+                }
                 count++;
                 table += "<tr>";
                 EquationTextHelper helper = new EquationTextHelper();
