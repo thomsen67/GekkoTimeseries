@@ -1686,27 +1686,27 @@ img {border-style: none;
                 myData.Add(new double[] { 1.1, 2.2, 3.3 }); // Your actual data goes here
             }
 
-            var partitioner = Partitioner.Create(myData as IEnumerable<double[]>);
+            var indexedItems = myData.Select((value, index) => new { Value = value, Index = index });
 
-            var options = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount
-            };
+            // Use the IEnumerable cast to force one-by-one load balancing
+            var partitioner = Partitioner.Create(indexedItems);
+
+            var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
             Parallel.ForEach(partitioner, options, (item) =>
             {
-                // Your heavy 1-second task
-                double sum = 0;
-                foreach (var d in item) sum += d;
+                // Access your data and index through the 'item' object
+                double sum = item.Value.Sum();
+                int idx = item.Index;
 
-                // Simulated work
+                // Now you can use 'idx' for your filename
+                new Writeln("Result " + idx + ", Sum " + sum);
+
+                // Your 1-second heavy load
                 System.Threading.Thread.Sleep(1000);
+                new Writeln("Finished " + idx + ", Sum " + sum);
 
-                // Note: Since we are using the IEnumerable partitioner, 
-                // the 'index' isn't directly available in the lambda.
             });
-
-
 
 
 
