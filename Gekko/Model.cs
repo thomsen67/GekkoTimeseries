@@ -266,9 +266,12 @@ namespace Gekko
                 {                    
                     GetEquationTextHelper2 two2a = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t0, null);
                     rv.s_scalarModel += two2a.s2 + G.NL;
-                    GetEquationTextHelper2 two2b = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, true, t0, null);
-                    rv.s_scalarModelMathRename += two2b.s2 + G.NL;
-                    rv.mathRename = two2b.mathRename;
+                    if (Program.options.model_gams_scalar_normalize)
+                    {
+                        GetEquationTextHelper2 two2b = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, true, t0, null);
+                        rv.s_scalarModelMathRename += two2b.s2 + G.NL;
+                        rv.mathRename = two2b.mathRename;
+                    }                    
                     if (!rv.s_scalarModel.Contains(Globals.eqs6)) hit = true;
                 }
                 else
@@ -2060,7 +2063,14 @@ namespace Gekko
                     {
                         if (sd != null) new Error("Not showing time not expected");
                         dName2 = dName.HACK_AddIndex(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
-                        varname2 = dName2.ToStringWithQuotes(Globals.greu);
+                        varname2 = dName2.ToString();
+                        if (Globals.greuHack)
+                        {
+                            //The equation text really ought to be math + DName showhow.
+                            //Maybe some List of string-or-DName, but how? Maybe List<object> that
+                            //is then unfolded?
+                            varname2 = dName2.ToString(new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null));
+                        }
                     }
                     
                     if (mathRename != null)

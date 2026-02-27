@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
-using System.Drawing;
+using System.Collections.Concurrent;
 
 namespace Gekko
 {
@@ -36,6 +36,8 @@ namespace Gekko
         public DName restrict_varName = null;
         public bool showTraces = true;
         public bool showOnly1DecompTable = false;
+        public DNameFormat dNameFormat = new DNameFormat();
+
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
         public StringBuilder text = null;
@@ -1406,6 +1408,7 @@ img {border-style: none;
                 //bh.restrict_maxDepth = 2;  //2=about 40 files
                 //bh.restrict_varName = DName.HACK1("qC");
                 bh.showTraces = false;
+
             }
             else
             {
@@ -1542,9 +1545,10 @@ img {border-style: none;
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
-                    //onlyHtml = true;
+                    onlyHtml = true;
                     //bh.nMax = 4;
-                    bh.showOnly1DecompTable = true;
+                    bh.showOnly1DecompTable = false;
+                    bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1633,6 +1637,14 @@ img {border-style: none;
             return;
         }
 
+        
+
+        private static void PerformHeavyCalculation(double[] data)
+        {
+            // Simulated 1-second work
+            System.Threading.Thread.Sleep(1000);
+        }
+
         private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, Dictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
             //FIXME
@@ -1650,10 +1662,10 @@ img {border-style: none;
             string sub = "vars";
 
             DateTime dt1 = DateTime.UtcNow;
-            
+
             GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
 
-            if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }            
+            if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }
 
             G.WritelnGray("Starting individual html pages");
 
@@ -1664,25 +1676,60 @@ img {border-style: none;
             System.Diagnostics.Stopwatch stopWatch = System.Diagnostics.Stopwatch.StartNew();
             TimeSpan reportInterval = TimeSpan.FromMinutes(1);
 
+            Dictionary<DName, TwoStrings> equationTextMemory = new Dictionary<DName, TwoStrings>(Multidim2Comparer.IgnoreCase); //scalar eqs take a bit of time to get in, because they are actually taken from C# code. Since the same equation is done many times, this spees things up.
+
+
+
+            List<double[]> myData = new List<double[]>();
+            for (int i = 0; i < 50; i++)
+            {
+                myData.Add(new double[] { 1.1, 2.2, 3.3 }); // Your actual data goes here
+            }
+
+            var partitioner = Partitioner.Create(myData as IEnumerable<double[]>);
+
+            var options = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount
+            };
+
+            Parallel.ForEach(partitioner, options, (item) =>
+            {
+                // Your heavy 1-second task
+                double sum = 0;
+                foreach (var d in item) sum += d;
+
+                // Simulated work
+                System.Threading.Thread.Sleep(1000);
+
+                // Note: Since we are using the IEnumerable partitioner, 
+                // the 'index' isn't directly available in the lambda.
+            });
+
+
+
+
+
+
             foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
             {
                 count++;
-               
+
                 if (count >= bh.nMax) break;
 
-                DName variableName = kvp.Key;                
+                DName variableName = kvp.Key;
                 if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
                 List<EquationNameAndNumber> equations = kvp.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
 
-                string fileName1 = SimplerName(variableName.ToString()) + ".html";                                
+                string fileName1 = SimplerName(variableName.ToString()) + ".html";
 
                 if (stopWatch.Elapsed >= reportInterval)
                 {
                     new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
                     stopWatch.Restart();
-                }                
-                
+                }
+
                 StringBuilder html1 = new StringBuilder();
 
                 foreach (EquationNameAndNumber equationHelper in equations)
@@ -1692,24 +1739,35 @@ img {border-style: none;
                     // TITLE
                     // ------------------------------------------------------
                     html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.                    
-                    EquationBrowser.SpanHtmlColor(html1, variableName.ToStringWithQuotes(Globals.greu));
+                    EquationBrowser.SpanHtmlColor(html1, variableName.ToString(bh.dNameFormat));
                     html1.Append(" from equation ");
-                    EquationBrowser.SpanHtmlColor(html1, equationHelper.name.ToStringWithQuotes(Globals.greu));
+                    EquationBrowser.SpanHtmlColor(html1, equationHelper.name.ToString(bh.dNameFormat));
                     html1.Append("</p>");
                     // ------------------------------------------------------
 
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
-                    // ------------------------------------------------------                                        
+                    // ------------------------------------------------------
+                    // 
+
                     string s5, s6;
-                    GetEquationText(t1, bh, equationHelper, modelGamsScalar, tUsedHere, out s5, out s6);
+                    TwoStrings two = null; equationTextMemory.TryGetValue(equationHelper.name, out two);
+                    if (two != null)
+                    {
+                        s5 = two.s1; s6 = two.s2;
+                    }
+                    else
+                    {
+                        GetEquationText(t1, bh, equationHelper, modelGamsScalar, tUsedHere, out s5, out s6);
+                        equationTextMemory.Add(equationHelper.name, new TwoStrings(s5, s6));
+                    }
                     html1.AppendLine("<br style=`line-height: 0.2rem;`>");
                     ToggleLink(html1, "Equation", "To see such equations in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
                     if (Globals.greu) html1.AppendLine("model &lt;gms> greu.zip;");
                     else html1.AppendLine("model &lt;gms> makro.zip;");
                     html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("decomp &lt;d> " + variableName.ToStringWithQuotes(Globals.greu) + " from " + equationHelper.name.ToStringWithQuotes(Globals.greu) + ";");
+                    html1.AppendLine("decomp &lt;d> " + variableName.ToString(bh.dNameFormat) + " from " + equationHelper.name.ToString(bh.dNameFormat) + ";");
                     html1.AppendLine();
                     html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
                     html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
@@ -1721,7 +1779,7 @@ img {border-style: none;
                     if (Globals.greu)
                     {
                         //html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: the first equation is in raw form, where sets are stated without quotes and elements with quotes." + "</span>");
-                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: except for the upper raw GAMS equation, the time dimension is generally suppressed. Lags/leads are shown as for instance suffix [-1] or [+1]." + "</span>");
+                        html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: except for the upper raw GAMS equation, the time dimension is generally omitted. Lags/leads are shown as for instance [-1] or [+1]." + "</span>");
                         html1.Append("<br>");
                     }
 
@@ -1730,7 +1788,7 @@ img {border-style: none;
                     html1.AppendLine("<table class = `table1`>");
 
                     html1.AppendLine("<tr>");
-                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName.ToStringWithQuotes(Globals.greu), SimplerName(variableName.ToString()) + ".html") + "</td>");
+                    html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName.ToString(bh.dNameFormat), SimplerName(variableName.ToString()) + ".html") + "</td>");
                     html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName.ToString())) + "</td>");
                     html1.AppendLine("</tr>");
 
@@ -1745,7 +1803,7 @@ img {border-style: none;
                         if (G.Equal(varnameWithoutLag, variableName.ToString())) continue;  //Shown at top
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
-                        html1.Append("<td>" + EquationBrowser.HtmlLink(DName.HACK1(varnameWithoutLag).ToStringWithQuotes(Globals.greu), SimplerName(varnameWithoutLag) + ".html") + "</td>");
+                        html1.Append("<td>" + EquationBrowser.HtmlLink(DName.HACK1(varnameWithoutLag).ToString(bh.dNameFormat), SimplerName(varnameWithoutLag) + ".html") + "</td>");
                         html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
                         html1.AppendLine("</tr>");
                         dict.Add(varnameWithoutLag, false);
@@ -1770,7 +1828,7 @@ img {border-style: none;
                     foreach (string s in dependentVarsList)
                     {
                         string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s));
-                        string s2 = DName.HACK1(s).ToStringWithQuotes(Globals.greu);
+                        string s2 = DName.HACK1(s).ToString(bh.dNameFormat);
                         string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
                         if (!first2) s8 += ", ";
                         s8 += link;
@@ -1789,9 +1847,9 @@ img {border-style: none;
                         ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read &lt;gdx> forecast.gdx;");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("plot " + variableName.ToStringWithQuotes(Globals.greu) + "; //plot&lt;p> for growth");
+                        html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
                         html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
-                    }                    
+                    }
 
                     try
                     {
@@ -1808,34 +1866,44 @@ img {border-style: none;
                     if (true) //print
                     {
                         Series ts = null;
-                        try { ts = O.GetIVariableFromString("work:" + kvp.Key.ToStringWithQuotes(true), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
+                        try { ts = O.GetIVariableFromString("work:" + kvp.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
                         if (ts != null)
                         {
                             html1.AppendLine("<p>");
-                            HtmlPrintVariable(variableName.ToStringWithQuotes(true), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
+                            HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
                         }
                     }
 
                     html1.AppendLine("</div>");
                 }
 
+                List<EquationNameAndNumber> reduced = new List<EquationNameAndNumber>();
                 DName bestEquation = null;
                 if (bh.showOnly1DecompTable)
                 {
                     //This runs ok fast now, for GREU
                     List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false, true);
                     if (eqsNew.Count > 0) bestEquation = eqsNew[0].eqNameWithLag.RemoveTime(); //the DName we are comparing with does not have lags: here there is a lag = 0 probably always
+                    foreach (EquationNameAndNumber equationHelper in equations)
+                    {
+                        if (!bh.showOnly1DecompTable || (bestEquation != null && G.Equal(equationHelper.name, bestEquation)))
+                        {
+                            reduced.Add(equationHelper);
+                            break;
+                        }
+                    }
                 }
+                else reduced.AddRange(equations);
 
-                foreach (EquationNameAndNumber equationHelper in equations)
+                foreach (EquationNameAndNumber equationHelper in reduced)
                 {
-                    html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());                    
-                    if (!bh.showOnly1DecompTable || (bestEquation != null && G.Equal(equationHelper.name, bestEquation)))
+                    if (true)
                     {
+                        html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                         string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
                         if (table != null)
                         {
@@ -1845,16 +1913,16 @@ img {border-style: none;
                             if (Globals.greu) html1.AppendLine("model &lt;gms> greu.zip;");
                             else html1.AppendLine("model &lt;gms> makro.zip;");
                             html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                            html1.AppendLine("decomp &lt;d> " + variableName.ToStringWithQuotes(Globals.greu) + " from " + equationHelper.name.ToStringWithQuotes(Globals.greu) + "; //&lt;p> for growth, &lt;errors> for errors");
+                            html1.AppendLine("decomp &lt;d> " + variableName.ToString(bh.dNameFormat) + " from " + equationHelper.name.ToString(bh.dNameFormat) + "; //&lt;p> for growth, &lt;errors> for errors");
                             html1.AppendLine();
                             html1.AppendLine("//NOTE: Gekko can merge decomp tables (link equations), and much more.");
                             html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()                            
                             html1.AppendLine(table);
-                            html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: The element names are without quotes and may appear without blanks etc. A [*] indicates aggregation." + "</span>");
+                            html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: The element names are without quotes and may appear without blanks etc. A star (*) indicates aggregation, and lags/leads are represented like [-1], [+1]." + "</span>");
                         }
                         // ------------------------------------------------------
+                        html1.Append("</div>");
                     }
-                    html1.Append("</div>");
                 }
 
                 if (bh.showTraces)
@@ -1877,8 +1945,8 @@ img {border-style: none;
                         ToggleLink(html1, "Data-traces", "To see these data-traces in Gekko 3.x, you may use the following statements (or similar):");
                         html1.AppendLine("read makrobk.gbk; //.gdx has no data-traces");
                         html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("trace " + variableName.ToStringWithQuotes(Globals.greu) + ";");
-                        html1.AppendLine("disp " + variableName.ToStringWithQuotes(Globals.greu) + "; //click the trace link");
+                        html1.AppendLine("trace " + variableName.ToString(bh.dNameFormat) + ";");
+                        html1.AppendLine("disp " + variableName.ToString(bh.dNameFormat) + "; //click the trace link");
                         html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
 
                         GekkoTimeSpansSimple gtss = null;
@@ -1913,10 +1981,10 @@ img {border-style: none;
                         EquationBrowser.WriteHtml(html1, s);
                         html1.AppendLine("</div>");
                     }
-                }                
+                }
 
                 StringBuilder x; string js;
-                BrowserNewCssAndJs(variableName.ToString(), bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, equations, true, out x, out js);
+                BrowserNewCssAndJs(variableName.ToString(), bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, reduced, true, out x, out js);
 
                 x.AppendLine("  <body>");
                 x.Append(LinkHome(true));
@@ -1936,15 +2004,15 @@ img {border-style: none;
             }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Starting list");
-            List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res);
+            List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res, bh);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Starting find");
-            BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2);            
+            BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2, bh);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
-            
+
             return;
         }
 
-        private static void BrowserNewHtmlFind(string path, string settings_css_filename, string settings_find_filename, List<EquationBrowserHelper> vars2)
+        private static void BrowserNewHtmlFind(string path, string settings_css_filename, string settings_find_filename, List<EquationBrowserHelper> vars2, BrowserHelper bh)
         {
             // ------------------------------------------------------------
             // ----------------- find -------------------------------------
@@ -1956,7 +2024,6 @@ img {border-style: none;
             x3.AppendLine("<html>");
             x3.AppendLine("<head>");
             x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
-            //x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
             x3.AppendLine("</head>");
 
             foreach (string s in CreateCss(false)) x3.AppendLine(s);
@@ -2116,7 +2183,7 @@ img {border-style: none;
             }
         }
 
-        private static List<EquationBrowserHelper> BrowserNewHtmlList(string path, Dictionary<DName, List<EquationNameAndNumber>> combos, string settings_vars_foldername, string res)
+        private static List<EquationBrowserHelper> BrowserNewHtmlList(string path, Dictionary<DName, List<EquationNameAndNumber>> combos, string settings_vars_foldername, string res, BrowserHelper bh)
         {
             List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();
             StringBuilder x2 = new StringBuilder();
@@ -2131,11 +2198,11 @@ img {border-style: none;
 
             foreach (DName var2 in vars)
             {
-                if (G.StartsWith(var2.ToString(), res)) continue;  //skip res_... variables.
+                if (G.StartsWith(var2.GetName(), res)) continue;  //skip res_... variables.
                 string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2.ToString()));
                 x2.Append("<tr>");
                 x2.Append("<td width = `20%`>");
-                x2.Append(HtmlLink(var2.ToString(), settings_vars_foldername + "/" + SimplerName(var2.ToString()) + ".html"));
+                x2.Append(HtmlLink(var2.ToString(bh.dNameFormat), settings_vars_foldername + "/" + SimplerName(var2.ToString()) + ".html"));
                 x2.Append("</td>");
                 x2.Append("<td width = `80%` style=`color:gray`>");
                 x2.Append(expl);
@@ -2143,7 +2210,7 @@ img {border-style: none;
                 x2.AppendLine("</tr>");
 
                 EquationBrowserHelper ebh = new EquationBrowserHelper();
-                ebh.s1 = var2.ToString();
+                ebh.s1 = var2.ToString(bh.dNameFormat);
                 if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
                 ebh.s2 = G.ReplaceWhitespaceWith1Blank(expl);
                 if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
@@ -2397,7 +2464,7 @@ img {border-style: none;
                         o0.prtType = "plot";
                         o0.opt_filename = "browser.svg";  //not used, but .svg indicates that .svg files are to be made                
                         O.Prt.Element ope0 = new O.Prt.Element();                        
-                        string label = kvp.Key.ToStringWithQuotes(Globals.greu);                        
+                        string label = kvp.Key.ToString(bh.dNameFormat);                        
                         ope0.labelGiven = new List<string>() { label + extra2 };
                         ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
@@ -2431,18 +2498,18 @@ img {border-style: none;
             if (Globals.runningOnTTComputer) new Writeln("TTH: Plots took: " + G.SecondsUtc(dt0));
         }
 
-        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, DName variableName, GekkoTime tUsedHere, BrowserHelper th)
+        private static string BrowserNewSelector(GekkoTime t1, Model model, ModelGamsScalar modelGamsScalar, DName variableName, GekkoTime tUsedHere, BrowserHelper bh)
         {
             List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false, true);
             StringBuilder html2 = new StringBuilder();
             html2.AppendLine("<div id = `no-hash` class=`content`>");            
             html2.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.
-            EquationBrowser.SpanHtmlColor(html2, variableName.ToStringWithQuotes(Globals.greu));
+            EquationBrowser.SpanHtmlColor(html2, variableName.ToString(bh.dNameFormat));
             html2.Append("</p>");
             //EquationBrowser.WriteHtmlColor(html2, variableName);
             EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName.ToString())));            
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
-            EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName.ToStringWithQuotes(Globals.greu) + ":");
+            EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName.ToString(bh.dNameFormat) + ":");
             string table = "<table cellpadding=`5`>";
             int count = -1;
             foreach (EqInfoSimple eqHelper in eqsNew)
@@ -2459,14 +2526,14 @@ img {border-style: none;
                 EquationTextHelper helper = new EquationTextHelper();
                 GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName.ToString() }, helper, tUsedHere);                
                 //string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(G.Chop_RemoveLagOrLead(eqHelper.eqNameWithLag)));
-                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToStringWithQuotes(Globals.greu), SimplerName(variableName.ToString()) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
+                string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(bh.dNameFormat), SimplerName(variableName.ToString()) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
                 if (count == 0) link ="<b>" + link + "</b>";
                 table += "<td style=`vertical-align:top`>";
                 table += link;
                 table += "</td>";
                 table += "<td style=`vertical-align:top`>";
                 string s = helper22.s_gamsOrFrnSyntax;
-                if (th.removeTx0Dollar) s = Tx0(s);
+                if (bh.removeTx0Dollar) s = Tx0(s);
                 table += "<pre><code>" +s + "</code></pre>";
                 table += "</td>";
                 table += "</tr>";

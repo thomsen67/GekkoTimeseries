@@ -366,6 +366,37 @@ namespace Gekko
         }
     }
 
+    public enum EDNameQuotes
+    {
+        Normal,
+        Quotes
+    }
+
+    public enum EDNameTime
+    {
+        None,
+        Last,
+        LastExceptLag0
+    }
+
+    public class DNameFormat
+    {
+        public EDNameQuotes format = EDNameQuotes.Normal;
+        public EDNameTime separateTime = EDNameTime.None;
+        public string separator = null;
+        
+        public DNameFormat() 
+        { 
+        }
+        
+        public DNameFormat(EDNameQuotes format, EDNameTime separateTime, string separator)
+        {
+            this.format = format;
+            this.separateTime = separateTime;
+            this.separator = separator;
+        }
+    }
+
     /// <summary>
     /// Has no frequency. May or may not have time
     /// </summary>
@@ -375,7 +406,7 @@ namespace Gekko
         private readonly int posName = 0; //hardcoded
         private readonly int posIndex = 1; //hardcoded
         [ProtoMember(1)]
-        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 1)
+        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 1)        
 
         public DName() : base() { } // Protobuf only
 
@@ -392,12 +423,14 @@ namespace Gekko
                     }
                     else
                     {
-                        if (this.timePosition != -1) new Error("Only 1 time element allowed for DName");
+                        if (this.HasTime()) new Error("Only 1 time element allowed for DName");
                         this.timePosition = i;                        
                     }
                 }
             }
         }
+
+        public static DNameFormat dNameFormatDefault = new DNameFormat();
 
         public string GetName()
         {
@@ -415,7 +448,7 @@ namespace Gekko
         private StringOrTime[] DeepCloneExceptFirstAndTime()
         {
             //Should be ok fast
-            if (this.timePosition == -1)
+            if (!this.HasTime())
             {
                 return this.DeepCloneExceptFirst();
             }
@@ -438,9 +471,15 @@ namespace Gekko
             return new DName(this.GetName(), this.DeepCloneExceptFirstAndTime());
         }
 
+        public bool HasTime() 
+        {
+            if (this.timePosition == -1) return false;
+            return true;
+        }
+
         public DName ConvertToLag(GekkoTime t)
         {
-            if (this.timePosition == -1) new Error("DName: cannot find time dimension to convert into lag/lead");
+            if (!this.HasTime()) new Error("DName: cannot find time dimension to convert into lag/lead");
             GekkoTime thisT = this.GetTime();
             int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
             StringOrTime[] elements = this.DeepCloneExceptFirst();
@@ -507,7 +546,7 @@ namespace Gekko
         /// <returns></returns>
         public GekkoTime GetTime()
         {
-            if (this.timePosition == -1) return GekkoTime.tNull;            
+            if (!this.HasTime()) return GekkoTime.tNull;            
             return this.Get(this.timePosition).GetTime();            
         }
 
@@ -522,27 +561,46 @@ namespace Gekko
 
         public override string ToString()
         {
-            return this.ToStringWithQuotes(false);
+            return this.ToString(DName.dNameFormatDefault);
         }
 
-        public string ToStringWithQuotes(bool quotes)
+        public string ToString(DNameFormat format)
         {
             if (this.IsNull()) return null;
             string name = this.Get(this.posName).GetString();
-            List<string> temp = new List<string>();
+            List<string> temp = new List<string>();            
             for (int i = this.posIndex; i < this.GetLength(); i++)
             {
                 string s = null;
-                StringOrTime sot = this.Get(i);
-                if (quotes && sot.IsString())
+                StringOrTime stringOrTime = this.Get(i);
+                if (format.separateTime != EDNameTime.None && stringOrTime.IsTime())
                 {
-                    s = "'" + sot.ToString() + "'";
+                    continue;
                 }
-                else s = sot.ToString();
+                if (format.format== EDNameQuotes.Quotes && stringOrTime.IsString())
+                {
+                    s = "'" + stringOrTime.ToString() + "'";
+                }
+                else s = stringOrTime.ToString();
                 if (s != null) temp.Add(s);
             }
-            if (temp.Count == 0) return name;
-            else return name + "[" + Stringlist.GetListWithCommas(temp, "") + "]";
+            string rv = null;
+            if (temp.Count == 0) rv = name;
+            else rv = name + "[" + Stringlist.GetListWithCommas(temp, format.separator) + "]";
+
+            if (this.HasTime() && (format.separateTime == EDNameTime.Last || format.separateTime == EDNameTime.LastExceptLag0))
+            {
+                GekkoTime t = this.GetTime();
+                if (format.separateTime == EDNameTime.LastExceptLag0 && t.freq == EFreq.Lag && t.super == 0)
+                {
+                    //ignore, so we do not get x[a,b][0] but x[a,b]
+                }
+                else
+                {
+                    rv += "[" + t.ToString() + "]";
+                }
+            }
+            return rv;
         }
 
         /// <summary>
