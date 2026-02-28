@@ -37,6 +37,7 @@ namespace Gekko
         public bool showTraces = true;
         public bool showOnly1DecompTable = false;
         public DNameFormat dNameFormat = new DNameFormat();
+        public int threads = Environment.ProcessorCount;  //Set to 1 for single-threaded
 
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
@@ -1547,8 +1548,9 @@ img {border-style: none;
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                     onlyHtml = true;
                     //bh.nMax = 4;
-                    bh.showOnly1DecompTable = false;
+                    bh.showOnly1DecompTable = true;
                     bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
+                    bh.threads = Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1637,13 +1639,6 @@ img {border-style: none;
             return;
         }
 
-        
-
-        private static void PerformHeavyCalculation(double[] data)
-        {
-            // Simulated 1-second work
-            System.Threading.Thread.Sleep(1000);
-        }
 
         private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, Dictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
@@ -1663,7 +1658,7 @@ img {border-style: none;
 
             DateTime dt1 = DateTime.UtcNow;
 
-            GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t1);
+            GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(t2.Add(Globals.decompPeriodDistanceFromEndPeriod));
 
             if (bh.type == EBrowserType.MakroIdentitiesText) { Identities(t1, bh, modelGamsScalar, res, tUsedHere); return; }
 
@@ -1672,63 +1667,33 @@ img {border-style: none;
             int count = 0;
 
             double lastMs = 0d;
+            //Dictionary<DName, TwoStrings> equationTextMemory = new Dictionary<DName, TwoStrings>(Multidim2Comparer.IgnoreCase); //scalar eqs take a bit of time to get in, because they are actually taken from C# code. Since the same equation is done many times, this spees things up.
+            ConcurrentDictionary<DName, TwoStrings> equationTextMemory = new ConcurrentDictionary<DName, TwoStrings>(Multidim2Comparer.IgnoreCase); //scalar eqs take a bit of time to get in, because they are actually taken from C# code. Since the same equation is done many times, this spees things up.
 
-            System.Diagnostics.Stopwatch stopWatch = System.Diagnostics.Stopwatch.StartNew();
-            TimeSpan reportInterval = TimeSpan.FromMinutes(1);
+            List<KeyValuePair<DName, List<EquationNameAndNumber>>> myData = new List<KeyValuePair<DName, List<EquationNameAndNumber>>>();
+            foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos) myData.Add(kvp);
+            var partitioner = Partitioner.Create(myData.Select((value, index) => new { Value = value, Index = index }));
+            var options = new ParallelOptions { MaxDegreeOfParallelism = bh.threads };
 
-            Dictionary<DName, TwoStrings> equationTextMemory = new Dictionary<DName, TwoStrings>(Multidim2Comparer.IgnoreCase); //scalar eqs take a bit of time to get in, because they are actually taken from C# code. Since the same equation is done many times, this spees things up.
-
-
-
-            List<double[]> myData = new List<double[]>();
-            for (int i = 0; i < 50; i++)
-            {
-                myData.Add(new double[] { 1.1, 2.2, 3.3 }); // Your actual data goes here
-            }
-
-            var indexedItems = myData.Select((value, index) => new { Value = value, Index = index });
-
-            // Use the IEnumerable cast to force one-by-one load balancing
-            var partitioner = Partitioner.Create(indexedItems);
-
-            var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+            int total = myData.Count;
+            Globals.browserCompleted = new ConcurrentDictionary<int, bool>();
+            Globals.browserWatermark = -1;
+            Globals.browserTimer = new System.Diagnostics.Stopwatch();
+            Globals.browserTimer.Start();
 
             Parallel.ForEach(partitioner, options, (item) =>
             {
-                // Access your data and index through the 'item' object
-                double sum = item.Value.Sum();
-                int idx = item.Index;
+                count = item.Index;
+                //new Writeln("--> Starting " + count);
 
-                // Now you can use 'idx' for your filename
-                new Writeln("Result " + idx + ", Sum " + sum);
+                if (count >= bh.nMax) { UpdateWatermark(item.Index, total); return; }
 
-                // Your 1-second heavy load
-                System.Threading.Thread.Sleep(1000);
-                new Writeln("Finished " + idx + ", Sum " + sum);
+                DName variableName = item.Value.Key;
+                if (ShouldSkip(bh, nodeNames, count, variableName)) { UpdateWatermark(item.Index, total); return; } //Change for plots too, if something changed here
+                List<EquationNameAndNumber> equations = item.Value.Value;
+                if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) { UpdateWatermark(item.Index, total); return; }
 
-            });
-
-
-
-
-            foreach (KeyValuePair<DName, List<EquationNameAndNumber>> kvp in combos)
-            {
-                count++;
-
-                if (count >= bh.nMax) break;
-
-                DName variableName = kvp.Key;
-                if (ShouldSkip(bh, nodeNames, count, variableName)) continue; //Change for plots too, if something changed here
-                List<EquationNameAndNumber> equations = kvp.Value;
-                if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) continue;
-
-                string fileName1 = SimplerName(variableName.ToString()) + ".html";
-
-                if (stopWatch.Elapsed >= reportInterval)
-                {
-                    new Writeln(" ========== " + count + " of " + combos.Count + " (" + G.FormatNumber((double)count / (double)combos.Count * 100d, "f10.2", false, false) + "%) ==========");
-                    stopWatch.Restart();
-                }
+                string fileName1 = SimplerName(variableName.ToString()) + ".html";                
 
                 StringBuilder html1 = new StringBuilder();
 
@@ -1738,7 +1703,7 @@ img {border-style: none;
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
-                    html1.Append("<p style=`font-size: 1.25rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.                    
+                    html1.Append("<p style=`font-size: 1.1rem;`>");  //rem is relative to the root of the whole html, em is relative to parent container.                    
                     EquationBrowser.SpanHtmlColor(html1, variableName.ToString(bh.dNameFormat));
                     html1.Append(" from equation ");
                     EquationBrowser.SpanHtmlColor(html1, equationHelper.name.ToString(bh.dNameFormat));
@@ -1749,18 +1714,17 @@ img {border-style: none;
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     // 
+                    
+                    TwoStrings two = equationTextMemory.GetOrAdd(equationHelper.name, (name) =>
+                    {
+                        // This code ONLY runs if the name is not found in the dictionary
+                        string localS5, localS6;
+                        GetEquationText(t1, bh, equationHelper, modelGamsScalar, tUsedHere, out localS5, out localS6);
+                        return new TwoStrings(localS5, localS6);
+                    });
+                    string s5 = two.s1;
+                    string s6 = two.s2;
 
-                    string s5, s6;
-                    TwoStrings two = null; equationTextMemory.TryGetValue(equationHelper.name, out two);
-                    if (two != null)
-                    {
-                        s5 = two.s1; s6 = two.s2;
-                    }
-                    else
-                    {
-                        GetEquationText(t1, bh, equationHelper, modelGamsScalar, tUsedHere, out s5, out s6);
-                        equationTextMemory.Add(equationHelper.name, new TwoStrings(s5, s6));
-                    }
                     html1.AppendLine("<br style=`line-height: 0.2rem;`>");
                     ToggleLink(html1, "Equation", "To see such equations in Gekko 3.x, you may use the following statements (or similar):");
                     html1.AppendLine("read &lt;gdx> forecast.gdx;");
@@ -1866,7 +1830,7 @@ img {border-style: none;
                     if (true) //print
                     {
                         Series ts = null;
-                        try { ts = O.GetIVariableFromString("work:" + kvp.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
+                        try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
                         if (ts != null)
                         {
                             html1.AppendLine("<p>");
@@ -2001,15 +1965,41 @@ img {border-style: none;
                     //        can be used. So if JavaScript with backticks is used, do a workaround.
                     sw.Write(x.Replace('`', '\"'));
                 }
-            }
+
+                UpdateWatermark(item.Index, total);
+                if (Globals.browserTimer.ElapsedMilliseconds > 1000)
+                {
+                    lock (Globals.browserTimer)
+                    {
+                        if (Globals.browserTimer.ElapsedMilliseconds > 1000) //double-checked locking
+                        {                            
+                            new Writeln(" ========== " + Globals.browserWatermark + "/" + total + " --> " + ((double)Globals.browserWatermark / total * 100d) + "%");
+                            Globals.browserTimer.Restart();
+                        }
+                    }
+                }
+
+            });
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Starting list");
             List<EquationBrowserHelper> vars2 = BrowserNewHtmlList(path, combos, settings_vars_foldername, res, bh);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Starting find");
             BrowserNewHtmlFind(path, settings_css_filename, settings_find_filename, vars2, bh);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Html took: " + G.SecondsUtc(dt1));            
+        }
 
-            return;
+        private static void UpdateWatermark(int i, int total)
+        {
+            Globals.browserCompleted.TryAdd(i, true);
+            // We look forward from the last known safe spot to see if the "hole" is filled
+            int next = Globals.browserWatermark + 1;
+            while (next < total && Globals.browserCompleted.ContainsKey(next))
+            {
+                // Interlocked not strictly needed here if only one thread moves the needle,
+                // but good practice.
+                System.Threading.Interlocked.Exchange(ref Globals.browserWatermark, next);
+                next++;
+            }
         }
 
         private static void BrowserNewHtmlFind(string path, string settings_css_filename, string settings_find_filename, List<EquationBrowserHelper> vars2, BrowserHelper bh)
@@ -2294,7 +2284,7 @@ img {border-style: none;
             if (Globals.greuHack)
             {
                 if (count > bh.maxPages) b = true;
-                else if (G.Equal(variableName.ToString(), "submodel_template_test_variable")) b = true; //why does it have 12.000 dependents?
+                else if (G.StartsWith(variableName.GetName(), "submodel_template_test_variable")) b = true; //why does it have 12.000 dependents?
                 else if (nodeNames.Count > 0 && !nodeNames.ContainsKey(variableName)) b = true;
             }
             return b;

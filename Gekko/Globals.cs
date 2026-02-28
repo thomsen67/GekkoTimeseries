@@ -27,6 +27,7 @@ using System.Windows;
 using System.Threading;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 
 namespace Gekko
 {
@@ -542,6 +543,10 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
+
+        public static ConcurrentDictionary<int, bool> browserCompleted = new ConcurrentDictionary<int, bool>();
+        public static int browserWatermark = -1;
+        public static System.Diagnostics.Stopwatch browserTimer = new System.Diagnostics.Stopwatch();
 
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
