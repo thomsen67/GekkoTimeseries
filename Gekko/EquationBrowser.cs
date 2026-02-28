@@ -1699,7 +1699,7 @@ img {border-style: none;
 
                 foreach (EquationNameAndNumber equationHelper in equations)
                 {
-                    html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-1` class=`content`>");
+                    html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-1` class=`content`>"); //#div 1 start
                     // ------------------------------------------------------
                     // TITLE
                     // ------------------------------------------------------
@@ -1774,19 +1774,16 @@ img {border-style: none;
                     }
                     html1.AppendLine("</table>");
                     // ------------------------------------------------------
-                    html1.Append("</div>");
+                    html1.Append("</div>"); //#div 1 end
                 }
 
                 if (true)
                 {
-                    html1.AppendLine("<div id = `hash-2` class=`content`>");
+                    html1.AppendLine("<div id = `hash-2` class=`content`>"); //#div 2 start
                     html1.Append("<br>");
                     EquationBrowser.WriteHtmlBold(html1, "Related variables");
                     string s8 = null;
-                    List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false, true);
-                    if (count == 3)
-                    {
-                    }
+                    List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false, true);                    
                     List<string> dependentVarsList = Program.FindDependentVars(variableName.ToString(), model, model.modelGams, modelGamsScalar, eqsContainingVariable);
                     bool first2 = true;
                     foreach (string s in dependentVarsList)
@@ -1799,46 +1796,41 @@ img {border-style: none;
                         first2 = false;
                     }
                     EquationBrowser.WriteHtml(html1, s8);
-                    html1.AppendLine("</div>");
+
+                    /*
+
+                    // ============ PLOT
+                                        
+                    html1.Append("<br>");
+                    ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
+                    html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                    html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                    html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
+                    html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
+                                                              //only plot the series from Work
+                    html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
+                    if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
+                    html1.AppendLine("<p>");
+
+                    // ============ PRINT
+
+                    Series ts = null;
+                    try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
+                    if (ts != null)
+                    {
+                        html1.AppendLine("<p>");
+                        HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
+                    }
+
+                    */
+
+                    html1.AppendLine("</div>"); //#div 2 end
                 }
 
-                if (true)
+                if (true) //For some reason, this needs to be here
                 {
-                    if (true) //plot
-                    {
-                        html1.AppendLine("<div id = `hash-1` class=`content`>");
-                        html1.Append("<br>");
-                        ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
-                        html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                        html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                        html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
-                        html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
-                    }
-
-                    try
-                    {
-                        //only plot the series from Work                        
-                        //Program.RunGekkoCommands("plot <" + t1.ToString() + " " + t2.ToString() + " > " + variableName + " file='" + path + variableName.ToLower() + ".svg';", "", 0, new P());
-                        html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
-                        if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
-                        html1.AppendLine("<p>");
-                    }
-                    catch
-                    {
-                    }
-
-                    if (true) //print
-                    {
-                        Series ts = null;
-                        try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
-                        if (ts != null)
-                        {
-                            html1.AppendLine("<p>");
-                            HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
-                        }
-                    }
-
-                    html1.AppendLine("</div>");
+                    html1.AppendLine("<div id = `hash-1` class=`content`>");
+                    html1.AppendLine("</div>"); //#div 2 end
                 }
 
                 List<EquationNameAndNumber> reduced = new List<EquationNameAndNumber>();
