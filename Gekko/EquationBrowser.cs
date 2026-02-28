@@ -1797,32 +1797,41 @@ img {border-style: none;
                     }
                     EquationBrowser.WriteHtml(html1, s8);
 
-                    /*
+                    
+
+
+
+
+
+
 
                     // ============ PLOT
                                         
-                    html1.Append("<br>");
-                    ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
-                    html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                    html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
-                    html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
-                                                              //only plot the series from Work
-                    html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
-                    if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
-                    html1.AppendLine("<p>");
+                    //html1.Append("<br>");
+                    //ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
+                    //html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                    //html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                    //html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
+                    //html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
+                    //                                          //only plot the series from Work
+                    //html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
+                    //if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
+                    //html1.AppendLine("<p>");
 
-                    // ============ PRINT
+                    //// ============ PRINT
 
-                    Series ts = null;
-                    try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
-                    if (ts != null)
-                    {
-                        html1.AppendLine("<p>");
-                        HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
-                    }
+                    //Series ts = null;
+                    //try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
+                    //if (ts != null)
+                    //{
+                    //    html1.AppendLine("<p>");
+                    //    HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
+                    //}
 
-                    */
+                    
+
+
+
 
                     html1.AppendLine("</div>"); //#div 2 end
                 }
