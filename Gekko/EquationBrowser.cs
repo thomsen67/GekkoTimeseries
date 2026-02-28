@@ -1550,7 +1550,7 @@ img {border-style: none;
                     //bh.nMax = 4;
                     bh.showOnly1DecompTable = true;
                     bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
-                    bh.threads = Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
+                    bh.threads = 1; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1842,7 +1842,7 @@ img {border-style: none;
                     html1.AppendLine("</div>"); //#div 2 end
                 }
 
-                List<EquationNameAndNumber> reduced = new List<EquationNameAndNumber>();
+                Dictionary<int, bool> reduced = new Dictionary<int, bool>();
                 DName bestEquation = null;
                 if (bh.showOnly1DecompTable)
                 {
@@ -1851,24 +1851,32 @@ img {border-style: none;
                     if (eqsNew.Count > 0) bestEquation = eqsNew[0].eqNameWithLag.RemoveTime(); //the DName we are comparing with does not have lags: here there is a lag = 0 probably always
                     foreach (EquationNameAndNumber equationHelper in equations)
                     {
-                        if (!bh.showOnly1DecompTable || (bestEquation != null && G.Equal(equationHelper.name, bestEquation)))
+                        if (bestEquation != null && G.Equal(equationHelper.name, bestEquation))
                         {
-                            reduced.Add(equationHelper);
+                            reduced.Add(equationHelper.i, false);
                             break;
                         }
                     }
                 }
-                else reduced.AddRange(equations);
+                else
+                {
+                    foreach (EquationNameAndNumber equationHelper in equations)
+                    {
+                        reduced.Add(equationHelper.i, false); //put all in
+                    }
+                }
 
-                foreach (EquationNameAndNumber equationHelper in reduced)
+
+                foreach (EquationNameAndNumber equationHelper in equations)
                 {
                     // ------------------------------------------------------
                     // EQUATIONS code and related variables
                     // ------------------------------------------------------
                     //Program.RunGekkoCommands("decomp <d> qbnp from e_qbnp endo qbnp;", "", 0, new P());                    
-                    if (true)
+
+                    html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
+                    if (reduced.ContainsKey(equationHelper.i))
                     {
-                        html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                         string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
                         if (table != null)
                         {
@@ -1885,9 +1893,9 @@ img {border-style: none;
                             html1.AppendLine(table);
                             html1.AppendLine("<p><span style=`color:gray;font-size:0.9rem`>" + "Note: The element names are without quotes and may appear without blanks etc. A star (*) indicates aggregation, and lags/leads are represented like [-1], [+1]." + "</span>");
                         }
-                        // ------------------------------------------------------
-                        html1.Append("</div>");
                     }
+                    // ------------------------------------------------------
+                    html1.Append("</div>");
                 }
 
                 if (bh.showTraces)
@@ -1949,7 +1957,7 @@ img {border-style: none;
                 }
 
                 StringBuilder x; string js;
-                BrowserNewCssAndJs(variableName.ToString(), bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, reduced, true, out x, out js);
+                BrowserNewCssAndJs(variableName.ToString(), bh.firstColWidth, bh.pixels, bh.pixelsAfterArrow, equations, reduced, true, out x, out js);
 
                 x.AppendLine("  <body>");
                 x.Append(LinkHome(true));
@@ -3422,12 +3430,15 @@ img {border-style: none;
             }
         }
 
-        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, List<EquationNameAndNumber> equations, bool levelUp, out StringBuilder x, out string js)
+        private static void BrowserNewCssAndJs(string variableName, int firstColWidth, int pixels, int pixelsAfterArrow, List<EquationNameAndNumber> equations, Dictionary<int, bool> reduced, bool levelUp, out StringBuilder x, out string js)
         {
             string s = null;
             foreach (EquationNameAndNumber equation in equations)
             {
-                s += "updateTable('#" + SimplerName(equation.name.ToString()) + "');" + G.NL;  //activate checkbox listeners for each decomp table
+                if (reduced.ContainsKey(equation.i))
+                {
+                    s += "updateTable('#" + SimplerName(equation.name.ToString()) + "');" + G.NL;  //activate checkbox listeners for each decomp table
+                }
             }
 
             string up = null;
