@@ -1090,7 +1090,7 @@ namespace Gekko
                             List<string> xx = c.vars_hack;
                             foreach (string s in xx)
                             {
-                                int a = -12345;  model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(s), out a);
+                                int a; if (!model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(s), out a)) a = -12345;
                                 if (a == -12345) continue;
 
                                 bool b1 = decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.Multiplier;

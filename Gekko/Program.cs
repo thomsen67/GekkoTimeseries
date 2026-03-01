@@ -18901,7 +18901,7 @@ namespace Gekko
                 string h1 = s3[i].ToString();
                 string h2 = s3[i + 1].ToString();
 
-                int i1 = -12345; int.TryParse(h1, out i1);
+                int i1; if (!int.TryParse(h1, out i1)) i1 = -12345;
                 if (i1 == -12345) new Error("Cannot parse " + h1 + " as an integer");
 
                 int i2 = -12345;

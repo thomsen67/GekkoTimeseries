@@ -1021,9 +1021,9 @@ namespace Gekko
                     string[] ss = null;
                     if (c1 == 2) ss = xtimestamp.Split('-');
                     else ss = xtimestamp.Split('/');
-                    int i0 = -12345; int.TryParse(ss[0], out i0);
-                    int i1 = -12345; int.TryParse(ss[1], out i1);
-                    int i2 = -12345; int.TryParse(ss[2], out i2);
+                    int i0; if (!int.TryParse(ss[0], out i0)) i0 = -12345;
+                    int i1; if (!int.TryParse(ss[1], out i1)) i1 = -12345;
+                    int i2; if (!int.TryParse(ss[2], out i2)) i2 = -12345;
                     if (i0 != -12345 && i1 != -12345 && i2 != -12345)
                     {
                         if (i2 >= 0 && i2 <= 99) i2 += 2000; //Gekko did not exist in year 19xx, so this should be safe regarding stamps.

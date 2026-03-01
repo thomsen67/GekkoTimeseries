@@ -481,7 +481,7 @@ namespace Gekko
 
                         DName inputName = helper.dict_FromVarNumberToVarName[id];
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
-                        int aNumber = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber);
+                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber)) aNumber = -12345;
                         if (aNumber == -12345)
                         {
                             if (Globals.greuHack) continue;
@@ -532,7 +532,7 @@ namespace Gekko
 
                     DName inputName = helper.dict_FromVarNumberToVarName[id];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
-                    int aNumber = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber);
+                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber)) aNumber = -12345;
                     if (aNumber == -12345)
                     {
                         new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
@@ -765,7 +765,7 @@ namespace Gekko
 
             if (tHere.IsNull()) tHere = modelGamsScalar.Maybe2000GekkoTime(modelGamsScalar.GetDecompT());
 
-            int aNumber = -12345;  modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
+            int aNumber; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber)) aNumber = -12345;
             if (aNumber == -12345)
             {
                 return rv;
@@ -2550,7 +2550,7 @@ namespace Gekko
                             i1 = helper2.time.Subtract(helper.tBasis);
                         }
 
-                        int i2 = -12345; helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out i2);
+                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out i2)) i2 = -12345;
 
                         int ii1 = helper.endo.Count;
                         int ii2 = helper.endo.Count + 1;

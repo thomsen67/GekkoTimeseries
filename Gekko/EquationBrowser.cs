@@ -1547,10 +1547,10 @@ img {border-style: none;
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                     onlyHtml = true;
-                    //bh.nMax = 4;
-                    bh.showOnly1DecompTable = true;
                     bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
-                    bh.threads = 1; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
+                    //bh.nMax = 4;
+                    bh.showOnly1DecompTable = true;                    
+                    bh.threads = 12; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1689,6 +1689,12 @@ img {border-style: none;
                 if (count >= bh.nMax) { UpdateWatermark(item.Index, total); return; }
 
                 DName variableName = item.Value.Key;
+
+                if (!G.Equal(variableName.GetName(), "qc"))
+                {
+                    UpdateWatermark(item.Index, total); return;
+                }
+
                 if (ShouldSkip(bh, nodeNames, count, variableName)) { UpdateWatermark(item.Index, total); return; } //Change for plots too, if something changed here
                 List<EquationNameAndNumber> equations = item.Value.Value;
                 if (restrict.Count > 0 && !restrict.ContainsKey(variableName)) { UpdateWatermark(item.Index, total); return; }
@@ -1797,41 +1803,28 @@ img {border-style: none;
                     }
                     EquationBrowser.WriteHtml(html1, s8);
 
-                    
-
-
-
-
-
-
-
                     // ============ PLOT
-                                        
-                    //html1.Append("<br>");
-                    //ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
-                    //html1.AppendLine("read &lt;gdx> forecast.gdx;");
-                    //html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
-                    //html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
-                    //html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
-                    //                                          //only plot the series from Work
-                    //html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
-                    //if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
-                    //html1.AppendLine("<p>");
 
-                    //// ============ PRINT
+                    html1.Append("<br>");
+                    ToggleLink(html1, "Plot", "To see this plot in Gekko 3.x, you may use the following statements (or similar):");
+                    html1.AppendLine("read &lt;gdx> forecast.gdx;");
+                    html1.AppendLine("time " + t1.ToString() + " " + t2.ToString() + ";");
+                    html1.AppendLine("plot " + variableName.ToString(bh.dNameFormat) + "; //plot&lt;p> for growth");
+                    html1.AppendLine("</code></pre></div>");  //must end the ToggleLink()
+                                                              //only plot the series from Work
+                    html1.AppendLine("<img style = `max-width: 425px;` src = `" + SimplerName(variableName.ToString()) + ".svg" + "`>");
+                    if (bh.plotTypes == 2) html1.AppendLine("<img style=`" + "margin-left: 50px; max-width: 425px;" + "` src = `" + SimplerName(variableName.ToString()) + "__p.svg" + "`>");
+                    html1.AppendLine("<p>");
 
-                    //Series ts = null;
-                    //try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
-                    //if (ts != null)
-                    //{
-                    //    html1.AppendLine("<p>");
-                    //    HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
-                    //}
+                    // ============ PRINT
 
-                    
-
-
-
+                    Series ts = null;
+                    try { ts = O.GetIVariableFromString("work:" + item.Value.Key.ToString(bh.dNameFormat), O.ECreatePossibilities.NoneReturnNullAlways) as Series; } catch { }
+                    if (ts != null)
+                    {
+                        html1.AppendLine("<p>");
+                        HtmlPrintVariable(variableName.ToString(bh.dNameFormat), 0, t1, t2, "", "", modelFrequencyString, html1, ts, null, false);
+                    }
 
                     html1.AppendLine("</div>"); //#div 2 end
                 }
