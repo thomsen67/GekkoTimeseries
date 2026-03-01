@@ -1137,6 +1137,10 @@ namespace Gekko
             bool b = false; // G.Equal(Program.options.decomp_equation_style, "gams");
             foreach (PeriodAndVariable dp in this.precedents[eqNumber].vars)
             {
+                if (Globals.greuHack && dp.variable == -12345)
+                {
+                    continue; //Some vars with " in element names (E_qCO2e_BU_energy_Corp_es_e_i["energy_Corp",heating,Other oil products,01011]). Should be handled with DName etc. later on
+                }
                 //see also #as7f3læaf9                
                 Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod(this);
                 string name2 = null;

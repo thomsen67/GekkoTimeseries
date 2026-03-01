@@ -1543,17 +1543,17 @@ img {border-style: none;
                         if (!s.StartsWith("header_")) s2 = s2.Replace("_GreenREFORM", "");
                         string dest = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s2;
                         if (!File.Exists(dest)) File.Copy(@"c:\Tools\Xxx\" + s, dest);
-                    }                    
+                    }
+                    flush = true; //ultra safety!
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
-                    Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model <%t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model < %t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                     onlyHtml = true;
                     bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
                     //bh.nMax = 4;
                     bh.showOnly1DecompTable = true;                    
                     bh.threads = 12; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
                     bh.decompOffset = 1;
-
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1693,7 +1693,15 @@ img {border-style: none;
 
                 DName variableName = item.Value.Key;
 
-                //if (!G.Equal(variableName.GetName(), "pc"))
+                if (!G.Equal(variableName.GetName(), "pc"))
+                {
+                    UpdateWatermark(item.Index, total); return;
+                }
+
+                //if (G.StartsWith(variableName.ToString(), "pc") || G.StartsWith(variableName.ToString(), "qc"))
+                //{
+                //}
+                //else
                 //{
                 //    UpdateWatermark(item.Index, total); return;
                 //}
