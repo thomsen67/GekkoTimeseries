@@ -2011,7 +2011,7 @@ namespace Gekko
                                 break;
                             }
                         }
-                        if (!nan)
+                        if (!nan && !Globals.greuHack) //For GREU, the matrix is just == 0
                         {
                             string extra = null;
                             if (CheckIfEverythingIsZero(mEndo2)) extra = " Note that the " + mEndo2.GetLength(0) + " x " + mEndo2.GetLength(1) + " Jacobian matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not affect the equation(s), and hence the effects cannot be calculated.";
@@ -3806,7 +3806,7 @@ namespace Gekko
                 rowIndexes.Add(frame.frameDimensionNames["lhs"]);
                 colIndexes.Add(frame.frameDimensionNames["time"]);
             }
-
+            
             Dictionary<string, Dictionary<string, AggContainer>> pivotTable = GekkoPivotTable.Compute(frame, rowIndexes, colIndexes, agg, decompOptions2, filter, group);
 
             decompOptions2.all.Clear();

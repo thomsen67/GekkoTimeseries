@@ -38,6 +38,7 @@ namespace Gekko
         public bool showOnly1DecompTable = false;
         public DNameFormat dNameFormat = new DNameFormat();
         public int threads = Environment.ProcessorCount;  //Set to 1 for single-threaded
+        public int decompOffset = 0;
 
         // ---
         public EquationBrowser.EBrowserType type = EquationBrowser.EBrowserType.Makro;
@@ -1551,6 +1552,8 @@ img {border-style: none;
                     //bh.nMax = 4;
                     bh.showOnly1DecompTable = true;                    
                     bh.threads = 12; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
+                    bh.decompOffset = 1;
+
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
                 {
@@ -1614,7 +1617,7 @@ img {border-style: none;
             if (onlyHtml && onlyPlot) new Error("Hov");
             if (onlyHtml)
             {
-                BrowserNewHtml(t1, t2, path, restrict, nodeNames, combos, bh, model, modelGamsScalar);
+                BrowserNewHtml(t1, t2, bh.decompOffset, path, restrict, nodeNames, combos, bh, model, modelGamsScalar);
             }
             else if (onlyPlot)
             {
@@ -1622,7 +1625,7 @@ img {border-style: none;
             }
             else
             {
-                BrowserNewHtml(t1, t2, path, restrict, nodeNames, combos, bh, model, modelGamsScalar);
+                BrowserNewHtml(t1, t2, bh.decompOffset, path, restrict, nodeNames, combos, bh, model, modelGamsScalar);
                 BrowserNewPlots(combos, path, restrict, nodeNames, bh);
             }
 
@@ -1640,7 +1643,7 @@ img {border-style: none;
         }
 
 
-        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, Dictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
+        private static void BrowserNewHtml(GekkoTime t1, GekkoTime t2, int decompAdd, string path, Dictionary<DName, bool> restrict, Dictionary<DName, DName> nodeNames, Dictionary<DName, List<EquationNameAndNumber>> combos, BrowserHelper bh, Model model, ModelGamsScalar modelGamsScalar)
         {
             //FIXME
             //FIXME
@@ -1690,10 +1693,10 @@ img {border-style: none;
 
                 DName variableName = item.Value.Key;
 
-                if (!G.Equal(variableName.GetName(), "qc"))
-                {
-                    UpdateWatermark(item.Index, total); return;
-                }
+                //if (!G.Equal(variableName.GetName(), "pc"))
+                //{
+                //    UpdateWatermark(item.Index, total); return;
+                //}
 
                 if (ShouldSkip(bh, nodeNames, count, variableName)) { UpdateWatermark(item.Index, total); return; } //Change for plots too, if something changed here
                 List<EquationNameAndNumber> equations = item.Value.Value;
@@ -1840,7 +1843,7 @@ img {border-style: none;
                 if (bh.showOnly1DecompTable)
                 {
                     //This runs ok fast now, for GREU
-                    List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t1, model, false, false, true);
+                    List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, t2.Add(Globals.decompPeriodDistanceFromEndPeriod), model, false, false, true);
                     if (eqsNew.Count > 0) bestEquation = eqsNew[0].eqNameWithLag.RemoveTime(); //the DName we are comparing with does not have lags: here there is a lag = 0 probably always
                     foreach (EquationNameAndNumber equationHelper in equations)
                     {
@@ -1870,7 +1873,7 @@ img {border-style: none;
                     html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                     if (reduced.ContainsKey(equationHelper.i))
                     {
-                        string table = BrowserDecompTable(t1, t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
+                        string table = BrowserDecompTable(t1.Add(decompAdd), t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
                         if (table != null)
                         {
                             html1.AppendLine("<br>");
@@ -2602,8 +2605,33 @@ img {border-style: none;
                         int funcCounter = 0;
                         DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
-                        decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-                        DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+                        decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;                                                
+
+                        if (true)
+                        {
+                            ////#kkkasafasf7 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                            //qwerty make this a method and get it in like a method (take from decompMain). Also integrate into flowgraph.
+                            int parentI = 0;
+                            int deduct = 0;
+                            //why deduct not enough??
+                            if (decompOptions2.decompOperator.isDoubleDifQuo || decompOptions2.decompOperator.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                            bool refreshObjects = true;
+                            foreach (GekkoTime gt in new GekkoTimeIterator(gt1.Add(deduct), gt2))
+                            {
+                                Decomp.DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
+                                refreshObjects = false;
+                            }
+                        }
+
+                        DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
+                        DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
 
                         Table decompTable = decompOutput.table;
 

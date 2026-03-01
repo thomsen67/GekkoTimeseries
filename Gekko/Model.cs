@@ -1515,7 +1515,7 @@ namespace Gekko
 
             for (int i = 0; i < this.CountVars(2); i++)
             {
-                string name = this.dict_FromANumberToVarName[i].ToString();
+                string name = this.dict_FromANumberToVarName[i].ToString(); //#kkkasafasf7 qwerty, the DatabankAHelperScalarModel() could just use the DName directly 
 
                 if (Globals.greuHack && name.Contains("'")) continue;
 

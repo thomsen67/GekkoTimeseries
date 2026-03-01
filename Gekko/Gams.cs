@@ -514,7 +514,8 @@ namespace Gekko
             int hasReadSomeData = 0;
 
             if (Program.options.model_gams_scalar_data)
-            {                
+            {
+                if (Globals.runningOnTTComputer) MessageBox.Show("Beware: read scalar model data");
                 //Read data from the scalar model (gams.gms)
                 foreach (string line in values)
                 {                    
@@ -726,8 +727,9 @@ namespace Gekko
             modelGamsScalar.hasReadSomeData = hasReadSomeData;
 
             if (Program.options.model_gams_scalar_data && modelGamsScalar.hasReadSomeData > 0)  //don't do if no data was found in scalar model
-            {                
+            {
                 //modelGamsScalar.a = helper.a; --> not necessary, is already so.
+                if (Globals.runningOnTTComputer) MessageBox.Show("Beware: scalar model data handled A");
                 modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);                
             }
 
@@ -2825,7 +2827,8 @@ namespace Gekko
                 modelGamsScalar.aTemp = null;
                 if (Program.options.model_gams_scalar_data && modelGamsScalar.hasReadSomeData > 0)  //don't do if no data was found in scalar model
                 {
-                    //Get these modelGamsScalar.a values into databank                    
+                    //Get these modelGamsScalar.a values into databank
+                    if (Globals.runningOnTTComputer) MessageBox.Show("Beware: scalar model data handled B");
                     modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
                 }
 
