@@ -1552,7 +1552,7 @@ img {border-style: none;
                     bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
                     //bh.nMax = 4;
                     bh.showOnly1DecompTable = true;                    
-                    bh.threads = 1; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
+                    bh.threads = 12; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
                     bh.decompOffset = 1;
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
