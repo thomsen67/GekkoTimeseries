@@ -1400,15 +1400,14 @@ namespace Gekko
 
     public class DecompDict
     {
-        public GekkoDictionary<string, Series> storage = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
-
+        public GekkoDictionary<DName, Series> storage = new GekkoDictionary<DName, Series>(Multidim2Comparer.IgnoreCase);
 
         /// <summary>
         /// Queries DecompDict. If series not there, it is created.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public Series this[string s]
+        public Series this[DName s]
         {            
             get
             {                
@@ -1427,17 +1426,17 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <param name="ts"></param>
-        public void Add(string s, Series ts)
+        public void Add(DName s, Series ts)
         {
             this.storage.Add(s, ts);
         }
 
-        public bool Remove(string s)
+        public bool Remove(DName s)
         {
             return storage.Remove(s);
         }
 
-        public bool ContainsKey(string s)
+        public bool ContainsKey(DName s)
         {
             return storage.ContainsKey(s);
         }
@@ -1445,10 +1444,10 @@ namespace Gekko
         public DecompDict DeepClone()
         {
             DecompDict dd = new DecompDict();
-            foreach (KeyValuePair<string, Series> kvp in this.storage)
+            foreach (KeyValuePair<DName, Series> kvp in this.storage)
             {
                 if (kvp.Value == null) dd.storage.Add(kvp.Key, null);
-                else dd.storage.Add(kvp.Key, kvp.Value.DeepClone(0, null, null) as Series);
+                else dd.storage.Add(kvp.Key, kvp.Value.DeepClone(0, null, null) as Series); //The DName keys are immutable!
             }
             return dd;
         }

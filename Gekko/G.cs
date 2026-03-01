@@ -77,6 +77,46 @@ namespace Gekko
             //return (string.Compare(s1, s2, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
+        /// <summary>
+        /// True if at least one element is EqualHandleBlanks(). Practical to see if "x[a, b]" is 
+        /// contained in the list ("x[a,b]", ...).
+        /// </summary>
+        /// <param name="name1"></param>
+        /// <param name="names2"></param>
+        /// <returns></returns>
+        public static bool Equal(DName name1, List<DName> names2)
+        {
+            string rv = null;
+            foreach (DName s2 in names2)
+            {
+                if (G.Equal(name1, s2))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Case-insensitive pairwise compare of two lists of strings. Returns false if either list is null, or if different number of elements.
+        /// </summary>
+        /// <param name="names1"></param>
+        /// <param name="names2"></param>
+        /// <returns></returns>
+        public static bool Equal(List<DName> names1, List<DName> names2)
+        {
+            if (names1 == null || names2 == null) return false;
+            if (names1.Count != names2.Count) return false;            
+            for (int i = 0; i < names1.Count; i++)
+            {
+                if (!G.Equal(names1[i], names2[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static bool Equal(DName name1, DName name2)
         {            
             Multidim2Comparer comparer = Multidim2Comparer.IgnoreCase;            

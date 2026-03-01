@@ -31,12 +31,12 @@ namespace Gekko
     /// </summary>
     public class ChopFullVariableName
     {
-        public string varName;
-        public string fullName;
-        public string lag;
-        public string[] indexes;
+        //public string varName;
+        public DName fullName;
+        //public string lag;
+        //public string[] indexes;
         public string[] domains;
-        public int iLag;
+        //public int iLag;
         public bool isLhs;
     }
 
@@ -71,7 +71,8 @@ namespace Gekko
         public DecompDict cellsChangeM = null;
         // -------------------------------------
 
-        public string lhs = null;  //name of the LHS variable, for instance "Work:y2¤[0]
+        //public string lhs = null;  //name of the LHS variable, for instance "Work:y2¤[0]
+        public DName lhs = null;
 
         public DecompData DeepClone()
         {
@@ -741,12 +742,13 @@ namespace Gekko
             foreach (DecompItems liv in o.decompItems)
             {
                 //
-                List<string> x1 = O.Restrict(liv.varnames as List, false, true, false, true);
-                List<string> x2 = O.Restrict(liv.eqname as List, false, true, false, false);
+                List<DName> x1 = DName.HACK1(O.Restrict(liv.varnames as List, false, true, false, true));
+                List<DName> x2 = DName.HACK1(O.Restrict(liv.eqname as List, false, true, false, false));
                 Link temp = new Link();
                 if (x1 != null)
                 {
-                    temp.varnames = G.HandleBlanksRemove(x1[0]);
+                    //temp.varnames = G.HandleBlanksRemove(x1[0]);
+                    temp.varnames = x1[0];
                 }
                 if (x2 != null) temp.eqname = x2[0];
                 temp.expressions = new List<Func<GekkoSmpl, IVariable>>() { liv.expression };
@@ -763,10 +765,10 @@ namespace Gekko
                 //       the for instance e1[a] by GekkoTime, so it can call
                 //       e1[a][2001a1], e1[a][2002a1], etc.
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
-                
-                if (o.select.Count > 0) decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
-                if (o.from.Count > 0) decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);
-                if (o.endo.Count > 0) decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+
+                if (o.select.Count > 0) decompOptions2.new_select = DName.HACK1(O.Restrict(o.select[0] as List, false, false, false, true));
+                if (o.from.Count > 0) decompOptions2.new_from = DName.HACK1(O.Restrict(o.from[0] as List, false, false, false, true));
+                if (o.endo.Count > 0) decompOptions2.new_endo = DName.HACK1(O.Restrict(o.endo[0] as List, false, false, false, true));
 
                 bool handleAsGekko = isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp);
                 HandleFromAndEndo(decompOptions2, handleAsGekko, isGamsRaw);
@@ -777,36 +779,37 @@ namespace Gekko
                     {
                         if (o.from.Count == 0)
                         {
-                            decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
+                            decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].HACK_Prefix(Globals.decompGekkoEquationPrefix) };
                             if (decompOptions2.new_endo == null || decompOptions2.new_endo.Count == 0)
                             {
-                                decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                                decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                             }
                         }
                         else
                         {
-                            decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);
-                            decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                            decompOptions2.new_from = DName.HACK1(O.Restrict(o.from[0] as List, false, false, false, true));
+                            decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                         }
                     }
                     else
                     {
-                        decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.                                    
+                        decompOptions2.new_from = DName.HACK1(O.Restrict(o.from[0] as List, false, false, false, true));  //eqs may be e[a, b] etc.                                    
                         if (decompOptions2.new_from != null && decompOptions2.new_from.Count == 1 && o.endo.Count == 0)
                         {
                             //For something like "decomp y from e_y ..." we do not need to write "decomp y from e_y endo y ..."
-                            decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                            decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                         }
                         else
                         {
-                            decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+                            decompOptions2.new_endo = DName.HACK1(O.Restrict(o.endo[0] as List, false, false, false, true));
                         }
                     }
                 }
 
-                for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
-                for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
-                for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
+                //Not necessary anymore! :-)
+                //for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
+                //for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
+                //for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
 
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
@@ -815,15 +818,15 @@ namespace Gekko
                 else
                 {
                     int counter = -1;
-                    foreach (string s in decompOptions2.new_from)
+                    foreach (DName s in decompOptions2.new_from)
                     {
                         counter++;
                         Link link = new Link();
                         link.eqname = s;
                         if (counter == 0)
                         {
-                            link.endo = new List<string>();
-                            foreach (string s10 in decompOptions2.new_endo)
+                            link.endo = new List<DName>();
+                            foreach (DName s10 in decompOptions2.new_endo)
                             {
                                 link.endo.Add(s10);
                             }
@@ -833,7 +836,7 @@ namespace Gekko
                         else
                         {
                             //is this still necessary?
-                            link.varnames = "<not used>"; //strange but necessary further on
+                            link.varnames = new DName(); //empty. Old: "<not used>"; //strange but necessary further on
                         }
                         link.expressions = new List<Func<GekkoSmpl, IVariable>>();
                         link.expressions.Add(null); //strange but necessary further on
@@ -900,7 +903,7 @@ namespace Gekko
                 if (decompOptions2.new_from.Count > 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_from.Count != decompOptions2.new_endo.Count) new Error("DECOMP: The number of elements in FROM and ENDO must match");
             }
             if (decompOptions2.new_from.Count == 0 && decompOptions2.new_endo.Count > 0 && decompOptions2.new_endo.Count != 1) new Error("DECOMP: You must provide 1 ENDO variable");
-            if (decompOptions2.new_endo.Count > 0 && !G.EqualHandleBlanks(decompOptions2.new_select[0], decompOptions2.new_endo)) new Error("DECOMP: The decomp variable must be one of the ENDO variables");
+            if (decompOptions2.new_endo.Count > 0 && !G.Equal(decompOptions2.new_select[0], decompOptions2.new_endo)) new Error("DECOMP: The decomp variable must be one of the ENDO variables");
 
             if (decompOptions2.new_from.Count == 0)
             {
@@ -910,8 +913,8 @@ namespace Gekko
                     if (handleAsGekko)
                     {
                         //Becomes: decomp y from e_y endo y
-                        decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
-                        decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                        decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].HACK_Prefix(Globals.decompGekkoEquationPrefix) };
+                        decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                     }
                     else
                     {
@@ -932,7 +935,7 @@ namespace Gekko
                     if (decompOptions2.new_from.Count == 1)
                     {
                         //Becomes: decomp y from e_y endo y
-                        decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                        decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                     }
                     else
                     {
@@ -958,7 +961,7 @@ namespace Gekko
         /// <param name="element"></param>
         /// <param name="type"></param>
         /// <param name="doubleDif"></param>
-        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimElement mmi, DecompStartHelper element, DecompOperator op, bool showErrors, ModelGamsScalar modelGamsScalar)
+        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, DName s, DName equationName, MultidimElement mmi, DecompStartHelper element, DecompOperator op, bool showErrors, ModelGamsScalar modelGamsScalar)
         {
             int deduct = op.lagGradient[0];
             if (op.isRaw) deduct = op.lagData[0];
@@ -999,10 +1002,16 @@ namespace Gekko
                 //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
                 //
 
-                string s2 = G.Chop_DimensionAddLast(s, time.ToString(), null);
+                //string s2 = G.Chop_DimensionAddLast(s, time.ToString(), null);
 
-                int eqNumber; 
-                if(!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(s2), out eqNumber))                
+                List<StringOrTime> xxx = new List<StringOrTime>();
+                foreach (string xx in s.HACK_IndexesWithoutTime()) xxx.Add(xx);
+                xxx.Add(time);
+                DName s2 = new DName(s.GetName(), xxx.ToArray());
+
+                int eqNumber;
+                //if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(s2), out eqNumber))
+                if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber))                
                 {
                     string s3 = null;
                     try
@@ -1063,7 +1072,7 @@ namespace Gekko
             EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
 
             int perLag = -2;
-            string lhsString = "Expression value";
+            DName lhsString = new DName("Expression value");
             int parentI = 0;
 
             //MAIN varnames are: decompOptions2.link[parentI].varnames
@@ -1131,7 +1140,7 @@ namespace Gekko
             if (decompOptions2.link[parentI].varnames == null)
             {
                 //does this ever happen?
-                decompOptions2.link[parentI].varnames = Globals.decompResidualName;
+                decompOptions2.link[parentI].varnames = new DName(Globals.decompResidualName, new StringOrTime[] { });
             }
 
             if (false)
@@ -1250,7 +1259,8 @@ namespace Gekko
             }
             else
             {
-                decompOutput = Decomp_OLD.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+                new Error("Old decomp not supported anymore");
+                //decompOutput = Decomp_OLD.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             }
 
             if (false)
@@ -1369,19 +1379,19 @@ namespace Gekko
         {
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimElement, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimElement, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
-            foreach (string s in decompOptions2.new_from)
+            foreach (DName s in decompOptions2.new_from)
             {
-                int n = s.Count(c => c == '[');
+                //int n = s.Count(c => c == '[');
+                //if (n > 2) new Error("More than two '[' encountered in equation name");
 
-                if (n > 2) new Error("More than two '[' encountered in equation name");
+                //string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
+                //G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
 
-                string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
-
-                G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
-
-                if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");
+                //if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");
 
                 //string sWithoutLagsLeads = s;
+
+                /*
                 int i = 0;
                 if (indexes2 != null)
                 {
@@ -1409,6 +1419,7 @@ namespace Gekko
                 string sWithoutLagsLeads = name;
                 if (indexes1 != null) sWithoutLagsLeads += "[" + Stringlist.GetListWithCommas(indexes1, "") + "]";
                 if (indexes2 != null) sWithoutLagsLeads += "[" + Stringlist.GetListWithCommas(indexes2, "") + "]";
+                */
 
                 //if (indexes1 == null) indexes1 = new string[0];  //a null array is standard way of saying "no indexes", like x having no dimensions unlike x[a,b].
                 //For each equation stated
@@ -1417,32 +1428,35 @@ namespace Gekko
                 //ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
 
                 Dictionary <MultidimElement, DecompStartHelper> elements = null;
-                equations.TryGetValue(name, out elements);
+                equations.TryGetValue(s.GetName(), out elements);
                 if (elements == null)
                 {
                     elements = new Dictionary<MultidimElement, DecompStartHelper>();
-                    equations.Add(name, elements);
+                    equations.Add(s.GetName(), elements);
                 }
 
-                MultidimElement mmi = new MultidimElement(indexes1 == null ? new string[0] : indexes1);
+                MultidimElement mmi = new MultidimElement(s.HACK_IndexesWithoutTime().ToArray());
                 DecompStartHelper element = null;
                 elements.TryGetValue(mmi, out element);
                 if (element == null)
                 {
                     element = new DecompStartHelper();
-                    element.name = name;
-                    element.indexes = mmi;
-                    //
-                    // TODO: add [-1] or [+1] ???
-                    //                    
-                    element.fullName = element.name + element.indexes.GetName();
+                    //element.name = name;
+                    //element.indexes = mmi;
+                    ////
+                    //// TODO: add [-1] or [+1] ???
+                    ////                    
+                    //element.fullName = element.name + element.indexes.GetName();
+                    element.fullName = s;
                     int periods = GekkoTime.Observations(modelGamsScalar.absoluteT1, modelGamsScalar.absoluteT2);
                     if (modelGamsScalar.isPerpetualModel) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
-                    element.offset = i;
+                    if (s.GetTime().freq != EFreq.Lag) new Error("Expected lag");
+                    element.offset = s.GetTime().super; //Should be a lag. Should it be with a minus??
                     elements.Add(mmi, element);
                 }
-                FindEquationsForEachRelevantPeriod(per1, per2, sWithoutLagsLeads, name, mmi, element, operator1, showErrors, modelGamsScalar);
+                //FindEquationsForEachRelevantPeriod(per1, per2, sWithoutLagsLeads, name, mmi, element, operator1, showErrors, modelGamsScalar);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, s, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
             int counter = -1;
@@ -1481,8 +1495,8 @@ namespace Gekko
                 {
                     if (decompOptions2.new_endo != null)
                     {
-                        link.endo = new List<string>();
-                        foreach (string s10 in decompOptions2.new_endo)
+                        link.endo = new List<DName>();
+                        foreach (DName s10 in decompOptions2.new_endo)
                         {
                             link.endo.Add(s10);
                         }
@@ -1496,7 +1510,7 @@ namespace Gekko
                 else
                 {
                     //is this still necessary?                    
-                    link.varnames = "<not used>"; //strange but necessary further on
+                    link.varnames = new DName("<not used>"); //strange but necessary further on
                 }
 
                 decompOptions2.link.Add(link);
@@ -1505,21 +1519,23 @@ namespace Gekko
 
         private static void DecompMainHelperInvert(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, Model model)
         {
-            GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            foreach (string s in decompOptions2.link[0].endo)
+            //GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<DName, int> endo = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
+            foreach (DName s in decompOptions2.link[0].endo)
             {
-                string s2 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
+                //string s2 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
+                DName s2 = s.HACK_AddIndex(new GekkoTime(EFreq.Lag, 0));
                 if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
             }
 
             DecompCheckNumberOfEqsAndEndo(decompDatas, endo);
 
-            GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<DName, int> exo = new GekkoDictionary<DName, int>(Multidim2Comparer.IgnoreCase);
             for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
             {
                 for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
                 {
-                    foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
+                    foreach (KeyValuePair<DName, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
                     {
                         if (exo.ContainsKey(kvp.Key) || endo.ContainsKey(kvp.Key))
                         {
@@ -1575,7 +1591,7 @@ namespace Gekko
                     for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
                     {
                         row++;
-                        foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
+                        foreach (KeyValuePair<DName, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
                         {
                             double d = kvp.Value.GetDataSimple(t);
                             if (endo.ContainsKey(kvp.Key))
@@ -1677,7 +1693,7 @@ namespace Gekko
 
                 int varnamesCounter = -1;
 
-                string s = decompOptions2.link[parentI].varnames;
+                DName s = decompOptions2.link[parentI].varnames;
 
                 if (true)
                 {
@@ -1739,15 +1755,22 @@ namespace Gekko
 
             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
             {
-                foreach (string s in decompOptions2.link[0].endo)
+                foreach (DName s in decompOptions2.link[0].endo)
                 {
                     //Transforms from for instance Work:x¤[+1] into Work:x¤[2002].
-                    string x = DecompFirst() + ":" + ConvertToTurtleName(s, 0, t);
-                    if (!endo.ContainsKey(DName.HACK1(x)))
+                    //string x = DecompFirst() + ":" + ConvertToTurtleName(s, 0, t);
+                    //if (!endo.ContainsKey(DName.HACK1(x)))
+                    //{
+                    //    int c = endo.Count();
+                    //    endo.Add(DName.HACK1(x), c);
+                    //    endoReverse.Add(c, DName.HACK1(x));
+                    //}
+                    DName x = s.HACK_AddIndex(new GekkoTime(EFreq.Lag, 0));
+                    if (!endo.ContainsKey(x))
                     {
                         int c = endo.Count();
-                        endo.Add(DName.HACK1(x), c);
-                        endoReverse.Add(c, DName.HACK1(x));
+                        endo.Add(x, c);
+                        endoReverse.Add(c, x);
                     }
                 }
             }            
@@ -2078,11 +2101,13 @@ namespace Gekko
                 // The period of the variable is not checked/matched at all (only the name), 
                 // but that is perhaps not
                 // necessary, since the period has already been filtered by the DECOMP time period.
-                GekkoTime gtNotUsed; string name;                
-                DName dn0 = endoReverse[row]; 
-                name = "Work:" + dn0.HACK_ToStringWithoutTime();
+                GekkoTime gtNotUsed; DName name;                
+                DName dn0 = endoReverse[row];
+                //name = "Work:" + dn0.HACK_ToStringWithoutTime();
+                name = dn0.HACK_RemoveTime();
                 gtNotUsed = dn0.GetTime();
-                if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
+                //if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
+                if (!decompOptions2.new_select.Contains(name)) continue;
 
                 for (int col = 0; col < exo.Count(); col++)
                 {                 
@@ -2392,10 +2417,10 @@ namespace Gekko
             MergeDecompDict(dd.cellsRef, decompDatas.storage[ii][jj].cellsRef);
         }
 
-        public static bool IsDecompResidualName(string name)
+        public static bool IsDecompResidualName(DName name)
         {
             if (name == null) return false;
-            return name.Contains(Globals.decompResidualName);
+            return name.GetName().Contains(Globals.decompResidualName);
         }
 
         /// <summary>
@@ -2445,7 +2470,7 @@ namespace Gekko
             //    }
             //}
 
-            foreach (KeyValuePair<string, Series> kvp in d.storage)
+            foreach (KeyValuePair<DName, Series> kvp in d.storage)
             {
                 Series ts = kvp.Value;
                 Series tsClone = ts.DeepClone(0, null, null) as Series;
@@ -2456,7 +2481,7 @@ namespace Gekko
 
         private static void PrintDecompDict(DecompDict d)
         {
-            foreach (KeyValuePair<string, Series> kvp in d.storage)
+            foreach (KeyValuePair<DName, Series> kvp in d.storage)
             {
                 Series ts = kvp.Value;
                 GekkoTime t1 = ts.GetRealDataPeriodFirst();
@@ -2482,14 +2507,15 @@ namespace Gekko
 
         private static void DecompRemoveResidualsIfZero(GekkoTime per1, GekkoTime per2, DecompDatas decompDatas, EContribType operatorOneOf3Types)
         {
-            List<string> remove = new List<string>();
+            List<DName> remove = new List<DName>();
             DecompDict dd = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types);
-            foreach (KeyValuePair<string, Series> kvp in dd.storage)
+            foreach (KeyValuePair<DName, Series> kvp in dd.storage)
             {
-                string s = kvp.Key;
-                string[] ss = s.Split('¤');
-                string s2 = G.Chop_RemoveBank(ss[0], DecompFirst());
-                if (IsDecompResidualName(s2))
+                DName s = kvp.Key;
+                //string[] ss = s.Split('¤');
+                //string s2 = G.Chop_RemoveBank(ss[0], DecompFirst());
+                //if (IsDecompResidualName(s2))
+                if (IsDecompResidualName(s))
                 {
                     //TODO TODO TODO
                     //TODO TODO TODO
@@ -2509,13 +2535,13 @@ namespace Gekko
                     }
                 }
             }
-            foreach (string s in remove)
+            foreach (DName s in remove)
             {
                 bool b = dd.Remove(s);
             }
         }
 
-        private static void DecompCheckNumberOfEqsAndEndo(DecompDatas decompDatas, GekkoDictionary<string, int> endo)
+        private static void DecompCheckNumberOfEqsAndEndo(DecompDatas decompDatas, Dictionary<DName, int> endo)
         {
             int nEqs = 0;
             for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
@@ -3691,9 +3717,10 @@ namespace Gekko
         /// <returns></returns>
 
 
-        public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, string lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
+        public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, DName lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
-            string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
+            //string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
+            DName lhs2 = decompOptions2.link[0].varnames;
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
 
             string format2 = GetNumberFormat(decompOptions2);
@@ -4415,7 +4442,7 @@ namespace Gekko
             else return "";
         }
 
-        private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, string lhs2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
+        private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DName lhs, DName lhs2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
             FrameLight frame = new FrameLight();
             int prime = Globals.startPrime;  //1013: next one is 1019
@@ -4423,15 +4450,15 @@ namespace Gekko
 
             //We start ordring the list, so that the LHS is in position 1.
             int hit = 0;
-            List<string> orderedNames = new List<string>();
-            foreach (string fullVariableName in dd.storage.Keys)
+            List<DName> orderedNames = new List<DName>();
+            foreach (DName fullVariableName in dd.storage.Keys)
             {
                 if (ChopFullVariableName(lhs2, fullVariableName).isLhs)
                 {
                     orderedNames.Add(fullVariableName); hit++;
                 }
             }
-            foreach (string fullVariableName in dd.storage.Keys)
+            foreach (DName fullVariableName in dd.storage.Keys)
             {
                 if (!ChopFullVariableName(lhs2, fullVariableName).isLhs) orderedNames.Add(fullVariableName);
             }
@@ -4456,7 +4483,7 @@ namespace Gekko
 
                 FrameLightRow frameRowLhs = null;
 
-                foreach (string fullVariableName in orderedNames)
+                foreach (DName fullVariableName in orderedNames)
                 {
                     ChopFullVariableName chop = ChopFullVariableName(lhs2, fullVariableName);
 
@@ -4901,15 +4928,21 @@ namespace Gekko
         /// <param name="iLag"></param>
         /// <param name="isLhs"></param>
         /// <param name="domains"></param>
-        public static ChopFullVariableName ChopFullVariableName(string lhs2, string dictName)
+        public static ChopFullVariableName ChopFullVariableName(DName lhs2, DName dictName)
         {
+            //ChopFullVariableName chop = new ChopFullVariableName();
+            //string[] ss = dictName.Split('¤');
+            //chop.fullName = ss[0];
+            //chop.lag = ss[1];
+            //chop.iLag = int.Parse(G.Substring(chop.lag, 1, chop.lag.Length - 2));
+            //string dbName, freq;
+            //O.Chop(chop.fullName, out dbName, out chop.varName, out freq, out chop.indexes);
+            //chop.isLhs = false;
+            //if (chop.iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(chop.fullName)), lhs2)) chop.isLhs = true;
+            //chop.domains = DecompPivotGetDomains(chop.fullName, chop.indexes);
+            //return chop;
             ChopFullVariableName chop = new ChopFullVariableName();
-            string[] ss = dictName.Split('¤');
-            chop.fullName = ss[0];
-            chop.lag = ss[1];
-            chop.iLag = int.Parse(G.Substring(chop.lag, 1, chop.lag.Length - 2));
-            string dbName, freq;
-            O.Chop(chop.fullName, out dbName, out chop.varName, out freq, out chop.indexes);
+            chop.fullName = dictName;
             chop.isLhs = false;
             if (chop.iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(chop.fullName)), lhs2)) chop.isLhs = true;
             chop.domains = DecompPivotGetDomains(chop.fullName, chop.indexes);
@@ -4948,19 +4981,25 @@ namespace Gekko
         /// <param name="fullName"></param>
         /// <param name="indexes"></param>
         /// <returns></returns>
-        private static string[] DecompPivotGetDomains(string fullName, string[] indexes)
+        private static string[] DecompPivotGetDomains(DName fullName)
         {
             string[] domains = null;
+            List<string> indexes = fullName.HACK_IndexesWithoutTime();
             if (indexes != null)
             {
-                domains = new string[indexes.Length];
+                domains = new string[indexes.Count];
                 for (int i = 0; i < domains.Length; i++) domains[i] = Globals.decompUniversal;
             }
             if (domains != null)
             {
                 //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
                 //So in this case, #a and #sector would be added as columns
-                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways);
+                // HACK HACK HACK
+                // HACK HACK HACK
+                // HACK HACK HACK What if fullName has lag or time or ...
+                // HACK HACK HACK
+                // HACK HACK HACK
+                IVariable iv = O.GetIVariableFromString(fullName.ToString(), O.ECreatePossibilities.NoneReturnNullAlways);
                 if (iv != null)
                 {
                     Series ts = iv as Series;
@@ -5783,14 +5822,14 @@ namespace Gekko
             //lags would only aggregate xb and xb[+1], not xa and xa[-1].
 
             DecompData d = decompDatasSupremeClone;
-            string name = decompOptions2.link[parentI].varnames;
-            d.lhs = DecompFirst() + ":" + ConvertToTurtleName(name, 0);  //lag = 0
+            DName name = decompOptions2.link[parentI].varnames;
+            d.lhs = name; // DecompFirst() + ":" + ConvertToTurtleName(name, 0);  //lag = 0
 
             if (Program.options.bugfix_decomp_jacobi)
             {
                 if (!decompOptions2.decompOperator.isRaw)
                 {
-                    foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+                    foreach (KeyValuePair<DName, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                     {
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
@@ -5834,7 +5873,7 @@ namespace Gekko
                         }
                         double factor = d2 / d1;
                         bool found = false;
-                        foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+                        foreach (KeyValuePair<DName, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                         {
                             kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
                         }
@@ -6009,9 +6048,9 @@ namespace Gekko
                 {
                     c2++;
                     DecompDict dict = GetDecompDatas(d, operatorOneOf3Types);
-                    foreach (KeyValuePair<string, Series> kvp in dict.storage)
+                    foreach (KeyValuePair<DName, Series> kvp in dict.storage)
                     {
-                        string nme = kvp.Key;
+                        DName nme = kvp.Key;
                         Series ts = kvp.Value;
                         foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
                         {
@@ -6770,9 +6809,9 @@ namespace Gekko
     /// </summary>
     public class DecompStartHelper
     {
-        public string name = null; //the "x" in "x[a, b, <time>]"
-        public string fullName = null; //the "x[a, b]" in "x[a, b, <time>]"
-        public MultidimElement indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
+        //public string name = null; //the "x" in "x[a, b, <time>]" --> covered by fullName.GetName()
+        public DName fullName = null; //the "x[a, b]" in "x[a, b, <time>]"
+        //public MultidimElement indexes = null; //the ["a", "b"] in "x[a, b, <time>]" --> covered by fullName
         public DecompStartHelperPeriod[] periods = null; //all the <time> periods found
         public int offset = 0;                                                 //
     }

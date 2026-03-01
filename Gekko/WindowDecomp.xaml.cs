@@ -3169,9 +3169,9 @@ namespace Gekko
         public double ignore = double.NaN;  //between 0 and 100.
         public bool plot = false;
         public bool expand = false;
-        public List<string> new_select = new List<string>();
-        public List<string> new_from = new List<string>();
-        public List<string> new_endo = new List<string>();
+        public List<DName> new_select = new List<DName>();
+        public List<DName> new_from = new List<DName>();
+        public List<DName> new_endo = new List<DName>();
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 
@@ -3220,7 +3220,7 @@ namespace Gekko
         public string modelHash = null;
         // ---
         public bool guiIsFlowStatement = false; //True for "FLOW qBNP ...;", and will activate flowgraph but only for depth==0!
-        public string guiFlowName = null;
+        public DName guiFlowName = null;
         public bool guiFlowRotate = false;        
         public bool guiFlowLagsOrLeadsWereEncountered = false;
         //-------- GUI stuff end ----------------        

@@ -409,10 +409,15 @@ namespace Gekko
         public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 1)        
 
         public DName() : base() { } // Protobuf only
-
-        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes)) 
+                                     
+        public DName(string name) : this(name, Array.Empty<StringOrTime>())
         {
-            for(int i = 0;i<this.GetLength();i++)
+            // This body can stay empty because the 'this' call above runs all the logic in your main constructor.
+        }
+
+        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes))
+        {
+            for (int i = 0; i < this.GetLength(); i++)
             {
                 if (this.Get(i).IsTime())
                 {
@@ -424,7 +429,7 @@ namespace Gekko
                     else
                     {
                         if (this.HasTime()) new Error("Only 1 time element allowed for DName");
-                        this.timePosition = i;                        
+                        this.timePosition = i;
                     }
                 }
             }
@@ -488,6 +493,14 @@ namespace Gekko
             return name;
         }
 
+        public DName HACK_RemoveTime()
+        {
+            List<string> temp = this.HACK_IndexesWithoutTime();
+            List<StringOrTime> temp2 = new List<StringOrTime>();
+            foreach (string s in temp) temp2.Add(s);
+            return new DName(this.GetName(), temp2.ToArray());            
+        }
+
         public string HACK_ToStringWithoutTime()
         {
             List<string> temp = this.HACK_IndexesWithoutTime();            
@@ -538,6 +551,16 @@ namespace Gekko
             }
             temp.Add(element);
             return new DName(this.GetName(), temp.ToArray());
+        }
+
+        public DName HACK_Prefix(string s)
+        {
+            List<StringOrTime> temp = new List<StringOrTime>();
+            for (int i = this.posIndex; i < this.GetLength(); i++)
+            {                
+                temp.Add(this.Get(i));
+            }
+            return new DName(s + this.GetName(), temp.ToArray());
         }
 
         /// <summary>
@@ -599,6 +622,16 @@ namespace Gekko
                 {
                     rv += "[" + t.ToString() + "]";
                 }
+            }
+            return rv;
+        }
+
+        public static List<DName> HACK1(List<string> ss)
+        {
+            List<DName> rv = new List<DName>();
+            foreach (string s in ss)
+            {
+                rv.Add(DName.HACK1(s));
             }
             return rv;
         }
