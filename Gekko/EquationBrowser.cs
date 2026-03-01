@@ -1544,7 +1544,7 @@ img {border-style: none;
                         string dest = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1\Browser\" + s2;
                         if (!File.Exists(dest)) File.Copy(@"c:\Tools\Xxx\" + s, dest);
                     }
-                    flush = true; //ultra safety!
+                    flush = false; //ultra safety!
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model < %t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
@@ -1552,7 +1552,7 @@ img {border-style: none;
                     bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
                     //bh.nMax = 4;
                     bh.showOnly1DecompTable = true;                    
-                    bh.threads = 12; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
+                    bh.threads = 1; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.
                     bh.decompOffset = 1;
                 }
                 else if (bh.type == EBrowserType.MakroIdentitiesText)
@@ -1693,10 +1693,10 @@ img {border-style: none;
 
                 DName variableName = item.Value.Key;
 
-                if (!G.Equal(variableName.GetName(), "pc"))
-                {
-                    UpdateWatermark(item.Index, total); return;
-                }
+                //if (!G.Equal(variableName.GetName(), "pc"))
+                //{
+                //    UpdateWatermark(item.Index, total); return;
+                //}
 
                 //if (G.StartsWith(variableName.ToString(), "pc") || G.StartsWith(variableName.ToString(), "qc"))
                 //{
@@ -2613,7 +2613,12 @@ img {border-style: none;
                         int funcCounter = 0;
                         DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
-                        decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;                                                
+                        decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
+
+                        DecompData decompDataMAINCloneBackup = decompDatas.MAIN_data.DeepClone();
+
+                        //Make a try here so if the DecompMainHelperInvertScalar() fails
+                        //we use the non-inverted...???
 
                         if (true)
                         {
@@ -2638,8 +2643,18 @@ img {border-style: none;
                             }
                         }
 
-                        DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
-                        DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+                        DecompData temp = null;
+                        if (decompDatas.MAIN_data.cellsContribD.storage.Count() == 0)
+                        {
+                            //Something failed, maybe blanks removed in element names...
+                            temp = decompDataMAINCloneBackup;
+                        }
+                        else
+                        {
+                            temp = decompDatas.MAIN_data.DeepClone();
+                        }
+
+                        DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, temp, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
 
                         Table decompTable = decompOutput.table;
 
@@ -2747,7 +2762,7 @@ img {border-style: none;
                     }
                 }                                              
             }
-            catch
+            catch (Exception e)
             {
                 table = null;
             }            
