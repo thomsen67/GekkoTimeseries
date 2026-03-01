@@ -263,8 +263,25 @@ namespace Gekko
                 i++;
                 if (i > 0) rv.s_scalarModel += G.NL;
                 if (this.modelGamsScalar != null)
-                {                    
-                    GetEquationTextHelper2 two2a = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t0, null);
+                {
+                    GetEquationTextHelper2 two2a = null;
+                    try
+                    {
+                        two2a = this.modelGamsScalar.GetEquationTextUnfolded(eq, helper, false, t0, null);
+                    }
+                    catch
+                    {
+                        if (Globals.greuHack)
+                        {
+                            two2a = new GetEquationTextHelper2();
+                            two2a.s1 = "<could not obtain equation>";
+                            two2a.s2 = "<could not obtain equation>";
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                     rv.s_scalarModel += two2a.s2 + G.NL;
                     if (Program.options.model_gams_scalar_normalize)
                     {

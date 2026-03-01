@@ -1796,23 +1796,37 @@ img {border-style: none;
 
                 if (true)
                 {
-                    html1.AppendLine("<div id = `hash-2` class=`content`>"); //#div 2 start
-                    html1.Append("<br>");
-                    EquationBrowser.WriteHtmlBold(html1, "Related variables");
-                    string s8 = null;
-                    List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false, true);                    
-                    List<string> dependentVarsList = Program.FindDependentVars(variableName.ToString(), model, model.modelGams, modelGamsScalar, eqsContainingVariable);
-                    bool first2 = true;
-                    foreach (string s in dependentVarsList)
+                    try
                     {
-                        string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s));
-                        string s2 = DName.HACK1(s).ToString(bh.dNameFormat);
-                        string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
-                        if (!first2) s8 += ", ";
-                        s8 += link;
-                        first2 = false;
+                        html1.AppendLine("<div id = `hash-2` class=`content`>"); //#div 2 start
+                        html1.Append("<br>");
+                        EquationBrowser.WriteHtmlBold(html1, "Related variables");
+                        string s8 = null;
+                        List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(variableName, tUsedHere, model, false, false, true);
+                        List<string> dependentVarsList = Program.FindDependentVars(variableName.ToString(), model, model.modelGams, modelGamsScalar, eqsContainingVariable);
+                        bool first2 = true;
+                        foreach (string s in dependentVarsList)
+                        {
+                            string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s));
+                            string s2 = DName.HACK1(s).ToString(bh.dNameFormat);
+                            string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
+                            if (!first2) s8 += ", ";
+                            s8 += link;
+                            first2 = false;
+                        }
+                        EquationBrowser.WriteHtml(html1, s8);
                     }
-                    EquationBrowser.WriteHtml(html1, s8);
+                    catch
+                    {
+                        if (Globals.greuHack)
+                        {
+                            EquationBrowser.WriteHtml(html1, "<Related variables could not be computed>");
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
 
                     // ============ PLOT
 
