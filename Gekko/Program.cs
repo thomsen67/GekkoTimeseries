@@ -22280,10 +22280,10 @@ write datatest;
                     bool traceFail = false;
                     TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
                     List<Trace2> tracesToWrite = null;                    
-                    if (useTraces)
+                    if (true)   //2/3 2026: Used to be: if (useTraces), but we need to pack the traces down even if not written, otherwise data protobuf will get lost in a maze of references and crash
                     {
                         try
-                        {
+                        {                            
                             Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces                    
                         }
                         catch (Exception e) { traceFail = true; }
@@ -22353,7 +22353,7 @@ write datatest;
 
                     if (true)
                     {
-                        //Restore traces
+                        //Restore traces, also when not written!
                         try
                         {
                             databank.traces = tracesToWrite;
