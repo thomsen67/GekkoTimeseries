@@ -783,11 +783,11 @@ namespace Gekko
     {
         
         [ProtoMember(2)]
-        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, List<ModelGamsEquation>> equationsByVarname = new Dictionary<DName, List<ModelGamsEquation>>(Multidim2Comparer.IgnoreCase);
         [ProtoMember(3)]
-        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
+        public Dictionary<DName, List<ModelGamsEquation>> equationsByEqname = new Dictionary<DName, List<ModelGamsEquation>>(Multidim2Comparer.IgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
 
-        public GekkoDictionary<string, EquationLhsPoints> lhsVariables = null;  //Is created when FIND is first used -- at that point we have sets/lists, too.
+        public Dictionary<DName, EquationLhsPoints> lhsVariables = null;  //Is created when FIND is first used -- at that point we have sets/lists, too.
         
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 

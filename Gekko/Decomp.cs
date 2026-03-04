@@ -1524,7 +1524,7 @@ namespace Gekko
             foreach (DName s in decompOptions2.link[0].endo)
             {
                 //string s2 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
-                DName s2 = s.HACK_AddIndex(new GekkoTime(EFreq.Lag, 0));
+                DName s2 = s.HACK_AddTime(new GekkoTime(EFreq.Lag, 0));
                 if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
             }
 
@@ -1708,19 +1708,19 @@ namespace Gekko
                         decompDatas.MAIN_data = dd;
                     }
 
-                    string s3 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
+                    //string s3 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
 
-                    Series ts = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types)[s3];
+                    Series ts = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types)[s];
                     ts.SetData(t, 1d);
 
-                    int i = endo[s3];  //row
+                    int i = endo[s];  //row
                     for (int j = 0; j < effect.GetLength(1); j++)
                     {
                         //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
                         //see also #sf94lkjsdjæ
                         if (model.DecompType() == EModelType.GAMSScalar || effect[i, j] != 0d)
                         {
-                            foreach (KeyValuePair<string, int> kvp in exo)
+                            foreach (KeyValuePair<DName, int> kvp in exo)
                             {
                                 if (kvp.Value == j)
                                 {
@@ -1765,7 +1765,7 @@ namespace Gekko
                     //    endo.Add(DName.HACK1(x), c);
                     //    endoReverse.Add(c, DName.HACK1(x));
                     //}
-                    DName x = s.HACK_AddIndex(new GekkoTime(EFreq.Lag, 0));
+                    DName x = s.HACK_AddTime(new GekkoTime(EFreq.Lag, 0));
                     if (!endo.ContainsKey(x))
                     {
                         int c = endo.Count();
@@ -1781,8 +1781,8 @@ namespace Gekko
             double[,] mEndo2 = null;  //gradients
             double[,] mEndo3 = null;  //differences
             double[,] mExo = null;
-            List<string> eqNames = new List<string>();
-            List<string> eqNamesPretty = new List<string>(); //Only used for an error message
+            List<DName> eqNames = new List<DName>();
+            List<DName> eqNamesPretty = new List<DName>(); //Only used for an error message
 
             //The loop here actually runs 2 times (over k). First time it just gathers elements for exo and exoReverse,
             //because the size of exo is used the second time.
@@ -1804,8 +1804,8 @@ namespace Gekko
                         using (Error txt = new Error())
                         {
                             txt.MainAdd("The numbers of total equations (" + eqNames.Count + ") and the number of endogenous variables (" + endo.Count() + ") do not match");
-                            List<string> temp2 = eqNames;
-                            temp2.Sort(G.CompareNaturalIgnoreCase);
+                            List<DName> temp2 = eqNames;                            
+                            temp2 = temp2.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
                             txt.MoreAdd("There are the following " + eqNames.Count + " equations given:");
                             txt.MoreNewLineTight();
                             txt.MoreAdd(Stringlist.GetListWithCommas(temp2));
@@ -1846,25 +1846,25 @@ namespace Gekko
                             tTemp = modelGamsScalar.Maybe2000GekkoTime(t);
                             add = t.Subtract(tTemp);
 
-                            string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp, false);
+                            DName eqName = eqPeriods.fullName.HACK_AddTime(tTemp);
                             if (k == 0)
                             {
                                 eqNames.Add(eqName);
-                                string eqNamePretty = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp, true);
+                                DName eqNamePretty = eqPeriods.fullName.HACK_AddTime(tTemp);
                                 eqNamesPretty.Add(eqNamePretty);
                             }
                             int eqNumber;
-                            if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(eqName), out eqNumber))
+                            if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(eqName, out eqNumber))
                             {
                                 eqNumber = -12345;
                             }
 
-                            List<TwoStrings> variables = new List<TwoStrings>();
+                            List<TwoDNames> variables = new List<TwoDNames>();
 
                             foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
                             {
                                 //foreach precedent variable
-                                string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);
+                                DName varName = modelGamsScalar.GetVarNameA(dp.variable);
 
                                 int add2 = 0;
 
@@ -1889,24 +1889,24 @@ namespace Gekko
                                 {
                                     tt1 += eqPeriods.offset;
                                     tt2 += eqPeriods.offset;
-                                }
+                                }                                
 
-                                string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt1, modelGamsScalar.tBasis);
-                                string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, tt2);
+                                DName x1 = varName.HACK_AddTime(modelGamsScalar.tBasis.Add(tt1));
+                                DName x2 = varName.HACK_AddTime(new GekkoTime(EFreq.Lag, tt2));
 
-                                TwoStrings two = new TwoStrings(x1, x2);
+                                TwoDNames two = new TwoDNames(x1, x2);
                                 variables.Add(two);
                             }
-                            string xx2 = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
-                            string xx1 = ConvertToTurtleName(xx2.Replace("¤[0]", ""), 0, t);
-                            variables.Add(new TwoStrings(xx1, xx2));
+                            DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count));
+                            DName xx1 = xx2.HACK_AddTime(t.Add(0));
+                            variables.Add(new TwoDNames(xx1, xx2));
 
                             //foreach precedent variable
-                            foreach (TwoStrings two in variables)
+                            foreach (TwoDNames two in variables)
                             {
-                                string x1 = two.s1;
-                                string x2 = two.s2;
-                                DName dnX1 = DName.HACK1(x1);
+                                DName x1 = two.s1;
+                                DName x2 = two.s2;
+                                DName dnX1 = x1;
 
                                 if (k == 0)
                                 {
@@ -2112,25 +2112,25 @@ namespace Gekko
                 for (int col = 0; col < exo.Count(); col++)
                 {                 
                     DName dn1 = endoReverse[row];
-                    string ename = "Work:" + dn1.HACK_ToStringWithoutTime();
+                    DName ename = dn1.HACK_RemoveTime();
                     GekkoTime etime = dn1.GetTime();                 
                                         
                     DName dn2 = exoReverse[col];
-                    string xname = "Work:" + dn2.HACK_ToStringWithoutTime();
+                    DName xname = dn2.HACK_RemoveTime();
                     GekkoTime xtime = dn2.GetTime();
 
-                    string enewName = ConvertToTurtleName(ename, 0);
+                    DName enewName = ename.HACK_RemoveTime().HACK_AddTime(new GekkoTime(EFreq.Lag, 0));
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
                                         
-                    int aNumber; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(xname), out aNumber)) aNumber = -12345;
+                    int aNumber; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(xname, out aNumber)) aNumber = -12345;
                     
                     if (aNumber != -12345 && modelGamsScalar.isTimeless[aNumber])
                     {
                         xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
                     }
 
-                    string xnewName = ConvertToTurtleName(xname, xlag);
+                    DName xnewName = ConvertToTurtleName(xname, xlag);
 
                     int ZERO = 0;
                     DecompDict dd = null;
@@ -2232,7 +2232,7 @@ namespace Gekko
             new Error("DECOMP aborted");
         }
 
-        private static double InvertGetGradient(DecompData d, string x2, GekkoTime t, EContribType operatorOneOf3Types)
+        private static double InvertGetGradient(DecompData d, DName x2, GekkoTime t, EContribType operatorOneOf3Types)
         {
             double x = double.NaN;
             if (operatorOneOf3Types == EContribType.D)
@@ -2251,7 +2251,7 @@ namespace Gekko
             return x;
         }
 
-        private static double InvertGetDifference(DecompData d, string x2, GekkoTime t, EContribType operatorOneOf3Types)
+        private static double InvertGetDifference(DecompData d, DName x2, GekkoTime t, EContribType operatorOneOf3Types)
         {
             double x = double.NaN;
             if (operatorOneOf3Types == EContribType.D)
@@ -2276,7 +2276,7 @@ namespace Gekko
             return x;
         }
 
-        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq, ModelGamsScalar modelGamsScalar, DecompOptions2 decompOptions2)
+        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, DName name, int eq, ModelGamsScalar modelGamsScalar, DecompOptions2 decompOptions2)
         {
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
@@ -3327,7 +3327,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, DecompStartHelper eqPeriods, DecompOperator op, string residualName, ref int funcCounter, bool missingAsZero, Model model)
+        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, DecompStartHelper eqPeriods, DecompOperator op, DName residualName, ref int funcCounter, bool missingAsZero, Model model)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
@@ -3342,7 +3342,7 @@ namespace Gekko
 
             DecompInitDict(d);
 
-            GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<DName, int> vars = new GekkoDictionary<DName, int>(Multidim2Comparer.IgnoreCase);
 
             //foreach time period
             foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
@@ -3387,12 +3387,12 @@ namespace Gekko
                     {
                         offset = -eqPeriods.offset;
                     }
-                }                
-                
-                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)), false);
-                int eqNumber; if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(s), out eqNumber))
+                }
+
+                DName s = eqPeriods.fullName.HACK_AddTime(modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)));
+                int eqNumber; if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber))
                 {
-                    new Error("Could not find equation '" + s + "'");
+                    new Error("Could not find equation '" + s.ToString() + "'");
                 }                
 
                 double y0 = double.NaN;
@@ -3411,7 +3411,7 @@ namespace Gekko
                     // --------------------------------------------
 
                     i++;
-                    string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);                    
+                    DName varName = modelGamsScalar.GetVarNameA(dp.variable);                    
 
                     if (op.isRaw)
                     {
@@ -3443,7 +3443,7 @@ namespace Gekko
                         {
                             lag2 += eqPeriods.offset;
                         }
-                        string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
+                        DName name = varName.HACK_AddTime(new GekkoTime(EFreq.Lag, lag2));
                         d.cellsRef[name].SetData(t, x0);
                         d.cellsQuo[name].SetData(t, x1);
                         if (!vars.ContainsKey(name))  //for decomp pivot
@@ -3626,7 +3626,7 @@ namespace Gekko
                 {
                     int add = 1; if (op.lowLevel == ELowLevel.Multiplier) add = 0;
                     GekkoTime t = t2.Add(add);
-                    foreach (string s in vars.Keys)
+                    foreach (string DName in vars.Keys)
                     {
                         if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
                         {
@@ -4341,12 +4341,12 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string FullVariableNamePretty(string s, bool replaceResidualName)
+        public static DName FullVariableNamePretty(DName s, bool replaceResidualName)
         {            
-            if (s == null) return s;
-            //s = s.Replace("¤", "").Replace(",", ", ");
-            s = s.Replace("¤", "");
-            if (replaceResidualName) s = s.Replace(Globals.decompResidualName, Globals.decompResidualName2);
+            if (replaceResidualName && s.GetName().Contains(Globals.decompResidualName))
+            {
+                return new DName(s.GetName().Replace(Globals.decompResidualName, Globals.decompResidualName2));
+            }            
             return s;
         }
 
@@ -4519,17 +4519,15 @@ namespace Gekko
                     {
                         //Maybe turn this off for x-type...
                         //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
-
-                        string fullNameRef = G.Chop_SetBank(chop.fullName, "Ref");
-
+                        
                         if (op.isRaw)
                         {
-                            Series tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            Series tsFirst = O.GetIVariableFromString(chop.fullName.ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsFirst != null)
                             {
-                                dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
-                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
-                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                dLevel = tsFirst.GetDataSimple(t2.Add(chop.fullName.GetLag()));
+                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.fullName.GetLag()));
+                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.fullName.GetLag()));
                                 if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero) 
                                 {
                                     if (G.IsNumericalError(dLevel)) dLevel = 0d;
@@ -4537,12 +4535,12 @@ namespace Gekko
                                     if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
                                 }
                             }
-                            Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            Series tsRef = O.GetIVariableFromString("Ref:" + chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsRef != null)
                             {
-                                dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
-                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
-                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                dLevelRef = tsRef.GetDataSimple(t2.Add(chop.fullName.GetLag()));
+                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.fullName.GetLag()));
+                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.fullName.GetLag()));
                                 if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
                                     if (G.IsNumericalError(dLevelRef)) dLevelRef = 0d;
@@ -4556,11 +4554,11 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                             {
                                 Series tsFirst = null;
-                                tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsFirst = O.GetIVariableFromString(chop.fullName.ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 bool isMissingResVariable = false;
                                 if (tsFirst == null)
                                 {
-                                    if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.varName, Globals.decompResidualPrefix))
+                                    if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.fullName.GetName(), Globals.decompResidualPrefix))
                                     {
                                         isMissingResVariable = true;
                                     }
@@ -4575,9 +4573,9 @@ namespace Gekko
                                 }
                                 if (!isMissingResVariable)
                                 {
-                                    dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
-                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.iLag));
-                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                    dLevel = tsFirst.GetDataSimple(t2.Add(chop.fullName.GetLag()));
+                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.fullName.GetLag()));
+                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.fullName.GetLag()));
                                 }
                                 if (isMissingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
@@ -4590,11 +4588,11 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                             {
                                 Series tsRef = null;
-                                tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsRef = O.GetIVariableFromString("Ref:" + chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 bool missingResVariable = false;
                                 if (tsRef == null)
                                 {
-                                    if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.varName, Globals.decompResidualPrefix))  //fullNameRef is made from chop anyways.
+                                    if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.fullName.GetName(), Globals.decompResidualPrefix))  //fullNameRef is made from chop anyways.
                                     {
                                         missingResVariable = true;
                                     }                                    
@@ -4609,9 +4607,9 @@ namespace Gekko
                                 }
                                 if (!missingResVariable)
                                 {
-                                    dLevelRef = tsRef.GetDataSimple(t2.Add(chop.iLag));
-                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.iLag));
-                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.iLag));
+                                    dLevelRef = tsRef.GetDataSimple(t2.Add(chop.fullName.GetLag()));
+                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + chop.fullName.GetLag()));
+                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + chop.fullName.GetLag()));
                                 }
                                 if (missingResVariable || G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
@@ -4647,11 +4645,11 @@ namespace Gekko
                     }
 
                     //string dictName2 = fullVariableName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
-                    string dictName2 = fullVariableName.Replace(DecompFirst() + ":", "");
+                    DName dictName2 = fullVariableName;
 
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
-                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.varName));
-                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.lag));
+                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.fullName.HACK_RemoveTime().ToString()));
+                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.fullName.GetLag()));
 
                     //Clean this up sometime, so we do not have gekkodim_x1&1 for a dimension, but just gekkodim_1, and
                     //all the vars share this gekkodim_1. Problem is the pivot selector, etc.
@@ -4666,18 +4664,16 @@ namespace Gekko
                     //     dims     x1-dim-1     x1-dim-2     dim-1     dim-2      #i     #j     #i     #j
                     //     3        a            m            a         m          a      m      1      2
                     //
-
-                    int dims = 0;
-                    if (chop.indexes != null) dims = chop.indexes.Length;
-                    //dims = 2
-                    frameRow.AddDimension(frame, Globals.decompDimension2, new CellLight(dims));
-                    if (dims > 0)
+                                        
+                    List<string> indexes = chop.fullName.HACK_IndexesWithoutTime();                    
+                    frameRow.AddDimension(frame, Globals.decompDimension2, new CellLight(indexes.Count));
+                    if (indexes.Count > 0)
                     {
-                        for (int ii = 0; ii < chop.indexes.Length; ii++)
+                        for (int ii = 0; ii < indexes.Count; ii++)
                         {
-                            string index = chop.indexes[ii];
+                            string index = indexes[ii];
                             //x1 dim 1 = "a", variable specific
-                            frameRow.AddDimension(frame, chop.varName + Globals.decompDimension + (ii + 1), new CellLight(index));
+                            frameRow.AddDimension(frame, chop.fullName.GetName() + Globals.decompDimension + (ii + 1), new CellLight(index));
                             // dim 1 = "a", common for all variables
                             frameRow.AddDimension(frame, "" + Globals.decompDimension + (ii + 1), new CellLight(index));  //Note: keep "" !!
 
@@ -4707,7 +4703,7 @@ namespace Gekko
 
                     if (decompOptions2.expand)
                     {
-                        frameRow.AddDimension(frame, Globals.col_expand, new CellLight(FullVariableNamePretty(fullVariableName, false).Replace("Work:", "")));
+                        frameRow.AddDimension(frame, Globals.col_expand, new CellLight(FullVariableNamePretty(fullVariableName, false).ToString()));
                     }
 
                     frameRow.AddValue(frame, Globals.col_value, new CellLight(d));
@@ -4718,7 +4714,7 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
-                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
+                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2.ToString()));
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
                     // -----                    
                     frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelLag).data));
@@ -4944,8 +4940,8 @@ namespace Gekko
             ChopFullVariableName chop = new ChopFullVariableName();
             chop.fullName = dictName;
             chop.isLhs = false;
-            if (chop.iLag == 0 && G.Equal(G.HandleBlanksRemove(G.Chop_RemoveBank(chop.fullName)), lhs2)) chop.isLhs = true;
-            chop.domains = DecompPivotGetDomains(chop.fullName, chop.indexes);
+            if (chop.fullName.GetLag() == 0 && G.Equal(chop.fullName.RemoveTime(), lhs2)) chop.isLhs = true;
+            chop.domains = DecompPivotGetDomains(chop.fullName);
             return chop;
         }
 
@@ -5893,7 +5889,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="tsQuo"></param>
         /// <param name="tsRef"></param>
-        public static Tuple<Series, Series> GetRealTimeseries(DecompDatas decompDatas, string s)
+        public static Tuple<Series, Series> GetRealTimeseries(DecompDatas decompDatas, DName s)
         {
             //Find the real values of the series for normalization
             Series tsQuo = GetRealTimeseries2(decompDatas, s, EStorage.cellsQuo);
@@ -5909,7 +5905,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static Series GetRealTimeseries2(DecompDatas decompDatas, string s, EStorage type)
+        private static Series GetRealTimeseries2(DecompDatas decompDatas, DName s, EStorage type)
         {
             Series ts = null;
             foreach (List<DecompData> temp in decompDatas.storage)
@@ -5995,7 +5991,7 @@ namespace Gekko
             return s1;
         }
 
-        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel, bool missingAsZero)
+        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, DName lhs, GekkoTime t2, DName colname, bool isScalarModel, bool missingAsZero)
         {
 
             double d = double.NaN;
@@ -6723,9 +6719,9 @@ namespace Gekko
             string op = "d";
             if (op2 == "m" || op2 == "q" || op2 == "mp") op = "m";
             decompOptions2.decompOperator = new DecompOperator(op);
-            decompOptions2.new_select = new List<string>() { variableName.ToString() };
-            decompOptions2.new_from = new List<string>() { equationName.ToString() };
-            decompOptions2.new_endo = new List<string>() { variableName.ToString() };            
+            decompOptions2.new_select = new List<DName>() { variableName };
+            decompOptions2.new_from = new List<DName>() { equationName };
+            decompOptions2.new_endo = new List<DName>() { variableName };            
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
             decompOptions2.expand = true;

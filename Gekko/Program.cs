@@ -2165,6 +2165,17 @@ namespace Gekko
         }
     }
 
+    public class TwoDNames
+    {
+        public DName s1 = null;
+        public DName s2 = null;
+        public TwoDNames(DName s1, DName s2)
+        {
+            this.s1 = s1;
+            this.s2 = s2;
+        }        
+    }
+
     public class StackHelper
     {
         public string line;  //has a lot of text added
@@ -31154,6 +31165,13 @@ namespace Gekko
             string s = "";
             if (all > 1) s = (counter + 1).ToString();
             return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + s + "¤[0]";
+        }
+
+        public static string GetDecompResidualNameSimple(int counter, int all)
+        {
+            string s = "";
+            if (all > 1) s = (counter + 1).ToString();
+            return Globals.decompResidualName + s;
         }
 
         public static double[,] PutJacobiIntoArray()

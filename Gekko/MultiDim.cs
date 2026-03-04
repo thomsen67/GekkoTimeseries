@@ -542,14 +542,20 @@ namespace Gekko
             return new DName(this.GetName(), temp.ToArray());
         }
 
-        public DName HACK_AddIndex(StringOrTime element)
+        public DName HACK_AddString(string element)
         {
             List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = this.posIndex; i < this.GetLength(); i++)
-            {
-                temp.Add(this.Get(i));
-            }
+            for (int i = this.posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
             temp.Add(element);
+            return new DName(this.GetName(), temp.ToArray());
+        }
+
+        public DName HACK_AddTime(GekkoTime t)
+        {
+            if (this.HasTime()) new Error("Cannot add time to variable that already has time");
+            List<StringOrTime> temp = new List<StringOrTime>();
+            for (int i = this.posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
+            temp.Add(t);
             return new DName(this.GetName(), temp.ToArray());
         }
 
@@ -571,6 +577,14 @@ namespace Gekko
         {
             if (!this.HasTime()) return GekkoTime.tNull;            
             return this.Get(this.timePosition).GetTime();            
+        }
+
+        public int GetLag()
+        {
+            if (!this.HasTime()) new Error("No time part found");
+            GekkoTime t = this.Get(this.timePosition).GetTime();
+            if (t.freq != EFreq.Lag) new Error("Expected lag time type");
+            return t.super;
         }
 
         private static StringOrTime[] Construct(string name, StringOrTime[] indexes)

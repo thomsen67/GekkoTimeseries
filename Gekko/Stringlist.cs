@@ -72,6 +72,28 @@ namespace Gekko
 
 
         /// <summary>
+        /// Transform a list of DNames to a comma-separated string.
+        /// Choose blanks between for instance elements, "a, b, c" (listBlanks = " ") or "a,b,c" (listBlanks = null or "").
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string GetListWithCommas(List<DName> list, string listBlanks)
+        {
+            if (list == null) return null;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < list.Count; i++)
+            {
+                string s = list[i].ToString();
+                sb.Append(s);
+                if (i < list.Count - 1)
+                {
+                    sb.Append("," + listBlanks);
+                }
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Transform a list of strings to a comma-separated string.
         /// Choose blanks between for instance elements, "a, b, c" (listBlanks = " ") or "a,b,c" (listBlanks = null or "").
         /// </summary>

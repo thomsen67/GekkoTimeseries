@@ -889,7 +889,7 @@ namespace Gekko
             {                
                 DName eqNameWithoutLast = eqName.HACK_NameWithoutLast(null);
                 //DName variableNameWithoutLast = variableName.HACK_NameWithoutLast("t");
-                DName variableNameWithExtraT = variableName.HACK_AddIndex("t");
+                DName variableNameWithExtraT = variableName.HACK_AddString("t");
                 List<DName> temp = null; modelGamsScalar.depNames2Inverted.TryGetValue(variableName, out temp);
                 List<DName> temp2 = null; modelGamsScalar.depNames2Inverted.TryGetValue(variableNameWithExtraT, out temp2);
                 bool hit1 = false;
@@ -3452,7 +3452,7 @@ namespace Gekko
         /// <param name="eqname"></param>
         /// <param name="varname"></param>
         /// <returns></returns>
-        public static ModelGamsEquation DecompEvalGams(string eqname, string varname, Model model)
+        public static ModelGamsEquation DecompEvalGams(DName eqname, DName varname, Model model)
         {
             List<ModelGamsEquation> eqs = null;
             ModelGamsEquation found = null;
@@ -3664,7 +3664,7 @@ namespace Gekko
             new Writeln("NAMES: " + eqs);
         }
 
-        private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable, Model model)
+        private static List<ModelGamsEquation> GetGamsEquationsByEqname(DName variable, Model model)
         {            
             if (model.modelGams.equationsByEqname == null || model.modelGams.equationsByEqname.Count == 0)
             {

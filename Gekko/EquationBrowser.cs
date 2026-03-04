@@ -2328,7 +2328,7 @@ img {border-style: none;
         private static void GetEquationText(GekkoTime t1, BrowserHelper bh, EquationNameAndNumber equationHelper, ModelGamsScalar modelGamsScalar, GekkoTime tUsedHere, out string s5, out string s6)
         {            
             //string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
-            DName dName2 = equationHelper.name.HACK_AddIndex(tUsedHere);
+            DName dName2 = equationHelper.name.HACK_AddTime(tUsedHere);
             string s2 = dName2.ToString();
             EquationTextHelper helper = new EquationTextHelper();
             GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
@@ -2567,17 +2567,17 @@ img {border-style: none;
             return s;
         }
 
-        private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, string variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
+        private static string BrowserDecompTable(GekkoTime t1, GekkoTime t2, DName variableName, EquationNameAndNumber equationHelper, Model model, ModelGamsScalar modelGamsScalar)
         {
-            string equationName = equationHelper.name.ToString();
-            string equationNameHash = "#" + SimplerName(equationName);
+            DName equationName = equationHelper.name;
+            string equationNameHash = "#" + SimplerName(equationName.ToString());
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = t1;
             decompOptions2.t2 = t2;
             decompOptions2.decompOperator = new DecompOperator("d");
-            decompOptions2.new_select = new List<string>() { variableName };
-            decompOptions2.new_from = new List<string>() { equationName };
-            decompOptions2.new_endo = new List<string>() { variableName };            
+            decompOptions2.new_select = new List<DName>() { variableName };
+            decompOptions2.new_from = new List<DName>() { equationName };
+            decompOptions2.new_endo = new List<DName>() { variableName };            
 
             decompOptions2.rows = new List<string>() { "vars", "lags" };
             decompOptions2.cols = new List<string>() { "time" };
