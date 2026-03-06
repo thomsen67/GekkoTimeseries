@@ -979,12 +979,13 @@ namespace Gekko
                         if (this.decompFind.decompOptions2.mergeNewVariables != null)
                         {                            
                             bool ok = false;
-                            foreach (string mergeVar in this.decompFind.decompOptions2.mergeNewVariables)
+                            foreach (DName mergeVar in this.decompFind.decompOptions2.mergeNewVariables)
                             {
                                 // HACK HACK HACK
                                 // HACK HACK HACK
                                 // HACK HACK HACK
-                                if (G.Equal(mergeVar.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""), v.ToString())) //Unsure of blank situation inside []...
+                                //if (G.Equal(mergeVar.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""), v.ToString())) //Unsure of blank situation inside []...
+                                if (G.Equal(mergeVar, v))
                                 {
                                     ok = true;
                                     break;
@@ -2849,16 +2850,17 @@ namespace Gekko
 
             WindowDecomp windowParentDecomp = dfParentDecomp.window as WindowDecomp;
             
-            List<string> varsParent = GetDecompedVariables(windowParentDecomp.decompDatas, dfParentDecomp.decompOptions2);
-            List<string> varsThis = GetDecompedVariables(this.decompDatas, this.decompFind.decompOptions2);
-            List<string> varsNew = varsThis.Except(varsParent).ToList();
-            var temp = varsNew.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default));
-            varsNew = new List<string>(); varsNew.AddRange(temp);
-            List<string> varsNew2 = new List<string>();
-            foreach (string s in varsNew)
+            List<DName> varsParent = GetDecompedVariables(windowParentDecomp.decompDatas, dfParentDecomp.decompOptions2);
+            List<DName> varsThis = GetDecompedVariables(this.decompDatas, this.decompFind.decompOptions2);
+            List<DName> varsNew = varsThis.Except(varsParent).ToList();
+            var temp = varsNew.OrderBy(x => x, new MultidimSortComparer(true));
+            varsNew = new List<DName>(); varsNew.AddRange(temp);
+            List<DName> varsNew2 = new List<DName>();
+            foreach (DName s in varsNew)
             {
                 //TODO: there must be a method for this...
-                varsNew2.Add(s.Replace(Decomp.DecompFirst() + ":", "").Replace("¤[0]", ""));  //keep the ¤ for lags
+                //varsNew2.Add(s.Replace(Decomp.DecompFirst() + ":", "").Replace("¤[0]", ""));  //keep the ¤ for lags
+                varsNew2.Add(s);
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
@@ -2921,11 +2923,11 @@ namespace Gekko
             x5.RecalcCellsWithNewType(x5.decompFind.model);            
         }
 
-        private List<string> GetDecompedVariables(DecompDatas decompDatas, DecompOptions2 decompOptions2)
+        private List<DName> GetDecompedVariables(DecompDatas decompDatas, DecompOptions2 decompOptions2)
         {
-            List<string> vars = new List<string>();
+            List<DName> vars = new List<DName>();
             DecompDict dd = Decomp.GetDecompDatas(decompDatas.MAIN_data, decompOptions2.decompOperator.type);
-            foreach (KeyValuePair<string, Series> kvp in dd.storage)
+            foreach (KeyValuePair<DName, Series> kvp in dd.storage)
             {
                 vars.Add(kvp.Key);
             }
@@ -3204,7 +3206,7 @@ namespace Gekko
         public List<GekkoDictionary<string, string>> freeValues = new List<GekkoDictionary<string, string>>();
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = new List<FrameFilter>();
-        public List<string> mergeNewVariables = null;  //do clone for this
+        public List<DName> mergeNewVariables = null;  //do clone for this
         public int flowgraphDepth = Program.options.decomp_flowgraph_depth;
 
         //-------- No clone for this, except guiDecompValues as a shallow copy  ----------------

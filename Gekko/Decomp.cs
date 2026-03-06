@@ -6312,7 +6312,7 @@ namespace Gekko
                 DName firstEqName2 = eqsNew[0].eqName;
                 WindowFind windowFind = new WindowFind(o);
                 windowFind.Title = variableName.ToString() + " - " + "Gekko equations";
-                windowFind.FindSetButtons(firstEqName2.ToString(), firstList, model);
+                windowFind.FindSetButtons(firstEqName2, firstList, model);
                 windowFind.FindSetLabel(variableName);
                 windowFind._activeEquation = firstEqName2;
                 windowFind._activeVariable = null;

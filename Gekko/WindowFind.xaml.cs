@@ -72,7 +72,7 @@ namespace Gekko
             ToggleButton b = sender as ToggleButton;
             string s = ((TextBlock)b.Content).Text;
             this.FindSetLabel(new DName(s));
-            this._activeVariable = s;
+            this._activeVariable = DName.HACK1(s);
 
             foreach (object o in this.windowEquationBrowserButtons.Children)
             {
@@ -89,7 +89,7 @@ namespace Gekko
             this._activeVariable = null;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetEquation(new DName(_activeEquation), helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+            this.FindSetEquation(_activeEquation, helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -118,13 +118,13 @@ namespace Gekko
             string ss = null;
             if (_activeVariable != null)
             {
-                this.FindSetLabel(new DName(_activeVariable));
+                this.FindSetLabel(_activeVariable);
             }
             else
             {
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = this.decompFind.decompOptions2.showTime;
-                this.FindSetEquation(new DName(_activeEquation), helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+                this.FindSetEquation(_activeEquation, helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
             }
         }
 
@@ -240,7 +240,7 @@ namespace Gekko
             WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s7));
         }
 
-        public void FindSetButtons(string eqName, List<string> firstList, Model model)
+        public void FindSetButtons(DName eqName, List<string> firstList, Model model)
         {
             FindSetButtons1(eqName, firstList);
             //Dispatching the color update
@@ -273,7 +273,7 @@ namespace Gekko
             GenerateCombinations(input, combination, index + 1);
         }
 
-        public void FindSetEquationButtonsColors(string eqName, Model model)
+        public void FindSetEquationButtonsColors(DName eqName, Model model)
         {
             try
             {
@@ -290,7 +290,7 @@ namespace Gekko
                     //    down the FIND window.                    
 
                     //qwerty bad hack
-                    decompOptionsTemp.new_from = new List<DName>() { DName.HACK1(eqName).HACK_NameWithoutLast(null) };
+                    decompOptionsTemp.new_from = new List<DName>() { eqName.HACK_NameWithoutLast(null) };
                     Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, decompOptionsTemp.decompOperator, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]
@@ -314,7 +314,7 @@ namespace Gekko
                     try
                     {
                         Globals.decompIsCalculatingButtonColors = true;  //so we will never get popups
-                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, dsh, decompOptionsTemp.decompOperator, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
+                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, dsh, decompOptionsTemp.decompOperator, new DName(residualName), ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
                     }
                     finally
                     {
@@ -323,7 +323,7 @@ namespace Gekko
 
                     double max = 0d;
 
-                    foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                    foreach (KeyValuePair<DName, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
                         double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.tSelected);
                         if (G.IsNumericalError(v)) v = 0d;
@@ -370,7 +370,7 @@ namespace Gekko
 
                         DecompOperator op = new DecompOperator("d");
 
-                        string residualName = "residual___";
+                        DName residualName = new DName("residual___");
                         int funcCounter = 0;
 
                         string s1 = Decomp.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
@@ -391,7 +391,7 @@ namespace Gekko
                         DecompData dd = Gekko.Decomp.DecompLowLevel(this.decompFind.decompOptions2.tSelected, this.decompFind.decompOptions2.tSelected, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
 
                         double max = 0d;
-                        foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                        foreach (KeyValuePair<DName, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                         {
                             double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.tSelected);
                             if (G.IsNumericalError(v)) v = 0d;
@@ -399,13 +399,13 @@ namespace Gekko
                             max = Math.Max(v, max);
                         }
 
-                        foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                        foreach (KeyValuePair<DName, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                         {
-                            string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                            //string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
                             double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.tSelected);
-
                             ToggleButton b = null;
-                            _buttons.TryGetValue(ss5, out b);
+                            //_buttons.TryGetValue(ss5, out b);
+                            _buttons.TryGetValue(kvp.Key, out b);
                             if (b != null)
                             {
                                 int i1 = 240;
@@ -423,7 +423,7 @@ namespace Gekko
             }
         }        
 
-        public void FindSetButtons1(string eqName, List<string> firstList)
+        public void FindSetButtons1(DName eqName, List<string> firstList)
         {
             this.windowEquationBrowserButtons.Children.Clear();
             this._buttons.Clear();
@@ -462,7 +462,7 @@ namespace Gekko
                 b.Unchecked += this.OnVariableButtonUntoggle;
 
                 this.windowEquationBrowserButtons.Children.Add(b);
-                _buttons.Add(ss5, b);
+                _buttons.Add(new DName(ss5), b);
             }
         }
     }
