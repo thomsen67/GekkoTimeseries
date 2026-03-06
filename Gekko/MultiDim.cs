@@ -665,7 +665,7 @@ namespace Gekko
         {
             if (s.Contains("¤"))
             {
-                string[] ss = s.Split('¤');
+                string[] ss = s.Split('¤'); //#as7asdfkalsfdads
                 string s0 = ss[0].Trim();
                 string bank; string name; string freq; string[] indexes;
                 G.Chop_Chop(s0, out bank, out name, out freq, out indexes);
