@@ -1014,7 +1014,16 @@ namespace Gekko
         /// <returns></returns>
         public static EFreq ConvertFreq(string freq)
         {
-            return ConvertFreq(freq, false);
+            EFreq f = EFreq.None;
+            try
+            {
+                f = Globals.freqFromStringToEnum[freq.ToLower()];
+            }
+            catch
+            {
+                new Error("Frequency '" + freq + "' not recognized");
+            }
+            return f;
         }
 
         /// <summary>
@@ -1078,7 +1087,6 @@ namespace Gekko
             if (f == null)
             {
                 new Error("freq problem"); return EFreq.None;
-                //throw new GekkoException();
             }
             else
             {
@@ -1839,53 +1847,7 @@ namespace Gekko
             }
 
         }
-
-        /// <summary>
-        /// Convert freq from EFreq to string
-        /// </summary>
-        /// <param name="eFreq"></param>
-        /// <returns></returns>
-        public static string ConvertFreq(EFreq eFreq)
-        {
-            //========================================================================================================
-            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-            //========================================================================================================
-            string freq = "a";
-            if (eFreq == EFreq.A)
-            {
-                //do nothing
-            }
-            else if (eFreq == EFreq.Q)
-            {
-                freq = "q";
-            }
-            else if (eFreq == EFreq.M)
-            {
-                freq = "m";
-            }
-            else if (eFreq == EFreq.W)
-            {
-                freq = "w";
-            }
-            else if (eFreq == EFreq.D)
-            {
-                freq = "d";
-            }
-            else if (eFreq == EFreq.U)
-            {
-                freq = "u";
-            }
-            else if (eFreq == EFreq.None)
-            {
-                freq = "undefined";
-            }
-            else
-            {
-                new Error("Strange error regarding freq");
-            }
-            return freq;
-        }
-
+        
         /// <summary>
         /// Extracts "fY" from "fY¤-2"
         /// </summary>
@@ -4349,7 +4311,20 @@ namespace Gekko
             return rv;
         }
 
-
+        public static string ConvertFreq(EFreq freq)
+        {            
+            if (freq == EFreq.None) return "undefined";
+            string s = null;
+            try
+            {
+                s = Globals.freqFromEnumToString[freq];
+            }
+            catch 
+            {
+                new Error("Cannot recognize frequency '" + freq.ToString() + "'");
+            }
+            return s;
+        }
 
         /// <summary>
         /// Helper for getting installed .NET versions

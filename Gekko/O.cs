@@ -4161,16 +4161,7 @@ namespace Gekko
                 if (!(rest.StartsWith("[") && rest.EndsWith("]")))
                 {
                     new Error("Expected indexer to start with '[' and end with ']'");
-                }
-                //indexes = rest.Substring(1, rest.Length - 2).Split(',');
-                //for (int i = 0; i < indexes.Length; i++)
-                //{
-                //    indexes[i] = indexes[i].Trim();
-                //}
-                //for (int i = 0; i < indexes.Length; i++)
-                //{
-                //    indexes[i] = G.StripQuotes(indexes[i]);  //probably not relevant now, but may be later on
-                //}
+                }                
                 indexes = G.SplitIndexerIntoParts(rest);
             }
 
@@ -9610,9 +9601,7 @@ namespace Gekko
             public static void Q()
             {                
                 new Writeln(G.FreqAndPeriodPretty(false, true));
-            }
-
-            
+            }            
         }
 
         public class TimeFilterHelper

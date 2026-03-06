@@ -384,35 +384,41 @@ namespace Gekko
         public EDNameQuotes format = EDNameQuotes.Normal;
         public EDNameTime separateTime = EDNameTime.None;
         public string separator = null;
+        public bool showFreq = true;
         
         public DNameFormat() 
         { 
         }
         
-        public DNameFormat(EDNameQuotes format, EDNameTime separateTime, string separator)
+        public DNameFormat(EDNameQuotes format, EDNameTime separateTime, string separator, bool showFreq)
         {
             this.format = format;
             this.separateTime = separateTime;
             this.separator = separator;
+            this.showFreq = showFreq;
         }
     }
 
     /// <summary>
-    /// Has no frequency. May or may not have time
+    /// May or may not have frequency. May or may not have time.
     /// </summary>
     [ProtoContract]
     public class DName : Multidim2Element
     {
-        private readonly int posName = 0; //hardcoded
-        private readonly int posIndex = 1; //hardcoded
+        private static readonly int _posName = 0; //hardcoded
+        private static readonly int _posFreq = 1; //hardcoded
+        private static readonly int _posIndex = 2; //hardcoded
         [ProtoMember(1)]
-        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 1)        
+        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 2)        
 
         public DName() : base() { } // Protobuf only
                                      
         public DName(string name) : this(name, Array.Empty<StringOrTime>())
-        {
-            // This body can stay empty because the 'this' call above runs all the logic in your main constructor.
+        {            
+        }
+
+        public DName(string name, EFreq freq) : this(name, freq, Array.Empty<StringOrTime>())
+        {            
         }
 
         public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes))
@@ -422,13 +428,28 @@ namespace Gekko
                 if (this.Get(i).IsTime())
                 {
                     GekkoTime t = this.Get(i).GetTime();
-                    if (t.freq == EFreq.None || t.freq == EFreq.Age)
-                    {
-                        //These are not considered "time" (neither are .Empty{i} enum slots if any)
-                    }
-                    else
-                    {
+                    if (!(t.freq == EFreq.None || t.freq == EFreq.Age))
+                    {                    
                         if (this.HasTime()) new Error("Only 1 time element allowed for DName");
+                        this.timePosition = i;
+                    }
+                }
+            }
+        }
+
+        public DName(string name, EFreq freq, StringOrTime[] indexes) : base(Construct(name, freq, indexes))
+        {
+            if (freq == EFreq.Lag) new Error("Lag not allowed as variable freq");
+            for (int i = 0; i < this.GetLength(); i++)
+            {
+                if (this.Get(i).IsTime())
+                {
+                    GekkoTime t = this.Get(i).GetTime();
+                    if (!(t.freq == EFreq.None || t.freq == EFreq.Age))
+                    {                    
+                        if (this.HasTime()) new Error("Only 1 time element allowed for DName");
+                        EFreq thisFreq = this.GetTime().freq;
+                        if (thisFreq != freq) new Error("Variable freq " + thisFreq.ToString() + " does not match period freq " + freq.ToString());
                         this.timePosition = i;
                     }
                 }
@@ -439,29 +460,39 @@ namespace Gekko
 
         public string GetName()
         {
-            return this.Get(this.posName).GetString();
+            return this.Get(DName._posName).GetString();
         }
 
-        private StringOrTime[] DeepCloneExceptFirst()
+        //Small time penalty, but we can live with it (dict lookup)
+        public EFreq GetFreq()
+        {
+            return G.ConvertFreq(this.Get(DName._posFreq).GetString());
+        }
+
+        public string GetNameAndFreq()
+        {
+            return this.GetName() + Globals.freqIndicator + this.GetFreq();
+        }
+
+        private StringOrTime[] GetIndexes()
         {
             //Should be ok fast
-            StringOrTime[] result = new StringOrTime[this.storage.Length - 1];
-            Array.Copy(this.storage, 1, result, 0, result.Length);
+            StringOrTime[] result = new StringOrTime[this.storage.Length - DName._posIndex];
+            Array.Copy(this.storage, DName._posIndex, result, 0, result.Length);
             return result;
         }
 
-        private StringOrTime[] DeepCloneExceptFirstAndTime()
+        private StringOrTime[] GetIndexesExceptTime()
         {
             //Should be ok fast
             if (!this.HasTime())
             {
-                return this.DeepCloneExceptFirst();
+                return this.GetIndexes();
             }
             else
-            {
-                //StringOrTime[] result = new StringOrTime[this.storage.Length - 2];
+            {                
                 List<StringOrTime> result = new List<StringOrTime>();
-                for (int i = 1; i < this.storage.Length; i++)
+                for (int i = DName._posIndex; i < this.storage.Length; i++)
                 {
                     StringOrTime element = this.storage[i];
                     if (element.IsTime()) continue;
@@ -473,7 +504,7 @@ namespace Gekko
 
         public DName RemoveTime()
         {
-            return new DName(this.GetName(), this.DeepCloneExceptFirstAndTime());
+            return new DName(this.GetName(), this.GetFreq(), this.GetIndexesExceptTime());
         }
 
         public bool HasTime() 
@@ -482,14 +513,21 @@ namespace Gekko
             return true;
         }
 
+
+        public bool HasIndex()
+        {
+            if (this.GetLength() - 1 >= DName._posIndex) return true;
+            return false;
+        }
+
         public DName ConvertToLag(GekkoTime t)
         {
             if (!this.HasTime()) new Error("DName: cannot find time dimension to convert into lag/lead");
             GekkoTime thisT = this.GetTime();
             int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
-            StringOrTime[] elements = this.DeepCloneExceptFirst();
+            StringOrTime[] elements = this.GetIndexes();
             elements[this.timePosition - 1] = new GekkoTime(EFreq.Lag, lag);  //Note: -1 because elements has first element removed
-            DName name = new DName(this.Get(0).GetString(), elements);
+            DName name = new DName(this.GetName(), this.GetFreq(), elements);
             return name;
         }
 
@@ -498,20 +536,19 @@ namespace Gekko
             List<string> temp = this.HACK_IndexesWithoutTime();
             List<StringOrTime> temp2 = new List<StringOrTime>();
             foreach (string s in temp) temp2.Add(s);
-            return new DName(this.GetName(), temp2.ToArray());            
+            return new DName(this.GetName(), this.GetFreq(), temp2.ToArray());            
         }
 
         public string HACK_ToStringWithoutTime()
         {
-            List<string> temp = this.HACK_IndexesWithoutTime();            
-            if (temp.Count == 0) return this.GetName();
-            else return this.GetName() + "[" + Stringlist.GetListWithCommas(temp, "") + "]";            
+            DName without = this.HACK_RemoveTime();
+            return without.ToString();
         }
 
         public List<string> HACK_IndexesWithoutTime()
         {
             List<string> temp = new List<string>();
-            for (int i = this.posIndex; i < this.GetLength(); i++)
+            for (int i = DName._posIndex; i < this.GetLength(); i++)
             {
                 if (i == this.timePosition) continue;
                 temp.Add(this.Get(i).ToString());
@@ -523,7 +560,7 @@ namespace Gekko
         public DName HACK_NameWithoutLast(string s)
         {
             List<StringOrTime> temp = new List<StringOrTime>();            
-            for (int i = this.posIndex; i < this.GetLength() - 1; i++)
+            for (int i = DName._posIndex; i < this.GetLength() - 1; i++)
             {
                 temp.Add(this.Get(i));
             }
@@ -539,34 +576,34 @@ namespace Gekko
                     temp.Add(xx);
                 }
             }
-            return new DName(this.GetName(), temp.ToArray());
+            return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
         }
 
         public DName HACK_AddString(string element)
         {
             List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = this.posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
+            for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
             temp.Add(element);
-            return new DName(this.GetName(), temp.ToArray());
+            return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
         }
 
         public DName HACK_AddTime(GekkoTime t)
         {
             if (this.HasTime()) new Error("Cannot add time to variable that already has time");
             List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = this.posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
+            for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
             temp.Add(t);
-            return new DName(this.GetName(), temp.ToArray());
+            return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
         }
 
         public DName HACK_Prefix(string s)
         {
             List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = this.posIndex; i < this.GetLength(); i++)
+            for (int i = DName._posIndex; i < this.GetLength(); i++)
             {                
                 temp.Add(this.Get(i));
             }
-            return new DName(s + this.GetName(), temp.ToArray());
+            return new DName(s + this.GetName(), this.GetFreq(), temp.ToArray());
         }
 
         /// <summary>
@@ -589,9 +626,15 @@ namespace Gekko
 
         private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
         {
-            int offset = 1;
+            return Construct(name, EFreq.None, indexes);
+        }
+
+        private static StringOrTime[] Construct(string name, EFreq freq, StringOrTime[] indexes)
+        {
+            int offset = DName._posIndex;
             var result = new StringOrTime[indexes.Length + offset];
-            result[0] = name;
+            result[DName._posName] = name;
+            result[DName._posFreq] = Globals.freqFromEnumToString[freq];
             Array.Copy(indexes, 0, result, offset, indexes.Length);
             return result;
         }
@@ -602,17 +645,17 @@ namespace Gekko
         }
 
         public string ToStringWithoutFreq()
-        {
-            //TODO TODO TODO
-            return G.Chop_RemoveFreq(this.ToString(DName.dNameFormatDefault));
+        {            
+            DNameFormat d = new DNameFormat();
+            d.showFreq = false;
+            return G.Chop_RemoveFreq(this.ToString(d));
         }
 
         public string ToString(DNameFormat format)
         {
-            if (this.IsNull()) return null;
-            string name = this.Get(this.posName).GetString();
+            if (this.IsNull()) return null;            
             List<string> temp = new List<string>();            
-            for (int i = this.posIndex; i < this.GetLength(); i++)
+            for (int i = DName._posIndex; i < this.GetLength(); i++)
             {
                 string s = null;
                 StringOrTime stringOrTime = this.Get(i);
@@ -628,8 +671,11 @@ namespace Gekko
                 if (s != null) temp.Add(s);
             }
             string rv = null;
-            if (temp.Count == 0) rv = name;
-            else rv = name + "[" + Stringlist.GetListWithCommas(temp, format.separator) + "]";
+            string naf = null;
+            if (format.showFreq) naf = this.GetNameAndFreq();
+            else naf = this.GetName();
+            if (temp.Count == 0) rv = naf;
+            else rv = naf + "[" + Stringlist.GetListWithCommas(temp, format.separator) + "]";
 
             if (this.HasTime() && (format.separateTime == EDNameTime.Last || format.separateTime == EDNameTime.LastExceptLag0))
             {
@@ -665,6 +711,7 @@ namespace Gekko
         {
             if (s.Contains("¤"))
             {
+                if (Globals.runningOnTTComputer) System.Windows.Forms.MessageBox.Show("HACK1 had turtle");
                 string[] ss = s.Split('¤'); //#as7asdfkalsfdads
                 string s0 = ss[0].Trim();
                 string bank; string name; string freq; string[] indexes;
@@ -712,18 +759,6 @@ namespace Gekko
                 }
                 return new DName(name.Replace("¤", ""), m.ToArray());
             }            
-        }
-
-        public bool HACKHASINDEX()
-        {
-            if (this.GetLength() - 1 >= this.posIndex) return true;
-            return false;            
-        }
-
-        public string HACKGETNAME()
-        {            
-            return this.Get(0).GetString();
-            return null;
         }
     }
 

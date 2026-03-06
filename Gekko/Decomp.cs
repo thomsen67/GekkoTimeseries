@@ -6550,10 +6550,10 @@ namespace Gekko
             string error = null;
             foreach (KeyValuePair<DName, int> kvp in modelGamsScalar.dict_FromVarNameToANumber)
             {
-                if (G.Equal((DName.HACK1(variableName).HACKGETNAME()), kvp.Key.HACKGETNAME()))
+                if (G.Equal(DName.HACK1(variableName), kvp.Key))
                 {
                     variableExists = true;
-                    if (kvp.Key.HACKHASINDEX()) variableExistsAndHasIndex = true;
+                    if (kvp.Key.HasIndex()) variableExistsAndHasIndex = true;
                     break;
                 }
             }

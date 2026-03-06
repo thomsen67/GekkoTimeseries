@@ -572,6 +572,32 @@ namespace Gekko
         public static int freqQSubperiods = 4;
         public static int freqMSubperiods = 12;
 
+        public static Dictionary<EFreq, string> freqFromEnumToString = new Dictionary<EFreq, string>
+        { 
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            {EFreq.A, "a" },
+            {EFreq.Q, "q" },
+            {EFreq.M, "m" },
+            {EFreq.W, "w" },
+            {EFreq.D, "d" },
+            {EFreq.U, "u" }
+        };
+
+        public static Dictionary<string, EFreq> freqFromStringToEnum = new Dictionary<string, EFreq>
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            {"a", EFreq.A },
+            {"q", EFreq.Q },
+            {"m", EFreq.M },
+            {"w", EFreq.W },
+            {"d", EFreq.D },
+            {"u", EFreq.U }
+        };
+
         public static bool databanksAsProtobuffers = true;
 
         //See also #80927435209843
