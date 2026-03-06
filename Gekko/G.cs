@@ -768,18 +768,6 @@ namespace Gekko
             return culprit;
         }
 
-        //will include lag indicator (¤)
-        /// <summary>
-        /// Helper function for models. Move to model part of code.
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        public static string FromBNumberToVarname2(int i)
-        {
-            string culprit = Program.model.modelGekko.varsBTypeInverted[i];
-            return culprit;
-        }
-
         // Converts "fY¤-2" into "fY(-2)"
         /// <summary>
         /// Helper not used much in Gekko 3.0
@@ -5371,7 +5359,7 @@ namespace Gekko
             {
                 //a Gekko model is loaded
                 //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
-                ATypeData temp = null; Program.model.modelGekko.varsAType.TryGetValue(var, out temp);
+                ATypeData temp = null; Program.model.modelGekko.varsAType.TryGetValue(new DName(var), out temp);
                 if (temp != null)
                 {
                     //var is known from the model

@@ -894,7 +894,7 @@ namespace Gekko
             bool canExpand = false;
             if (decompOutput.black != null)
             {
-                foreach (List<string> names in decompOutput.black)
+                foreach (List<DName> names in decompOutput.black)
                 {
                     if (names != null && names.Count > 1)
                     {
@@ -971,9 +971,9 @@ namespace Gekko
                     }
                     else if (c.cellType == CellType.Date) s = c.date;
 
-                    string v = Decomp.GetVarsHack(c);
-                    if (v == Globals.decompErrorName) v = null;
-                    if (v == Globals.decompIgnoreName) v = null;
+                    DName v = Decomp.GetVarsHack(c);
+                    if (v.GetName() == Globals.decompErrorName) v = null;
+                    if (v.GetName() == Globals.decompIgnoreName) v = null;
                     if (v != null)
                     {
                         if (this.decompFind.decompOptions2.mergeNewVariables != null)
@@ -984,7 +984,7 @@ namespace Gekko
                                 // HACK HACK HACK
                                 // HACK HACK HACK
                                 // HACK HACK HACK
-                                if (G.Equal(mergeVar.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""), v.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""))) //Unsure of blank situation inside []...
+                                if (G.Equal(mergeVar.Replace(" ", "").Replace("¤" + Globals.decompNoLag, "").Replace("¤", ""), v.ToString())) //Unsure of blank situation inside []...
                                 {
                                     ok = true;
                                     break;
@@ -1081,7 +1081,7 @@ namespace Gekko
             Clipboard.SetText(s, TextDataFormat.Text);            
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, List<List<string>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator, bool canExpand, DecompOptions2 decompOptions2)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, List<List<DName>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOperator decompOperator, bool canExpand, DecompOptions2 decompOptions2)
         {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
@@ -1215,20 +1215,22 @@ namespace Gekko
             if (c == null) return false;
             if (c.vars_hack == null) return false;
             if (c.vars_hack.Count == 0) return false;
-            string v = Decomp.GetVarsHack(c);  //Only looks at the first element if aggregated. If error/ignore/residual, there is only 1, no?
-            if (v == Globals.decompErrorName) return false;
-            if (v == Globals.decompIgnoreName) return false;
+            DName v = Decomp.GetVarsHack(c);  //Only looks at the first element if aggregated. If error/ignore/residual, there is only 1, no?
+            if (v.GetName() == Globals.decompErrorName) return false;
+            if (v.GetName() == Globals.decompIgnoreName) return false;
             if (Decomp.IsDecompResidualName(v)) return false;
 
             bool isEndogenous = false;
 
             if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
             {
-                foreach (string varname in c.vars_hack)
+                foreach (DName varname in c.vars_hack)
                 {
                     //All of these must be exogenous for the return value to be false (so any one endogenous among a list of otherwise exogenous will make the name blue)
-                    string name; int lag;
-                    Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
+                    //string name; int lag;
+                    //Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
+                    DName name = varname.RemoveTime();
+                    int lag = varname.GetLag();
                     List<GekkoTime> fixed2 = Program.model.modelGamsScalar.GetFixedPeriods(name);
 
                     //Test if ALL are fixed
@@ -1274,10 +1276,10 @@ namespace Gekko
                         isEndogenous = true;
                         try
                         {
-                            int lag2;
-                            string name2 = v;
-                            if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
-                            EEndoOrExo e = Program.VariableTypeEndoExo(name2);
+                            //int lag2;
+                            //string name2 = v;
+                            //if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]                            
+                            EEndoOrExo e = Program.VariableTypeEndoExo(v.RemoveTime().ToString());
                             isEndogenous = e == EEndoOrExo.Endo;
                         }
                         catch { }
@@ -1389,7 +1391,7 @@ namespace Gekko
         /// <param name="red"></param>
         /// <param name="rowsOrColsSumUp"></param>
         /// <param name="decompOptions2"></param>
-        private void SetExpandCollapse(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<List<string>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
+        private void SetExpandCollapse(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<List<DName>> black, Tuple<bool, bool> rowsOrColsSumUp, DecompOptions2 decompOptions2)
         {            
             int ij = GetIJ(i, j, type, isRowOrCol, false);
             if (ij == -12345) return;         
@@ -1429,7 +1431,7 @@ namespace Gekko
         /// <param name="black"></param>
         /// <param name="ij"></param>
         /// <returns></returns>
-        private static bool ShowBlackArrow(List<List<string>> black, int ij)
+        private static bool ShowBlackArrow(List<List<DName>> black, int ij)
         {
             bool visible = false;
             if (black != null && black[ij] != null) visible = black[ij].Count > 1;
@@ -1747,23 +1749,23 @@ namespace Gekko
                 // FIND
                 // ---------------------------------------
 
-                string var = Decomp.HiddenVariableHelper(c2, false);
+                DName var = Decomp.HiddenVariableHelper(c2, false);
                 if (var == null)
                 {                    
                     new Error(Decomp.Text1(1));
                 }
 
-                _activeVariable = var;
+                _activeVariable = var.ToString();
 
                 if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                 {
-                    decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
+                    decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var.ToString()) });
                     WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
                 }
                 else
                 {
                     O.Find o = new O.Find(this.decompFind);
-                    List m = new List(new List<string>() { var });
+                    List m = new List(new List<string>() { var.ToString() });
                     o.iv = m;
                     o.Exe();
                 }
@@ -1932,11 +1934,11 @@ namespace Gekko
                                 {
                                     this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gams;
                                 }
-                                string var7 = Decomp.HiddenVariableHelper(c2, false);
+                                DName var7 = Decomp.HiddenVariableHelper(c2, false);
 
                                 int number = -12345;
-                                try { if (var7 != null) number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch { };
-                                if (var7 == Globals.decompResidualName) number = 0;
+                                try { if (var7 != null) number = int.Parse(var7.GetName().Substring(Globals.decompResidualName.Length)); } catch { };
+                                if (var7.GetName() == Globals.decompResidualName) number = 0;
                                 //"Residual" --> number = 0
                                 //"Residual1" --> number = 1
                                 //"Residual2" --> number = 2
@@ -1949,15 +1951,15 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    if (var7 == Globals.decompErrorName)
+                                    if (var7.GetName() == Globals.decompErrorName)
                                     {
                                         RichSetText(equation, Decomp.GetColoredEquations(Globals.decompErrorText));
                                     }
-                                    else if (var7 == Globals.decompIgnoreName)
+                                    else if (var7.GetName() == Globals.decompIgnoreName)
                                     {                                        
                                         RichSetText(equation, Decomp.GetColoredEquations(Globals.decompIgnoreText1  + this.textBlockIgnore.Text + Globals.decompIgnoreText2));
                                     }
-                                    else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
+                                    else if (var7.GetName().StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
                                         string more = "";
                                         if (number > 0) more = " #" + number;
@@ -1965,7 +1967,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+                                        List<string> ss = Program.GetVariableExplanation(var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
                                         string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
                                         RichSetText(equation, Decomp.GetColoredEquations(txt));
                                     }
@@ -2835,8 +2837,8 @@ namespace Gekko
         private void Merge(DecompFind dfParentDecomp)
         {            
             DecompOptions2 remember = dfParentDecomp.decompOptions2.Clone();            
-            List<string> thisFrom = this.decompFind.decompOptions2.new_from;
-            List<string> thisEndo = this.decompFind.decompOptions2.new_endo;
+            List<DName> thisFrom = this.decompFind.decompOptions2.new_from;
+            List<DName> thisEndo = this.decompFind.decompOptions2.new_endo;
             dfParentDecomp.decompOptions2.new_from.AddRange(thisFrom);
             dfParentDecomp.decompOptions2.new_endo.AddRange(thisEndo);
             //
@@ -2862,8 +2864,8 @@ namespace Gekko
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
 
             //can be up to around 30 chars with GUI looking too bad...
-            string variable = this.decompFind.decompOptions2.new_select[0];
-            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " replaced" + Environment.NewLine + G.Chop_RemoveIndex(variable) + ". [";            
+            DName variable = this.decompFind.decompOptions2.new_select[0];
+            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " replaced" + Environment.NewLine + variable.GetName().ToString() + ". [";            
             windowParentDecomp.textMerge.Visibility = Visibility.Visible;            
             windowParentDecomp.textMerge.Inlines.Clear();
             windowParentDecomp.textMerge.Inlines.Add(txt);
@@ -3427,8 +3429,8 @@ namespace Gekko
 
             if (this.new_select != null)
             {
-                List<string> tempSelect = new List<string>();
-                foreach (string s in this.new_select)
+                List<DName> tempSelect = new List<DName>();
+                foreach (DName s in this.new_select)
                 {
                     tempSelect.Add(s);
                 }
@@ -3437,8 +3439,8 @@ namespace Gekko
 
             if (this.new_from != null)
             {
-                List<string> tempFrom = new List<string>();
-                foreach (string s in this.new_from)
+                List<DName> tempFrom = new List<DName>();
+                foreach (DName s in this.new_from)
                 {
                     tempFrom.Add(s);
                 }
@@ -3447,8 +3449,8 @@ namespace Gekko
 
             if (this.new_endo != null)
             {
-                List<string> tempEndo = new List<string>();
-                foreach (string s in this.new_endo)
+                List<DName> tempEndo = new List<DName>();
+                foreach (DName s in this.new_endo)
                 {
                     tempEndo.Add(s);
                 }

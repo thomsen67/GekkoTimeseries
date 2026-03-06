@@ -1934,42 +1934,6 @@ namespace Gekko
         {
             this.wraps.Add(wrap);
         }
-
-    }
-
-    /// <summary>
-    /// A storage implementation where the key "example7" and the key "ExAmpLe7" are treated as equal.
-    /// Used to contain variables in a model. Such variable names are not case-sensitive.
-    /// </summary>
-    ///
-    [Serializable]
-    public class CaseInsensitiveHashtable : Hashtable
-    {
-
-        public CaseInsensitiveHashtable(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public CaseInsensitiveHashtable()
-            : base()
-        {
-            this.hcp = new CaseInsensitiveHashCodeProvider();
-            this.comparer = new CaseInsensitiveComparer();
-        }
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="capacity"></param>
-        public CaseInsensitiveHashtable(int capacity)
-            : base(capacity)
-        {
-            this.hcp = new CaseInsensitiveHashCodeProvider();
-            this.comparer = new CaseInsensitiveComparer();
-        }
     }
 
     public class OptString
@@ -10221,7 +10185,7 @@ namespace Gekko
         {
 
             int r = -12345;
-            if (Program.model?.modelGekko?.fromVariableToEquationNumber != null && Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
+            if (Program.model?.modelGekko?.fromVariableToEquationNumber != null && Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsName.RemoveTime(), out r))
             {
                 //r will get a value
             }
@@ -10245,8 +10209,8 @@ namespace Gekko
             foreach (int i in al)
             {
                 int tmp = Program.model.modelGekko.m2.fromEqNumberToBNumber[i];
-                string var = Program.model.modelGekko.varsBTypeInverted[tmp];
-                TwoStrings ts = GetVariableAndLag(var);
+                DName var = Program.model.modelGekko.varsBTypeInverted[tmp];
+                TwoStrings ts = GetVariableAndLag(var.ToString());
                 string var2 = G.GetUpperLowerCase(ts.s1);
                 res.WriteLine("  " + var2);
             }
@@ -12411,11 +12375,11 @@ namespace Gekko
         /// </summary>
         /// <param name="varnameMaybeWithFreq"></param>
         /// <returns></returns>
-        public static string GetVariableExplanation1Line(string varnameMaybeWithFreq)
+        public static string GetVariableExplanation1Line(DName varname)
         {
-            if (varnameMaybeWithFreq == null) return null;
+            if (varname == null) return null;
             string label = null;
-            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+            List<string> expls = Program.GetVariableExplanation(varname, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
             if (expls != null && expls.Count > 0) label = expls[0];
             return label;
         }
@@ -12429,7 +12393,7 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanation(DName varname, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
         {
             //For Gekko 4.0, clean up the two first parameters (should be just 1).
             //For Gekko 4.0, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
@@ -12439,7 +12403,7 @@ namespace Gekko
             if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
 
             List<string> rv = new List<string>();
-            IVariable iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
+            IVariable iv = O.GetIVariableFromString(varname.ToString(), O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
@@ -12465,16 +12429,16 @@ namespace Gekko
                 {                    
                     if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
                     {                        
-                        fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(varnameWithoutFreq));
+                        fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(varname));
                     }
                 }
                 catch { } //No need to crash on this, the try-catch can be removed in Gekko 4.0
                 string fixes = null;
                 if (fixList != null && fixList.data.Count != 0) fixes = ", modelfix: " + fixList.ToString();
-                rv.Add("Series: " + varnameMaybeWithFreq + sDomains + fixes);
+                rv.Add("Series: " + varname.ToString() + sDomains + fixes);
             }
 
-            List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(varnameWithoutFreq);
+            List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(varname.ToStringWithoutFreq());
             foreach (string line in explanationsFromExternalFile)
             {
                 if (line != "")
@@ -12547,11 +12511,12 @@ namespace Gekko
         /// </summary>
         /// <param name="variableNameWithOrWithoutLag"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanationAugmented(DName varname, HtmlBrowserSettings htmlBrowserSettings)
         {
             string ss = "";
-            string var2 = G.Chop_RemoveLagOrLead_OLD(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
-            List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
+            //string var2 = G.Chop_RemoveLagOrLead_OLD(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
+            //List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
+            List<string> ss2 = Program.GetVariableExplanation(varname.RemoveTime(), true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
             return ss2;
         }        
 
@@ -13340,7 +13305,7 @@ namespace Gekko
                 count++;
                 if (count < start) continue;
                 if (count > end) break;
-                int eqNumber = (int)Program.model.modelGekko.fromVariableToEquationNumber[s + Globals.lagIndicator + "0"];
+                int eqNumber = (int)Program.model.modelGekko.fromVariableToEquationNumber[new DName(s + Globals.lagIndicator + "0")];
                 EquationHelper eh = Program.model.modelGekko.equations[eqNumber];
                 string code = eh.csCodeRhsLongVersion;
                 s2.Append("hs = ");
@@ -14485,7 +14450,7 @@ namespace Gekko
                     {
                         foreach (string s7 in names)
                         {
-                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(new DName(s7), false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
                             rv2.Add(new TwoStrings(s7, ss));
                         }
                     }
@@ -14602,7 +14567,7 @@ namespace Gekko
 
                     foreach (string s7 in names)
                     {
-                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(new DName(s7), false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
                         rv2.Add(new TwoStrings(s7, ss));
                     }
                 }
@@ -16547,7 +16512,7 @@ namespace Gekko
                     }
                 }
 
-                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+                List<string> expls = Program.GetVariableExplanation(new DName(varnameWithoutFreq), false, false, GekkoTime.tNull, GekkoTime.tNull, null);
                 foreach (string expl in expls) G.Writeln(expl);
 
                 if (ts.meta.trace2 != null)
@@ -16626,21 +16591,21 @@ namespace Gekko
         /// <param name="varnameWithoutFreq"></param>
         private static void DispHelperShowNormalEquation(bool showDetailed, string varnameWithoutFreq)
         {
-            List<string> d4 = new List<string>();
-            if (Program.model?.modelGekko?.dependents != null && Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
+            List<DName> d4 = new List<DName>();
+            if (Program.model?.modelGekko?.dependents != null && Program.model.modelGekko.dependents.ContainsKey(new DName(varnameWithoutFreq)))
             {
-                Dictionary<string, string> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
+                Dictionary<DName, DName> d2 = Program.model.modelGekko.dependents[new DName(varnameWithoutFreq)].storage;
                 if (d2 != null)
                 {
-                    foreach (string d3 in d2.Keys)
+                    foreach (DName d3 in d2.Keys)
                     {
                         d4.Add(d3);
                     }
-                }
-                d4.Sort(StringComparer.InvariantCulture);
+                }                
+                d4 = d4.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
             }
 
-            EquationHelper found = Program.FindEquationByMeansOfVariableName(varnameWithoutFreq);
+            EquationHelper found = Program.FindEquationByMeansOfVariableName(new DName(varnameWithoutFreq));
 
             if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
             {
@@ -16651,7 +16616,7 @@ namespace Gekko
             if (d4.Count == 0) G.Writeln("<none>");
             else
             {
-                G.PrintListWithCommas(d4, true);
+                G.Writeln(Stringlist.GetListWithCommas(d4));
             }
 
             G.Writeln("------------------------------------------------------------------------------------------");
@@ -16674,7 +16639,7 @@ namespace Gekko
                         if (s == "£") G.Writeln();
                         else
                         {
-                            if (Program.model.modelGekko.varsAType.ContainsKey(s))
+                            if (Program.model.modelGekko.varsAType.ContainsKey(new DName(s)))
                             {
                                 //seems the word exists as variable
                                 G.WriteLink(s, "disp:" + s);
@@ -16727,7 +16692,7 @@ namespace Gekko
         /// </summary>
         /// <param name="var"></param>
         /// <returns></returns>
-        public static bool HasGamsEquation(string var, Model model)
+        public static bool HasGamsEquation(DName var, Model model)
         {
             if (var == null) return false;
             return Program.model.modelGams?.equationsByVarname != null && Program.model.modelGams.equationsByVarname.ContainsKey(var);
@@ -16738,7 +16703,7 @@ namespace Gekko
         /// </summary>
         /// <param name="var"></param>
         /// <returns></returns>
-        public static bool HasGamsEquation(string var)
+        public static bool HasGamsEquation(DName var)
         {
             return HasGamsEquation(var, Program.model);
         }
@@ -16773,18 +16738,21 @@ namespace Gekko
             // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
             // NONSCALAR, OR OLD DESIGN FOR SCALAR MODELS
             //
+            // CLEAN THIS UP!
+            // CLEAN THIS UP!
+            // CLEAN THIS UP!
 
             string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
 
             GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
+            foreach (KeyValuePair<DName, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
             {
                 foreach (ModelGamsEquation e5 in e4.Value)
                 {
                     GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
-                    if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key))
+                    if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key.ToString()))
                     {
-                        dependents.Add(e4.Key, null);
+                        dependents.Add(e4.Key.ToString(), null);
                     }
                 }
             }
@@ -16809,7 +16777,7 @@ namespace Gekko
                 G.Writeln();
             }
 
-            List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
+            List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(new DName(varnameWithoutFreqAndIndex), model);
 
             if (G.IsUnitTestingOrNotShowingGUI())
             {
@@ -17581,10 +17549,8 @@ namespace Gekko
             foreach (TokenHelper token in tokens.storage)
             {
                 if (token.type == ETokenType.Word)
-                {
-                    //List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
-                    List<ModelGamsEquation> e3 = GamsModel.GetGamsEquationsByVarname(token.s, model);
-
+                {                    
+                    List<ModelGamsEquation> e3 = GamsModel.GetGamsEquationsByVarname(new DName(token.s), model);
                     if (e3 != null)
                     {
                         if (!knownVars.ContainsKey(token.s)) knownVars.Add(token.s, null);
@@ -17704,11 +17670,11 @@ namespace Gekko
             {
                 //checks if left-hand var in model. So this ignores exo/endo statements.
                 //so the E and X only describes the model equations as they are
-                if (Program.model.modelGekko?.endogenousOriginallyInModel != null && Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(var))
+                if (Program.model.modelGekko?.endogenousOriginallyInModel != null && Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(new DName(var)))
                 {
                     type = EEndoOrExo.Endo;
                 }
-                else if (Program.model?.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var))
+                else if (Program.model?.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(new DName(var)))
                 {
                     type = EEndoOrExo.Exo;
                 }
@@ -19159,12 +19125,12 @@ namespace Gekko
             Program.model.modelGekko.endogenized.Clear();
             foreach (string var in vars)
             {
-                if (Program.model.modelGekko.endogenized.ContainsKey(var))
+                if (Program.model.modelGekko.endogenized.ContainsKey(new DName(var)))
                 {
                     new Error("" + var + " is already endogenized");
                     //throw new GekkoException();
                 }
-                else Program.model.modelGekko.endogenized.Add(var, "");
+                else Program.model.modelGekko.endogenized.Add(new DName(var), null);
 
             }
             G.Writeln2("Endogenized " + vars.Count + " variables");
@@ -19182,10 +19148,11 @@ namespace Gekko
             {
                 if (Program.model.modelGekko.endogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.endogenized.Count + " endogenized var: ");
                 else G.Write("There are " + Program.model.modelGekko.endogenized.Count + " endogenized vars: ");
-                List<string> temp1 = new List<string>();
-                foreach (string s in Program.model.modelGekko.endogenized.Keys) temp1.Add(s);
+                List<DName> temp1 = new List<DName>();
+                foreach (DName s in Program.model.modelGekko.endogenized.Keys) temp1.Add(s);
                 temp1.Sort();
-                G.PrintListWithCommas(temp1, false);
+                temp1 = temp1.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
+                G.Writeln(Stringlist.GetListWithCommas(temp1));
             }
             //G.Writeln();
             if ((G.GetModelSourceType() != EModelType.Gekko) || Program.model.modelGekko.exogenized == null || Program.model.modelGekko.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
@@ -19193,10 +19160,10 @@ namespace Gekko
             {
                 if (Program.model.modelGekko.exogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.exogenized.Count + " exogenized var: ");
                 else G.Write("There are " + Program.model.modelGekko.exogenized.Count + " exogenized vars: ");
-                List<string> temp1 = new List<string>();
-                foreach (string s in Program.model.modelGekko.exogenized.Keys) temp1.Add(s);
-                temp1.Sort();
-                G.PrintListWithCommas(temp1, false);
+                List<DName> temp1 = new List<DName>();
+                foreach (DName s in Program.model.modelGekko.exogenized.Keys) temp1.Add(s);
+                temp1 = temp1.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
+                G.Writeln(Stringlist.GetListWithCommas(temp1));                
             }
             G.Writeln();
             return;
@@ -19228,12 +19195,12 @@ namespace Gekko
             Program.model.modelGekko.exogenized.Clear();
             foreach (string var in vars)
             {
-                if (Program.model.modelGekko.exogenized.ContainsKey(var))
+                if (Program.model.modelGekko.exogenized.ContainsKey(new DName(var)))
                 {
                     new Error("" + var + " is already exogenized");
                     //throw new GekkoException();
                 }
-                else Program.model.modelGekko.exogenized.Add(var, "");
+                else Program.model.modelGekko.exogenized.Add(new DName(var), null);
             }
             G.Writeln2("Endogenized " + vars.Count + " variables");
             return;
@@ -19606,7 +19573,7 @@ namespace Gekko
                     if (o.opt_dep != null)
                     {
                         //Slack that we do this 2 times... :-(
-                        Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(o.opt_dep);
+                        Tuple<Dictionary<DName, DName>, StringBuilder> tup = GamsModel.GetDependentsGams(o.opt_dep);
                         cacheParameters.dep = tup.Item2.ToString();
                     }
                     cacheParameters.option_model_gams_dep_current = Program.options.model_gams_dep_current;
@@ -19728,10 +19695,10 @@ namespace Gekko
                 if (model.modelGamsScalar.depNames != null)
                 {
                     //Not in protobuf for now, maybe at some point
-                    foreach (KeyValuePair<string, string> kvp in model.modelGamsScalar.depNames)
+                    foreach (KeyValuePair<DName, DName> kvp in model.modelGamsScalar.depNames)
                     {
-                        DName key = DName.HACK1(kvp.Key);
-                        DName value = DName.HACK1(kvp.Value);
+                        DName key = kvp.Key;
+                        DName value = kvp.Value;
                         if (!model.modelGamsScalar.depNames2.ContainsKey(key)) model.modelGamsScalar.depNames2.Add(key, value);
                         if (!model.modelGamsScalar.depNames2Inverted.ContainsKey(value)) model.modelGamsScalar.depNames2Inverted.Add(value, new List<DName>() { key });
                         else model.modelGamsScalar.depNames2Inverted[value].Add(key);
@@ -19838,12 +19805,14 @@ namespace Gekko
             equations.Add("Model m / all /;");
 
             n = -1;
-            foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)
+            foreach (KeyValuePair<DName, BTypeData> kvp in Program.model.modelGekko.varsBType)
             {
                 n++;
-                string s = kvp.Key;
-                string variable = null; int lag = 0;
-                G.ExtractVariableAndLag(kvp.Key, out variable, out lag);
+                string variable = kvp.Key.GetName();
+                int lag = kvp.Key.GetLag();
+                //string s = kvp.Key.ToString();
+                //string variable = null; int lag = 0;
+                //G.ExtractVariableAndLag(kvp.Key.ToString(), out variable, out lag);
                 dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0.Add(lag).ToString()) + ")";
             }
 
@@ -20098,7 +20067,7 @@ namespace Gekko
 
                     if (lhs == null && G.IsSimpleToken(varname))
                     {
-                        lhs = varname;  //only if lhs is not already found, and if the name is a token
+                        lhs = new DName(varname);  //only if lhs is not already found, and if the name is a token
                     }
                 }
             }
@@ -21052,7 +21021,7 @@ namespace Gekko
                     if (s.Value.Type() != EVariableType.Series) continue;
                     if (G.GetFreqFromName(s.Key) != Program.options.freq) continue;  //filter out other freqs
                     string s2 = G.Chop_RemoveFreq(s.Key);
-                    if (!Program.model.modelGekko.varsAType.ContainsKey(s2))
+                    if (!Program.model.modelGekko.varsAType.ContainsKey(new DName(s2)))
                     {
                         onlyDatabankNotModel.Add(s2);
                     }
@@ -21788,9 +21757,9 @@ namespace Gekko
                 {
                     int rowYearStart = row;
                     List<IterMemory> iterMemories = null;
-                    if (Program.model.modelGekko.bMemory.ContainsKey(t.ToString()))
+                    if (Program.model.modelGekko.bMemory.ContainsKey(t))
                     {
-                        iterMemories = Program.model.modelGekko.bMemory[t.ToString()];
+                        iterMemories = Program.model.modelGekko.bMemory[t];
                     }
                     else
                     {
@@ -21820,7 +21789,7 @@ namespace Gekko
                         double[] bBefore = iterMemory.bBefore;
                         double[] bAfter = iterMemory.bAfter;
 
-                        EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
+                        EquationHelper found = Program.FindEquationByMeansOfVariableName(new DName(var));
                         if (found == null)
                         {
                             //G.Writeln();
@@ -24167,9 +24136,9 @@ namespace Gekko
                 //instance after a OPEN<edit>, etc. This is mode=data and something else.
                 //(Would probably happen very rarely anyhow, since model endogenous and databank variables must match)
                 bool ok = true;
-                foreach (string s in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
+                foreach (DName s in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
                 {
-                    if (!databank.ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
+                    if (!databank.ContainsIVariable(s.ToString() + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
                     {
                         ok = false;
                         break;
@@ -31099,7 +31068,7 @@ namespace Gekko
                 G.Writeln();
                 foreach (string var5 in vars)
                 {
-                    BTypeData temp = (BTypeData)Program.model.modelGekko.varsBType[var5 + Globals.lagIndicator + "0"];
+                    BTypeData temp = (BTypeData)Program.model.modelGekko.varsBType[new DName(var5 + Globals.lagIndicator + "0")];
                     int tem2 = temp.bNumber;
                     double num = b[tem2];
                     G.Writeln(iterCounter + "  " + var5 + " = " + num);
@@ -33625,7 +33594,7 @@ namespace Gekko
             }
             int dublets = 0;
             Dictionary<string, int> varlistDublets = new Dictionary<string, int>();
-            CaseInsensitiveHashtable varlist = new CaseInsensitiveHashtable();
+            GekkoDictionary<string, bool> varlist = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             if (Program.model?.modelGekko?.modelInfo?.varlist != null)
             {
                 foreach (Program.Item item in Program.model.modelGekko.modelInfo.varlist)
@@ -33645,7 +33614,7 @@ namespace Gekko
                     }
                     else
                     {
-                        varlist.Add(varName, "");
+                        varlist.Add(varName, false);
                     }
                 }
             }
@@ -33668,8 +33637,8 @@ namespace Gekko
             {
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //filter other freqs
                 string s = G.Chop_RemoveFreq(ss);
-                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.model.modelGekko.varsAType.ContainsKey(s))
+                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(new DName(s)) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(new DName(s)) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(new DName(s))) continue;
+                if (Program.model.modelGekko.varsAType.ContainsKey(new DName(s)))
                 {
                     bothModelAndDatabank.Add(s);
                 }
@@ -33688,23 +33657,23 @@ namespace Gekko
                 }
             }
 
-            foreach (string s in Program.model.modelGekko.varsAType.Keys)
+            foreach (DName s in Program.model.modelGekko.varsAType.Keys)
             {
                 if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
+                if (Program.databanks.GetFirst().ContainsIVariable(s.ToString() + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
                 {
                 }
                 else
                 {
-                    onlyModelNotDatabank.Add(s);
+                    onlyModelNotDatabank.Add(s.ToString());
                 }
-                if (varlist.ContainsKey(s))
+                if (varlist.ContainsKey(s.ToString()))
                 {
-                    bothModelAndVarlist.Add(s);
+                    bothModelAndVarlist.Add(s.ToString());
                 }
                 else
                 {
-                    onlyModelNotVarlist.Add(s);
+                    onlyModelNotVarlist.Add(s.ToString());
                 }
             }
 
@@ -33718,7 +33687,7 @@ namespace Gekko
                 {
                     onlyVarlistNotDatabank.Add(s);
                 }
-                if (Program.model.modelGekko.varsAType.ContainsKey(s))
+                if (Program.model.modelGekko.varsAType.ContainsKey(new DName(s)))
                 {
                 }
                 else

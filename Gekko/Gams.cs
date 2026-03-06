@@ -908,17 +908,20 @@ namespace Gekko
             }
             else
             {
-
-                string eqNameWithoutLast = G.Chop_DimensionRemoveLast_FASTER(eqName.ToString());  //Note: what about lagged/leaded equation???
+                DName eqNameWithoutLast = eqName.RemoveTime();  //Note: what about lagged/leaded equation???
 
                 bool hit1 = false;
                 //SLACK SLACK SLACK
+                //SLACK SLACK SLACK
+                //SLACK SLACK SLACK
                 //SLACK SLACK SLACK --> GetDependentEquations() is not so fast because it is not a dict lookup. Will use time for flowgraph. Could make the dict inverted and faster, but we are moving away from eqnames anyway...?
                 //SLACK SLACK SLACK
-                List<string> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
-                foreach (string s in lhsEqs)
+                //SLACK SLACK SLACK
+                //SLACK SLACK SLACK
+                List<DName> lhsEqs = modelGamsScalar.GetDependentEquations(variableName, model.modelCommon.GetModelSourceType() == EModelType.Gekko);
+                foreach (DName s in lhsEqs)
                 {
-                    if (G.EqualHandleBlanks(eqNameWithoutLast, s)) { hit1 = true; break; }
+                    if (G.Equal(eqNameWithoutLast, s)) { hit1 = true; break; }
                 }
                 double extra = 0d;
                 if (hit1) extra = Globals.lhsScore2; //100

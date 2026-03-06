@@ -4083,7 +4083,7 @@ namespace Gekko
         /// <param name="c2"></param>
         /// <param name="onlyIfUnique"></param>
         /// <returns></returns>
-        public static string HiddenVariableHelper(Cell c2, bool onlyIfUnique)
+        public static DName HiddenVariableHelper(Cell c2, bool onlyIfUnique)
         {
             if (c2 == null) return null;
             List<DName> vars = c2.vars_hack;  //See also GetVarsHack().
@@ -4100,8 +4100,8 @@ namespace Gekko
             if (vars.Count > 0) var = vars[0];  //#dskla8asjkdfa
             //int lag; string name;
             //Decomp.ConvertFromTurtleName(var, false, out name, out lag);
-            string name = null;
-            if (vars != null) name = var.HACK_RemoveTime().ToString();
+            DName name = null;
+            if (vars != null) name = var.HACK_RemoveTime();
             return name;
         }
 
@@ -6313,12 +6313,12 @@ namespace Gekko
                 WindowFind windowFind = new WindowFind(o);
                 windowFind.Title = variableName.ToString() + " - " + "Gekko equations";
                 windowFind.FindSetButtons(firstEqName2.ToString(), firstList, model);
-                windowFind.FindSetLabel(variableName.ToString());
-                windowFind._activeEquation = firstEqName2.ToString();
+                windowFind.FindSetLabel(variableName);
+                windowFind._activeEquation = firstEqName2;
                 windowFind._activeVariable = null;
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = o.decompFind.decompOptions2.showTime;
-                windowFind.FindSetEquation(firstEqName2.ToString(), helper, modelGamsScalar.GetDecompT(), model);
+                windowFind.FindSetEquation(firstEqName2, helper, modelGamsScalar.GetDecompT(), model);
                 windowFind.decompFind.SetWindow(windowFind);
                 windowFind.ShowDialog();
 
@@ -6652,7 +6652,7 @@ namespace Gekko
                 //#6irhwakery7
                 string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, b, b, "");
 
-                string label = Program.GetVariableExplanation1Line(name);
+                string label = Program.GetVariableExplanation1Line(new DName(name));
 
                 string lbl = null;
                 if (!G.NullOrEmpty(label)) lbl = " (" + label + ")";
@@ -6756,12 +6756,12 @@ namespace Gekko
                 Cell cellVariableName = decompTable.Get(i2, 1);
                 List<DName> vars = new List<DName>();
                 Cell cellFirstData = decompTable.Get(i2, 2);
-                string uniqueName = null;
-                if (cellFirstData != null)
-                {
-                    vars = cellFirstData.vars_hack;
-                    uniqueName = Decomp.HiddenVariableHelper(cellFirstData, true);
-                }
+                //DName uniqueName = null;
+                //if (cellFirstData != null)
+                //{
+                //    vars = cellFirstData.vars_hack;
+                //    uniqueName = Decomp.HiddenVariableHelper(cellFirstData, true);
+                //}
                 //string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
                 //string label = null;
                 //if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));

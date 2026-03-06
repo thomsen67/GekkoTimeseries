@@ -18,11 +18,11 @@ namespace Gekko
 
         DateTime lastClick = DateTime.Now;
         
-        public string _activeEquation = null; //this always has a non-null value
-        public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
+        public DName _activeEquation = null; //this always has a non-null value
+        public DName _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
         //public GekkoTime _t1 = GekkoTime.tNull;
         //public GekkoTime _t2 = GekkoTime.tNull;
-        public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, ToggleButton> _buttons = new Dictionary<DName, ToggleButton>(Multidim2Comparer.IgnoreCase);
         public DecompFind decompFind = null;
         //public DecompOptions2 decompOptions2 = null;
 
@@ -71,7 +71,7 @@ namespace Gekko
         {
             ToggleButton b = sender as ToggleButton;
             string s = ((TextBlock)b.Content).Text;
-            this.FindSetLabel(s);
+            this.FindSetLabel(new DName(s));
             this._activeVariable = s;
 
             foreach (object o in this.windowEquationBrowserButtons.Children)
@@ -89,7 +89,7 @@ namespace Gekko
             this._activeVariable = null;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetEquation(_activeEquation, helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+            this.FindSetEquation(new DName(_activeEquation), helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -108,7 +108,7 @@ namespace Gekko
                 int idx = s.IndexOf("[+");
                 s = G.Substring(s, 0, idx - 1);
             }
-            this.FindSetLabel(s);
+            this.FindSetLabel(new DName(s));
         }
 
         public void OnVariableButtonLeave(object sender, MouseEventArgs e)
@@ -118,13 +118,13 @@ namespace Gekko
             string ss = null;
             if (_activeVariable != null)
             {
-                this.FindSetLabel(_activeVariable);
+                this.FindSetLabel(new DName(_activeVariable));
             }
             else
             {
                 EquationTextHelper helper = new EquationTextHelper();
                 helper.showTime = this.decompFind.decompOptions2.showTime;
-                this.FindSetEquation(_activeEquation, helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+                this.FindSetEquation(new DName(_activeEquation), helper, decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
             }
         }
 
@@ -183,8 +183,8 @@ namespace Gekko
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(item.fullName, helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
-            this._activeEquation = item.fullName;
+            this.FindSetButtons(new DName(item.fullName), helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+            this._activeEquation = new DName(item.fullName);
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
@@ -194,7 +194,7 @@ namespace Gekko
             EquationListItem item = x.Content as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(item.fullName, helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+            this.FindSetButtons(new DName(item.fullName), helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -208,7 +208,7 @@ namespace Gekko
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
-        private void FindSetButtons(string eqName, EquationTextHelper helper, GekkoTime t0, Model model)
+        private void FindSetButtons(DName eqName, EquationTextHelper helper, GekkoTime t0, Model model)
         {
             this.FindSetEquation(eqName, helper, t0, model);
             int eqNumber = model.modelGamsScalar.GetEqNumber(eqName);
@@ -216,9 +216,9 @@ namespace Gekko
             this.FindSetButtons(eqName, precedents, model);
         }
 
-        public void FindSetEquation(string eq, EquationTextHelper helper, GekkoTime t0, Model model)
+        public void FindSetEquation(DName eq, EquationTextHelper helper, GekkoTime t0, Model model)
         {
-            string s = model.GetEquationText(new List<string>() { eq }, helper, t0).resultingText;
+            string s = model.GetEquationText(new List<DName>() { eq }, helper, t0).resultingText;
             WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s));
         }
 
@@ -233,9 +233,9 @@ namespace Gekko
         }
 
 
-        public void FindSetLabel(string variableName)
+        public void FindSetLabel(DName variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+            List<string> ss = Program.GetVariableExplanation(variableName, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
             string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
             WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s7));
         }
@@ -284,12 +284,13 @@ namespace Gekko
                     int funcCounter = 0;
 
                     DecompOptions2 decompOptionsTemp = this.decompFind.decompOptions2.Clone();  //also clones operator                    
-                    if (decompOptionsTemp.decompOperator.isRaw) decompOptionsTemp.decompOperator = Decomp.GetFindOperator();                    
+                    if (decompOptionsTemp.decompOperator.isRaw) decompOptionsTemp.decompOperator = Decomp.GetFindOperator();
 
                     //!!! a bit of a waste of time, but is probably not significantly slowing
                     //    down the FIND window.                    
-                    
-                    decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName, " ") }; //qwerty
+
+                    //qwerty bad hack
+                    decompOptionsTemp.new_from = new List<DName>() { DName.HACK1(eqName).HACK_NameWithoutLast(null) };
                     Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, decompOptionsTemp.decompOperator, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]
@@ -330,13 +331,15 @@ namespace Gekko
                         max = Math.Max(v, max);
                     }
 
-                    foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                    foreach (KeyValuePair<DName, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
-                        string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                        //string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                        //qwerty probably wrong
+                        //string ss5 = kvp.Key.ToString();
                         double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.tSelected);
 
                         ToggleButton b = null;
-                        _buttons.TryGetValue(ss5, out b);
+                        _buttons.TryGetValue(kvp.Key, out b);
                         if (b != null)
                         {
                             int i1 = 240;

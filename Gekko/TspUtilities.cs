@@ -272,9 +272,9 @@ namespace Gekko
         //combine with .out file from tsp.       
         
         public static void tspUtility(String dataFile, String templateFile, String frmOutputFile)
-        {            
-            CaseInsensitiveHashtable ht = new CaseInsensitiveHashtable();
-            CaseInsensitiveHashtable htConst = new CaseInsensitiveHashtable();
+        {
+            GekkoDictionary<string, string> ht = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, string> htConst = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);            
             List<string> al = new List<string>(5000);
             List<string> alType = new List<string>(5000);
             List<string> al1 = new List<string>(5000);  //contains output                        

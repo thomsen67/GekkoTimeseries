@@ -601,6 +601,12 @@ namespace Gekko
             return this.ToString(DName.dNameFormatDefault);
         }
 
+        public string ToStringWithoutFreq()
+        {
+            //TODO TODO TODO
+            return G.Chop_RemoveFreq(this.ToString(DName.dNameFormatDefault));
+        }
+
         public string ToString(DNameFormat format)
         {
             if (this.IsNull()) return null;
