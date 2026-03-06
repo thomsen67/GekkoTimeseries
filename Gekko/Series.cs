@@ -165,6 +165,27 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Returns for instance "x!a" as name and "i", "j" as indexes.
+        /// </summary>
+        /// <returns></returns>
+        public DName GetDName()
+        {
+            if (this.name == null || G.StartsWithCaseSensitiveFast(this.name, Globals.seriesArraySubName))
+            {
+                if (!this.IsArraySubSeries())
+                {
+                    return null;
+                }
+                List<StringOrTime> list = new List<StringOrTime>();
+                foreach (string s2 in this.mmi.storage) list.Add(s2);                
+                string s = null;
+                if (this.mmi.parent != null) s = this.mmi.parent.name;
+                return new DName(s, list.ToArray());
+            }
+            else return new DName(this.name);
+        }
+
+        /// <summary>
         /// Returns for instance "x!a" or "x!a[i, j]"
         /// </summary>
         /// <returns></returns>

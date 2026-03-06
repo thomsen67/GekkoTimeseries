@@ -60,10 +60,10 @@ namespace Gekko
 
     public class ExtractTimeDimensionHelper
     {
-        public string name = null;
-        public GekkoTime time = GekkoTime.tNull;
-        public string resultingFullName = null;
-        public List<string> indexes = null;
+        //public string name = null;
+        //public GekkoTime time = GekkoTime.tNull;
+        public DName resultingFullName = null;
+        //public List<string> indexes = null;
     }
 
     public class EquationLhsPoints
@@ -277,51 +277,51 @@ namespace Gekko
         public static ExtractTimeDimensionHelper ExtractTimeDimensionNew(DName varname)
         {
             ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
-            helper.name = varname.GetName();            
-            helper.time = varname.GetTime();
-            helper.resultingFullName = varname.HACK_ToStringWithoutTime();
-            helper.indexes = varname.HACK_IndexesWithoutTime();
+            //helper.name = varname.GetName();            
+            //helper.time = varname.GetTime();
+            helper.resultingFullName = varname;
+            //helper.indexes = varname.HACK_IndexesWithoutTime();
             return helper;
         }
 
-        private static bool ExtractTimeDimensionHelper2(EExtractTimeDimension settings, string input, ExtractTimeDimensionHelper helper)
-        {
-            //input like "x[a,b,2022]"
-            bool simple = false;
-            int end = input.Length - 1;
-            if (input[end] != ']') return simple;
-            if (input.Length < 7) return simple;  //if input has length 7, it is like '123456', where x[6] = x[end] = '6'. Here, x[end-6] = x[0] = '1' is legal.            
-            if (!(input[end - 5] == '[' || input[end - 5] == ',')) return simple;  //Must be x[2022] or x[...,2022].            
-            int i9 = G.IntParse(G.Substring(input, end - 4, end - 1));
-            if (i9 == -12345) return simple;
-            helper.time = new GekkoTime(EFreq.A, i9, 1);
-            if (input[end - 5] == '[')
-            {
-                //input like "x[2022]"
-                //.resultingFullName --> "x"
-                //.name --> "x"
-                simple = true;
-                helper.resultingFullName = G.Substring(input, 0, end - 6);
-                helper.name = helper.resultingFullName;
-                if (settings == EExtractTimeDimension.Full) helper.indexes = new List<string>();
-            }
-            else  //has comma before 4 digits
-            {
-                //input like "x[a,b,2022]"
-                //.resultingFullName --> "x[a,b]"
-                //.name --> "x"
-                simple = true;
-                helper.resultingFullName = G.Substring(input, 0, end - 6) + "]";
-                int idx = input.IndexOf('[');
-                helper.name = G.Substring(input, 0, idx - 1);
-                if (settings == EExtractTimeDimension.Full)
-                {                    
-                    string s2 = G.Substring(input, idx + 1, end - 1);                    
-                    helper.indexes = s2.Split(',').ToList();
-                }
-            }
-            return simple;
-        }
+        //private static bool ExtractTimeDimensionHelper2(EExtractTimeDimension settings, string input, ExtractTimeDimensionHelper helper)
+        //{
+        //    //input like "x[a,b,2022]"
+        //    bool simple = false;
+        //    int end = input.Length - 1;
+        //    if (input[end] != ']') return simple;
+        //    if (input.Length < 7) return simple;  //if input has length 7, it is like '123456', where x[6] = x[end] = '6'. Here, x[end-6] = x[0] = '1' is legal.            
+        //    if (!(input[end - 5] == '[' || input[end - 5] == ',')) return simple;  //Must be x[2022] or x[...,2022].            
+        //    int i9 = G.IntParse(G.Substring(input, end - 4, end - 1));
+        //    if (i9 == -12345) return simple;
+        //    helper.time = new GekkoTime(EFreq.A, i9, 1);
+        //    if (input[end - 5] == '[')
+        //    {
+        //        //input like "x[2022]"
+        //        //.resultingFullName --> "x"
+        //        //.name --> "x"
+        //        simple = true;
+        //        helper.resultingFullName = G.Substring(input, 0, end - 6);
+        //        helper.name = helper.resultingFullName;
+        //        if (settings == EExtractTimeDimension.Full) helper.indexes = new List<string>();
+        //    }
+        //    else  //has comma before 4 digits
+        //    {
+        //        //input like "x[a,b,2022]"
+        //        //.resultingFullName --> "x[a,b]"
+        //        //.name --> "x"
+        //        simple = true;
+        //        helper.resultingFullName = G.Substring(input, 0, end - 6) + "]";
+        //        int idx = input.IndexOf('[');
+        //        helper.name = G.Substring(input, 0, idx - 1);
+        //        if (settings == EExtractTimeDimension.Full)
+        //        {                    
+        //            string s2 = G.Substring(input, idx + 1, end - 1);                    
+        //            helper.indexes = s2.Split(',').ToList();
+        //        }
+        //    }
+        //    return simple;
+        //}
 
         /// <summary>
         /// Read a scalar model. For each model line, it calls HandleEqLine().
@@ -481,7 +481,8 @@ namespace Gekko
 
                         DName inputName = helper.dict_FromVarNumberToVarName[id];
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
-                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber)) aNumber = -12345;
+                        //qwerty remove time?
+                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(helper2.resultingFullName, out aNumber)) aNumber = -12345;
                         if (aNumber == -12345)
                         {
                             if (Globals.greuHack) continue;
@@ -489,13 +490,13 @@ namespace Gekko
                         }
                         int i1 = -12345;
                         int i2 = aNumber;
-                        if (helper2.time.IsNull())  //reading .fx values
+                        if (helper2.resultingFullName.GetTime().IsNull())  //reading .fx values
                         {
                             i1 = 0;
                         }
                         else
                         {
-                            i1 = helper2.time.Subtract(helper.tBasis);
+                            i1 = helper2.resultingFullName.GetTime().Subtract(helper.tBasis);
                         }
                         try
                         {
@@ -533,13 +534,14 @@ namespace Gekko
 
                     DName inputName = helper.dict_FromVarNumberToVarName[id];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
-                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out aNumber)) aNumber = -12345;
+                    //qwerty remove time
+                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(helper2.resultingFullName, out aNumber)) aNumber = -12345;
                     if (aNumber == -12345)
                     {
                         new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
                     }
                     int i1 = -12345;
-                    if (helper2.time.IsNull()) //reading scalar data (not activated)
+                    if (helper2.resultingFullName.GetTime().IsNull()) //reading scalar data (not activated)
                     {
                         //TODO TODO TODO
                         //TODO TODO TODO what to do about these, if read from .fx lines
@@ -553,7 +555,7 @@ namespace Gekko
                     }
                     else
                     {
-                        i1 = helper2.time.Subtract(helper.tBasis);
+                        i1 = helper2.resultingFullName.GetTime().Subtract(helper.tBasis);
                     }
                     int i2 = aNumber;
                     double d;
@@ -628,8 +630,8 @@ namespace Gekko
                     string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
                     List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
                     IVariable nestedListOfDependents_opt_dep = null;
-                    Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
-                    GekkoDictionary<string, string> dependents = tup.Item1;
+                    Tuple<Dictionary<DName, DName>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
+                    Dictionary<DName, DName> dependents = tup.Item1;
                     modelGams = GamsModel.ReadGamsModelHelper(false, Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
                     if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
                     modelGams.rawGmsFile = text;
@@ -849,11 +851,11 @@ namespace Gekko
             }
             else
             {
-                List<string> lhsVars = Program.BeforeEqualSign(eqInfo.eqName.GetName(), modelGams);
+                List<DName> lhsVars = Program.BeforeEqualSign(new DName(eqInfo.eqName.GetName()), modelGams);
                 bool hit2 = false;
-                foreach (string s in lhsVars)
+                foreach (DName s in lhsVars)
                 {
-                    if (G.EqualHandleBlanks(variableName.GetName(), s)) { hit2 = true; break; }
+                    if (G.Equal(new DName(variableName.GetName()), s)) { hit2 = true; break; }
                 }
                 if (hit2) eqInfo.score += Globals.lhsScore1; //0.5                    
 
@@ -974,7 +976,7 @@ namespace Gekko
         /// if analyzing the equations gets more advanced).
         /// </summary>
         /// <param name="modelGamsScalar"></param>
-        public static GekkoDictionary<string, string> DepNames(Model model)
+        public static Dictionary<DName, DName> DepNames(Model model)
         {
 
             //Is called with MODEL statement, used for GetSortedEquations() point system.
@@ -1033,45 +1035,45 @@ namespace Gekko
             // ------------------------------------------------------------
 
             int nAll = 0;
-            List<string> notFoundInModel = new List<string>();
-            List<string> notFoundInEq = new List<string>();
+            List<DName> notFoundInModel = new List<DName>();
+            List<DName> notFoundInEq = new List<DName>();
             int nFail = 0;
 
             List<string> writer = new List<string>();
-            GekkoDictionary<string, List<EquationHelper2>> batches = GetScalarEquations(model);
+            Dictionary<DName, List<EquationHelper2>> batches = GetScalarEquations(model);
 
             GekkoDictionary<string, bool> varsNoIndex = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             List<string> varsNoIndex2 = model.modelGamsScalar.GetVars(3);
             foreach (string s in varsNoIndex2) varsNoIndex.Add(s, false);
 
-            GekkoDictionary<string, string> lhsEquationsStrings = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);            
+            Dictionary<DName, DName> lhsEquationsStrings = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);            
 
             //For each equation name (without indexes)
-            foreach (KeyValuePair<string, List<EquationHelper2>> kvp in batches)
+            foreach (KeyValuePair<DName, List<EquationHelper2>> kvp in batches)
             {
-                string equationNameWithoutIndexes = kvp.Key;
+                DName equationNameWithoutIndexes = kvp.Key;
 
                 //For each scalar equation (no time dimension)
                 foreach (EquationHelper2 eh in kvp.Value)
                 {
                     nAll++;
-                    string equationNameWithIndexes = eh.eqName;
-                    if (Globals.runningOnTTComputer && equationNameWithoutIndexes.Contains("__"))
+                    DName equationNameWithIndexes = eh.eqName;
+                    if (Globals.runningOnTTComputer && equationNameWithIndexes.GetName().Contains("__"))
                     {
                         MessageBox.Show("Hovsa3"); //Not possible
                     }
 
-                    string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
+                    DName equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
                     if (spelling)
                     {
-                        equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_vHhTilBorn_aTot", "E_vHhTilBoern_aTot");
-                        equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_rOffTilVirk", "E_rOffTilVirk2BNP");
-                        equationNameWithoutIndexesTemp = equationNameWithoutIndexesTemp.Replace("E_tSubLoen_sTot", "E_vSubLoen_sTot");
+                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_vHhTilBorn_aTot")) equationNameWithoutIndexesTemp = new DName(equationNameWithoutIndexesTemp.GetName().Replace("E_vHhTilBorn_aTot", "E_vHhTilBoern_aTot"));
+                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_rOffTilVirk")) equationNameWithoutIndexesTemp = new DName(equationNameWithoutIndexesTemp.GetName().Replace("E_rOffTilVirk", "E_rOffTilVirk2BNP"));
+                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_tSubLoen_sTot")) equationNameWithoutIndexesTemp = new DName(equationNameWithoutIndexesTemp.GetName().Replace("E_tSubLoen_sTot", "E_vSubLoen_sTot"));
                     }
 
-                    string[] eqNameChunks = equationNameWithoutIndexesTemp.Split('_');
+                    string[] eqNameChunks = equationNameWithoutIndexesTemp.GetName().Split('_');
 
-                    string lhsName = null;
+                    DName lhsName = null;
                     string indexName = null;
                     for (int i = eqNameChunks.Length - 1; i > 0; i--)
                     {
@@ -1084,7 +1086,7 @@ namespace Gekko
                         if (varsNoIndex.ContainsKey(s))
                         {
                             //Good
-                            lhsName = s;
+                            lhsName = new DName(s);
                             if (i + 1 < eqNameChunks.Length)
                             {
                                 indexName = eqNameChunks[i + 1];  //TODO: What about > 1 index names???
@@ -1095,7 +1097,7 @@ namespace Gekko
 
                     if (lhsName == null)
                     {
-                        if (equationNameWithoutIndexes.StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
+                        if (equationNameWithoutIndexes.GetName().StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
                         {
                             //ignore
                         }
@@ -1111,7 +1113,7 @@ namespace Gekko
 
                     if (m1.storage.Count == 0)
                     {
-                        if (equationNameWithoutIndexes.StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
+                        if (equationNameWithoutIndexes.GetName().StartsWith("e_j", StringComparison.OrdinalIgnoreCase))
                         {
                             //ignore
                         }
@@ -1124,7 +1126,7 @@ namespace Gekko
                     }
 
                     GekkoDictionary<string, bool>[] span = GetIndexesFromScalarEquations(m1);
-                    List<string> eqIndexes = G.Chop_GetIndex(equationNameWithIndexes);
+                    List<string> eqIndexes = equationNameWithIndexes.HACK_IndexesWithoutTime();
                     int nDim = GetDim(m1);
                     int summedDimensions = nDim - eqIndexes.Count;
                     string[] names = new string[nDim];
@@ -1290,30 +1292,29 @@ namespace Gekko
                     {
                         if (eh.eqName == null)
                         {
-                        }
-
-                        if (names.Length > 0) lhsName += "[" + Stringlist.GetListWithCommas(names) + "]";
-
+                        }                        
+                        if (names.Length > 0) lhsName = new DName(lhsName.GetName(), names.Select(s => (StringOrTime)s).ToArray());
+                        
                         if (Globals.greu)
                         {
-                            if (Globals.runningOnTTComputer && lhsEquationsStrings.ContainsKey(G.HandleBlanksHacky(eh.eqName)))
+                            if (Globals.runningOnTTComputer && lhsEquationsStrings.ContainsKey(eh.eqName))
                             {
                                 MessageBox.Show("Hovsa6"); //Not possible?
                             }
                             else
                             {
-                                lhsEquationsStrings.Add(G.HandleBlanksHacky(eh.eqName), G.HandleBlanksHacky(lhsName));                                
+                                lhsEquationsStrings.Add(eh.eqName, lhsName);                                
                             }
                         }
                         else
                         {
-                            if (Globals.runningOnTTComputer && lhsEquationsStrings.ContainsKey(G.HandleBlanksRemove(eh.eqName)))
+                            if (Globals.runningOnTTComputer && lhsEquationsStrings.ContainsKey(eh.eqName))
                             {
                                 MessageBox.Show("Hovsa6"); //Not possible?
                             }
                             else
                             {
-                                lhsEquationsStrings.Add(G.HandleBlanksRemove(eh.eqName), G.HandleBlanksRemove(lhsName));
+                                lhsEquationsStrings.Add(eh.eqName, lhsName);
                             }
                         }
                     }
@@ -1365,7 +1366,7 @@ namespace Gekko
             return lhsEquationsStrings;
         }        
 
-        private static void WriteEquation(EquationHelper2 eh, string lhsName, string equationNameWithIndexes, string[] names, List<string> writer)
+        private static void WriteEquation(EquationHelper2 eh, DName lhsName, DName equationNameWithIndexes, string[] names, List<string> writer)
         {
             writer.Add(equationNameWithIndexes + " ..");
             writer.Add(eh.eqMathRaw);
@@ -1375,11 +1376,11 @@ namespace Gekko
             writer.Add("");
         }
 
-        private static void WalkScalarEquations(string lhsName, TokenHelper tok, VariableDims m2)
+        private static void WalkScalarEquations(DName lhsName, TokenHelper tok, VariableDims m2)
         {
             if (tok.HasNoChildren())
             {
-                if (G.Equal(tok.s, lhsName))
+                if (G.Equal(tok.s, lhsName.ToString()))
                 {
                     TokenHelper next = tok.SiblingAfter();
                     if (next != null)
@@ -1473,7 +1474,7 @@ namespace Gekko
             return nDim;
         }
 
-        private static VariableDims GetScalarModelVariables(string lhsName, EquationHelper2 eh)
+        private static VariableDims GetScalarModelVariables(DName lhsName, EquationHelper2 eh)
         {
             int nM2 = -12345;
             //For each sub-equation under the equation name
@@ -1494,22 +1495,22 @@ namespace Gekko
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        private static GekkoDictionary<string, List<EquationHelper2>> GetScalarEquations(Model model)
+        private static Dictionary<DName, List<EquationHelper2>> GetScalarEquations(Model model)
         {            
-            List<string> eqs = model.modelGamsScalar.GetEqs(1);
+            List<DName> eqs = model.modelGamsScalar.GetEqs(1);
 
-            GekkoDictionary<string, List<EquationHelper2>> batches = new GekkoDictionary<string, List<EquationHelper2>>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, bool> known = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<DName, List<EquationHelper2>> batches = new Dictionary<DName, List<EquationHelper2>>(Multidim2Comparer.IgnoreCase);
+            Dictionary<DName, bool> known = new Dictionary<DName, bool>(Multidim2Comparer.IgnoreCase);
 
-            foreach (string eq in eqs)
+            foreach (DName eq in eqs)
             {
                 if (eq == null) continue;
                 try
                 {                    
-                    if (eq.Contains(Globals.scalarModelExtraVariable)) continue;
-                    if (eq.Contains("e_temp")) continue;
+                    if (eq.GetName().Contains(Globals.scalarModelExtraVariable)) continue;
+                    if (eq.GetName().Contains("e_temp")) continue;
 
-                    string noTime = G.Chop_DimensionRemoveLast_FASTER(eq);
+                    DName noTime = eq.HACK_RemoveTime();
 
                     if (!known.ContainsKey(noTime))
                     {
@@ -1520,11 +1521,11 @@ namespace Gekko
                         continue;
                     }
 
-                    GekkoTime time = G.Chop_DimensionGetPeriod(eq);
+                    GekkoTime time = eq.GetTime();
 
                     if (!time.IsNull())  //ignore for instance a timeless equation like E_tIOy_tBase[d,s]
                     {
-                        string noIndex = G.Chop_GetName(eq);
+                        DName noIndex = new DName(eq.GetName());
 
                         if (!batches.ContainsKey(noIndex))
                         {
@@ -1532,12 +1533,12 @@ namespace Gekko
                         }
 
                         EquationTextHelper helper = new EquationTextHelper();
-                        GetEquationTextHelper helper22 = model.GetEquationText(new List<string>() { eq }, helper, time);
+                        GetEquationTextHelper helper22 = model.GetEquationText(new List<DName>() { eq }, helper, time);
                         string scalar = helper22.s_scalarModel;
                         EquationHelper2 eh = new EquationHelper2();
                         eh.eqMathScalar = helper22.s_scalarModel;
                         eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
-                        eh.eqName = G.Chop_DimensionRemoveLast(eq, " "); //qwerty
+                        eh.eqName = eq.HACK_RemoveTime();
                         batches[noIndex].Add(eh);
                     }
                 }
@@ -1626,7 +1627,7 @@ namespace Gekko
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(modelGamsScalar.dict_FromEqNumberToEqName[i]);
                 var equationName = helper2.resultingFullName;
 
-                if (helper2.time.LargerThanOrEqual(t1) && helper2.time.SmallerThanOrEqual(t2))
+                if (helper2.resultingFullName.GetTime().LargerThanOrEqual(t1) && helper2.resultingFullName.GetTime().SmallerThanOrEqual(t2))
                 {
                     a1++;
                     EquationTextHelper helper = new EquationTextHelper();
@@ -1647,8 +1648,8 @@ namespace Gekko
                     if (c1 == c2)
                     {
                         a2++;
-                        string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i].ToString();
-                        string eqNameWithoutIndex = G.Chop_RemoveIndex(eqName);
+                        DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        DName eqNameWithoutIndex = new DName(eqName.GetName());
                         bool found = false;
                         foreach (IdentityHelper ih in eqs)
                         {
@@ -1677,21 +1678,21 @@ namespace Gekko
             StringBuilder sb_gams_gms = new StringBuilder();
             StringBuilder sb_raw_gms = new StringBuilder();
             ScalarDictionary sd2 = new ScalarDictionary();
-            eqs = eqs.OrderBy(x1 => x1.eqName, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+            eqs = eqs.OrderBy(x1 => x1.eqName, new MultidimSortComparer(true)).ToList();
             using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + "identities.txt", null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 foreach (IdentityHelper ih in eqs)
                 {
-                    List<string> childrenSorted = ih.children.OrderBy(x2 => x2, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                    List<string> xx = new List<string>();
-                    foreach (string s in childrenSorted)
+                    List<DName> childrenSorted = ih.children.OrderBy(x2 => x2, new MultidimSortComparer(true)).ToList();
+                    List<DName> xx = new List<DName>();
+                    foreach (DName s in childrenSorted)
                     {
-                        xx.Add(G.Chop_DimensionRemoveLast_FASTER(s).Replace(ih.eqName, ""));
+                        xx.Add(ih.eqName.RemoveTime());
                     }
                     EquationTextHelper eh = new EquationTextHelper();
                     eh.showTime = false;
-                    GetEquationTextHelper output1 = Program.model.GetEquationText(new List<string>() { childrenSorted[0] }, eh, t1);
+                    GetEquationTextHelper output1 = Program.model.GetEquationText(new List<DName>() { childrenSorted[0] }, eh, t1);
                     string extra = null;
                     if (childrenSorted.Count > 1) extra = " (" + childrenSorted.Count + " sub-equations)";
                     sw.WriteLine(ih.eqName + extra);
@@ -1702,16 +1703,16 @@ namespace Gekko
                     if (childrenSorted.Count > 1)
                     {
                         sw.WriteLine("...");
-                        GetEquationTextHelper output2 = Program.model.GetEquationText(new List<string>() { childrenSorted[childrenSorted.Count - 1] }, eh, t1);
+                        GetEquationTextHelper output2 = Program.model.GetEquationText(new List<DName>() { childrenSorted[childrenSorted.Count - 1] }, eh, t1);
                         sw.WriteLine(output2.s_scalarModel);
                     }
                     sw.WriteLine();
                     sw.WriteLine("================================================================================");
                     sw.WriteLine();
 
-                    foreach (string child in childrenSorted)
+                    foreach (DName child in childrenSorted)
                     {
-                        string eq = child; // Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        DName eq = child; // Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
                         EquationTextHelper helper = new EquationTextHelper();
                         helper.showTime = true;
                         helper.emitScalarModel = true;
@@ -1754,19 +1755,19 @@ namespace Gekko
 
                 sw.WriteLine(Globals.string_equations_1_to + sd2.eqsList.Count);
                 int j = -1;
-                foreach (string s in sd2.eqsList)
+                foreach (DName s in sd2.eqsList)
                 {
                     j++;
-                    sw.WriteLine("e" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
+                    sw.WriteLine("e" + (j + 1) + "  " + s.ToString().Replace("[", "(").Replace("]", ")"));
                 }
 
                 sw.WriteLine();
                 sw.WriteLine(Globals.string_variables_1_to + sd2.varsList.Count);
                 j = -1;
-                foreach (string s in sd2.varsList)
+                foreach (DName s in sd2.varsList)
                 {
                     j++;
-                    sw.WriteLine("x" + (j + 1) + "  " + s.Replace("[", "(").Replace("]", ")"));
+                    sw.WriteLine("x" + (j + 1) + "  " + s.ToString().Replace("[", "(").Replace("]", ")"));
                 }
             }
 
@@ -2543,16 +2544,17 @@ namespace Gekko
                         ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(varname);
 
                         int i1 = -12345;
-                        if (helper2.time.IsNull())
+                        if (helper2.resultingFullName.GetTime().IsNull())
                         {
                             i1 = Globals.decompTimelessNumber; //signals timeless (-12345)
                         }
                         else
                         {
-                            i1 = helper2.time.Subtract(helper.tBasis);
+                            i1 = helper2.resultingFullName.GetTime().Subtract(helper.tBasis);
                         }
 
-                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(helper2.resultingFullName), out i2)) i2 = -12345;
+                        //qwerty remove time?
+                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(helper2.resultingFullName, out i2)) i2 = -12345;
 
                         int ii1 = helper.endo.Count;
                         int ii2 = helper.endo.Count + 1;
@@ -2690,13 +2692,12 @@ namespace Gekko
             model.modelCommon.SetModelSourceType(EModelType.GAMSRaw);
             ModelGams modelGams = new ModelGams(model);
 
-            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
-            GekkoDictionary<string, string> dependents = tup.Item1;
+            Tuple<Dictionary<DName, DName>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
+            Dictionary<DName, DName> dependents = tup.Item1;
             //
             // Should #dependents list be reflected in hash ?????
             //
-            model.modelGams = ReadGamsModelHelper(false, textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
-            if (false && Globals.runningOnTTComputer) Sniff3(model);
+            model.modelGams = ReadGamsModelHelper(false, textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);            
             DateTime t1 = DateTime.Now;
             return model;
         }
@@ -2893,7 +2894,7 @@ namespace Gekko
         /// <param name="fileName"></param>
         /// <param name="dependents"></param>
         /// <param name="o"></param>
-        public static ModelGams ReadGamsModelHelper(bool allowAssignments, string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, bool dump, bool silent, Model model)
+        public static ModelGams ReadGamsModelHelper(bool allowAssignments, string textInputRaw, string fileName, Dictionary<DName, DName> dependents, bool dump, bool silent, Model model)
         {
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
@@ -2913,8 +2914,8 @@ namespace Gekko
             var tags4 = new List<string>() { "*" };
 
             TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
-            GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<DName, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<DName, List<ModelGamsEquation>>(Multidim2Comparer.IgnoreCase);
+            GekkoDictionary<DName, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<DName, List<ModelGamsEquation>>(Multidim2Comparer.IgnoreCase);
 
             List<string> problems = new List<string>();  //vars
             List<string> problems2 = new List<string>(); //eqs
@@ -3024,15 +3025,15 @@ namespace Gekko
         /// The resulting equation is put into equationsByVarname and equationsByEqname.
         /// Has quite a lot of try-catch.
         /// </summary>
-        private static int ReadGamsEquation(bool allowAssignments, StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, List<string> problems2, bool dump)
+        private static int ReadGamsEquation(bool allowAssignments, StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<DName, List<ModelGamsEquation>> equationsByVarname, Dictionary<DName, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, Dictionary<DName, DName> dependents, List<string> problems, List<string> problems2, bool dump)
         {
             TokenHelper lhsTokensGekko = null;
             ModelGamsEquation equation = null;
-            string eqnameGams = null;
+            DName eqnameGams = null;
             int i = -12345;
-            List<string> lhsVars = new List<string>();
+            List<DName> lhsVars = new List<DName>();
             List<EquationNameChunks> lhsVars2 = new List<EquationNameChunks>();
-            List<string> rhsVars = new List<string>();
+            List<DName> rhsVars = new List<DName>();
             List<EquationNameChunks> rhsVars2 = new List<EquationNameChunks>();            
 
             try
@@ -3106,7 +3107,7 @@ namespace Gekko
 
                 string dollar = null;
 
-                eqnameGams = tok.Offset(i)?.s;
+                eqnameGams = new DName(tok.Offset(i)?.s);
                 
                 i++;
 
@@ -3164,7 +3165,7 @@ namespace Gekko
                             wh2.checkIfVariableIsASet = true;
 
                             WalkTokensHandleParentheses(list);
-                            List<string> vars = new List<string>();
+                            List<DName> vars = new List<DName>();
                             List<EquationNameChunks> vars2 = new List<EquationNameChunks>();
                             WalkTokensGekkoSyntax(list, wh2, vars, vars2, new GamsWalkerInfo());
 
@@ -3330,10 +3331,10 @@ namespace Gekko
             }
             
             bool fromList = false;
-            string lhsVariable = ReadGamsModelGetLhsNameAndStoreEquation(equationsByVarname, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, problems2, lhsVars, lhsVars2, rhsVars, rhsVars2, ref fromList);
+            DName lhsVariable = ReadGamsModelGetLhsNameAndStoreEquation(equationsByVarname, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, problems2, lhsVars, lhsVars2, rhsVars, rhsVars2, ref fromList);
             string s = null;
             if (fromList) s = ", designated from list";
-            if (lhsVariable == null) lhsVariable = "[not identified]";
+            if (lhsVariable == null) lhsVariable = new DName("[not identified]");
             sb1.AppendLine("--> " + lhsVariable + " (dependent" + s + ")");
             sb1.AppendLine();
             sb1.AppendLine("----------------------------------------------------------------------------------------------------------------");
@@ -3347,9 +3348,9 @@ namespace Gekko
         /// Tries to identify what is the LHS variable in the GAMS equation, and puts this into dictionaries for later retrieval by variable name or equation name.
         /// The method reacts to option model gams dep method = lhs|eqname, and also reacts to a #dependents list.
         /// </summary>
-        private static string ReadGamsModelGetLhsNameAndStoreEquation(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation equation, string eqnameGams, GekkoDictionary<string, string> dependents, List<string> problems, List<string> problems2, List<string> lhsVars, List<EquationNameChunks> lhsVars2, List<string> rhsVars, List<EquationNameChunks> rhsVars2, ref bool fromList)
+        private static DName ReadGamsModelGetLhsNameAndStoreEquation(Dictionary<DName, List<ModelGamsEquation>> equationsByVarname, Dictionary<DName, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation equation, DName eqnameGams, Dictionary<DName, DName> dependents, List<string> problems, List<string> problems2, List<DName> lhsVars, List<EquationNameChunks> lhsVars2, List<DName> rhsVars, List<EquationNameChunks> rhsVars2, ref bool fromList)
         {
-            string lhs = null;
+            DName lhs = null;
 
             if (G.Equal(Program.options.model_gams_dep_method, "lhs"))
             {
@@ -3357,18 +3358,18 @@ namespace Gekko
             }
             else if (G.Equal(Program.options.model_gams_dep_method, "eqname") || G.Equal(Program.options.model_gams_dep_method, "both"))
             {
-                string[] ss = SplitEqName(eqnameGams);
+                string[] ss = SplitEqName(eqnameGams.ToString());
                 if (ss.Length > 1)
                 {
                     if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
                     {
                         G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
                     }
-                    lhs = ss[1];
+                    lhs = new DName(ss[1]);
                 }
                 else
                 {
-                    lhs = ss[0];
+                    lhs = new DName(ss[0]);
                 }                
             }
             else
@@ -3376,8 +3377,8 @@ namespace Gekko
                 new Error("option model gams dep method = lhs|eqname.");
             }
 
-            string d = null; if (dependents != null) dependents.TryGetValue(eqnameGams, out d);
-            string varnameFound = null;
+            DName d = null; if (dependents != null) dependents.TryGetValue(eqnameGams, out d);
+            DName varnameFound = null;
             if (d != null)
             {
                 //found in #dependents
@@ -3502,167 +3503,9 @@ namespace Gekko
 
             return found;
         }
+        
 
-        private static void Sniff2(Model model)
-        {
-            DateTime dt = DateTime.Now;
-            double ms1 = 0;
-            double ms2 = 0;
-            int n1 = 0;
-            int n2 = 0;
-            int n3 = 0;
-
-            int counterA = 0;
-            int counterError1 = 0;
-            int counterError2 = 0;
-
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
-            {
-                //if (counterA > 6) break;
-                if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
-
-                counterA++;
-                ModelGamsEquation eq = kvp.Value[0];
-
-                eq.expressionVariablesWithSets = new List<EquationVariablesGams>();
-
-                string rhs = eq.rhs.Trim();
-                string lhs = eq.lhs.Trim();
-                string s1 = Decomp.EquationLhsRhs(lhs, rhs, true) + ";";
-
-                if (eq.expressions == null || eq.expressions.Count == 0)
-                {
-                    Globals.expressions = null;  //maybe not necessary
-
-                    try
-                    {
-                        DateTime dt1 = DateTime.Now;
-                        Program.CallEval(eq.conditionals, s1);
-                        ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
-                        n1++;
-                    }
-                    catch (Exception e)
-                    {
-                        counterError1++;
-                        if (e.Message.Contains("System.OutOfMemoryException"))
-                        {
-                            G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
-                        }
-                        else
-                        {
-                            G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
-                        }
-                        continue;
-                    }
-                    eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-
-                    DateTime dt2 = DateTime.Now;
-                    foreach (Func<GekkoSmpl, IVariable> expression in eq.expressions)
-                    {
-
-                        //Function call start --------------
-                        //O.AdjustSmplForDecomp(smpl, 0);
-                        //TODO: can be deleted, #p24234oi32
-
-                        try
-                        {
-                            DecompOperator op = new DecompOperator("d");
-                            GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
-                            GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
-                            string residualName = "residual___";
-                            int funcCounter = 0;
-                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, expression, Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
-
-                            List<string> m1 = new List<string>();
-                            List<string> m2 = new List<string>();
-                            foreach (string s in dd.cellsContribD.storage.Keys)
-                            {
-                                string ss5 = Program.DecompGetNameFromContrib(s);
-                                if (!m1.Contains(ss5, StringComparer.OrdinalIgnoreCase))
-                                {
-                                    m1.Add(ss5);
-                                }
-                            }
-                            EquationVariablesGams temp = new EquationVariablesGams();
-                            temp.equationVariables = m1;
-                            eq.expressionVariablesWithSets.Add(temp);
-                        }
-                        catch (Exception e)
-                        {
-                            counterError2++;
-                            eq.expressionVariablesWithSets.Add(null); //keep alignment
-                            if (e.Message.Contains("System.OutOfMemoryException"))
-                            {
-                                G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
-                            }
-                            else
-                            {
-                                G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
-                            }
-                            break;
-                        }
-                        n2++;
-                    }
-                    ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
-                    n3++;
-                    Globals.expressions = null;  //maybe not necessary
-                }
-            }
-            G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + (-ms1 / 1000d) + " " + (-ms2 / 1000d));
-            G.Writeln2("n1 " + n1 + " n2 " + n2 + " n3 " + n3);
-        }
-
-        private static void Sniff3(Model model)
-        {
-            DateTime dt = DateTime.Now;            
-
-            int counterA = 0;
-
-            string eqs = null;
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
-            {                
-                counterA++;
-                ModelGamsEquation eq = kvp.Value[0];
-                eqs += ", " + eq.nameGams;
-
-                eq.expressionVariablesWithSets = new List<EquationVariablesGams>();
-
-                string rhs = eq.rhs.Trim();
-                string lhs = eq.lhs.Trim();
-                string s1 = Decomp.EquationLhsRhs(lhs, rhs, true) + ";";
-                string sets = null;
-                bool hasDim = false;
-                
-                foreach(string ss in eq.setsGamsList)
-                {                    
-                    if (!G.Equal(ss, "t"))
-                    {
-                        hasDim = true;
-                        sets += ", #" + ss;
-                    }
-                }
-                string c = null;
-                if (!G.NullOrBlanks(eq.conditionals))
-                {
-                    c = " $ (" + eq.conditionals + ")";
-                }
-                if (sets != null) sets = sets.Substring(2);
-                string x = null;
-                if (hasDim) x = "[" + sets + "]";
-                string s2 = kvp.Key + x + c + " = " + s1;
-                using (var txt = new Writeln())
-                {
-                    if (hasDim) txt.MainAdd(kvp.Key + " = series(" + (eq.setsGamsList.Count - 1) + ");");
-                    else txt.MainAdd("//");
-                    txt.MainNewLineTight();
-                    //txt.MainAdd("// " + eq.nameGams);
-                    //txt.MainNewLineTight();
-                    txt.MainAdd(s2);
-                }                
-            }
-            new Writeln("===> Eqs: " + counterA + ", " + G.Seconds(dt));
-            new Writeln("NAMES: " + eqs);
-        }
+        
 
         private static List<ModelGamsEquation> GetGamsEquationsByEqname(DName variable, Model model)
         {            
@@ -3674,7 +3517,7 @@ namespace Gekko
             return eqs;
         }
 
-        public static List<ModelGamsEquation> GetGamsEquationsByVarname(string variable, Model model)
+        public static List<ModelGamsEquation> GetGamsEquationsByVarname(DName variable, Model model)
         {
             if (model.modelGams.equationsByVarname == null || model.modelGams.equationsByVarname.Count == 0)
             {
@@ -3684,9 +3527,9 @@ namespace Gekko
             return eqs;
         }
 
-        public static Tuple<GekkoDictionary<string, string>, StringBuilder> GetDependentsGams(IVariable opt_dep)
+        public static Tuple<Dictionary<DName, DName>, StringBuilder> GetDependentsGams(IVariable opt_dep)
         {
-            GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<DName, DName> dependents = new GekkoDictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
             //hashHelper: will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
             //the dependents list does not change the model per se, but it changes how DISP and other statements
             //like DECOMP show stuff.
@@ -3743,17 +3586,18 @@ namespace Gekko
                         //Since each equation can only have 1 lhs, the eqnames (E_qG etc.) can at most appear 1 time in
                         //the ss list.
 
-                        string temp = null; dependents.TryGetValue(ss[i], out temp);
+                        //qwerty, hmmm ?
+                        DName temp = null; dependents.TryGetValue(new DName(ss[i]), out temp);
                         if (temp != null)
                         {
                             new Error("#dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
                         }
-                        dependents.Add(ss[i], lhs);
+                        dependents.Add(new DName(ss[i]), new DName(lhs));
                     }
                 }
             }
 
-            return new Tuple<GekkoDictionary<string, string>, StringBuilder>(dependents, hashHelper);
+            return new Tuple<Dictionary<DName, DName>, StringBuilder>(dependents, hashHelper);
         }
 
         private static bool CheckIfVarIsASet(string name, WalkTokensHelper th)
@@ -3774,7 +3618,7 @@ namespace Gekko
         /// <summary>
         /// Helper
         /// </summary>
-        public static void WalkTokensGekkoSyntax(TokenList nodes, WalkTokensHelper th, List<string>vars, List<EquationNameChunks>vars2, GamsWalkerInfo info)
+        public static void WalkTokensGekkoSyntax(TokenList nodes, WalkTokensHelper th, List<DName>vars, List<EquationNameChunks>vars2, GamsWalkerInfo info)
         {
             foreach (TokenHelper child in nodes.storage)
             {
@@ -3787,7 +3631,7 @@ namespace Gekko
         /// </summary>
         /// <param name="node"></param>
         /// <param name="th"></param>
-        public static void WalkTokensGekkoSyntax(TokenHelper node, WalkTokensHelper th, List<string> vars, List<EquationNameChunks> vars2, GamsWalkerInfo info)
+        public static void WalkTokensGekkoSyntax(TokenHelper node, WalkTokensHelper th, List<DName> vars, List<EquationNameChunks> vars2, GamsWalkerInfo info)
         {
             //Performs these transformations:
             //- GAMS functions are not touched (log, etc)
@@ -4188,9 +4032,9 @@ namespace Gekko
         /// <param name="vars2"></param>
         /// <param name="nextNode"></param>
         /// <param name="split"></param>
-        private static void GetVariableChunks(TokenHelper node, List<string> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split, GamsWalkerInfo info)
+        private static void GetVariableChunks(TokenHelper node, List<DName> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split, GamsWalkerInfo info)
         {
-            vars.Add((node.ToString() + nextNode.ToString()).Replace(" ", ""));  //pretty raw version, as it is
+            vars.Add(DName.HACK1(node.ToString() + nextNode.ToString()));  //pretty raw version, as it is
             EquationNameChunks vars2a = new EquationNameChunks();
             vars2a.info = info;
             string name = node.ToString();

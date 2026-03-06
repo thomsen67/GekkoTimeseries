@@ -290,8 +290,8 @@ namespace Gekko
         public static StreamWriter sw = null;
 
         public static List<string> unitTestsPromtingHelper = null;
-        public static List<string> unitTestLhsNotFoundInModel = null;
-        public static List<string> unitTestLhsNotFoundInEq = null;
+        public static List<DName> unitTestLhsNotFoundInModel = null;
+        public static List<DName> unitTestLhsNotFoundInEq = null;
 
         // ============== batch stuff start ====================================================
         public static EBatchType batchType = EBatchType.None;
@@ -398,7 +398,7 @@ namespace Gekko
 
         public static bool deepTrace = true;
 
-        public static GekkoDictionary<string, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
+        public static GekkoDictionary<DName, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
         
         public static string extensionPlot = "gpt";
@@ -465,7 +465,7 @@ namespace Gekko
         public static int firstPeriodPositionInArrayNull = int.MaxValue;
         public static int lastPeriodPositionInArrayNull = int.MinValue;
 
-        public static List<string> unitTestDependents = null;
+        public static List<DName> unitTestDependents = null;
                 
         public const string stringConversionNote = "NOTE: If a string %x is enclosed in {}-curlies like {%x}, it can be used as a name reference";
         public const string stringConversionNote2 = "NOTE: A string %x or a list of strings #x can be enclosed in {}-curlies like {%x} or {#x} and be used as name reference";

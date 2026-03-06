@@ -356,7 +356,7 @@ namespace Gekko
 
     public class EquationHelper2 
     {
-        public string eqName = null;
+        public DName eqName = null;
         public string eqMathScalar = null;
         public string eqMathRaw = null;
     }
@@ -400,16 +400,16 @@ namespace Gekko
 
     public class ScalarDictionary
     {
-        public GekkoDictionary<string, string> vars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> eqs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public List<string> varsList = new List<string>();
-        public List<string> eqsList = new List<string>();
+        public GekkoDictionary<DName, DName> vars = new GekkoDictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
+        public GekkoDictionary<DName, DName> eqs = new GekkoDictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
+        public List<DName> varsList = new List<DName>();
+        public List<DName> eqsList = new List<DName>();
     }
 
     public class IdentityHelper 
     {
-        public string eqName = null;
-        public List<string> children = new List<string>();
+        public DName eqName = null;
+        public List<DName> children = new List<DName>();
     }
 
     /// <summary>
@@ -2808,14 +2808,14 @@ namespace Gekko
         /// <param name="eqName"></param>
         /// <param name="modelGams"></param>
         /// <returns></returns>
-        public static List<string> BeforeEqualSign(string eqName, ModelGams modelGams)
+        public static List<DName> BeforeEqualSign(DName eqName, ModelGams modelGams)
         {            
-            List<string> rv = new List<string>();
+            List<DName> rv = new List<DName>();
             if (modelGams == null)
             {
-                if (G.StartsWith(eqName, "e_"))
+                if (G.StartsWith(eqName.GetName(), "e_"))
                 {
-                    rv.Add(eqName.Substring("e_".Length));
+                    rv.Add(new DName(eqName.GetName().Substring("e_".Length)));
                 }
             }
             else
@@ -2825,9 +2825,10 @@ namespace Gekko
                 {
                     foreach (ModelGamsEquation equation in x)  //Actually only 1 in these lists!
                     {
-                        foreach (string s in equation.lhsVars)
+                        foreach (DName s in equation.lhsVars)
                         {
-                            rv.Add(s.Split('(')[0]);  //Indexes here look like x(i, j), not x[i, j].
+                            //qwerty hacky
+                            rv.Add(new DName(s.GetName().Split('(')[0]));  //Indexes here look like x(i, j), not x[i, j].
                         }
                     }
                 }
@@ -2955,107 +2956,7 @@ namespace Gekko
                     new Writeln(G.Seconds(dt));
                     return;
                 }
-
-                if (Globals.runningOnTTComputer && (text == "xd2"))
-                {
-
-                    ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                    List<string> eqs = modelGamsScalar.GetEqs(2);
-                    List<string> relevant = new List<string>();
-                    GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    int n = 0;
-                    int nfix = 0;
-
-                    GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" })
-                    {
-                        d.Add(s, false);
-                    }
-
-                    GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
-                    {
-                        portf.Add(s, false);
-                    }
-
-                    GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
-                    {
-                        ovf.Add(s, false);
-                    }
-
-
-                    //ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-                    //List<string> vars = modelGamsScalar.GetVars(2);
-                    //List<string> relevant = new List<string>();
-                    //GekkoDictionary<string, bool> relevant2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    //int n = 0;
-                    //int nfix = 0;
-
-                    //GekkoDictionary<string, bool> d = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    //foreach (string s in new List<string>() { "tje", "fre", "byg", "lan", "soe", "bol", "ene", "udv", "off", "xEne", "xVar", "xSoe", "xTje", "xTur", "cBol", "cBil", "cEne", "cVar", "cTje", "cTur", "g", "iB", "iM", "iL" }) 
-                    //{
-                    //    d.Add(s, false);
-                    //}
-
-                    //GekkoDictionary<string, bool> portf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    //foreach (string s in new List<string>() { "Obl", "RealKred", "IndlAktier", "UdlAktier", "pensTot", "Bank", "Guld" })
-                    //{
-                    //    portf.Add(s, false);
-                    //}
-
-                    //GekkoDictionary<string, bool> ovf = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    //foreach (string s in new List<string>() { "sbeskjobtdag", "leddag", "ledkont", "uddsu", "orlov", "barsel", "syge", "aktdag", "reval", "ledigyd", "fortid", "overg", "fleksyd", "efterl", "pension", "tjmand", "udvforlob", "ledarbj", "aktarbj", "intro", "tidlpens", "seniorpens", "aktkont", "ferie", "tillaeg", "tilbtrk", "kontflex", "kontrest", "boernyd", "boligyd", "boligst", "skatpl", "iskatpl", "groen", "medie", "lumpsumovf", "udlpens", "udlfortid", "udltidlpens", "udlseniorpens" })
-                    //{
-                    //    ovf.Add(s, false);
-                    //}                
-
-                    //foreach (string varNameWithIndexes in vars)
-                    //{
-                    //    n++;
-                    //    List<GekkoTime> fixVars = modelGamsScalar.GetFixedPeriods(varNameWithIndexes);
-                    //    if (fixVars.Contains(new GekkoTime(EFreq.A, 2030, 1)))
-                    //    {
-                    //        nfix++;
-                    //    }
-                    //    else
-                    //    {
-                    //        relevant.Add(varNameWithIndexes);
-                    //        string dbName, varName, freq; string[] indexes;
-                    //        O.Chop(varNameWithIndexes, out dbName, out varName, out freq, out indexes);
-
-                    //        if (indexes != null)
-                    //        {
-                    //            for (int pos = 0; pos < indexes.Length; pos++)
-                    //            {
-                    //                int i;
-                    //                if (int.TryParse(indexes[pos], out i))
-                    //                {
-                    //                    if (i >= 0 && i <= 120)
-                    //                    {
-                    //                        indexes[pos] = "40";
-                    //                    }
-                    //                }
-                    //                else
-                    //                {
-                    //                    if (d.ContainsKey(indexes[pos])) indexes[pos] = "tje";
-                    //                    else if (portf.ContainsKey(indexes[pos])) indexes[pos] = "Obl";
-                    //                    else if (ovf.ContainsKey(indexes[pos])) indexes[pos] = "orlov";
-                    //                }
-                    //            }
-                    //        }
-                    //        string varNameWithIndexes2 = O.UnChop(dbName, varName, freq, indexes);
-                    //        if (indexes != null && !relevant2.ContainsKey(varNameWithIndexes2)) relevant2.Add(varNameWithIndexes2, false);
-                    //    }
-                    //}
-                    //List<string> important = relevant2.Keys.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
-                    //foreach (string s in important)
-                    //{
-                    //    G.Writeln(s);
-                    //}
-                    //new Writeln("n = " + n + " nfix = " + nfix + " ratio = " + (double)nfix / (double)n + "   " + relevant2.Count);
-                    //return;
-                }
+                
 
                 if (Globals.runningOnTTComputer && (text == "b"))
                 {
@@ -10316,7 +10217,7 @@ namespace Gekko
         /// </summary>
         /// <param name="lhsName"></param>
         /// <returns></returns>
-        public static EquationHelper FindEquationByMeansOfVariableName(string lhsName)
+        public static EquationHelper FindEquationByMeansOfVariableName(DName lhsName)
         {
 
             int r = -12345;
@@ -10587,7 +10488,7 @@ namespace Gekko
             // PRECEDENTS PRECEDENTS PRECEDENTS 
             if (alsoIncludePrecedents && Globals.precedentsContainer != null && rv_series != null)
             {
-                Program.AddToPrecedents(ib as Databank, rv_series.GetName());
+                Program.AddToPrecedents(ib as Databank, rv_series.GetDName());
             }
 
             // TRACING TRACING TRACING TRACING 
@@ -12091,12 +11992,12 @@ namespace Gekko
         /// </summary>
         /// <param name="db"></param>
         /// <param name="varnameWithFreq"></param>
-        public static void AddToPrecedents(Databank db, string s)
+        public static void AddToPrecedents(Databank db, DName s)
         {
-            string two = db.name + ":" + s;
+            DName two = new DName(db.name + "." + s.GetName(), s.HACK_IndexesWithoutTime().Select(x => (StringOrTime)x).ToArray()); //s has no time anyway
             if (!Globals.precedentsContainer.ContainsKey(two))
             {
-                Globals.precedentsContainer.Add(two, 0);
+                Globals.precedentsContainer.Add(two, 0);                
             }
         }
 
@@ -16502,7 +16403,7 @@ namespace Gekko
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), null);
-                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<DName>() { DName.HACK1(s2) }, helper, tUsedHere);
                         string eq = temp.resultingText;
                         if (temp.hasHit)
                         {
@@ -16912,7 +16813,7 @@ namespace Gekko
 
             if (G.IsUnitTestingOrNotShowingGUI())
             {
-                Globals.unitTestDependents = new List<string>();
+                Globals.unitTestDependents = new List<DName>();
                 if (eqs != null)
                 {
                     foreach (ModelGamsEquation eq in eqs)
@@ -17005,7 +16906,7 @@ namespace Gekko
 
                 //Gets the equation text (raw)
                 EquationTextHelper helperA = new EquationTextHelper();                
-                GetEquationTextHelper helperA1 = Program.model.GetEquationText(new List<string>() { bestEq.eqName.ToString() }, helperA, tUsedHere);
+                GetEquationTextHelper helperA1 = Program.model.GetEquationText(new List<DName>() { bestEq.eqName }, helperA, tUsedHere);
 
                 string eqTextA = helperA1.s_gekkoSyntax;                
 
@@ -20134,7 +20035,7 @@ namespace Gekko
         /// </summary>
         /// <param name="node"></param>
         /// <param name="lhs"></param>
-        public static void GetLhsVariable(TokenHelper node, ref string lhs)
+        public static void GetLhsVariable(TokenHelper node, ref DName lhs)
         {
             if (lhs != null) return;  //found the lhs
 
@@ -31160,11 +31061,11 @@ namespace Gekko
             return code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "m" || code1 == "xm" || code1 == "rp" || code1 == "xrp" || code1 == "q" || code1 == "xq" || code1 == "rdp" || code1 == "xrdp" || code1 == "mp" || code1 == "xmp";
         }
 
-        public static string GetDecompResidualName(int counter, int all)
-        {
+        public static DName GetDecompResidualName(int counter, int all)
+        {            
             string s = "";
             if (all > 1) s = (counter + 1).ToString();
-            return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + s + "¤[0]";
+            return new DName(Globals.decompResidualName, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
         }
 
         public static string GetDecompResidualNameSimple(int counter, int all)

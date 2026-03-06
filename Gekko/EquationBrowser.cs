@@ -1895,7 +1895,7 @@ img {border-style: none;
                     html1.Append("<div id = `#" + SimplerName(equationHelper.name.ToString()) + "-2` class=`content`>");
                     if (reduced.ContainsKey(equationHelper.i))
                     {
-                        string table = BrowserDecompTable(t1.Add(decompAdd), t2, variableName.ToString(), equationHelper, model, modelGamsScalar);
+                        string table = BrowserDecompTable(t1.Add(decompAdd), t2, variableName, equationHelper, model, modelGamsScalar);
                         if (table != null)
                         {
                             html1.AppendLine("<br>");
@@ -2260,12 +2260,12 @@ img {border-style: none;
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
                 var equationName = helper2.resultingFullName;
 
-                if (helper2.time.Equals(t1))
+                if (helper2.resultingFullName.GetTime().Equals(t1))
                 {
                     string s5, s6;
                     EquationNameAndNumber equationHelper5 = new EquationNameAndNumber();
                     //equationHelper5.name = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false).resultingFullName;
-                    equationHelper5.name = DName.HACK1(helper2.resultingFullName);
+                    equationHelper5.name = helper2.resultingFullName;
                     equationHelper5.i = i;
                     GetEquationText(t1, bh, equationHelper5, modelGamsScalar, tUsedHere, out s5, out s6);
 
@@ -2329,9 +2329,9 @@ img {border-style: none;
         {            
             //string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
             DName dName2 = equationHelper.name.HACK_AddTime(tUsedHere);
-            string s2 = dName2.ToString();
+            DName s2 = dName2;
             EquationTextHelper helper = new EquationTextHelper();
-            GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { s2 }, helper, tUsedHere);
+            GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<DName>() { s2 }, helper, tUsedHere);
             s5 = helper22.s_gamsOrFrnSyntax;
             if (bh.removeTx0Dollar) s5 = Tx0(s5);
             s6 = helper22.s_scalarModel;
@@ -2386,7 +2386,7 @@ img {border-style: none;
                 ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
                 var equationName = helper2.resultingFullName;
 
-                if (helper2.time.Equals(t))
+                if (helper2.resultingFullName.GetTime().Equals(t))
                 {
                     EquationTextHelper helper = new EquationTextHelper();
                     helper.showTime = false;
@@ -2396,7 +2396,7 @@ img {border-style: none;
                     {
                         DName variableNameWithoutLagOrLead = DName.HACK1(G.Chop_RemoveLagOrLead(variableName));
                         if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
-                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = DName.HACK1(equationName) });
+                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
                     }
                 }
             }
@@ -2541,7 +2541,7 @@ img {border-style: none;
                 count++;
                 table += "<tr>";
                 EquationTextHelper helper = new EquationTextHelper();
-                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<string>() { eqHelper.eqName.ToString() }, helper, tUsedHere);                
+                GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<DName>() { eqHelper.eqName }, helper, tUsedHere);                
                 //string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(), SimplerName(variableName) + ".html" + "#" + SimplerName(G.Chop_RemoveLagOrLead(eqHelper.eqNameWithLag)));
                 string link = EquationBrowser.HtmlLink(eqHelper.eqNameWithLag.ToString(bh.dNameFormat), SimplerName(variableName.ToString()) + ".html" + "#" + SimplerName(eqHelper.eqNameWithLag.RemoveTime().ToString()));
                 if (count == 0) link ="<b>" + link + "</b>";
@@ -2586,8 +2586,8 @@ img {border-style: none;
             DecompDatas decompDatas = new DecompDatas();
             GekkoTime gt1, gt2;
             Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);            
-            Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;            
-            string lhsString = "Expression value";            
+            Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
+            DName lhsString = new DName("Expression value");
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
             decompDatas.MAIN_data = null;
@@ -2623,7 +2623,7 @@ img {border-style: none;
                         decompOptions2.decompOperator = new DecompOperator(combo_op);
                         if (combo_errors == "yes") decompOptions2.showErrors = true;
                         else decompOptions2.showErrors = false;
-                        string residualName = Program.GetDecompResidualName(0, 1);
+                        DName residualName = Program.GetDecompResidualName(0, 1);
                         int funcCounter = 0;
                         DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
@@ -2697,7 +2697,7 @@ img {border-style: none;
                         for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
                         {
                             Cell cellVariableName = decompTable.Get(i2, 1);
-                            List<string> vars = new List<string>();
+                            List<DName> vars = new List<DName>();
                             Cell cellFirstData = decompTable.Get(i2, 2);
                             string uniqueName = null;
                             if (cellFirstData != null)
@@ -2729,16 +2729,16 @@ img {border-style: none;
                             table += "<tr>";                           
                             table += "<th style=`white-space: nowrap`" + titleHtml + ">";
 
-                            List<List<string>> black = decompOutput.black;
+                            List<List<DName>> black = decompOutput.black;
                             bool view = false;
-                            foreach (List<string> b5 in black)
+                            foreach (List<DName> b5 in black)
                             {
                                 if (b5.Count > 1)
                                 {
                                     view = true; break;
                                 }
                             }
-                            List<string> black2 = black[i2 - 2];
+                            List<DName> black2 = black[i2 - 2];
                             int n = black2.Count;
                             string imgBlack = "";
                             if (view)
@@ -2943,7 +2943,7 @@ img {border-style: none;
                     list.Sort(StringComparer.InvariantCulture);
                 }
 
-                EquationHelper eq = Program.FindEquationByMeansOfVariableName(varnameWithoutFreq);
+                EquationHelper eq = Program.FindEquationByMeansOfVariableName(new DName(varnameWithoutFreq));
 
                 if (eq == null)
                 {

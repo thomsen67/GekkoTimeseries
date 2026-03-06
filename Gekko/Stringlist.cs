@@ -93,6 +93,13 @@ namespace Gekko
             return sb.ToString();
         }
 
+
+        public static string GetListWithCommas(List<DName> list)
+        {
+            return GetListWithCommas(list, " ");
+        }
+
+
         /// <summary>
         /// Transform a list of strings to a comma-separated string.
         /// Choose blanks between for instance elements, "a, b, c" (listBlanks = " ") or "a,b,c" (listBlanks = null or "").

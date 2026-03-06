@@ -131,7 +131,7 @@ namespace Gekko
                 // Step 5: Add the value (from the values part of the data row)
 
                 //double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<string>() { dataframeRow.storageValues[Globals.dNames].text }, dataframeRow.storageValues[Globals.dPrimeShare].data,      
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<DName>() { new DName( dataframeRow.storageValues[Globals.dNames].text) }, dataframeRow.storageValues[Globals.dPrimeShare].data,      
                     dataframeRow.storageValues[Globals.dFirstLevelLag].data,
                     dataframeRow.storageValues[Globals.dFirstLevelLag2].data,
                     dataframeRow.storageValues[Globals.dFirstLevelRef].data, 
@@ -298,10 +298,10 @@ namespace Gekko
         public Table table = null;
         public string ignore = null;
         public List<double> red = null; //lamps
-        public List<List<string>> black = null;  //expand/collapse arrows
+        public List<List<DName>> black = null;  //expand/collapse arrows
         public Tuple<bool, bool> rowsOrColsSumUp = null;
 
-        public DecompOutput(Table table, string ignore, List<double> red, List<List<string>> black)
+        public DecompOutput(Table table, string ignore, List<double> red, List<List<DName>> black)
         {
             this.table = table;
             this.ignore = ignore;
@@ -319,7 +319,7 @@ namespace Gekko
     {        
         public int position = -12345;
         public double value = double.NaN;
-        public string name = null;
+        public DName name = null;
         public override string ToString()
         {
             return position + " --- " + value + " ---name--- " + name;
@@ -580,7 +580,7 @@ namespace Gekko
         public double levelRefLag;
         public double levelRefLag2;
         public int n;
-        public List<string> fullVariableNames;
+        public List<DName> fullVariableNames;
         //public string backgroundColor;
         public double prime; //used to see if elements should sum up
         //Values from lhs/endo variable
@@ -590,7 +590,7 @@ namespace Gekko
         public double dFirstLevelRefLag;
         public double dFirstLevelRefLag2;
 
-        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, double primeShare, double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2)
+        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<DName> fullVariableNames, double primeShare, double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2)
         {
             this.change = change;
             this.changeAlternative = changeAlternative;
@@ -1110,7 +1110,7 @@ namespace Gekko
             foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
             {
                 ii++;
-                string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
+                DName residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
 
                 int jj = -1;
                 if (model.DecompType() == EModelType.GAMSScalar)
@@ -2130,7 +2130,7 @@ namespace Gekko
                         xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
                     }
 
-                    DName xnewName = ConvertToTurtleName(xname, xlag);
+                    DName xnewName = xname.HACK_AddTime(new GekkoTime(EFreq.Lag, xlag));
 
                     int ZERO = 0;
                     DecompDict dd = null;
@@ -2180,7 +2180,7 @@ namespace Gekko
             }
         }
 
-        private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, Dictionary<DName, int> all, List<string> eqNames, List<DName> problem)
+        private static void EndoVariableNotFoundInEquations(GekkoTime per1, GekkoTime per2, Dictionary<DName, int> all, List<DName> eqNames, List<DName> problem)
         {
             List<string> all2 = new List<string>();
             foreach (DName s2 in all.Keys.ToList())
@@ -2192,7 +2192,7 @@ namespace Gekko
             if (eqNames.Count > 0)
             {
                 extra3 = "Equation" + G.S(eqNames.Count) + ":" + G.NL;
-                foreach (string s6 in eqNames.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList())
+                foreach (DName s6 in eqNames.OrderBy(x => x, new MultidimSortComparer(true)).ToList())
                 {
                     extra3 += "  " + s6 + G.NL;
                 }
@@ -2285,10 +2285,7 @@ namespace Gekko
             // ==> Fix this in Gekko 4.0, make it more clean. Here we have to check for null, etc.
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-            
-            int lag2; string name2;
-            ConvertFromTurtleName(name, true, out name2, out lag2);
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK                        
 
             Tuple<Series, Series> tup = null;
             if (IsDecompResidualName(name))
@@ -2305,19 +2302,19 @@ namespace Gekko
                     // Why taken from databank?
                     // HACK HACK HACK HACK HACK
                     Series ts = null;
-                    ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    ts = O.GetIVariableFromString(name.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         if (ts.type == ESeriesType.ArraySuper)
                         {
-                            new Error("Did not expect variable '" + name2 + "' to be an array-series");
+                            new Error("Did not expect variable '" + name.HACK_ToStringWithoutTime() + "' to be an array-series");
                         }
                         ts = ts.DeepClone(0, null, null) as Series;
                         if (Globals.runningOnTTComputer && ts.type == ESeriesType.Timeless)
                         {
                             //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
                         }
-                        ts.Lag(lag2);
+                        ts.Lag(name.GetLag());
                         if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                         {
                             DecompMainStoreRawVariableHelper(ts);
@@ -2339,19 +2336,19 @@ namespace Gekko
                     // Why taken from databank?
                     // HACK HACK HACK HACK HACK
 
-                    Series ts = O.GetIVariableFromString(name2.Replace(DecompFirst() + ":", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    Series ts = O.GetIVariableFromString("Ref:" + name.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         if (ts.type == ESeriesType.ArraySuper)
                         {
-                            new Error("Did not expect variable '" + name2 + "' to be an array-series");
+                            new Error("Did not expect variable '" + name.HACK_ToStringWithoutTime() + "' to be an array-series");
                         }
                         ts = (ts.DeepClone(0, null, null) as Series);
                         if (Globals.runningOnTTComputer && ts.type == ESeriesType.Timeless)
                         {
                             //This works ok, since lag2 is always == 0, so .anchorPeriod is not touched (and if it were, that would still be ok)
                         }
-                        ts.Lag(lag2);
+                        ts.Lag(name.GetLag());
                         if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                         {
                             DecompMainStoreRawVariableHelper(ts);
@@ -2898,7 +2895,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, DName residualName, ref int funcCounter)
         {
             //See #kljaf89usafasdf for scalar model
             //
@@ -3035,7 +3032,7 @@ namespace Gekko
             {  //resets Globals.precedents afterwards
                 DecompInitDict(d);
 
-                Globals.precedentsContainer = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.precedentsContainer = new GekkoDictionary<DName, int>(Multidim2Comparer.IgnoreCase);
 
                 //Function call start --------------
                 O.AdjustSmplForDecomp(smpl, 0);
@@ -3047,11 +3044,11 @@ namespace Gekko
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
 
-                List<string> ss = Globals.precedentsContainer.Keys.ToList<string>();
-                ss.Sort(StringComparer.OrdinalIgnoreCase);
-                foreach (string s in ss)
+                List<DName> ss = Globals.precedentsContainer.Keys.ToList();
+                ss = ss.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
+                foreach (DName s in ss)
                 {
-                    IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+                    IVariable x = O.GetIVariableFromString(s.ToString(), O.ECreatePossibilities.NoneReportError);
 
                     if (x.Type() == EVariableType.Series)
                     {
@@ -3116,7 +3113,7 @@ namespace Gekko
 
                 if (decompPrecedents.Count > 0)
                 {
-                    GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<DName, int> vars = new GekkoDictionary<DName, int>(Multidim2Comparer.IgnoreCase);
 
                     int iVar = -1;
 
@@ -3125,7 +3122,7 @@ namespace Gekko
                         iVar++;
 
                         Series xRef_series = null;
-                        IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
+                        IVariable dpx = O.GetIVariableFromString(dp.s.ToString(), O.ECreatePossibilities.NoneReportError);
 
                         if (dpx.Type() == EVariableType.Series)
                         {
@@ -3133,7 +3130,7 @@ namespace Gekko
                                                                                          //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe
                             if (mm.Contains(1))
                             {
-                                xRef_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
+                                xRef_series = O.GetIVariableFromString("Ref:" + dp.s.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReportError) as Series;
                             }
                         }
                         else
@@ -3186,7 +3183,7 @@ namespace Gekko
                                         //Function call end   --------------
 
                                         Series y1_series = y1 as Series;
-                                        string nameOriginal = G.Chop_RemoveFreq(dp.s, tt1.freq);
+                                        DName nameOriginal = dp.s;
 
                                         if (true)  //this does not seem to cost any time...?
                                         {
@@ -3203,16 +3200,16 @@ namespace Gekko
                                                     //If it does evaluate, but there is no effect, it is skipped too.
 
                                                     int lag = -t2.Subtract(t1);  //x[-1] --> lag = -1                                                                                        
-                                                    string lag2 = null;
-                                                    if (lag >= 1)
-                                                    {
-                                                        lag2 = "+" + lag.ToString();
-                                                    }
-                                                    else
-                                                    {
-                                                        lag2 = lag.ToString();
-                                                    }
-                                                    string name = nameOriginal + "¤[" + lag2 + "]";
+                                                    //string lag2 = null;
+                                                    //if (lag >= 1)
+                                                    //{
+                                                    //    lag2 = "+" + lag.ToString();
+                                                    //}
+                                                    //else
+                                                    //{
+                                                    //    lag2 = lag.ToString();
+                                                    //}
+                                                    DName name = nameOriginal.HACK_AddTime(new GekkoTime(EFreq.Lag, lag));
 
                                                     if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
                                                     {
@@ -3275,7 +3272,7 @@ namespace Gekko
                     {
                         i++;
                         int j = 0;
-                        foreach (string s in vars.Keys)
+                        foreach (DName s in vars.Keys)
                         {
                             j++;
 
@@ -3491,7 +3488,7 @@ namespace Gekko
                                     {
                                         lag2 += eqPeriods.offset;
                                     }
-                                    string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
+                                    DName name = varName.HACK_AddTime(new GekkoTime(EFreq.Lag, lag2));
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
                                     d.cellsGradQuo[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
@@ -3544,7 +3541,7 @@ namespace Gekko
                                     {
                                         lag2 += eqPeriods.offset;
                                     }
-                                    string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
+                                    DName name = varName.HACK_AddTime(new GekkoTime(EFreq.Lag, lag2));
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
                                     d.cellsGradRef[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
@@ -3597,7 +3594,7 @@ namespace Gekko
                                     {
                                         lag2 += eqPeriods.offset;
                                     }
-                                    string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
+                                    DName name = varName.HACK_AddTime(new GekkoTime(EFreq.Lag, lag2));
                                     d.cellsRef[name].SetData(t, x0_before);
                                     d.cellsQuo[name].SetData(t, x1);
                                     d.cellsGradRef[name].SetData(t, grad);
@@ -3626,7 +3623,7 @@ namespace Gekko
                 {
                     int add = 1; if (op.lowLevel == ELowLevel.Multiplier) add = 0;
                     GekkoTime t = t2.Add(add);
-                    foreach (string DName in vars.Keys)
+                    foreach (DName s in vars.Keys)
                     {
                         if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
                         {
@@ -3784,7 +3781,7 @@ namespace Gekko
 
             Func<IEnumerable<AggContainer>, AggContainer> agg = (m) =>
             {
-                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<string>(), 0d, 0d, 0d, 0d, 0d, 0d);
+                AggContainer aggregate = new AggContainer(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0, new List<DName>(), 0d, 0d, 0d, 0d, 0d, 0d);
                 int n = 0;
                 foreach (AggContainer x in m)
                 {
@@ -4089,7 +4086,7 @@ namespace Gekko
         public static string HiddenVariableHelper(Cell c2, bool onlyIfUnique)
         {
             if (c2 == null) return null;
-            List<string> vars = c2.vars_hack;  //See also GetVarsHack().
+            List<DName> vars = c2.vars_hack;  //See also GetVarsHack().
 
             if (vars == null || vars.Count == 0)
             {
@@ -4099,10 +4096,12 @@ namespace Gekko
             {
                 if (vars.Count != 1) return null;
             }
-            string var = null;
+            DName var = null;
             if (vars.Count > 0) var = vars[0];  //#dskla8asjkdfa
-            int lag; string name;
-            Decomp.ConvertFromTurtleName(var, false, out name, out lag);
+            //int lag; string name;
+            //Decomp.ConvertFromTurtleName(var, false, out name, out lag);
+            string name = null;
+            if (vars != null) name = var.HACK_RemoveTime().ToString();
             return name;
         }
 
@@ -4292,11 +4291,11 @@ namespace Gekko
                             string tmp2 = null;
                             if (agg.fullVariableNames != null)
                             {
-                                List<string> tmp = new List<string>();
-                                foreach (string s in agg.fullVariableNames)
+                                List<DName> tmp = new List<DName>();
+                                foreach (DName s in agg.fullVariableNames)
                                 {
-                                    string s2 = FullVariableNamePretty(s, true);
-                                    string s3 = TrimAndRemoveLag0(s2);
+                                    DName s2 = FullVariableNamePretty(s, true);
+                                    DName s3 = s2.HACK_RemoveTime();
                                     tmp.Add(s3);
                                 }
                                 tmp2 = Stringlist.GetListWithCommas(tmp, "  ");  //x[i, j], x[i, k] --> x[i, j],  x[i, k]
@@ -5030,7 +5029,7 @@ namespace Gekko
 
             string ignoredText = null;
             List<double> red = new List<double>();
-            List<List<string>> black = new List<List<string>>();
+            List<List<DName>> black = new List<List<DName>>();
 
             // --------------------------------
             // SORT AND IGNORE START
@@ -5044,7 +5043,7 @@ namespace Gekko
                 {
                     Cell c5 = table1.Get(i, 2);
                     //string name2 = c5?.vars_hack?[0];
-                    string name2 = GetVarsHack(c5);
+                    DName name2 = GetVarsHack(c5);
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -5065,7 +5064,7 @@ namespace Gekko
                 {
                     Cell c5 = table1.Get(2, j);
                     //string name2 = c5?.vars_hack?[0];
-                    string name2 = GetVarsHack(c5);
+                    DName name2 = GetVarsHack(c5);
                     if (IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
@@ -5212,7 +5211,7 @@ namespace Gekko
 
                         Cell c = table2.Get(rowmax + 1, j);
                         c.backgroundColor = Globals.decompIgnoredColor;
-                        c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                        c.vars_hack = new List<DName>() { new DName(Globals.decompIgnoreName) };
                         c.value_hack = sum_hack;
                     }
                 }
@@ -5244,7 +5243,7 @@ namespace Gekko
 
                         Cell c = table2.Get(i, colmax + 1);
                         c.backgroundColor = Globals.decompIgnoredColor;
-                        c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                        c.vars_hack = new List<DName>() { new DName(Globals.decompIgnoreName) };
                         c.value_hack = sum_hack;
                     }
                 }
@@ -5271,12 +5270,12 @@ namespace Gekko
                             if (double.IsNaN(d))
                             {
                                 bool hit = false;
-                                List<string> xx = c.vars_hack;
+                                List<DName> xx = c.vars_hack;
                                 if (xx != null)
                                 {
-                                    foreach (string s in xx)
+                                    foreach (DName s in xx)
                                     {
-                                        int a; if (!model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(s), out a)) a = -12345;
+                                        int a; if (!model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(s, out a)) a = -12345;
                                         if (a == -12345) continue;
 
                                         bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
@@ -5352,7 +5351,7 @@ namespace Gekko
                             table2.SetNumber(rowmax + 1, j, target - sum, numberFormat);
                         }
 
-                        table2.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
+                        table2.Get(rowmax + 1, j).vars_hack = new List<DName>() { new DName(Globals.decompErrorName) };
                         table2.Get(rowmax + 1, j).value_hack = -sum_hack;  //probably not used?
                         table2.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
                     }
@@ -5386,7 +5385,7 @@ namespace Gekko
                             table2.SetNumber(i, colmax + 1, target - sum, numberFormat);
                         }
 
-                        table2.Get(i, colmax + 1).vars_hack = new List<string>() { Globals.decompErrorName };
+                        table2.Get(i, colmax + 1).vars_hack = new List<DName>() { new DName(Globals.decompErrorName) };
                         table2.Get(i, colmax + 1).value_hack = -sum_hack;  //probably not used?
                         table2.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
                     }
@@ -5450,7 +5449,7 @@ namespace Gekko
                 for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
                 {
                     Cell c = table2.Get(i, 2);
-                    if (c == null) black.Add(new List<string>());
+                    if (c == null) black.Add(new List<DName>());
                     else
                     {
                         black.Add(c.vars_hack);  //We mostly use the count though
@@ -5462,7 +5461,7 @@ namespace Gekko
                 for (int j = 2; j <= table2.GetColMaxNumber(); j++)
                 {
                     Cell c = table2.Get(2, j);
-                    if (c == null) black.Add(new List<string>());
+                    if (c == null) black.Add(new List<DName>());
                     else
                     {
                         black.Add(c.vars_hack);  //We mostly use the count though
@@ -5514,22 +5513,25 @@ namespace Gekko
         /// <param name="vars_hack"></param>
         /// <param name="s"></param>
         /// <returns></returns>
-        private static string ReplaceStars(List<string> vars_hack, string s)
+        private static string ReplaceStars(List<DName> vars_hack, string s)
         {
             VariableDims variableDims = new VariableDims();
 
             string name = null;
-            foreach (string var in vars_hack)
+            foreach (DName var in vars_hack)
             {
-                string s2 = var.Split('¤')[0];
-                string input2, dbName, varName, freq; string[] indexes;
-                O.Chop(s2, out dbName, out varName, out freq, out indexes);
-                if (name == null) name = varName;
+                List<string> xx = var.HACK_IndexesWithoutTime();
                 Dims dims = new Dims();
-                if (indexes != null)
-                {
-                    foreach (string index in indexes) dims.storage.Add(index);
-                }
+                //string s2 = var.Split('¤')[0];
+                //string input2, dbName, varName, freq; string[] indexes;
+                //O.Chop(s2, out dbName, out varName, out freq, out indexes);
+                //if (name == null) name = varName;
+                //Dims dims = new Dims();
+                //if (indexes != null)
+                //{
+                //    foreach (string index in indexes) dims.storage.Add(index);
+                //}
+                foreach (string index in xx) dims.storage.Add(index);
                 variableDims.storage.Add(dims);
             }
 
@@ -5593,9 +5595,9 @@ namespace Gekko
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public static string GetVarsHack(Cell c)
+        public static DName GetVarsHack(Cell c)
         {
-            string name2 = null; if (c != null && c.vars_hack != null && c.vars_hack.Count > 0) name2 = c.vars_hack[0];
+            DName name2 = null; if (c != null && c.vars_hack != null && c.vars_hack.Count > 0) name2 = c.vars_hack[0];
             return name2;
         }
 
@@ -6058,7 +6060,7 @@ namespace Gekko
             }
         }
 
-        public static EquationHelper DecompEvalGekko(string variable)
+        public static EquationHelper DecompEvalGekko(DName variable)
         {
             EquationHelper found = Program.FindEquationByMeansOfVariableName(variable);
             if (found == null)
@@ -6293,7 +6295,7 @@ namespace Gekko
                     string textColor = "Black";
                     if (o.decompFind.decompOptions2.new_from != null)
                     {
-                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3.ToString(), StringComparer.OrdinalIgnoreCase))
+                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
                         {
                             textColor = "Gray";
                         }
@@ -6738,12 +6740,12 @@ namespace Gekko
             if (decompDatas.storage == null || decompDatas.storage.Count == 0) Gekko.Decomp.InitDecompDatas(decompOptions2, decompDatas, model);
             decompOptions2.decompOperator = new DecompOperator(op);
             decompOptions2.showErrors = true;
-            string residualName = Program.GetDecompResidualName(0, 1);
+            DName residualName = Program.GetDecompResidualName(0, 1);
             int funcCounter = 0;
             DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
             Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
             decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-            DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+            DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, new DName(lhsString), decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             Table decompTable = decompOutput.table;
 
             //Hack, because after expand, removing lags does not work in pivot (maybe it should...!)
@@ -6752,7 +6754,7 @@ namespace Gekko
             for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
             {
                 Cell cellVariableName = decompTable.Get(i2, 1);
-                List<string> vars = new List<string>();
+                List<DName> vars = new List<DName>();
                 Cell cellFirstData = decompTable.Get(i2, 2);
                 string uniqueName = null;
                 if (cellFirstData != null)

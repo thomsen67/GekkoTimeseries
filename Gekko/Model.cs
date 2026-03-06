@@ -158,7 +158,7 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public TwoStrings GetEquationTextRawScalar(List<string>eqNames)
+        public TwoStrings GetEquationTextRawScalar(List<DName>eqNames)
         {
             //See also how to get unfolded equations: #jseds78hsd33.
             string rv = "";
@@ -167,7 +167,7 @@ namespace Gekko
             if (this.modelGams != null)
             {
                 int i = -1;
-                foreach (string eqName in eqNames)
+                foreach (DName eqName in eqNames)
                 {
                     i++;
                     List<ModelGamsEquation> temp = null; this.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
@@ -192,12 +192,12 @@ namespace Gekko
             }
             else if (this.modelGekko != null)
             {
-                foreach (string eqName in eqNames)
+                foreach (DName eqName in eqNames)
                 {
                     if (eqName == null) continue;  //probably not necessary
-                    if (!eqName.ToLower().StartsWith(Globals.gekkoEquationPrefix)) continue;
+                    if (!G.StartsWith(eqName.GetName(), Globals.gekkoEquationPrefix)) continue;
                     string s1 = null;
-                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(eqName.Substring(Globals.gekkoEquationPrefix.Length));
+                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(new DName(eqName.GetName().Substring(Globals.gekkoEquationPrefix.Length)));
                     if (eh != null) s1 = eh.equationText + G.NL + G.NL;
                     sb1.Append(s1);
                     string s2 = null;
@@ -220,10 +220,10 @@ namespace Gekko
             GekkoTime tUsedHere = t0;
             if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(t0);
             string s = null;
-            List<string> eqNames = new List<string>();            
+            List<DName> eqNames = new List<DName>();            
             foreach (Link link in links)
             {
-                if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), null));                
+                if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(link.GAMS_dsh[0].fullName.HACK_AddTime(tUsedHere));
             }
             s = model.GetEquationText(eqNames, helper, t0).resultingText;
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
@@ -238,15 +238,15 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public GetEquationTextHelper GetEquationText(List<string> eqs, EquationTextHelper helper, GekkoTime t0)
+        public GetEquationTextHelper GetEquationText(List<DName> eqs, EquationTextHelper helper, GekkoTime t0)
         {
             GetEquationTextHelper rv = new GetEquationTextHelper();
 
             bool hit = false;  //if anything is found
-            List<string> eqs2 = new List<string>();
-            foreach (string s in eqs)
+            List<DName> eqs2 = new List<DName>();
+            foreach (DName s in eqs)
             {
-                eqs2.Add(G.Chop_RemoveIndex(s));
+                eqs2.Add(new DName(s.GetName()));
             }
             TwoStrings two = this.GetEquationTextRawScalar(eqs2);
 
@@ -258,7 +258,7 @@ namespace Gekko
             // -- s_gamsOrFrnSyntax
             
             int i = -1;
-            foreach (string eq in eqs)
+            foreach (DName eq in eqs)
             {
                 i++;
                 if (i > 0) rv.s_scalarModel += G.NL;
@@ -369,9 +369,9 @@ namespace Gekko
         public Type assemblyReverted = null;
         public Type assemblyRevertedFailSafe = null;
         [ProtoMember(3)]
-        public GekkoDictionary<string, string> endogenized = new GekkoDictionary<string, string> (StringComparer.OrdinalIgnoreCase);  //for use when doing goal-search, only keys are used
+        public Dictionary<DName, DName> endogenized = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);  //for use when doing goal-search, only keys are used
         [ProtoMember(4)]
-        public GekkoDictionary<string, string> exogenized = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //for use when doing goal-search, only keys are used
+        public Dictionary<DName, DName> exogenized = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);  //for use when doing goal-search, only keys are used
         [ProtoMember(5)]
         public int largestLag = 0;  //always 0 or positive        
         [ProtoMember(6)]
@@ -394,17 +394,17 @@ namespace Gekko
         /// Contains only auto-generated J-vars
         /// </summary>
         [ProtoMember(10)]
-        public GekkoDictionary<string, string> varsJTypeAutoGenerated = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, DName> varsJTypeAutoGenerated = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);;
         /// <summary>
         /// Contains only auto-generated D-vars
         /// </summary>
         [ProtoMember(11)]
-        public GekkoDictionary<string, string> varsDTypeAutoGenerated = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, DName> varsDTypeAutoGenerated = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
         /// <summary>
         /// Contains only auto-generated Z-vars
         /// </summary>
         [ProtoMember(12)]
-        public GekkoDictionary<string, string>  varsZTypeAutoGenerated  = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, DName>  varsZTypeAutoGenerated = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
         [ProtoMember(13)]
         public int numberOfEndo = 0;
         [ProtoMember(14)]
@@ -414,19 +414,19 @@ namespace Gekko
         //varsBType (stor, med lags) bruges i array i frml.cs når der simuleres
         //varsAType (lille, uden lags) bruges i varnavn x år data matrix
         [ProtoMember(16)]
-        public GekkoDictionary<string, BTypeData> varsBType = new GekkoDictionary<string, BTypeData>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, BTypeData> varsBType = new Dictionary<DName, BTypeData>(Multidim2Comparer.IgnoreCase);
         [ProtoMember(17)]
-        public GekkoDictionary<int, string> varsBTypeInverted = new GekkoDictionary<int, string>();
+        public Dictionary<int, DName> varsBTypeInverted = new Dictionary<int, DName>();
         [ProtoMember(18)]
-        public GekkoDictionary<string, ATypeData> varsAType = new GekkoDictionary<string, ATypeData>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, ATypeData> varsAType = new Dictionary<DName, ATypeData>(Multidim2Comparer.IgnoreCase);
         [ProtoMember(19)]
-        public GekkoDictionary<int, int> leadedVariables = new GekkoDictionary<int, int>();  //note: corresponds to .largestLeadOutsideRevertedPart rather than .largestLead
+        public Dictionary<int, int> leadedVariables = new Dictionary<int, int>();  //note: corresponds to .largestLeadOutsideRevertedPart rather than .largestLead
         //corresponds to endo when no EXO/ENDO is done (cf. endogenous).
         [ProtoMember(20)]       
-        public GekkoDictionary<string, string> endogenousOriginallyInModel = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //only keys are used
+        public Dictionary<DName, DName> endogenousOriginallyInModel = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);  //only keys are used
         //the following 3 contain the same numbers when no endo/exo is done (the two last are always identical) 
         [ProtoMember(21)]
-        public GekkoDictionary<int, string> endogenousBNumbersOriginallyInModel = new GekkoDictionary<int, string>();  //only keys are used
+        public Dictionary<int, DName> endogenousBNumbersOriginallyInModel = new Dictionary<int, DName>();  //only keys are used
         [ProtoMember(22)]
         public List<int> endogenousBNumbersOriginalInModelList = null;  //for convergence check in gauss
                 
@@ -436,7 +436,7 @@ namespace Gekko
         /// are typically hand-made J- and Z-variables and the like.
         /// </summary>
         [ProtoMember(23)]
-        public GekkoDictionary<string, string> reverted = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, DName> reverted = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
         [ProtoMember(24)]
         public List<EquationHelper> equations = new List<EquationHelper>();
         [ProtoMember(25)]
@@ -444,20 +444,20 @@ namespace Gekko
         [ProtoMember(32)]
         public List<EquationHelper> equationsNotRunAtAll = new List<EquationHelper>();
         [ProtoMember(26)]
-        public GekkoDictionary<string, DependentsHelper> dependents = new GekkoDictionary<string, DependentsHelper>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<DName, DependentsHelper> dependents = new GekkoDictionary<DName, DependentsHelper>(Multidim2Comparer.IgnoreCase);
         [ProtoMember(27)]
-        public GekkoDictionary<string, int> fromVariableToEquationNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<DName, int> fromVariableToEquationNumber = new GekkoDictionary<DName, int>(Multidim2Comparer.IgnoreCase);
         public string generateResults = "";  //for genr statement
         public double[] b;  //used for simulation
         public double[] bVariance;  //how much b typical differs from year to year historically
-        public GekkoDictionary<string, List<IterMemory>> bMemory = new GekkoDictionary<string, List<IterMemory>>(StringComparer.OrdinalIgnoreCase);  //for showing with itershow
+        public Dictionary<DName, List<IterMemory>> bMemory = new Dictionary<DName, List<IterMemory>>(Multidim2Comparer.IgnoreCase);  //for showing with itershow
                 
         public IElementalAccessMatrix jacobiMatrix = null;  //these matrices change for each period simulated (possibly several times per period)
         public double[,] jacobiMatrixDense = null;
         public double[,] jacobiMatrixInverted = null;  //not exactly inverted: rather LUD (dense)
         public int[] jacobiMatrixInvertedIndex = null;
         [ProtoMember(28)]
-        public GekkoDictionary<string, string> dampVariables = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<DName, DName> dampVariables = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
         //public int hasBeenModelStatement = 0;
         public double[] bOld = null;
         public ESignatureStatus signatureStatus;
@@ -521,8 +521,8 @@ namespace Gekko
     [ProtoContract]
     public class DependentsHelper
     {
-        [ProtoMember(1)]
-        public GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        [ProtoMember(1)]        
+        public Dictionary<DName, DName> storage = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
     }
 
     [ProtoContract]
@@ -1597,8 +1597,8 @@ namespace Gekko
         /// <returns></returns>
         public int CountEqs(int type)
         {            
-            if (type == 1) return this.dict_FromEqNumberToEqName.Length;            
-            GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            if (type == 1) return this.dict_FromEqNumberToEqName.Length;
+            Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
             foreach (DName s2 in this.dict_FromEqNumberToEqName)
             {
                 if (!this.t1.IsNull() && s2.IsNull()) continue;
@@ -1609,7 +1609,8 @@ namespace Gekko
                 }
                 else if (type == 3)
                 {
-                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                    DName xx = new DName(helper.resultingFullName.GetName());
+                    if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                 }
                 else new Error("Unexpected");
             }
@@ -1622,18 +1623,18 @@ namespace Gekko
         /// See also CountEqs().
         /// </summary>
         /// <returns></returns>
-        public List<string> GetEqs(int type)
+        public List<DName> GetEqs(int type)
         {
-            List<string> rv = null;
+            List<DName> rv = null;
             if (type == 1)
             {                
-                rv = new List<string>();
-                foreach (Multidim2Element mm in this.dict_FromEqNumberToEqName) rv.Add(mm.ToString());
+                rv = new List<DName>();
+                foreach (DName mm in this.dict_FromEqNumberToEqName) rv.Add(mm);
                 return rv;
             }
             else
             {
-                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
                 foreach (DName s2 in this.dict_FromEqNumberToEqName)
                 {
                     ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimensionNew(s2);
@@ -1643,7 +1644,8 @@ namespace Gekko
                     }
                     else if (type == 3)
                     {
-                        if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                        DName xx = new DName(helper.resultingFullName.GetName());
+                        if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                     }
                     else new Error("Unexpected");
                 }
@@ -1670,11 +1672,12 @@ namespace Gekko
             }
             else if (type == 3)
             {
-                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
                 foreach (DName s2 in this.dict_FromVarNumberToVarName)
                 {                    
                     ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimensionNew(s2);
-                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                    DName xx = new DName(helper.resultingFullName.GetName());
+                    if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                 }
                 return temp.Count;
             }
@@ -1945,7 +1948,7 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public GetEquationTextHelper2 GetEquationTextUnfolded(string name, EquationTextHelper helper, bool useMathRename, GekkoTime t0, ScalarDictionary sd)
+        public GetEquationTextHelper2 GetEquationTextUnfolded(DName name, EquationTextHelper helper, bool useMathRename, GekkoTime t0, ScalarDictionary sd)
         {
             //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
@@ -1966,7 +1969,7 @@ namespace Gekko
             if (useMathRename) mathRename = new List<string>();
 
             int eq;
-            if(!this.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(name), out eq))            
+            if(!this.dict_FromEqNameToEqNumber.TryGetValue(name, out eq))            
             {
                 if (sd == null)
                 {
@@ -2048,7 +2051,7 @@ namespace Gekko
             Lbl1b:;
             }
 
-            string resName = null;
+            DName resName = null;
             bool start = false;
             for (int i = 0; i < tokens.Count() - more; i++)
             {
@@ -2075,38 +2078,43 @@ namespace Gekko
                     DName dName= this.GetVarNameA(i2);
                     DName dName2 = null;
 
-                    string varname = null; //this.GetVarNameA_OLD(i2);
-                    string varname2 = null;
+                    DName varname = null; //this.GetVarNameA_OLD(i2);
+                    DName varname2 = null;
                     if (G.StartsWith(dName.GetName(), Globals.decompResidualPrefix)) resName = varname;
                     if (helper.showTime)
                     {
-                        dName2 = dName.HACK_AddIndex(gt);
-                        varname2 = dName2.ToString();
+                        dName2 = dName.HACK_AddTime(gt);
+                        varname2 = dName2;
                     }
                     else
                     {
                         if (sd != null) new Error("Not showing time not expected");
-                        dName2 = dName.HACK_AddIndex(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
-                        varname2 = dName2.ToString();
+                        dName2 = dName.HACK_AddTime(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
+                        varname2 = dName2;
                         if (Globals.greuHack)
                         {
                             //The equation text really ought to be math + DName showhow.
                             //Maybe some List of string-or-DName, but how? Maybe List<object> that
                             //is then unfolded?
-                            varname2 = dName2.ToString(new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null));
+                            //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
+                            //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
+                            //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
+                            //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
+                            //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
+                            varname2 = new DName(dName2.ToString(new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null)));
                         }
                     }
                     
                     if (mathRename != null)
                     {
-                        varname2 = Program.MathPutIntoDict(mathRename, varname2);
+                        varname2 = new DName(Program.MathPutIntoDict(mathRename, varname2.ToString()));
                     }
                     
                     if (sd != null) //Used for special identities model
                     {
                         if (!sd.vars.ContainsKey(varname2))
                         {
-                            string xName = "x" + (sd.vars.Count + 1);
+                            DName xName = new DName("x" + (sd.vars.Count + 1));
                             sd.vars.Add(varname2, xName);  //Starts with x1
                             sd.varsList.Add(varname2);  //Will start at slot 0
                             varname2 = xName;
@@ -2153,7 +2161,7 @@ namespace Gekko
                 }                
             }
 
-            string rv1 = null;
+            DName rv1 = null;
             if (helper.showEq)
             {                
                 if (helper.showTime)
@@ -2164,7 +2172,7 @@ namespace Gekko
                     {
                         if (!sd.eqs.ContainsKey(name))
                         {
-                            string eName = "e" + (sd.eqs.Count + 1);
+                            DName eName = new DName("e" + (sd.eqs.Count + 1));
                             sd.eqs.Add(name, eName);  //Starts with e1
                             sd.eqsList.Add(name);  //Will start with slot 0
                             rv1 = eName;
@@ -2182,13 +2190,13 @@ namespace Gekko
                 else
                 {
                     if (sd != null) new Error("Not showing time not expected");
-                    rv1 = name.Replace("," + t0.ToString() + "]", "]").Replace("[" + t0.ToString() + "]", "");
+                    rv1 = name.RemoveTime();
                 }
             }
             GetEquationTextHelper2 tmp = new GetEquationTextHelper2();
-            tmp.s1 = rv1;
+            tmp.s1 = rv1.ToString();
             tmp.s2 = sb.ToString().Trim();
-            tmp.s3 = resName;
+            tmp.s3 = resName.ToString();
             tmp.mathRename = mathRename;
             return tmp;
         }        
@@ -2258,7 +2266,7 @@ namespace Gekko
     public class ModelGamsEquation
     {
         [ProtoMember(1)]
-        public string nameGams = null;
+        public DName nameGams = null;
 
         [ProtoMember(2)]
         public string setsGams = null;
@@ -2276,13 +2284,13 @@ namespace Gekko
         public string rhsGams = null;
 
         [ProtoMember(11)]
-        public List<string> lhsVars = new List<string>();
+        public List<DName> lhsVars = new List<DName>();
 
         [ProtoMember(12)]
         public List<EquationNameChunks> lhsVarsChunks = new List<EquationNameChunks>();
 
         [ProtoMember(13)]
-        public List<string> rhsVars = new List<string>();
+        public List<DName> rhsVars = new List<DName>();
 
         [ProtoMember(14)]
         public List<EquationNameChunks> rhsVarsChunks = new List<EquationNameChunks>();

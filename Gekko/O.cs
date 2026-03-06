@@ -22,9 +22,9 @@ namespace Gekko
     /// 
     public class DecompPrecedent
     {
-        public string s = null;
+        public DName s = null;
 
-        public DecompPrecedent(string s, IVariable iv)
+        public DecompPrecedent(DName s, IVariable iv)
         {
             this.s = s;
         }
