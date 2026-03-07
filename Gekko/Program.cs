@@ -3714,8 +3714,14 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// For writing protobuf file
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static List<object> ProtobufModelGamsScalar5a(int k, Model model)
-        {
+        {            
             if (k != 5) new Error("Hov");
 
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
@@ -3733,6 +3739,8 @@ namespace Gekko
             }
             else
             {
+                Program.ProtobufModelGamsScalarNulls(model, true);
+
                 //In these, [1]-[5] are large, [0] is small. Later on, [6]-[8] are small, too.
                 m[0] = model.modelGamsScalar;
                 m[1] = new ModelGamsScalar(null);
@@ -3785,6 +3793,30 @@ namespace Gekko
             return mm;
         }
 
+        private static void ProtobufModelGamsScalarNulls(ModelGamsScalar modelGamsScalar, bool isWriting)
+        {
+            if (isWriting)
+            {
+                for (int i = 0; i < modelGamsScalar.dict_FromEqNumberToEqName.Length; i++)
+                {
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[i] == null) modelGamsScalar.dict_FromEqNumberToEqName[i] = new DName(); //Protobuf does not accept null in a list or array
+                }
+            }
+            else
+            {
+                for (int i = 0; i < modelGamsScalar.dict_FromEqNumberToEqName.Length; i++)
+                {
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[i].IsNull()) modelGamsScalar.dict_FromEqNumberToEqName[i] = null; //Just easier to handle that way
+                }
+            }
+        }
+
+        /// <summary>
+        /// For reading protobuf file
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="mm"></param>
+        /// <returns></returns>
         public static Model ProtobufModelGamsScalar5b(int k, List<object> mm)
         {
             if (k != 5) new Error("Hov");
@@ -3821,6 +3853,8 @@ namespace Gekko
             if (model.modelGamsScalar != null) model.modelGamsScalar.parent = model;
             if (model.modelGams != null) model.modelGams.parent = model;
             if (model.modelGekko != null) model.modelGekko.parent = model;
+
+            Program.ProtobufModelGamsScalarNulls(model, false);
 
             return model;
         }
@@ -4007,18 +4041,7 @@ namespace Gekko
             //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             t = DateTime.Now;
 
-            if (Globals.test_runParallelAsSequential)
-            {
-                for (int i = 0; i < lists.Count; i++)
-                {
-                    DateTime t0 = DateTime.Now;
-                    string fileName2 = files[i];
-                    ModelGamsScalar o = ProtobufRead<ModelGamsScalar>(fileName2);
-                    lists[i] = o;
-                    new Writeln("Seq" + i + ": " + G.Seconds(t0));
-                }
-            }
-            else
+            if (true)
             {
                 Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
                 {

@@ -332,11 +332,11 @@ namespace Gekko
             insensitiveHash = iHash;
         }
 
-        //public bool IsNull() //Same as .ToString() == null
-        //{            
-        //    if (this.storage == null) return true;
-        //    return false;
-        //}
+        public bool IsNull() //Same as .ToString() == null
+        {            
+            if (this.storage == null) return true;
+            return false;
+        }
 
         private StringOrTime[] GetStorage()
         {
