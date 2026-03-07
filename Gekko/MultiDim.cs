@@ -445,11 +445,11 @@ namespace Gekko
                 if (this.Get(i).IsTime())
                 {
                     GekkoTime t = this.Get(i).GetTime();
-                    if (!(t.freq == EFreq.None || t.freq == EFreq.Age))
+                    EFreq tFreq = t.freq;
+                    if (!(tFreq == EFreq.None || tFreq == EFreq.Age))
                     {                    
-                        if (this.HasTime()) new Error("Only 1 time element allowed for DName");
-                        EFreq thisFreq = this.GetTime().freq;
-                        if (thisFreq != freq) new Error("Variable freq " + thisFreq.ToString() + " does not match period freq " + freq.ToString());
+                        if (this.HasTime()) new Error("Only 1 time element allowed for DName");                        
+                        if (freq != EFreq.None && tFreq != freq) new Error("Variable freq " + tFreq.ToString() + " does not match period freq " + freq.ToString());
                         this.timePosition = i;
                     }
                 }
@@ -592,7 +592,7 @@ namespace Gekko
             if (this.HasTime()) new Error("Cannot add time to variable that already has time");
             List<StringOrTime> temp = new List<StringOrTime>();
             for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
-            temp.Add(t);
+            temp.Add(t);            
             return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
         }
 
@@ -634,7 +634,7 @@ namespace Gekko
             int offset = DName._posIndex;
             var result = new StringOrTime[indexes.Length + offset];
             result[DName._posName] = name;
-            result[DName._posFreq] = Globals.freqFromEnumToString[freq];
+            result[DName._posFreq] = G.ConvertFreq(freq);
             Array.Copy(indexes, 0, result, offset, indexes.Length);
             return result;
         }
@@ -672,7 +672,7 @@ namespace Gekko
             }
             string rv = null;
             string naf = null;
-            if (format.showFreq) naf = this.GetNameAndFreq();
+            if (format.showFreq && this.GetFreq() != EFreq.None) naf = this.GetNameAndFreq();
             else naf = this.GetName();
             if (temp.Count == 0) rv = naf;
             else rv = naf + "[" + Stringlist.GetListWithCommas(temp, format.separator) + "]";
@@ -757,7 +757,7 @@ namespace Gekko
                         }
                     }
                 }
-                return new DName(name.Replace("¤", ""), m.ToArray());
+                return new DName(name, G.ConvertFreq(freq), m.ToArray());
             }            
         }
     }

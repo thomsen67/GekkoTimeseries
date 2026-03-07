@@ -450,8 +450,9 @@ namespace Gekko
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
             if (helper.count != semis) new Error("Not summing up");
 
-            if (true)
+            if (true) //#sss87uakjdsfs
             {
+                DateTime t0 = DateTime.Now;
                 //Get fixed variables
                 
                 helper.fix = new byte[periods][];
@@ -509,6 +510,7 @@ namespace Gekko
                         }
                     }                    
                 }
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Finding fixed vars: " + G.Seconds(dt0));
             }
 
             
@@ -518,6 +520,7 @@ namespace Gekko
             {
                 if (Globals.runningOnTTComputer) MessageBox.Show("Beware: read scalar model data");
                 //Read data from the scalar model (gams.gms)
+                DateTime dt00 = DateTime.Now;
                 foreach (string line in values)
                 {                    
                     if (line.Trim() == "" || line.StartsWith("*")) continue;
@@ -594,7 +597,8 @@ namespace Gekko
                         new Error("Index out of range when reading GAMS scalar equation");
                     }
                     hasReadSomeData++;
-                }                
+                }
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Read variable data: " + G.Seconds(dt00));
             }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS data reading " + hasReadSomeData + " obs: " + G.Seconds(dt1));
@@ -731,8 +735,10 @@ namespace Gekko
             if (Program.options.model_gams_scalar_data && modelGamsScalar.hasReadSomeData > 0)  //don't do if no data was found in scalar model
             {
                 //modelGamsScalar.a = helper.a; --> not necessary, is already so.
+                DateTime dt00 = DateTime.Now;
                 if (Globals.runningOnTTComputer) MessageBox.Show("Beware: scalar model data handled A");
-                modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);                
+                modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: From A to Databank: " + G.Seconds(dt00));
             }
 
             return model;
@@ -2287,10 +2293,9 @@ namespace Gekko
                             {
                                 if (!Globals.greuHack) G.WarningInternal("TTH: Expected timeless .date = " + Globals.decompTimelessNumber);
                             }
-                        }
-                        //if (Globals.greuHack) continue;
+                        }                        
                     }
-                    if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets
+                    if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets. #kljae8aerlk
                 }
             }
 

@@ -1015,6 +1015,7 @@ namespace Gekko
         public static EFreq ConvertFreq(string freq)
         {
             EFreq f = EFreq.None;
+            if (freq == null) return f;
             try
             {
                 f = Globals.freqFromStringToEnum[freq.ToLower()];
@@ -4313,7 +4314,6 @@ namespace Gekko
 
         public static string ConvertFreq(EFreq freq)
         {            
-            if (freq == EFreq.None) return "undefined";
             string s = null;
             try
             {

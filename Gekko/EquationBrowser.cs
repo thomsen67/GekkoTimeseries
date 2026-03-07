@@ -1549,7 +1549,7 @@ img {border-style: none;
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing\DREAM\GREU\Version1";
                     Program.RunGekkoCommands(f + "reset; greu(); /*option decomp equation style = gams;*/ global:%t1 = 2018; global:%t2 = 2036; model < %t1 %t2 gms> GREU.zip; read <first> main_CGE; time %t1+2 %t2-1;", "", 0, new P());
                     onlyHtml = true;
-                    bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null);
+                    bh.dNameFormat = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null, false);
                     //bh.nMax = 4;
                     bh.showOnly1DecompTable = true;                    
                     bh.threads = 12; // Environment.ProcessorCount; // is 12, not better with 24. Seems GC and file IO is tough.

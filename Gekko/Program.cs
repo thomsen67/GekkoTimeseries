@@ -19673,6 +19673,7 @@ namespace Gekko
 
                 model.modelCommon.cacheParameters = cacheParameters; //a cache hit must also match this object
 
+                DateTime dt00 = DateTime.Now;
                 try 
                 {
                     //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
@@ -19685,6 +19686,7 @@ namespace Gekko
                 {
                     //do nothing, not the end of the world if it fails
                 }
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Write parallel model: " + G.Seconds(dt00));
             }
 
             //if not put here, info will not be printed when loading from cache
@@ -19692,6 +19694,7 @@ namespace Gekko
 
             if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
             {
+                DateTime dt00 = DateTime.Now;
                 if (model.modelGamsScalar.depNames != null)
                 {
                     //Not in protobuf for now, maybe at some point
@@ -19704,6 +19707,7 @@ namespace Gekko
                         else model.modelGamsScalar.depNames2Inverted[value].Add(key);
                     }
                 }
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Depnames2: " + G.Seconds(dt00));
             }
 
         }

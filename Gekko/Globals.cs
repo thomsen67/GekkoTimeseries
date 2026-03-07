@@ -582,7 +582,8 @@ namespace Gekko
             {EFreq.M, "m" },
             {EFreq.W, "w" },
             {EFreq.D, "d" },
-            {EFreq.U, "u" }
+            {EFreq.U, "u" },
+            {EFreq.None, null }
         };
 
         public static Dictionary<string, EFreq> freqFromStringToEnum = new Dictionary<string, EFreq>
