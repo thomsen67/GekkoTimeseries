@@ -2237,7 +2237,7 @@ namespace Gekko
             GetEquationTextHelper2 tmp = new GetEquationTextHelper2();
             tmp.s1 = rv1.ToString();
             tmp.s2 = sb.ToString().Trim();
-            tmp.s3 = resName.ToString();
+            if (resName != null) tmp.s3 = resName.ToString();
             tmp.mathRename = mathRename;
             return tmp;
         }        

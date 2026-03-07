@@ -2508,9 +2508,8 @@ namespace Gekko
                         {
                             i1 = varname.GetTime().Subtract(helper.tBasis);
                         }
-
-                        //qwerty remove time?
-                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(varname, out i2)) i2 = -12345;
+                        
+                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(varname.RemoveTime(), out i2)) i2 = -12345;
 
                         int ii1 = helper.endo.Count;
                         int ii2 = helper.endo.Count + 1;

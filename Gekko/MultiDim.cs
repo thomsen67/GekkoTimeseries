@@ -526,7 +526,7 @@ namespace Gekko
             GekkoTime thisT = this.GetTime();
             int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
             StringOrTime[] elements = this.GetIndexes();
-            elements[this.timePosition - 1] = new GekkoTime(EFreq.Lag, lag);  //Note: -1 because elements has first element removed
+            elements[this.timePosition - DName._posIndex] = new GekkoTime(EFreq.Lag, lag);  //Note: -2 because elements has first element removed
             DName name = new DName(this.GetName(), this.GetFreq(), elements);
             return name;
         }
