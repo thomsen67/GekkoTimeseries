@@ -19650,23 +19650,7 @@ namespace Gekko
                 else if (modelType == EModelType.GAMSScalar)
                 {
                     Model model = null;
-                    model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
-
-                    if (true) // !model.modelGamsScalar.hasResVariables)
-                    {
-                        //Doesn't take much time, and can act as fallback even if res_... vars are present
-                        try
-                        {
-                            DateTime dt = DateTime.Now;
-                            model.modelGamsScalar.depNames = GamsModel.DepNames(model);  //Finding out which variables are dependent, from eq naming conventions.
-                            if (Globals.runningOnTTComputer) new Writeln("TTH: DepNames() took: " + G.Seconds(dt) + " with " + model.modelGamsScalar.depNames.Count + " items");
-                        }
-                        catch
-                        {
-                            //No need to choke on this
-                            new Note("The module that identifies dependent variables from equation names failed to load");
-                        }
-                    }                    
+                    model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);                        
                     Program.model = model;
                 }
                 else new Error("No model defined");

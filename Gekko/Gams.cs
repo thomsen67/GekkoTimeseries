@@ -267,62 +267,6 @@ namespace Gekko
             }
         }
 
-
-
-        /// <summary>
-        /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].        
-        /// </summary>
-        /// <param name="varname"></param>
-        /// <returns></returns>
-        public static ExtractTimeDimensionHelper ExtractTimeDimensionNew(DName varname)
-        {
-            ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
-            //helper.name = varname.GetName();            
-            //helper.time = varname.GetTime();
-            helper.resultingFullName = varname;
-            //helper.indexes = varname.HACK_IndexesWithoutTime();
-            return helper;
-        }
-
-        //private static bool ExtractTimeDimensionHelper2(EExtractTimeDimension settings, string input, ExtractTimeDimensionHelper helper)
-        //{
-        //    //input like "x[a,b,2022]"
-        //    bool simple = false;
-        //    int end = input.Length - 1;
-        //    if (input[end] != ']') return simple;
-        //    if (input.Length < 7) return simple;  //if input has length 7, it is like '123456', where x[6] = x[end] = '6'. Here, x[end-6] = x[0] = '1' is legal.            
-        //    if (!(input[end - 5] == '[' || input[end - 5] == ',')) return simple;  //Must be x[2022] or x[...,2022].            
-        //    int i9 = G.IntParse(G.Substring(input, end - 4, end - 1));
-        //    if (i9 == -12345) return simple;
-        //    helper.time = new GekkoTime(EFreq.A, i9, 1);
-        //    if (input[end - 5] == '[')
-        //    {
-        //        //input like "x[2022]"
-        //        //.resultingFullName --> "x"
-        //        //.name --> "x"
-        //        simple = true;
-        //        helper.resultingFullName = G.Substring(input, 0, end - 6);
-        //        helper.name = helper.resultingFullName;
-        //        if (settings == EExtractTimeDimension.Full) helper.indexes = new List<string>();
-        //    }
-        //    else  //has comma before 4 digits
-        //    {
-        //        //input like "x[a,b,2022]"
-        //        //.resultingFullName --> "x[a,b]"
-        //        //.name --> "x"
-        //        simple = true;
-        //        helper.resultingFullName = G.Substring(input, 0, end - 6) + "]";
-        //        int idx = input.IndexOf('[');
-        //        helper.name = G.Substring(input, 0, idx - 1);
-        //        if (settings == EExtractTimeDimension.Full)
-        //        {                    
-        //            string s2 = G.Substring(input, idx + 1, end - 1);                    
-        //            helper.indexes = s2.Split(',').ToList();
-        //        }
-        //    }
-        //    return simple;
-        //}
-
         /// <summary>
         /// Read a scalar model. For each model line, it calls HandleEqLine().
         /// </summary>
@@ -452,7 +396,7 @@ namespace Gekko
 
             if (true) //#sss87uakjdsfs
             {
-                DateTime t0 = DateTime.Now;
+                DateTime dt00 = DateTime.Now;
                 //Get fixed variables
                 
                 helper.fix = new byte[periods][];
@@ -463,41 +407,39 @@ namespace Gekko
 
                 foreach (string line in values)
                 {
-                    if (line.Trim() == "" || line.StartsWith("*")) continue;
-                    bool isFix = false;
+                    if (line.StartsWith("*")) continue;                    
                     int iFix = line.IndexOf(".fx");
                     if (iFix > -1)
                     {
-                        string sFix = G.Substring(line, 0, iFix - 1);
-                        sFix = sFix.Trim();
+                        string sFix = G.Substring(line, 1, iFix - 1);                        
                         int id = -12345;
                         try
                         {
-                            id = int.Parse(sFix.Substring(1)) - 1;  //0-based
+                            id = int.Parse(sFix) - 1;  //0-based
                         }
                         catch
                         {
-                            new Error("Could not parse integer part of the string '" + sFix + "'");
+                            new Error("Could not parse integer part of the string '" + line + "'");
                         }
 
                         DName inputName = helper.dict_FromVarNumberToVarName[id];
-                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
+                        
                         //qwerty remove time?
-                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(helper2.resultingFullName, out aNumber)) aNumber = -12345;
+                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(inputName, out aNumber)) aNumber = -12345;
                         if (aNumber == -12345)
                         {
                             if (Globals.greuHack) continue;
-                            new Error("When reading fixed variable, could not find name '" + helper2.resultingFullName + "' in dictionary");
+                            new Error("When reading fixed variable, could not find name '" + inputName + "' in dictionary");
                         }
                         int i1 = -12345;
                         int i2 = aNumber;
-                        if (helper2.resultingFullName.GetTime().IsNull())  //reading .fx values
+                        if (inputName.GetTime().IsNull())  //reading .fx values
                         {
                             i1 = 0;
                         }
                         else
                         {
-                            i1 = helper2.resultingFullName.GetTime().Subtract(helper.tBasis);
+                            i1 = inputName.GetTime().Subtract(helper.tBasis);
                         }
                         try
                         {
@@ -510,20 +452,23 @@ namespace Gekko
                         }
                     }                    
                 }
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Finding fixed vars: " + G.Seconds(dt0));
+                if (Globals.runningOnTTComputer) new Writeln("TTH: -sub- Finding fixed vars: " + G.Seconds(dt00));
             }
-
             
             int hasReadSomeData = 0;
 
             if (Program.options.model_gams_scalar_data)
             {
+                DateTime dt01 = DateTime.Now;
                 if (Globals.runningOnTTComputer) MessageBox.Show("Beware: read scalar model data");
                 //Read data from the scalar model (gams.gms)
                 DateTime dt00 = DateTime.Now;
                 foreach (string line in values)
                 {                    
-                    if (line.Trim() == "" || line.StartsWith("*")) continue;
+                    if (line.StartsWith("*")) continue;
+                    //Not efficient
+                    //Not efficient
+                    //Not efficient
                     string[] ss = line.Split(split, StringSplitOptions.None);
                     int id = -12345;
                     try
@@ -536,15 +481,15 @@ namespace Gekko
                     }
 
                     DName inputName = helper.dict_FromVarNumberToVarName[id];
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(inputName);
-                    //qwerty remove time
-                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(helper2.resultingFullName, out aNumber)) aNumber = -12345;
+                    
+                    //qwerty remove time (?)
+                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(inputName, out aNumber)) aNumber = -12345;
                     if (aNumber == -12345)
                     {
-                        new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
+                        new Error("When reading equation, could not find name '" + inputName + "' in dictionary");
                     }
                     int i1 = -12345;
-                    if (helper2.resultingFullName.GetTime().IsNull()) //reading scalar data (not activated)
+                    if (inputName.GetTime().IsNull()) //reading timeless data (not activated)
                     {
                         //TODO TODO TODO
                         //TODO TODO TODO what to do about these, if read from .fx lines
@@ -558,7 +503,7 @@ namespace Gekko
                     }
                     else
                     {
-                        i1 = helper2.resultingFullName.GetTime().Subtract(helper.tBasis);
+                        i1 = inputName.GetTime().Subtract(helper.tBasis);
                     }
                     int i2 = aNumber;
                     double d;
@@ -598,10 +543,10 @@ namespace Gekko
                     }
                     hasReadSomeData++;
                 }
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Read variable data: " + G.Seconds(dt00));
+                if (Globals.runningOnTTComputer) new Writeln("TTH: -sub- Read variable data: " + G.Seconds(dt01));
             }
 
-            if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS data reading " + hasReadSomeData + " obs: " + G.Seconds(dt1));
+            if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS total data reading " + hasReadSomeData + " obs, " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
@@ -621,7 +566,6 @@ namespace Gekko
             Compile5(csCodeLines, functions);
             
             if (Globals.runningOnTTComputer) new Writeln("TTH: Data preparation finished: " + G.Seconds(dt1));
-
             dt1 = DateTime.Now;
 
             //The method below handles ANSI, but labels are not fetched here yet.        
@@ -636,8 +580,7 @@ namespace Gekko
                     IVariable nestedListOfDependents_opt_dep = null;
                     Tuple<Dictionary<DName, DName>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
                     Dictionary<DName, DName> dependents = tup.Item1;
-                    modelGams = GamsModel.ReadGamsModelHelper(false, Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
-                    if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
+                    modelGams = GamsModel.ReadGamsModelHelper(false, Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);                    
                     modelGams.rawGmsFile = text;
 
                     //Model m = Program.model;
@@ -645,6 +588,7 @@ namespace Gekko
                 }
             }
 
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
             ModelGamsScalar modelGamsScalar = new ModelGamsScalar(model);
@@ -678,8 +622,6 @@ namespace Gekko
             modelGamsScalar.fakeEqCounts = fakeEqCounts2;
             modelGamsScalar.fakeVarCounts = fakeVarCounts2;
 
-            //if (Globals.runningOnTTComputer && modelGamsScalar.CountVars(1) != varCounts - fakeVarCounts2) new Writeln("TTH: Var count problem");
-
             //
             // Note that GAMS equation periods are not very useful.
             // In principle, e1[2020] .. may designate an equation with
@@ -703,31 +645,9 @@ namespace Gekko
             modelGamsScalar.isTimeless = helper.isTimeless;  //the a-vars that are timeless
             
             CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
+
             if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
-
-            //if (false && Globals.runningOnTTComputer)
-            //{
-            //    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)
-            //    {
-            //        string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
-            //        GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
-            //        string s7 = varName + "[" + t.ToString() + "] = ";
-            //        foreach (int i in kvp.Value)
-            //        {
-            //            string eqName = modelGamsScalar.GetEqName(i);
-            //            s7 += eqName + ", ";
-            //        }
-            //        new Writeln(s7);
-            //    }
-            //}                        
-
-            if (Globals.runningOnTTComputer)
-            {
-                using (var txt = new Writeln())
-                {                    
-                    txt.MainAdd("TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");                    
-                }
-            }
+            dt1 = DateTime.Now;                                                   
 
             modelGamsScalar.hasResVariables = hasResVariables;
             modelGamsScalar.hasReadSomeData = hasReadSomeData;
@@ -738,8 +658,28 @@ namespace Gekko
                 DateTime dt00 = DateTime.Now;
                 if (Globals.runningOnTTComputer) MessageBox.Show("Beware: scalar model data handled A");
                 modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
-                if (Globals.runningOnTTComputer) new Writeln("TTH: From A to Databank: " + G.Seconds(dt00));
             }
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: From A to Databank: : " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
+
+            if (true) // !model.modelGamsScalar.hasResVariables)
+            {
+                //Doesn't take much time, and can act as fallback even if res_... vars are present
+                try
+                {
+                    model.modelGamsScalar.depNames = GamsModel.DepNames(model);  //Finding out which variables are dependent, from eq naming conventions.                    
+                }
+                catch
+                {
+                    //No need to choke on this
+                    new Note("The module that identifies dependent variables from equation names failed to load");
+                }
+            }
+            if (Globals.runningOnTTComputer) new Writeln("TTH: DepNames() took: " + G.Seconds(dt1) + " with " + model.modelGamsScalar.depNames.Count + " items");
+            dt1 = DateTime.Now;
+
+            new Writeln("TTH: ====> Setting up everything took: " + G.Seconds(dt0) + ", all included");
 
             return model;
         }
@@ -1633,10 +1573,9 @@ namespace Gekko
             List<IdentityHelper> eqs = new List<IdentityHelper>();
             for (int i = 0; i < n; i++)
             {
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(modelGamsScalar.dict_FromEqNumberToEqName[i]);
-                var equationName = helper2.resultingFullName;
+                DName xx = modelGamsScalar.dict_FromEqNumberToEqName[i];                
 
-                if (helper2.resultingFullName.GetTime().LargerThanOrEqual(t1) && helper2.resultingFullName.GetTime().SmallerThanOrEqual(t2))
+                if (xx.GetTime().LargerThanOrEqual(t1) && xx.GetTime().SmallerThanOrEqual(t2))
                 {
                     a1++;
                     EquationTextHelper helper = new EquationTextHelper();
@@ -2260,11 +2199,10 @@ namespace Gekko
             modelGamsScalar.precedents = new List<ModelScalarEquation>();
             modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
 
+            DateTime dt1 = DateTime.Now;
+
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
-            {
-                //if (eqNumber == 36)
-                //{
-                //}
+            {                
                 if (Globals.greuHack)
                 {
                     if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].IsNull())
@@ -2299,6 +2237,9 @@ namespace Gekko
                 }
             }
 
+            G.Writeln2("TTH: --sub-- prec/dep 1: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
+
             //mapping from a varname to the equations it is part of                
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
@@ -2329,6 +2270,9 @@ namespace Gekko
                     }
                 }
             }
+
+            G.Writeln2("TTH: --sub-- prec/dep 2: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
         }        
 
         private static void RemoveDoubleDots(EqLineHelper helper, List<string> output)
@@ -2548,21 +2492,20 @@ namespace Gekko
                             new Error("Could not parse integer part of the string '" + th1.s + "'");
                         }
 
-                        DName varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
-                        ExtractTimeDimensionHelper helper2 = ExtractTimeDimensionNew(varname);
+                        DName varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa                        
 
                         int i1 = -12345;
-                        if (helper2.resultingFullName.GetTime().IsNull())
+                        if (varname.GetTime().IsNull())
                         {
                             i1 = Globals.decompTimelessNumber; //signals timeless (-12345)
                         }
                         else
                         {
-                            i1 = helper2.resultingFullName.GetTime().Subtract(helper.tBasis);
+                            i1 = varname.GetTime().Subtract(helper.tBasis);
                         }
 
                         //qwerty remove time?
-                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(helper2.resultingFullName, out i2)) i2 = -12345;
+                        int i2; if (!helper.dict_FromVarNameToANumber.TryGetValue(varname, out i2)) i2 = -12345;
 
                         int ii1 = helper.endo.Count;
                         int ii2 = helper.endo.Count + 1;

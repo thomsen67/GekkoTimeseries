@@ -2257,15 +2257,13 @@ img {border-style: none;
             {
                 DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
                 if (eqName.IsNull()) continue;
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
-                var equationName = helper2.resultingFullName;
 
-                if (helper2.resultingFullName.GetTime().Equals(t1))
+                if (eqName.GetTime().Equals(t1))
                 {
                     string s5, s6;
                     EquationNameAndNumber equationHelper5 = new EquationNameAndNumber();
                     //equationHelper5.name = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, eqName, false).resultingFullName;
-                    equationHelper5.name = helper2.resultingFullName;
+                    equationHelper5.name = eqName;
                     equationHelper5.i = i;
                     GetEquationText(t1, bh, equationHelper5, modelGamsScalar, tUsedHere, out s5, out s6);
 
@@ -2382,11 +2380,9 @@ img {border-style: none;
                 //}
                 //if (combos.Count > bh.maxPages) break;
                 DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                if (eqName.IsNull()) continue;
-                ExtractTimeDimensionHelper helper2 = GamsModel.ExtractTimeDimensionNew(eqName);
-                var equationName = helper2.resultingFullName;
+                if (eqName.IsNull()) continue;                
 
-                if (helper2.resultingFullName.GetTime().Equals(t))
+                if (eqName.GetTime().Equals(t))
                 {
                     EquationTextHelper helper = new EquationTextHelper();
                     helper.showTime = false;
@@ -2396,7 +2392,7 @@ img {border-style: none;
                     {
                         DName variableNameWithoutLagOrLead = DName.HACK1(G.Chop_RemoveLagOrLead(variableName));
                         if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
-                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = equationName });
+                        combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = eqName });
                     }
                 }
             }

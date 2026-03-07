@@ -1602,14 +1602,14 @@ namespace Gekko
             foreach (DName s2 in this.dict_FromEqNumberToEqName)
             {
                 if (!this.t1.IsNull() && s2.IsNull()) continue;
-                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimensionNew(s2);
+                
                 if (type == 2)
                 {
-                    if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
+                    if (!temp.ContainsKey(s2)) temp.Add(s2, 0);
                 }
                 else if (type == 3)
                 {
-                    DName xx = new DName(helper.resultingFullName.GetName());
+                    DName xx = new DName(s2.GetName());
                     if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                 }
                 else new Error("Unexpected");
@@ -1636,15 +1636,14 @@ namespace Gekko
             {
                 Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
                 foreach (DName s2 in this.dict_FromEqNumberToEqName)
-                {
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimensionNew(s2);
+                {                    
                     if (type == 2)
                     {
-                        if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
+                        if (!temp.ContainsKey(s2)) temp.Add(s2, 0);
                     }
                     else if (type == 3)
                     {
-                        DName xx = new DName(helper.resultingFullName.GetName());
+                        DName xx = new DName(s2.GetName());
                         if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                     }
                     else new Error("Unexpected");
@@ -1675,8 +1674,7 @@ namespace Gekko
                 Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
                 foreach (DName s2 in this.dict_FromVarNumberToVarName)
                 {                    
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimensionNew(s2);
-                    DName xx = new DName(helper.resultingFullName.GetName());
+                    DName xx = new DName(s2.GetName());
                     if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                 }
                 return temp.Count;
