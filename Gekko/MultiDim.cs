@@ -243,7 +243,6 @@ namespace Gekko
             if (ReferenceEquals(x, y)) return 0;
             if (x == null) return -1;
             if (y == null) return 1;
-            //if (x.GetLength() != y.GetLength()) return x.GetLength().CompareTo(y.GetLength());
 
             int xLen = x.GetLength();
             int yLen = y.GetLength();
@@ -332,6 +331,10 @@ namespace Gekko
             insensitiveHash = iHash;
         }
 
+        /// <summary>
+        /// For internal use: a DName can just be null, which is more logical. So no need to define a DName x = DName(). Used because of protobuf.
+        /// </summary>
+        /// <returns></returns>
         public bool IsNull() //Same as .ToString() == null
         {            
             if (this.storage == null) return true;
@@ -386,6 +389,9 @@ namespace Gekko
         public string separator = null;
         public bool showFreq = true;
         
+        /// <summary>
+        /// For protobuf: do not use this.
+        /// </summary>
         public DNameFormat() 
         { 
         }
@@ -409,7 +415,7 @@ namespace Gekko
         private static readonly int _posFreq = 1; //hardcoded
         private static readonly int _posIndex = 2; //hardcoded
         [ProtoMember(1)]
-        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= 2)        
+        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= _posIndex)        
 
         public DName() : base() { } // Protobuf only
                                      
@@ -516,7 +522,7 @@ namespace Gekko
 
         public bool HasIndex()
         {
-            if (this.GetLength() - 1 >= DName._posIndex) return true;
+            if (this.GetLength() > DName._posIndex) return true;
             return false;
         }
 
@@ -526,7 +532,7 @@ namespace Gekko
             GekkoTime thisT = this.GetTime();
             int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
             StringOrTime[] elements = this.GetIndexes();
-            elements[this.timePosition - DName._posIndex] = new GekkoTime(EFreq.Lag, lag);  //Note: -2 because elements has first element removed
+            elements[this.timePosition - DName._posIndex] = new GekkoTime(EFreq.Lag, lag);  //Note: -2 because elements is without name and freq.
             DName name = new DName(this.GetName(), this.GetFreq(), elements);
             return name;
         }
@@ -598,12 +604,10 @@ namespace Gekko
 
         public DName HACK_Prefix(string s)
         {
-            List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = DName._posIndex; i < this.GetLength(); i++)
-            {                
-                temp.Add(this.Get(i));
-            }
-            return new DName(s + this.GetName(), this.GetFreq(), temp.ToArray());
+            //List<StringOrTime> temp = new List<StringOrTime>();
+            //for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
+            //return new DName(s + this.GetName(), this.GetFreq(), temp.ToArray());
+            return new DName(s + this.GetName(), this.GetFreq(), this.GetIndexes());
         }
 
         /// <summary>
