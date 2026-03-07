@@ -767,7 +767,7 @@ namespace Gekko
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
 
                 if (o.select.Count > 0) decompOptions2.new_select = DName.HACK1(O.Restrict(o.select[0] as List, false, false, false, true));
-                if (o.from.Count > 0) decompOptions2.new_from = DName.HACK1(O.Restrict(o.from[0] as List, false, false, false, true));
+                if (o.from.Count > 0) decompOptions2.new_from = DName.HACK1a(O.Restrict(o.from[0] as List, false, false, false, true));
                 if (o.endo.Count > 0) decompOptions2.new_endo = DName.HACK1(O.Restrict(o.endo[0] as List, false, false, false, true));
 
                 bool handleAsGekko = isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp);
@@ -1381,52 +1381,6 @@ namespace Gekko
             GekkoDictionary<string, Dictionary<MultidimElement, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimElement, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
             foreach (DName s in decompOptions2.new_from)
             {
-                //int n = s.Count(c => c == '[');
-                //if (n > 2) new Error("More than two '[' encountered in equation name");
-
-                //string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
-                //G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
-
-                //if (bank != null || freq != null) new Error("Bank or freq not allowed for eq name");
-
-                //string sWithoutLagsLeads = s;
-
-                /*
-                int i = 0;
-                if (indexes2 != null)
-                {
-                    //Something like e[a,b][-1]
-                    if (indexes2.Length != 1) new Error("Expected second index to have 1 element");
-                    if (!(indexes2[0].StartsWith("+") || indexes2[0].StartsWith("-"))) new Error("Expected second index to start with '+' or '-'");
-                    bool b = int.TryParse(indexes2[0], out i);
-                    if (!b) new Error("Expected second index to be an integer lag/lead");
-                    //sWithoutLagsLeads = s.Substring(0, s.LastIndexOf('[')); //removes lag/lead
-                    indexes2 = null;
-                }
-                else if (indexes1 != null)
-                {
-                    //Something like e[a,b], but also e[-1]. We need to check if it is e[-{i}] or e[+{i}] where i is an integer >= 0.
-                    //(here, e[-0] or e[+0] will point to the same equation as e, so why would anybody do that?).
-                    if (indexes1.Length == 1 && (indexes1[0].StartsWith("+") || indexes1[0].StartsWith("-")))
-                    {
-                        bool b = int.TryParse(indexes1[0], out i);
-                        if (!b) new Error("Expected index to be an integer lag/lead");
-                        //sWithoutLagsLeads = s.Substring(0, s.LastIndexOf('[')); //removes lag/lead
-                        indexes1 = null;
-                    }
-                }
-
-                string sWithoutLagsLeads = name;
-                if (indexes1 != null) sWithoutLagsLeads += "[" + Stringlist.GetListWithCommas(indexes1, "") + "]";
-                if (indexes2 != null) sWithoutLagsLeads += "[" + Stringlist.GetListWithCommas(indexes2, "") + "]";
-                */
-
-                //if (indexes1 == null) indexes1 = new string[0];  //a null array is standard way of saying "no indexes", like x having no dimensions unlike x[a,b].
-                //For each equation stated
-                //Actually there is no time extracted below: the s string hos no time element
-                //GekkoTime trash = GekkoTime.tNull;
-                //ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
-
                 Dictionary <MultidimElement, DecompStartHelper> elements = null;
                 equations.TryGetValue(s.GetName(), out elements);
                 if (elements == null)
@@ -1440,23 +1394,16 @@ namespace Gekko
                 elements.TryGetValue(mmi, out element);
                 if (element == null)
                 {
-                    element = new DecompStartHelper();
-                    //element.name = name;
-                    //element.indexes = mmi;
-                    ////
-                    //// TODO: add [-1] or [+1] ???
-                    ////                    
-                    //element.fullName = element.name + element.indexes.GetName();
-                    element.fullName = s;
+                    element = new DecompStartHelper();                    
+                    element.fullName = s.RemoveTime();
                     int periods = GekkoTime.Observations(modelGamsScalar.absoluteT1, modelGamsScalar.absoluteT2);
                     if (modelGamsScalar.isPerpetualModel) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
                     if (s.GetTime().freq != EFreq.Lag) new Error("Expected lag");
                     element.offset = s.GetTime().super; //Should be a lag. Should it be with a minus??
                     elements.Add(mmi, element);
-                }
-                //FindEquationsForEachRelevantPeriod(per1, per2, sWithoutLagsLeads, name, mmi, element, operator1, showErrors, modelGamsScalar);
-                FindEquationsForEachRelevantPeriod(per1, per2, s, s, mmi, element, operator1, showErrors, modelGamsScalar);
+                }                
+                FindEquationsForEachRelevantPeriod(per1, per2, s.RemoveTime(), new DName(s.GetName()), mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
             int counter = -1;
@@ -1473,24 +1420,7 @@ namespace Gekko
                     link.GAMS_eqNumber = counter;
                 }
 
-                //    O.Decomp2 o0 = new O.Decomp2();
-                //    o0.type = @"ASTDECOMP3";
-                //    o0.label = o.rv;
-                //    o0.t1 = o.t1;
-                //    o0.t2 = o.t2;
-                //    o0.opt_prtcode = o.opt_prtcode;
-
-                //    o0.decompItems = new List<DecompItems>();                    
-
-                //    o0.select.Add(O.FlattenIVariablesSeq(false, new
-                //     List(new List<IVariable> { new ScalarString(var) })));
-
-                //    o0.from.Add(O.FlattenIVariablesSeq(false,
-                //     new List(new List<IVariable> { new ScalarString(o.rv) })));
-
-                //    o0.endo.Add(O.FlattenIVariablesSeq(false, new List(new
-                //     List<IVariable> { new ScalarString(var) })));
-
+                
                 if (counter == 0)
                 {
                     if (decompOptions2.new_endo != null)
