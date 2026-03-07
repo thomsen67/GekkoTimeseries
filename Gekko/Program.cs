@@ -3739,7 +3739,7 @@ namespace Gekko
             }
             else
             {
-                Program.ProtobufModelGamsScalarNulls(model, true);
+                Program.ProtobufModelGamsScalarNulls(model.modelGamsScalar, true);
 
                 //In these, [1]-[5] are large, [0] is small. Later on, [6]-[8] are small, too.
                 m[0] = model.modelGamsScalar;
@@ -3854,7 +3854,7 @@ namespace Gekko
             if (model.modelGams != null) model.modelGams.parent = model;
             if (model.modelGekko != null) model.modelGekko.parent = model;
 
-            Program.ProtobufModelGamsScalarNulls(model, false);
+            Program.ProtobufModelGamsScalarNulls(model.modelGamsScalar, false);
 
             return model;
         }
