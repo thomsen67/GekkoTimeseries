@@ -802,8 +802,13 @@ namespace Gekko
             GekkoTime t = new GekkoTime(EFreq.Lag, 0);
             if (indexes2 != null)
             {
-                if (indexes2.Length != 1) new Error("Expected x[..., ...][...] pattern");                
+                if (indexes2.Length != 1) new Error("Expected x[..., ...][...] pattern");
                 t = new GekkoTime(EFreq.Lag, int.Parse(indexes2[0]));
+                m.Add(t);
+            }
+            else
+            {
+                //t = new GekkoTime(EFreq.Lag, 0);
                 m.Add(t);
             }
             return new DName(name, G.ConvertFreq(freq), m.ToArray());
