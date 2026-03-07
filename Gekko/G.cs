@@ -106,7 +106,7 @@ namespace Gekko
         public static bool Equal(List<DName> names1, List<DName> names2)
         {
             if (names1 == null || names2 == null) return false;
-            if (names1.Count != names2.Count) return false;            
+            if (names1.Count != names2.Count) return false;
             for (int i = 0; i < names1.Count; i++)
             {
                 if (!G.Equal(names1[i], names2[i]))
@@ -118,10 +118,10 @@ namespace Gekko
         }
 
         public static bool Equal(DName name1, DName name2)
-        {            
-            Multidim2Comparer comparer = Multidim2Comparer.IgnoreCase;            
+        {
+            Multidim2Comparer comparer = Multidim2Comparer.IgnoreCase;
             return comparer.Equals(name1, name2);
-        }        
+        }
 
         /// <summary>
         /// /// Compares two strings, ignoring case (so "aBc" == "Abc"). If one but not the other
@@ -376,7 +376,7 @@ namespace Gekko
         /// <param name="missingAsZero"></param>
         /// <returns></returns>
         public static ESeriesMissing DecompShouldHandleMissings(bool missingAsZero, bool wholeSeriesExistence)
-        {            
+        {
             if (missingAsZero) return ESeriesMissing.Zero;
             if (wholeSeriesExistence)
             {
@@ -488,7 +488,7 @@ namespace Gekko
                 ok = false;
                 return double.NaN;
             }
-        }                
+        }
 
         /// <summary>
         /// For instance, 5 --> 0..9, 12 --> 10..19
@@ -659,7 +659,7 @@ namespace Gekko
             }
 
             return result;
-        }        
+        }
 
         /// <summary>
         /// Add 's' to plural word. For instance "0 files", "1 file", "2 files", ... . 
@@ -983,7 +983,7 @@ namespace Gekko
         {
             if (count == 1) return "";
             else return "s";
-        }        
+        }
 
         /// <summary>
         /// For current freq, returns 4 for !q, 12 for !m, else 1. So 1 for !a and !u (but also 1 for !d and !w...).
@@ -1204,7 +1204,7 @@ namespace Gekko
         {
             string bank, name, freq; string[] index;
             O.Chop(bankvarname, out bank, out name, out freq, out index);
-            return O.UnChop(null, name, freq, index);            
+            return O.UnChop(null, name, freq, index);
         }
 
         /// <summary>
@@ -1408,7 +1408,7 @@ namespace Gekko
         public static string Chop_GetNameAndIndex(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(bankvarname, out bank, out name, out freq, out index);            
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             return O.UnChop(null, name, null, index);
         }
 
@@ -1632,7 +1632,7 @@ namespace Gekko
         /// <param name="varName"></param>
         /// <param name="freq"></param>
         /// <param name="indexes"></param>
-        public static void Chop_Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes) 
+        public static void Chop_Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes)
         {
             O.Chop(input2, out dbName, out varName, out freq, out indexes);
         }
@@ -1742,9 +1742,9 @@ namespace Gekko
         /// <param name="inputName"></param>
         /// <returns></returns>
         public static string Chop_DimensionRemoveLast_FASTER(string inputName)
-        {            
+        {
             int i3 = inputName.LastIndexOf(']');
-            if (i3 == -1) return inputName;            
+            if (i3 == -1) return inputName;
             int i2 = inputName.LastIndexOf(',');
             int i1 = inputName.LastIndexOf('[');
             if (i2 != -1 && i1 < i2 && i2 < i3)
@@ -1848,7 +1848,7 @@ namespace Gekko
             }
 
         }
-        
+
         /// <summary>
         /// Extracts "fY" from "fY¤-2"
         /// </summary>
@@ -1856,7 +1856,7 @@ namespace Gekko
         public static string ExtractOnlyVariableIgnoreLag(string key)
         {
             return Chop_RemoveLagOrLead_OLD(key, Globals.lagIndicator);
-        }        
+        }
 
         /// <summary>
         /// True if between a..z or A..Z
@@ -2350,7 +2350,7 @@ namespace Gekko
         public static bool IsDecompOrFindThread()
         {
             return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp" || Thread.CurrentThread.Name == "Flow" || Thread.CurrentThread.Name == "Plot";
-        }        
+        }
 
         /// <summary>
         /// Thin wrapper on RemoveLagOrLead(), see that.
@@ -2359,7 +2359,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool HasLagOrLead(string name)
         {
-            if(name == G.Chop_RemoveLagOrLead(name)) return true;
+            if (name == G.Chop_RemoveLagOrLead(name)) return true;
             return false;
         }
 
@@ -2468,7 +2468,7 @@ namespace Gekko
                     hit = true;
                 }
                 else
-                {                    
+                {
                     m2.Add(x);
                 }
             }
@@ -2479,7 +2479,7 @@ namespace Gekko
                 {
                     m.Add(x);
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -2608,7 +2608,7 @@ namespace Gekko
             CloneHelper cloneHelper = new CloneHelper();
             //don't touch alias names: we are cloning the content of the databank, not altering its name.
             foreach (KeyValuePair<string, IVariable> kvp in originalDatabank.storage)
-            {                
+            {
                 IVariable ivCopy = kvp.Value.DeepClone(0, null, cloneHelper);  //uses that CloneHelper deeper down, which is ok
                 newDatabank.AddIVariable(kvp.Key, ivCopy);
             }
@@ -2904,7 +2904,7 @@ namespace Gekko
                 return softResult;
             }
             return 0;
-        }        
+        }
 
         public static int RoundUpToNearest32(int value)
         {
@@ -3206,7 +3206,7 @@ namespace Gekko
         /// <param name="fs2"></param>
         /// <returns></returns>
         public static StreamWriter GekkoStreamWriter(FileStream fs2, Encoding encoding)
-        {           
+        {
             return new StreamWriter(fs2, encoding);
         }
 
@@ -3238,12 +3238,12 @@ namespace Gekko
         /// <returns></returns>
         public static Encoding GetEncoding()
         {
-            Encoding encoding = null;            
+            Encoding encoding = null;
             if (G.Equal(Program.options.system_write_encoding, "ansi"))
             {
                 //For emitting html for MAKRO, this seems to be the only one that gives ok æ ø å,
                 //just not for the dynamic JavaScript.
-                encoding = Encoding.GetEncoding("Windows-1252");                
+                encoding = Encoding.GetEncoding("Windows-1252");
             }
             else if (G.Equal(Program.options.system_write_encoding, "utf8"))
             {
@@ -3336,7 +3336,7 @@ namespace Gekko
             if (G.IsEnglishLetter(c) || char.IsDigit(c))
                 return true;
             else return false;
-        }        
+        }
 
         /// <summary>
         /// letters, digits, _ or !
@@ -3526,8 +3526,8 @@ namespace Gekko
                     if (c == '[')
                     {
                         break; //We accept x!q[... where something follows [.
-                    }                    
-                    new Error("Malformed name: '" + name + "'");                    
+                    }
+                    new Error("Malformed name: '" + name + "'");
                 }
             }
 
@@ -3597,7 +3597,7 @@ namespace Gekko
             if (G.IsEnglishLetter(c) || c == '_')
                 return true;
             else return false;
-        }        
+        }
 
         /// <summary>
         /// Overload.
@@ -3725,7 +3725,7 @@ namespace Gekko
         /// <param name="ii"></param>
         /// <returns></returns>
         public static int SkipSpaces(string s, int ii)
-        {            
+        {
             if (ii < 0) return -12345;  //should not happen, but just in case...                        
             //skip spaces (tab is included counted)
             for (int i = ii; i < s.Length; i++)
@@ -3884,7 +3884,7 @@ namespace Gekko
             }
 
             return false;
-        }        
+        }
 
         /// <summary>
         /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another 
@@ -4062,7 +4062,7 @@ namespace Gekko
             result.Add(currentStr.ToString());
             return result;
         }
-        
+
         /// <summary>
         /// Method for printing out "service messages" in the Gekko GUI,
         /// for instance when assigning z = x + y;
@@ -4126,7 +4126,7 @@ namespace Gekko
             }
             string s = version;
             if (stable) s += " (stable)";
-            else s += " (develop)";            
+            else s += " (develop)";
             if (type != "large")  //i.e., == "small"
             {
                 sb.AppendLine(" Gekko version " + s + "  " + Globals.versionInternal);
@@ -4156,7 +4156,7 @@ namespace Gekko
                 catch { }
 
                 sb.AppendLine(" Program folder: ");
-                sb.AppendLine("   " + pd + exe);                
+                sb.AppendLine("   " + pd + exe);
             }
 
             string branch = Program.GetBranch();
@@ -4166,7 +4166,7 @@ namespace Gekko
                 if (branch.Contains(":")) sBranch = " (" + branch + ")";
                 else sBranch = " (branch: " + branch + ")";
             }
-                        
+
             sb.AppendLine(" Working folder: ");
             sb.AppendLine("   " + workingFolder + sBranch);
 
@@ -4244,7 +4244,7 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                }                  
+                }
             }
             return sb;
         }
@@ -4313,13 +4313,13 @@ namespace Gekko
         }
 
         public static string ConvertFreq(EFreq freq)
-        {            
+        {
             string s = null;
             try
             {
                 s = Globals.freqFromEnumToString[freq];
             }
-            catch 
+            catch
             {
                 new Error("Cannot recognize frequency '" + freq.ToString() + "'");
             }
@@ -4585,7 +4585,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static bool IsYear(int x) 
+        public static bool IsYear(int x)
         {
             if (x >= Globals.possibleYearStart && x <= Globals.possibleYearEnd) return true;
             return false;
@@ -4601,7 +4601,7 @@ namespace Gekko
         /// <returns></returns>
         public static int FindYear(int x, bool allowTwoDigits)
         {
-            
+
             if (G.IsYear(x))
             {
                 return x;
@@ -4921,7 +4921,7 @@ namespace Gekko
         /// <param name="i"></param>
         /// <returns></returns>
         public static bool IsDelimited(string input, int i, int length)
-        {            
+        {
             if (i > 0 && G.IsLetterOrDigitOrUnderscore(input[i - 1])) return false;
             if (i + length < input.Length && G.IsLetterOrDigitOrUnderscore(input[i + length])) return false;
             return true;
@@ -5165,7 +5165,7 @@ namespace Gekko
             }
             catch (Exception e) { };
             return output;
-            
+
         }
 
         /// <summary>
@@ -5330,7 +5330,7 @@ namespace Gekko
         /// <returns>Output string</returns>
         public static string GetUpperLowerCase(string var)
         {
-            if (G.GetModelSourceType()==EModelType.Gekko && Program.model.modelGekko.varsAType != null)
+            if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelGekko.varsAType != null)
             {
                 //a Gekko model is loaded
                 //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
@@ -5379,7 +5379,7 @@ namespace Gekko
         /// <param name="insertLinks"></param>
         public static void PrintListWithCommas(List<string> list, bool insertLinks)
         {
-            PrintListWithCommas(list, insertLinks, false);            
+            PrintListWithCommas(list, insertLinks, false);
             return;
         }
 
@@ -5413,14 +5413,14 @@ namespace Gekko
             }
             if (!nocr) G.Writeln();
             return;
-        }        
-        
+        }
+
         /// <summary>
         /// For writing output to screen
         /// </summary>        
         public static void Write(string s)
         {
-            WriteAbstract(EWrapType.Writeln, s, null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Writeln, s, null, false, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -5447,13 +5447,13 @@ namespace Gekko
         {
             WriteAbstract(EWrapType.Writeln, s, null, false, color, false, tab);
         }
-      
+
         /// <summary>
         /// For writing output to screen
         /// </summary>        
         public static void Write(int x)
         {
-            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -5468,7 +5468,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(double x)
         {
-            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -5488,13 +5488,13 @@ namespace Gekko
             Globals.linkAction.Add(Globals.linkActionCounter, a);
             return s2;
         }
-        
+
         /// <summary>
         /// For writing link to screen (without line feed)
         /// </summary>
         /// <param name="s"></param>
         public static void WriteLink(string text, string linktype)
-        {            
+        {
             //for instance input0 = "output", "tab:output"
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
@@ -5570,7 +5570,7 @@ namespace Gekko
         public static void Writeln(string s, ETabs tab)
         {
             WriteAbstract(EWrapType.Writeln, s, null, true, Color.Empty, false, tab);
-        }        
+        }
 
         /// <summary>
         /// For writing output to screen
@@ -5603,7 +5603,7 @@ namespace Gekko
         /// For writing output to screen
         /// </summary>
         public static void WriteAbstract(EWrapType type, string s, string linktype, bool newline, Color color, bool link, ETabs tab)
-        {            
+        {
             WriteAbstractScroll(type, s, linktype, null, newline, color, link, tab, false, false);
         }
 
@@ -5617,7 +5617,7 @@ namespace Gekko
                 //if (s.Trim() != "") MessageBox.Show(s);  //this just creates confusion
                 return;
             }
-            
+
             Program.WorkerThreadHelper2 helper = new Program.WorkerThreadHelper2();
             if (s == null)
             {
@@ -5632,7 +5632,7 @@ namespace Gekko
             {
                 color = Globals.warningColor;
                 Globals.numberOfWarnings++;
-            }            
+            }
             helper.color = color;
             helper.s = s;
             helper.linktype = linktype;
@@ -5695,7 +5695,7 @@ namespace Gekko
             System.Threading.Tasks.Parallel.ForEach(numbers, number =>   //TODO: could test chunks...?
             {
                 if (number == 0) md5_1 = G.GetMd5FromFile(p1, null);
-                else md5_2 = G.GetMd5FromFile(p2, null);                
+                else md5_2 = G.GetMd5FromFile(p2, null);
             });
             if (md5_1 == md5_2) return true;  //almost certainly identical            
             return false;
@@ -5707,7 +5707,7 @@ namespace Gekko
         /// <param name="fileNameWithPath"></param>
         /// <returns></returns>
         public static string GetMd5FromFile(string fileNameWithPath, string extraSalt)
-        {            
+        {
             //tried physically splitting file in n chunks --> 
             //has about same speed as MD5 itself... (0.6 s for a 176 MB file)                
             //also, copying the file with File.Copy is not that much slower than MD5 itself.
@@ -5789,8 +5789,8 @@ namespace Gekko
         /// </summary>
         /// <param name="FileName"></param>
         /// <returns></returns>
-        public static bool IsBlocked(string FileName) 
-        {            
+        public static bool IsBlocked(string FileName)
+        {
             bool isBlocked = false;
             if (System.IO.File.Exists(FileName))
             {
@@ -5837,7 +5837,7 @@ namespace Gekko
         /// <param name="word"></param>
         /// <returns></returns>
         public static bool ContainsWord(string s, string word)
-        {                       
+        {
             return Regex.Match(s, @"\b" + word + @"\b", RegexOptions.IgnoreCase).Success;
         }
 
@@ -5864,7 +5864,6 @@ namespace Gekko
             return noComments;
         }
 
-        
         /// <summary>
         /// For developer use/debugging
         /// </summary>        

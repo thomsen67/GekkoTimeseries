@@ -2256,7 +2256,7 @@ img {border-style: none;
             for (int i = 0; i < n; i++)
             {
                 DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                if (eqName.IsNull()) continue;
+                if (eqName == null) continue;
 
                 if (eqName.GetTime().Equals(t1))
                 {
@@ -2380,7 +2380,7 @@ img {border-style: none;
                 //}
                 //if (combos.Count > bh.maxPages) break;
                 DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                if (eqName.IsNull()) continue;                
+                if (eqName == null) continue;                
 
                 if (eqName.GetTime().Equals(t))
                 {

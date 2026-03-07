@@ -836,7 +836,7 @@ namespace Gekko
                         else
                         {
                             //is this still necessary?
-                            link.varnames = new DName(); //empty. Old: "<not used>"; //strange but necessary further on
+                            link.varnames = null; //empty. Old: "<not used>"; //strange but necessary further on
                         }
                         link.expressions = new List<Func<GekkoSmpl, IVariable>>();
                         link.expressions.Add(null); //strange but necessary further on
@@ -1861,18 +1861,18 @@ namespace Gekko
 
                             List<TwoDNames> variables = new List<TwoDNames>();
 
-                            foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                            foreach (long dp in modelGamsScalar.precedents[eqNumber].vars)
                             {
                                 //foreach precedent variable
-                                DName varName = modelGamsScalar.GetVarNameA(dp.variable);
+                                DName varName = modelGamsScalar.GetVarNameA(ModelGamsScalar.UnpackVariable(dp));
 
                                 int add2 = 0;
 
-                                int date = dp.date;
+                                int date = ModelGamsScalar.UnpackPeriod(dp);
                                 int tt1 = date + add + add2;
                                 int tt2 = date + add + add2 - t.Subtract(modelGamsScalar.tBasis);
 
-                                if (modelGamsScalar.isTimeless[dp.variable])
+                                if (modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(dp)])
                                 {
                                     if (Globals.runningOnTTComputer && add != 0) G.WarningInternal("TTH: Expected add = 0 here");
                                     tt2 = 0;  //always show as if unlagged, even if it really points back to .tBasis.
@@ -3401,14 +3401,14 @@ namespace Gekko
 
                 //foreach precedent variable
                 int i = -1;
-                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                foreach (long dp in modelGamsScalar.precedents[eqNumber].vars)
                 {                                        
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
 
                     i++;
-                    DName varName = modelGamsScalar.GetVarNameA(dp.variable);                    
+                    DName varName = modelGamsScalar.GetVarNameA(ModelGamsScalar.UnpackVariable(dp));                    
 
                     if (op.isRaw)
                     {
@@ -3425,10 +3425,10 @@ namespace Gekko
                             y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                             d.cellsQuo[residualName].SetData(t, y1);
                         }
-                        double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
-                        double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
-                        int lag2 = dp.date + timeIndex2;
-                        if (modelGamsScalar.isTimeless[dp.variable])
+                        double x0 = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, true);
+                        double x1 = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, false);
+                        int lag2 = ModelGamsScalar.UnpackPeriod(dp) + timeIndex2;
+                        if (modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(dp)])
                         {
                             lag2 = 0;
                         }
@@ -3460,13 +3460,13 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + (1 - ONE)].eqNumber, false, tZero + ONE, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t.Add(1), y1);
                             }
-                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
-                            double x1 = modelGamsScalar.GetData(dp.date + 1, tZero, dp.variable, missingAsZero, false);
+                            double x0_before = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, false);
+                            double x1 = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp) + 1, tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, false);
 
                             try
                             {
                                 double x0_after = x0_before + eps;                                
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, false, x0_after);                                
+                                modelGamsScalar.SetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), false, x0_after);                                
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
 
                                 double grad = (y0_after - y0a) / eps;
@@ -3475,8 +3475,8 @@ namespace Gekko
                                 //see also #sf94lkjsdjæ
                                 if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
-                                    int lag2 = dp.date + timeIndex2;                                    
-                                    if (modelGamsScalar.isTimeless[dp.variable])
+                                    int lag2 = ModelGamsScalar.UnpackPeriod(dp) + timeIndex2;                                    
+                                    if (modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(dp)])
                                     {
                                         lag2 = 0;
                                     }
@@ -3500,7 +3500,7 @@ namespace Gekko
                             }
                             finally
                             {
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, false, x0_before);
+                                modelGamsScalar.SetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), false, x0_before);
                             }
                         }
 
@@ -3514,13 +3514,13 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + (1 - ONE)].eqNumber, true, tZero + ONE, ref funcCounter);
                                 d.cellsRef[residualName].SetData(t.Add(1), y1);
                             }
-                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
-                            double x1 = modelGamsScalar.GetData(dp.date + 1, tZero, dp.variable, missingAsZero, true);
+                            double x0_before = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, true);
+                            double x1 = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp) + 1, tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, true);
 
                             try
                             {
                                 double x0_after = x0_before + eps;
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, true, x0_after);
+                                modelGamsScalar.SetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), true, x0_after);
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, true, tZero, ref funcCounter);
                                 double grad = (y0_after - y0b) / eps;
 
@@ -3528,8 +3528,8 @@ namespace Gekko
                                 //see also #sf94lkjsdjæ
                                 if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
-                                    int lag2 = dp.date + timeIndex2;
-                                    if (modelGamsScalar.isTimeless[dp.variable])
+                                    int lag2 = ModelGamsScalar.UnpackPeriod(dp) + timeIndex2;
+                                    if (modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(dp)])
                                     {
                                         lag2 = 0;
                                     }
@@ -3553,7 +3553,7 @@ namespace Gekko
                             }
                             finally
                             {
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, true, x0_before);
+                                modelGamsScalar.SetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), true, x0_before);
                             }
                         }
 
@@ -3567,13 +3567,13 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t, y1);
                             }
-                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
-                            double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
+                            double x0_before = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, true);
+                            double x1 = modelGamsScalar.GetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), missingAsZero, false);
 
                             try
                             {
                                 double x0_after = x0_before + eps;
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, true, x0_after);
+                                modelGamsScalar.SetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), true, x0_after);
                                 double y0_after = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, true, tZero, ref funcCounter);
                                 double grad = (y0_after - y0c) / eps;
 
@@ -3581,8 +3581,8 @@ namespace Gekko
                                 //see also #sf94lkjsdjæ
                                 if (Globals.decompFix || !G.IsNumericalError(grad))
                                 {
-                                    int lag2 = dp.date + timeIndex2;
-                                    if (modelGamsScalar.isTimeless[dp.variable])
+                                    int lag2 = ModelGamsScalar.UnpackPeriod(dp) + timeIndex2;
+                                    if (modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(dp)])
                                     {
                                         lag2 = 0;
                                     }
@@ -3606,7 +3606,7 @@ namespace Gekko
                             }
                             finally
                             {
-                                modelGamsScalar.SetData(dp.date, tZero, dp.variable, true, x0_before);
+                                modelGamsScalar.SetData(ModelGamsScalar.UnpackPeriod(dp), tZero, ModelGamsScalar.UnpackVariable(dp), true, x0_before);
                             }
                         }
                     }
@@ -6604,7 +6604,7 @@ namespace Gekko
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(t0));
 
-            Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
+            Dictionary<long, Flood> colors = new Dictionary<long, Flood>();
 
             int a1; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(x1), out a1)) a1 = -12345;
             if (a1 == -12345) new Error(NonFoundInModelError(x1, modelGamsScalar));
@@ -6612,8 +6612,8 @@ namespace Gekko
             int a2 ; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(x2), out a2)) a2 = -12345;
             if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));
 
-            PeriodAndVariable pv1 = new PeriodAndVariable(timeIndex, a1);
-            PeriodAndVariable pv2 = new PeriodAndVariable(timeIndex, a2);            
+            long pv1 = ModelGamsScalar.PackPeriodAndVariable(timeIndex, a1);
+            long pv2 = ModelGamsScalar.PackPeriodAndVariable(timeIndex, a2);            
 
             Flood start = new Flood();
             start.color = 0;
@@ -6650,7 +6650,7 @@ namespace Gekko
             while (true)
             {
                 //#6irhwakery7
-                string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, b, b, "");
+                string name = G.Chop_DimensionAddLag(modelGamsScalar.GetVariableAndPeriod(f.pv).Item1.ToString(), modelGamsScalar.Maybe2000GekkoTime(t0), modelGamsScalar.GetVariableAndPeriod(f.pv).Item2, b, b, "");
 
                 string label = Program.GetVariableExplanation1Line(new DName(name));
 

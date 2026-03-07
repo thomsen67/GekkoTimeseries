@@ -1014,12 +1014,10 @@ namespace Gekko
         public List<string> csCodeLines = null; //C# source code
         
         /// <summary>
-        /// Points a period-and-variable to the unfolded equations (equation numbers) it is part of. This could
-        /// be a bit faster and use a bit less ram if PeriodAndVariable was a long and by using
-        /// modulo. 
+        /// Points a period-and-variable to the unfolded equations (equation numbers) it is part of.
         /// </summary>
         [ProtoMember(25)]
-        public GekkoDictionary<PeriodAndVariable, List<int>> dependents = null;
+        public Dictionary<long, List<int>> dependents = null;
 
         /// <summary>
         /// Points an equation number to a list of period-and-variables, that is, the variables
@@ -1152,22 +1150,22 @@ namespace Gekko
         {
             List<string> precedents = new List<string>();
             bool b = false; // G.Equal(Program.options.decomp_equation_style, "gams");
-            foreach (PeriodAndVariable dp in this.precedents[eqNumber].vars)
+            foreach (long dp in this.precedents[eqNumber].vars)
             {
-                if (Globals.greuHack && dp.variable == -12345)
+                if (Globals.greuHack && ModelGamsScalar.UnpackVariable(dp) == -12345)
                 {
                     continue; //Some vars with " in element names (E_qCO2e_BU_energy_Corp_es_e_i["energy_Corp",heating,Other oil products,01011]). Should be handled with DName etc. later on
                 }
                 //see also #as7f3læaf9                
-                Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod(this);
+                Tuple<DName, GekkoTime> tup = this.GetVariableAndPeriod(dp);
                 string name2 = null;
                 if (helper.showTime)
                 {
-                    name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
+                    name2 = G.Chop_DimensionAddLast(tup.Item1.ToString(), tup.Item2.ToString());
                 }
                 else
                 {                    
-                    name2 = G.Chop_DimensionAddLag(tup.Item1, this.Maybe2000GekkoTime(t0), tup.Item2, b, b, " "); //qwerty
+                    name2 = G.Chop_DimensionAddLag(tup.Item1.ToString(), this.Maybe2000GekkoTime(t0), tup.Item2, b, b, " "); //qwerty
                 }
                 precedents.Add(name2);
             }
@@ -1445,6 +1443,51 @@ namespace Gekko
             }
         }
 
+
+        /// <summary>
+        /// Used to pack period+variable, both i1 and i2 are expected to be >= 0. See .UnpackPeriod() and .UnpackVariable().
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
+        public static long PackPeriodAndVariable(int i1, int i2)
+        {
+            return ((long)i1 << 32) | (uint)i2;
+        }
+
+        /// <summary>
+        /// Used to pack period+variable, the return value is expected to be >= 0. See PackPeriodAndVariable() and GetVariableAndPeriod().
+        /// </summary>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        public static int UnpackPeriod(long l)
+        {
+            return (int)(l >> 32);
+        }
+
+        /// <summary>
+        /// Used to pack period+variablee, the return value is expected to be >= 0. See PackPeriodAndVariable() and GetVariableAndPeriod().
+        /// </summary>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        public static int UnpackVariable(long l)
+        {
+            return (int)l;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        public Tuple<DName, GekkoTime> GetVariableAndPeriod(long l)
+        {            
+            GekkoTime gt = this.FromTimeIntegerToGekkoTime(ModelGamsScalar.UnpackPeriod(l));
+            DName varName = this.GetVarNameA(ModelGamsScalar.UnpackVariable(l));
+            Tuple<DName, GekkoTime> tup = new Tuple<DName, GekkoTime>(varName, gt);
+            return tup;
+        }
+
         public void WriteMissingModelGamsScalarVariables(bool isRef)
         {
             using (Writeln txt = new Writeln())
@@ -1601,7 +1644,7 @@ namespace Gekko
             Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
             foreach (DName s2 in this.dict_FromEqNumberToEqName)
             {
-                if (!this.t1.IsNull() && s2.IsNull()) continue;
+                if (!this.t1.IsNull() && s2 == null) continue;
                 
                 if (type == 2)
                 {
@@ -2261,7 +2304,8 @@ namespace Gekko
     public class ModelScalarEquation
     {
         [ProtoMember(1)]
-        public List<PeriodAndVariable> vars = new List<PeriodAndVariable>();
+        //Each period+variable is packed as a long, in that order.
+        public List<long> vars = new List<long>(); 
     }    
 
     [ProtoContract]

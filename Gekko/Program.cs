@@ -929,7 +929,7 @@ namespace Gekko
     public class Flood
     {
         public int color = -12345;
-        public PeriodAndVariable pv = null;
+        public long pv = long.MinValue; //period+variable packed
         public int eq = -12345;
         public Flood parent = null;
     }
@@ -3441,7 +3441,7 @@ namespace Gekko
         /// <param name="flood"></param>
         /// <param name="color"></param>
         /// <param name="colors"></param>
-        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<PeriodAndVariable, Flood> colors, out bool done, ModelGamsScalar model)
+        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<long, Flood> colors, out bool done, ModelGamsScalar model)
         {
             done = false;
             List<Flood> rv = new List<Flood>();
@@ -3449,7 +3449,7 @@ namespace Gekko
             foreach (int eq in eqs)
             {
                 ModelScalarEquation eqs2 = model.precedents[eq];
-                foreach (PeriodAndVariable pv2 in eqs2.vars)
+                foreach (long pv2 in eqs2.vars)
                 {
                     //new Writeln("equation " + eqName + " containing variable " + pv.GetVariableAndPeriod().Item1 + " in " + pv.GetVariableAndPeriod().Item2.ToString());
                     Flood found = null; colors.TryGetValue(pv2, out found);
@@ -17033,10 +17033,10 @@ namespace Gekko
             {
                 double bestScore = double.MinValue;
                 string bestVar = "<not found>";
-                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars) //can have 840...
+                foreach (long dp in modelGamsScalar.precedents[eqInfo.eqNumber].vars) //can have 840...
                 {
                     //foreach precedent variable
-                    string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);
+                    string varName = modelGamsScalar.GetVarNameA_OLD(ModelGamsScalar.UnpackVariable(dp));
                     EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
                     GamsModel.ScoreEquationGivenVariable(eqInfoClone, DName.HACK1(varName), model, modelGams, modelGamsScalar);
                     double score = eqInfoClone.score;

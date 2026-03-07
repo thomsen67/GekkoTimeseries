@@ -722,7 +722,7 @@ namespace Gekko
             }            
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(tHere);
-            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+            long pav = ModelGamsScalar.PackPeriodAndVariable(timeIndex, aNumber);
             List<int> eqNumbers = null;            
             if (modelGamsScalar.dependents != null) modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
             
@@ -754,9 +754,9 @@ namespace Gekko
                     if (abortIfError)
                     {
                         string s = ". You may want to adjust the DECOMP time period.";
-                        bool b = false; try { b = modelGamsScalar.isTimeless[pav.variable]; } catch { }
+                        bool b = false; try { b = modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(pav)]; } catch { }
                         if (b) s = ". Note that the variable " + variableName + " is timeless (without time dimension): it may therefore not make sense to try to decompose it.";
-                        new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
+                        new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(ModelGamsScalar.UnpackPeriod(pav)).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + s);
                     }
                     else return new List<EqInfoSimple>();  //Flowgraph just ignores the problem
                 }
@@ -885,10 +885,10 @@ namespace Gekko
         {
             string dep = null;
             //Look for the special "res_..." variable name in the equation variables
-            foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+            foreach (long dp in modelGamsScalar.precedents[eqNumber].vars)
             {
                 //foreach precedent variable
-                string varName = modelGamsScalar.GetVarNameA_OLD(dp.variable);
+                string varName = modelGamsScalar.GetVarNameA_OLD(ModelGamsScalar.UnpackVariable(dp));
                 if (G.StartsWith(varName, Globals.decompResidualPrefix))
                 {
                     dep = varName.Substring(Globals.decompResidualPrefix.Length);
@@ -1936,10 +1936,11 @@ namespace Gekko
                             substatus2 = 0;
                             helper.dict_FromEqNumberToEqName = new DName[eqCounts2];
 
-                            for (int i = 0; i < eqCounts2; i++)
-                            {
-                                helper.dict_FromEqNumberToEqName[i] = new DName();  //because of protobuf when truncating periods
-                            }
+                            //Must items be added?
+                            //for (int i = 0; i < eqCounts2; i++)
+                            //{
+                            //    helper.dict_FromEqNumberToEqName[i] = new DName();  //because of protobuf when truncating periods
+                            //}
 
                             helper.dict_FromEqNumberToEqChunkNumber = new int[eqCounts2];
                             break;
@@ -2197,62 +2198,70 @@ namespace Gekko
         private static void CalculatePrecedentsAndDependents(ModelGamsScalar modelGamsScalar, int bigN)
         {
             modelGamsScalar.precedents = new List<ModelScalarEquation>();
-            modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
+            modelGamsScalar.dependents = new Dictionary<long, List<int>>();
+            Dictionary<long, bool> helper = new Dictionary<long, bool>();
 
             DateTime dt1 = DateTime.Now;
 
+            //First precedents
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {                
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].IsNull())
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == null)
                     {
                         modelGamsScalar.precedents.Add(new ModelScalarEquation());
                         continue;
                     }
                 }
                 
-                ModelScalarEquation equ = new ModelScalarEquation();
-                modelGamsScalar.precedents.Add(equ);                
-                //foreach precedent variable
+                ModelScalarEquation precedentsInEquation = new ModelScalarEquation();
+                modelGamsScalar.precedents.Add(precedentsInEquation);
+                helper.Clear();  //prepare for next equation (eliminate dublets)                
                 for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
-                {                    
-                    PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
+                {
+                    //foreach precedent variable
+                    long dp = ModelGamsScalar.PackPeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
                     if (Globals.runningOnTTComputer)  //Just an assert here
                     {
-                        if (dp.variable == -12345)
+                        if (ModelGamsScalar.UnpackVariable(dp) == -12345)
                         {
                             if (!Globals.greuHack) G.WarningInternal("TTH: Variable number == -12345...");
                         }
                         else
                         {
-                            bool b = modelGamsScalar.isTimeless[dp.variable];
-                            if (b && dp.date != Globals.decompTimelessNumber)
+                            bool b = modelGamsScalar.isTimeless[ModelGamsScalar.UnpackVariable(dp)];
+                            if (b && ModelGamsScalar.UnpackPeriod(dp) != Globals.decompTimelessNumber)
                             {
                                 if (!Globals.greuHack) G.WarningInternal("TTH: Expected timeless .date = " + Globals.decompTimelessNumber);
                             }
                         }                        
                     }
-                    if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets. #kljae8aerlk
+                    if (!helper.ContainsKey(dp)) //Faster to look up than using equ.vars list. There can be hundreds of variables!
+                    {
+                        helper.Add(dp, false);
+                        precedentsInEquation.vars.Add(dp);  //avoid dublets.
+                    }
                 }
             }
-
-            G.Writeln2("TTH: --sub-- prec/dep 1: " + G.Seconds(dt1));
+            
+            if (Globals.runningOnTTComputer) new Writeln("TTH: --sub-- precedents: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
+            //Then dependents
             //mapping from a varname to the equations it is part of                
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
                 if (Globals.greuHack)
                 {
-                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber].IsNull())
+                    if (modelGamsScalar.dict_FromEqNumberToEqName[eqNumber] == null)
                     {                        
                         continue;
                     }
                 }
 
                 //foreach precedent variable
-                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                foreach (long dp in modelGamsScalar.precedents[eqNumber].vars)
                 {
                     List<int> eqsHere = null;
                     modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
@@ -2261,17 +2270,13 @@ namespace Gekko
                         modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
                     }
                     else
-                    {
-                        if (eqsHere.Contains(eqNumber))
-                        {
-                            new Error("Strange!");
-                        }
+                    {                        
                         eqsHere.Add(eqNumber);
                     }
                 }
             }
-
-            G.Writeln2("TTH: --sub-- prec/dep 2: " + G.Seconds(dt1));
+            
+            if (Globals.runningOnTTComputer) new Writeln("TTH: --sub-- dependents: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
         }        
 
@@ -2311,9 +2316,9 @@ namespace Gekko
             string sEqLine = eqLine.ToString();
             int iDot = sEqLine.IndexOf("..");            
             int equationNumber = int.Parse(sEqLine.Substring(1, iDot - 1)) - 1; //0-based, ignoring the first 'e'                                       
-            if (!helper.dict_FromEqNumberToEqName[equationNumber].IsNull())
+            if (helper.dict_FromEqNumberToEqName[equationNumber] != null)
             {
-                if (Globals.runningOnTTComputer && helper.dict_FromEqNumberToEqName[equationNumber] == null) G.WarningInternal("Did not expect null in equation name");
+                //if (Globals.runningOnTTComputer && helper.dict_FromEqNumberToEqName[equationNumber] == null) G.WarningInternal("Did not expect null in equation name");
                 tokens = StringTokenizer.GetTokensWithLeftBlanks(sEqLine, more);  //1 empty "" token
                 //probe, checking for **
                 for (int i = 0; i < tokens.Count() - more; i++)
@@ -4349,7 +4354,6 @@ namespace Gekko
 
                                                 }
                                             }
-
 
                                             if (gt.IsNull())
                                             {

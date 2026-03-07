@@ -332,11 +332,11 @@ namespace Gekko
             insensitiveHash = iHash;
         }
 
-        public bool IsNull() //Same as .ToString() == null
-        {            
-            if (this.storage == null) return true;
-            return false;
-        }
+        //public bool IsNull() //Same as .ToString() == null
+        //{            
+        //    if (this.storage == null) return true;
+        //    return false;
+        //}
 
         private StringOrTime[] GetStorage()
         {
@@ -652,8 +652,7 @@ namespace Gekko
         }
 
         public string ToString(DNameFormat format)
-        {
-            if (this.IsNull()) return null;            
+        {            
             List<string> temp = new List<string>();            
             for (int i = DName._posIndex; i < this.GetLength(); i++)
             {
