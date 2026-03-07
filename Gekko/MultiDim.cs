@@ -763,6 +763,51 @@ namespace Gekko
                 return new DName(name, G.ConvertFreq(freq), m.ToArray());
             }            
         }
+
+        public static List<DName> HACK1a(List<string> ss)
+        {
+            List<DName> rv = new List<DName>();
+            foreach (string s in ss)
+            {
+                rv.Add(DName.HACK1a(s));
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Hacky, try to get rid of it when scalar model dicts are done
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static DName HACK1a(string s)
+        {
+            string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
+            G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);            
+            List<StringOrTime> m = new List<StringOrTime>();
+            bool hasTime = false;
+            if (indexes1 != null)
+            {
+                foreach (string s2 in indexes1)
+                {
+                    if (G.LooksLikeYearOrQuarterOrMonth(s2))
+                    {
+                        new Error("Time period in the first [] in x[..., ...][...] not allowed");                        
+                    }
+                    else
+                    {
+                        m.Add(s2);
+                    }
+                }
+            }
+            GekkoTime t = new GekkoTime(EFreq.Lag, 0);
+            if (indexes2 != null)
+            {
+                if (indexes2.Length != 1) new Error("Expected x[..., ...][...] pattern");                
+                t = new GekkoTime(EFreq.Lag, int.Parse(indexes2[0]));
+                m.Add(t);
+            }
+            return new DName(name, G.ConvertFreq(freq), m.ToArray());
+        }
     }
 
     [ProtoContract]
