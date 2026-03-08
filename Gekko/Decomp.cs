@@ -1399,7 +1399,10 @@ namespace Gekko
                     int periods = GekkoTime.Observations(modelGamsScalar.absoluteT1, modelGamsScalar.absoluteT2);
                     if (modelGamsScalar.isPerpetualModel) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
-                    if (s.GetTime().freq != EFreq.Lag) new Error("Expected lag");
+                    if (s.GetTime().freq != EFreq.Lag)
+                    {
+                        new Error("Expected lag");
+                    }
                     element.offset = s.GetTime().super; //Should be a lag. Should it be with a minus??
                     elements.Add(mmi, element);
                 }                
@@ -2975,7 +2978,7 @@ namespace Gekko
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
 
-                List<DName> ss = Globals.precedentsContainer.Keys.ToList();
+                List<DName> ss = Globals.precedentsContainer.Keys.ToList(); //no lags/leads
                 ss = ss.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
                 foreach (DName s in ss)
                 {
@@ -3053,7 +3056,7 @@ namespace Gekko
                         iVar++;
 
                         Series xRef_series = null;
-                        IVariable dpx = O.GetIVariableFromString(dp.s.ToString(), O.ECreatePossibilities.NoneReportError);
+                        IVariable dpx = O.GetIVariableFromString(dp.s.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReportError);
 
                         if (dpx.Type() == EVariableType.Series)
                         {
@@ -4452,7 +4455,8 @@ namespace Gekko
                         
                         if (op.isRaw)
                         {
-                            Series tsFirst = O.GetIVariableFromString(chop.fullName.ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            //qwerty, does this var need to have lag/lead removed?
+                            Series tsFirst = O.GetIVariableFromString(chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsFirst != null)
                             {
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.fullName.GetLag()));
@@ -4464,8 +4468,8 @@ namespace Gekko
                                     if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
                                     if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
                                 }
-                            }
-                            Series tsRef = O.GetIVariableFromString("Ref:" + chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            }                            
+                            Series tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsRef != null)
                             {
                                 dLevelRef = tsRef.GetDataSimple(t2.Add(chop.fullName.GetLag()));
@@ -4484,7 +4488,7 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                             {
                                 Series tsFirst = null;
-                                tsFirst = O.GetIVariableFromString(chop.fullName.ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsFirst = O.GetIVariableFromString(chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 bool isMissingResVariable = false;
                                 if (tsFirst == null)
                                 {
@@ -4518,7 +4522,7 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                             {
                                 Series tsRef = null;
-                                tsRef = O.GetIVariableFromString("Ref:" + chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 bool missingResVariable = false;
                                 if (tsRef == null)
                                 {
@@ -4919,13 +4923,8 @@ namespace Gekko
             if (domains != null)
             {
                 //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
-                //So in this case, #a and #sector would be added as columns
-                // HACK HACK HACK
-                // HACK HACK HACK
-                // HACK HACK HACK What if fullName has lag or time or ...
-                // HACK HACK HACK
-                // HACK HACK HACK
-                IVariable iv = O.GetIVariableFromString(fullName.ToString(), O.ECreatePossibilities.NoneReturnNullAlways);
+                //So in this case, #a and #sector would be added as columns                
+                IVariable iv = O.GetIVariableFromString(fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways);
                 if (iv != null)
                 {
                     Series ts = iv as Series;
@@ -6226,7 +6225,7 @@ namespace Gekko
                     string textColor = "Black";
                     if (o.decompFind.decompOptions2.new_from != null)
                     {
-                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3, Multidim2Comparer.IgnoreCase))
                         {
                             textColor = "Gray";
                         }

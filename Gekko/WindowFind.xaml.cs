@@ -71,7 +71,7 @@ namespace Gekko
         {
             ToggleButton b = sender as ToggleButton;
             string s = ((TextBlock)b.Content).Text;
-            this.FindSetLabel(new DName(s));
+            this.FindSetLabel(DName.HACK1(s));
             this._activeVariable = DName.HACK1(s);
 
             foreach (object o in this.windowEquationBrowserButtons.Children)
@@ -95,20 +95,8 @@ namespace Gekko
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
         {
             ToggleButton b = sender as ToggleButton;
-            string s = ((TextBlock)b.Content).Text;
-            if (s.Contains("[-"))
-            {
-                //lag
-                int idx = s.IndexOf("[-");
-                s = G.Substring(s, 0, idx - 1);
-            }
-            else if (s.Contains("[+"))
-            {
-                //lag
-                int idx = s.IndexOf("[+");
-                s = G.Substring(s, 0, idx - 1);
-            }
-            this.FindSetLabel(new DName(s));
+            string s = ((TextBlock)b.Content).Text;            
+            this.FindSetLabel(DName.HACK1a(s).RemoveTime()); //Will remove any lag/lead x[-1], x[+1]
         }
 
         public void OnVariableButtonLeave(object sender, MouseEventArgs e)
@@ -183,8 +171,8 @@ namespace Gekko
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(new DName(item.fullName), helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
-            this._activeEquation = new DName(item.fullName);
+            this.FindSetButtons(DName.HACK1(item.fullName), helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+            this._activeEquation = DName.HACK1(item.fullName);
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
@@ -194,7 +182,7 @@ namespace Gekko
             EquationListItem item = x.Content as EquationListItem;
             EquationTextHelper helper = new EquationTextHelper();
             helper.showTime = this.decompFind.decompOptions2.showTime;
-            this.FindSetButtons(new DName(item.fullName), helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
+            this.FindSetButtons(DName.HACK1(item.fullName), helper, this.decompFind.model.modelGamsScalar.GetDecompT(), decompFind.model);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -288,9 +276,10 @@ namespace Gekko
 
                     //!!! a bit of a waste of time, but is probably not significantly slowing
                     //    down the FIND window.                    
-
+                                        
+                    int lag = eqName.GetTime().Subtract(model.modelGamsScalar.GetDecompT());
                     //qwerty bad hack
-                    decompOptionsTemp.new_from = new List<DName>() { eqName.HACK_NameWithoutLast(null) };
+                    decompOptionsTemp.new_from = new List<DName>() { eqName.RemoveTime().HACK_AddTime(new GekkoTime(EFreq.Lag, lag)) };
                     Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, decompOptionsTemp.decompOperator, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]
@@ -462,7 +451,7 @@ namespace Gekko
                 b.Unchecked += this.OnVariableButtonUntoggle;
 
                 this.windowEquationBrowserButtons.Children.Add(b);
-                _buttons.Add(new DName(ss5), b);
+                _buttons.Add(DName.HACK1a(ss5), b);
             }
         }
     }

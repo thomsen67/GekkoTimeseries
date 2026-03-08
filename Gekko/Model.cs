@@ -2273,21 +2273,12 @@ namespace Gekko
             List<DName> lhsEqs = new List<DName>();
             if (isModelGekko)
             {
-                lhsEqs.Add(new DName("e_" + variableName.ToString()));
+                lhsEqs.Add(variableName.HACK_Prefix("e_"));
             }
             else
             {
                 foreach (KeyValuePair<DName, DName> kvp in this.depNames)
-                {
-                    //string s = kvp.Value;
-                    //if (Globals.greuHack)
-                    //{
-                    //    s = s.Replace("[t]", "").Replace(",t]", "]");
-                    //}
-                    //if (G.EqualHandleBlanks(s, variableName.ToString()))
-                    //{
-                    //    lhsEqs.Add(kvp.Key);
-                    //}
+                {                    
                     if (G.Equal(kvp.Value, variableName))
                     {
                         lhsEqs.Add(kvp.Key);

@@ -194,7 +194,7 @@ namespace Gekko
         {
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;
-            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but we keep it for now
+            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but very good for lists etc.
             if (x.GetLength() != y.GetLength()) return false;
             for (int i = 0; i < x.GetLength(); i++)
             {
@@ -346,9 +346,25 @@ namespace Gekko
             return this.storage;
         }
 
-        public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
+        // Regarding these, default behavior regarding these objects (and DName) is case-insensitive, corresponding
+        // to G.Equal(). That way, lists etc. are easy to use.
+        //public override bool Equals(object obj) => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
+        //public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
 
-        public override int GetHashCode() => throw new InvalidOperationException("Use Multidim2Comparer explicitly");
+        public override bool Equals(object obj)
+        {
+            // Use the MatchCase (Ordinal) comparer as the default logic
+            if (obj is Multidim2Element other)
+            {
+                return Multidim2Comparer.IgnoreCase.Equals(this, other);
+            }
+            return false;
+        }        
+
+        public override int GetHashCode()
+        {
+            return this.insensitiveHash;            
+        }
 
         public int GetHashCode(bool ignoreCase) => ignoreCase ? insensitiveHash : sensitiveHash;
 
@@ -639,7 +655,10 @@ namespace Gekko
                 new Error("No time part found");
             }
             GekkoTime t = this.Get(this.timePosition).GetTime();
-            if (t.freq != EFreq.Lag) new Error("Expected lag time type");
+            if (t.freq != EFreq.Lag)
+            {
+                new Error("Expected lag time type");
+            }
             return t.super;
         }
 
