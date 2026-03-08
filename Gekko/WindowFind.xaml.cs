@@ -96,7 +96,7 @@ namespace Gekko
         {
             ToggleButton b = sender as ToggleButton;
             string s = ((TextBlock)b.Content).Text;            
-            this.FindSetLabel(DName.HACK1a(s).RemoveTime()); //Will remove any lag/lead x[-1], x[+1]
+            this.FindSetLabel(DName.HACK1_lag(s).RemoveTime()); //Will remove any lag/lead x[-1], x[+1]
         }
 
         public void OnVariableButtonLeave(object sender, MouseEventArgs e)
@@ -451,7 +451,7 @@ namespace Gekko
                 b.Unchecked += this.OnVariableButtonUntoggle;
 
                 this.windowEquationBrowserButtons.Children.Add(b);
-                _buttons.Add(DName.HACK1a(ss5), b);
+                _buttons.Add(DName.HACK1_lag(ss5), b);
             }
         }
     }

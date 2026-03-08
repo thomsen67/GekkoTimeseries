@@ -1459,7 +1459,7 @@ namespace Gekko
                     if (eq.GetName().Contains(Globals.scalarModelExtraVariable)) continue;
                     if (eq.GetName().Contains("e_temp")) continue;
 
-                    DName noTime = eq.HACK_RemoveTime();
+                    DName noTime = eq.RemoveTime();
 
                     if (!known.ContainsKey(noTime))
                     {
@@ -1487,7 +1487,7 @@ namespace Gekko
                         EquationHelper2 eh = new EquationHelper2();
                         eh.eqMathScalar = helper22.s_scalarModel;
                         eh.eqMathRaw = helper22.s_gamsOrFrnSyntax;
-                        eh.eqName = eq.HACK_RemoveTime();
+                        eh.eqName = eq.RemoveTime();
                         batches[noIndex].Add(eh);
                     }
                 }

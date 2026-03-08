@@ -131,7 +131,7 @@ namespace Gekko
                 // Step 5: Add the value (from the values part of the data row)
 
                 //double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<DName>() { new DName( dataframeRow.storageValues[Globals.dNames].text) }, dataframeRow.storageValues[Globals.dPrimeShare].data,      
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<DName>() { DName.HACK1_lag(dataframeRow.storageValues[Globals.dNames].text) }, dataframeRow.storageValues[Globals.dPrimeShare].data,      
                     dataframeRow.storageValues[Globals.dFirstLevelLag].data,
                     dataframeRow.storageValues[Globals.dFirstLevelLag2].data,
                     dataframeRow.storageValues[Globals.dFirstLevelRef].data, 
@@ -1832,7 +1832,7 @@ namespace Gekko
                             }
                             //Has freq set to .None, because that is so in the decompDatas containers.
                             DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count), EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
-                            DName xx1 = xx2.HACK_RemoveTime().HACK_AddTime(t.Add(0));
+                            DName xx1 = xx2.RemoveTime().HACK_AddTime(t.Add(0));
                             variables.Add(new TwoDNames(xx1, xx2));
 
                             //foreach precedent variable
@@ -2038,7 +2038,7 @@ namespace Gekko
                 GekkoTime gtNotUsed; DName name;                
                 DName dn0 = endoReverse[row];
                 //name = "Work:" + dn0.HACK_ToStringWithoutTime();
-                name = dn0.HACK_RemoveTime();
+                name = dn0.RemoveTime();
                 gtNotUsed = dn0.GetTime();
                 //if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
                 if (!decompOptions2.new_select.Contains(name, Multidim2Comparer.IgnoreCase)) continue;
@@ -2046,14 +2046,14 @@ namespace Gekko
                 for (int col = 0; col < exo.Count(); col++)
                 {                 
                     DName dn1 = endoReverse[row];
-                    DName ename = dn1.HACK_RemoveTime();
+                    DName ename = dn1.RemoveTime();
                     GekkoTime etime = dn1.GetTime();                 
                                         
                     DName dn2 = exoReverse[col];
-                    DName xname = dn2.HACK_RemoveTime();
+                    DName xname = dn2.RemoveTime();
                     GekkoTime xtime = dn2.GetTime();
 
-                    DName enewName = ename.HACK_RemoveTime().HACK_AddTime(new GekkoTime(EFreq.Lag, 0));
+                    DName enewName = ename.RemoveTime().HACK_AddTime(new GekkoTime(EFreq.Lag, 0));
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
                                         
@@ -2236,12 +2236,12 @@ namespace Gekko
                     // Why taken from databank?
                     // HACK HACK HACK HACK HACK
                     Series ts = null;
-                    ts = O.GetIVariableFromString(name.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    ts = O.GetIVariableFromString(name.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         if (ts.type == ESeriesType.ArraySuper)
                         {
-                            new Error("Did not expect variable '" + name.HACK_ToStringWithoutTime() + "' to be an array-series");
+                            new Error("Did not expect variable '" + name.RemoveTime().ToString() + "' to be an array-series");
                         }
                         ts = ts.DeepClone(0, null, null) as Series;
                         if (Globals.runningOnTTComputer && ts.type == ESeriesType.Timeless)
@@ -2270,12 +2270,12 @@ namespace Gekko
                     // Why taken from databank?
                     // HACK HACK HACK HACK HACK
 
-                    Series ts = O.GetIVariableFromString("Ref:" + name.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    Series ts = O.GetIVariableFromString("Ref:" + name.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         if (ts.type == ESeriesType.ArraySuper)
                         {
-                            new Error("Did not expect variable '" + name.HACK_ToStringWithoutTime() + "' to be an array-series");
+                            new Error("Did not expect variable '" + name.RemoveTime().ToString() + "' to be an array-series");
                         }
                         ts = (ts.DeepClone(0, null, null) as Series);
                         if (Globals.runningOnTTComputer && ts.type == ESeriesType.Timeless)
@@ -3056,7 +3056,7 @@ namespace Gekko
                         iVar++;
 
                         Series xRef_series = null;
-                        IVariable dpx = O.GetIVariableFromString(dp.s.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReportError);
+                        IVariable dpx = O.GetIVariableFromString(dp.s.RemoveTime().ToString(), O.ECreatePossibilities.NoneReportError);
 
                         if (dpx.Type() == EVariableType.Series)
                         {
@@ -3064,7 +3064,7 @@ namespace Gekko
                                                                                          //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe
                             if (mm.Contains(1))
                             {
-                                xRef_series = O.GetIVariableFromString("Ref:" + dp.s.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReportError) as Series;
+                                xRef_series = O.GetIVariableFromString("Ref:" + dp.s.RemoveTime().ToString(), O.ECreatePossibilities.NoneReportError) as Series;
                             }
                         }
                         else
@@ -4035,7 +4035,7 @@ namespace Gekko
             //int lag; string name;
             //Decomp.ConvertFromTurtleName(var, false, out name, out lag);
             DName name = null;
-            if (vars != null) name = var.HACK_RemoveTime();
+            if (vars != null) name = var.RemoveTime();
             return name;
         }
 
@@ -4229,7 +4229,7 @@ namespace Gekko
                                 foreach (DName s in agg.fullVariableNames)
                                 {
                                     DName s2 = FullVariableNamePretty(s, true);
-                                    DName s3 = s2.HACK_RemoveTime();
+                                    DName s3 = s2.RemoveTime();
                                     tmp.Add(s3);
                                 }
                                 tmp2 = Stringlist.GetListWithCommas(tmp, "  ");  //x[i, j], x[i, k] --> x[i, j],  x[i, k]
@@ -4456,7 +4456,7 @@ namespace Gekko
                         if (op.isRaw)
                         {
                             //qwerty, does this var need to have lag/lead removed?
-                            Series tsFirst = O.GetIVariableFromString(chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            Series tsFirst = O.GetIVariableFromString(chop.fullName.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsFirst != null)
                             {
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.fullName.GetLag()));
@@ -4469,7 +4469,7 @@ namespace Gekko
                                     if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
                                 }
                             }                            
-                            Series tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            Series tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsRef != null)
                             {
                                 dLevelRef = tsRef.GetDataSimple(t2.Add(chop.fullName.GetLag()));
@@ -4488,7 +4488,7 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                             {
                                 Series tsFirst = null;
-                                tsFirst = O.GetIVariableFromString(chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsFirst = O.GetIVariableFromString(chop.fullName.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 bool isMissingResVariable = false;
                                 if (tsFirst == null)
                                 {
@@ -4522,7 +4522,7 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                             {
                                 Series tsRef = null;
-                                tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 bool missingResVariable = false;
                                 if (tsRef == null)
                                 {
@@ -4582,7 +4582,7 @@ namespace Gekko
                     DName dictName2 = fullVariableName;
 
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
-                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.fullName.HACK_RemoveTime().ToString()));
+                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.fullName.RemoveTime().ToString()));
                     frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.fullName.GetLag()));
 
                     //Clean this up sometime, so we do not have gekkodim_x1&1 for a dimension, but just gekkodim_1, and
@@ -4924,7 +4924,7 @@ namespace Gekko
             {
                 //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
                 //So in this case, #a and #sector would be added as columns                
-                IVariable iv = O.GetIVariableFromString(fullName.HACK_ToStringWithoutTime(), O.ECreatePossibilities.NoneReturnNullAlways);
+                IVariable iv = O.GetIVariableFromString(fullName.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways);
                 if (iv != null)
                 {
                     Series ts = iv as Series;

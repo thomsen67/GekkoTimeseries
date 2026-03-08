@@ -306,6 +306,11 @@ namespace Gekko
 
         public Multidim2Element(StringOrTime[] elements)
         {
+            if (Globals.runningOnTTComputer && elements[0].GetString().Contains("["))
+            {
+                //System.Windows.Forms.MessageBox.Show("TTH: Found '[' when constructing first part of DName");
+            }
+            
             this.storage = elements;
 
             //We now calculate hash once at birth, and .timePosition is also found (if any)
@@ -565,19 +570,19 @@ namespace Gekko
             return name;
         }
 
-        public DName HACK_RemoveTime()
-        {
-            List<string> temp = this.HACK_IndexesWithoutTime();
-            List<StringOrTime> temp2 = new List<StringOrTime>();
-            foreach (string s in temp) temp2.Add(s);
-            return new DName(this.GetName(), this.GetFreq(), temp2.ToArray());            
-        }
+        //public DName HACK_RemoveTime()
+        //{
+        //    List<string> temp = this.HACK_IndexesWithoutTime();
+        //    List<StringOrTime> temp2 = new List<StringOrTime>();
+        //    foreach (string s in temp) temp2.Add(s);
+        //    return new DName(this.GetName(), this.GetFreq(), temp2.ToArray());            
+        //}
 
-        public string HACK_ToStringWithoutTime()
-        {
-            DName without = this.HACK_RemoveTime();
-            return without.ToString();
-        }
+        //public string HACK_ToStringWithoutTime()
+        //{
+        //    DName without = this.RemoveTime();
+        //    return without.ToString();
+        //}
 
         public List<string> HACK_IndexesWithoutTime()
         {
@@ -803,49 +808,56 @@ namespace Gekko
             List<DName> rv = new List<DName>();
             foreach (string s in ss)
             {
-                rv.Add(DName.HACK1a(s));
+                rv.Add(DName.HACK1_lag(s));
             }
             return rv;
         }
 
         /// <summary>
-        /// Hacky, try to get rid of it when scalar model dicts are done
+        /// Can handle lag in input, and always returns a DName with lag/lead. 
+        /// Hacky, try to get rid of it when scalar model dicts are done. 
+        /// Can translate x, x[-1], x[a][-1] into proper DName with lag.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static DName HACK1a(string s)
+        public static DName HACK1_lag(string s)
         {
             string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
-            G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);            
-            List<StringOrTime> m = new List<StringOrTime>();
-            bool hasTime = false;
-            if (indexes1 != null)
+            G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
+
+            if (indexes1 == null && indexes2 == null)
             {
-                foreach (string s2 in indexes1)
+                // x
+                return new DName(name, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
+            }
+            else if (indexes1 != null && indexes2 == null)
+            {
+                // x[-1], x[+1], x[a], x[i,j]
+                if (indexes1.Length == 1)
                 {
-                    if (G.LooksLikeYearOrQuarterOrMonth(s2))
-                    {
-                        new Error("Time period in the first [] in x[..., ...][...] not allowed");                        
-                    }
-                    else
-                    {
-                        m.Add(s2);
-                    }
+                    // x[-1], x[+1]
+                    int i; if (!int.TryParse(indexes1[0], out i)) i = -12345;
+                    if (i != -12345) return new DName(name, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, i) });
                 }
+                // x[a], x[i,j]
+                List<StringOrTime> m = new List<StringOrTime>();
+                foreach (string s2 in indexes1) m.Add(s2);
+                m.Add(new GekkoTime(EFreq.Lag, 0));
+                return new DName(name, G.ConvertFreq(freq), m.ToArray());
             }
-            GekkoTime t = new GekkoTime(EFreq.Lag, 0);
-            if (indexes2 != null)
+            else if (indexes1 != null && indexes2 != null)
             {
-                if (indexes2.Length != 1) new Error("Expected x[..., ...][...] pattern");
-                t = new GekkoTime(EFreq.Lag, int.Parse(indexes2[0]));
-                m.Add(t);
+                // x[a][-1], x[a][+1], x[i,j][-1], x[i,j][+1]
+                if (indexes2.Length != 1) new Error("Bad x[...][...] pattern");                
+                int i; if (!int.TryParse(indexes2[0], out i)) i = -12345;
+                if (i == -12345) new Error("Bad x[...][...] pattern");
+                List<StringOrTime> m = new List<StringOrTime>();
+                foreach (string s2 in indexes1) m.Add(s2);
+                m.Add(new GekkoTime(EFreq.Lag, i));
+                return new DName(name, G.ConvertFreq(freq), m.ToArray());
             }
-            else
-            {
-                //t = new GekkoTime(EFreq.Lag, 0);
-                m.Add(t);
-            }
-            return new DName(name, G.ConvertFreq(freq), m.ToArray());
+            else new Error("Hov");
+            return null; //we never get here            
         }
     }
 

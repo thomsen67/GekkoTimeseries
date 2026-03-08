@@ -1319,11 +1319,16 @@ namespace Gekko
         /// Input a varname without freq (possibly with indexes) for a GAMS scalar model, and it returns the periods that are fixed.
         /// Returns null if no scalar model is loaded. May crash if the name is wrong.
         /// </summary>
-        /// <param name="varnameWithoutFreq"></param>
+        /// <param name="varnameWithLag"></param>
         /// <returns></returns>
-        public List<GekkoTime> GetFixedPeriods(DName varnameWithoutFreq)
+        public List<GekkoTime> GetFixedPeriods(DName varnameWithLag)
         {
-            int aNumber; if (!this.dict_FromVarNameToANumber.TryGetValue(varnameWithoutFreq, out aNumber)) aNumber = -12345;
+            int aNumber; 
+            if (!this.dict_FromVarNameToANumber.TryGetValue(varnameWithLag.RemoveTime(), out aNumber)) aNumber = -12345;
+            if (aNumber == -12345)
+            {
+                //hov
+            }
             List<GekkoTime> list = new List<GekkoTime>();
             for (int timeIndex = 0; timeIndex < this.fix.Length; timeIndex++)
             {
@@ -2132,7 +2137,7 @@ namespace Gekko
                         if (sd != null) new Error("Not showing time not expected");
                         dName2 = dName.HACK_AddTime(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
                         varname2 = dName2;
-                        if (Globals.greuHack)
+                        if (false && Globals.greuHack) //Switched off for now, need to do the fix
                         {
                             //The equation text really ought to be math + DName showhow.
                             //Maybe some List of string-or-DName, but how? Maybe List<object> that
