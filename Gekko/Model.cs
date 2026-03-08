@@ -2147,7 +2147,7 @@ namespace Gekko
                             //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
                             //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
                             //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
-                            varname2 = new DName(dName2.ToString(new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null, false)));
+                            varname2 = new DName(dName2.ToString(Globals.varFormatInScalarEquation));
                         }
                     }
                     
