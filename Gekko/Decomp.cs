@@ -1695,7 +1695,7 @@ namespace Gekko
                     //    endo.Add(DName.HACK1(x), c);
                     //    endoReverse.Add(c, DName.HACK1(x));
                     //}
-                    DName x = s.HACK_AddTime(new GekkoTime(EFreq.Lag, 0));
+                    DName x = s.HACK_AddTime(t);
                     if (!endo.ContainsKey(x))
                     {
                         int c = endo.Count();
@@ -1780,8 +1780,8 @@ namespace Gekko
                             if (k == 0)
                             {
                                 eqNames.Add(eqName);
-                                DName eqNamePretty = eqPeriods.fullName.HACK_AddTime(tTemp);
-                                eqNamesPretty.Add(eqNamePretty);
+                                //DName eqNamePretty = eqPeriods.fullName.HACK_AddTime(tTemp);
+                                //eqNamesPretty.Add(eqNamePretty);
                             }
                             int eqNumber;
                             if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(eqName, out eqNumber))
@@ -1827,8 +1827,9 @@ namespace Gekko
                                 TwoDNames two = new TwoDNames(x1, x2);
                                 variables.Add(two);
                             }
-                            DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count));
-                            DName xx1 = xx2.HACK_AddTime(t.Add(0));
+                            //Has freq set to .None, because that is so in the decompDatas containers.
+                            DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count), EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
+                            DName xx1 = xx2.HACK_RemoveTime().HACK_AddTime(t.Add(0));
                             variables.Add(new TwoDNames(xx1, xx2));
 
                             //foreach precedent variable
@@ -2037,7 +2038,7 @@ namespace Gekko
                 name = dn0.HACK_RemoveTime();
                 gtNotUsed = dn0.GetTime();
                 //if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
-                if (!decompOptions2.new_select.Contains(name)) continue;
+                if (!decompOptions2.new_select.Contains(name, Multidim2Comparer.IgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count(); col++)
                 {                 

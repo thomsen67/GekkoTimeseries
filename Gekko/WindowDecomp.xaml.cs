@@ -972,8 +972,8 @@ namespace Gekko
                     else if (c.cellType == CellType.Date) s = c.date;
 
                     DName v = Decomp.GetVarsHack(c);
-                    if (v.GetName() == Globals.decompErrorName) v = null;
-                    if (v.GetName() == Globals.decompIgnoreName) v = null;
+                    if (v != null && v.GetName() == Globals.decompErrorName) v = null;
+                    if (v != null && v.GetName() == Globals.decompIgnoreName) v = null;
                     if (v != null)
                     {
                         if (this.decompFind.decompOptions2.mergeNewVariables != null)
@@ -1230,8 +1230,8 @@ namespace Gekko
                     //All of these must be exogenous for the return value to be false (so any one endogenous among a list of otherwise exogenous will make the name blue)
                     //string name; int lag;
                     //Decomp.ConvertFromTurtleName(varname, true, out name, out lag);
-                    DName name = varname.RemoveTime();
-                    int lag = varname.GetLag();
+                    DName name = varname; // varname.RemoveTime();
+                    //int lag = varname.GetLag();
                     List<GekkoTime> fixed2 = Program.model.modelGamsScalar.GetFixedPeriods(name);
 
                     //Test if ALL are fixed

@@ -445,19 +445,31 @@ namespace Gekko
 
         public DName(string name, EFreq freq, StringOrTime[] indexes) : base(Construct(name, freq, indexes))
         {
+            // freq is on rows, frequency of time variable is on cols
+            //
+            //           a    q    m    w    d    u    age   lag   none
+            // a         x    -    -    -    -    -    +     +     +
+            // q         -    +    -    -    -    -    +     +     +
+            // m         -    -    +    -    -    -    +     +     +
+            // w         -    -    -    +    -    -    +     +     +
+            // d         -    -    -    -    +    -    +     +     +
+            // u         -    -    -    -    -    +    +     +     +
+            // age       not allowed for var, but can be set for time (will not count as GekkoTime)
+            // lag       not allowed for var, but can be set for time (only 1 GekkoTime allowed)
+            // none      +    +    +    +    +    +    +     +     +
+            if (freq == EFreq.Age) new Error("Age not allowed as variable freq");
             if (freq == EFreq.Lag) new Error("Lag not allowed as variable freq");
             for (int i = 0; i < this.GetLength(); i++)
             {
                 if (this.Get(i).IsTime())
                 {
-                    GekkoTime t = this.Get(i).GetTime();
-                    EFreq tFreq = t.freq;
-                    if (!(tFreq == EFreq.None || tFreq == EFreq.Age))
-                    {                    
-                        if (this.HasTime()) new Error("Only 1 time element allowed for DName");                        
-                        if (freq != EFreq.None && tFreq != freq) new Error("Variable freq " + tFreq.ToString() + " does not match period freq " + freq.ToString());
-                        this.timePosition = i;
-                    }
+                    EFreq gekkoTimeFreq = this.Get(i).GetTime().freq;
+                    if (this.HasTime() && gekkoTimeFreq != EFreq.Age) new Error("Only 1 time element allowed for DName");
+                    this.timePosition = i;
+                    if (freq != gekkoTimeFreq && Globals.freqNormal.ContainsKey(freq) && Globals.freqNormal.ContainsKey(gekkoTimeFreq))
+                    {
+                        new Error("Frequency mismatch in DName");
+                    }                   
                 }
             }
         }
@@ -622,7 +634,10 @@ namespace Gekko
 
         public int GetLag()
         {
-            if (!this.HasTime()) new Error("No time part found");
+            if (!this.HasTime())
+            {
+                new Error("No time part found");
+            }
             GekkoTime t = this.Get(this.timePosition).GetTime();
             if (t.freq != EFreq.Lag) new Error("Expected lag time type");
             return t.super;

@@ -571,6 +571,19 @@ namespace Gekko
         public static int freqQSubperiods = 4;
         public static int freqMSubperiods = 12;
 
+        public static Dictionary<EFreq, bool> freqNormal = new Dictionary<EFreq, bool>
+        { 
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            {EFreq.A, false },
+            {EFreq.Q, false },
+            {EFreq.M, false },
+            {EFreq.W, false },
+            {EFreq.D, false },
+            {EFreq.U, false },            
+        };
+
         public static Dictionary<EFreq, string> freqFromEnumToString = new Dictionary<EFreq, string>
         { 
             //========================================================================================================
