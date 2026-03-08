@@ -131,7 +131,7 @@ namespace Gekko
                 // Step 5: Add the value (from the values part of the data row)
 
                 //double dFirstLevelLag, double dFirstLevelLag2, double dFirstLevelRef, double dFirstLevelRefLag, double dFirstLevelRefLag2
-                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<DName>() { DName.HACK1_lag(dataframeRow.storageValues[Globals.dNames].text) }, dataframeRow.storageValues[Globals.dPrimeShare].data,      
+                AggContainer ac = new AggContainer(dataframeRow.storageValues[Globals.d].data, dataframeRow.storageValues[Globals.dAlternative].data, dataframeRow.storageValues[Globals.dLevel].data, dataframeRow.storageValues[Globals.dLevelLag].data, dataframeRow.storageValues[Globals.dLevelLag2].data, dataframeRow.storageValues[Globals.dLevelRef].data, dataframeRow.storageValues[Globals.dLevelRefLag].data, dataframeRow.storageValues[Globals.dLevelRefLag2].data, 1, new List<DName>() { dataframeRow.storageValues[Globals.dNames].name }, dataframeRow.storageValues[Globals.dPrimeShare].data,
                     dataframeRow.storageValues[Globals.dFirstLevelLag].data,
                     dataframeRow.storageValues[Globals.dFirstLevelLag2].data,
                     dataframeRow.storageValues[Globals.dFirstLevelRef].data, 
@@ -4225,14 +4225,14 @@ namespace Gekko
                             string tmp2 = null;
                             if (agg.fullVariableNames != null)
                             {
-                                List<DName> tmp = new List<DName>();
-                                foreach (DName s in agg.fullVariableNames)
-                                {
-                                    DName s2 = FullVariableNamePretty(s, true);
-                                    DName s3 = s2.RemoveTime();
-                                    tmp.Add(s3);
-                                }
-                                tmp2 = Stringlist.GetListWithCommas(tmp, "  ");  //x[i, j], x[i, k] --> x[i, j],  x[i, k]
+                                //List<DName> tmp = new List<DName>();
+                                //foreach (DName s in agg.fullVariableNames)
+                                //{
+                                //    DName s2 = FullVariableNamePretty(s, true);
+                                //    DName s3 = s2.RemoveTime();
+                                //    tmp.Add(s3);
+                                //}
+                                tmp2 = Stringlist.GetListWithCommas(agg.fullVariableNames, "  ");  //x[i, j], x[i, k] --> x[i, j],  x[i, k]
                             }
                             else
                             {
@@ -4647,16 +4647,8 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelLag2, new CellLight(dLevelLag2));
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
-                    frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
-                    // SLACK: Should be a DName!
-                    // SLACK: Should be a DName!
-                    // SLACK: Should be a DName!
-                    // SLACK: Should be a DName!
-                    // SLACK: Should be a DName! Will omit frequency, put quotes, add lag last if any, so x['a','b'][-1] or x['a','b'].
-                    // SLACK: Should be a DName!
-                    // SLACK: Should be a DName!
-                    // SLACK: Should be a DName!
-                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2.ToString(Globals.varFormatInDecompTable)));
+                    frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));                    
+                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
                     // -----                    
                     frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelLag).data));

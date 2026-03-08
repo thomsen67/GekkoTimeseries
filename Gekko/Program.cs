@@ -19819,11 +19819,11 @@ namespace Gekko
             foreach (KeyValuePair<DName, BTypeData> kvp in Program.model.modelGekko.varsBType)
             {
                 n++;
-                string variable = kvp.Key.GetName();
-                int lag = kvp.Key.GetLag();
+                //string variable = kvp.Key.GetName();
+                //int lag = kvp.Key.GetLag();
                 //string s = kvp.Key.ToString();
-                //string variable = null; int lag = 0;
-                //G.ExtractVariableAndLag(kvp.Key.ToString(), out variable, out lag);
+                string variable = null; int lag = 0;
+                G.ExtractVariableAndLag(kvp.Key.ToString(), out variable, out lag);
                 dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0.Add(lag).ToString()) + ")";
             }
 
@@ -36685,7 +36685,8 @@ namespace Gekko
         None,
         String,
         Double,
-        DateTime
+        DateTime,
+        DName
     }
 
     ////This is like the struct CellLight, but enhanced with a list of strings.
@@ -36704,6 +36705,7 @@ namespace Gekko
         public DateTime dateTime;
         public ECellLightType type;
         public bool hasQuotes;
+        public DName name = null;
 
         public CellLight(double input)
         {
@@ -36712,6 +36714,7 @@ namespace Gekko
             dateTime = DateTime.MinValue;
             type = ECellLightType.Double;
             hasQuotes = false;
+            name = null;
         }
 
         public CellLight(DateTime input)
@@ -36721,19 +36724,17 @@ namespace Gekko
             dateTime = input;
             type = ECellLightType.DateTime;
             hasQuotes = false;
+            name = null;
         }
 
         public CellLight(string input)
-        {
-            //if (Globals.runningOnTTComputer && input.Contains("-1]"))
-            //{
-
-            //}
+        {            
             text = input;
             data = double.NaN;
             dateTime = DateTime.MinValue;
             type = ECellLightType.String;
             hasQuotes = false;
+            name = null;
         }
 
         public CellLight(string input, bool hasQuotes2)
@@ -36743,6 +36744,17 @@ namespace Gekko
             dateTime = DateTime.MinValue;
             type = ECellLightType.String;
             hasQuotes = hasQuotes2;
+            name = null;
+        }
+
+        public CellLight(DName input)
+        {
+            text = null;
+            data = double.NaN;
+            dateTime = DateTime.MinValue;
+            type = ECellLightType.DName;
+            hasQuotes = false;
+            name = input;
         }
 
         public string ToString()
