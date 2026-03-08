@@ -36725,6 +36725,10 @@ namespace Gekko
 
         public CellLight(string input)
         {
+            //if (Globals.runningOnTTComputer && input.Contains("-1]"))
+            //{
+
+            //}
             text = input;
             data = double.NaN;
             dateTime = DateTime.MinValue;

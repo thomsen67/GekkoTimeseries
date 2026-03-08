@@ -309,8 +309,8 @@ namespace Gekko
             if (Globals.runningOnTTComputer && elements[0].GetString().Contains("["))
             {
                 //System.Windows.Forms.MessageBox.Show("TTH: Found '[' when constructing first part of DName");
-            }
-            
+            }            
+
             this.storage = elements;
 
             //We now calculate hash once at birth, and .timePosition is also found (if any)
@@ -328,6 +328,10 @@ namespace Gekko
                 }
                 else if (si.GetString() != null)
                 {
+                    if (Globals.runningOnTTComputer && si.GetString().Contains("-1"))
+                    {
+                        //System.Windows.Forms.MessageBox.Show("TTH: Found '-1' string when constructing DName");
+                    }
                     sHash = sHash * 31 + StringComparer.Ordinal.GetHashCode(si.GetString());
                     iHash = iHash * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(si.GetString());
                 }

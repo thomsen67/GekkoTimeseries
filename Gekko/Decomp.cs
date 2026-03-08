@@ -4648,7 +4648,15 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
-                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2.ToString()));
+                    // SLACK: Should be a DName!
+                    // SLACK: Should be a DName!
+                    // SLACK: Should be a DName!
+                    // SLACK: Should be a DName!
+                    // SLACK: Should be a DName! Will omit frequency, put quotes, add lag last if any, so x['a','b'][-1] or x['a','b'].
+                    // SLACK: Should be a DName!
+                    // SLACK: Should be a DName!
+                    // SLACK: Should be a DName!
+                    frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2.ToString(Globals.varFormatInDecompTable)));
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
                     // -----                    
                     frameRow.AddValue(frame, Globals.col_firstValueLevelLag, new CellLight(frameRowLhs.GetValue(frame, Globals.col_valueLevelLag).data));

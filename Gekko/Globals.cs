@@ -67,6 +67,7 @@ namespace Gekko
         public const string decompUniversal = "#universal";
         public const string decompNoLag = "[0]";
         public const int decompPeriodDistanceFromEndPeriod = -1;
+        public static DNameFormat varFormatInDecompTable = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.LastExceptLag0, null, false);
         //
         public const string col_variable = "vars";
         public const string col_lag = "lags";
