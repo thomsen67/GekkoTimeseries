@@ -117,7 +117,7 @@ namespace Gekko
             ats.meta.domains = new string[] { lName };
             ats.SetArrayTimeseries(2, true);
             foreach (KeyValuePair<string, IVariable> kvp in x)
-            {                
+            {
                 ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimElement(new string[] { G.Chop_RemoveFreq(kvp.Key) }, ats), kvp.Value);
                 Program.databanks.GetFirst().RemoveIVariable(kvp.Key);
                 m.Add(G.Chop_RemoveFreq(kvp.Key));
@@ -125,7 +125,7 @@ namespace Gekko
             Program.databanks.GetFirst().Clear();
             Program.databanks.GetFirst().AddIVariableWithOverwrite(ats);
             List mm = new List(m);
-            if (lName != "*") Program.databanks.GetFirst().AddIVariableWithOverwrite(lName, mm);            
+            if (lName != "*") Program.databanks.GetFirst().AddIVariableWithOverwrite(lName, mm);
         }
 
         public static void arrayunpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1)
@@ -291,7 +291,7 @@ namespace Gekko
                 new Error("getmonth() expects monthly or daily date");
             }
 
-            int month = gt.sub;            
+            int month = gt.sub;
 
             if (lang == null)
             {
@@ -395,16 +395,16 @@ namespace Gekko
             }
             else if (ts.type == ESeriesType.Light)
             {
-                new Error("getparent(): an expression cannot have a parent series");                
+                new Error("getparent(): an expression cannot have a parent series");
             }
             if (!ts.IsArraySubSeries())
             {
-                new Error("getparent(): this series is not an array subseries");                
+                new Error("getparent(): this series is not an array subseries");
             }
 
             if (ts.mmi.parent == null)
             {
-                new Error("getparent(): this array subseries does not have a parent series assigned to it");                
+                new Error("getparent(): this array subseries does not have a parent series assigned to it");
             }
 
             return ts.mmi.parent;
@@ -853,9 +853,31 @@ namespace Gekko
         public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             List<IVariable> rowList = O.ConvertToList(x2);
-            if (rowList == null) new Error("Expected list as argument #2");            
+            if (rowList == null) new Error("Expected list as argument #2");
             if (rowList.Count == 0) new Error("Empty list not allowed");
 
+            List list0 = rowList[0] as List;
+            if (list0 == null) new Error("List sub-elements must be lists, too (nested list)");
+
+            Series y = null;
+
+            if (list0.list.Count == 3)
+            {
+                y = Helper_Rename(x1, rowList);
+            }
+            else if (list0.list.Count == 4)
+            {
+                y = Helper_Rename_OLD(smpl, _t1, _t2, x1, rowList, list0); //First 3 args because reorder() is called inside
+            }
+            else
+            {
+                new Error("Expected sub-lists with 3 or 4 elements");
+            }
+            return y;
+        }
+
+        private static Series Helper_Rename(IVariable x1, List<IVariable> rowList)
+        {
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
             {
@@ -922,7 +944,7 @@ namespace Gekko
                     }
                     else if (col == 3)
                     {
-                        renameFrom.Add(s);                        
+                        renameFrom.Add(s);
                     }
                     else if (col == 4)
                     {
@@ -941,7 +963,7 @@ namespace Gekko
             SortedDictionary<int, int> sortedOldDim = new SortedDictionary<int, int>();
             SortedDictionary<int, int> sortedNewDim = new SortedDictionary<int, int>();
             Dictionary<Tuple<int, int>, string> tjek = new Dictionary<Tuple<int, int>, string>();
-            
+
             for (int i = 0; i < oldDim.Count; i++)
             {
                 if (!sortedOldDim.ContainsKey(oldDim[i])) sortedOldDim.Add(oldDim[i], 0);
@@ -955,7 +977,7 @@ namespace Gekko
             {
                 using (var txt = new Error())
                 {
-                    txt.MainAdd(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last()+". There are these combinations regarding first and second element of sublists:");
+                    txt.MainAdd(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last() + ". There are these combinations regarding first and second element of sublists:");
                     txt.MainNewLineTight();
                     foreach (string s in col1col2)
                     {
@@ -1021,12 +1043,12 @@ namespace Gekko
                 c++;
                 if (key.Item1 != c) new Error("Bad dimension");
                 m.Add(new ScalarVal(key.Item2));
-            }            
-            
+            }
+
             Series z = ts.DeepClone(0, null, null) as Series;
             int dim = 0;
             foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
-            {                
+            {
                 MultidimElement map = kvp.Key;
                 for (int i = 0; i < map.storage.Length; i++)
                 {
@@ -1038,12 +1060,202 @@ namespace Gekko
                     if (to != null)
                     {
                         map.storage[i] = to;
-                    }                    
+                    }
+                }
+            }
+
+            return z;
+        }
+
+        private static Series Helper_Rename_OLD(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, List<IVariable> rowList, List list0)
+        {
+            Series ts = x1 as Series;
+            if (ts == null || ts.type != ESeriesType.ArraySuper)
+            {
+                new Error("You must use an array-timeseries variable");
+            }
+
+            List<int> oldDim = new List<int>();
+            List<int> newDim = new List<int>();
+            List<string> table = new List<string>();
+            List<string> renameFrom = new List<string>();
+            List<string> renameTo = new List<string>();
+            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();
+            List<string> col1col2 = new List<string>();
+
+            string cfg = "Config list: ";
+
+            string lastRow = null;  //will not match anything
+            int lastRowCounter = 0;
+            int row = 0;
+            foreach (IVariable iv in rowList)
+            {
+                row++;
+                List colList = iv as List;
+                if (colList == null) new Error(cfg + "Expected list element #" + row + " to be a list of strings");
+                int col = 0;
+                foreach (IVariable ivCol in colList.list)
+                {
+                    col++;
+                    ScalarString ss = ivCol as ScalarString;
+                    if (ss == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be a string");
+                    string s = ss.string2;
+                    if (G.NullOrBlanks(s)) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-blank");
+                    s = s.Trim();
+                    if (col == 1)
+                    {
+                        int i = G.ConvertToInt(s);
+                        if (i == int.MaxValue) new Error(cfg + "Cannot convert string '" + s + "' into an integer");
+                        newDim.Add(i);
+                    }
+                    else if (col == 2)
+                    {
+                        string scol2col2Lower = newDim.Last() + "; " + s.ToLower();
+
+                        int i = col1col2.IndexOf(scol2col2Lower);
+                        if (i == -1)
+                        {
+                            col1col2.Add(scol2col2Lower);
+                        }
+                        else
+                        {
+                            if (i != col1col2.Count - 1)
+                            {
+                                new Error(cfg + "Combination of '" + scol2col2Lower + "' in row " + row + " has already been seen in row " + (i + 1) + ". Rows must be contiguous for each dimension.");
+                            }
+                        }
+
+                        if (!G.Equal(lastRow, s))
+                        {
+                            lastRow = s;
+                            lastRowCounter++;  //1 first time
+                            fromTo.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                        }
+                        oldDim.Add(lastRowCounter);
+                    }
+                    else if (col == 3)
+                    {
+                        renameFrom.Add(s);
+                    }
+                    else if (col == 4)
+                    {
+                        renameTo.Add(s);
+                        if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
+                        if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
+                        fromTo[lastRowCounter - 1].Add(renameFrom[renameFrom.Count - 1], renameTo[renameTo.Count - 1]);
+                    }
+                    else
+                    {
+                        new Error(cfg + "Sublists must have exactly 4 elements");
+                    }
+                }
+            }
+
+            SortedDictionary<int, int> sortedOldDim = new SortedDictionary<int, int>();
+            SortedDictionary<int, int> sortedNewDim = new SortedDictionary<int, int>();
+            Dictionary<Tuple<int, int>, string> tjek = new Dictionary<Tuple<int, int>, string>();
+
+            for (int i = 0; i < oldDim.Count; i++)
+            {
+                if (!sortedOldDim.ContainsKey(oldDim[i])) sortedOldDim.Add(oldDim[i], 0);
+                if (!sortedNewDim.ContainsKey(newDim[i])) sortedNewDim.Add(newDim[i], 0);
+                if (!tjek.ContainsKey(new Tuple<int, int>(oldDim[i], newDim[i]))) tjek.Add(new Tuple<int, int>(oldDim[i], newDim[i]), null);
+            }
+
+            if (sortedOldDim.Keys.First() != 1) new Error(cfg + "Old dimensions must start with 1");
+            if (sortedNewDim.Keys.First() != 1) new Error(cfg + "New dimensions must start with 1");
+            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last())
+            {
+                using (var txt = new Error())
+                {
+                    txt.MainAdd(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last() + ". There are these combinations regarding first and second element of sublists:");
+                    txt.MainNewLineTight();
+                    foreach (string s in col1col2)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                }
+            }
+
+            int n = sortedOldDim.Keys.Last();
+
+            int c = 0;
+            foreach (int i in sortedOldDim.Keys)
+            {
+                c++;
+                if (i != c) new Error(cfg + "In old dimensions, dimension #" + i + " is missing");
+            }
+
+            c = 0;
+            foreach (int i in sortedNewDim.Keys)
+            {
+                c++;
+                if (i != c) new Error(cfg + "In new dimensions, dimension #" + i + " is missing");
+            }
+
+            if (col1col2.Count != n)
+            {
+                //Is this error even possibe here. Oh well, now we have it.
+                using (var txt = new Error())
+                {
+                    txt.MainAdd(cfg + "Bad dimension combinations (first 2 columns): expected " + n + ", got " + col1col2.Count + ":");
+                    txt.MainNewLineTight();
+                    foreach (string s in col1col2)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                }
+            }
+
+            if (tjek.Count != n)
+            {
+                using (var txt = new Error())
+                {
+                    txt.MainAdd(cfg + "Bad dimension reordering: expected " + n + " reorderings, got " + tjek.Count + ":");
+                    txt.MainNewLineTight();
+                    foreach (Tuple<int, int> s in tjek.Keys)
+                    {
+                        txt.MainAdd(s.Item1 + " --> " + s.Item2);
+                        txt.MainNewLineTight();
+                    }
+                }
+            }
+
+            // ================================================
+            // Now we are ready for reordering and renaming
+            // ================================================
+
+            List<IVariable> m = new List<IVariable>();
+            c = 0;
+            foreach (Tuple<int, int> key in tjek.Keys)
+            {
+                c++;
+                if (key.Item1 != c) new Error("Bad dimension");
+                m.Add(new ScalarVal(key.Item2));
+            }
+
+            Series z = ts.DeepClone(0, null, null) as Series;
+            int dim = 0;
+            foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
+            {
+                MultidimElement map = kvp.Key;
+                for (int i = 0; i < map.storage.Length; i++)
+                {
+                    if (fromTo.Count != map.storage.Length)
+                    {
+                        new Error(cfg + "The array-series has " + map.storage.Length + " dimensions, but only " + fromTo.Count + " are present in the cfg list.");
+                    }
+                    string to = null; fromTo[i].TryGetValue(map.storage[i], out to);
+                    if (to != null)
+                    {
+                        map.storage[i] = to;
+                    }
                 }
             }
 
             Series y = Functions.reorder(smpl, _t1, _t2, z, new List(m)) as Series;
-
             return y;
         }
 
