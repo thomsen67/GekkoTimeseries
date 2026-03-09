@@ -908,7 +908,7 @@ namespace Gekko
                     col++;
                     ScalarString ss = ivCol as ScalarString;
                     if (ss == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be a string");
-                    string s = ss.string2;
+                    string s = ss.string2;                    
                     if (G.NullOrBlanks(s)) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-blank");
                     s = s.Trim();
                     if (col == 1)
@@ -932,6 +932,10 @@ namespace Gekko
                         int rowDim = oldDim[n - 1];
                         int dif = rowDim - fromTo.Count;  //do not move into loop!
                         for (int i = 0; i < dif; i++) fromTo.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                        if (fromTo[rowDim - 1].ContainsKey(renameFrom[n - 1]))
+                        {
+                            new Error("List element " + row + ": the from name '" + renameFrom[n - 1] + "' already exists");
+                        }
                         fromTo[rowDim - 1].Add(renameFrom[n - 1], renameTo[n - 1]);
                     }
                     else
@@ -941,32 +945,24 @@ namespace Gekko
                 }
             }
 
+            for (int i = 0; i < fromTo.Count; i++)
+            {
+                GekkoDictionary<string, string> d = fromTo[i];                
+                string s = Program.HasDuplicateValues(d);
+                if (s != null) new Error("In dimension " + (i + 1) + ", the to name '" + s + "' appears > 1 time");
+            }
             
             // ================================================
             // Now we are ready for reordering and renaming
             // ================================================
 
-            List<IVariable> m = new List<IVariable>();
-            int c = 0;
-            //foreach (Tuple<int, int> key in tjek.Keys)
-            //{
-            //    c++;
-            //    if (key.Item1 != c) new Error("Bad dimension");
-            //    m.Add(new ScalarVal(key.Item2));
-            //}
-
             Series z = ts.DeepClone(0, null, null) as Series;
-            int dim = 0;
             foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
             {
                 MultidimElement map = kvp.Key;
                 for (int i = 0; i < map.storage.Length; i++)
-                {
-                    if (fromTo.Count != map.storage.Length)
-                    {
-                        new Error(cfg + "The array-series has " + map.storage.Length + " dimensions, but only " + fromTo.Count + " are present in the cfg list.");
-                    }
-                    string to = null; fromTo[i].TryGetValue(map.storage[i], out to);
+                {                    
+                    string to; fromTo[i].TryGetValue(map.storage[i], out to);
                     if (to != null)
                     {
                         map.storage[i] = to;

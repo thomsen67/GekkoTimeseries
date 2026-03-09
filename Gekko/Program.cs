@@ -10511,6 +10511,19 @@ namespace Gekko
             }
         }
 
+        public static string HasDuplicateValues(GekkoDictionary<string, string> dict)
+        {
+            var seenValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s in dict.Values)
+            {
+                if (!seenValues.Add(s))
+                {
+                    return s;
+                }
+            }
+            return null;
+        }
+
         private static void RecordRestorInfo()
         {
             //after the statement is done -- even if an error occurs
