@@ -2852,10 +2852,9 @@ namespace Gekko
             
             List<DName> varsParent = GetDecompedVariables(windowParentDecomp.decompDatas, dfParentDecomp.decompOptions2);
             List<DName> varsThis = GetDecompedVariables(this.decompDatas, this.decompFind.decompOptions2);
-            List<DName> varsNew = varsThis.Except(varsParent).ToList();            
-            var temp = varsNew.OrderBy(x => x, new MultidimSortComparer(true));
-            varsNew = new List<DName>(); varsNew.AddRange(temp);
+            List<DName> varsNew = varsThis.Except(varsParent).ToList();
             List<DName> varsNew2 = new List<DName>();
+            varsNew.AddRange(varsNew.OrderBy(x => x, new MultidimSortComparer(true)));            
             foreach (DName s in varsNew)
             {
                 //TODO: there must be a method for this...

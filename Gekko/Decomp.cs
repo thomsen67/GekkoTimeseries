@@ -4582,7 +4582,7 @@ namespace Gekko
                     DName dictName2 = fullVariableName;
 
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
-                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.fullName.RemoveTime().ToString()));
+                    frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.fullName.GetName().ToString()));
                     frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.fullName.GetLag()));
 
                     //Clean this up sometime, so we do not have gekkodim_x1&1 for a dimension, but just gekkodim_1, and

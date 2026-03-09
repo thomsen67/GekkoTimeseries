@@ -208,15 +208,19 @@ namespace Gekko
                 }
                 else
                 {
-                    int result;
-                    if (_ignoreCase)
-                    {
-                        if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.OrdinalIgnoreCase)) return false;
-                    }
-                    else
-                    {
-                        if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.Ordinal)) return false;
-                    }
+                    //int result;
+                    //if (_ignoreCase)
+                    //{
+                    //    if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.OrdinalIgnoreCase)) return false;
+                    //}
+                    //else
+                    //{
+                    //    if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.Ordinal)) return false;
+                    //}
+
+                    // string.Equals(null, null) is true, string.Equals(null, "val") is false
+                    var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                    if (!string.Equals(elX.GetString(), elY.GetString(), comparison)) return false;
                 }
             }
             return true;
@@ -266,9 +270,25 @@ namespace Gekko
                 }
                 else
                 {
+                    //int compare;
+                    //if (_ignoreCase) compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
+                    //else compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    //if (compare != 0) return compare;
+
+                    string sX = xi.GetString();
+                    string sY = yi.GetString();
+
                     int compare;
-                    if (_ignoreCase) compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
-                    else compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    if (sX == sY) compare = 0;       // Both null or same string
+                    else if (sX == null) compare = -1; // null comes before any string
+                    else if (sY == null) compare = 1;  // any string comes after null
+                    else
+                    {
+                        // Neither are null, use Natural Sort
+                        var options = _ignoreCase ? CompareOptions.OrdinalIgnoreCase : CompareOptions.Ordinal;
+                        compare = G.CompareNatural(sX, sY, CultureInfo.InvariantCulture, options);
+                    }
+
                     if (compare != 0) return compare;
                 }
             }
