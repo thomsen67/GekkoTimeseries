@@ -887,12 +887,10 @@ namespace Gekko
             }
 
             List<int> oldDim = new List<int>();
-            List<int> newDim = new List<int>();
-            List<string> table = new List<string>();
             List<string> renameFrom = new List<string>();
             List<string> renameTo = new List<string>();
-            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();
-            List<string> col1col2 = new List<string>();
+            //Note: slot #i in the following list corresponds to dimension number i+1 !
+            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();            
 
             string cfg = "Config list: ";
 
@@ -917,135 +915,45 @@ namespace Gekko
                     {
                         int i = G.ConvertToInt(s);
                         if (i == int.MaxValue) new Error(cfg + "Cannot convert string '" + s + "' into an integer");
-                        newDim.Add(i);
-                    }
+                        if (i < 1) new Error("Dimension number " + i + ", must be >= 1");
+                        oldDim.Add(i);
+                    }                    
                     else if (col == 2)
-                    {
-                        string scol2col2Lower = newDim.Last() + "; " + s.ToLower();
-
-                        int i = col1col2.IndexOf(scol2col2Lower);
-                        if (i == -1)
-                        {
-                            col1col2.Add(scol2col2Lower);
-                        }
-                        else
-                        {
-                            if (i != col1col2.Count - 1)
-                            {
-                                new Error(cfg + "Combination of '" + scol2col2Lower + "' in row " + row + " has already been seen in row " + (i + 1) + ". Rows must be contiguous for each dimension.");
-                            }
-                        }
-
-                        if (!G.Equal(lastRow, s))
-                        {
-                            lastRow = s;
-                            lastRowCounter++;  //1 first time
-                            fromTo.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-                        }
-                        oldDim.Add(lastRowCounter);
-                    }
-                    else if (col == 3)
                     {
                         renameFrom.Add(s);
                     }
-                    else if (col == 4)
+                    else if (col == 3)
                     {
                         renameTo.Add(s);
-                        if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
-                        if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
-                        fromTo[lastRowCounter - 1].Add(renameFrom[renameFrom.Count - 1], renameTo[renameTo.Count - 1]);
+                        int n = renameFrom.Count;
+                        //TODO: Checks
+                        //if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
+                        //if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
+                        int rowDim = oldDim[n - 1];
+                        int dif = rowDim - fromTo.Count;  //do not move into loop!
+                        for (int i = 0; i < dif; i++) fromTo.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                        fromTo[rowDim - 1].Add(renameFrom[n - 1], renameTo[n - 1]);
                     }
                     else
                     {
-                        new Error(cfg + "Sublists must have exactly 4 elements");
+                        new Error(cfg + "Sublists must have exactly 3 elements");
                     }
                 }
             }
 
-            SortedDictionary<int, int> sortedOldDim = new SortedDictionary<int, int>();
-            SortedDictionary<int, int> sortedNewDim = new SortedDictionary<int, int>();
-            Dictionary<Tuple<int, int>, string> tjek = new Dictionary<Tuple<int, int>, string>();
-
-            for (int i = 0; i < oldDim.Count; i++)
-            {
-                if (!sortedOldDim.ContainsKey(oldDim[i])) sortedOldDim.Add(oldDim[i], 0);
-                if (!sortedNewDim.ContainsKey(newDim[i])) sortedNewDim.Add(newDim[i], 0);
-                if (!tjek.ContainsKey(new Tuple<int, int>(oldDim[i], newDim[i]))) tjek.Add(new Tuple<int, int>(oldDim[i], newDim[i]), null);
-            }
-
-            if (sortedOldDim.Keys.First() != 1) new Error(cfg + "Old dimensions must start with 1");
-            if (sortedNewDim.Keys.First() != 1) new Error(cfg + "New dimensions must start with 1");
-            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last())
-            {
-                using (var txt = new Error())
-                {
-                    txt.MainAdd(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last() + ". There are these combinations regarding first and second element of sublists:");
-                    txt.MainNewLineTight();
-                    foreach (string s in col1col2)
-                    {
-                        txt.MainAdd(s);
-                        txt.MainNewLineTight();
-                    }
-                }
-            }
-
-            int n = sortedOldDim.Keys.Last();
-
-            int c = 0;
-            foreach (int i in sortedOldDim.Keys)
-            {
-                c++;
-                if (i != c) new Error(cfg + "In old dimensions, dimension #" + i + " is missing");
-            }
-
-            c = 0;
-            foreach (int i in sortedNewDim.Keys)
-            {
-                c++;
-                if (i != c) new Error(cfg + "In new dimensions, dimension #" + i + " is missing");
-            }
-
-            if (col1col2.Count != n)
-            {
-                //Is this error even possibe here. Oh well, now we have it.
-                using (var txt = new Error())
-                {
-                    txt.MainAdd(cfg + "Bad dimension combinations (first 2 columns): expected " + n + ", got " + col1col2.Count + ":");
-                    txt.MainNewLineTight();
-                    foreach (string s in col1col2)
-                    {
-                        txt.MainAdd(s);
-                        txt.MainNewLineTight();
-                    }
-                }
-            }
-
-            if (tjek.Count != n)
-            {
-                using (var txt = new Error())
-                {
-                    txt.MainAdd(cfg + "Bad dimension reordering: expected " + n + " reorderings, got " + tjek.Count + ":");
-                    txt.MainNewLineTight();
-                    foreach (Tuple<int, int> s in tjek.Keys)
-                    {
-                        txt.MainAdd(s.Item1 + " --> " + s.Item2);
-                        txt.MainNewLineTight();
-                    }
-                }
-            }
-
+            
             // ================================================
             // Now we are ready for reordering and renaming
             // ================================================
 
             List<IVariable> m = new List<IVariable>();
-            c = 0;
-            foreach (Tuple<int, int> key in tjek.Keys)
-            {
-                c++;
-                if (key.Item1 != c) new Error("Bad dimension");
-                m.Add(new ScalarVal(key.Item2));
-            }
+            int c = 0;
+            //foreach (Tuple<int, int> key in tjek.Keys)
+            //{
+            //    c++;
+            //    if (key.Item1 != c) new Error("Bad dimension");
+            //    m.Add(new ScalarVal(key.Item2));
+            //}
 
             Series z = ts.DeepClone(0, null, null) as Series;
             int dim = 0;
