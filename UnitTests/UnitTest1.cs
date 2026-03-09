@@ -35373,7 +35373,6 @@ print(df2)
         public void _Test_RenameFunction()
         {
             I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            //Just to get some data in: 
             I("x = series(3);");
             I("x[a, b, d] <2001 2001> = 1.2;");
             I("x[a, c, d] <2001 2001> = 3.4;");
@@ -35385,7 +35384,7 @@ print(df2)
             _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);
 
             // ---
-
+                        
             I("z1 = x.rename(#(listfile xnew1_cfg.csv));");
             I("z1.flatten('_');");
             _AssertSeries(First(), "z1!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
@@ -35409,6 +35408,62 @@ print(df2)
             _AssertSeries(First(), "z2aadd!a", 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z2aabbdd!a", 2002, 5.6d, sharedDelta);
             _AssertSeries(First(), "z2aadd!a", 2002, 7.8d, sharedDelta);
+
+            // ---
+
+            I("y = series(3);");
+            I("y[a, '', d] <2001 2001> = 1.2;");
+            I("y[a, c, d] <2001 2001> = 3.4;");
+            I("y[a, '', d] <2002 2002> = 5.6;");
+            I("y[a, c, d] <2002 2002> = 7.8;");
+            I("z3 = y.rename(#(listfile xnew3_cfg.csv));");            
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "bb2", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "bb2", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "", "dd" }, 2002, 7.8d, sharedDelta);
+
+            // ---            
+
+            for (int i = 0; i < 2; i++)
+            {
+
+                I("z = series(3);");
+                I("z[a, b, d] <2001 2001> = 1.2;");
+                I("z[a, c, d] <2001 2001> = 3.4;");
+                I("z[a, b, d] <2002 2002> = 5.6;");
+                I("z[a, c, d] <2002 2002> = 7.8;");
+                I("z[x, b, d] <2002 2002> = 9.0;");
+                I("z[a, y, d] <2002 2002> = 11.2;");
+                I("z[a, b, z] <2002 2002> = 13.4;");
+                I("z[h, i, j] <2002 2002> = 15.6;");
+                I("z[h, i, k] <2002 2002> = 17.8;");
+                if (i == 0) I("z4 = z.rename(#(listfile xnew1_cfg.csv));");
+                else I("z4 = z.rename(#(listfile xnew1_cfg.csv), 'drop');");
+
+                _AssertSeries(First(), "z!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
+                _AssertSeries(First(), "z!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
+                _AssertSeries(First(), "z!a", new string[] { "a", "b", "d" }, 2002, 5.6d, sharedDelta);
+                _AssertSeries(First(), "z!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);                
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,bb,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,cc,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[x,bb,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,y,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,bb,z]", ECreatePossibilities.NoneReturnNullAlways));
+                if (i == 0)
+                {
+                    Assert.IsNotNull(O.GetIVariableFromString("z4!a[h,i,j]", ECreatePossibilities.NoneReturnNullAlways));
+                    Assert.IsNotNull(O.GetIVariableFromString("z4!a[h,i,k]", ECreatePossibilities.NoneReturnNullAlways));
+                }
+                else
+                {
+                    Assert.IsNull(O.GetIVariableFromString("z4!a[h,i,j]", ECreatePossibilities.NoneReturnNullAlways));
+                    Assert.IsNull(O.GetIVariableFromString("z4!a[h,i,k]", ECreatePossibilities.NoneReturnNullAlways));
+                }
+            }
         }
 
 

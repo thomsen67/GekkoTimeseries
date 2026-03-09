@@ -849,10 +849,26 @@ namespace Gekko
 
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
-        // ===========================================================================================================================
+        // ===========================================================================================================================        
+
         public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            List<IVariable> rowList = O.ConvertToList(x2);
+            return rename(smpl, _t1, _t2, x1, x2, new ScalarString("none"));
+        }
+        
+        public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            //Cannot get ... , params IVariable[] args to work.... --> unknown reason
+            IVariable[] args = new IVariable[] { x1, x2, x3 };            
+
+            bool drop = false; //drop non-touched combos
+            if (args.Length == 0 || args.Length > 3) new Error("Function rename() accepts 1-3 parameters");
+            if (args.Length == 3)
+            {
+                string s = O.ConvertToString(args[2]);
+                if (G.Equal(s, "drop")) drop = true;
+            }
+            List<IVariable> rowList = O.ConvertToList(args[1]);
             if (rowList == null) new Error("Expected list as argument #2");
             if (rowList.Count == 0) new Error("Empty list not allowed");
 
@@ -864,12 +880,12 @@ namespace Gekko
             if (list0.list.Count == 3)
             {
                 new Writeln("Calling rename() on a rename-list with 3 'columns' (lengths of the sub-lists)");
-                y = Helper_Rename(x1, rowList);
+                y = Helper_Rename(args[0], rowList, drop);
             }
             else if (list0.list.Count == 4)
             {
                 new Writeln("Calling rename() on a rename-list with 4 'columns' (lengths of the sub-lists)");
-                y = Helper_Rename_OLD(smpl, _t1, _t2, x1, rowList, list0); //First 3 args because reorder() is called inside
+                y = Helper_Rename_OLD(smpl, _t1, _t2, args[0], rowList); //First 3 args because reorder() is called inside
             }
             else
             {
@@ -878,7 +894,7 @@ namespace Gekko
             return y;
         }
 
-        private static Series Helper_Rename(IVariable x1, List<IVariable> rowList)
+        private static Series Helper_Rename(IVariable x1, List<IVariable> rowList, bool drop)
         {
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
@@ -893,9 +909,7 @@ namespace Gekko
             List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();            
 
             string cfg = "Config list: ";
-
-            string lastRow = null;  //will not match anything
-            int lastRowCounter = 0;
+            
             int row = 0;
             foreach (IVariable iv in rowList)
             {
@@ -957,23 +971,41 @@ namespace Gekko
             // ================================================
 
             Series z = ts.DeepClone(0, null, null) as Series;
+            Dictionary<MultidimElement, bool> keep = new Dictionary<MultidimElement, bool>();
+            Dictionary<MultidimElement, bool> remove = new Dictionary<MultidimElement, bool>();
             foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
             {
                 MultidimElement map = kvp.Key;
                 for (int i = 0; i < map.storage.Length; i++)
-                {                    
-                    string to; fromTo[i].TryGetValue(map.storage[i], out to);
-                    if (to != null)
+                {
+                    if (i < fromTo.Count)
                     {
-                        map.storage[i] = to;
+                        string to; fromTo[i].TryGetValue(map.storage[i], out to);
+                        if (to != null)
+                        {
+                            map.storage[i] = to;
+                            if (drop && !keep.ContainsKey(map)) keep.Add(map, false);
+                        }
                     }
+                }
+            }
+
+            if (drop)
+            {
+                foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
+                {
+                    if (!keep.ContainsKey(kvp.Key)) remove.Add(kvp.Key, false);
+                }
+                foreach (MultidimElement m in remove.Keys)
+                {
+                    z.dimensionsStorage.storage.Remove(m);
                 }
             }
 
             return z;
         }
 
-        private static Series Helper_Rename_OLD(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, List<IVariable> rowList, List list0)
+        private static Series Helper_Rename_OLD(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, List<IVariable> rowList)
         {
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
