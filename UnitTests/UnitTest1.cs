@@ -35382,17 +35382,33 @@ print(df2)
             _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
             _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2002, 5.6d, sharedDelta);
-            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);            
-            I("z = x.rename(#(listfile xnew_cfg.csv));");
-            I("z.flatten('_');");
-            _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
-            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
-            _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
-            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
-            _AssertSeries(First(), "z_aa_bb_dd!a", 2001, 1.2d, sharedDelta);
-            _AssertSeries(First(), "z_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
-            _AssertSeries(First(), "z_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
-            _AssertSeries(First(), "z_aa_cc_dd!a", 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);
+
+            // ---
+
+            I("z1 = x.rename(#(listfile xnew1_cfg.csv));");
+            I("z1.flatten('_');");
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_bb_dd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_cc_dd!a", 2002, 7.8d, sharedDelta);
+
+            // ---
+
+            I("z2 = x.rename(#(listfile xnew2_cfg.csv));");
+            I("z2.flatten('');");
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "", "dd" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z2aabbdd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z2aadd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z2aabbdd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z2aadd!a", 2002, 7.8d, sharedDelta);
         }
 
 

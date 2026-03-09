@@ -909,7 +909,7 @@ namespace Gekko
                     ScalarString ss = ivCol as ScalarString;
                     if (ss == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be a string");
                     string s = ss.string2;                    
-                    if (G.NullOrBlanks(s)) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-blank");
+                    if (s == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-null"); //Can this ever happen?
                     s = s.Trim();
                     if (col == 1)
                     {
