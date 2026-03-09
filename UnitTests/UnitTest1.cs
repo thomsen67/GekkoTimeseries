@@ -6000,6 +6000,8 @@ namespace UnitTests
 
         }
 
+
+
         [TestMethod]
         public void _Test_Utf8()
         {
@@ -35365,6 +35367,32 @@ print(df2)
             _AssertSeries(First(), "z_cc_dd_aa", 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z_bb_dd_aa", 2002, 5.6d, sharedDelta);
             _AssertSeries(First(), "z_cc_dd_aa", 2002, 7.8d, sharedDelta);
+        }
+
+        [TestMethod]
+        public void _Test_RenameFunction()
+        {
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            //Just to get some data in: 
+            I("x = series(3);");
+            I("x[a, b, d] <2001 2001> = 1.2;");
+            I("x[a, c, d] <2001 2001> = 3.4;");
+            I("x[a, b, d] <2002 2002> = 5.6;");
+            I("x[a, c, d] <2002 2002> = 7.8;");
+            _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);            
+            I("z = x.rename(#(listfile xnew_cfg.csv));");
+            I("z.flatten('_');");
+            _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z_aa_bb_dd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z_aa_cc_dd!a", 2002, 7.8d, sharedDelta);
         }
 
 

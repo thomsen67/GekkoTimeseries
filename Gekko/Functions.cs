@@ -863,10 +863,12 @@ namespace Gekko
 
             if (list0.list.Count == 3)
             {
+                new Writeln("Calling rename() on a rename-list with 3 'columns' (lengths of the sub-lists)");
                 y = Helper_Rename(x1, rowList);
             }
             else if (list0.list.Count == 4)
             {
+                new Writeln("Calling rename() on a rename-list with 4 'columns' (lengths of the sub-lists)");
                 y = Helper_Rename_OLD(smpl, _t1, _t2, x1, rowList, list0); //First 3 args because reorder() is called inside
             }
             else
