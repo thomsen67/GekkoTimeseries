@@ -213,8 +213,7 @@ namespace Gekko
                 foreach (int i in selectedIndexes)
                 {
                     string groupName = group(row, i);
-                    if (groupName == null) 
-                        groupName = Globals.decompNull;                    
+                    if (groupName == null) groupName = Globals.decompNull;
                     if (groupName == Globals.pivotHelper2New)
                     {
                         s = groupName + s;  //Just put "00000000 " on the left
@@ -225,8 +224,7 @@ namespace Gekko
                     }                    
                 }
                 if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
-                else 
-                    rowKey = Globals.decompNull;
+                else rowKey = Globals.decompNull;
             }            
             return rowKey;
         }
