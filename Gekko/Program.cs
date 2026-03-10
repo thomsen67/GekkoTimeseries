@@ -31045,7 +31045,7 @@ namespace Gekko
         {            
             string s = "";
             if (all > 1) s = (counter + 1).ToString();
-            return new DName(Globals.decompResidualName, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
+            return new DName(Globals.decompResidualName + s, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
         }
 
         public static string GetDecompResidualNameSimple(int counter, int all)
