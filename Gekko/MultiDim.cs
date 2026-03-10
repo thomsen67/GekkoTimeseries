@@ -501,35 +501,24 @@ namespace Gekko
         private static readonly int _posFreq = 1; //hardcoded
         private static readonly int _posIndex = 2; //hardcoded
         [ProtoMember(1)]
-        public readonly int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= _posIndex)        
+        private int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= _posIndex)        
 
         public DName() : base() { } // Protobuf only
                                      
-        public DName(string name) : this(name, Array.Empty<StringOrTime>())
+        public DName(string name) : base(Construct(name, null, EFreq.None, Array.Empty<StringOrTime>(), -1))
         {            
         }
 
-        public DName(string name, EFreq freq) : this(name, freq, Array.Empty<StringOrTime>())
+        public DName(string name, EFreq freq) : base(Construct(name, null, freq, Array.Empty<StringOrTime>(), -1))
         {            
+        }        
+
+        public DName(string name, string bank, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(Construct(name, null, freq, indexes, posTimeOrLag))
+        {            
+            Prepare();
         }
 
-        public DName(string name, StringOrTime[] indexes) : base(Construct(name, indexes))
-        {
-            for (int i = 0; i < this.GetLength(); i++)
-            {
-                if (this.Get(i).IsTime())
-                {
-                    GekkoTime t = this.Get(i).GetTime();
-                    if (!(t.freq == EFreq.None || t.freq == EFreq.Age))
-                    {                    
-                        if (this.HasTime()) new Error("Only 1 time element allowed for DName");
-                        this.timePosition = i;
-                    }
-                }
-            }
-        }
-
-        public DName(string name, EFreq freq, StringOrTime[] indexes) : base(Construct(name, freq, indexes))
+        private void Prepare()
         {
             // freq is on rows, frequency of time variable is on cols
             //
@@ -543,19 +532,23 @@ namespace Gekko
             // age       not allowed for var, but can be set for time (will not count as GekkoTime)
             // lag       not allowed for var, but can be set for time (only 1 GekkoTime allowed)
             // none      +    +    +    +    +    +    +     +     +
-            if (freq == EFreq.Age) new Error("Age not allowed as variable freq");
-            if (freq == EFreq.Lag) new Error("Lag not allowed as variable freq");
-            for (int i = 0; i < this.GetLength(); i++)
+            if (this.GetFreq() == EFreq.Age) new Error("Age not allowed as variable freq");
+            if (this.GetFreq() == EFreq.Lag) new Error("Lag not allowed as variable freq");
+            if (this.timePosition == -1)
             {
-                if (this.Get(i).IsTime())
+                //Set automatically for timepos == -1
+                for (int i = 0; i < this.GetLength(); i++)
                 {
-                    EFreq gekkoTimeFreq = this.Get(i).GetTime().freq;
-                    if (this.HasTime() && gekkoTimeFreq != EFreq.Age) new Error("Only 1 time element allowed for DName");
-                    this.timePosition = i;
-                    if (freq != gekkoTimeFreq && Globals.freqNormal.ContainsKey(freq) && Globals.freqNormal.ContainsKey(gekkoTimeFreq))
+                    if (this.Get(i).IsTime())
                     {
-                        new Error("Frequency mismatch in DName");
-                    }                   
+                        EFreq gekkoTimeFreq = this.Get(i).GetTime().freq;
+                        if (this.HasTime() && gekkoTimeFreq != EFreq.Age) new Error("Only 1 time element allowed for DName");
+                        this.timePosition = i;
+                        if (this.GetFreq() != gekkoTimeFreq && Globals.freqNormal.ContainsKey(this.GetFreq()) && Globals.freqNormal.ContainsKey(gekkoTimeFreq))
+                        {
+                            new Error("Frequency mismatch in DName");
+                        }
+                    }
                 }
             }
         }
@@ -608,7 +601,7 @@ namespace Gekko
 
         public DName RemoveTime()
         {
-            return new DName(this.GetName(), this.GetFreq(), this.GetIndexesExceptTime());
+            return new DName(this.GetName(), null, this.GetFreq(), this.GetIndexesExceptTime(), -1);
         }
 
         public bool HasTime() 
@@ -631,7 +624,7 @@ namespace Gekko
             int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
             StringOrTime[] elements = this.GetIndexes();
             elements[this.timePosition - DName._posIndex] = new GekkoTime(EFreq.Lag, lag);  //Note: -2 because elements is without name and freq.
-            DName name = new DName(this.GetName(), this.GetFreq(), elements);
+            DName name = new DName(this.GetName(), null, this.GetFreq(), elements, -1);
             return name;
         }
 
@@ -680,7 +673,7 @@ namespace Gekko
                     temp.Add(xx);
                 }
             }
-            return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
+            return new DName(this.GetName(), null, this.GetFreq(), temp.ToArray(), -1);
         }
 
         public DName HACK_AddString(string element)
@@ -688,7 +681,7 @@ namespace Gekko
             List<StringOrTime> temp = new List<StringOrTime>();
             for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
             temp.Add(element);
-            return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
+            return new DName(this.GetName(), null, this.GetFreq(), temp.ToArray(), -1);
         }
 
         public DName HACK_AddTime(GekkoTime t)
@@ -697,7 +690,7 @@ namespace Gekko
             List<StringOrTime> temp = new List<StringOrTime>();
             for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
             temp.Add(t);            
-            return new DName(this.GetName(), this.GetFreq(), temp.ToArray());
+            return new DName(this.GetName(), null, this.GetFreq(), temp.ToArray(), -1);
         }
 
         public DName HACK_Prefix(string s)
@@ -705,7 +698,7 @@ namespace Gekko
             //List<StringOrTime> temp = new List<StringOrTime>();
             //for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
             //return new DName(s + this.GetName(), this.GetFreq(), temp.ToArray());
-            return new DName(s + this.GetName(), this.GetFreq(), this.GetIndexes());
+            return new DName(s + this.GetName(), null, this.GetFreq(), this.GetIndexes(), -1);
         }
 
         /// <summary>
@@ -732,12 +725,7 @@ namespace Gekko
             return t.super;
         }
 
-        private static StringOrTime[] Construct(string name, StringOrTime[] indexes)
-        {
-            return Construct(name, EFreq.None, indexes);
-        }
-
-        private static StringOrTime[] Construct(string name, EFreq freq, StringOrTime[] indexes)
+        private static StringOrTime[] Construct(string name, string bank, EFreq freq, StringOrTime[] indexes, int posTimeOrLag)
         {
             int offset = DName._posIndex;
             var result = new StringOrTime[indexes.Length + offset];
@@ -797,133 +785,7 @@ namespace Gekko
                 }
             }
             return rv;
-        }
-
-        public static List<DName> HACK1(List<string> ss)
-        {
-            List<DName> rv = new List<DName>();
-            foreach (string s in ss)
-            {
-                rv.Add(DName.HACK1(s));
-            }
-            return rv;
-        }
-
-        /// <summary>
-        /// Hacky, try to get rid of it when scalar model dicts are done
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static DName HACK1(string s)
-        {
-            if (s.Contains("¤"))
-            {
-                if (Globals.runningOnTTComputer) System.Windows.Forms.MessageBox.Show("HACK1 had turtle");
-                string[] ss = s.Split('¤'); //#as7asdfkalsfdads
-                string s0 = ss[0].Trim();
-                string bank; string name; string freq; string[] indexes;
-                G.Chop_Chop(s0, out bank, out name, out freq, out indexes);
-
-                string s1 = ss[1].Trim();
-                if (!(s1.StartsWith("[") && s1.EndsWith("]"))) new Error("DName problem1");
-                string s1a = s1.Substring(1, s1.Length - 2);
-                if (!G.LooksLikeYearOrQuarterOrMonth(s1a))
-                {
-                    new Error("DName problem2");
-                }
-                GekkoTime gt = GekkoTime.FromStringToGekkoTime(s1a, false, true, false);
-                List<StringOrTime> m = new List<StringOrTime>();
-                if (indexes != null)
-                {
-                    foreach (string s2 in indexes)
-                    {
-                        if (G.LooksLikeYearOrQuarterOrMonth(s2)) new Error("DName problem3");
-                        m.Add(s2);
-                    }
-                }
-                //m.Add(new GekkoTime(EFreq.A, int.Parse(s1a), 1));
-                m.Add(gt);
-                return new DName(name, m.ToArray());
-            }
-            else
-            {
-                string bank; string name; string freq; string[] indexes;
-                G.Chop_Chop(s, out bank, out name, out freq, out indexes);
-                List<StringOrTime> m = new List<StringOrTime>();
-                if (indexes != null)
-                {
-                    foreach (string s2 in indexes)
-                    {
-                        if (G.LooksLikeYearOrQuarterOrMonth(s2))
-                        {
-                            m.Add(GekkoTime.FromStringToGekkoTime(s2, false, true, false));
-                        }
-                        else
-                        {
-                            m.Add(s2);
-                        }
-                    }
-                }
-                return new DName(name, G.ConvertFreq(freq), m.ToArray());
-            }            
-        }
-
-        public static List<DName> HACK1a(List<string> ss)
-        {
-            List<DName> rv = new List<DName>();
-            foreach (string s in ss)
-            {
-                rv.Add(DName.HACK1_lag(s));
-            }
-            return rv;
-        }
-
-        /// <summary>
-        /// Can handle lag in input, and always returns a DName with lag/lead. 
-        /// Hacky, try to get rid of it when scalar model dicts are done. 
-        /// Can translate x, x[-1], x[a][-1] into proper DName with lag.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static DName HACK1_lag(string s)
-        {
-            string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
-            G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
-
-            if (indexes1 == null && indexes2 == null)
-            {
-                // x
-                return new DName(name, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
-            }
-            else if (indexes1 != null && indexes2 == null)
-            {
-                // x[-1], x[+1], x[a], x[i,j]
-                if (indexes1.Length == 1)
-                {
-                    // x[-1], x[+1]
-                    int i; if (!int.TryParse(indexes1[0], out i)) i = -12345;
-                    if (i != -12345) return new DName(name, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, i) });
-                }
-                // x[a], x[i,j]
-                List<StringOrTime> m = new List<StringOrTime>();
-                foreach (string s2 in indexes1) m.Add(s2);
-                m.Add(new GekkoTime(EFreq.Lag, 0));
-                return new DName(name, G.ConvertFreq(freq), m.ToArray());
-            }
-            else if (indexes1 != null && indexes2 != null)
-            {
-                // x[a][-1], x[a][+1], x[i,j][-1], x[i,j][+1]
-                if (indexes2.Length != 1) new Error("Bad x[...][...] pattern");                
-                int i; if (!int.TryParse(indexes2[0], out i)) i = -12345;
-                if (i == -12345) new Error("Bad x[...][...] pattern");
-                List<StringOrTime> m = new List<StringOrTime>();
-                foreach (string s2 in indexes1) m.Add(s2);
-                m.Add(new GekkoTime(EFreq.Lag, i));
-                return new DName(name, G.ConvertFreq(freq), m.ToArray());
-            }
-            else new Error("Hov");
-            return null; //we never get here            
-        }
+        }        
     }
 
     public enum EDNameQuotes

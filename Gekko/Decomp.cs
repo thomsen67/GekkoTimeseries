@@ -742,8 +742,8 @@ namespace Gekko
             foreach (DecompItems liv in o.decompItems)
             {
                 //
-                List<DName> x1 = DName.HACK1(O.Restrict(liv.varnames as List, false, true, false, true));
-                List<DName> x2 = DName.HACK1(O.Restrict(liv.eqname as List, false, true, false, false));
+                List<DName> x1 = Program.DName_HACK1(O.Restrict(liv.varnames as List, false, true, false, true));
+                List<DName> x2 = Program.DName_HACK1(O.Restrict(liv.eqname as List, false, true, false, false));
                 Link temp = new Link();
                 if (x1 != null)
                 {
@@ -766,9 +766,9 @@ namespace Gekko
                 //       e1[a][2001a1], e1[a][2002a1], etc.
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
 
-                if (o.select.Count > 0) decompOptions2.new_select = DName.HACK1(O.Restrict(o.select[0] as List, false, false, false, true));
-                if (o.from.Count > 0) decompOptions2.new_from = DName.HACK1a(O.Restrict(o.from[0] as List, false, false, false, true));
-                if (o.endo.Count > 0) decompOptions2.new_endo = DName.HACK1(O.Restrict(o.endo[0] as List, false, false, false, true));
+                if (o.select.Count > 0) decompOptions2.new_select = Program.DName_HACK1(O.Restrict(o.select[0] as List, false, false, false, true));
+                if (o.from.Count > 0) decompOptions2.new_from = Program.DName_HACK1LAG(O.Restrict(o.from[0] as List, false, false, false, true));
+                if (o.endo.Count > 0) decompOptions2.new_endo = Program.DName_HACK1(O.Restrict(o.endo[0] as List, false, false, false, true));
 
                 bool handleAsGekko = isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp);
                 HandleFromAndEndo(decompOptions2, handleAsGekko, isGamsRaw);
@@ -969,7 +969,7 @@ namespace Gekko
                 List<StringOrTime> xxx = new List<StringOrTime>();
                 foreach (string xx in s.HACK_IndexesWithoutTime()) xxx.Add(xx);
                 xxx.Add(time);
-                DName s2 = new DName(s.GetName(), xxx.ToArray());
+                DName s2 = new DName(s.GetName(), null, EFreq.None, xxx.ToArray(), -1);
 
                 int eqNumber;
                 //if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(s2), out eqNumber))
@@ -1102,7 +1102,7 @@ namespace Gekko
             if (decompOptions2.link[parentI].varnames == null)
             {
                 //does this ever happen?
-                decompOptions2.link[parentI].varnames = new DName(Globals.decompResidualName, new StringOrTime[] { });
+                decompOptions2.link[parentI].varnames = new DName(Globals.decompResidualName, null, EFreq.None, new StringOrTime[] { }, -1);
             }
 
             if (false)
@@ -1793,7 +1793,7 @@ namespace Gekko
                                 variables.Add(two);
                             }
                             //Has freq set to .None, because that is so in the decompDatas containers.
-                            DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count), EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
+                            DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count), null, EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
                             DName xx1 = xx2.RemoveTime().HACK_AddTime(t.Add(0));
                             variables.Add(new TwoDNames(xx1, xx2));
 
@@ -6161,7 +6161,7 @@ namespace Gekko
 
                 if (o.iv2 != null) { List<string> vars2 = O.Restrict(o.iv2, false, false, false, true); FindConnection(o.tSelected, vars[0], vars2[0], modelGamsScalar); return; }
 
-                DName variableName = DName.HACK1(vars[0]); //.Replace(" ", "");  //no blanks
+                DName variableName = Program.DName_HACK1(vars[0]); //.Replace(" ", "");  //no blanks
                 
                 List<EqInfoSimple> eqsNew = GamsModel.GetSortedEquations(variableName, GekkoTime.tNull, model, false, true, false);
 
@@ -6448,7 +6448,7 @@ namespace Gekko
             string error = null;
             foreach (KeyValuePair<DName, int> kvp in modelGamsScalar.dict_FromVarNameToANumber)
             {
-                if (G.Equal(DName.HACK1(variableName), kvp.Key))
+                if (G.Equal(Program.DName_HACK1(variableName), kvp.Key))
                 {
                     variableExists = true;
                     if (kvp.Key.HasIndex()) variableExistsAndHasIndex = true;
@@ -6504,10 +6504,10 @@ namespace Gekko
 
             Dictionary<long, Flood> colors = new Dictionary<long, Flood>();
 
-            int a1; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(x1), out a1)) a1 = -12345;
+            int a1; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(Program.DName_HACK1(x1), out a1)) a1 = -12345;
             if (a1 == -12345) new Error(NonFoundInModelError(x1, modelGamsScalar));
 
-            int a2 ; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(DName.HACK1(x2), out a2)) a2 = -12345;
+            int a2 ; if (!modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(Program.DName_HACK1(x2), out a2)) a2 = -12345;
             if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));
 
             long pv1 = ModelGamsScalar.PackPeriodAndVariable(timeIndex, a1);
@@ -6683,8 +6683,8 @@ namespace Gekko
             foreach (KeyValuePair<string, double> kvp in poolingFrom)
             {
                 FlowItem flowItem = new FlowItem();
-                flowItem.from = DName.HACK1(kvp.Key);
-                flowItem.to = DName.HACK1(flowInfo.variableName);
+                flowItem.from = Program.DName_HACK1(kvp.Key);
+                flowItem.to = Program.DName_HACK1(flowInfo.variableName);
                 flowItem.v = kvp.Value;
                 flowInfo.children.Add(flowItem);
             }

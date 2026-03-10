@@ -2800,6 +2800,132 @@ namespace Gekko
             return rv;
         }
 
+        public static List<DName> DName_HACK1(List<string> ss)
+        {
+            List<DName> rv = new List<DName>();
+            foreach (string s in ss)
+            {
+                rv.Add(Program.DName_HACK1(s));
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Hacky, try to get rid of it when scalar model dicts are done
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static DName DName_HACK1(string s)
+        {
+            if (s.Contains("¤"))
+            {
+                if (Globals.runningOnTTComputer) System.Windows.Forms.MessageBox.Show("HACK1 had turtle");
+                string[] ss = s.Split('¤'); //#as7asdfkalsfdads
+                string s0 = ss[0].Trim();
+                string bank; string name; string freq; string[] indexes;
+                G.Chop_Chop(s0, out bank, out name, out freq, out indexes);
+
+                string s1 = ss[1].Trim();
+                if (!(s1.StartsWith("[") && s1.EndsWith("]"))) new Error("DName problem1");
+                string s1a = s1.Substring(1, s1.Length - 2);
+                if (!G.LooksLikeYearOrQuarterOrMonth(s1a))
+                {
+                    new Error("DName problem2");
+                }
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(s1a, false, true, false);
+                List<StringOrTime> m = new List<StringOrTime>();
+                if (indexes != null)
+                {
+                    foreach (string s2 in indexes)
+                    {
+                        if (G.LooksLikeYearOrQuarterOrMonth(s2)) new Error("DName problem3");
+                        m.Add(s2);
+                    }
+                }
+                //m.Add(new GekkoTime(EFreq.A, int.Parse(s1a), 1));
+                m.Add(gt);
+                return new DName(name, null, EFreq.None, m.ToArray(), -1);
+            }
+            else
+            {
+                string bank; string name; string freq; string[] indexes;
+                G.Chop_Chop(s, out bank, out name, out freq, out indexes);
+                List<StringOrTime> m = new List<StringOrTime>();
+                if (indexes != null)
+                {
+                    foreach (string s2 in indexes)
+                    {
+                        if (G.LooksLikeYearOrQuarterOrMonth(s2))
+                        {
+                            m.Add(GekkoTime.FromStringToGekkoTime(s2, false, true, false));
+                        }
+                        else
+                        {
+                            m.Add(s2);
+                        }
+                    }
+                }
+                return new DName(name, null, G.ConvertFreq(freq), m.ToArray(), -1);
+            }
+        }
+
+        public static List<DName> DName_HACK1LAG(List<string> ss)
+        {
+            List<DName> rv = new List<DName>();
+            foreach (string s in ss)
+            {
+                rv.Add(Program.DName_HACK1LAG(s));
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Can handle lag in input, and always returns a DName with lag/lead. 
+        /// Hacky, try to get rid of it when scalar model dicts are done. 
+        /// Can translate x, x[-1], x[a][-1] into proper DName with lag.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static DName DName_HACK1LAG(string s)
+        {
+            string bank = null; string name = null; string freq = null; string[] indexes1 = null; string[] indexes2 = null;
+            G.Chop_Chop_Jagged(s, out bank, out name, out freq, out indexes1, out indexes2);
+
+            if (indexes1 == null && indexes2 == null)
+            {
+                // x
+                return new DName(name, null, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
+            }
+            else if (indexes1 != null && indexes2 == null)
+            {
+                // x[-1], x[+1], x[a], x[i,j]
+                if (indexes1.Length == 1)
+                {
+                    // x[-1], x[+1]
+                    int i; if (!int.TryParse(indexes1[0], out i)) i = -12345;
+                    if (i != -12345) return new DName(name, null, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, i) }, -1);
+                }
+                // x[a], x[i,j]
+                List<StringOrTime> m = new List<StringOrTime>();
+                foreach (string s2 in indexes1) m.Add(s2);
+                m.Add(new GekkoTime(EFreq.Lag, 0));
+                return new DName(name, null, G.ConvertFreq(freq), m.ToArray(), -1);
+            }
+            else if (indexes1 != null && indexes2 != null)
+            {
+                // x[a][-1], x[a][+1], x[i,j][-1], x[i,j][+1]
+                if (indexes2.Length != 1) new Error("Bad x[...][...] pattern");
+                int i; if (!int.TryParse(indexes2[0], out i)) i = -12345;
+                if (i == -12345) new Error("Bad x[...][...] pattern");
+                List<StringOrTime> m = new List<StringOrTime>();
+                foreach (string s2 in indexes1) m.Add(s2);
+                m.Add(new GekkoTime(EFreq.Lag, i));
+                return new DName(name, null, G.ConvertFreq(freq), m.ToArray(), -1);
+            }
+            else new Error("Hov");
+            return null; //we never get here            
+        }
+
         /// <summary>
         /// TELL statement.
         /// </summary>
@@ -11981,7 +12107,7 @@ namespace Gekko
         /// <param name="varnameWithFreq"></param>
         public static void AddToPrecedents(Databank db, DName s)
         {
-            DName two = new DName(db.name + "." + s.GetName(), s.HACK_IndexesWithoutTime().Select(x => (StringOrTime)x).ToArray()); //s has no time anyway
+            DName two = new DName(db.name + "." + s.GetName(), null, EFreq.None, s.HACK_IndexesWithoutTime().Select(x => (StringOrTime)x).ToArray(), -1); //s has no time anyway
             if (!Globals.precedentsContainer.ContainsKey(two))
             {
                 Globals.precedentsContainer.Add(two, 0);                
@@ -16391,7 +16517,7 @@ namespace Gekko
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), null);
-                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<DName>() { DName.HACK1(s2) }, helper, tUsedHere);
+                        GetEquationTextHelper temp = Program.model.GetEquationText(new List<DName>() { Program.DName_HACK1(s2) }, helper, tUsedHere);
                         string eq = temp.resultingText;
                         if (temp.hasHit)
                         {
@@ -16848,7 +16974,7 @@ namespace Gekko
             ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             GekkoTime tUsedHere = modelGamsScalar.Maybe2000GekkoTime(tStart);
 
-            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(DName.HACK1(varnameWithoutFreq), tUsedHere, model, false, false, false);
+            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(Program.DName_HACK1(varnameWithoutFreq), tUsedHere, model, false, false, false);
 
             if (eqsContainingVariable.Count == 0)
             {
@@ -17061,7 +17187,7 @@ namespace Gekko
                     //foreach precedent variable
                     string varName = modelGamsScalar.GetVarNameA_OLD(ModelGamsScalar.UnpackVariable(dp));
                     EqInfoSimple eqInfoClone = eqInfo.CloneWithoutBestAndScore();
-                    GamsModel.ScoreEquationGivenVariable(eqInfoClone, DName.HACK1(varName), model, modelGams, modelGamsScalar);
+                    GamsModel.ScoreEquationGivenVariable(eqInfoClone, Program.DName_HACK1(varName), model, modelGams, modelGamsScalar);
                     double score = eqInfoClone.score;
                     if (score > bestScore)
                     {
@@ -31045,7 +31171,7 @@ namespace Gekko
         {            
             string s = "";
             if (all > 1) s = (counter + 1).ToString();
-            return new DName(Globals.decompResidualName + s, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) });
+            return new DName(Globals.decompResidualName + s, null, EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
         }
 
         public static string GetDecompResidualNameSimple(int counter, int all)

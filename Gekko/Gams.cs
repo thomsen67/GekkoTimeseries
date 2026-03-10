@@ -1242,7 +1242,7 @@ namespace Gekko
                         if (eh.eqName == null)
                         {
                         }                        
-                        if (names.Length > 0) lhsName = new DName(lhsName.GetName(), names.Select(s => (StringOrTime)s).ToArray());
+                        if (names.Length > 0) lhsName = new DName(lhsName.GetName(), null, EFreq.None, names.Select(s => (StringOrTime)s).ToArray(), -1);
                         
                         if (Globals.greu)
                         {
@@ -1998,10 +1998,10 @@ namespace Gekko
                     }
                     
                     eqName = nameWithoutIndexes;
-                    DName temp1 = DName.HACK1(nameWithIndexes);
+                    DName temp1 = Program.DName_HACK1(nameWithIndexes);
                     helper.dict_FromEqNumberToEqName[n] = temp1;
                     helper.dict_FromEqNameToEqNumber.Add(temp1, n);  //filling this out could be postponed until decomp if loading is slow                        
-                    DName temp2 = DName.HACK1(eqName);
+                    DName temp2 = Program.DName_HACK1(eqName);
                     if (!helper.dict_FromEqNameToEqChunkNumber.ContainsKey(temp2))
                     {
                         helper.dict_FromEqNameToEqChunkNumber.Add(temp2, helper.dict_FromEqNameToEqChunkNumber.Count());
@@ -2028,7 +2028,7 @@ namespace Gekko
                         fakeVarCounts2++;
                     }
 
-                    DName temp5 = DName.HACK1(nameWithIndexes);
+                    DName temp5 = Program.DName_HACK1(nameWithIndexes);
                     helper.dict_FromVarNumberToVarName[n] = temp5;
                     helper.dict_FromVarNameToVarNumber.Add(temp5, n);
 
@@ -2059,7 +2059,7 @@ namespace Gekko
                         if (helper.t2.IsNull() || t.StrictlyLargerThan(helper.t2)) helper.t2 = t;
                     }
                     //helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(nameWithIndexesNoTime, helper.dict_FromVarNameToANumber.Count(), b);
-                    DName temp = DName.HACK1(nameWithIndexesNoTime);
+                    DName temp = Program.DName_HACK1(nameWithIndexesNoTime);
                     if (!helper.dict_FromVarNameToANumber.ContainsKey(temp))
                     {
                         helper.dict_FromVarNameToANumber.Add(temp, helper.dict_FromVarNameToANumber.Count());
@@ -3989,7 +3989,7 @@ namespace Gekko
         /// <param name="split"></param>
         private static void GetVariableChunks(TokenHelper node, List<DName> vars, List<EquationNameChunks> vars2, TokenHelper nextNode, List<TokenHelperComma> split, GamsWalkerInfo info)
         {
-            vars.Add(DName.HACK1(node.ToString() + nextNode.ToString()));  //pretty raw version, as it is
+            vars.Add(Program.DName_HACK1(node.ToString() + nextNode.ToString()));  //pretty raw version, as it is
             EquationNameChunks vars2a = new EquationNameChunks();
             vars2a.info = info;
             string name = node.ToString();

@@ -268,7 +268,7 @@ namespace Gekko
                 statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
                 statusTextBox.Opacity = 1.0;
                 var drawingNode = (Node)node.DrawingObject;
-                string label = Program.GetVariableExplanation1Line(DName.HACK1(drawingNode.Label.Text));
+                string label = Program.GetVariableExplanation1Line(Program.DName_HACK1(drawingNode.Label.Text));
                 statusTextBox.Text = label;
             }
             else
@@ -344,11 +344,11 @@ namespace Gekko
                         DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
                         decompFindHereChild.children.Clear(); //This and the next line so we are sure to get a blank state DECOMP window: not much sense in linking via flowgraphs...
                         decompFindHereChild.parent = null;
-                        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(DName.HACK1(name), GekkoTime.tNull, this.decompFind.model, false, false, false);
+                        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(Program.DName_HACK1(name), GekkoTime.tNull, this.decompFind.model, false, false, false);
                         string eqName = temp[0].eqName.RemoveTime().ToString();
-                        decompFindHereChild.decompOptions2.new_select = new List<DName> { DName.HACK1(name) };
-                        decompFindHereChild.decompOptions2.new_from = new List<DName>() { DName.HACK1(eqName) };
-                        decompFindHereChild.decompOptions2.new_endo = new List<DName>() { DName.HACK1(name) };
+                        decompFindHereChild.decompOptions2.new_select = new List<DName> { Program.DName_HACK1(name) };
+                        decompFindHereChild.decompOptions2.new_from = new List<DName>() { Program.DName_HACK1(eqName) };
+                        decompFindHereChild.decompOptions2.new_endo = new List<DName>() { Program.DName_HACK1(name) };
                         Decomp.DecompGetFuncExpressionsAndRecalc(decompFindHereChild, null);
                     }
                     else
@@ -357,7 +357,7 @@ namespace Gekko
                         {
                             DecompFind decompFindHere = this.decompFind;
                             DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
-                            decompFindHereChild.decompOptions2.guiFlowName = DName.HACK1(name);
+                            decompFindHereChild.decompOptions2.guiFlowName = Program.DName_HACK1(name);
                             CallFlowGraph(decompFindHereChild);                            
                         }
                     }

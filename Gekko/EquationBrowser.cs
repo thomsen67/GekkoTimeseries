@@ -1462,18 +1462,18 @@ img {border-style: none;
             Dictionary<DName, bool> restrict = new Dictionary<DName, bool>(Multidim2Comparer.IgnoreCase);
             if (small)
             {
-                restrict.Add(DName.HACK1("qbnp"), false);
-                restrict.Add(DName.HACK1("pbnp"), false);
-                restrict.Add(DName.HACK1("vbnp"), false);
-                restrict.Add(DName.HACK1("pC[cTot]"), false);
-                restrict.Add(DName.HACK1("pG[gTot]"), false);
-                restrict.Add(DName.HACK1("pI[iTot]"), false);
-                restrict.Add(DName.HACK1("pM[tot]"), false);
-                restrict.Add(DName.HACK1("pX[xTot]"), false);
-                restrict.Add(DName.HACK1("qC[cTot]"), false);
-                restrict.Add(DName.HACK1("qI[iTot]"), false);
-                restrict.Add(DName.HACK1("qM[tot]"), false);
-                restrict.Add(DName.HACK1("qX[xTot]"), false);
+                restrict.Add(Program.DName_HACK1("qbnp"), false);
+                restrict.Add(Program.DName_HACK1("pbnp"), false);
+                restrict.Add(Program.DName_HACK1("vbnp"), false);
+                restrict.Add(Program.DName_HACK1("pC[cTot]"), false);
+                restrict.Add(Program.DName_HACK1("pG[gTot]"), false);
+                restrict.Add(Program.DName_HACK1("pI[iTot]"), false);
+                restrict.Add(Program.DName_HACK1("pM[tot]"), false);
+                restrict.Add(Program.DName_HACK1("pX[xTot]"), false);
+                restrict.Add(Program.DName_HACK1("qC[cTot]"), false);
+                restrict.Add(Program.DName_HACK1("qI[iTot]"), false);
+                restrict.Add(Program.DName_HACK1("qM[tot]"), false);
+                restrict.Add(Program.DName_HACK1("qX[xTot]"), false);
             }
 
             if (deleteFolder && Directory.Exists(rootFolder))
@@ -1784,7 +1784,7 @@ img {border-style: none;
                         if (G.Equal(varnameWithoutLag, variableName.ToString())) continue;  //Shown at top
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
-                        html1.Append("<td>" + EquationBrowser.HtmlLink(DName.HACK1(varnameWithoutLag).ToString(bh.dNameFormat), SimplerName(varnameWithoutLag) + ".html") + "</td>");
+                        html1.Append("<td>" + EquationBrowser.HtmlLink(Program.DName_HACK1(varnameWithoutLag).ToString(bh.dNameFormat), SimplerName(varnameWithoutLag) + ".html") + "</td>");
                         html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DName(varnameWithoutLag))) + "</td>");
                         html1.AppendLine("</tr>");
                         dict.Add(varnameWithoutLag, false);
@@ -1808,7 +1808,7 @@ img {border-style: none;
                         foreach (string s in dependentVarsList)
                         {
                             string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DName(s)));
-                            string s2 = DName.HACK1(s).ToString(bh.dNameFormat);
+                            string s2 = Program.DName_HACK1(s).ToString(bh.dNameFormat);
                             string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
                             if (!first2) s8 += ", ";
                             s8 += link;
@@ -2390,7 +2390,7 @@ img {border-style: none;
 
                     foreach (string variableName in precedentsTemp)  //excluding any variables with lags/leads here
                     {
-                        DName variableNameWithoutLagOrLead = DName.HACK1(G.Chop_RemoveLagOrLead(variableName));
+                        DName variableNameWithoutLagOrLead = Program.DName_HACK1(G.Chop_RemoveLagOrLead(variableName));
                         if (!combos.ContainsKey(variableNameWithoutLagOrLead)) combos.Add(variableNameWithoutLagOrLead, new List<EquationNameAndNumber>());
                         combos[variableNameWithoutLagOrLead].Add(new EquationNameAndNumber() { i = i, name = eqName });
                     }

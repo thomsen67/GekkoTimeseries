@@ -180,7 +180,7 @@ namespace Gekko
                 foreach (string s2 in this.mmi.storage) list.Add(s2);                
                 string s = null;
                 if (this.mmi.parent != null) s = this.mmi.parent.name;
-                return new DName(s, list.ToArray());
+                return new DName(s, null, EFreq.None, list.ToArray(), -1);
             }
             else return new DName(this.name);
         }
