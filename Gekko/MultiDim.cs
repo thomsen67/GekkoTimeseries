@@ -475,6 +475,11 @@ namespace Gekko
     // ================================ DName =========================================================
     // ================================================================================================
 
+    public interface IHasBank { string GetBank(); }
+    public interface IHasFreq { string GetFreq(); }
+    public interface IHasTime { GekkoTime GetTime(); }
+    public interface IHasLag { GekkoTime GetLag(); }
+
     /// <summary>
     /// May or may not have frequency. May or may not have time.
     /// </summary>

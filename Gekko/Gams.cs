@@ -425,7 +425,7 @@ namespace Gekko
                         DName inputName = helper.dict_FromVarNumberToVarName[id];
                         
                         //qwerty remove time?
-                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(inputName, out aNumber)) aNumber = -12345;
+                        int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(inputName.RemoveTime(), out aNumber)) aNumber = -12345;
                         if (aNumber == -12345)
                         {
                             if (Globals.greuHack) continue;

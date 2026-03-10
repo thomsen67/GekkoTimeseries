@@ -213,7 +213,8 @@ namespace Gekko
                 foreach (int i in selectedIndexes)
                 {
                     string groupName = group(row, i);
-                    if (groupName == null) groupName = Globals.decompNull;                    
+                    if (groupName == null) 
+                        groupName = Globals.decompNull;                    
                     if (groupName == Globals.pivotHelper2New)
                     {
                         s = groupName + s;  //Just put "00000000 " on the left
@@ -224,7 +225,8 @@ namespace Gekko
                     }                    
                 }
                 if (s != null) rowKey = G.Substring(s, 0, s.Length - Globals.pivotTableDelimiter.Length - 1);
-                else rowKey = Globals.decompNull;
+                else 
+                    rowKey = Globals.decompNull;
             }            
             return rowKey;
         }
@@ -4414,7 +4416,7 @@ namespace Gekko
                     {
                         //Maybe turn this off for x-type...
                         //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
-                        
+
                         if (op.isRaw)
                         {
                             //qwerty, does this var need to have lag/lead removed?
@@ -4424,13 +4426,13 @@ namespace Gekko
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.fullName.GetLag()));
                                 dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + chop.fullName.GetLag()));
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + chop.fullName.GetLag()));
-                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero) 
+                                if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, false) == ESeriesMissing.Zero)
                                 {
                                     if (G.IsNumericalError(dLevel)) dLevel = 0d;
                                     if (G.IsNumericalError(dLevelLag)) dLevelLag = 0d;
-                                    if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;                                    
+                                    if (G.IsNumericalError(dLevelLag2)) dLevelLag2 = 0d;
                                 }
-                            }                            
+                            }
                             Series tsRef = O.GetIVariableFromString("Ref:" + chop.fullName.RemoveTime().ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                             if (tsRef != null)
                             {
@@ -4491,7 +4493,7 @@ namespace Gekko
                                     if (Program.options.decomp_res_missing == ESeriesMissing.Zero && G.StartsWith(chop.fullName.GetName(), Globals.decompResidualPrefix))  //fullNameRef is made from chop anyways.
                                     {
                                         missingResVariable = true;
-                                    }                                    
+                                    }
                                     else if (G.DecompShouldHandleMissings(decompOptions2.missingAsZero, true) == ESeriesMissing.Zero)
                                     {
                                         tsRef = DecompCreateArtificialSeries(model.modelGamsScalar, 0d);
@@ -4545,7 +4547,7 @@ namespace Gekko
 
                     frameRow.AddDimension(frame, Globals.col_t, new CellLight(t2.ToString()));
                     frameRow.AddDimension(frame, Globals.col_variable, new CellLight(chop.fullName.GetName().ToString()));
-                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(chop.fullName.GetLag()));
+                    frameRow.AddDimension(frame, Globals.col_lag, new CellLight(PrettyLag(chop.fullName.GetLag()))); //Represented as "[-1]", "[+1]", etc.
 
                     //Clean this up sometime, so we do not have gekkodim_x1&1 for a dimension, but just gekkodim_1, and
                     //all the vars share this gekkodim_1. Problem is the pivot selector, etc.
@@ -4560,8 +4562,8 @@ namespace Gekko
                     //     dims     x1-dim-1     x1-dim-2     dim-1     dim-2      #i     #j     #i     #j
                     //     3        a            m            a         m          a      m      1      2
                     //
-                                        
-                    List<string> indexes = chop.fullName.HACK_IndexesWithoutTime();                    
+
+                    List<string> indexes = chop.fullName.HACK_IndexesWithoutTime();
                     frameRow.AddDimension(frame, Globals.decompDimension2, new CellLight(indexes.Count));
                     if (indexes.Count > 0)
                     {
@@ -4609,7 +4611,7 @@ namespace Gekko
                     frameRow.AddValue(frame, Globals.col_valueLevelLag2, new CellLight(dLevelLag2));
                     frameRow.AddValue(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
                     frameRow.AddValue(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
-                    frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));                    
+                    frameRow.AddValue(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
                     frameRow.AddValue(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                     frameRow.AddValue(frame, Globals.col_prime, new CellLight(prime));
                     // -----                    
@@ -4764,6 +4766,12 @@ namespace Gekko
             }
 
             return frame;
+        }
+
+        private static string PrettyLag(int lag)
+        {            
+            if (lag > 0) return "[" + "+" + lag.ToString() + "]";
+            else return "[" + lag.ToString() + "]";
         }
 
         /// <summary>
