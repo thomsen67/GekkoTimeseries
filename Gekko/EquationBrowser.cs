@@ -608,7 +608,7 @@ img {border-style: none;
                 HtmlBrowserSettings htmlBrowserSettings = new HtmlBrowserSettings();
                 htmlBrowserSettings.isDanish = isDanish;
                 htmlBrowserSettings.show_source = settings_show_source;
-                List<string> varExpl = Program.GetVariableExplanationAugmented(new DName(varnameWithoutFreq), htmlBrowserSettings);
+                List<string> varExpl = Program.GetVariableExplanationAugmented(new DNameSimplest(varnameWithoutFreq), htmlBrowserSettings);
                 foreach (string line in varExpl)
                 {
                     if (line != "")
@@ -1785,7 +1785,7 @@ img {border-style: none;
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
                         html1.Append("<td>" + EquationBrowser.HtmlLink(Program.DName_HACK1(varnameWithoutLag).ToString(bh.dNameFormat), SimplerName(varnameWithoutLag) + ".html") + "</td>");
-                        html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DName(varnameWithoutLag))) + "</td>");
+                        html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DNameSimplest(varnameWithoutLag))) + "</td>");
                         html1.AppendLine("</tr>");
                         dict.Add(varnameWithoutLag, false);
                     }
@@ -1807,7 +1807,7 @@ img {border-style: none;
                         bool first2 = true;
                         foreach (string s in dependentVarsList)
                         {
-                            string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DName(s)));
+                            string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DNameSimplest(s)));
                             string s2 = Program.DName_HACK1(s).ToString(bh.dNameFormat);
                             string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
                             if (!first2) s8 += ", ";
@@ -2583,7 +2583,7 @@ img {border-style: none;
             GekkoTime gt1, gt2;
             Gekko.Decomp.DecompMainInit(out gt1, out gt2, t1, t2, decompOptions2.decompOperator);            
             Gekko.Decomp.EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
-            DName lhsString = new DName("Expression value");
+            DName lhsString = new DNameSimplest("Expression value");
             Gekko.Decomp.PrepareEquations(t1, t2, decompOptions2.decompOperator, decompOptions2, false, modelGamsScalar);
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
             decompDatas.MAIN_data = null;
@@ -2926,9 +2926,9 @@ img {border-style: none;
             if (G.GetModelSourceType() == EModelType.Gekko)
             {
                 List<string> list = new List<string>();
-                if (Program.model.modelGekko.dependents.ContainsKey(new DName(varnameWithoutFreq)))
+                if (Program.model.modelGekko.dependents.ContainsKey(new DNameSimplest(varnameWithoutFreq)))
                 {
-                    Dictionary<DName, DName> d2 = Program.model.modelGekko.dependents[new DName(varnameWithoutFreq)].storage;
+                    Dictionary<DName, DName> d2 = Program.model.modelGekko.dependents[new DNameSimplest(varnameWithoutFreq)].storage;
                     if (d2 != null)
                     {
                         foreach (DName d3 in d2.Keys)
@@ -2939,7 +2939,7 @@ img {border-style: none;
                     list.Sort(StringComparer.InvariantCulture);
                 }
 
-                EquationHelper eq = Program.FindEquationByMeansOfVariableName(new DName(varnameWithoutFreq));
+                EquationHelper eq = Program.FindEquationByMeansOfVariableName(new DNameSimplest(varnameWithoutFreq));
 
                 if (eq == null)
                 {
@@ -3445,7 +3445,7 @@ img {border-style: none;
                             sb.Append(G.Blanks(a[i].leftblanks));
                         }
                     }
-                    if (counter > 1 && a[i].type == ETokenType.Word && Program.model.modelGekko.varsAType.ContainsKey(new DName(a[i].s)))
+                    if (counter > 1 && a[i].type == ETokenType.Word && Program.model.modelGekko.varsAType.ContainsKey(new DNameSimplest(a[i].s)))
                     {
                         if (!html)
                         {

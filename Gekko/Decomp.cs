@@ -1405,7 +1405,7 @@ namespace Gekko
                 else
                 {
                     //is this still necessary?                    
-                    link.varnames = new DName("<not used>"); //strange but necessary further on
+                    link.varnames = new DNameSimplest("<not used>"); //strange but necessary further on
                 }
 
                 decompOptions2.link.Add(link);
@@ -4240,7 +4240,7 @@ namespace Gekko
         {            
             if (replaceResidualName && s.GetName().Contains(Globals.decompResidualName))
             {
-                return new DName(s.GetName().Replace(Globals.decompResidualName, Globals.decompResidualName2));
+                return new DNameSimplest(s.GetName().Replace(Globals.decompResidualName, Globals.decompResidualName2));
             }            
             return s;
         }
@@ -5109,7 +5109,7 @@ namespace Gekko
 
                         Cell c = table2.Get(rowmax + 1, j);
                         c.backgroundColor = Globals.decompIgnoredColor;
-                        c.vars_hack = new List<DName>() { new DName(Globals.decompIgnoreName) };
+                        c.vars_hack = new List<DName>() { new DNameSimplest(Globals.decompIgnoreName) };
                         c.value_hack = sum_hack;
                     }
                 }
@@ -5141,7 +5141,7 @@ namespace Gekko
 
                         Cell c = table2.Get(i, colmax + 1);
                         c.backgroundColor = Globals.decompIgnoredColor;
-                        c.vars_hack = new List<DName>() { new DName(Globals.decompIgnoreName) };
+                        c.vars_hack = new List<DName>() { new DNameSimplest(Globals.decompIgnoreName) };
                         c.value_hack = sum_hack;
                     }
                 }
@@ -5249,7 +5249,7 @@ namespace Gekko
                             table2.SetNumber(rowmax + 1, j, target - sum, numberFormat);
                         }
 
-                        table2.Get(rowmax + 1, j).vars_hack = new List<DName>() { new DName(Globals.decompErrorName) };
+                        table2.Get(rowmax + 1, j).vars_hack = new List<DName>() { new DNameSimplest(Globals.decompErrorName) };
                         table2.Get(rowmax + 1, j).value_hack = -sum_hack;  //probably not used?
                         table2.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
                     }
@@ -5283,7 +5283,7 @@ namespace Gekko
                             table2.SetNumber(i, colmax + 1, target - sum, numberFormat);
                         }
 
-                        table2.Get(i, colmax + 1).vars_hack = new List<DName>() { new DName(Globals.decompErrorName) };
+                        table2.Get(i, colmax + 1).vars_hack = new List<DName>() { new DNameSimplest(Globals.decompErrorName) };
                         table2.Get(i, colmax + 1).value_hack = -sum_hack;  //probably not used?
                         table2.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
                     }
@@ -6550,7 +6550,7 @@ namespace Gekko
                 //#6irhwakery7
                 string name = G.Chop_DimensionAddLag(modelGamsScalar.GetVariableAndPeriod(f.pv).Item1.ToString(), modelGamsScalar.Maybe2000GekkoTime(t0), modelGamsScalar.GetVariableAndPeriod(f.pv).Item2, b, b, "");
 
-                string label = Program.GetVariableExplanation1Line(new DName(name));
+                string label = Program.GetVariableExplanation1Line(new DNameSimplest(name));
 
                 string lbl = null;
                 if (!G.NullOrEmpty(label)) lbl = " (" + label + ")";
@@ -6643,7 +6643,7 @@ namespace Gekko
             DecompData dd = Gekko.Decomp.DecompLowLevelScalar(gt1, gt2, decompOptions2.link[0].GAMS_dsh[0], decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
             Decomp.DecompMainMergeOrAdd(decompDatas, dd, 0, 0);  //probably superfluous when looking a abs differences?
             decompDatas.MAIN_data = dd; decompDatas.storage[0][0] = dd;
-            DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, new DName(lhsString), decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+            DecompOutput decompOutput = Decomp.DecompPivotToTable(smpl, t1, t2, dd, decompDatas, new DNameSimplest(lhsString), decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             Table decompTable = decompOutput.table;
 
             //Hack, because after expand, removing lags does not work in pivot (maybe it should...!)

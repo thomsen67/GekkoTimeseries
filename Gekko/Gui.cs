@@ -1581,7 +1581,7 @@ namespace Gekko
                     //Hmmm, no difference between this and the below anyway...
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
-                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(new DName(var))) || (Program.HasGamsEquation(new DName(var))))
+                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(new DNameSimplest(var))) || (Program.HasGamsEquation(new DNameSimplest(var))))
                 {
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
@@ -1626,7 +1626,7 @@ namespace Gekko
                     //Hmmm, no difference between this and the below anyway...
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
-                else if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(new DName(var))) || (Program.HasGamsEquation(new DName(var))))
+                else if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(new DNameSimplest(var))) || (Program.HasGamsEquation(new DNameSimplest(var))))
                 {                    
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }

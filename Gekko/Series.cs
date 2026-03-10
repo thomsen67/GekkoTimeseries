@@ -177,12 +177,12 @@ namespace Gekko
                     return null;
                 }
                 List<StringOrTime> list = new List<StringOrTime>();
-                foreach (string s2 in this.mmi.storage) list.Add(s2);                
+                foreach (string s2 in this.mmi.storage) list.Add(s2);
                 string s = null;
                 if (this.mmi.parent != null) s = this.mmi.parent.name;
                 return new DName(s, EFreq.None, list.ToArray(), -1);
             }
-            else return new DName(this.name);
+            else return new DName(this.name, EFreq.None, Array.Empty<StringOrTime>(), -1);
         }
 
         /// <summary>

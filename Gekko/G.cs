@@ -5334,7 +5334,7 @@ namespace Gekko
             {
                 //a Gekko model is loaded
                 //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
-                ATypeData temp = null; Program.model.modelGekko.varsAType.TryGetValue(new DName(var), out temp);
+                ATypeData temp = null; Program.model.modelGekko.varsAType.TryGetValue(new DNameSimplest(var), out temp);
                 if (temp != null)
                 {
                     //var is known from the model

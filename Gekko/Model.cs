@@ -197,7 +197,7 @@ namespace Gekko
                     if (eqName == null) continue;  //probably not necessary
                     if (!G.StartsWith(eqName.GetName(), Globals.gekkoEquationPrefix)) continue;
                     string s1 = null;
-                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(new DName(eqName.GetName().Substring(Globals.gekkoEquationPrefix.Length)));
+                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(new DNameSimplest(eqName.GetName().Substring(Globals.gekkoEquationPrefix.Length)));
                     if (eh != null) s1 = eh.equationText + G.NL + G.NL;
                     sb1.Append(s1);
                     string s2 = null;
@@ -246,7 +246,7 @@ namespace Gekko
             List<DName> eqs2 = new List<DName>();
             foreach (DName s in eqs)
             {
-                eqs2.Add(new DName(s.GetName()));
+                eqs2.Add(new DNameSimplest(s.GetName()));
             }
             TwoStrings two = this.GetEquationTextRawScalar(eqs2);
 
@@ -1657,7 +1657,7 @@ namespace Gekko
                 }
                 else if (type == 3)
                 {
-                    DName xx = new DName(s2.GetName());
+                    DName xx = new DNameSimplest(s2.GetName());
                     if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                 }
                 else new Error("Unexpected");
@@ -1691,7 +1691,7 @@ namespace Gekko
                     }
                     else if (type == 3)
                     {
-                        DName xx = new DName(s2.GetName());
+                        DName xx = new DNameSimplest(s2.GetName());
                         if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                     }
                     else new Error("Unexpected");
@@ -1722,7 +1722,7 @@ namespace Gekko
                 Dictionary<DName, int> temp = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
                 foreach (DName s2 in this.dict_FromVarNumberToVarName)
                 {                    
-                    DName xx = new DName(s2.GetName());
+                    DName xx = new DNameSimplest(s2.GetName());
                     if (!temp.ContainsKey(xx)) temp.Add(xx, 0);
                 }
                 return temp.Count;
@@ -2147,20 +2147,20 @@ namespace Gekko
                             //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
                             //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
                             //ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK ULTRAHACK 
-                            varname2 = new DName(dName2.ToString(Globals.varFormatInScalarEquation));
+                            varname2 = new DNameSimplest(dName2.ToString(Globals.varFormatInScalarEquation));
                         }
                     }
                     
                     if (mathRename != null)
                     {
-                        varname2 = new DName(Program.MathPutIntoDict(mathRename, varname2.ToString()));
+                        varname2 = new DNameSimplest(Program.MathPutIntoDict(mathRename, varname2.ToString()));
                     }
                     
                     if (sd != null) //Used for special identities model
                     {
                         if (!sd.vars.ContainsKey(varname2))
                         {
-                            DName xName = new DName("x" + (sd.vars.Count + 1));
+                            DName xName = new DNameSimplest("x" + (sd.vars.Count + 1));
                             sd.vars.Add(varname2, xName);  //Starts with x1
                             sd.varsList.Add(varname2);  //Will start at slot 0
                             varname2 = xName;
@@ -2218,7 +2218,7 @@ namespace Gekko
                     {
                         if (!sd.eqs.ContainsKey(name))
                         {
-                            DName eName = new DName("e" + (sd.eqs.Count + 1));
+                            DName eName = new DNameSimplest("e" + (sd.eqs.Count + 1));
                             sd.eqs.Add(name, eName);  //Starts with e1
                             sd.eqsList.Add(name);  //Will start with slot 0
                             rv1 = eName;

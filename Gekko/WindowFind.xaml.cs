@@ -303,7 +303,7 @@ namespace Gekko
                     try
                     {
                         Globals.decompIsCalculatingButtonColors = true;  //so we will never get popups
-                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, dsh, decompOptionsTemp.decompOperator, new DName(residualName), ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
+                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, dsh, decompOptionsTemp.decompOperator, new DNameSimplest(residualName), ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
                     }
                     finally
                     {
@@ -359,7 +359,7 @@ namespace Gekko
 
                         DecompOperator op = new DecompOperator("d");
 
-                        DName residualName = new DName("residual___");
+                        DName residualName = new DNameSimplest("residual___");
                         int funcCounter = 0;
 
                         string s1 = Decomp.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";

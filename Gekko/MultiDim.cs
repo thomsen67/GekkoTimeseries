@@ -475,16 +475,18 @@ namespace Gekko
     // ================================ DName =========================================================
     // ================================================================================================
 
+    [ProtoContract]
     public class DNameTime : DName
-    {
-        public DNameTime(string name) : base(name) { }
+    {        
         public DNameTime(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
     }
 
+    [ProtoContract]
     public class DNameSimplest : DName
     {
-        public DNameSimplest(string name) : base(name) { }
-        public DNameSimplest(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
+        public DNameSimplest(string name) : base(name, EFreq.None, Array.Empty<StringOrTime>(), -1) { }
+
+        //public DNameSimplest(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
     }
 
     /// <summary>
@@ -511,8 +513,6 @@ namespace Gekko
         private int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= _posIndex)        
 
         public DName() : base() { } // Protobuf only
-
-        public DName(string name) : base(Construct(name, EFreq.None, Array.Empty<StringOrTime>(), -1)) { }  
 
         public DName(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(Construct(name, freq, indexes, posTimeOrLag))
         {            
@@ -665,7 +665,7 @@ namespace Gekko
             if (this.HasTime()) new Error("Cannot add time to variable that already has time");
             int add = 1;
             StringOrTime[] temp = new StringOrTime[this.storage.Length + add - DName._posIndex];
-            Array.Copy(this.storage, DName._posIndex, temp, 0, temp.Length);
+            Array.Copy(this.storage, DName._posIndex, temp, 0, this.storage.Length - DName._posIndex);
             temp[temp.Length - 1] = t;
             return new DName(this.GetName(), this.GetFreq(), temp, -1);
         }

@@ -797,11 +797,11 @@ namespace Gekko
             }
             else
             {
-                List<DName> lhsVars = Program.BeforeEqualSign(new DName(eqInfo.eqName.GetName()), modelGams);
+                List<DName> lhsVars = Program.BeforeEqualSign(new DNameSimplest(eqInfo.eqName.GetName()), modelGams);
                 bool hit2 = false;
                 foreach (DName s in lhsVars)
                 {
-                    if (G.Equal(new DName(variableName.GetName()), s)) { hit2 = true; break; }
+                    if (G.Equal(new DNameSimplest(variableName.GetName()), s)) { hit2 = true; break; }
                 }
                 if (hit2) eqInfo.score += Globals.lhsScore1; //0.5                    
 
@@ -1012,9 +1012,9 @@ namespace Gekko
                     DName equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
                     if (spelling)
                     {
-                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_vHhTilBorn_aTot")) equationNameWithoutIndexesTemp = new DName(equationNameWithoutIndexesTemp.GetName().Replace("E_vHhTilBorn_aTot", "E_vHhTilBoern_aTot"));
-                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_rOffTilVirk")) equationNameWithoutIndexesTemp = new DName(equationNameWithoutIndexesTemp.GetName().Replace("E_rOffTilVirk", "E_rOffTilVirk2BNP"));
-                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_tSubLoen_sTot")) equationNameWithoutIndexesTemp = new DName(equationNameWithoutIndexesTemp.GetName().Replace("E_tSubLoen_sTot", "E_vSubLoen_sTot"));
+                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_vHhTilBorn_aTot")) equationNameWithoutIndexesTemp = new DNameSimplest(equationNameWithoutIndexesTemp.GetName().Replace("E_vHhTilBorn_aTot", "E_vHhTilBoern_aTot"));
+                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_rOffTilVirk")) equationNameWithoutIndexesTemp = new DNameSimplest(equationNameWithoutIndexesTemp.GetName().Replace("E_rOffTilVirk", "E_rOffTilVirk2BNP"));
+                        if (equationNameWithoutIndexesTemp.GetName().Contains("E_tSubLoen_sTot")) equationNameWithoutIndexesTemp = new DNameSimplest(equationNameWithoutIndexesTemp.GetName().Replace("E_tSubLoen_sTot", "E_vSubLoen_sTot"));
                     }
 
                     string[] eqNameChunks = equationNameWithoutIndexesTemp.GetName().Split('_');
@@ -1032,7 +1032,7 @@ namespace Gekko
                         if (varsNoIndex.ContainsKey(s))
                         {
                             //Good
-                            lhsName = new DName(s);
+                            lhsName = new DNameSimplest(s);
                             if (i + 1 < eqNameChunks.Length)
                             {
                                 indexName = eqNameChunks[i + 1];  //TODO: What about > 1 index names???
@@ -1471,7 +1471,7 @@ namespace Gekko
 
                     if (!time.IsNull())  //ignore for instance a timeless equation like E_tIOy_tBase[d,s]
                     {
-                        DName noIndex = new DName(eq.GetName());
+                        DName noIndex = new DNameSimplest(eq.GetName());
 
                         if (!batches.ContainsKey(noIndex))
                         {
@@ -1594,7 +1594,7 @@ namespace Gekko
                     {
                         a2++;
                         DName eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                        DName eqNameWithoutIndex = new DName(eqName.GetName());
+                        DName eqNameWithoutIndex = new DNameSimplest(eqName.GetName());
                         bool found = false;
                         foreach (IdentityHelper ih in eqs)
                         {
@@ -3059,7 +3059,7 @@ namespace Gekko
 
                 string dollar = null;
 
-                eqnameGams = new DName(tok.Offset(i)?.s);
+                eqnameGams = new DNameSimplest(tok.Offset(i)?.s);
                 
                 i++;
 
@@ -3286,7 +3286,7 @@ namespace Gekko
             DName lhsVariable = ReadGamsModelGetLhsNameAndStoreEquation(equationsByVarname, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, problems2, lhsVars, lhsVars2, rhsVars, rhsVars2, ref fromList);
             string s = null;
             if (fromList) s = ", designated from list";
-            if (lhsVariable == null) lhsVariable = new DName("[not identified]");
+            if (lhsVariable == null) lhsVariable = new DNameSimplest("[not identified]");
             sb1.AppendLine("--> " + lhsVariable + " (dependent" + s + ")");
             sb1.AppendLine();
             sb1.AppendLine("----------------------------------------------------------------------------------------------------------------");
@@ -3317,11 +3317,11 @@ namespace Gekko
                     {
                         G.Warning("w1.6", "Eqname '" + eqnameGams + "': could not resolve variable name");
                     }
-                    lhs = new DName(ss[1]);
+                    lhs = new DNameSimplest(ss[1]);
                 }
                 else
                 {
-                    lhs = new DName(ss[0]);
+                    lhs = new DNameSimplest(ss[0]);
                 }                
             }
             else
@@ -3539,12 +3539,12 @@ namespace Gekko
                         //the ss list.
 
                         //qwerty, hmmm ?
-                        DName temp = null; dependents.TryGetValue(new DName(ss[i]), out temp);
+                        DName temp = null; dependents.TryGetValue(new DNameSimplest(ss[i]), out temp);
                         if (temp != null)
                         {
                             new Error("#dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
                         }
-                        dependents.Add(new DName(ss[i]), new DName(lhs));
+                        dependents.Add(new DNameSimplest(ss[i]), new DNameSimplest(lhs));
                     }
                 }
             }
