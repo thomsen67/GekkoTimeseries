@@ -475,10 +475,17 @@ namespace Gekko
     // ================================ DName =========================================================
     // ================================================================================================
 
-    public interface IHasBank { string GetBank(); }
-    public interface IHasFreq { string GetFreq(); }
-    public interface IHasTime { GekkoTime GetTime(); }
-    public interface IHasLag { GekkoTime GetLag(); }
+    public class DNameTime : DName
+    {
+        public DNameTime(string name) : base(name) { }
+        public DNameTime(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
+    }
+
+    public class DNameSimplest : DName
+    {
+        public DNameSimplest(string name) : base(name) { }
+        public DNameSimplest(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
+    }
 
     /// <summary>
     /// May or may not have frequency. May or may not have time.
@@ -504,16 +511,10 @@ namespace Gekko
         private int timePosition = -1; //-1 --> no time, if >= 0 it tells which dimension is time (pos >= _posIndex)        
 
         public DName() : base() { } // Protobuf only
-                                     
-        public DName(string name) : base(Construct(name, null, EFreq.None, Array.Empty<StringOrTime>(), -1))
-        {            
-        }
 
-        public DName(string name, EFreq freq) : base(Construct(name, null, freq, Array.Empty<StringOrTime>(), -1))
-        {            
-        }        
+        public DName(string name) : base(Construct(name, EFreq.None, Array.Empty<StringOrTime>(), -1)) { }  
 
-        public DName(string name, string bank, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(Construct(name, null, freq, indexes, posTimeOrLag))
+        public DName(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(Construct(name, freq, indexes, posTimeOrLag))
         {            
             Prepare();
         }
@@ -551,9 +552,13 @@ namespace Gekko
                     }
                 }
             }
+            else
+            {
+                if (!this.Get(this.timePosition).IsTime()) new Error("Expected a time variable in position " + this.timePosition);
+            }
         }
 
-        public static DNameFormat dNameFormatDefault = new DNameFormat();
+        public static DNameFormat dNameFormatDefault = new DNameFormat();        
 
         public string GetName()
         {
@@ -571,6 +576,24 @@ namespace Gekko
             return this.GetName() + Globals.freqIndicator + this.GetFreq();
         }
 
+        /// <summary>
+        /// May return GekkoTime.tNull if no time present.
+        /// </summary>
+        /// <returns></returns>
+        public GekkoTime GetTime()
+        {
+            if (!this.HasTime()) return GekkoTime.tNull;
+            return this.Get(this.timePosition).GetTime();
+        }
+
+        public int GetLag()
+        {
+            if (!this.HasTime()) new Error("No time part found");            
+            GekkoTime t = this.Get(this.timePosition).GetTime();
+            if (t.freq != EFreq.Lag) new Error("Expected lag time type");            
+            return t.super;
+        }
+
         private StringOrTime[] GetIndexes()
         {
             //Should be ok fast
@@ -579,7 +602,7 @@ namespace Gekko
             return result;
         }
 
-        private StringOrTime[] GetIndexesExceptTime()
+        public StringOrTime[] GetIndexesExceptTime()
         {
             //Should be ok fast
             if (!this.HasTime())
@@ -588,12 +611,12 @@ namespace Gekko
             }
             else
             {                
+                //TODO: Could use 2 x array copy, but tricky
                 List<StringOrTime> result = new List<StringOrTime>();
                 for (int i = DName._posIndex; i < this.storage.Length; i++)
-                {
-                    StringOrTime element = this.storage[i];
-                    if (element.IsTime()) continue;
-                    result.Add(element);                    
+                {                    
+                    if (i == this.timePosition) continue;
+                    result.Add(this.storage[i]);                    
                 }
                 return result.ToArray();
             }            
@@ -601,7 +624,7 @@ namespace Gekko
 
         public DName RemoveTime()
         {
-            return new DName(this.GetName(), null, this.GetFreq(), this.GetIndexesExceptTime(), -1);
+            return new DName(this.GetName(), this.GetFreq(), this.GetIndexesExceptTime(), -1);
         }
 
         public bool HasTime() 
@@ -609,7 +632,6 @@ namespace Gekko
             if (this.timePosition == -1) return false;
             return true;
         }
-
 
         public bool HasIndex()
         {
@@ -624,108 +646,36 @@ namespace Gekko
             int lag = thisT.Subtract(t); //will fail if freq mismatch. Note: -2 means lagged 2 periods.
             StringOrTime[] elements = this.GetIndexes();
             elements[this.timePosition - DName._posIndex] = new GekkoTime(EFreq.Lag, lag);  //Note: -2 because elements is without name and freq.
-            DName name = new DName(this.GetName(), null, this.GetFreq(), elements, -1);
+            DName name = new DName(this.GetName(), this.GetFreq(), elements, -1);
             return name;
-        }
+        }        
 
-        //public DName HACK_RemoveTime()
-        //{
-        //    List<string> temp = this.HACK_IndexesWithoutTime();
-        //    List<StringOrTime> temp2 = new List<StringOrTime>();
-        //    foreach (string s in temp) temp2.Add(s);
-        //    return new DName(this.GetName(), this.GetFreq(), temp2.ToArray());            
-        //}
-
-        //public string HACK_ToStringWithoutTime()
-        //{
-        //    DName without = this.RemoveTime();
-        //    return without.ToString();
-        //}
-
-        public List<string> HACK_IndexesWithoutTime()
+        //Removes last index
+        public DName RemoveLastIndex()
         {
-            List<string> temp = new List<string>();
-            for (int i = DName._posIndex; i < this.GetLength(); i++)
-            {
-                if (i == this.timePosition) continue;
-                temp.Add(this.Get(i).ToString());
-            }
-            return temp;            
+            if (!this.HasIndex()) return this;
+            int deduct = 1;
+            StringOrTime[] temp = new StringOrTime[this.storage.Length - deduct - DName._posIndex];
+            Array.Copy(this.storage, DName._posIndex, temp, 0, temp.Length);
+            return new DName(this.GetName(), this.GetFreq(), temp, -1);
         }
 
-        //Removes last index if s==null. If s != null last index is removed if it is == s.
-        public DName HACK_NameWithoutLast(string s)
-        {
-            List<StringOrTime> temp = new List<StringOrTime>();            
-            for (int i = DName._posIndex; i < this.GetLength() - 1; i++)
-            {
-                temp.Add(this.Get(i));
-            }
-            if (s != null)
-            {
-                StringOrTime xx = this.Get(this.GetLength() - 1);
-                if (xx.IsString() && G.Equal(s, xx.GetString()))
-                {
-                    //do not add it
-                }
-                else
-                {
-                    temp.Add(xx);
-                }
-            }
-            return new DName(this.GetName(), null, this.GetFreq(), temp.ToArray(), -1);
-        }
-
-        public DName HACK_AddString(string element)
-        {
-            List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
-            temp.Add(element);
-            return new DName(this.GetName(), null, this.GetFreq(), temp.ToArray(), -1);
-        }
-
-        public DName HACK_AddTime(GekkoTime t)
+        public DName AddTime(GekkoTime t)
         {
             if (this.HasTime()) new Error("Cannot add time to variable that already has time");
-            List<StringOrTime> temp = new List<StringOrTime>();
-            for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
-            temp.Add(t);            
-            return new DName(this.GetName(), null, this.GetFreq(), temp.ToArray(), -1);
+            int add = 1;
+            StringOrTime[] temp = new StringOrTime[this.storage.Length + add - DName._posIndex];
+            Array.Copy(this.storage, DName._posIndex, temp, 0, temp.Length);
+            temp[temp.Length - 1] = t;
+            return new DName(this.GetName(), this.GetFreq(), temp, -1);
         }
 
-        public DName HACK_Prefix(string s)
-        {
-            //List<StringOrTime> temp = new List<StringOrTime>();
-            //for (int i = DName._posIndex; i < this.GetLength(); i++) temp.Add(this.Get(i));            
-            //return new DName(s + this.GetName(), this.GetFreq(), temp.ToArray());
-            return new DName(s + this.GetName(), null, this.GetFreq(), this.GetIndexes(), -1);
+        public DName SetNamePrefix(string s)
+        {            
+            return new DName(s + this.GetName(), this.GetFreq(), this.GetIndexes(), -1);
         }
 
-        /// <summary>
-        /// May return GekkoTime.tNull if no time present.
-        /// </summary>
-        /// <returns></returns>
-        public GekkoTime GetTime()
-        {
-            if (!this.HasTime()) return GekkoTime.tNull;            
-            return this.Get(this.timePosition).GetTime();            
-        }
-
-        public int GetLag()
-        {
-            if (!this.HasTime())
-            {
-                new Error("No time part found");
-            }
-            GekkoTime t = this.Get(this.timePosition).GetTime();
-            if (t.freq != EFreq.Lag)
-            {
-                new Error("Expected lag time type");
-            }
-            return t.super;
-        }
-
-        private static StringOrTime[] Construct(string name, string bank, EFreq freq, StringOrTime[] indexes, int posTimeOrLag)
+        private static StringOrTime[] Construct(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag)
         {
             int offset = DName._posIndex;
             var result = new StringOrTime[indexes.Length + offset];

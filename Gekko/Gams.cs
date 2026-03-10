@@ -835,11 +835,8 @@ namespace Gekko
         {
             if (Globals.greu && model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
             {                
-                DName eqNameWithoutLast = eqName.HACK_NameWithoutLast(null);
-                //DName variableNameWithoutLast = variableName.HACK_NameWithoutLast("t");
-                DName variableNameWithExtraT = variableName.HACK_AddString("t");
-                List<DName> temp = null; modelGamsScalar.depNames2Inverted.TryGetValue(variableName, out temp);
-                List<DName> temp2 = null; modelGamsScalar.depNames2Inverted.TryGetValue(variableNameWithExtraT, out temp2);
+                DName eqNameWithoutLast = eqName.RemoveLastIndex();                
+                List<DName> temp; modelGamsScalar.depNames2Inverted.TryGetValue(variableName, out temp);
                 bool hit1 = false;
                 if (temp != null)
                 {
@@ -1075,7 +1072,7 @@ namespace Gekko
                     }
 
                     GekkoDictionary<string, bool>[] span = GetIndexesFromScalarEquations(m1);
-                    List<string> eqIndexes = equationNameWithIndexes.HACK_IndexesWithoutTime();
+                    List<string> eqIndexes = equationNameWithIndexes.GetIndexesExceptTime().Select(x => x.ToString()).ToList();
                     int nDim = GetDim(m1);
                     int summedDimensions = nDim - eqIndexes.Count;
                     string[] names = new string[nDim];
@@ -1242,7 +1239,7 @@ namespace Gekko
                         if (eh.eqName == null)
                         {
                         }                        
-                        if (names.Length > 0) lhsName = new DName(lhsName.GetName(), null, EFreq.None, names.Select(s => (StringOrTime)s).ToArray(), -1);
+                        if (names.Length > 0) lhsName = new DName(lhsName.GetName(), EFreq.None, names.Select(s => (StringOrTime)s).ToArray(), -1);
                         
                         if (Globals.greu)
                         {

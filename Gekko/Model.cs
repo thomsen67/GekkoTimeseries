@@ -223,7 +223,7 @@ namespace Gekko
             List<DName> eqNames = new List<DName>();            
             foreach (Link link in links)
             {
-                if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(link.GAMS_dsh[0].fullName.HACK_AddTime(tUsedHere));
+                if (link.GAMS_dsh != null && link.GAMS_dsh.Count > 0) eqNames.Add(link.GAMS_dsh[0].fullName.AddTime(tUsedHere));
             }
             s = model.GetEquationText(eqNames, helper, t0).resultingText;
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
@@ -2129,13 +2129,13 @@ namespace Gekko
                     if (G.StartsWith(dName.GetName(), Globals.decompResidualPrefix)) resName = varname;
                     if (helper.showTime)
                     {
-                        dName2 = dName.HACK_AddTime(gt);
+                        dName2 = dName.AddTime(gt);
                         varname2 = dName2;
                     }
                     else
                     {
                         if (sd != null) new Error("Not showing time not expected");
-                        dName2 = dName.HACK_AddTime(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
+                        dName2 = dName.AddTime(new GekkoTime(EFreq.Lag, gt.Subtract(tUsedHere)));
                         varname2 = dName2;
                         if (false && Globals.greuHack) //Switched off for now, need to do the fix
                         {
@@ -2278,7 +2278,7 @@ namespace Gekko
             List<DName> lhsEqs = new List<DName>();
             if (isModelGekko)
             {
-                lhsEqs.Add(variableName.HACK_Prefix("e_"));
+                lhsEqs.Add(variableName.SetNamePrefix("e_"));
             }
             else
             {

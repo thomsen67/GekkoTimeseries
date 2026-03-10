@@ -279,7 +279,7 @@ namespace Gekko
                                         
                     int lag = eqName.GetTime().Subtract(model.modelGamsScalar.GetDecompT());
                     //qwerty bad hack
-                    decompOptionsTemp.new_from = new List<DName>() { eqName.RemoveTime().HACK_AddTime(new GekkoTime(EFreq.Lag, lag)) };
+                    decompOptionsTemp.new_from = new List<DName>() { eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, lag)) };
                     Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, decompOptionsTemp.decompOperator, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]

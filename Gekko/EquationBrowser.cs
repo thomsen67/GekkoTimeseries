@@ -2326,7 +2326,7 @@ img {border-style: none;
         private static void GetEquationText(GekkoTime t1, BrowserHelper bh, EquationNameAndNumber equationHelper, ModelGamsScalar modelGamsScalar, GekkoTime tUsedHere, out string s5, out string s6)
         {            
             //string s2 = G.Chop_DimensionAddLast(equationHelper.name, tUsedHere.ToString(), null);
-            DName dName2 = equationHelper.name.HACK_AddTime(tUsedHere);
+            DName dName2 = equationHelper.name.AddTime(tUsedHere);
             DName s2 = dName2;
             EquationTextHelper helper = new EquationTextHelper();
             GetEquationTextHelper helper22 = Program.model.GetEquationText(new List<DName>() { s2 }, helper, tUsedHere);
