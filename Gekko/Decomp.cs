@@ -772,45 +772,7 @@ namespace Gekko
 
                 bool handleAsGekko = isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp);
                 HandleFromAndEndo(decompOptions2, handleAsGekko, isGamsRaw);
-
-                if (false)
-                {
-                    if (handleAsGekko)
-                    {
-                        if (o.from.Count == 0)
-                        {
-                            decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].HACK_Prefix(Globals.decompGekkoEquationPrefix) };
-                            if (decompOptions2.new_endo == null || decompOptions2.new_endo.Count == 0)
-                            {
-                                decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
-                            }
-                        }
-                        else
-                        {
-                            decompOptions2.new_from = DName.HACK1(O.Restrict(o.from[0] as List, false, false, false, true));
-                            decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
-                        }
-                    }
-                    else
-                    {
-                        decompOptions2.new_from = DName.HACK1(O.Restrict(o.from[0] as List, false, false, false, true));  //eqs may be e[a, b] etc.                                    
-                        if (decompOptions2.new_from != null && decompOptions2.new_from.Count == 1 && o.endo.Count == 0)
-                        {
-                            //For something like "decomp y from e_y ..." we do not need to write "decomp y from e_y endo y ..."
-                            decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
-                        }
-                        else
-                        {
-                            decompOptions2.new_endo = DName.HACK1(O.Restrict(o.endo[0] as List, false, false, false, true));
-                        }
-                    }
-                }
-
-                //Not necessary anymore! :-)
-                //for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
-                //for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
-                //for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
-
+                                
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2, decompOptions2.missingAsZero, false);
@@ -913,7 +875,7 @@ namespace Gekko
                     if (handleAsGekko)
                     {
                         //Becomes: decomp y from e_y endo y
-                        decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].HACK_Prefix(Globals.decompGekkoEquationPrefix) };
+                        decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].HACK_Prefix(Globals.decompGekkoEquationPrefix).HACK_AddTime(new GekkoTime(EFreq.Lag, 0)) };
                         decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                     }
                     else
@@ -3320,7 +3282,7 @@ namespace Gekko
                     }
                 }
 
-                DName s = eqPeriods.fullName.HACK_AddTime(modelGamsScalar.Maybe2000GekkoTime(t.Add(-offset)));
+                DName s = eqPeriods.fullName.HACK_AddTime(modelGamsScalar.Maybe2000GekkoTime(t).Add(-offset));
                 int eqNumber; if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber))
                 {
                     new Error("Could not find equation '" + s.ToString() + "'");

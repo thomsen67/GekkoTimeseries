@@ -178,123 +178,62 @@ namespace Gekko
     // ================================================================================
     // ================================================================================
 
-    public class Multidim2Comparer : IEqualityComparer<Multidim2Element>
+    [ProtoContract]
+    public struct StringOrTime
     {
-        public static readonly Multidim2Comparer IgnoreCase = new Multidim2Comparer(true); //For faster reuse
-        public static readonly Multidim2Comparer MatchCase = new Multidim2Comparer(false); //For faster reuse
+        [ProtoMember(1)]
+        private readonly bool isTime = false;
 
-        private readonly bool _ignoreCase;
+        [ProtoMember(2)]
+        private readonly GekkoTime timeValue;
 
-        private Multidim2Comparer(bool ignoreCase)
+        [ProtoMember(3)]
+        private readonly string stringValue;
+
+        public StringOrTime(GekkoTime value)
         {
-            _ignoreCase = ignoreCase;
+            this.isTime = true;
+            timeValue = value;
+            stringValue = null;
         }
 
-        public bool Equals(Multidim2Element x, Multidim2Element y)
+        public StringOrTime(string value)
         {
-            if (ReferenceEquals(x, y)) return true;
-            if (x == null || y == null) return false;
-            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but very good for lists etc.
-            if (x.GetLength() != y.GetLength()) return false;
-            for (int i = 0; i < x.GetLength(); i++)
-            {
-                var elX = x.Get(i);
-                var elY = y.Get(i);
-
-                if (elX.IsTime() != elY.IsTime()) return false;
-                if (elX.IsTime())
-                {
-                    if (elX.GetTime().CompareTo(elY.GetTime()) != 0) return false;
-                }
-                else
-                {
-                    //int result;
-                    //if (_ignoreCase)
-                    //{
-                    //    if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.OrdinalIgnoreCase)) return false;
-                    //}
-                    //else
-                    //{
-                    //    if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.Ordinal)) return false;
-                    //}
-
-                    // string.Equals(null, null) is true, string.Equals(null, "val") is false
-                    var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-                    if (!string.Equals(elX.GetString(), elY.GetString(), comparison)) return false;
-                }
-            }
-            return true;
+            timeValue = GekkoTime.tNull;
+            stringValue = value;
         }
 
-        public int GetHashCode(Multidim2Element obj)
+        public bool IsTime()
         {
-            if (obj == null) return 0;
-            return obj.GetHashCode(_ignoreCase); //pick the right one
-        }
-    }
-
-    public class MultidimSortComparer : IComparer<Multidim2Element>
-    {
-        private readonly bool _ignoreCase;
-
-        public MultidimSortComparer(bool ignoreCase)
-        {
-            _ignoreCase = ignoreCase;
+            return this.isTime;
         }
 
-        public int Compare(Multidim2Element x, Multidim2Element y)
+        public bool IsString()
         {
-            if (ReferenceEquals(x, y)) return 0;
-            if (x == null) return -1;
-            if (y == null) return 1;
-
-            int xLen = x.GetLength();
-            int yLen = y.GetLength();
-            int maxLength = Math.Max(xLen, yLen);
-
-            for (int i = 0; i < maxLength; i++)
-            {
-                // 2. If we are past the end of x, but y still has values
-                if (i >= xLen) return -1; // x is shorter
-
-                // 3. If we are past the end of y, but x still has values
-                if (i >= yLen) return 1;  // y is shorter
-
-                var xi = x.Get(i);
-                var yi = y.Get(i);
-                if (xi.IsTime() != yi.IsTime()) return xi.IsTime() ? -1 : 1;
-                if (xi.IsTime())
-                {
-                    int compare = xi.GetTime().CompareTo(yi.GetTime());
-                    if (compare != 0) return compare;
-                }
-                else
-                {
-                    //int compare;
-                    //if (_ignoreCase) compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
-                    //else compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.Ordinal);
-                    //if (compare != 0) return compare;
-
-                    string sX = xi.GetString();
-                    string sY = yi.GetString();
-
-                    int compare;
-                    if (sX == sY) compare = 0;       // Both null or same string
-                    else if (sX == null) compare = -1; // null comes before any string
-                    else if (sY == null) compare = 1;  // any string comes after null
-                    else
-                    {
-                        // Neither are null, use Natural Sort
-                        var options = _ignoreCase ? CompareOptions.OrdinalIgnoreCase : CompareOptions.Ordinal;
-                        compare = G.CompareNatural(sX, sY, CultureInfo.InvariantCulture, options);
-                    }
-
-                    if (compare != 0) return compare;
-                }
-            }
-            return 0;
+            return !this.isTime;
         }
-    }
+
+        public string GetString()
+        {
+            if (this.isTime) new Error("Error_GetString");
+            return this.stringValue;
+        }
+
+        public GekkoTime GetTime()
+        {
+            if (!this.isTime) new Error("Error_GetTime");
+            return this.timeValue;
+        }
+
+        public override string ToString()
+        {
+            if (this.isTime) return this.GetTime().ToString();
+            else return this.GetString();
+        }
+
+        public static implicit operator StringOrTime(string s) => new StringOrTime(s);
+        public static implicit operator StringOrTime(GekkoTime t) => new StringOrTime(t);
+    }    
 
     [ProtoContract]
     [ProtoInclude(101, typeof(DName))] //101 to not collide with other member numbers
@@ -414,41 +353,127 @@ namespace Gekko
         }
     }
 
-    public enum EDNameQuotes
+    public class Multidim2Comparer : IEqualityComparer<Multidim2Element>
     {
-        Normal,
-        Quotes
-    }
+        public static readonly Multidim2Comparer IgnoreCase = new Multidim2Comparer(true); //For faster reuse
+        public static readonly Multidim2Comparer MatchCase = new Multidim2Comparer(false); //For faster reuse
 
-    public enum EDNameTime
-    {
-        None,
-        Last,
-        LastExceptLag0
-    }
+        private readonly bool _ignoreCase;
 
-    public class DNameFormat
-    {
-        public EDNameQuotes format = EDNameQuotes.Normal;
-        public EDNameTime separateTime = EDNameTime.None;
-        public string separator = null;
-        public bool showFreq = true;
-        
-        /// <summary>
-        /// For protobuf: do not use this.
-        /// </summary>
-        public DNameFormat() 
-        { 
-        }
-        
-        public DNameFormat(EDNameQuotes format, EDNameTime separateTime, string separator, bool showFreq)
+        private Multidim2Comparer(bool ignoreCase)
         {
-            this.format = format;
-            this.separateTime = separateTime;
-            this.separator = separator;
-            this.showFreq = showFreq;
+            _ignoreCase = ignoreCase;
+        }
+
+        public bool Equals(Multidim2Element x, Multidim2Element y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (x == null || y == null) return false;
+            if (x.GetHashCode(_ignoreCase) != y.GetHashCode(_ignoreCase)) return false; //actually redundant for dictionaries, but very good for lists etc.
+            if (x.GetLength() != y.GetLength()) return false;
+            for (int i = 0; i < x.GetLength(); i++)
+            {
+                var elX = x.Get(i);
+                var elY = y.Get(i);
+
+                if (elX.IsTime() != elY.IsTime()) return false;
+                if (elX.IsTime())
+                {
+                    if (elX.GetTime().CompareTo(elY.GetTime()) != 0) return false;
+                }
+                else
+                {
+                    //int result;
+                    //if (_ignoreCase)
+                    //{
+                    //    if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.OrdinalIgnoreCase)) return false;
+                    //}
+                    //else
+                    //{
+                    //    if (!string.Equals(elX.GetString(), elY.GetString(), StringComparison.Ordinal)) return false;
+                    //}
+
+                    // string.Equals(null, null) is true, string.Equals(null, "val") is false
+                    var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                    if (!string.Equals(elX.GetString(), elY.GetString(), comparison)) return false;
+                }
+            }
+            return true;
+        }
+
+        public int GetHashCode(Multidim2Element obj)
+        {
+            if (obj == null) return 0;
+            return obj.GetHashCode(_ignoreCase); //pick the right one
         }
     }
+
+    public class MultidimSortComparer : IComparer<Multidim2Element>
+    {
+        private readonly bool _ignoreCase;
+
+        public MultidimSortComparer(bool ignoreCase)
+        {
+            _ignoreCase = ignoreCase;
+        }
+
+        public int Compare(Multidim2Element x, Multidim2Element y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+
+            int xLen = x.GetLength();
+            int yLen = y.GetLength();
+            int maxLength = Math.Max(xLen, yLen);
+
+            for (int i = 0; i < maxLength; i++)
+            {
+                // 2. If we are past the end of x, but y still has values
+                if (i >= xLen) return -1; // x is shorter
+
+                // 3. If we are past the end of y, but x still has values
+                if (i >= yLen) return 1;  // y is shorter
+
+                var xi = x.Get(i);
+                var yi = y.Get(i);
+                if (xi.IsTime() != yi.IsTime()) return xi.IsTime() ? -1 : 1;
+                if (xi.IsTime())
+                {
+                    int compare = xi.GetTime().CompareTo(yi.GetTime());
+                    if (compare != 0) return compare;
+                }
+                else
+                {
+                    //int compare;
+                    //if (_ignoreCase) compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.OrdinalIgnoreCase);
+                    //else compare = G.CompareNatural(xi.GetString(), yi.GetString(), CultureInfo.InvariantCulture, CompareOptions.Ordinal);
+                    //if (compare != 0) return compare;
+
+                    string sX = xi.GetString();
+                    string sY = yi.GetString();
+
+                    int compare;
+                    if (sX == sY) compare = 0;       // Both null or same string
+                    else if (sX == null) compare = -1; // null comes before any string
+                    else if (sY == null) compare = 1;  // any string comes after null
+                    else
+                    {
+                        // Neither are null, use Natural Sort
+                        var options = _ignoreCase ? CompareOptions.OrdinalIgnoreCase : CompareOptions.Ordinal;
+                        compare = G.CompareNatural(sX, sY, CultureInfo.InvariantCulture, options);
+                    }
+
+                    if (compare != 0) return compare;
+                }
+            }
+            return 0;
+        }
+    }
+
+    // ================================================================================================
+    // ================================ DName =========================================================
+    // ================================================================================================
 
     /// <summary>
     /// May or may not have frequency. May or may not have time.
@@ -456,6 +481,17 @@ namespace Gekko
     [ProtoContract]
     public class DName : Multidim2Element
     {
+        // Bank var freq indexes                  iname  ibank  ifreq  iindex  --> others are -1
+        //      x        ?        DName           0                    1
+        // x    x        ?        DNameBank       0             1      2
+        //      x   x    ?        DNameFreq       0      1             2
+        // x    x   x    ?        DNameBankFreq   0      1      2      3   actually the current DName...
+        //
+        //In addition for indexes: ...Lag or ...Time. Lag has 1 lag, Time has 1 time. Position is given for these because index order matters.
+        //So we have _posTime that is also used by lag.
+        //Other GekkoTimes added in principle ok, for instance Age (call it Integer, perhaps use 2 shorts) or birth year.
+        //So do we have 12 combinations??
+
         private static readonly int _posName = 0; //hardcoded
         private static readonly int _posFreq = 1; //hardcoded
         private static readonly int _posIndex = 2; //hardcoded
@@ -885,61 +921,42 @@ namespace Gekko
         }
     }
 
-    [ProtoContract]
-    public struct StringOrTime
+    public enum EDNameQuotes
     {
-        [ProtoMember(1)]
-        private readonly bool isTime = false;
-
-        [ProtoMember(2)]
-        private readonly GekkoTime timeValue;
-
-        [ProtoMember(3)]
-        private readonly string stringValue;
-
-        public StringOrTime(GekkoTime value)
-        {
-            this.isTime = true;
-            timeValue = value;
-            stringValue = null;
-        }
-
-        public StringOrTime(string value)
-        {
-            timeValue = GekkoTime.tNull;
-            stringValue = value;
-        }
-
-        public bool IsTime()
-        {
-            return this.isTime;
-        }
-
-        public bool IsString()
-        {
-            return !this.isTime;
-        }
-
-        public string GetString()
-        {
-            if (this.isTime) new Error("Error_GetString");
-            return this.stringValue;
-        }
-
-        public GekkoTime GetTime()
-        {
-            if (!this.isTime) new Error("Error_GetTime");
-            return this.timeValue;
-        }
-
-        public override string ToString()
-        {
-            if (this.isTime) return this.GetTime().ToString();
-            else return this.GetString();
-        }
-
-        public static implicit operator StringOrTime(string s) => new StringOrTime(s);
-        public static implicit operator StringOrTime(GekkoTime t) => new StringOrTime(t);
+        Normal,
+        Quotes
     }
+
+    public enum EDNameTime
+    {
+        None,
+        Last,
+        LastExceptLag0
+    }
+
+    public class DNameFormat
+    {
+        public EDNameQuotes format = EDNameQuotes.Normal;
+        public EDNameTime separateTime = EDNameTime.None;
+        public string separator = null;
+        public bool showFreq = true;
+
+        /// <summary>
+        /// For protobuf: do not use this.
+        /// </summary>
+        public DNameFormat()
+        {
+        }
+
+        public DNameFormat(EDNameQuotes format, EDNameTime separateTime, string separator, bool showFreq)
+        {
+            this.format = format;
+            this.separateTime = separateTime;
+            this.separator = separator;
+            this.showFreq = showFreq;
+        }
+    }
+
+    
 
 }
