@@ -464,6 +464,7 @@
     <Compile Include="O.cs" />
     <Compile Include="OnlineDatabanks.cs" />
     <Compile Include="Operators.cs" />
+    <Compile Include="Optimize.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Parser\ASTNode.cs" />
     <Compile Include="Parser\ASTNodeSimple.cs" />
