@@ -27,16 +27,70 @@ namespace Gekko
         public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
         {
             Series input_series = O.ConvertToSeries(input) as Series;
+            if (input_series.dimensions == 0) new Error("Expected series with cells to be array-series");
             List<string> rowNames_list = Stringlist.GetListOfStringsFromIVariable(rowNames);
             List<string> colNames_list = Stringlist.GetListOfStringsFromIVariable(colNames);
             Series rowSums_series = O.ConvertToSeries(rowSums) as Series;
-            Series colSUms_series = O.ConvertToSeries(colSums) as Series;
-            double[,] xResult = Ras2(null, null, null, null, null, null, o);
+            if (rowSums_series.dimensions == 0) new Error("Expected series with row sums to be array-series");
+            Series colSums_series = O.ConvertToSeries(colSums) as Series;
+            if (colSums_series.dimensions == 0) new Error("Expected series with column sums to be array-series");
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                double[,] a_array = new double[rowNames_list.Count(), colNames_list.Count()];
+                double[] rowSums_array = new double[rowNames_list.Count()];
+                double[] colSums_array = new double[colNames_list.Count()];
+
+                int ni = -1;
+                int nj = -1;
+                foreach (string si in rowNames_list)
+                {
+                    ni++;
+                    nj = -1;
+                    foreach (string sj in colNames_list)
+                    {
+                        nj++;
+                        double d = (input_series.dimensionsStorage.storage[new MultidimElement(new string[] { si, sj })] as Series).GetDataSimple(t);
+                        a_array[ni, nj] = d;
+                    }
+                }
+
+                ni = -1;
+                foreach (string si in rowNames_list)
+                {
+                    ni++;
+                    double d = (rowSums_series.dimensionsStorage.storage[new MultidimElement(new string[] { si })] as Series).GetDataSimple(t);
+                    rowSums_array[ni] = d;
+                }
+
+                nj = -1;
+                foreach (string sj in colNames_list)
+                {
+                    nj++;
+                    double d = (colSums_series.dimensionsStorage.storage[new MultidimElement(new string[] { sj })] as Series).GetDataSimple(t);
+                    colSums_array[nj] = d;
+                }
+
+                double[,] xResult = Ras2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, null, null, o);
+
+                ni = -1;
+                nj = -1;
+                foreach (string si in rowNames_list)
+                {
+                    ni++;
+                    nj = -1;
+                    foreach (string sj in colNames_list)
+                    {
+                        nj++;
+                        double d = xResult[ni, nj];
+                        (input_series.dimensionsStorage.storage[new MultidimElement(new string[] { si, sj })] as Series).SetData(t, d);
+                    }
+                }
+            }
             IVariable rv = null;
             return rv;
         }
 
-        public static double[,] Ras2(double[,] a, double[,] weights, double[] rowTotals, double[] colTotals, IVariable constraints3, IVariable weights3, OptimizerOptions o)
+        public static double[,] Ras2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
         {
             //We could have strings like "[a,b] + [a,c] - 2*x[a,d] = 500". But maybe a more generic approach is better:
             //                           (('a','b'), ('a','c'), ('a', 'd', -2), 500),
@@ -48,83 +102,86 @@ namespace Gekko
 
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
-            int nr = rowTotals.Length; //rowTotals run over i
-            int nc = colTotals.Length; //colTotals run over j
+            int nr = rowSums.Length; //rowTotals run over i
+            int nc = colSums.Length; //colTotals run over j
             if (ni != nr) new Error("Cells have " + ni + " rows, row totals have " + nr + " rows");
             if (nj != nc) new Error("Cells have " + nj + " cols, col totals have " + nr + " cols");            
             double toti = 0d; //sum of row sums
             double totj = 0d; //sum of col sums
             for (int i = 0; i < ni; i++)
             {
-                if (o.treatNaNAs0 && G.IsNumericalError(rowTotals[i])) rowTotals[i] = 0d;
-                toti += rowTotals[i];
+                if (o.treatNaNAs0 && G.IsNumericalError(rowSums[i])) rowSums[i] = 0d;
+                toti += rowSums[i];
                 for (int j = 0; j < nj; j++)
                 {
                     if (o.treatNaNAs0 && G.IsNumericalError(a[i, j])) a[i, j] = 0d;                    
                     if (i == 0)
                     {
-                        if (o.treatNaNAs0 && G.IsNumericalError(colTotals[j])) colTotals[j] = 0d;
-                        totj += colTotals[j];
+                        if (o.treatNaNAs0 && G.IsNumericalError(colSums[j])) colSums[j] = 0d;
+                        totj += colSums[j];
                     }
-                    if (G.IsNumericalError(weights[i, j])) weights[i, j] = 1d;
+                    //if (G.IsNumericalError(weights[i, j])) weights[i, j] = 1d;
                 }
             }
             if (Math.Abs(toti / totj - 1d) > o.totalTolerance) new Error("Rows sum to " + toti + ", whereas cols sum to " + totj + ". Tolerance " + o.totalTolerance + " exceeded");
 
-            List<IVariable> contraints2 = O.ConvertToList(constraints3);
-            foreach (IVariable temp1 in contraints2)
+            if (false)
             {
-                //(('a', 'b'), ('a', 'c'), ('a', 'd', -2), 500)
-                List<IVariable> temp2 = O.ConvertToList(temp1);
-                int c = -1;
-                foreach (IVariable temp3 in temp2)
+                List<IVariable> contraints2 = O.ConvertToList(constraints3);
+                foreach (IVariable temp1 in contraints2)
                 {
-                    //('a', 'd', -2) or
-                    //500
-                    c++;
-                    if (temp3.Type() == EVariableType.Val)
+                    //(('a', 'b'), ('a', 'c'), ('a', 'd', -2), 500)
+                    List<IVariable> temp2 = O.ConvertToList(temp1);
+                    int c = -1;
+                    foreach (IVariable temp3 in temp2)
                     {
-                        //check last
-                        if (c != temp2.Count) new Error("Expected value to be last element");
-                        double d = O.ConvertToVal(temp3);
-                    }
-                    else
-                    {
-                        List<IVariable> temp4 = O.ConvertToList(temp3);
-                        if (temp4.Count == 2)
+                        //('a', 'd', -2) or
+                        //500
+                        c++;
+                        if (temp3.Type() == EVariableType.Val)
                         {
-                            string s0 = O.ConvertToString(temp4[0]);
-                            string s1 = O.ConvertToString(temp4[1]);
-                            double d = 1d;
+                            //check last
+                            if (c != temp2.Count) new Error("Expected value to be last element");
+                            double d = O.ConvertToVal(temp3);
                         }
-                        else if (temp4.Count == 3)
+                        else
                         {
-                            string s0 = O.ConvertToString(temp4[0]);
-                            string s1 = O.ConvertToString(temp4[1]);
-                            double d = O.ConvertToVal(temp4[2]);
+                            List<IVariable> temp4 = O.ConvertToList(temp3);
+                            if (temp4.Count == 2)
+                            {
+                                string s0 = O.ConvertToString(temp4[0]);
+                                string s1 = O.ConvertToString(temp4[1]);
+                                double d = 1d;
+                            }
+                            else if (temp4.Count == 3)
+                            {
+                                string s0 = O.ConvertToString(temp4[0]);
+                                string s1 = O.ConvertToString(temp4[1]);
+                                double d = O.ConvertToVal(temp4[2]);
+                            }
+                            else new Error("Expected list with 2 or 3 elements");
                         }
-                        else new Error("Expected list with 2 or 3 elements");
-                    }
 
+                    }
                 }
-            }
 
-            List<IVariable> weights2 = O.ConvertToList(weights3);
-            foreach (IVariable temp1 in weights2)
-            {
-                //('a', 'b', 2)
-                List<IVariable> temp2 = O.ConvertToList(temp1);
-                if (temp2.Count != 3) new Error("Expected 3 elements regarding constraint");
-                string s0 = O.ConvertToString(temp2[0]);
-                string s1 = O.ConvertToString(temp2[1]);
-                double d = O.ConvertToVal(temp2[2]);
-                //Handle
+                List<IVariable> weights2 = O.ConvertToList(weights3);
+                foreach (IVariable temp1 in weights2)
+                {
+                    //('a', 'b', 2)
+                    List<IVariable> temp2 = O.ConvertToList(temp1);
+                    if (temp2.Count != 3) new Error("Expected 3 elements regarding constraint");
+                    string s0 = O.ConvertToString(temp2[0]);
+                    string s1 = O.ConvertToString(temp2[1]);
+                    double d = O.ConvertToVal(temp2[2]);
+                    //Handle
+                }
             }
 
             int niPlusNj = ni + nj;
             int niMultiplyNj = ni * nj;
 
-            double[,] constraints = new double[niPlusNj, niMultiplyNj];
+            double[,] constraints = new double[niPlusNj, niMultiplyNj + 1];
 
             // row constraints
             for (int i = 0; i < ni; i++)
@@ -133,7 +190,7 @@ namespace Gekko
                 {
                     constraints[i, i * nj + j] = 1;
                 }
-                constraints[i, niMultiplyNj] = rowTotals[i];
+                constraints[i, niMultiplyNj] = rowSums[i];
             }
 
             // column constraints
@@ -143,7 +200,7 @@ namespace Gekko
                 {
                     constraints[ni + j, i * nj + j] = 1;
                 }
-                constraints[ni + j, niMultiplyNj] = colTotals[j];
+                constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
             int[] ct = new int[niPlusNj];

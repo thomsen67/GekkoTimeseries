@@ -35393,10 +35393,11 @@ print(df2)
             I("colsum[b]= 170;");
             I("colsum[c]= 140;");
             I("#rownames = a, b, c;");
-            I("#colnames = a, b, c;");            
-            string s = G.GekkoExePath();
-            I("iony = ras(io, rowsum, colsum, #rownames, #colnames);");
-
+            I("#colnames = a, b, c;");
+            I("prt <n> io;");
+            //I("iony = ras(io, rowsum, colsum, #rownames, #colnames);");
+            I("ras(io, rowsum, colsum, #rownames, #colnames);");
+            I("prt <n> io;");
         }
 
         [TestMethod]
