@@ -909,10 +909,14 @@ namespace Gekko.Parser.Frm
             if (G.IsUnitTestingOrNotShowingGUI())
             {
                 //if running test cases, use this absolute path                
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
+                //compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
+                // --
+                //This should work too, and be more robust:
+                compilerParams.ReferencedAssemblies.Add(G.GekkoExePath());
             }
             else
             {
+                //Should this not be: compilerParams.ReferencedAssemblies.Add(G.GekkoExePath()); ???
                 compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
             }
         }

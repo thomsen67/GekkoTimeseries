@@ -6132,7 +6132,6 @@ namespace Gekko
             else
             {
                 new Error("Cannot convert " + G.GetTypeString(x) + " into SERIES type"); return null;
-                //throw new GekkoException();
             }
         }
 

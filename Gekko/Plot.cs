@@ -1328,7 +1328,10 @@ namespace Gekko
             }
             else if (G.IsUnitTestingOrNotShowingGUI())
             {
-                process.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
+                //process.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
+                // ---
+                //this should work, too
+                process.StartInfo.FileName = G.GekkoExeFolder() + "\\gnuplot\\" + exe;
             }
             else
             {

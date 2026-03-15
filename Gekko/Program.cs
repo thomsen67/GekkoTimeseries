@@ -2841,7 +2841,7 @@ namespace Gekko
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
                 //                
 
-                Program2.RAS();
+                Optimize.RAS();
 
                 if (Globals.runningOnTTComputer)
                 {
@@ -12201,7 +12201,11 @@ namespace Gekko
                 }
                 else if (G.IsUnitTestingOrNotShowingGUI())
                 {
-                    startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
+                    //startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
+                    //
+                    // ---
+                    //This should work too, and be more robust
+                    startup = G.GekkoExeFolder();
                 }
                 else
                 {
@@ -25900,7 +25904,7 @@ namespace Gekko
                     //but discard all other helper_... functions.
                 }
                 else
-                {
+                {                    
                     if (!gekkoBuiltInFunctions.ContainsKey(name))
                     {
                         gekkoBuiltInFunctions.Add(name, meta);  //meta contains info on lags etc.         

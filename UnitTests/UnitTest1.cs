@@ -1159,11 +1159,11 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Timeposition()
-        {            
+        {
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("option model gams scalar data = yes;");
-            I("model <gms> timeposition.zip;");            
+            I("model <gms> timeposition.zip;");
             I("time 2001 2003;");
             I("x2[a] = 20, 22, 24;");
             I("x2[b] = 26, 28, 30;");
@@ -6099,14 +6099,14 @@ namespace UnitTests
             Assert.AreEqual(bytesutf8_4[3], 230); //汉1 (汉 takes three bytes in utf8, cf. https://stackoverflow.com/questions/643694/what-is-the-difference-between-utf-8-and-unicode)
             Assert.AreEqual(bytesutf8_4[4], 177); //汉2
             Assert.AreEqual(bytesutf8_4[5], 137); //汉3
-            
+
             I("option system write encoding = utf8;"); //reverting
             I("option system write utf8 bom = no;"); //reverting
         }
 
         [TestMethod]
         public void _Test_CopyWithIndexSanity()
-        {            
+        {
             void Setup()
             {
                 I("reset;");
@@ -6155,7 +6155,7 @@ namespace UnitTests
             Setup(); I("copy <frombank=b1 tobank=b2> x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
             Setup(); I("copy <frombank=b1 tobank=b2> b1:x[a] to *;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
             Setup(); I("copy <frombank=b1 tobank=b2> b1:x[a] to b2:*;"); Assert.IsTrue((O.GetIVariableFromString("b2:x!a", ECreatePossibilities.NoneReturnNullAlways) as Series).dimensionsStorage.storage.Count == 1);
-        }        
+        }
 
         [TestMethod]
         public void _Test_CopyDeleteArraySeries()
@@ -6196,7 +6196,7 @@ namespace UnitTests
             I("copy x[a,n] to z[a];");
             _AssertSeries(First(), "z!a", new string[] { "a" }, 2001, 11d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "a" }, 2002, 12d, sharedDelta);
-            _AssertSeries(First(), "z!a", new string[] { "a" }, 2003, 13d, sharedDelta);            
+            _AssertSeries(First(), "z!a", new string[] { "a" }, 2003, 13d, sharedDelta);
             Assert.IsFalse(O.GetIVariableFromString("x[a,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
             Assert.IsFalse(O.GetIVariableFromString("x[a,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
             Assert.IsFalse(O.GetIVariableFromString("x[b,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
@@ -6206,9 +6206,9 @@ namespace UnitTests
             Assert.IsFalse(O.GetIVariableFromString("x[a,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
             Assert.IsFalse(O.GetIVariableFromString("x[b,m]", ECreatePossibilities.NoneReturnNullAlways) == null);
             Assert.IsTrue(O.GetIVariableFromString("x[b,n]", ECreatePossibilities.NoneReturnNullAlways) == null);
-            
+
             //Normal to array
-            I("reset; time 2001 2003;");            
+            I("reset; time 2001 2003;");
             I("y = series(2);");
             I("xam = 1, 2, 3;");
             I("xan = 11, 12, 13;");
@@ -6229,7 +6229,7 @@ namespace UnitTests
             _AssertSeries(First(), "z!a", new string[] { "a" }, 2001, 11d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "a" }, 2002, 12d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "a" }, 2003, 13d, sharedDelta);
-            
+
             //Array to normal
             I("reset; time 2001 2003;");
             I("x = series(2);");
@@ -6237,7 +6237,7 @@ namespace UnitTests
             I("x[a,m] = 1, 2 , 3;");
             I("x[a,n] = 11, 12, 13;");
             I("x[b,m] = 21, 22, 23;");
-            I("x[b,n] = 31, 32, 33;");            
+            I("x[b,n] = 31, 32, 33;");
             I("copy x[a,m] to yap;");
             I("copy x[a,n] to ybp;");
             I("copy <2002 2002> x[b,m] to ybp;");
@@ -13621,7 +13621,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Parquet2()
-        {            
+        {
             //Some sanity roundtrip testing
 
             I("reset;");
@@ -13630,7 +13630,7 @@ namespace UnitTests
             I("x0 <label = 'XXX1'> = (-100, m(), 100);");
             I("option freq d; time 2001m1d1 2001m1d3;");
             I("x1 = series(1);");
-            I("x1[a] <source = 'XXX2'> = (-1000, m(), 1000);");            
+            I("x1[a] <source = 'XXX2'> = (-1000, m(), 1000);");
             I("option freq w; time 2001w1 2001w3;");
             I("x1 = series(1);");
             I("x1[a] <unit = 'XXX3'> = timeless(-10000);");
@@ -13658,10 +13658,10 @@ namespace UnitTests
             Assert.IsTrue(x1wa.type == ESeriesType.Timeless);
             Assert.AreEqual(x1wa.meta.stamp, Globals.dateStamp); //May fail around midnight...!
             Assert.AreEqual("XXX3", x1wa.meta.units);
-            Series x1wb = O.GetIVariableFromString("x1!w[b]", ECreatePossibilities.NoneReportError) as Series;            
+            Series x1wb = O.GetIVariableFromString("x1!w[b]", ECreatePossibilities.NoneReportError) as Series;
             Assert.AreEqual(x1wb.meta.stamp, Globals.dateStamp); //May fail around midnight...!
             Assert.AreEqual("XXX4", x1wb.meta.label);
-            
+
             Assert.AreEqual(x1wa.GetTimelessData(), -10000d);
             _AssertSeries(First(), "x1!w", new string[] { "b" }, EFreq.W, 2001, 1, -100000d, sharedDelta);
             _AssertSeries(First(), "x1!w", new string[] { "b" }, EFreq.W, 2001, 2, double.NaN, sharedDelta);
@@ -13687,14 +13687,14 @@ namespace UnitTests
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 if (file == "monadata.gbk") I("model mona.mar22.frm;");
                 string s = null; if (file.EndsWith(".gdx")) s = "<gdx>";
-                I("read " + s + " " + file + ";");                          
-                
+                I("read " + s + " " + file + ";");
+
                 if (file == "monadata.gbk") I("doc <varlist>;");
                 I("write parquet_test" + j + ".gbk;");
                 I("write <parquet> parquet_test" + j + ".parquet;");
                 // ---
                 I("reset;");
-                I("tell 'FILE2 " + file + "';");                
+                I("tell 'FILE2 " + file + "';");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 I("read <first parquet> parquet_test" + j + ".parquet;");
                 I("read <ref> parquet_test" + j + ".gbk;");
@@ -13708,7 +13708,7 @@ namespace UnitTests
             //I("option freq q;");
             //I("model mona.mar22.frm;");
             //I("read monadata;");
-            
+
             //I("write parquet_test1.gbk;");
             //I("write <parquet> parquet_test1;");
             //I("reset;");
@@ -13718,7 +13718,7 @@ namespace UnitTests
             //CompareTwoDatabanks();
             //// ===================================
 
-            
+
 
 
 
@@ -13771,7 +13771,7 @@ namespace UnitTests
                 Assert.IsTrue(ts1.MetaGetLabel() == ts2.MetaGetLabel());
                 Assert.IsTrue(ts1.MetaGetSource() == ts2.MetaGetSource());
                 Assert.IsTrue(ts1.MetaGetUnits() == ts2.MetaGetUnits());
-                
+
                 GekkoTime gt1Start = ts1.GetRealDataPeriodFirst();
                 GekkoTime gt1End = ts1.GetRealDataPeriodLast();
                 GekkoTime gt2Start = ts2.GetRealDataPeriodFirst();
@@ -13786,7 +13786,7 @@ namespace UnitTests
                     Assert.AreEqual(ts1.GetTimelessData(), ts2.GetTimelessData());
                 }
                 else
-                {                    
+                {
                     Assert.IsTrue(gt1Start.EqualsGekkoTime(gt2Start));
                     Assert.IsTrue(gt1End.EqualsGekkoTime(gt2End));
                     if (gt1Start.IsNull() && gt1End.IsNull())
@@ -15065,9 +15065,9 @@ namespace UnitTests
             // --------------
 
             I("decomp <2002 2002> y from e1;");
-            table = Globals.lastDecompTable;                        
+            table = Globals.lastDecompTable;
             HelperMissings(table, 536d, 474d, 62d, 0d);
-            
+
             I("decomp <2002 2002 d> y from e1;");
             table = Globals.lastDecompTable;
             HelperMissings(table, 32d, 12d, 20d, 0d);
@@ -15075,7 +15075,7 @@ namespace UnitTests
             // -------------- missing value ----------
 
             I("z1 <2001 2003> = m();");
-            
+
             I("decomp <2002 2002> y from e1;");
             table = Globals.lastDecompTable;
             HelperMissings(table, 536d, 474d, 62d, double.NaN);
@@ -15088,7 +15088,7 @@ namespace UnitTests
 
             I("decomp <2002 2002 d> y from e1;");
             table = Globals.lastDecompTable;
-            HelperMissings(table, 32d, double.NaN, double.NaN, double.NaN);            
+            HelperMissings(table, 32d, double.NaN, double.NaN, double.NaN);
 
             I("decomp <2002 2002  missing=zero d> y from e1;");
             table = Globals.lastDecompTable;
@@ -15109,7 +15109,7 @@ namespace UnitTests
             HelperMissings(table, 536d, 474d, 62d, double.NaN);
 
             // --- <d>
-            
+
             I("decomp <2002 2002 d> y from e1;");  //Before Gekko 3.3.1, this gave a popup: "Could not find variable ...". Now values just show as missings.
             table = Globals.lastDecompTable;
             HelperMissings(table, 32d, double.NaN, double.NaN, double.NaN);
@@ -15143,7 +15143,7 @@ namespace UnitTests
                 if (G.IsBothNumericalError(x1, x2)) Assert.IsTrue(true);
                 else Assert.AreEqual(x1, x2, tol);
             }
-        }        
+        }
 
         [TestMethod]
         public void _Test_Decomp_Scalar_Simul5()
@@ -15267,7 +15267,7 @@ namespace UnitTests
             _AssertListString(First(), "#i1", new StringOrList("x1!a", "x2!a"));
             _AssertListString(First(), "#i2", new StringOrList("x2!a"));
             _AssertListString(First(), "#i3", new StringOrList("y1!a", "y2!a"));
-            _AssertListString(First(), "#i4", new StringOrList("y1!a"));            
+            _AssertListString(First(), "#i4", new StringOrList("y1!a"));
         }
 
 
@@ -20315,7 +20315,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Labels()
-        {            
+        {
             I("reset;");
             I("x1 = 2;");
             I("x2 = 3;");
@@ -20334,7 +20334,7 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2"));
             // ---
-            Globals.unitTestScreenOutput.Clear();            
+            Globals.unitTestScreenOutput.Clear();
             I("prt <width=50 label n> {#m};");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl1"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("lbl2"));
@@ -20512,7 +20512,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 2).number, +7d * (194d - 255d) / 49d, sharedTableDelta); //calculated by hand
 
         }
-        
+
         [TestMethod]
         public void _Test_Decomp_Scalar_Pivot1()
         {
@@ -23658,7 +23658,7 @@ print(df2)
             File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.py", s);
             I("option python exe folder = " + pydir + ";");
             I("python_run test1.py;");
-            output = Globals.unitTestScreenOutput.ToString();            
+            output = Globals.unitTestScreenOutput.ToString();
 
             Assert.IsTrue(output.Contains(" name freq  dims  dim1  dim2  per1  per2  per3  value"));
             Assert.IsTrue(output.Contains(" x    a     0  None  None  2021     0     0    1.0"));
@@ -32907,7 +32907,7 @@ print(df2)
             string xx1, xx3;
             string defa = null;
             const bool fixMePointer = true;  //Stuff that is skipped for now, for instance WRITE x[a], x[c] and such. Always true, just a pointer.
-                        
+
             for (int array = 1; array >= 0; array--)
             {
                 if (array == 0)
@@ -32947,7 +32947,7 @@ print(df2)
                     // ------ tsdx, selection
                     {
                         if (array == 0 && fixMePointer)
-                        {                        
+                        {
                             I("RESET; " + defa + "TIME 2001 2002; SER " + xx1 + " = (1001, 1002); SER " + xx3 + " = (3001, 3002);");
                             if (bank != null) I("OPEN <edit> other; CLEAR other; " + defa + "SER " + xx3 + " = (4001, 4002); CLOSE other; OPEN other;");
                             I("WRITE<" + Globals.extensionDatabank + ">" + xx1 + ", " + bank + "" + xx3 + " file=temp;");
@@ -34882,7 +34882,7 @@ print(df2)
             _AssertSeries(First(), "zc", EFreq.Q, 2001, 2, double.NaN, delta);
             //I("prt <1999q4 2001q2 n> y, c, i, g, dc, zc, jrc;");
             I("dc = 1; zc += 100;");
-            I("sim;");            
+            I("sim;");
             //I("prt <1999q4 2001q2 n> y, c, i, g, dc, zc, jrc;");
             I("dc = 0;");
             I("sim;");
@@ -35132,7 +35132,7 @@ print(df2)
 
             Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.source, "2000-2001: series extra2 = 1/extra1 + 0.1*extra1[-1]");
             Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
-        }        
+        }
 
         [TestMethod]
         public void _Test_ReplaceTimeseries()
@@ -35346,7 +35346,7 @@ print(df2)
             _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
-            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);            
+            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
             _AssertSeries(First(), "z_aa_bb_dd!a", 2001, 1.2d, sharedDelta);
             _AssertSeries(First(), "z_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
@@ -35367,6 +35367,36 @@ print(df2)
             _AssertSeries(First(), "z_cc_dd_aa", 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z_bb_dd_aa", 2002, 5.6d, sharedDelta);
             _AssertSeries(First(), "z_cc_dd_aa", 2002, 7.8d, sharedDelta);
+        }
+
+        [TestMethod]
+        public void _Test_Ras()
+        {
+            I("reset;");
+            I("time 2020 2020;");
+            I("io = series(2);");
+            I("io[a,a] = 10;");
+            I("io[a,b] = 20;");
+            I("io[a,c] = 30;");
+            I("io[b,a] = 50;");
+            I("io[b,b] = 60;");
+            I("io[b,c] = 70;");
+            I("io[c,a] = 90;");
+            I("io[c,b] = 80;");
+            I("io[c,c] = 70;");
+            I("rowsum = series(1);");
+            I("rowsum[a]= 80;");
+            I("rowsum[b]= 130;");
+            I("rowsum[c]= 260;");
+            I("colsum = series(1);");
+            I("colsum[a]= 160;");
+            I("colsum[b]= 170;");
+            I("colsum[c]= 140;");
+            I("#rownames = a, b, c;");
+            I("#colnames = a, b, c;");            
+            string s = G.GekkoExePath();
+            I("iony = ras(io, rowsum, colsum, #rownames, #colnames);");
+
         }
 
         [TestMethod]

@@ -10,7 +10,7 @@ namespace Gekko
     using System;
     //using alglib;
 
-    class Program2
+    class Optimize
     {
         static int N;
         static double[,] A;
@@ -18,12 +18,206 @@ namespace Gekko
         static double[] rowTotals;
         static double[] colTotals;
 
-        public static void RAS()
+        public class OptimizerOptions
         {
+            public double totalTolerance = 0.001;  //1 promille
+            public bool treatNaNAs0 = true;
+        }
 
-            N = 3; // size of the matrix
-            double minValue = 1.0;
+        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
+        {
+            Series input_series = O.ConvertToSeries(input) as Series;
+            List<string> rowNames_list = Stringlist.GetListOfStringsFromIVariable(rowNames);
+            List<string> colNames_list = Stringlist.GetListOfStringsFromIVariable(colNames);
+            Series rowSums_series = O.ConvertToSeries(rowSums) as Series;
+            Series colSUms_series = O.ConvertToSeries(colSums) as Series;
+            double[,] xResult = Ras2(null, null, null, null, null, null, o);
+            IVariable rv = null;
+            return rv;
+        }
+
+        public static double[,] Ras2(double[,] a, double[,] weights, double[] rowTotals, double[] colTotals, IVariable constraints3, IVariable weights3, OptimizerOptions o)
+        {
+            //We could have strings like "[a,b] + [a,c] - 2*x[a,d] = 500". But maybe a more generic approach is better:
+            //                           (('a','b'), ('a','c'), ('a', 'd', -2), 500),
+            //                           (('b','a', 2), ('b','e'), 0)
+            //
+            //                           (('a','b', 2), ('b','e', 100)
+            //            
+            //            
+
+            int ni = a.GetLength(0);
+            int nj = a.GetLength(1);
+            int nr = rowTotals.Length; //rowTotals run over i
+            int nc = colTotals.Length; //colTotals run over j
+            if (ni != nr) new Error("Cells have " + ni + " rows, row totals have " + nr + " rows");
+            if (nj != nc) new Error("Cells have " + nj + " cols, col totals have " + nr + " cols");            
+            double toti = 0d; //sum of row sums
+            double totj = 0d; //sum of col sums
+            for (int i = 0; i < ni; i++)
+            {
+                if (o.treatNaNAs0 && G.IsNumericalError(rowTotals[i])) rowTotals[i] = 0d;
+                toti += rowTotals[i];
+                for (int j = 0; j < nj; j++)
+                {
+                    if (o.treatNaNAs0 && G.IsNumericalError(a[i, j])) a[i, j] = 0d;                    
+                    if (i == 0)
+                    {
+                        if (o.treatNaNAs0 && G.IsNumericalError(colTotals[j])) colTotals[j] = 0d;
+                        totj += colTotals[j];
+                    }
+                    if (G.IsNumericalError(weights[i, j])) weights[i, j] = 1d;
+                }
+            }
+            if (Math.Abs(toti / totj - 1d) > o.totalTolerance) new Error("Rows sum to " + toti + ", whereas cols sum to " + totj + ". Tolerance " + o.totalTolerance + " exceeded");
+
+            List<IVariable> contraints2 = O.ConvertToList(constraints3);
+            foreach (IVariable temp1 in contraints2)
+            {
+                //(('a', 'b'), ('a', 'c'), ('a', 'd', -2), 500)
+                List<IVariable> temp2 = O.ConvertToList(temp1);
+                int c = -1;
+                foreach (IVariable temp3 in temp2)
+                {
+                    //('a', 'd', -2) or
+                    //500
+                    c++;
+                    if (temp3.Type() == EVariableType.Val)
+                    {
+                        //check last
+                        if (c != temp2.Count) new Error("Expected value to be last element");
+                        double d = O.ConvertToVal(temp3);
+                    }
+                    else
+                    {
+                        List<IVariable> temp4 = O.ConvertToList(temp3);
+                        if (temp4.Count == 2)
+                        {
+                            string s0 = O.ConvertToString(temp4[0]);
+                            string s1 = O.ConvertToString(temp4[1]);
+                            double d = 1d;
+                        }
+                        else if (temp4.Count == 3)
+                        {
+                            string s0 = O.ConvertToString(temp4[0]);
+                            string s1 = O.ConvertToString(temp4[1]);
+                            double d = O.ConvertToVal(temp4[2]);
+                        }
+                        else new Error("Expected list with 2 or 3 elements");
+                    }
+
+                }
+            }
+
+            List<IVariable> weights2 = O.ConvertToList(weights3);
+            foreach (IVariable temp1 in weights2)
+            {
+                //('a', 'b', 2)
+                List<IVariable> temp2 = O.ConvertToList(temp1);
+                if (temp2.Count != 3) new Error("Expected 3 elements regarding constraint");
+                string s0 = O.ConvertToString(temp2[0]);
+                string s1 = O.ConvertToString(temp2[1]);
+                double d = O.ConvertToVal(temp2[2]);
+                //Handle
+            }
+
+            int niPlusNj = ni + nj;
+            int niMultiplyNj = ni * nj;
+
+            double[,] constraints = new double[niPlusNj, niMultiplyNj];
+
+            // row constraints
+            for (int i = 0; i < ni; i++)
+            {
+                for (int j = 0; j < nj; j++)
+                {
+                    constraints[i, i * nj + j] = 1;
+                }
+                constraints[i, niMultiplyNj] = rowTotals[i];
+            }
+
+            // column constraints
+            for (int j = 0; j < ni; j++)
+            {
+                for (int i = 0; i < nj; i++)
+                {
+                    constraints[ni + j, i * nj + j] = 1;
+                }
+                constraints[ni + j, niMultiplyNj] = colTotals[j];
+            }
+
+            int[] ct = new int[niPlusNj];
+            for (int i = 0; i < niPlusNj; i++)
+            {
+                ct[i] = 0; // equality
+            }
+
+            double[] x1d = new double[niMultiplyNj];
+            for (int i = 0; i < nr; i++)
+            {
+                for (int j = 0; j < nc; j++)
+                {
+                    x1d[i * nc + j] = a[i, j];
+                }
+            }
+
+            // bounds (xij > 0)
+            double[] bndl = new double[niMultiplyNj];
+            double[] bndu = new double[niMultiplyNj];
+
+            for (int i = 0; i < niMultiplyNj; i++)
+            {
+                bndl[i] = 1e-6;
+                bndu[i] = double.PositiveInfinity;
+            }
+
+            double[] x = new double[ni * nj];
+
+            alglib.minbleicstate state;
+            alglib.minbleicreport rep;
+            alglib.minbleiccreate(x1d, out state);
+            alglib.minbleicsetbc(state, bndl, bndu);
+            alglib.minbleicsetlc(state, constraints, ct);
+            alglib.minbleicsetcond(state, 1e-10, 0, 0, 0);
+            DateTime t2 = DateTime.Now;
+            alglib.minbleicoptimize(state, F, null, null);
+            alglib.minbleicresults(state, out x1d, out rep);
+            G.Writeln2("Optimized " + ni + "x" + nj + " cells done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
+
+            double[,] xResult = new double[nr, nc];
+            for (int k = 0; k < x1d.Length; k++)
+            {
+                int i = k / nc;
+                int j = k % nc;
+                xResult[i, j] = x1d[k];
+            }
+            return xResult;
+
+            void F(double[] x, ref double f, double[] g, object obj)
+            {
+                f = 0;
+                for (int i = 0; i < ni; i++)
+                {
+                    for (int j = 0; j < nj; j++)
+                    {
+                        int k = i * nj + j;
+                        double xij = x[k];
+                        double aij = a[i, j];
+                        double ratio = xij / aij;
+                        f += xij * Math.Log(ratio);
+                        g[k] = Math.Log(ratio) + 1;
+                    }
+                }
+            }
+        }
+
+
+        public static void RAS()
+        {            
+            N = 30; // size of the matrix
+            double minValue = 50.0;
             double maxValue = 100.0;
+            double pert = 0.10d; //0.10 is 10%
 
             Random rnd = new Random();
 
@@ -39,45 +233,67 @@ namespace Gekko
                 }
             }
 
-            
-
             // 2. Generate random row and column totals
             rowTotals = new double[N];
             colTotals = new double[N];
-
             for (int i = 0; i < N; i++)
-                rowTotals[i] = N * minValue + (N * maxValue - N * minValue) * rnd.NextDouble();
+            {
+                double rowSum = 0;
+                for (int j = 0; j < N; j++)
+                    rowSum += A[i, j];
+
+                // Apply small relative perturbation (±5%)
+                double perturb = pert * rowSum;
+                rowTotals[i] = rowSum + (2 * rnd.NextDouble() - 1) * perturb;
+            }
 
             for (int j = 0; j < N; j++)
-                colTotals[j] = N * minValue + (N * maxValue - N * minValue) * rnd.NextDouble();
+            {
+                double colSum = 0;
+                for (int i = 0; i < N; i++)
+                    colSum += A[i, j];
+
+                // Apply small relative perturbation (±5%)
+                double perturb = pert * colSum;
+                colTotals[j] = colSum + (2 * rnd.NextDouble() - 1) * perturb;
+            }
+
+            // 3. Adjust column totals to match total sum of rowTotals
+            double totalRows = 0, totalCols = 0;
+            for (int i = 0; i < N; i++) totalRows += rowTotals[i];
+            for (int j = 0; j < N; j++) totalCols += colTotals[j];
+            double scale = totalRows / totalCols;
+            for (int j = 0; j < N; j++)
+                colTotals[j] *= scale;
 
 
+            if (false)
+            {
 
-            A =      new double[,]  {
+                A = new double[,]  {
         {10,20,30},
         {20,10,40},
         {30,40,10}
         };
 
-            W = new double[,]
-            {
+                W = new double[,]
+                {
         {1,1,1},
         {1,1,1},
         {1,1,1}
-        };
+            };
 
-            rowTotals = new double[] { 80, 70, 90 };
-            colTotals = new double[] { 90, 80, 70 };
+                rowTotals = new double[] { 80, 70, 90 };
+                colTotals = new double[] { 90, 80, 70 };
 
+            }
 
             G.Writeln("Input matrix A:");
-            Print2(A);
+            if (N <= 10)
+            {
+                Print2(A);
+            }
             G.Writeln();
-
-
-
-
-
 
 
 
@@ -148,17 +364,27 @@ namespace Gekko
             alglib.minbleicsetlc(state, C, ct);
             alglib.minbleicsetcond(state, 1e-10, 0, 0, 0);
 
+            DateTime t2 = DateTime.Now;
             alglib.minbleicoptimize(state, FuncGrad, null, null);
-
             double[] x;
             alglib.minbleicresults(state, out x, out rep);
+            G.Writeln("BLEIC " + N + "x" + N + " done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
+            G.Writeln(x[0] + "  " + x[1] + " " + x[2] + "  " + x[3]);
 
-            Print(x);
+            if (N <= 10)
+            {
+                Print(x);
+            }
 
             G.Writeln();
-            G.Writeln("RAS");
-            double[,] y = RAS(A, rowTotals, colTotals, 1000, 1e-10);
-            Print2(y);
+            DateTime t3 = DateTime.Now;
+            double[,] y = RAS(A, rowTotals, colTotals, 1000, 1e-10);            
+            G.Writeln("RAS " + N + "x" + N + " done " + G.Seconds(t3));
+            G.Writeln(y[0, 0] + "  " + y[0, 1] + " " + y[0, 2] + "  " + y[0, 3]);
+            if (N <= 10)
+            {
+                Print2(y);
+            }
 
         }
 
@@ -256,22 +482,19 @@ namespace Gekko
 
         static void FuncGrad(double[] x, ref double f, double[] g, object obj)
         {
-            f = 0;            
-
+            f = 0;
             for (int i = 0; i < N; i++)
+            {
                 for (int j = 0; j < N; j++)
                 {
                     int k = i * N + j;
-
                     double xij = x[k];
                     double aij = A[i, j];
-
                     double ratio = xij / aij;
-
                     f += xij * Math.Log(ratio);
-
                     g[k] = Math.Log(ratio) + 1;
                 }
+            }
         }
 
         static void FuncGradGRAS(double[] x, ref double f, double[] g, object obj)

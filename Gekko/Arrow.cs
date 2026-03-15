@@ -700,13 +700,6 @@ namespace Gekko
 
             Arrow.WriteArrow(recordBatch1, pathAndFilename); //Doesn't the call need await??
 
-            if (false)
-            {
-                RecordBatch recordBatch2 = Arrow.ReadArrowOld(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
-                DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
-                Databank db2 = new Databank(null);
-            }
-
             string s = null; if (hasSubSeries) s = " (including array-subseries)";
             new Writeln("Wrote " + seriesCounter + " series" + s + " to arrow file with " + rowCounter + " rows in " + G.Seconds(dt));
 

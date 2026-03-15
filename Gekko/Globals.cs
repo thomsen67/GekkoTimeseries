@@ -521,8 +521,7 @@ namespace Gekko
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";
-
-        public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
+                
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
 
         public static List<Action<string, GekkoTime>> predictActions = null;
