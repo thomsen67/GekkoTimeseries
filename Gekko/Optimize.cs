@@ -20,20 +20,30 @@ namespace Gekko
 
         public class OptimizerOptions
         {
+            public string type = "default"; // default | fast
             public double totalTolerance = 0.001;  //1 promille
             public bool treatNaNAs0 = true;
         }
 
-        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
-        {
-            Series input_series = O.ConvertToSeries(input) as Series;
-            if (input_series.dimensions == 0) new Error("Expected series with cells to be array-series");
+        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable constraints3, IVariable weights3, IVariable options)
+        {            
+            Series adjusted = input.DeepClone(0, null, null) as Series;
+            if (adjusted == null) new Error("Expected series input as first argument");
+            if (adjusted.dimensions == 0) new Error("Expected array-series as first argument");
             List<string> rowNames_list = Stringlist.GetListOfStringsFromIVariable(rowNames);
             List<string> colNames_list = Stringlist.GetListOfStringsFromIVariable(colNames);
             Series rowSums_series = O.ConvertToSeries(rowSums) as Series;
             if (rowSums_series.dimensions == 0) new Error("Expected series with row sums to be array-series");
             Series colSums_series = O.ConvertToSeries(colSums) as Series;
             if (colSums_series.dimensions == 0) new Error("Expected series with column sums to be array-series");
+
+            //Options
+            OptimizerOptions o = new OptimizerOptions();            
+            if (options.Type() != EVariableType.Map) new Error("Options should be stated as a map variable type");
+            Map options_map = options as Map;
+            //Type can be 'fast', 
+            IVariable temp = null; if (options_map.storage.TryGetValue("%type", out temp)) { o.type = O.ConvertToString(temp); }
+
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
                 double[,] a_array = new double[rowNames_list.Count(), colNames_list.Count()];
@@ -49,7 +59,7 @@ namespace Gekko
                     foreach (string sj in colNames_list)
                     {
                         nj++;
-                        double d = (input_series.dimensionsStorage.storage[new MultidimElement(new string[] { si, sj })] as Series).GetDataSimple(t);
+                        double d = (adjusted.dimensionsStorage.storage[new MultidimElement(new string[] { si, sj })] as Series).GetDataSimple(t);
                         a_array[ni, nj] = d;
                     }
                 }
@@ -82,12 +92,11 @@ namespace Gekko
                     {
                         nj++;
                         double d = xResult[ni, nj];
-                        (input_series.dimensionsStorage.storage[new MultidimElement(new string[] { si, sj })] as Series).SetData(t, d);
+                        (adjusted.dimensionsStorage.storage[new MultidimElement(new string[] { si, sj })] as Series).SetData(t, d);
                     }
                 }
-            }
-            IVariable rv = null;
-            return rv;
+            }            
+            return adjusted;
         }
 
         public static double[,] Ras2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
@@ -209,44 +218,54 @@ namespace Gekko
                 ct[i] = 0; // equality
             }
 
-            double[] x1d = new double[niMultiplyNj];
-            for (int i = 0; i < nr; i++)
+            double[,] xResult = null;
+
+            if (G.Equal(o.type, "fast"))
+            {                
+                xResult = RAS(a, rowSums, colSums, 1000, o.totalTolerance);
+            }
+            else
             {
-                for (int j = 0; j < nc; j++)
+
+                double[] x1d = new double[niMultiplyNj];
+                for (int i = 0; i < nr; i++)
                 {
-                    x1d[i * nc + j] = a[i, j];
+                    for (int j = 0; j < nc; j++)
+                    {
+                        x1d[i * nc + j] = a[i, j];
+                    }
                 }
-            }
 
-            // bounds (xij > 0)
-            double[] bndl = new double[niMultiplyNj];
-            double[] bndu = new double[niMultiplyNj];
+                // bounds (xij > 0)
+                double[] bndl = new double[niMultiplyNj];
+                double[] bndu = new double[niMultiplyNj];
 
-            for (int i = 0; i < niMultiplyNj; i++)
-            {
-                bndl[i] = 1e-6;
-                bndu[i] = double.PositiveInfinity;
-            }
+                for (int i = 0; i < niMultiplyNj; i++)
+                {
+                    bndl[i] = 1e-6;
+                    bndu[i] = double.PositiveInfinity;
+                }
 
-            double[] x = new double[ni * nj];
+                double[] x = new double[ni * nj];
 
-            alglib.minbleicstate state;
-            alglib.minbleicreport rep;
-            alglib.minbleiccreate(x1d, out state);
-            alglib.minbleicsetbc(state, bndl, bndu);
-            alglib.minbleicsetlc(state, constraints, ct);
-            alglib.minbleicsetcond(state, 1e-10, 0, 0, 0);
-            DateTime t2 = DateTime.Now;
-            alglib.minbleicoptimize(state, F, null, null);
-            alglib.minbleicresults(state, out x1d, out rep);
-            G.Writeln2("Optimized " + ni + "x" + nj + " cells done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
+                alglib.minbleicstate state;
+                alglib.minbleicreport rep;
+                alglib.minbleiccreate(x1d, out state);
+                alglib.minbleicsetbc(state, bndl, bndu);
+                alglib.minbleicsetlc(state, constraints, ct);
+                alglib.minbleicsetcond(state, 1e-10, 0, 0, 0);
+                DateTime t2 = DateTime.Now;
+                alglib.minbleicoptimize(state, F, null, null);
+                alglib.minbleicresults(state, out x1d, out rep);
+                G.Writeln2("Optimized " + ni + "x" + nj + " cells done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
 
-            double[,] xResult = new double[nr, nc];
-            for (int k = 0; k < x1d.Length; k++)
-            {
-                int i = k / nc;
-                int j = k % nc;
-                xResult[i, j] = x1d[k];
+                xResult = new double[nr, nc];
+                for (int k = 0; k < x1d.Length; k++)
+                {
+                    int i = k / nc;
+                    int j = k % nc;
+                    xResult[i, j] = x1d[k];
+                }
             }
             return xResult;
 
