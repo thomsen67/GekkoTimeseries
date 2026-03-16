@@ -35402,24 +35402,28 @@ print(df2)
             I("colsum[d]= 51;");
             I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
-            I("prt <n> io;");            
-            I("iony = ras(io, rowsum, colsum, #rownames, #colnames);");
-            //I("prt <n> io;");
-            //I("prt <n> iony;");
-            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'fast'));");
-            //I("prt <n> iony2;");
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'default'));");
+            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");            
+            
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
             {
                 foreach (string i in rows)
                 {
                     foreach (string j in cols)
                     {
-                        double d1 = (O.GetIVariableFromString("iony[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
+                        double d1 = (O.GetIVariableFromString("iony1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
                         double d2 = (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
                         Assert.AreEqual(d1, d2, deltaHere);
                     }
                 }
             }
+
+            I("#rest = (   (    ('a','a',1), ('a','b',1), 30    ),     );");
+
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #rest, (%type = 'entropy'));");
+            I("prt <n> io;");
+            I("prt <n> iony2;");
+            I("prt <n> iony3;");
         }
 
         [TestMethod]

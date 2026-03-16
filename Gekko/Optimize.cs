@@ -25,7 +25,7 @@ namespace Gekko
             public bool treatNaNAs0 = true;
         }
 
-        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable constraints3, IVariable weights3, IVariable options)
+        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable[] other)
         {            
             Series adjusted = input.DeepClone(0, null, null) as Series;
             if (adjusted == null) new Error("Expected series input as first argument");
@@ -37,12 +37,38 @@ namespace Gekko
             Series colSums_series = O.ConvertToSeries(colSums) as Series;
             if (colSums_series.dimensions == 0) new Error("Expected series with column sums to be array-series");
 
-            //Options
-            OptimizerOptions o = new OptimizerOptions();            
-            if (options.Type() != EVariableType.Map) new Error("Options should be stated as a map variable type");
-            Map options_map = options as Map;
-            //Type can be 'fast', 
-            IVariable temp; if (options_map.storage.TryGetValue("%type", out temp)) { o.type = O.ConvertToString(temp); }
+            OptimizerOptions o = new OptimizerOptions();
+            List restrict = null;
+            List weights = null;
+
+            if (other.Length > 0)
+            {
+                IVariable[] other2 = other.Clone() as IVariable[];
+
+                //Options                
+                if (other.Last().Type() == EVariableType.Map)
+                {
+                    Map options_map = other.Last() as Map;
+                    //Type can be 'fast', 
+                    IVariable temp; if (options_map.storage.TryGetValue("%type", out temp)) { o.type = O.ConvertToString(temp); }
+                    other2 = other.Take(other.Length - 1).ToArray();
+                }
+
+                if (other2.Length == 0)
+                {
+                    //ok!
+                }
+                else if (other2.Length == 1)
+                {
+                    restrict = other2[0] as List;
+                }
+                else if (other2.Length == 2)
+                {
+                    restrict = other2[0] as List;
+                    weights = other2[1] as List;
+                }
+                else new Error("Expected 1 or 2 arguments after column names (and before any map of options as the last argument)");
+            }            
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
@@ -80,7 +106,7 @@ namespace Gekko
                     colSums_array[nj] = d;
                 }
 
-                double[,] xResult = Ras2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, null, null, o);
+                double[,] xResult = Ras2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, restrict, weights, o);
 
                 ni = -1;
                 nj = -1;
@@ -135,12 +161,22 @@ namespace Gekko
             }
             if (Math.Abs(toti / totj - 1d) > o.totalTolerance) new Error("Rows sum to " + toti + ", whereas cols sum to " + totj + ". Tolerance " + o.totalTolerance + " exceeded");
 
-            if (false)
+            int niPlusNj = ni + nj;
+            int niMultiplyNj = ni * nj;
+
+            int extraConstraints = 0;
+            List<double[]> storage1 = new List<double[]>();
+            List<double> storage2 = new List<double>();
+            if (constraints3 != null)
             {
                 List<IVariable> contraints2 = O.ConvertToList(constraints3);
+                int counter = -1;
                 foreach (IVariable temp1 in contraints2)
                 {
                     //(('a', 'b'), ('a', 'c'), ('a', 'd', -2), 500)
+                    counter++;
+                    storage1.Add(new double[niMultiplyNj]);
+                    storage2.Add(double.NaN);
                     List<IVariable> temp2 = O.ConvertToList(temp1);
                     int c = -1;
                     foreach (IVariable temp3 in temp2)
@@ -151,30 +187,38 @@ namespace Gekko
                         if (temp3.Type() == EVariableType.Val)
                         {
                             //check last
-                            if (c != temp2.Count) new Error("Expected value to be last element");
+                            if (c != temp2.Count - 1) new Error("Expected value to be last element");
                             double d = O.ConvertToVal(temp3);
+                            storage2[counter] = d;
                         }
                         else
                         {
                             List<IVariable> temp4 = O.ConvertToList(temp3);
+                            string s0 = O.ConvertToString(temp4[0]);
+                            int i0 = rowNames.IndexOf(s0);
+                            if (i0 < 0) new Error("Restriction: could not find '" + s0 + "' as row name");
+                            string s1 = O.ConvertToString(temp4[1]);
+                            int i1 = colNames.IndexOf(s1);
+                            if (i1 < 0) new Error("Restriction: could not find '" + s1 + "' as col name");
+                            double d = 1d; //coefficient
                             if (temp4.Count == 2)
-                            {
-                                string s0 = O.ConvertToString(temp4[0]);
-                                string s1 = O.ConvertToString(temp4[1]);
-                                double d = 1d;
+                            {                                
+                                //ok
                             }
                             else if (temp4.Count == 3)
-                            {
-                                string s0 = O.ConvertToString(temp4[0]);
-                                string s1 = O.ConvertToString(temp4[1]);
-                                double d = O.ConvertToVal(temp4[2]);
+                            {                                
+                                d = O.ConvertToVal(temp4[2]);
                             }
                             else new Error("Expected list with 2 or 3 elements");
+                            storage1[counter][i0 * ni + i1] = d;
                         }
-
-                    }
+                    }                    
                 }
+                extraConstraints = counter + 1;
+            }
 
+            if (weights3 != null)
+            {
                 List<IVariable> weights2 = O.ConvertToList(weights3);
                 foreach (IVariable temp1 in weights2)
                 {
@@ -188,10 +232,16 @@ namespace Gekko
                 }
             }
 
-            int niPlusNj = ni + nj;
-            int niMultiplyNj = ni * nj;
+            double[,] constraints = new double[niPlusNj + extraConstraints, niMultiplyNj + 1]; //why + 1 ??? Is it not number of cells? Maybe constant term?
 
-            double[,] constraints = new double[niPlusNj, niMultiplyNj + 1];
+            for (int i = 0; i < extraConstraints; i++)
+            {
+                for (int j = 0; j < storage1[i].Length; j++) 
+                {
+                    constraints[niPlusNj + i, j] = storage1[i][j];
+                }
+                constraints[niPlusNj + i, niMultiplyNj] = storage2[i];  //The constant column that is last
+            }
 
             // row constraints
             for (int i = 0; i < ni; i++)
@@ -213,21 +263,25 @@ namespace Gekko
                 constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
-            int[] ct = new int[niPlusNj];
+            int[] ct = new int[niPlusNj + extraConstraints];
             for (int i = 0; i < niPlusNj; i++)
             {
-                ct[i] = 0; // equality
+                ct[i] = 0; //equality
+            }
+
+            for (int i = 0; i < extraConstraints; i++)
+            {
+                ct[niPlusNj + i] = 0; //equality
             }
 
             double[,] xResult = null;
 
-            if (G.Equal(o.type, "fast"))
-            {                
+            if (G.Equal(o.type, "default"))
+            {
                 xResult = RAS(a, rowSums, colSums, 1000, o.totalTolerance);
             }
-            else
+            else if (G.Equal(o.type, "entropy"))
             {
-
                 double[] x1d = new double[niMultiplyNj];
                 for (int i = 0; i < ni; i++)
                 {
@@ -268,6 +322,7 @@ namespace Gekko
                     xResult[i, j] = x1d[k];
                 }
             }
+            else new Error("Expected %type option 'default' or 'entropy'");
             return xResult;
 
             void F(double[] x, ref double f, double[] g, object obj)
