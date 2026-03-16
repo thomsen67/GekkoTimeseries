@@ -35374,6 +35374,8 @@ print(df2)
         {
             double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
             int year = 2020;
+            List<string> rows = new List<string>() { "a", "b", "c" };
+            List<string> cols = new List<string>() { "a", "b", "c", "d" };
             I("reset;");
             I("time " + year + " " + year + ";");
             I("io = series(2);");
@@ -35390,27 +35392,27 @@ print(df2)
             I("io[c,c] = 70;");
             I("io[c,d] = 27;");
             I("rowsum = series(1);");
-            I("rowsum[a]= 80+7;");
-            I("rowsum[b]= 130+17;");
-            I("rowsum[c]= 260+27;");
+            I("rowsum[a]= 87;");
+            I("rowsum[b]= 147;");
+            I("rowsum[c]= 287;");
             I("colsum = series(1);");
             I("colsum[a]= 160;");
             I("colsum[b]= 170;");
             I("colsum[c]= 140;");
-            I("colsum[d]= 7+17+27;");
-            I("#rownames = a, b, c;");
-            I("#colnames = a, b, c, d;");
+            I("colsum[d]= 51;");
+            I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
+            I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("prt <n> io;");            
             I("iony = ras(io, rowsum, colsum, #rownames, #colnames);");
-            I("prt <n> io;");
-            I("prt <n> iony;");
+            //I("prt <n> io;");
+            //I("prt <n> iony;");
             I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'fast'));");
-            I("prt <n> iony2;");
+            //I("prt <n> iony2;");
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
             {
-                foreach (string i in new List<string>() { "a", "b", "c" })
+                foreach (string i in rows)
                 {
-                    foreach (string j in new List<string>() { "a", "b", "c", "d" })
+                    foreach (string j in cols)
                     {
                         double d1 = (O.GetIVariableFromString("iony[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
                         double d2 = (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
