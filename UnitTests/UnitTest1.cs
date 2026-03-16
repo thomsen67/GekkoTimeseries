@@ -35372,6 +35372,11 @@ print(df2)
         [TestMethod]
         public void _Test_Ras()
         {
+            //TODO: handle pure == 0d.
+            //TODO: handle weights
+            //TODO: abs() on function? And how do negative cells do?
+            //TODO: sum of (xij-aij)^2, or ((xij-aij)/aij)^2
+
             double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
             int year = 2020;
             List<string> rows = new List<string>() { "a", "b", "c" };
@@ -35403,8 +35408,14 @@ print(df2)
             I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'default'));");
-            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");            
-            
+            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+            //Sætter celle [a,a]==[a,b] og celle [a,c]==[a,d].
+            I("#rest = (   (    ('a','a',-1), ('a','b',1), 0    ),      (    ('a','c',-1), ('a','d',1), 0    )     );");
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #rest, (%type = 'entropy'));");
+            I("prt <n> io;");
+            I("prt <n> iony2;");
+            I("prt <n> iony3;");
+
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
             {
                 foreach (string i in rows)
@@ -35416,14 +35427,15 @@ print(df2)
                         Assert.AreEqual(d1, d2, deltaHere);
                     }
                 }
+                if (true)
+                {
+                    //Test the 2 restrictions
+                    Assert.AreEqual((O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                    (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                    Assert.AreEqual((O.GetIVariableFromString("iony3[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                    (O.GetIVariableFromString("iony3[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                }
             }
-
-            I("#rest = (   (    ('a','a',1), ('a','b',1), 30    ),     );");
-
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #rest, (%type = 'entropy'));");
-            I("prt <n> io;");
-            I("prt <n> iony2;");
-            I("prt <n> iony3;");
         }
 
         [TestMethod]

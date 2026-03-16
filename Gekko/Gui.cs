@@ -412,6 +412,12 @@ namespace Gekko
 
         private static void GuiStuff(string folder, bool noini, bool hideGui, bool nolog)
         {
+            if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
+            {
+                Globals.runningOnTTComputer = true;  //for some debugging                
+                G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");
+            }
+
             bool track = false;
             if (File.Exists(@"c:\test\testing1234.txt"))
             {

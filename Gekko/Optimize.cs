@@ -10,20 +10,15 @@ namespace Gekko
     using System;
     //using alglib;
 
-    class Optimize
+    public class OptimizerOptions
     {
-        static int N;
-        static double[,] A;
-        static double[,] W;
-        static double[] rowTotals;
-        static double[] colTotals;
+        public string type = "default"; // default | fast
+        public double totalTolerance = 0.001;  //1 promille
+        public bool treatNaNAs0 = true;
+    }
 
-        public class OptimizerOptions
-        {
-            public string type = "default"; // default | fast
-            public double totalTolerance = 0.001;  //1 promille
-            public bool treatNaNAs0 = true;
-        }
+    class Optimize
+    {        
 
         public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable[] other)
         {            
@@ -356,7 +351,13 @@ namespace Gekko
 
 
         public static void RAS()
-        {            
+        {
+            int N;
+            double[,] A;
+            double[,] W;
+            double[] rowTotals;
+            double[] colTotals;
+
             N = 30; // size of the matrix
             double minValue = 50.0;
             double maxValue = 100.0;
@@ -508,7 +509,7 @@ namespace Gekko
             alglib.minbleicsetcond(state, 1e-10, 0, 0, 0);
 
             DateTime t2 = DateTime.Now;
-            alglib.minbleicoptimize(state, FuncGrad, null, null);
+            alglib.minbleicoptimize(state, TestF, null, null);
             double[] x;
             alglib.minbleicresults(state, out x, out rep);
             G.Writeln("BLEIC " + N + "x" + N + " done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
@@ -516,7 +517,7 @@ namespace Gekko
 
             if (N <= 10)
             {
-                Print(x);
+                Print(x, N);
             }
 
             G.Writeln();
@@ -529,24 +530,58 @@ namespace Gekko
                 Print2(y);
             }
 
+            void TestF(double[] x, ref double f, double[] g, object obj)
+            {
+                f = 0;
+                for (int i = 0; i < N; i++)
+                {
+                    for (int j = 0; j < N; j++)
+                    {
+                        int k = i * N + j;
+                        double xij = x[k];
+                        double aij = A[i, j];
+                        double ratio = xij / aij;
+                        f += xij * Math.Log(ratio);
+                        g[k] = Math.Log(ratio) + 1;
+                    }
+                }
+            }
+
+            void TestFSquared(double[] x, ref double f, double[] g, object obj)
+            {
+                //int N = ...; // matrix size
+                //double[,] A = ...; // input
+                //double[,] W = ...; // weights
+
+                f = 0;
+                for (int i = 0; i < N; i++)
+                    for (int j = 0; j < N; j++)
+                    {
+                        int k = i * N + j;
+                        double diff = x[k] - A[i, j];
+                        f += diff * diff / (2 * W[i, j]);
+                        g[k] = diff / W[i, j];
+                    }
+            }
+
         }
 
         private static void Print2(double[,] x)
         {
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < x.GetLength(0); i++)
             {
-                for (int j = 0; j < N; j++)
+                for (int j = 0; j < x.GetLength(1); j++)
                     G.Write($"{x[i, j]:F4} ");
                 G.Writeln();
             }
         }
 
-        private static void Print(double[] x)
+        private static void Print(double[] x, int N)
         {
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < x.Length; i++)
             {
-                for (int j = 0; j < N; j++)
-                    G.Write($"{x[i * N + j]:F4} ");
+                for (int j = 0; j < x.Length; j++)
+                    G.Write($"{x[i * x.Length + j]:F4} ");
                 G.Writeln();
             }
         }
@@ -621,41 +656,7 @@ namespace Gekko
             }
 
             return X;
-        }
-
-        static void FuncGrad(double[] x, ref double f, double[] g, object obj)
-        {
-            f = 0;
-            for (int i = 0; i < N; i++)
-            {
-                for (int j = 0; j < N; j++)
-                {
-                    int k = i * N + j;
-                    double xij = x[k];
-                    double aij = A[i, j];
-                    double ratio = xij / aij;
-                    f += xij * Math.Log(ratio);
-                    g[k] = Math.Log(ratio) + 1;
-                }
-            }
-        }
-
-        static void FuncGradGRAS(double[] x, ref double f, double[] g, object obj)
-        {
-            //int N = ...; // matrix size
-            //double[,] A = ...; // input
-            //double[,] W = ...; // weights
-
-            f = 0;
-            for (int i = 0; i < N; i++)
-                for (int j = 0; j < N; j++)
-                {
-                    int k = i * N + j;
-                    double diff = x[k] - A[i, j];
-                    f += diff * diff / (2 * W[i, j]);
-                    g[k] = diff / W[i, j];
-                }
-        }
+        }        
     }
 }
 
