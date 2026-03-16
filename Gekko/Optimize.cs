@@ -42,7 +42,7 @@ namespace Gekko
             if (options.Type() != EVariableType.Map) new Error("Options should be stated as a map variable type");
             Map options_map = options as Map;
             //Type can be 'fast', 
-            IVariable temp = null; if (options_map.storage.TryGetValue("%type", out temp)) { o.type = O.ConvertToString(temp); }
+            IVariable temp; if (options_map.storage.TryGetValue("%type", out temp)) { o.type = O.ConvertToString(temp); }
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
@@ -109,6 +109,7 @@ namespace Gekko
             //            
             //            
 
+            double[,] weights = null;
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
             int nr = rowSums.Length; //rowTotals run over i
@@ -279,9 +280,20 @@ namespace Gekko
                         int k = i * nj + j;
                         double xij = x[k];
                         double aij = a[i, j];
-                        double ratio = xij / aij;
-                        f += xij * Math.Log(ratio);
-                        g[k] = Math.Log(ratio) + 1;
+                        double lratio = Math.Log(xij / aij);
+                        //What are the f values used for? Can their calculation be dropped or set constant??
+                        if (weights == null)
+                        {
+                            //Without weights
+                            f += xij * lratio;
+                            g[k] = lratio + 1;
+                        }
+                        else
+                        {
+                            //With weights
+                            f += weights[i, j] * xij * lratio;
+                            g[k] = weights[i, j] * (lratio + 1);
+                        }
                     }
                 }
             }
