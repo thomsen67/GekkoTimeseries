@@ -35372,34 +35372,52 @@ print(df2)
         [TestMethod]
         public void _Test_Ras()
         {
+            double deltaHere = 0.00001d;  //!! adjust this if convergence criteria change!!
+            int year = 2020;
             I("reset;");
-            I("time 2020 2020;");
+            I("time " + year + " " + year + ";");
             I("io = series(2);");
             I("io[a,a] = 10;");
             I("io[a,b] = 20;");
             I("io[a,c] = 30;");
+            I("io[a,d] = 7;");
             I("io[b,a] = 50;");
             I("io[b,b] = 60;");
             I("io[b,c] = 70;");
+            I("io[b,d] = 17;");
             I("io[c,a] = 90;");
             I("io[c,b] = 80;");
             I("io[c,c] = 70;");
+            I("io[c,d] = 27;");
             I("rowsum = series(1);");
-            I("rowsum[a]= 80;");
-            I("rowsum[b]= 130;");
-            I("rowsum[c]= 260;");
+            I("rowsum[a]= 80+7;");
+            I("rowsum[b]= 130+17;");
+            I("rowsum[c]= 260+27;");
             I("colsum = series(1);");
             I("colsum[a]= 160;");
             I("colsum[b]= 170;");
             I("colsum[c]= 140;");
+            I("colsum[d]= 7+17+27;");
             I("#rownames = a, b, c;");
-            I("#colnames = a, b, c;");
+            I("#colnames = a, b, c, d;");
             I("prt <n> io;");            
             I("iony = ras(io, rowsum, colsum, #rownames, #colnames);");
             I("prt <n> io;");
             I("prt <n> iony;");
             I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'fast'));");
             I("prt <n> iony2;");
+            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
+            {
+                foreach (string i in new List<string>() { "a", "b", "c" })
+                {
+                    foreach (string j in new List<string>() { "a", "b", "c", "d" })
+                    {
+                        double d1 = (O.GetIVariableFromString("iony[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
+                        double d2 = (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
+                        Assert.AreEqual(d1, d2, deltaHere);
+                    }
+                }
+            }
         }
 
         [TestMethod]
