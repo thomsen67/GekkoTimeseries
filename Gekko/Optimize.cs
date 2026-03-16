@@ -33,7 +33,7 @@ namespace Gekko
             if (colSums_series.dimensions == 0) new Error("Expected series with column sums to be array-series");
 
             OptimizerOptions o = new OptimizerOptions();
-            List restrict = null;
+            List constraints = null;
             List weights = null;
 
             if (other.Length > 0)
@@ -55,11 +55,11 @@ namespace Gekko
                 }
                 else if (other2.Length == 1)
                 {
-                    restrict = other2[0] as List;
+                    constraints = other2[0] as List;
                 }
                 else if (other2.Length == 2)
                 {
-                    restrict = other2[0] as List;
+                    constraints = other2[0] as List;
                     weights = other2[1] as List;
                 }
                 else new Error("Expected 1 or 2 arguments after column names (and before any map of options as the last argument)");
@@ -101,7 +101,7 @@ namespace Gekko
                     colSums_array[nj] = d;
                 }
 
-                double[,] xResult = Ras2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, restrict, weights, o);
+                double[,] xResult = Ras2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, o);
 
                 ni = -1;
                 nj = -1;
@@ -191,10 +191,10 @@ namespace Gekko
                             List<IVariable> temp4 = O.ConvertToList(temp3);
                             string s0 = O.ConvertToString(temp4[0]);
                             int i0 = rowNames.IndexOf(s0);
-                            if (i0 < 0) new Error("Restriction: could not find '" + s0 + "' as row name");
+                            if (i0 < 0) new Error("Constraing: could not find '" + s0 + "' as row name");
                             string s1 = O.ConvertToString(temp4[1]);
                             int i1 = colNames.IndexOf(s1);
-                            if (i1 < 0) new Error("Restriction: could not find '" + s1 + "' as col name");
+                            if (i1 < 0) new Error("Constraing: could not find '" + s1 + "' as col name");
                             double d = 1d; //coefficient
                             if (temp4.Count == 2)
                             {                                
@@ -258,22 +258,26 @@ namespace Gekko
                 constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
-            int[] ct = new int[niPlusNj + extraConstraints];
+            int[] constraintsType = new int[niPlusNj + extraConstraints];
             for (int i = 0; i < niPlusNj; i++)
             {
-                ct[i] = 0; //equality
+                constraintsType[i] = 0; //equality
             }
 
             for (int i = 0; i < extraConstraints; i++)
             {
-                ct[niPlusNj + i] = 0; //equality
+                constraintsType[niPlusNj + i] = 0; //equality
             }
 
             double[,] xResult = null;
 
             if (G.Equal(o.type, "default"))
             {
-                xResult = RAS(a, rowSums, colSums, 1000, o.totalTolerance);
+                if (extraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
+                DateTime t3 = DateTime.Now;
+                int iterations;
+                xResult = RAS(a, rowSums, colSums, 1000, o.totalTolerance, out iterations);
+                G.Writeln2("Normal RAS on " + ni + "x" + nj + " cells using " + iterations + " iterations in " + G.Seconds(t3));
             }
             else if (G.Equal(o.type, "entropy"))
             {
@@ -287,27 +291,27 @@ namespace Gekko
                 }
 
                 // bounds (xij > 0)
-                double[] bndl = new double[niMultiplyNj];
-                double[] bndu = new double[niMultiplyNj];
+                double[] boundsLower = new double[niMultiplyNj];
+                double[] boundsUpper = new double[niMultiplyNj];
 
                 for (int i = 0; i < niMultiplyNj; i++)
                 {
-                    bndl[i] = 1e-6;
-                    bndu[i] = double.PositiveInfinity;
-                }
-
-                double[] x = new double[ni * nj];
+                    boundsLower[i] = double.NegativeInfinity; // 1e-6; --> probably not much gain even if we say all cells must be positive
+                    boundsUpper[i] = double.PositiveInfinity;
+                }                
 
                 alglib.minbleicstate state;
                 alglib.minbleicreport rep;
                 alglib.minbleiccreate(x1d, out state);
-                alglib.minbleicsetbc(state, bndl, bndu);
-                alglib.minbleicsetlc(state, constraints, ct);
+                alglib.minbleicsetbc(state, boundsLower, boundsUpper); //limits, similar to GAMS lower and upper.
+                alglib.minbleicsetlc(state, constraints, constraintsType); //0 means exact, <= or >= are possible.
                 alglib.minbleicsetcond(state, 1e-10, 0, 0, 0);
                 DateTime t2 = DateTime.Now;
                 alglib.minbleicoptimize(state, F, null, null);
                 alglib.minbleicresults(state, out x1d, out rep);
-                G.Writeln2("Optimized " + ni + "x" + nj + " cells done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
+                string sConstraintsExtra = null;
+                if (extraConstraints > 0) sConstraintsExtra = " with " + extraConstraints + " constraints";
+                G.Writeln2("Optimized entropy on " + ni + "x" + nj + " cells" + sConstraintsExtra + " using " + rep.iterationscount + " iterations in " + G.Seconds(t2));
 
                 xResult = new double[ni, nj];
                 for (int k = 0; k < x1d.Length; k++)
@@ -318,6 +322,7 @@ namespace Gekko
                 }
             }
             else new Error("Expected %type option 'default' or 'entropy'");
+
             return xResult;
 
             void F(double[] x, ref double f, double[] g, object obj)
@@ -330,19 +335,31 @@ namespace Gekko
                         int k = i * nj + j;
                         double xij = x[k];
                         double aij = a[i, j];
-                        double lratio = Math.Log(xij / aij);
-                        //What are the f values used for? Can their calculation be dropped or set constant??
+                        double ratio = xij / aij;
+
+                        if (aij == 0)
+                        {                            
+                            g[k] = 0;
+                            continue;
+                        }
+
+                        if (ratio <= 0)
+                        {                            
+                            ratio = 1e-15; //Solver may have been overshooting beyound plus minus boundary
+                        }
+
+                        double lratio = Math.Log(ratio);                        
                         if (weights == null)
                         {
                             //Without weights
-                            f += xij * lratio;
-                            g[k] = lratio + 1;
+                            f += Math.Abs(xij) * lratio; //Note: it sees taking abs(xij) is the GRAS modification. Regarding log, cells should never be able to cross the plus/minus boundary.
+                            g[k] = (xij < 0) ? -(lratio + 1) : (lratio + 1);
                         }
                         else
                         {
-                            //With weights
-                            f += weights[i, j] * xij * lratio;
-                            g[k] = weights[i, j] * (lratio + 1);
+                            //With weights. Note: weights are always > 0.
+                            f += weights[i, j] * Math.Abs(xij) * lratio;
+                            g[k] = (xij < 0) ? (-weights[i, j] * (lratio + 1)) : (weights[i, j] * (lratio + 1));
                         }
                     }
                 }
@@ -522,8 +539,9 @@ namespace Gekko
 
             G.Writeln();
             DateTime t3 = DateTime.Now;
-            double[,] y = RAS(A, rowTotals, colTotals, 1000, 1e-10);            
-            G.Writeln("RAS " + N + "x" + N + " done " + G.Seconds(t3));
+            int iterations = -1;
+            double[,] y = RAS(A, rowTotals, colTotals, 1000, 1e-10, out iterations);
+            G.Writeln("RAS " + N + "x" + N + " done " + G.Seconds(t3) + " in " + iterations + " iterations");
             G.Writeln(y[0, 0] + "  " + y[0, 1] + " " + y[0, 2] + "  " + y[0, 3]);
             if (N <= 10)
             {
@@ -586,8 +604,9 @@ namespace Gekko
             }
         }
 
-        static double[,] RAS(double[,] A, double[] r, double[] c, int maxIter, double tol)
+        static double[,] RAS(double[,] A, double[] r, double[] c, int maxIter, double tol, out int iterations)
         {
+            iterations = -1;
             int n = A.GetLength(0);
             int m = A.GetLength(1);
 
@@ -650,11 +669,12 @@ namespace Gekko
 
                 if (maxError < tol)
                 {
-                    G.Writeln($"Converged in {iter + 1} iterations");
+                    //G.Writeln($"Converged in {iter + 1} iterations");
+                    iterations = iter + 1;
                     break;
                 }
-            }
-
+            }            
+            
             return X;
         }        
     }

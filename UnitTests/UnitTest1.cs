@@ -35407,13 +35407,14 @@ print(df2)
             I("colsum[d]= 51;");
             I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
+            I("prt <n> io;");
             I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'default'));");
+            I("prt <n> iony1;");
             I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+            I("prt <n> iony2;");
             //Sætter celle [a,a]==[a,b] og celle [a,c]==[a,d].
             I("#rest = (   (    ('a','a',-1), ('a','b',1), 0    ),      (    ('a','c',-1), ('a','d',1), 0    )     );");
             I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #rest, (%type = 'entropy'));");
-            I("prt <n> io;");
-            I("prt <n> iony2;");
             I("prt <n> iony3;");
 
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
