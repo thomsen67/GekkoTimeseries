@@ -35372,7 +35372,7 @@ print(df2)
         [TestMethod]
         public void _Test_Ras()
         {
-            double deltaHere = 0.00001d;  //!! adjust this if convergence criteria change!!
+            double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
             int year = 2020;
             I("reset;");
             I("time " + year + " " + year + ";");

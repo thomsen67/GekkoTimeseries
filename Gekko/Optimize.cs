@@ -203,9 +203,9 @@ namespace Gekko
             }
 
             // column constraints
-            for (int j = 0; j < ni; j++)
+            for (int j = 0; j < nj; j++)
             {
-                for (int i = 0; i < nj; i++)
+                for (int i = 0; i < ni; i++)
                 {
                     constraints[ni + j, i * nj + j] = 1;
                 }
@@ -228,11 +228,11 @@ namespace Gekko
             {
 
                 double[] x1d = new double[niMultiplyNj];
-                for (int i = 0; i < nr; i++)
+                for (int i = 0; i < ni; i++)
                 {
-                    for (int j = 0; j < nc; j++)
+                    for (int j = 0; j < nj; j++)
                     {
-                        x1d[i * nc + j] = a[i, j];
+                        x1d[i * nj + j] = a[i, j];
                     }
                 }
 
@@ -259,11 +259,11 @@ namespace Gekko
                 alglib.minbleicresults(state, out x1d, out rep);
                 G.Writeln2("Optimized " + ni + "x" + nj + " cells done " + G.Seconds(t2) + " iterations " + rep.iterationscount);
 
-                xResult = new double[nr, nc];
+                xResult = new double[ni, nj];
                 for (int k = 0; k < x1d.Length; k++)
                 {
-                    int i = k / nc;
-                    int j = k % nc;
+                    int i = k / nj;
+                    int j = k % nj;
                     xResult[i, j] = x1d[k];
                 }
             }
