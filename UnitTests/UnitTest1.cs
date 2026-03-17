@@ -35439,6 +35439,11 @@ print(df2)
             I("tell 'Entropy with constraints for x11==10';");
             I("prt <n> iony7;");
 
+
+            I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#w = #weights, %type = 'biproportional'));");
+            I("tell 'Original row/col RAS procedure';");
+            I("prt <n> iony7a;");
+
             I("iony8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
             I("tell 'Old 2003 entropy function';");
             I("prt <n> iony8;");
@@ -35459,10 +35464,9 @@ print(df2)
                 foreach (string i in rows)
                 {
                     foreach (string j in cols)
-                    {
-                        double d1 = (O.GetIVariableFromString("iony1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
-                        double d2 = (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t);
-                        Assert.AreEqual(d1, d2, deltaHere);
+                    {                        
+                        Assert.AreEqual((O.GetIVariableFromString("iony1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("iony7[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony7a[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
                     }
                 }
                 if (true)

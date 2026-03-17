@@ -304,13 +304,14 @@ namespace Gekko
             if (o.type == EOptimizeType.Biproportional)
             {
                 if (extraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
-                if (weights != null) new Error("You cannot use cell weights with the normal RAS procedure");
                 int max = 1000;
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = RAS(a, rowSums, colSums, max, o.totalTolerance, out iterations);
-                if (iterations == -1) new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
-                G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                xResult = RAS(a, rowSums, colSums, weights, max, o.totalTolerance, out iterations);
+                string sExtra = null;                
+                if (nWeights > 0) sExtra = " with " + nWeights + " fix-weight" + G.S(nWeights);
+                if (iterations == -1) new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
             else
             {
@@ -730,7 +731,7 @@ namespace Gekko
             G.Writeln();
             DateTime t3 = DateTime.Now;
             int iterations = -1;
-            double[,] y = RAS(A, rowTotals, colTotals, 1000, 1e-10, out iterations);
+            double[,] y = RAS(A, rowTotals, colTotals, null, 1000, 1e-10, out iterations);
             G.Writeln("RAS " + N + "x" + N + " done " + G.Seconds(t3) + " in " + iterations + " iterations");
             G.Writeln(y[0, 0] + "  " + y[0, 1] + " " + y[0, 2] + "  " + y[0, 3]);
             if (N <= 10)
@@ -794,13 +795,36 @@ namespace Gekko
             }
         }
 
-        static double[,] RAS(double[,] a, double[] r, double[] c, int maxIter, double tol, out int iterations)
+        static double[,] RAS(double[,] a, double[] r, double[] c, double[,] weights, int maxIter, double tol, out int iterations)
         {
+            double limit = 1000000d;
             iterations = -1; //signals failure
             int n = a.GetLength(0);
             int m = a.GetLength(1);
-
+                        
+            double[] adjR = (double[])r.Clone();
+            double[] adjC = (double[])c.Clone();
             double[,] x = (double[,])a.Clone();
+
+            if (weights != null)
+            {                
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        if (weights[i, j] >= limit)
+                        {
+                            adjR[i] -= a[i, j];
+                            adjC[j] -= a[i, j];
+                            x[i, j] = 0; // Temporarily 0 so scaling factors don't affect it
+                        }
+                        else if (weights[i, j] != 1d)
+                        {
+                            new Error("When setting weights for the biproportional method, these weights must be >= 1000000 to indicate absolute fixation (w[" + i + ", " + j + "] = " + weights[i, j] + ")");
+                        }
+                    }
+                }
+            }
 
             for (int iter = 0; iter < maxIter; iter++)
             {
@@ -808,62 +832,69 @@ namespace Gekko
                 for (int i = 0; i < n; i++)
                 {
                     double sum = 0;
+                    for (int j = 0; j < m; j++) sum += x[i, j];
 
-                    for (int j = 0; j < m; j++)
-                        sum += x[i, j];
-
-                    double factor = r[i] / sum;
-
-                    for (int j = 0; j < m; j++)
-                        x[i, j] *= factor;
+                    if (sum > 0) // Avoid division by zero if all cells in row are fixed/zero
+                    {
+                        double factor = adjR[i] / sum;
+                        for (int j = 0; j < m; j++) x[i, j] *= factor;
+                    }
                 }
 
                 // ---- Column scaling ----
                 for (int j = 0; j < m; j++)
                 {
                     double sum = 0;
+                    for (int i = 0; i < n; i++) sum += x[i, j];
 
-                    for (int i = 0; i < n; i++)
-                        sum += x[i, j];
-
-                    double factor = c[j] / sum;
-
-                    for (int i = 0; i < n; i++)
-                        x[i, j] *= factor;
+                    if (sum > 0)
+                    {
+                        double factor = adjC[j] / sum;
+                        for (int i = 0; i < n; i++) x[i, j] *= factor;
+                    }
                 }
 
                 // ---- Convergence test ----
                 double maxError = 0;
 
-                // row errors
+                // Note: For checking error, we must mentally "add back" the fixed cells
+                // which is equivalent to checking active sum against adjR/adjC
                 for (int i = 0; i < n; i++)
                 {
                     double sum = 0;
-
-                    for (int j = 0; j < m; j++)
-                        sum += x[i, j];
-
-                    maxError = Math.Max(maxError, Math.Abs(sum - r[i]));
+                    for (int j = 0; j < m; j++) sum += x[i, j];
+                    maxError = Math.Max(maxError, Math.Abs(sum - adjR[i]));
                 }
 
-                // column errors
                 for (int j = 0; j < m; j++)
                 {
                     double sum = 0;
-
-                    for (int i = 0; i < n; i++)
-                        sum += x[i, j];
-
-                    maxError = Math.Max(maxError, Math.Abs(sum - c[j]));
+                    for (int i = 0; i < n; i++) sum += x[i, j];
+                    maxError = Math.Max(maxError, Math.Abs(sum - adjC[j]));
                 }
 
                 if (maxError < tol)
-                {                    
+                {
                     iterations = iter + 1;
                     break;
                 }
-            }            
-            
+            }
+
+            if (weights != null)
+            {
+                // 4. Restore fixed cells
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        if (weights[i, j] >= limit)
+                        {
+                            x[i, j] = a[i, j];
+                        }
+                    }
+                }
+            }
+
             return x;
         }        
     }
