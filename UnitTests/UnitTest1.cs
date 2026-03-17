@@ -35417,8 +35417,8 @@ print(df2)
             I("tell 'New 2013 entropy function, no #c or #w';");
             I("prt <n> iony2;");            
             
-            I("#constraints = (   (    ('a','a',-1), ('a','b',1), 0    ),      (    ('a','c',-1), ('a','d',1), 0    )     );");            
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #constraints, (%type = 'entropy'));");
+            I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('a','c',-1) ,('a','d',1), 0  )  );");            
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#c = #constraints, %type = 'entropy'));");
             I("tell 'New 2013 entropy function, #c set so that [a,a]==[a,b] and [a,c]==[a,d]';");
             I("prt <n> iony3;");
 
@@ -35430,13 +35430,13 @@ print(df2)
             I("tell 'Squared relative differences';");
             I("prt <n> iony5;");
 
-            I("#weights = (   ('a','a',1000000), ('a','b',1)    );");
-            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, null(), #weights, (%type = 'entropy'));");
+            I("#weights = (  ('a','a',1000000),  );");
+            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#w = #weights, %type = 'entropy'));");
             I("tell 'Entropy with weights for x11==10';");
             I("prt <n> iony6;");
 
-            I("#constraints = (   (    ('a','a'), 10    ),  );");            
-            I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, #constraints, null(), (%type = 'entropy'));");
+            I("#constraints = (  (  ('a','a'), 10  ),  );");
+            I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, (#c = #constraints, %type = 'entropy'));");
             I("tell 'Entropy with constraints for x11==10';");
             I("prt <n> iony7;");
 

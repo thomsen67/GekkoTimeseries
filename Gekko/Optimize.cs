@@ -32,7 +32,7 @@ namespace Gekko
     class Optimize
     {        
 
-        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable[] other)
+        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
         {            
             Series adjusted = input.DeepClone(0, null, null) as Series;
             if (adjusted == null) new Error("Expected series input as first argument");
@@ -48,16 +48,15 @@ namespace Gekko
             List constraints = null;
             List weights = null;
 
-            if (other.Length > 0)
+            if (other != null)
             {
-                IVariable[] other2 = other.Clone() as IVariable[];
-
                 //Options                
-                if (other.Last().Type() == EVariableType.Map)
+                if (other.Type() == EVariableType.Map)
                 {
-                    Map options_map = other.Last() as Map;
+                    IVariable temp = null;
+                    Map options_map = other as Map;
                     //Type can be 'fast', 
-                    IVariable temp; if (options_map.storage.TryGetValue("%type", out temp))
+                    if (options_map.storage.TryGetValue("%type", out temp))
                     {
                         string s = O.ConvertToString(temp);
                         if (G.Equal(s, "biproportional")) o.type = EOptimizeType.Biproportional;
@@ -69,24 +68,18 @@ namespace Gekko
                         else if (G.Equal(s, "distrel")) o.type = EOptimizeType.DistRel;
                         else new Error("Expected type 'default', 'entropy', 'sqdif', 'sqrel', 'distdif' or 'distrel'");
                     }
-                    other2 = other.Take(other.Length - 1).ToArray();
-                }
 
-                if (other2.Length == 0)
-                {
-                    //ok!
+                    if (options_map.storage.TryGetValue("#c", out temp))
+                    {
+                        constraints = temp as List;
+                    }
+
+                    if (options_map.storage.TryGetValue("#w", out temp))
+                    {
+                        weights = temp as List;
+                    }
                 }
-                else if (other2.Length == 1)
-                {
-                    constraints = other2[0] as List; //Will be null if null()
-                }
-                else if (other2.Length == 2)
-                {
-                    constraints = other2[0] as List; //Will be null if null()
-                    weights = other2[1] as List; //Will be null if null()
-                }
-                else new Error("Expected 1 or 2 arguments after column names (and before any map of options as the last argument)");
-            }            
+            }   
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
@@ -153,6 +146,7 @@ namespace Gekko
             //            
             //            
 
+            int nWeights = 0;
             double[,] weights = null;
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
@@ -249,6 +243,7 @@ namespace Gekko
                 foreach (IVariable temp1 in weights2)
                 {
                     //('a', 'b', 2)
+                    nWeights++;
                     List<IVariable> temp2 = O.ConvertToList(temp1);
                     if (temp2.Count != 3) new Error("Expected 3 elements regarding constraint");
                     string s0 = O.ConvertToString(temp2[0]);
@@ -310,10 +305,11 @@ namespace Gekko
             {
                 if (extraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
                 if (weights != null) new Error("You cannot use cell weights with the normal RAS procedure");
-                
+                int max = 1000;
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = RAS(a, rowSums, colSums, 1000, o.totalTolerance, out iterations);
+                xResult = RAS(a, rowSums, colSums, max, o.totalTolerance, out iterations);
+                if (iterations == -1) new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
             else
@@ -346,10 +342,29 @@ namespace Gekko
                 DateTime t2 = DateTime.Now;
                 alglib.minbleicoptimize(state, F, null, null);
                 alglib.minbleicresults(state, out x1d, out rep);
-                string sConstraintsExtra = null;
-                if (extraConstraints > 0) sConstraintsExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints) + "";
-                G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sConstraintsExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2));
 
+                string sExtra = null;
+                if (extraConstraints > 0 && nWeights == 0) sExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints);
+                else if (extraConstraints == 0 && nWeights > 0) sExtra = " with " + nWeights + " weight" + G.S(nWeights);
+                else if (extraConstraints > 0 && nWeights > 0) sExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints) + " and " + nWeights + " weight" + G.S(nWeights);
+
+                string s = null;
+                if (rep.terminationtype == -7) s = "Gradient verification failed.";
+                else if (rep.terminationtype == -3) s = "Inconsistent constraints. Feasible point is either nonexistent or too hard to find. Try to restart optimizer with better initial approximation.";
+                else if (rep.terminationtype == 1) s = "Relative function improvement is no more than EpsF.";
+                else if (rep.terminationtype == 2) s = "Scaled step is no more than EpsX.";
+                else if (rep.terminationtype == 4) s = "Scaled gradient norm is no more than EpsG.";
+                else if (rep.terminationtype == 5) s = "MaxIts steps was taken";
+
+                if (rep.terminationtype == 1 || rep.terminationtype == 2 || rep.terminationtype == 4)
+                {
+                    G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2));
+                }
+                else
+                {
+                    G.Writeln2("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". Solver message: " + s);
+                }
+                
                 xResult = new double[ni, nj];
                 for (int k = 0; k < x1d.Length; k++)
                 {
@@ -740,13 +755,13 @@ namespace Gekko
             }
         }
 
-        static double[,] RAS(double[,] A, double[] r, double[] c, int maxIter, double tol, out int iterations)
+        static double[,] RAS(double[,] a, double[] r, double[] c, int maxIter, double tol, out int iterations)
         {
-            iterations = -1;
-            int n = A.GetLength(0);
-            int m = A.GetLength(1);
+            iterations = -1; //signals failure
+            int n = a.GetLength(0);
+            int m = a.GetLength(1);
 
-            double[,] X = (double[,])A.Clone();
+            double[,] x = (double[,])a.Clone();
 
             for (int iter = 0; iter < maxIter; iter++)
             {
@@ -756,12 +771,12 @@ namespace Gekko
                     double sum = 0;
 
                     for (int j = 0; j < m; j++)
-                        sum += X[i, j];
+                        sum += x[i, j];
 
                     double factor = r[i] / sum;
 
                     for (int j = 0; j < m; j++)
-                        X[i, j] *= factor;
+                        x[i, j] *= factor;
                 }
 
                 // ---- Column scaling ----
@@ -770,12 +785,12 @@ namespace Gekko
                     double sum = 0;
 
                     for (int i = 0; i < n; i++)
-                        sum += X[i, j];
+                        sum += x[i, j];
 
                     double factor = c[j] / sum;
 
                     for (int i = 0; i < n; i++)
-                        X[i, j] *= factor;
+                        x[i, j] *= factor;
                 }
 
                 // ---- Convergence test ----
@@ -787,7 +802,7 @@ namespace Gekko
                     double sum = 0;
 
                     for (int j = 0; j < m; j++)
-                        sum += X[i, j];
+                        sum += x[i, j];
 
                     maxError = Math.Max(maxError, Math.Abs(sum - r[i]));
                 }
@@ -798,20 +813,19 @@ namespace Gekko
                     double sum = 0;
 
                     for (int i = 0; i < n; i++)
-                        sum += X[i, j];
+                        sum += x[i, j];
 
                     maxError = Math.Max(maxError, Math.Abs(sum - c[j]));
                 }
 
                 if (maxError < tol)
-                {
-                    //G.Writeln($"Converged in {iter + 1} iterations");
+                {                    
                     iterations = iter + 1;
                     break;
                 }
             }            
             
-            return X;
+            return x;
         }        
     }
 }

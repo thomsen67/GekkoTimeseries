@@ -855,11 +855,11 @@ namespace Gekko
         {
             return rename(smpl, _t1, _t2, x1, x2, new ScalarString("none"));
         }
-        
+
         public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
         {
             //Cannot get ... , params IVariable[] args to work.... --> unknown reason
-            IVariable[] args = new IVariable[] { x1, x2, x3 };            
+            IVariable[] args = new IVariable[] { x1, x2, x3 };
 
             bool drop = false; //drop non-touched combos
             if (args.Length == 0 || args.Length > 3) new Error("Function rename() accepts 1-3 parameters");
@@ -906,10 +906,10 @@ namespace Gekko
             List<string> renameFrom = new List<string>();
             List<string> renameTo = new List<string>();
             //Note: slot #i in the following list corresponds to dimension number i+1 !
-            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();            
+            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();
 
             string cfg = "Config list: ";
-            
+
             int row = 0;
             foreach (IVariable iv in rowList)
             {
@@ -922,7 +922,7 @@ namespace Gekko
                     col++;
                     ScalarString ss = ivCol as ScalarString;
                     if (ss == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be a string");
-                    string s = ss.string2;                    
+                    string s = ss.string2;
                     if (s == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-null"); //Can this ever happen?
                     s = s.Trim();
                     if (col == 1)
@@ -931,7 +931,7 @@ namespace Gekko
                         if (i == int.MaxValue) new Error(cfg + "Cannot convert string '" + s + "' into an integer");
                         if (i < 1) new Error("Dimension number " + i + ", must be >= 1");
                         oldDim.Add(i);
-                    }                    
+                    }
                     else if (col == 2)
                     {
                         renameFrom.Add(s);
@@ -961,11 +961,11 @@ namespace Gekko
 
             for (int i = 0; i < fromTo.Count; i++)
             {
-                GekkoDictionary<string, string> d = fromTo[i];                
+                GekkoDictionary<string, string> d = fromTo[i];
                 string s = Program.HasDuplicateValues(d);
                 if (s != null) new Error("In dimension " + (i + 1) + ", the to name '" + s + "' appears > 1 time");
             }
-            
+
             // ================================================
             // Now we are ready for reordering and renaming
             // ================================================
@@ -1206,13 +1206,13 @@ namespace Gekko
         }
 
         public static IVariable reorder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
-        {            
+        {
             IVariable iv = vals(smpl, _t1, _t2, x2);
 
             List iv_list = iv as List;
             if (iv_list == null) new Error("Malformed list");
 
-            if(iv_list.list.Count==0) new Error("Empty list not allowed");
+            if (iv_list.list.Count == 0) new Error("Empty list not allowed");
 
             List<int> reorder = new List<int>();
             foreach (IVariable element in iv_list.list)
@@ -1228,7 +1228,7 @@ namespace Gekko
             bool has1 = false;
             SortedDictionary<int, int> tjek = new SortedDictionary<int, int>();
             foreach (int i in reorder)
-            {                
+            {
                 if (!tjek.ContainsKey(i)) tjek.Add(i, 0);
             }
 
@@ -1237,7 +1237,7 @@ namespace Gekko
             {
                 counter++;
                 if (kvp.Key != counter) new Error("In list, expected an element " + counter + ", but it is not present in the list.");
-            }            
+            }
 
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
@@ -1249,12 +1249,12 @@ namespace Gekko
             {
                 new Error("Array-series expected to have " + reorder.Count + " dimensions, but has " + ts.dimensions);
             }
-            
+
             //Series tsNew = new Series(ts.freq, G.Chop_SetFreq(ts.name, ts.freq));
             //tsNew.SetArrayTimeseries(ts.dimensions + 1, true);
             Series tsNew = ts.DeepClone(0, null, null) as Series;
             foreach (KeyValuePair<MultidimElement, IVariable> kvp in tsNew.dimensionsStorage.storage)
-            {                
+            {
                 MultidimElement map = kvp.Key;
                 List<string> remember = new List<string>(map.storage);
                 for (int i = 0; i < reorder.Count; i++)
@@ -1262,7 +1262,7 @@ namespace Gekko
                     //from i --> ii
                     int ii = reorder[i];
                     map.storage[i] = remember[ii - 1];
-                }                
+                }
             }
             return tsNew;
         }
@@ -1281,7 +1281,7 @@ namespace Gekko
             {
                 new Error("Array-series does not have a dimension #" + iDim);
             }
-                        
+
             Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
@@ -1440,7 +1440,7 @@ namespace Gekko
             Databank db = Program.databanks.GetDatabank(y1);
             if (db == null)
             {
-                new Error("No open databank has the name '" + y1 + "'");                
+                new Error("No open databank has the name '" + y1 + "'");
             }
 
             string y2 = x2.ConvertToString();
@@ -1823,8 +1823,12 @@ namespace Gekko
             double d = alglib.rmatrixdet(m.data);
             return new ScalarVal(d);
         }
+        public static IVariable ras(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames)
+        {
+            return ras(smpl, _t1, _t2, a, rowSums, colSums, rowNames, colNames, null);
+        }
 
-        public static IVariable ras(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, params IVariable[] other)
+        public static IVariable ras(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             return Optimize.Ras1(t1, t2, a, rowSums, colSums, rowNames, colNames, other);

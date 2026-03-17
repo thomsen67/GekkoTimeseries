@@ -2839,12 +2839,12 @@ namespace Gekko
                 //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
                 //new Writeln("0 --> " + M.Errorf(0d));
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
-                //                
-
-                Optimize.RAS();
+                //                                
 
                 if (Globals.runningOnTTComputer)
                 {
+                    //Optimize.RAS();
+
                     if (true)
                     {
                         //Entity expr = "2 x^2 * y + z = 200";
