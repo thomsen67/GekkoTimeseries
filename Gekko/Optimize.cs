@@ -32,7 +32,7 @@ namespace Gekko
     class Optimize
     {        
 
-        public static IVariable Ras1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
+        public static IVariable Optimize1(GekkoTime t1, GekkoTime t2, IVariable input, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
         {            
             Series adjusted = input.DeepClone(0, null, null) as Series;
             if (adjusted == null) new Error("Expected series input as first argument");
@@ -117,7 +117,7 @@ namespace Gekko
                     colSums_array[nj] = d;
                 }
 
-                double[,] xResult = Ras2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, o);
+                double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, o);
 
                 ni = -1;
                 nj = -1;
@@ -136,7 +136,7 @@ namespace Gekko
             return adjusted;
         }
 
-        public static double[,] Ras2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
+        public static double[,] Optimize2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
         {
             //We could have strings like "[a,b] + [a,c] - 2*x[a,d] = 500". But maybe a more generic approach is better:
             //                           (('a','b'), ('a','c'), ('a', 'd', -2), 500),
@@ -327,11 +327,38 @@ namespace Gekko
                 double[] boundsLower = new double[niMultiplyNj];
                 double[] boundsUpper = new double[niMultiplyNj];
 
-                for (int i = 0; i < niMultiplyNj; i++)
+                for (int i = 0; i < ni; i++)
                 {
-                    boundsLower[i] = double.NegativeInfinity; // 1e-6; --> probably not much gain even if we say all cells must be positive
-                    boundsUpper[i] = double.PositiveInfinity;
-                }                
+                    for (int j = 0; j < nj; j++)
+                    {
+                        int k = i * nj + j;
+                        double aij = a[i, j];
+                        if (false && o.type == EOptimizeType.Entropy)
+                        {
+                            if (aij > 0)
+                            {
+                                boundsLower[k] = 1e-12;       // Must stay positive
+                                boundsUpper[k] = double.PositiveInfinity;
+                            }
+                            else if (aij < 0)
+                            {
+                                boundsLower[k] = double.NegativeInfinity;
+                                boundsUpper[k] = -1e-12;      // Must stay negative
+                            }
+                            else
+                            {
+                                boundsLower[k] = 0;           // Structural zero
+                                boundsUpper[k] = 0;
+                            }
+
+                        }
+                        else
+                        {
+                            boundsLower[k] = double.NegativeInfinity; // 1e-6; --> probably not much gain even if we say all cells must be positive
+                            boundsUpper[k] = double.PositiveInfinity;
+                        }
+                    }
+                }    
 
                 alglib.minbleicstate state;
                 alglib.minbleicreport rep;
@@ -359,13 +386,13 @@ namespace Gekko
 
                 if (rep.terminationtype == 1 || rep.terminationtype == 2 || rep.terminationtype == 4 || rep.terminationtype == 7)
                 {
-                    G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ", termination type #" + rep.terminationtype + ".");
+                    G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ", termination type " + rep.terminationtype + ".");
                 }
                 else
                 {
                     string s2 = null;
                     if (s != null) s2 = "Solver message: " + s;
-                    new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". " + s2 + ". Termination type #" + rep.terminationtype + ".");
+                    new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". " + s2 + ". Termination type " + rep.terminationtype + ".");
                 }
                 
                 xResult = new double[ni, nj];
@@ -415,13 +442,13 @@ namespace Gekko
                                 //So for aij > 0 it reduces to:                                    
                                 //xij log(xij / aij) - xij + aij
                                 //The last 2 terms tend to cancel out in RAS procedure.                                    
-                                f += Math.Abs(aij) * (ratio * lratio - ratio + 1d);
-                                g[k] = Math.Sign(aij) * lratio;
+                                f += Math.Abs(aij) * Theta(ratio);
+                                g[k] = Math.Sign(aij) * Thetadiff(ratio);
                             }
                             else
                             {
-                                f += weights[i, j] * Math.Abs(aij) * (ratio * lratio - ratio + 1d);
-                                g[k] = weights[i, j] * Math.Sign(aij) * lratio;
+                                f += weights[i, j] * Theta(ratio);
+                                g[k] = weights[i, j] * Thetadiff(ratio);
                             }
                         }
                         else if (o.type == EOptimizeType.Entropy2003)
@@ -520,6 +547,15 @@ namespace Gekko
             }
         }
 
+        public static double Theta(double x)
+        {
+            return x * Math.Log(x) - x + 1;
+        }
+
+        public static double Thetadiff(double x)
+        {
+            return Math.Log(x);
+        }
 
         public static void RAS()
         {

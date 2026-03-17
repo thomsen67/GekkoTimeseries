@@ -2843,7 +2843,10 @@ namespace Gekko
 
                 if (Globals.runningOnTTComputer)
                 {
-                    //Optimize.RAS();
+                    if (false)
+                    {
+                        Optimize.RAS();
+                    }
 
                     if (true)
                     {

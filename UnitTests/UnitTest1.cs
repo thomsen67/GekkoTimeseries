@@ -35372,10 +35372,8 @@ print(df2)
         [TestMethod]
         public void _Test_Ras()
         {
-            //TODO: handle pure == 0d.
-            //TODO: handle weights
-            //TODO: abs() on function? And how do negative cells do?
-            //TODO: sum of (xij-aij)^2, or ((xij-aij)/aij)^2
+            //TODO: handle pure == 0d.         
+            //TODO: abs() on function? And how do negative cells do?            
 
             double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
             int year = 2020;
@@ -35414,12 +35412,13 @@ print(df2)
             I("prt <n> iony1;");
             
             I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
-            I("tell 'New 2013 entropy function, no #c or #w';");
-            I("prt <n> iony2;");            
-            
-            I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('a','c',-1) ,('a','d',1), 0  )  );");            
+            I("tell 'Entropy function (2013)';");
+            I("prt <n> iony2;");
+
+            double sum = 60d;
+            I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
             I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#c = #constraints, %type = 'entropy'));");
-            I("tell 'New 2013 entropy function, #c set so that [a,a]==[a,b] and [a,c]==[a,d]';");
+            I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
             I("prt <n> iony3;");
 
             I("iony4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
@@ -35471,8 +35470,8 @@ print(df2)
                     //Test the 2 restrictions
                     Assert.AreEqual((O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
                                     (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                    Assert.AreEqual((O.GetIVariableFromString("iony3[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                    (O.GetIVariableFromString("iony3[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                    Assert.AreEqual((O.GetIVariableFromString("iony3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t)+
+                                    (O.GetIVariableFromString("iony3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
                 }
             }
         }
