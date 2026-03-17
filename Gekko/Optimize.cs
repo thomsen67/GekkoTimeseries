@@ -347,19 +347,44 @@ namespace Gekko
                         {                            
                             ratio = 1e-15; //Solver may have been overshooting beyound plus minus boundary
                         }
+                        
+                        double lratio = Math.Log(ratio);
 
-                        double lratio = Math.Log(ratio);                        
-                        if (weights == null)
+                        if (true)
                         {
-                            //Without weights
-                            f += Math.Abs(xij) * lratio; //Note: it sees taking abs(xij) is the GRAS modification. Regarding log, cells should never be able to cross the plus/minus boundary.
-                            g[k] = (xij < 0) ? -(lratio + 1) : (lratio + 1);
+                            //Seems to give the same as RAS, and the same as (false), for positive cells.
+                            if (weights == null)
+                            {
+                                //Temurshoev, Miller, and Bouwmeester, titled "A Note on the GRAS Method", 2013.
+                                //abs(xij) * log(xij/aij) --> abs(aij) * (xij/aij log(xij/aij) - xij/aij + 1)
+                                //So for aij > 0 it reduces:
+                                //aij * (xij/aij log(xij/aij) - xij/aij + 1)
+                                //xij log(xij / aij) - xij + aij
+                                //The last 2 terms tend to cancel out in RAS procedure.
+                                // 2013 Refined Objective Function
+                                f += Math.Abs(aij) * (ratio * lratio - ratio + 1);
+                                g[k] = Math.Sign(aij) * lratio;
+                            }
+                            else
+                            {
+                                f += weights[i, j] * Math.Abs(aij) * (ratio * lratio - ratio + 1);
+                                g[k] = weights[i, j] * Math.Sign(aij) * lratio;
+                            }
                         }
                         else
                         {
-                            //With weights. Note: weights are always > 0.
-                            f += weights[i, j] * Math.Abs(xij) * lratio;
-                            g[k] = (xij < 0) ? (-weights[i, j] * (lratio + 1)) : (weights[i, j] * (lratio + 1));
+                            if (weights == null)
+                            {
+                                //Without weights
+                                f += Math.Abs(xij) * lratio; //Note: it sees taking abs(xij) is the GRAS modification. Regarding log, cells should never be able to cross the plus/minus boundary.
+                                g[k] = Math.Sign(xij) * (lratio + 1);
+                            }
+                            else
+                            {
+                                //With weights. Note: weights are always > 0.
+                                f += weights[i, j] * Math.Abs(xij) * lratio;
+                                g[k] = weights[i, j] * Math.Sign(xij) * (lratio + 1);
+                            }
                         }
                     }
                 }
