@@ -35408,14 +35408,52 @@ print(df2)
             I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("prt <n> io;");
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'default'));");
+            
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'biproportional'));");
+            I("tell 'Original row/col RAS procedure';");
             I("prt <n> iony1;");
+            
             I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
-            I("prt <n> iony2;");
-            //Sætter celle [a,a]==[a,b] og celle [a,c]==[a,d].
-            I("#rest = (   (    ('a','a',-1), ('a','b',1), 0    ),      (    ('a','c',-1), ('a','d',1), 0    )     );");
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #rest, (%type = 'entropy'));");
+            I("tell 'New 2013 entropy function, no #c or #w';");
+            I("prt <n> iony2;");            
+            
+            I("#constraints = (   (    ('a','a',-1), ('a','b',1), 0    ),      (    ('a','c',-1), ('a','d',1), 0    )     );");            
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, #constraints, (%type = 'entropy'));");
+            I("tell 'New 2013 entropy function, #c set so that [a,a]==[a,b] and [a,c]==[a,d]';");
             I("prt <n> iony3;");
+
+            I("iony4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
+            I("tell 'Squared absolute differences';");
+            I("prt <n> iony4;");
+
+            I("iony5 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
+            I("tell 'Squared relative differences';");
+            I("prt <n> iony5;");
+
+            I("#weights = (   ('a','a',1000000), ('a','b',1)    );");
+            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, null(), #weights, (%type = 'entropy'));");
+            I("tell 'Entropy with weights for x11==10';");
+            I("prt <n> iony6;");
+
+            I("#constraints = (   (    ('a','a'), 10    ),  );");            
+            I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, #constraints, null(), (%type = 'entropy'));");
+            I("tell 'Entropy with constraints for x11==10';");
+            I("prt <n> iony7;");
+
+            I("iony8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+            I("tell 'Old 2003 entropy function';");
+            I("prt <n> iony8;");
+
+            I("iony9 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
+            I("tell 'Distance/abs on differences';");
+            I("prt <n> iony9;");
+
+            I("iony10 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
+            I("tell 'Distance/abs on relative differences';");
+            I("prt <n> iony10;");
+
+            //!! It is strange that iony6 and iony7 both have a11 == 10, but the other cells deviate from 
+            //   each other. Using #rest like in iony7 is clearly most clean to remove the cell completely.
 
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
             {

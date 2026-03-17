@@ -12,9 +12,21 @@ namespace Gekko
 
     public class OptimizerOptions
     {
-        public string type = "default"; // default | fast
+        public EOptimizeType type = EOptimizeType.Biproportional; //default
         public double totalTolerance = 0.001;  //1 promille
         public bool treatNaNAs0 = true;
+    }
+
+    public enum EOptimizeType
+    {
+        Biproportional,
+        Entropy,
+        Entropy2003,
+        SqDif,
+        SqRel,
+        DistDif,
+        DistRel,
+        
     }
 
     class Optimize
@@ -45,7 +57,18 @@ namespace Gekko
                 {
                     Map options_map = other.Last() as Map;
                     //Type can be 'fast', 
-                    IVariable temp; if (options_map.storage.TryGetValue("%type", out temp)) { o.type = O.ConvertToString(temp); }
+                    IVariable temp; if (options_map.storage.TryGetValue("%type", out temp))
+                    {
+                        string s = O.ConvertToString(temp);
+                        if (G.Equal(s, "biproportional")) o.type = EOptimizeType.Biproportional;
+                        else if (G.Equal(s, "entropy")) o.type = EOptimizeType.Entropy;
+                        else if (G.Equal(s, "entropy2003")) o.type = EOptimizeType.Entropy2003;
+                        else if (G.Equal(s, "sqdif")) o.type = EOptimizeType.SqDif;
+                        else if (G.Equal(s, "sqrel")) o.type = EOptimizeType.SqRel;
+                        else if (G.Equal(s, "distdif")) o.type = EOptimizeType.DistDif;
+                        else if (G.Equal(s, "distrel")) o.type = EOptimizeType.DistRel;
+                        else new Error("Expected type 'default', 'entropy', 'sqdif', 'sqrel', 'distdif' or 'distrel'");
+                    }
                     other2 = other.Take(other.Length - 1).ToArray();
                 }
 
@@ -55,12 +78,12 @@ namespace Gekko
                 }
                 else if (other2.Length == 1)
                 {
-                    constraints = other2[0] as List;
+                    constraints = other2[0] as List; //Will be null if null()
                 }
                 else if (other2.Length == 2)
                 {
-                    constraints = other2[0] as List;
-                    weights = other2[1] as List;
+                    constraints = other2[0] as List; //Will be null if null()
+                    weights = other2[1] as List; //Will be null if null()
                 }
                 else new Error("Expected 1 or 2 arguments after column names (and before any map of options as the last argument)");
             }            
@@ -211,9 +234,17 @@ namespace Gekko
                 }
                 extraConstraints = counter + 1;
             }
-
+            
             if (weights3 != null)
             {
+                weights = new double[ni, nj];
+                for (int i = 0; i < ni; i++)
+                {
+                    for (int j = 0; j < nj; j++)
+                    {
+                        weights[i, j] = 1d; //default
+                    }
+                }
                 List<IVariable> weights2 = O.ConvertToList(weights3);
                 foreach (IVariable temp1 in weights2)
                 {
@@ -221,13 +252,17 @@ namespace Gekko
                     List<IVariable> temp2 = O.ConvertToList(temp1);
                     if (temp2.Count != 3) new Error("Expected 3 elements regarding constraint");
                     string s0 = O.ConvertToString(temp2[0]);
+                    int i0 = rowNames.IndexOf(s0);
+                    if (i0 < 0) new Error("Constraing: could not find '" + s0 + "' as row name");                    
                     string s1 = O.ConvertToString(temp2[1]);
+                    int i1 = colNames.IndexOf(s1);                    
+                    if (i1 < 0) new Error("Constraing: could not find '" + s1 + "' as col name");                    
                     double d = O.ConvertToVal(temp2[2]);
-                    //Handle
+                    weights[i0, i1] = d;
                 }
             }
 
-            double[,] constraints = new double[niPlusNj + extraConstraints, niMultiplyNj + 1]; //why + 1 ??? Is it not number of cells? Maybe constant term?
+            double[,] constraints = new double[niPlusNj + extraConstraints, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
 
             for (int i = 0; i < extraConstraints; i++)
             {
@@ -271,15 +306,17 @@ namespace Gekko
 
             double[,] xResult = null;
 
-            if (G.Equal(o.type, "default"))
+            if (o.type == EOptimizeType.Biproportional)
             {
                 if (extraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
+                if (weights != null) new Error("You cannot use cell weights with the normal RAS procedure");
+                
                 DateTime t3 = DateTime.Now;
                 int iterations;
                 xResult = RAS(a, rowSums, colSums, 1000, o.totalTolerance, out iterations);
-                G.Writeln2("Normal RAS on " + ni + "x" + nj + " cells using " + iterations + " iterations in " + G.Seconds(t3));
+                G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
-            else if (G.Equal(o.type, "entropy"))
+            else
             {
                 double[] x1d = new double[niMultiplyNj];
                 for (int i = 0; i < ni; i++)
@@ -310,8 +347,8 @@ namespace Gekko
                 alglib.minbleicoptimize(state, F, null, null);
                 alglib.minbleicresults(state, out x1d, out rep);
                 string sConstraintsExtra = null;
-                if (extraConstraints > 0) sConstraintsExtra = " with " + extraConstraints + " constraints";
-                G.Writeln2("Optimized entropy on " + ni + "x" + nj + " cells" + sConstraintsExtra + " using " + rep.iterationscount + " iterations in " + G.Seconds(t2));
+                if (extraConstraints > 0) sConstraintsExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints) + "";
+                G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sConstraintsExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2));
 
                 xResult = new double[ni, nj];
                 for (int k = 0; k < x1d.Length; k++)
@@ -321,7 +358,6 @@ namespace Gekko
                     xResult[i, j] = x1d[k];
                 }
             }
-            else new Error("Expected %type option 'default' or 'entropy'");
 
             return xResult;
 
@@ -338,52 +374,127 @@ namespace Gekko
                         double ratio = xij / aij;
 
                         if (aij == 0)
-                        {                            
+                        {
                             g[k] = 0;
                             continue;
                         }
 
                         if (ratio <= 0)
-                        {                            
+                        {
                             ratio = 1e-15; //Solver may have been overshooting beyound plus minus boundary
                         }
-                        
+
                         double lratio = Math.Log(ratio);
 
-                        if (true)
+                        if (o.type == EOptimizeType.Entropy)
                         {
+                            //2013 paper (note)
                             //Seems to give the same as RAS, and the same as (false), for positive cells.
                             if (weights == null)
                             {
-                                //Temurshoev, Miller, and Bouwmeester, titled "A Note on the GRAS Method", 2013.
+                                //Temurshoev, Miller, and Bouwmeester (2013): "A Note on the GRAS Method"
                                 //abs(xij) * log(xij/aij) --> abs(aij) * (xij/aij log(xij/aij) - xij/aij + 1)
-                                //So for aij > 0 it reduces:
-                                //aij * (xij/aij log(xij/aij) - xij/aij + 1)
+                                //So for aij > 0 it reduces to:                                    
                                 //xij log(xij / aij) - xij + aij
-                                //The last 2 terms tend to cancel out in RAS procedure.
-                                // 2013 Refined Objective Function
-                                f += Math.Abs(aij) * (ratio * lratio - ratio + 1);
+                                //The last 2 terms tend to cancel out in RAS procedure.                                    
+                                f += Math.Abs(aij) * (ratio * lratio - ratio + 1d);
                                 g[k] = Math.Sign(aij) * lratio;
                             }
                             else
                             {
-                                f += weights[i, j] * Math.Abs(aij) * (ratio * lratio - ratio + 1);
+                                f += weights[i, j] * Math.Abs(aij) * (ratio * lratio - ratio + 1d);
                                 g[k] = weights[i, j] * Math.Sign(aij) * lratio;
                             }
                         }
-                        else
+                        else if (o.type == EOptimizeType.Entropy2003)
                         {
+                            //2003 paper
                             if (weights == null)
                             {
                                 //Without weights
                                 f += Math.Abs(xij) * lratio; //Note: it sees taking abs(xij) is the GRAS modification. Regarding log, cells should never be able to cross the plus/minus boundary.
-                                g[k] = Math.Sign(xij) * (lratio + 1);
+                                g[k] = Math.Sign(xij) * (lratio + 1d);
                             }
                             else
                             {
                                 //With weights. Note: weights are always > 0.
                                 f += weights[i, j] * Math.Abs(xij) * lratio;
-                                g[k] = weights[i, j] * Math.Sign(xij) * (lratio + 1);
+                                g[k] = weights[i, j] * Math.Sign(xij) * (lratio + 1d);
+                            }
+                        }
+                        else if (o.type == EOptimizeType.SqDif)
+                        {
+                            double dif = xij - aij;
+                            if (weights == null)
+                            {
+                                f += dif * dif;
+                                g[k] = 2d * dif;
+                            }
+                            else
+                            {
+                                f += weights[i, j] * dif * dif;
+                                g[k] = 2d * weights[i, j] * dif;
+                            }
+                        }
+                        else if (o.type == EOptimizeType.SqRel)
+                        {
+                            double diff = xij - aij;
+                            double a2 = aij * aij;
+
+                            if (weights == null)
+                            {
+                                f += (diff * diff) / a2;
+                                g[k] = (2 * diff) / a2;
+                            }
+                            else
+                            {
+                                f += weights[i, j] * (diff * diff) / a2;
+                                g[k] = weights[i, j] * (2 * diff) / a2;
+                            }
+                        }
+                        else if (o.type == EOptimizeType.DistDif)
+                        {
+                            double dif = xij - aij;
+                            if (weights == null)
+                            {
+                                f += Math.Abs(dif);
+                                if (dif == 0d) g[k] = 0d; //hack
+                                else g[k] = Math.Sign(dif);
+                            }
+                            else
+                            {
+                                f += weights[i, j] * Math.Abs(dif);
+                                if (dif == 0d) g[k] = 0d; //hack
+                                else g[k] = weights[i, j] * Math.Sign(dif);
+                            }
+                        }
+                        else if (o.type == EOptimizeType.DistRel)
+                        {
+                            double dif = xij - aij;
+                            double absA = Math.Abs(aij);
+                            if (weights == null)
+                            {
+                                if (absA != 0d)
+                                {
+                                    f += Math.Abs(dif) / absA;
+                                    g[k] = Math.Sign(dif) / absA;
+                                }
+                                else
+                                {
+                                    g[k] = 0d; //hack
+                                }
+                            }
+                            else
+                            {
+                                if (absA != 0d)
+                                {
+                                    f += weights[i, j] * Math.Abs(dif) / absA;
+                                    g[k] = weights[i, j] * Math.Sign(dif) / absA;
+                                }
+                                else
+                                {
+                                    g[k] = 0d; //hack
+                                }
                             }
                         }
                     }
