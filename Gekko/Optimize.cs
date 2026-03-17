@@ -188,7 +188,7 @@ namespace Gekko
                     //(('a', 'b'), ('a', 'c'), ('a', 'd', -2), 500)
                     counter++;
                     storage1.Add(new double[niMultiplyNj]);
-                    storage2.Add(double.NaN);
+                    storage2.Add(0d); //So if not indicated, is implicitly understood as 0!
                     List<IVariable> temp2 = O.ConvertToList(temp1);
                     int c = -1;
                     foreach (IVariable temp3 in temp2)
@@ -222,7 +222,7 @@ namespace Gekko
                                 d = O.ConvertToVal(temp4[2]);
                             }
                             else new Error("Expected list with 2 or 3 elements");
-                            storage1[counter][i0 * ni + i1] = d;
+                            storage1[counter][i0 * nj + i1] = d;
                         }
                     }                    
                 }
@@ -349,20 +349,23 @@ namespace Gekko
                 else if (extraConstraints > 0 && nWeights > 0) sExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints) + " and " + nWeights + " weight" + G.S(nWeights);
 
                 string s = null;
-                if (rep.terminationtype == -7) s = "Gradient verification failed.";
-                else if (rep.terminationtype == -3) s = "Inconsistent constraints. Feasible point is either nonexistent or too hard to find. Try to restart optimizer with better initial approximation.";
-                else if (rep.terminationtype == 1) s = "Relative function improvement is no more than EpsF.";
-                else if (rep.terminationtype == 2) s = "Scaled step is no more than EpsX.";
-                else if (rep.terminationtype == 4) s = "Scaled gradient norm is no more than EpsG.";
+                if (rep.terminationtype == -7) s = "Gradient verification failed. See MinBLEICSetGradientCheck() for more information";
+                else if (rep.terminationtype == -3) s = "inconsistent constraints. Feasible point is either nonexistent or too hard to find. Try to restart optimizer with better initial approximation";
+                else if (rep.terminationtype == 1) s = "Relative function improvement is no more than EpsF";
+                else if (rep.terminationtype == 2) s = "Relative step is no more than EpsX";
+                else if (rep.terminationtype == 4) s = "Gradient norm is no more than EpsG";
                 else if (rep.terminationtype == 5) s = "MaxIts steps was taken";
+                else if (rep.terminationtype == 7) s = "Stopping conditions are too stringent, further improvement is impossible, X contains best point found so far";
 
-                if (rep.terminationtype == 1 || rep.terminationtype == 2 || rep.terminationtype == 4)
+                if (rep.terminationtype == 1 || rep.terminationtype == 2 || rep.terminationtype == 4 || rep.terminationtype == 7)
                 {
-                    G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2));
+                    G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ", termination type #" + rep.terminationtype + ".");
                 }
                 else
                 {
-                    G.Writeln2("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". Solver message: " + s);
+                    string s2 = null;
+                    if (s != null) s2 = "Solver message: " + s;
+                    new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". " + s2 + ". Termination type #" + rep.terminationtype + ".");
                 }
                 
                 xResult = new double[ni, nj];
