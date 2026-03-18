@@ -35382,27 +35382,13 @@ print(df2)
             I("reset;");
             I("time " + year + " " + year + ";");
             I("io = series(2);");
-            I("io[a,a] = 10;");
-            I("io[a,b] = 20;");
-            I("io[a,c] = 30;");
-            I("io[a,d] = 7;");
-            I("io[b,a] = 50;");
-            I("io[b,b] = 60;");
-            I("io[b,c] = 70;");
-            I("io[b,d] = 17;");
-            I("io[c,a] = 90;");
-            I("io[c,b] = 80;");
-            I("io[c,c] = 70;");
-            I("io[c,d] = 27;");
+            I("io[a,a] = 10;"); I("io[a,b] = 20;"); I("io[a,c] = 30;"); I("io[a,d] = 7;");
+            I("io[b,a] = 50;"); I("io[b,b] = 60;"); I("io[b,c] = 70;"); I("io[b,d] = 17;");
+            I("io[c,a] = 90;"); I("io[c,b] = 80;"); I("io[c,c] = 70;"); I("io[c,d] = 27;");
             I("rowsum = series(1);");
-            I("rowsum[a]= 87;");
-            I("rowsum[b]= 147;");
-            I("rowsum[c]= 287;");
+            I("rowsum[a]= 87;"); I("rowsum[b]= 147;"); I("rowsum[c]= 287;");
             I("colsum = series(1);");
-            I("colsum[a]= 160;");
-            I("colsum[b]= 170;");
-            I("colsum[c]= 140;");
-            I("colsum[d]= 51;");
+            I("colsum[a]= 160;"); I("colsum[b]= 170;"); I("colsum[c]= 140;"); I("colsum[d]= 51;");
             I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("prt <n> io;");
@@ -35476,6 +35462,130 @@ print(df2)
                                     (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
                     Assert.AreEqual((O.GetIVariableFromString("iony3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t)+
                                     (O.GetIVariableFromString("iony3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void _Test_Ras_Negative()
+        {            
+            double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
+            int year = 2020;
+            List<string> rows = new List<string>() { "a", "b" };
+            List<string> cols = new List<string>() { "a", "b" };
+            I("reset;");
+            I("time " + year + " " + year + ";");
+            I("io = series(2);");
+            I("io[a,a] = -1;"); I("io[a,b] = 2;");
+            I("io[b,a] = 2;"); I("io[b,b] = 3;");
+            I("rowsum = series(1);");
+            I("rowsum[a]= 1;"); I("rowsum[b]= 5;");
+            I("colsum = series(1);");
+            I("colsum[a]= 1;"); I("colsum[b]= 5;");
+            I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
+            I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
+            I("prt <n> io;");
+
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'biproportional'));");
+            I("tell 'Original row/col RAS procedure';");
+            I("prt <n> iony1;");
+
+            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+            I("tell 'Entropy function';");
+            I("prt <n> iony2;");
+
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+            I("tell 'Entropy function';");
+            I("prt <n> iony3;");
+
+            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
+            {
+                foreach (string i in rows)
+                {
+                    foreach (string j in cols)
+                    {
+                        //No movement --> good
+                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony1[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony1[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        // ---
+                        //No movement --> good
+                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony2[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony2[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        // ---
+                        //Wrong values for which the 2003 method was critizised (numbers are 2007 Lenzen/Wood counter-example)
+                        //https://richardw.folk.ntnu.no/papers/Lenzen,%20Wood,%20Gallego_2007_Some%20comments%20on%20the%20GRAS%20method.pdf
+                        //https://www.tandfonline.com/doi/abs/10.1080/09535314.2012.746645
+                        Assert.AreEqual(-0.357d, (O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(3.643d, (O.GetIVariableFromString("iony3[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                    }
+                }                
+            }
+        }
+
+        [TestMethod]
+        public void _Test_Ras_Zero()
+        {
+            double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
+            int year = 2020;
+            List<string> rows = new List<string>() { "a", "b" };
+            List<string> cols = new List<string>() { "a", "b" };
+            I("reset;");
+            I("time " + year + " " + year + ";");
+            I("io = series(2);");
+            I("io[a,a] = -1;"); I("io[a,b] = 2;");
+            I("io[b,a] = 2;"); I("io[b,b] = 3;");
+            I("rowsum = series(1);");
+            I("rowsum[a]= 1;"); I("rowsum[b]= 5;");
+            I("colsum = series(1);");
+            I("colsum[a]= 1;"); I("colsum[b]= 5;");
+            I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
+            I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
+            I("prt <n> io;");
+
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'biproportional'));");
+            I("tell 'Original row/col RAS procedure';");
+            I("prt <n> iony1;");
+
+            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+            I("tell 'Entropy function';");
+            I("prt <n> iony2;");
+
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+            I("tell 'Entropy function';");
+            I("prt <n> iony3;");
+
+            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
+            {
+                foreach (string i in rows)
+                {
+                    foreach (string j in cols)
+                    {
+                        //No movement --> good
+                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony1[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony1[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        // ---
+                        //No movement --> good
+                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony2[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony2[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        // ---
+                        //Wrong values for which the 2003 method was critizised (numbers are 2007 Lenzen/Wood counter-example)
+                        //https://richardw.folk.ntnu.no/papers/Lenzen,%20Wood,%20Gallego_2007_Some%20comments%20on%20the%20GRAS%20method.pdf
+                        //https://www.tandfonline.com/doi/abs/10.1080/09535314.2012.746645
+                        Assert.AreEqual(-0.357d, (O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual(3.643d, (O.GetIVariableFromString("iony3[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                    }
                 }
             }
         }
