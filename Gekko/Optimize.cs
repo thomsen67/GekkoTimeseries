@@ -157,7 +157,7 @@ namespace Gekko
             int nExo_OLD = 0;
             int nExo = 0;
             double[,] weights = null;
-            bool[,] exo = null;
+            //bool[,] exo = null;
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
             int nr = rowSums.Length; //rowTotals run over i
@@ -234,7 +234,7 @@ namespace Gekko
                 //These may in principle be inconsistent regarding the more "normal" constraints.
                 //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
                 //if we are exogenizing that cell. So exo notation is much easier for this.
-                exo = new bool[ni, nj];
+                //exo = new bool[ni, nj];
                 List<IVariable> exo2 = O.ConvertToList(exo3);
                 foreach (IVariable temp1 in exo2)
                 {
@@ -248,7 +248,7 @@ namespace Gekko
                     string s1 = O.ConvertToString(temp2[1]);
                     int i1 = colNames.FindIndex(x => G.Equal(x, s1));
                     if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
-                    exo[i0, i1] = true;
+                    //exo[i0, i1] = true;
                     //double[] temp = new double[niMultiplyNj];
                     //temp[i0 * nj + i1] = 1;
                     //storage1_exo.Add(temp);
@@ -402,7 +402,7 @@ namespace Gekko
                 if (nExtraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");                
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = RAS(a, rowSums, colSums, exo, o.rasMaxIterations, o.totalTolerance, out iterations);
+                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasMaxIterations, o.totalTolerance, out iterations);
                 string sExtra = null;                
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
@@ -789,7 +789,7 @@ namespace Gekko
             G.Writeln();
             DateTime t3 = DateTime.Now;
             int iterations = -1;
-            double[,] y = RAS(A, rowTotals, colTotals, null, 1000, 1e-10, out iterations);
+            double[,] y = RAS(A, rowTotals, colTotals, null, null, 1000, 1e-10, out iterations);
             G.Writeln("RAS " + N + "x" + N + " done " + G.Seconds(t3) + " in " + iterations + " iterations");
             G.Writeln(y[0, 0] + "  " + y[0, 1] + " " + y[0, 2] + "  " + y[0, 3]);
             if (N <= 10)
@@ -853,7 +853,7 @@ namespace Gekko
             }
         }
 
-        static double[,] RAS(double[,] a, double[] r, double[] c, bool[,] exo, int maxIter, double tol, out int iterations)
+        static double[,] RAS(double[,] a, double[] r, double[] c, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
         {            
             iterations = -1; //signals failure
             int ni = a.GetLength(0);
@@ -863,16 +863,40 @@ namespace Gekko
             double[] adjC = (double[])c.Clone();
             double[,] x = (double[,])a.Clone();
 
+            double[,] exo = new double[ni, nj];
+
+            if (boundsLower != null && boundsUpper != null)
+            {
+                if (boundsLower.Length != boundsUpper.Length) new Error("Bounds upper/lower sizes do not match");
+                for (int k = 0; k < boundsLower.Length; k++)
+                {
+                    int i = k / nj;
+                    int j = k % nj;
+                    exo[i, j] = double.NaN;
+                    if (G.IsNumericalError(boundsLower[k]) || G.IsNumericalError(boundsUpper[k]))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        if (boundsLower[k] == boundsUpper[k]) exo[i, j] = boundsLower[k];
+                        else new Error("Bounds upper/lower are different");
+                    }
+                }
+            }
+
             if (exo != null)
             {                
                 for (int i = 0; i < ni; i++)
                 {
                     for (int j = 0; j < nj; j++)
                     {
-                        if (exo[i, j])
+                        if (!G.IsNumericalError(exo[i, j]))
                         {
-                            adjR[i] -= a[i, j];
-                            adjC[j] -= a[i, j];
+                            //adjR[i] -= a[i, j];
+                            //adjC[j] -= a[i, j];
+                            adjR[i] -= exo[i, j];
+                            adjC[j] -= exo[i, j];
                             x[i, j] = 0; // Temporarily 0 so scaling factors don't affect it
                         }                        
                     }
@@ -940,9 +964,10 @@ namespace Gekko
                 {
                     for (int j = 0; j < nj; j++)
                     {
-                        if (exo[i, j])
+                        if (!G.IsNumericalError(exo[i, j]))
                         {
-                            x[i, j] = a[i, j];
+                            //x[i, j] = a[i, j];
+                            x[i, j] = exo[i, j];
                         }
                     }
                 }
