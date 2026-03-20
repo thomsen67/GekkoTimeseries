@@ -35393,7 +35393,7 @@ print(df2)
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("prt <n> io;");
             
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'biproportional'));");
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
             I("tell 'Original row/col RAS procedure';");
             I("prt <n> iony1;");
             
@@ -35403,7 +35403,7 @@ print(df2)
 
             double sum = 60d;
             I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#c = #constraints, %type = 'entropy'));");
+            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
             I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
             I("prt <n> iony3;");
 
@@ -35415,18 +35415,18 @@ print(df2)
             I("tell 'Squared relative differences';");
             I("prt <n> iony5;");
 
-            I("#weights = (  ('a','a',1000000),  );");
-            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#w = #weights, %type = 'entropy'));");
+            I("#exo = (  ('a','a'),  );");
+            I("#w = (  ('a','a', 1000000),  );");
+            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#weights = #w, %type = 'entropy'));"); //#exo does not work?
             I("tell 'Entropy with weights for x11==10';");
             I("prt <n> iony6;");
 
             I("#constraints = (  (  ('a','a'), 10  ),  );");
-            I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, (#c = #constraints, %type = 'entropy'));");
+            I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
             I("tell 'Entropy with constraints for x11==10';");
             I("prt <n> iony7;");
 
-
-            I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#w = #weights, %type = 'biproportional'));");
+            I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
             I("tell 'Original row/col RAS procedure';");
             I("prt <n> iony7a;");
 
@@ -35486,7 +35486,7 @@ print(df2)
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("prt <n> io;");
 
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'biproportional'));");
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
             I("tell 'Original row/col RAS procedure';");
             I("prt <n> iony1;");
 
@@ -35548,7 +35548,7 @@ print(df2)
             I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
             I("prt <n> io;");
 
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'biproportional'));");
+            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
             I("tell 'Original row/col RAS procedure';");
             I("prt <n> iony1;");
 

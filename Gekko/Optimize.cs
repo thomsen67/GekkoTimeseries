@@ -12,14 +12,14 @@ namespace Gekko
 
     public class OptimizerOptions
     {
-        public EOptimizeType type = EOptimizeType.Biproportional; //default
+        public EOptimizeType type = EOptimizeType.Ras; //default
         public double totalTolerance = 0.001;  //1 promille
         public bool treatNaNAs0 = true;
     }
 
     public enum EOptimizeType
     {
-        Biproportional,
+        Ras,
         Entropy,
         Entropy2003,
         SqDif,
@@ -47,6 +47,7 @@ namespace Gekko
             OptimizerOptions o = new OptimizerOptions();
             List constraints = null;
             List weights = null;
+            List exo = null;
 
             if (other != null)
             {
@@ -59,7 +60,7 @@ namespace Gekko
                     if (options_map.storage.TryGetValue("%type", out temp))
                     {
                         string s = O.ConvertToString(temp);
-                        if (G.Equal(s, "biproportional")) o.type = EOptimizeType.Biproportional;
+                        if (G.Equal(s, "ras")) o.type = EOptimizeType.Ras;
                         else if (G.Equal(s, "entropy")) o.type = EOptimizeType.Entropy;
                         else if (G.Equal(s, "entropy2003")) o.type = EOptimizeType.Entropy2003;
                         else if (G.Equal(s, "sqdif")) o.type = EOptimizeType.SqDif;
@@ -69,14 +70,19 @@ namespace Gekko
                         else new Error("Expected type 'default', 'entropy', 'sqdif', 'sqrel', 'distdif' or 'distrel'");
                     }
 
-                    if (options_map.storage.TryGetValue("#c", out temp))
+                    if (options_map.storage.TryGetValue("#constraints", out temp))
                     {
                         constraints = temp as List;
                     }
 
-                    if (options_map.storage.TryGetValue("#w", out temp))
+                    if (options_map.storage.TryGetValue("#weights", out temp))
                     {
                         weights = temp as List;
+                    }
+
+                    if (options_map.storage.TryGetValue("#exo", out temp))
+                    {
+                        exo = temp as List;
                     }
                 }
             }   
@@ -117,7 +123,7 @@ namespace Gekko
                     colSums_array[nj] = d;
                 }
 
-                double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, t.ToString(), o);
+                double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, exo, t.ToString(), o);
 
                 ni = -1;
                 nj = -1;
@@ -136,7 +142,7 @@ namespace Gekko
             return adjusted;
         }
 
-        public static double[,] Optimize2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, string period, OptimizerOptions o)
+        public static double[,] Optimize2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, IVariable exo3, string period, OptimizerOptions o)
         {
             //We could have strings like "[a,b] + [a,c] - 2*x[a,d] = 500". But maybe a more generic approach is better:
             //                           (('a','b'), ('a','c'), ('a', 'd', -2), 500),
@@ -147,7 +153,9 @@ namespace Gekko
             //            
 
             int nWeights = 0;
+            int nExo = 0;
             double[,] weights = null;
+            bool[,] exo = null;
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
             int nr = rowSums.Length; //rowTotals run over i
@@ -176,9 +184,11 @@ namespace Gekko
             int niPlusNj = ni + nj;
             int niMultiplyNj = ni * nj;
 
-            int extraConstraints = 0;
+            int nExtraConstraints = 0;
             List<double[]> storage1 = new List<double[]>();
             List<double> storage2 = new List<double>();
+            List<double[]> storage1_exo = new List<double[]>();
+            List<double> storage2_exo = new List<double>();
             if (constraints3 != null)
             {
                 List<IVariable> contraints2 = O.ConvertToList(constraints3);
@@ -226,9 +236,36 @@ namespace Gekko
                         }
                     }                    
                 }
-                extraConstraints = counter + 1;
+                nExtraConstraints = counter + 1;
             }
-            
+
+            if (exo3 != null)
+            {
+                //These may in principle be inconsistent regarding the more "normal" constraints.
+                //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
+                //if we are exogenizing that cell. So exo notation is much easier for this.
+                exo = new bool[ni, nj];
+                List<IVariable> exo2 = O.ConvertToList(exo3);
+                foreach (IVariable temp1 in exo2)
+                {
+                    //('a', 'b')
+                    nExo++;
+                    List<IVariable> temp2 = O.ConvertToList(temp1);
+                    if (temp2.Count != 2) new Error("Expected 2 elements regarding exo variables");
+                    string s0 = O.ConvertToString(temp2[0]);
+                    int i0 = rowNames.FindIndex(x => G.Equal(x, s0));
+                    if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");
+                    string s1 = O.ConvertToString(temp2[1]);
+                    int i1 = colNames.FindIndex(x => G.Equal(x, s1));
+                    if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
+                    exo[i0, i1] = true;                                       
+                    double[] temp = new double[niMultiplyNj];
+                    temp[i0 * nj + i1] = 1;
+                    storage1_exo.Add(temp);
+                    storage2_exo.Add(a[i0, i1]); //Set to initial cell value                    
+                }
+            }
+
             if (weights3 != null)
             {
                 weights = new double[ni, nj];
@@ -257,15 +294,26 @@ namespace Gekko
                 }
             }
 
-            double[,] constraints = new double[niPlusNj + extraConstraints, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
+            double[,] constraints = new double[niPlusNj + nExtraConstraints + nExo, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
 
-            for (int i = 0; i < extraConstraints; i++)
+            //Normal constraints
+            for (int i = 0; i < nExtraConstraints; i++)
             {
                 for (int j = 0; j < storage1[i].Length; j++) 
                 {
                     constraints[niPlusNj + i, j] = storage1[i][j];
                 }
                 constraints[niPlusNj + i, niMultiplyNj] = storage2[i];  //The constant column that is last
+            }
+
+            //Exo
+            for (int i = 0; i < nExo; i++)
+            {
+                for (int j = 0; j < storage1_exo[i].Length; j++)
+                {
+                    constraints[niPlusNj + nExtraConstraints + i, j] = storage1_exo[i][j];
+                }
+                constraints[niPlusNj + nExtraConstraints + i, niMultiplyNj] = storage2_exo[i];  //The constant column that is last
             }
 
             // row constraints
@@ -288,28 +336,28 @@ namespace Gekko
                 constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
-            int[] constraintsType = new int[niPlusNj + extraConstraints];
+            int[] constraintsType = new int[niPlusNj + nExtraConstraints];
             for (int i = 0; i < niPlusNj; i++)
             {
                 constraintsType[i] = 0; //equality
             }
 
-            for (int i = 0; i < extraConstraints; i++)
+            for (int i = 0; i < nExtraConstraints; i++)
             {
                 constraintsType[niPlusNj + i] = 0; //equality
             }
 
             double[,] xResult = null;
 
-            if (o.type == EOptimizeType.Biproportional)
+            if (o.type == EOptimizeType.Ras)
             {
-                if (extraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
+                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
                 int max = 1000;
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = RAS(a, rowSums, colSums, weights, max, o.totalTolerance, out iterations);
+                xResult = RAS(a, rowSums, colSums, exo, max, o.totalTolerance, out iterations);
                 string sExtra = null;                
-                if (nWeights > 0) sExtra = " with " + nWeights + " fix-weight" + G.S(nWeights);
+                if (nExo > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
@@ -372,9 +420,9 @@ namespace Gekko
                 alglib.minbleicresults(state, out x1d, out rep);
 
                 string sExtra = null;
-                if (extraConstraints > 0 && nWeights == 0) sExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints);
-                else if (extraConstraints == 0 && nWeights > 0) sExtra = " with " + nWeights + " weight" + G.S(nWeights);
-                else if (extraConstraints > 0 && nWeights > 0) sExtra = " with " + extraConstraints + " constraint" + G.S(extraConstraints) + " and " + nWeights + " weight" + G.S(nWeights);
+                if (nExtraConstraints > 0 && nWeights == 0) sExtra = " with " + nExtraConstraints + " constraint" + G.S(nExtraConstraints);
+                else if (nExtraConstraints == 0 && nWeights > 0) sExtra = " with " + nWeights + " weight" + G.S(nWeights);
+                else if (nExtraConstraints > 0 && nWeights > 0) sExtra = " with " + nExtraConstraints + " constraint" + G.S(nExtraConstraints) + " and " + nWeights + " weight" + G.S(nWeights);
 
                 string s = null;
                 if (rep.terminationtype == -7) s = "Gradient verification failed. See MinBLEICSetGradientCheck() for more information";
@@ -795,33 +843,28 @@ namespace Gekko
             }
         }
 
-        static double[,] RAS(double[,] a, double[] r, double[] c, double[,] weights, int maxIter, double tol, out int iterations)
-        {
-            double limit = 1000000d;
+        static double[,] RAS(double[,] a, double[] r, double[] c, bool[,] exo, int maxIter, double tol, out int iterations)
+        {            
             iterations = -1; //signals failure
-            int n = a.GetLength(0);
-            int m = a.GetLength(1);
+            int ni = a.GetLength(0);
+            int nj = a.GetLength(1);
                         
             double[] adjR = (double[])r.Clone();
             double[] adjC = (double[])c.Clone();
             double[,] x = (double[,])a.Clone();
 
-            if (weights != null)
+            if (exo != null)
             {                
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < ni; i++)
                 {
-                    for (int j = 0; j < m; j++)
+                    for (int j = 0; j < nj; j++)
                     {
-                        if (weights[i, j] >= limit)
+                        if (exo[i, j])
                         {
                             adjR[i] -= a[i, j];
                             adjC[j] -= a[i, j];
                             x[i, j] = 0; // Temporarily 0 so scaling factors don't affect it
-                        }
-                        else if (weights[i, j] != 1d)
-                        {
-                            new Error("When setting weights for the biproportional method, these weights must be >= 1000000 to indicate absolute fixation (w[" + i + ", " + j + "] = " + weights[i, j] + ")");
-                        }
+                        }                        
                     }
                 }
             }
@@ -829,28 +872,28 @@ namespace Gekko
             for (int iter = 0; iter < maxIter; iter++)
             {
                 // ---- Row scaling ----
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < ni; i++)
                 {
                     double sum = 0;
-                    for (int j = 0; j < m; j++) sum += x[i, j];
+                    for (int j = 0; j < nj; j++) sum += x[i, j];
 
                     if (sum > 0) // Avoid division by zero if all cells in row are fixed/zero
                     {
                         double factor = adjR[i] / sum;
-                        for (int j = 0; j < m; j++) x[i, j] *= factor;
+                        for (int j = 0; j < nj; j++) x[i, j] *= factor;
                     }
                 }
 
                 // ---- Column scaling ----
-                for (int j = 0; j < m; j++)
+                for (int j = 0; j < nj; j++)
                 {
                     double sum = 0;
-                    for (int i = 0; i < n; i++) sum += x[i, j];
+                    for (int i = 0; i < ni; i++) sum += x[i, j];
 
                     if (sum > 0)
                     {
                         double factor = adjC[j] / sum;
-                        for (int i = 0; i < n; i++) x[i, j] *= factor;
+                        for (int i = 0; i < ni; i++) x[i, j] *= factor;
                     }
                 }
 
@@ -859,17 +902,17 @@ namespace Gekko
 
                 // Note: For checking error, we must mentally "add back" the fixed cells
                 // which is equivalent to checking active sum against adjR/adjC
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < ni; i++)
                 {
                     double sum = 0;
-                    for (int j = 0; j < m; j++) sum += x[i, j];
+                    for (int j = 0; j < nj; j++) sum += x[i, j];
                     maxError = Math.Max(maxError, Math.Abs(sum - adjR[i]));
                 }
 
-                for (int j = 0; j < m; j++)
+                for (int j = 0; j < nj; j++)
                 {
                     double sum = 0;
-                    for (int i = 0; i < n; i++) sum += x[i, j];
+                    for (int i = 0; i < ni; i++) sum += x[i, j];
                     maxError = Math.Max(maxError, Math.Abs(sum - adjC[j]));
                 }
 
@@ -880,14 +923,14 @@ namespace Gekko
                 }
             }
 
-            if (weights != null)
+            if (exo != null)
             {
-                // 4. Restore fixed cells
-                for (int i = 0; i < n; i++)
+                // Restore fixed cells
+                for (int i = 0; i < ni; i++)
                 {
-                    for (int j = 0; j < m; j++)
+                    for (int j = 0; j < nj; j++)
                     {
-                        if (weights[i, j] >= limit)
+                        if (exo[i, j])
                         {
                             x[i, j] = a[i, j];
                         }
