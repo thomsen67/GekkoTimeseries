@@ -117,7 +117,7 @@ namespace Gekko
                     colSums_array[nj] = d;
                 }
 
-                double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, o);
+                double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, t.ToString(), o);
 
                 ni = -1;
                 nj = -1;
@@ -136,7 +136,7 @@ namespace Gekko
             return adjusted;
         }
 
-        public static double[,] Optimize2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, OptimizerOptions o)
+        public static double[,] Optimize2(double[,] a, double[] rowSums, double[] colSums, List<string> rowNames, List<string> colNames, IVariable constraints3, IVariable weights3, string period, OptimizerOptions o)
         {
             //We could have strings like "[a,b] + [a,c] - 2*x[a,d] = 500". But maybe a more generic approach is better:
             //                           (('a','b'), ('a','c'), ('a', 'd', -2), 500),
@@ -208,10 +208,10 @@ namespace Gekko
                             List<IVariable> temp4 = O.ConvertToList(temp3);
                             string s0 = O.ConvertToString(temp4[0]);
                             int i0 = rowNames.IndexOf(s0);
-                            if (i0 < 0) new Error("Constraing: could not find '" + s0 + "' as row name");
+                            if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");
                             string s1 = O.ConvertToString(temp4[1]);
                             int i1 = colNames.IndexOf(s1);
-                            if (i1 < 0) new Error("Constraing: could not find '" + s1 + "' as col name");
+                            if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
                             double d = 1d; //coefficient
                             if (temp4.Count == 2)
                             {                                
@@ -247,11 +247,11 @@ namespace Gekko
                     List<IVariable> temp2 = O.ConvertToList(temp1);
                     if (temp2.Count != 3) new Error("Expected 3 elements regarding constraint");
                     string s0 = O.ConvertToString(temp2[0]);
-                    int i0 = rowNames.IndexOf(s0);
-                    if (i0 < 0) new Error("Constraing: could not find '" + s0 + "' as row name");                    
-                    string s1 = O.ConvertToString(temp2[1]);
-                    int i1 = colNames.IndexOf(s1);                    
-                    if (i1 < 0) new Error("Constraing: could not find '" + s1 + "' as col name");                    
+                    int i0 = rowNames.FindIndex(x => G.Equal(x, s0));
+                    if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");                    
+                    string s1 = O.ConvertToString(temp2[1]);                    
+                    int i1 = colNames.FindIndex(x => G.Equal(x, s1));
+                    if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");                    
                     double d = O.ConvertToVal(temp2[2]);
                     weights[i0, i1] = d;
                 }
@@ -310,8 +310,8 @@ namespace Gekko
                 xResult = RAS(a, rowSums, colSums, weights, max, o.totalTolerance, out iterations);
                 string sExtra = null;                
                 if (nWeights > 0) sExtra = " with " + nWeights + " fix-weight" + G.S(nWeights);
-                if (iterations == -1) new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
-                G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
             else
             {
@@ -387,13 +387,13 @@ namespace Gekko
 
                 if (rep.terminationtype == 1 || rep.terminationtype == 2 || rep.terminationtype == 4 || rep.terminationtype == 7)
                 {
-                    G.Writeln2("Optimized (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ", termination type " + rep.terminationtype + ".");
+                    G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ", termination type " + rep.terminationtype + ".");
                 }
                 else
                 {
                     string s2 = null;
                     if (s != null) s2 = "Solver message: " + s;
-                    new Error("Optimization (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". " + s2 + ". Termination type " + rep.terminationtype + ".");
+                    new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". " + s2 + ". Termination type " + rep.terminationtype + ".");
                 }
                 
                 xResult = new double[ni, nj];
