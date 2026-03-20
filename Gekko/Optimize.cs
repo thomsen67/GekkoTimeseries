@@ -190,7 +190,74 @@ namespace Gekko
             List<double[]> storage1 = new List<double[]>();
             List<double> storage2 = new List<double>();
             List<double[]> storage1_exo = new List<double[]>();
-            List<double> storage2_exo = new List<double>();
+            List<double> storage2_exo = new List<double>();            
+            
+            
+            double[] boundsLower = new double[niMultiplyNj];
+            double[] boundsUpper = new double[niMultiplyNj];
+            for (int i = 0; i < ni; i++)
+            {
+                for (int j = 0; j < nj; j++)
+                {
+                    int k = i * nj + j;
+                    double aij = a[i, j];
+                    if (false && o.type == EOptimizeType.Entropy)
+                    {
+                        if (aij > 0)
+                        {
+                            boundsLower[k] = 1e-12;       // Must stay positive
+                            boundsUpper[k] = double.PositiveInfinity;
+                        }
+                        else if (aij < 0)
+                        {
+                            boundsLower[k] = double.NegativeInfinity;
+                            boundsUpper[k] = -1e-12;      // Must stay negative
+                        }
+                        else
+                        {
+                            boundsLower[k] = 0;           // Structural zero
+                            boundsUpper[k] = 0;
+                        }
+
+                    }
+                    else
+                    {
+                        boundsLower[k] = double.NegativeInfinity; // 1e-6; --> probably not much gain even if we say all cells must be positive
+                        boundsUpper[k] = double.PositiveInfinity;
+                    }
+                }
+            }
+
+            if (exo3 != null)
+            {
+                //These may in principle be inconsistent regarding the more "normal" constraints.
+                //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
+                //if we are exogenizing that cell. So exo notation is much easier for this.
+                exo = new bool[ni, nj];
+                List<IVariable> exo2 = O.ConvertToList(exo3);
+                foreach (IVariable temp1 in exo2)
+                {
+                    //('a', 'b')
+                    //nExo_OLD++;
+                    List<IVariable> temp2 = O.ConvertToList(temp1);
+                    if (temp2.Count != 2) new Error("Expected 2 elements regarding exo variables");
+                    string s0 = O.ConvertToString(temp2[0]);
+                    int i0 = rowNames.FindIndex(x => G.Equal(x, s0));
+                    if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");
+                    string s1 = O.ConvertToString(temp2[1]);
+                    int i1 = colNames.FindIndex(x => G.Equal(x, s1));
+                    if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
+                    exo[i0, i1] = true;
+                    //double[] temp = new double[niMultiplyNj];
+                    //temp[i0 * nj + i1] = 1;
+                    //storage1_exo.Add(temp);
+                    //storage2_exo.Add(a[i0, i1]); //Set to initial cell value
+                    int k = i0 * nj + i1;
+                    boundsLower[k] = a[i0, i1];
+                    boundsUpper[k] = a[i0, i1];
+                }
+            }
+
             if (constraints3 != null)
             {
                 List<IVariable> contraints2 = O.ConvertToList(constraints3);
@@ -282,14 +349,14 @@ namespace Gekko
             }
 
             //Exo
-            for (int i = 0; i < nExo_OLD; i++)
-            {
-                for (int j = 0; j < storage1_exo[i].Length; j++)
-                {
-                    constraints[niPlusNj + nExtraConstraints + i, j] = storage1_exo[i][j];
-                }
-                constraints[niPlusNj + nExtraConstraints + i, niMultiplyNj] = storage2_exo[i];  //The constant column that is last
-            }
+            //for (int i = 0; i < nExo_OLD; i++)
+            //{
+            //    for (int j = 0; j < storage1_exo[i].Length; j++)
+            //    {
+            //        constraints[niPlusNj + nExtraConstraints + i, j] = storage1_exo[i][j];
+            //    }
+            //    constraints[niPlusNj + nExtraConstraints + i, niMultiplyNj] = storage2_exo[i];  //The constant column that is last
+            //}
 
             // row constraints
             for (int i = 0; i < ni; i++)
@@ -349,74 +416,7 @@ namespace Gekko
                     {
                         x1d[i * nj + j] = a[i, j];
                     }
-                }
-
-                // bounds (xij > 0)
-                double[] boundsLower = new double[niMultiplyNj];
-                double[] boundsUpper = new double[niMultiplyNj];
-
-                for (int i = 0; i < ni; i++)
-                {
-                    for (int j = 0; j < nj; j++)
-                    {
-                        int k = i * nj + j;
-                        double aij = a[i, j];
-                        if (false && o.type == EOptimizeType.Entropy)
-                        {
-                            if (aij > 0)
-                            {
-                                boundsLower[k] = 1e-12;       // Must stay positive
-                                boundsUpper[k] = double.PositiveInfinity;
-                            }
-                            else if (aij < 0)
-                            {
-                                boundsLower[k] = double.NegativeInfinity;
-                                boundsUpper[k] = -1e-12;      // Must stay negative
-                            }
-                            else
-                            {
-                                boundsLower[k] = 0;           // Structural zero
-                                boundsUpper[k] = 0;
-                            }
-
-                        }
-                        else
-                        {
-                            boundsLower[k] = double.NegativeInfinity; // 1e-6; --> probably not much gain even if we say all cells must be positive
-                            boundsUpper[k] = double.PositiveInfinity;
-                        }
-                    }
-                }
-
-                if (exo3 != null)
-                {
-                    //These may in principle be inconsistent regarding the more "normal" constraints.
-                    //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
-                    //if we are exogenizing that cell. So exo notation is much easier for this.
-                    exo = new bool[ni, nj];
-                    List<IVariable> exo2 = O.ConvertToList(exo3);
-                    foreach (IVariable temp1 in exo2)
-                    {
-                        //('a', 'b')
-                        nExo_OLD++;
-                        List<IVariable> temp2 = O.ConvertToList(temp1);
-                        if (temp2.Count != 2) new Error("Expected 2 elements regarding exo variables");
-                        string s0 = O.ConvertToString(temp2[0]);
-                        int i0 = rowNames.FindIndex(x => G.Equal(x, s0));
-                        if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");
-                        string s1 = O.ConvertToString(temp2[1]);
-                        int i1 = colNames.FindIndex(x => G.Equal(x, s1));
-                        if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
-                        exo[i0, i1] = true;
-                        //double[] temp = new double[niMultiplyNj];
-                        //temp[i0 * nj + i1] = 1;
-                        //storage1_exo.Add(temp);
-                        //storage2_exo.Add(a[i0, i1]); //Set to initial cell value
-                        int k = i0 * nj + i1;
-                        boundsLower[k] = a[i0, i1];
-                        boundsUpper[k] = a[i0, i1];
-                    }
-                }
+                }                                
 
                 alglib.minbleicstate state;
                 alglib.minbleicreport rep;
