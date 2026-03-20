@@ -154,6 +154,7 @@ namespace Gekko
             //            
 
             int nWeights = 0;
+            int nExo_OLD = 0;
             int nExo = 0;
             double[,] weights = null;
             bool[,] exo = null;
@@ -238,34 +239,7 @@ namespace Gekko
                     }                    
                 }
                 nExtraConstraints = counter + 1;
-            }
-
-            if (exo3 != null)
-            {
-                //These may in principle be inconsistent regarding the more "normal" constraints.
-                //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
-                //if we are exogenizing that cell. So exo notation is much easier for this.
-                exo = new bool[ni, nj];
-                List<IVariable> exo2 = O.ConvertToList(exo3);
-                foreach (IVariable temp1 in exo2)
-                {
-                    //('a', 'b')
-                    nExo++;
-                    List<IVariable> temp2 = O.ConvertToList(temp1);
-                    if (temp2.Count != 2) new Error("Expected 2 elements regarding exo variables");
-                    string s0 = O.ConvertToString(temp2[0]);
-                    int i0 = rowNames.FindIndex(x => G.Equal(x, s0));
-                    if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");
-                    string s1 = O.ConvertToString(temp2[1]);
-                    int i1 = colNames.FindIndex(x => G.Equal(x, s1));
-                    if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
-                    exo[i0, i1] = true;                                       
-                    double[] temp = new double[niMultiplyNj];
-                    temp[i0 * nj + i1] = 1;
-                    storage1_exo.Add(temp);
-                    storage2_exo.Add(a[i0, i1]); //Set to initial cell value                    
-                }
-            }
+            }            
 
             if (weights3 != null)
             {
@@ -295,7 +269,7 @@ namespace Gekko
                 }
             }
 
-            double[,] constraints = new double[niPlusNj + nExtraConstraints + nExo, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
+            double[,] constraints = new double[niPlusNj + nExtraConstraints + nExo_OLD, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
 
             //Normal constraints
             for (int i = 0; i < nExtraConstraints; i++)
@@ -308,7 +282,7 @@ namespace Gekko
             }
 
             //Exo
-            for (int i = 0; i < nExo; i++)
+            for (int i = 0; i < nExo_OLD; i++)
             {
                 for (int j = 0; j < storage1_exo[i].Length; j++)
                 {
@@ -337,7 +311,7 @@ namespace Gekko
                 constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
-            int[] constraintsType = new int[niPlusNj + nExtraConstraints + nExo];
+            int[] constraintsType = new int[niPlusNj + nExtraConstraints + nExo_OLD];
             for (int i = 0; i < niPlusNj; i++)
             {
                 constraintsType[i] = 0; //equality
@@ -348,7 +322,7 @@ namespace Gekko
                 constraintsType[niPlusNj + i] = 0; //equality
             }
 
-            for (int i = 0; i < nExo; i++)
+            for (int i = 0; i < nExo_OLD; i++)
             {
                 constraintsType[niPlusNj + nExtraConstraints + i] = 0; //equality
             }
@@ -362,7 +336,7 @@ namespace Gekko
                 int iterations;
                 xResult = RAS(a, rowSums, colSums, exo, o.rasMaxIterations, o.totalTolerance, out iterations);
                 string sExtra = null;                
-                if (nExo > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo);
+                if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
@@ -412,7 +386,37 @@ namespace Gekko
                             boundsUpper[k] = double.PositiveInfinity;
                         }
                     }
-                }    
+                }
+
+                if (exo3 != null)
+                {
+                    //These may in principle be inconsistent regarding the more "normal" constraints.
+                    //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
+                    //if we are exogenizing that cell. So exo notation is much easier for this.
+                    exo = new bool[ni, nj];
+                    List<IVariable> exo2 = O.ConvertToList(exo3);
+                    foreach (IVariable temp1 in exo2)
+                    {
+                        //('a', 'b')
+                        nExo_OLD++;
+                        List<IVariable> temp2 = O.ConvertToList(temp1);
+                        if (temp2.Count != 2) new Error("Expected 2 elements regarding exo variables");
+                        string s0 = O.ConvertToString(temp2[0]);
+                        int i0 = rowNames.FindIndex(x => G.Equal(x, s0));
+                        if (i0 < 0) new Error("Constraint: could not find '" + s0 + "' as row name");
+                        string s1 = O.ConvertToString(temp2[1]);
+                        int i1 = colNames.FindIndex(x => G.Equal(x, s1));
+                        if (i1 < 0) new Error("Constraint: could not find '" + s1 + "' as col name");
+                        exo[i0, i1] = true;
+                        //double[] temp = new double[niMultiplyNj];
+                        //temp[i0 * nj + i1] = 1;
+                        //storage1_exo.Add(temp);
+                        //storage2_exo.Add(a[i0, i1]); //Set to initial cell value
+                        int k = i0 * nj + i1;
+                        boundsLower[k] = a[i0, i1];
+                        boundsUpper[k] = a[i0, i1];
+                    }
+                }
 
                 alglib.minbleicstate state;
                 alglib.minbleicreport rep;

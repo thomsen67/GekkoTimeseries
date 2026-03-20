@@ -35429,7 +35429,7 @@ print(df2)
 
             I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
             I("tell 'Original row/col RAS procedure';");
-            I("prt <n> iony7a;");
+            I("prt <n> iony7a;");            
 
             I("iony8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
             I("tell 'Old 2003 entropy function';");
