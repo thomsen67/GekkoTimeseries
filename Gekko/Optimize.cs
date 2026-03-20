@@ -15,7 +15,9 @@ namespace Gekko
         public EOptimizeType type = EOptimizeType.Ras; //default
         public double totalTolerance = 0.001;  //1 promille
         public bool treatNaNAs0 = true;
-        public int rasMaxIterations = 1000;        
+        public int rasMaxIterations = 1000;
+        public string hack = null;
+        public double epsilon = 0.0001d;
     }
 
     public enum EOptimizeType
@@ -49,6 +51,7 @@ namespace Gekko
             List constraints = null;
             List weights = null;
             List exo = null;
+            string hack = null;
 
             if (other != null)
             {
@@ -84,6 +87,11 @@ namespace Gekko
                     if (options_map.storage.TryGetValue("#exo", out temp))
                     {
                         exo = temp as List;
+                    }
+
+                    if (options_map.storage.TryGetValue("%hack", out temp))
+                    {
+                        o.hack = O.ConvertToString(temp);
                     }
                 }
             }   
@@ -122,7 +130,7 @@ namespace Gekko
                     nj++;
                     double d = (colSums_series.dimensionsStorage.storage[new MultidimElement(new string[] { sj })] as Series).GetDataSimple(t);
                     colSums_array[nj] = d;
-                }
+                }                
 
                 double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, exo, t.ToString(), o);
 
@@ -163,7 +171,7 @@ namespace Gekko
             int nr = rowSums.Length; //rowTotals run over i
             int nc = colSums.Length; //colTotals run over j
             if (ni != nr) new Error("Cells have " + ni + " rows, row totals have " + nr + " rows");
-            if (nj != nc) new Error("Cells have " + nj + " cols, col totals have " + nr + " cols");            
+            if (nj != nc) new Error("Cells have " + nj + " cols, col totals have " + nr + " cols");
             double toti = 0d; //sum of row sums
             double totj = 0d; //sum of col sums
             for (int i = 0; i < ni; i++)
@@ -172,7 +180,7 @@ namespace Gekko
                 toti += rowSums[i];
                 for (int j = 0; j < nj; j++)
                 {
-                    if (o.treatNaNAs0 && G.IsNumericalError(a[i, j])) a[i, j] = 0d;                    
+                    if (o.treatNaNAs0 && G.IsNumericalError(a[i, j])) a[i, j] = 0d;
                     if (i == 0)
                     {
                         if (o.treatNaNAs0 && G.IsNumericalError(colSums[j])) colSums[j] = 0d;
@@ -190,9 +198,25 @@ namespace Gekko
             List<double[]> storage1 = new List<double[]>();
             List<double> storage2 = new List<double>();
             List<double[]> storage1_exo = new List<double[]>();
-            List<double> storage2_exo = new List<double>();            
-            
-            
+            List<double> storage2_exo = new List<double>();
+
+            if (G.Equal(o.hack, "hack1"))
+            {
+                for (int k = 0; k < niMultiplyNj; k++)
+                {
+                    int i = k / nj;
+                    int j = k % nj;
+                    if (i == 20 && j == 21)
+                    {
+                        //ignore
+                    }
+                    else
+                    {                        
+                        a[i, j] = Math.Max(o.epsilon, a[i, j]);
+                    }
+                }
+            }
+
             //TODO: Clean the use of exo[,] up, so that RAS instead uses boundsLower/Upper.
             double[] boundsLower = new double[niMultiplyNj];
             double[] boundsUpper = new double[niMultiplyNj];
@@ -396,6 +420,29 @@ namespace Gekko
             }
 
             double[,] xResult = null;
+
+            if (boundsLower != null && boundsUpper != null)
+            {
+                if (G.Equal(o.hack, "hack1"))
+                {
+                    for (int k = 0; k < niMultiplyNj; k++)
+                    {                        
+                        int i = k / nj;
+                        int j = k % nj;
+                        if (i == 20 && j == 21)
+                        {
+                            //ignore, can be negative
+                        }
+                        else
+                        {
+                            if (G.IsNumericalError(boundsLower[k]))
+                            {
+                                boundsLower[k] = o.epsilon;
+                            }
+                        }
+                    }
+                }
+            }
 
             if (o.type == EOptimizeType.Ras)
             {
