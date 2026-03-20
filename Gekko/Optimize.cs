@@ -15,6 +15,7 @@ namespace Gekko
         public EOptimizeType type = EOptimizeType.Ras; //default
         public double totalTolerance = 0.001;  //1 promille
         public bool treatNaNAs0 = true;
+        public int rasMaxIterations = 1000;        
     }
 
     public enum EOptimizeType
@@ -356,14 +357,13 @@ namespace Gekko
 
             if (o.type == EOptimizeType.Ras)
             {
-                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");
-                int max = 1000;
+                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");                
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = RAS(a, rowSums, colSums, exo, max, o.totalTolerance, out iterations);
+                xResult = RAS(a, rowSums, colSums, exo, o.rasMaxIterations, o.totalTolerance, out iterations);
                 string sExtra = null;                
                 if (nExo > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo);
-                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + max + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
             else
