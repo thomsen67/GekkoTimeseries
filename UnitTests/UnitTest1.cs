@@ -35417,7 +35417,8 @@ print(df2)
 
             I("#exo = (  ('a','a'),  );");
             I("#w = (  ('a','a', 1000000),  );");
-            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#weights = #w, %type = 'entropy'));"); //#exo does not work?
+            //I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#weights = #w, %type = 'entropy'));"); //#exo does not work?            
+            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
             I("tell 'Entropy with weights for x11==10';");
             I("prt <n> iony6;");
 

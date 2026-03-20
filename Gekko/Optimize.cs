@@ -336,7 +336,7 @@ namespace Gekko
                 constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
-            int[] constraintsType = new int[niPlusNj + nExtraConstraints];
+            int[] constraintsType = new int[niPlusNj + nExtraConstraints + nExo];
             for (int i = 0; i < niPlusNj; i++)
             {
                 constraintsType[i] = 0; //equality
@@ -345,6 +345,11 @@ namespace Gekko
             for (int i = 0; i < nExtraConstraints; i++)
             {
                 constraintsType[niPlusNj + i] = 0; //equality
+            }
+
+            for (int i = 0; i < nExo; i++)
+            {
+                constraintsType[niPlusNj + nExtraConstraints + i] = 0; //equality
             }
 
             double[,] xResult = null;
