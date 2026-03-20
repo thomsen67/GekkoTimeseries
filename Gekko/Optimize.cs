@@ -193,6 +193,7 @@ namespace Gekko
             List<double> storage2_exo = new List<double>();            
             
             
+            //TODO: Clean the use of exo[,] up, so that RAS instead uses boundsLower/Upper.
             double[] boundsLower = new double[niMultiplyNj];
             double[] boundsUpper = new double[niMultiplyNj];
             for (int i = 0; i < ni; i++)
