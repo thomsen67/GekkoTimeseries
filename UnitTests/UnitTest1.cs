@@ -35375,217 +35375,213 @@ print(df2)
             //TODO: handle pure == 0d.         
             //TODO: abs() on function? And how do negative cells do?            
 
-            double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
-            int year = 2020;
-            List<string> rows = new List<string>() { "a", "b", "c" };
-            List<string> cols = new List<string>() { "a", "b", "c", "d" };
-            I("reset;");
-            I("time " + year + " " + year + ";");
-            I("io = series(2);");
-            I("io[a,a] = 10;"); I("io[a,b] = 20;"); I("io[a,c] = 30;"); I("io[a,d] = 7;");
-            I("io[b,a] = 50;"); I("io[b,b] = 60;"); I("io[b,c] = 70;"); I("io[b,d] = 17;");
-            I("io[c,a] = 90;"); I("io[c,b] = 80;"); I("io[c,c] = 70;"); I("io[c,d] = 27;");
-            I("rowsum = series(1);");
-            I("rowsum[a]= 87;"); I("rowsum[b]= 147;"); I("rowsum[c]= 287;");
-            I("colsum = series(1);");
-            I("colsum[a]= 160;"); I("colsum[b]= 170;"); I("colsum[c]= 140;"); I("colsum[d]= 51;");
-            I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
-            I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
-            I("prt <n> io;");
-            
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
-            I("tell 'Original row/col RAS procedure';");
-            I("prt <n> iony1;");
-            
-            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
-            I("tell 'Entropy function (2013)';");
-            I("prt <n> iony2;");
-
-            double sum = 60d;
-            I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
-            I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
-            I("prt <n> iony3;");
-
-            I("iony4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
-            I("tell 'Squared absolute differences';");
-            I("prt <n> iony4;");
-
-            I("iony5 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
-            I("tell 'Squared relative differences';");
-            I("prt <n> iony5;");
-
-            I("#exo = (  ('a','a'),  );");
-            I("#w = (  ('a','a', 1000000),  );");
-            //I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#weights = #w, %type = 'entropy'));"); //#exo does not work?            
-            I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
-            I("tell 'Entropy with weights for x11==10';");
-            I("prt <n> iony6;");
-
-            I("#constraints = (  (  ('a','a'), 10  ),  );");
-            I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
-            I("tell 'Entropy with constraints for x11==10';");
-            I("prt <n> iony7;");
-
-            I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
-            I("tell 'Original row/col RAS procedure';");
-            I("prt <n> iony7a;");            
-
-            I("iony8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
-            I("tell 'Old 2003 entropy function';");
-            I("prt <n> iony8;");
-
-            I("iony9 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
-            I("tell 'Distance/abs on differences';");
-            I("prt <n> iony9;");
-
-            I("iony10 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
-            I("tell 'Distance/abs on relative differences';");
-            I("prt <n> iony10;");
-
-            //!! It is strange that iony6 and iony7 both have a11 == 10, but the other cells deviate from 
-            //   each other. Using #rest like in iony7 is clearly most clean to remove the cell completely.
-
-            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
+            for (int ii = 0; ii < 2; ii++)
             {
-                foreach (string i in rows)
+
+                double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
+                int year = 2020;
+                List<string> rows = new List<string>() { "a", "b", "c" };
+                List<string> cols = new List<string>() { "a", "b", "c", "d" };
+                I("reset;");
+                I("time " + year + " " + year + ";");
+                I("io = series(2);");
+                if (ii == 0)
                 {
-                    foreach (string j in cols)
-                    {                        
-                        Assert.AreEqual((O.GetIVariableFromString("iony1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual((O.GetIVariableFromString("iony7[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony7a[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
-                    }
+                    I("io[a,a] = 10;"); I("io[a,b] = 20;"); I("io[a,c] = 30;"); I("io[a,d] = 7;");
+                    I("io[b,a] = 50;"); I("io[b,b] = 60;"); I("io[b,c] = 70;"); I("io[b,d] = 17;");
+                    I("io[c,a] = 90;"); I("io[c,b] = 80;"); I("io[c,c] = 70;"); I("io[c,d] = 27;");
+                    I("rowsum = series(1);");
+                    I("rowsum[a]= 87;"); I("rowsum[b]= 147;"); I("rowsum[c]= 287;");
+                    I("colsum = series(1);");
+                    I("colsum[a]= 160;"); I("colsum[b]= 170;"); I("colsum[c]= 140;"); I("colsum[d]= 51;");
                 }
-                if (true)
+                else
                 {
-                    //Test the 2 restrictions
-                    Assert.AreEqual((O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                    (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                    Assert.AreEqual((O.GetIVariableFromString("iony3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t)+
-                                    (O.GetIVariableFromString("iony3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
+                    I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 3;"); I("io[a,d] = 1;");
+                    I("io[b,a] = 4;"); I("io[b,b] = 5;"); I("io[b,c] = 6;"); I("io[b,d] = 1;");
+                    I("io[c,a] = 7;"); I("io[c,b] = 8;"); I("io[c,c] = 9;"); I("io[c,d] = 1;");
+                    I("rowsum = series(1);");
+                    I("rowsum[a]= 9;"); I("rowsum[b]= 15;"); I("rowsum[c]= 26;");
+                    I("colsum = series(1);");
+                    I("colsum[a]= 10;"); I("colsum[b]= 16;"); I("colsum[c]= 20;"); I("colsum[d]= 4;");
+                    //
+                    // Gauss: x = {-1 2 3 1, 4 5 6 1, 7 8 9 1}; u = { 9, 15, 26}; v = { 10, 16, 20, 4};
+                    //
                 }
-            }
-        }
+                I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
+                I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
+                I("prt <n> io;");
 
-        [TestMethod]
-        public void _Test_Ras_Negative()
-        {            
-            double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
-            int year = 2020;
-            List<string> rows = new List<string>() { "a", "b" };
-            List<string> cols = new List<string>() { "a", "b" };
-            I("reset;");
-            I("time " + year + " " + year + ";");
-            I("io = series(2);");
-            I("io[a,a] = -1;"); I("io[a,b] = 2;");
-            I("io[b,a] = 2;"); I("io[b,b] = 3;");
-            I("rowsum = series(1);");
-            I("rowsum[a]= 1;"); I("rowsum[b]= 5;");
-            I("colsum = series(1);");
-            I("colsum[a]= 1;"); I("colsum[b]= 5;");
-            I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
-            I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
-            I("prt <n> io;");
+                I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
+                I("tell 'Original row/col RAS procedure';");
+                I("prt <n> iony1;");
 
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
-            I("tell 'Original row/col RAS procedure';");
-            I("prt <n> iony1;");
+                I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+                I("tell 'Entropy function (2013)';");
+                I("prt <n> iony2;");
 
-            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
-            I("tell 'Entropy function';");
-            I("prt <n> iony2;");
+                double sum = 60d;
+                I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
+                I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
+                I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
+                I("prt <n> iony3;");
 
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
-            I("tell 'Entropy function';");
-            I("prt <n> iony3;");
+                I("iony4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
+                I("tell 'Squared absolute differences';");
+                I("prt <n> iony4;");
 
-            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
-            {
-                foreach (string i in rows)
+                I("iony5 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
+                I("tell 'Squared relative differences';");
+                I("prt <n> iony5;");
+
+                I("#exo = (  ('a','a'),  );");
+                I("#w = (  ('a','a', 1000000),  );");
+                //I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#weights = #w, %type = 'entropy'));"); //#exo does not work?            
+                I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
+                I("tell 'Entropy with weights for x11==10';");
+                I("prt <n> iony6;");
+
+                I("#constraints = (  (  ('a','a'), 10  ),  );");
+                I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
+                I("tell 'Entropy with constraints for x11==10';");
+                I("prt <n> iony7;");
+
+                I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
+                I("tell 'Original row/col RAS procedure';");
+                I("prt <n> iony7a;");
+
+                I("iony8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+                I("tell 'Old 2003 entropy function';");
+                I("prt <n> iony8;");
+
+                I("iony9 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
+                I("tell 'Distance/abs on differences';");
+                I("prt <n> iony9;");
+
+                I("iony10 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
+                I("tell 'Distance/abs on relative differences';");
+                I("prt <n> iony10;");
+
+                I("iony11 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");
+                I("tell 'GRAS';");
+                I("prt <n> iony11;");
+
+                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
                 {
-                    foreach (string j in cols)
+                    if (ii == 0)
                     {
-                        //No movement --> good
-                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony1[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony1[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        // ---
-                        //No movement --> good
-                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony2[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony2[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        // ---
-                        //Wrong values for which the 2003 method was critizised (numbers are 2007 Lenzen/Wood counter-example)
-                        //https://richardw.folk.ntnu.no/papers/Lenzen,%20Wood,%20Gallego_2007_Some%20comments%20on%20the%20GRAS%20method.pdf
-                        //https://www.tandfonline.com/doi/abs/10.1080/09535314.2012.746645
-                        Assert.AreEqual(-0.357d, (O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(3.643d, (O.GetIVariableFromString("iony3[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        foreach (string i in rows)
+                        {
+                            foreach (string j in cols)
+                            {
+                                Assert.AreEqual((O.GetIVariableFromString("iony1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                                Assert.AreEqual((O.GetIVariableFromString("iony7[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony7a[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
+                            }
+                        }
+                        //Test the 2 restrictions
+                        Assert.AreEqual((O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                        (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("iony3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t) +
+                                        (O.GetIVariableFromString("iony3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
+
                     }
-                }                
-            }
-        }
-
-        [TestMethod]
-        public void _Test_Ras_Zero()
-        {
-            double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
-            int year = 2020;
-            List<string> rows = new List<string>() { "a", "b" };
-            List<string> cols = new List<string>() { "a", "b" };
-            I("reset;");
-            I("time " + year + " " + year + ";");
-            I("io = series(2);");
-            I("io[a,a] = -1;"); I("io[a,b] = 2;");
-            I("io[b,a] = 2;"); I("io[b,b] = 3;");
-            I("rowsum = series(1);");
-            I("rowsum[a]= 1;"); I("rowsum[b]= 5;");
-            I("colsum = series(1);");
-            I("colsum[a]= 1;"); I("colsum[b]= 5;");
-            I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
-            I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
-            I("prt <n> io;");
-
-            I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
-            I("tell 'Original row/col RAS procedure';");
-            I("prt <n> iony1;");
-
-            I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
-            I("tell 'Entropy function';");
-            I("prt <n> iony2;");
-
-            I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
-            I("tell 'Entropy function';");
-            I("prt <n> iony3;");
-
-            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
-            {
-                foreach (string i in rows)
-                {
-                    foreach (string j in cols)
+                    else
                     {
-                        //No movement --> good
-                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony1[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony1[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony1[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        // ---
-                        //No movement --> good
-                        Assert.AreEqual(-1d, (O.GetIVariableFromString("iony2[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(2d, (O.GetIVariableFromString("iony2[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(3d, (O.GetIVariableFromString("iony2[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        // ---
-                        //Wrong values for which the 2003 method was critizised (numbers are 2007 Lenzen/Wood counter-example)
-                        //https://richardw.folk.ntnu.no/papers/Lenzen,%20Wood,%20Gallego_2007_Some%20comments%20on%20the%20GRAS%20method.pdf
-                        //https://www.tandfonline.com/doi/abs/10.1080/09535314.2012.746645
-                        Assert.AreEqual(-0.357d, (O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(1.357d, (O.GetIVariableFromString("iony3[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual(3.643d, (O.GetIVariableFromString("iony3[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        double deltaHere2 = 0.00000000001d;
+                        Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("iony11[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.1093591, (O.GetIVariableFromString("iony11[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.7803250, (O.GetIVariableFromString("iony11[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.7699601, (O.GetIVariableFromString("iony11[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.6140556, (O.GetIVariableFromString("iony11[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.6329270, (O.GetIVariableFromString("iony11[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(5.6981252, (O.GetIVariableFromString("iony11[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.0548921, (O.GetIVariableFromString("iony11[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(7.0455885, (O.GetIVariableFromString("iony11[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(8.2577139, (O.GetIVariableFromString("iony11[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(9.5215498, (O.GetIVariableFromString("iony11[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.1751477, (O.GetIVariableFromString("iony11[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+
+                        // Taken from the following Gauss program that has been tested a lot on Statistics Denmark.
+                        // For positive cells and totals, the Gauss programs and %type = 'ras' seems to correspond.
+                        // It seems that if all cell and totals values are flipped sign-wise, the Gauss program results also just flip.
+                        //
+                        //x = {-1 2 3 1, 4 5 6 1, 7 8 9 1};
+                        //u = {9, 15, 26};
+                        //v = {10, 16, 20, 4};
+                        //maxiter = 1000;
+                        //limit = 0.0000000000000001;
+                        //print x;
+                        //y = GRAS(x, u, v, maxiter, limit); 
+                        //print y;
+                        //
+                        ////reciprocal col vector put into diagonal
+                        //proc invd(y);                                              
+                        //  local a;                                                 
+                        //  a = diagrv(zeros(rows(y),rows(y)),(y + (y .== 0)).^-1) ;
+                        //  retp(a);                                                 
+                        //endp;      
+                        //
+                        //proc GRAS(X0, u, v, maxiter, limit);
+                        //local m,nn,P,N,r,s,pr,nr,s1,ss,ps,ns,rr,s2,dif,iter,Maal,X,skriv1,skriv,forskel ;
+                        //  forskel = abs(sumc(u)-sumc(v)) ;
+                        //  if forskel > 0.000001 ;
+                        //    //action...    
+                        //  endif ;      
+                        //  m = rows(X0) ;
+                        //  nn = cols(X0) ;  
+                        //  P = X0.*(X0 .>= 0) ;
+                        //  N = abs(X0 .* (X0 .< 0)) ;  
+                        //  r = ones(rows(X0),1) ;
+                        //  s = ones(1,cols(X0)) ;  
+                        //  pr = P'*r ;
+                        //  nr = N'* invd(r) * ones(m,1) ;  
+                        //  s1 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));
+                        //  ss = -invd(v) * nr ;  
+                        //  s1 = s1 + ss .* (pr .== 0) ;  
+                        //  ps = P * s1 ;
+                        //  ns = N * invd(s1) * ones(nn,1) ;  
+                        //  r  =  invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+                        //  rr = -invd(u) * ns ;  
+                        //  r = r + rr .* (ps .== 0) ; 
+                        //  pr = P' * r ;
+                        //  nr = N' * invd(r) * ones(m,1) ;  
+                        //  s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr))) ;
+                        //  ss = -invd(v) * nr ;  
+                        //  s2 = s2 + ss .* (pr .== 0) ;  
+                        //  dif = s2 - s1 ;  
+                        //  iter = 1 ;    
+                        //  Maal = maxc(abs(dif)) ;  
+                        //  do while Maal > limit and iter < maxiter ;    
+                        //    s1 = s2 ;
+                        //    ps = P * s1 ;
+                        //    ns = N * invd(s1) * ones(nn,1) ;  
+                        //    r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+                        //    rr = -invd(u) * ns ;  
+                        //    r = r + rr .* (ps .== 0) ;  
+                        //    pr = p'*r ;
+                        //    nr = N'* invd(r) * ones(m,1) ;  
+                        //    s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));  /* s2*= s1 */
+                        //    ss = -invd(v) * nr ;  
+                        //    s2 = s2 + ss .* (pr .== 0) ;      
+                        //    dif = s2 - s1 ;    
+                        //    iter = iter + 1 ;  
+                        //    Maal = maxc(abs(dif)) ;    
+                        //  endo ;
+                        //  
+                        //  s = s2 ;
+                        //  ps = P * s ;
+                        //  ns = N * invd(s) * ones(nn,1) ;  
+                        //  r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+                        //  rr = -invd(u) * ns ;  
+                        //  r = r + rr .* (ps .== 0) ;  
+                        //  X = diagrv(zeros(m,m),r) * P * diagrv(zeros(nn,nn),s) - invd(r) * N * invd(s) ;  
+                        //  if iter < maxiter-1 ;
+                        //    print; print "ok, iterations = " iter;
+                        //  else ;
+                        //    print; print "fail, iterations = " iter;
+                        //  endif ;  
+                        //  retp(X) ;
+                        //endp ;
                     }
                 }
             }

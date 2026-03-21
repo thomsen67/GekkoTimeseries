@@ -14,7 +14,7 @@ namespace Gekko
     {
         public EOptimizeType type = EOptimizeType.Ras; //default
         public double totalTolerance = 0.001;  //1 promille
-        public bool treatNaNAs0 = true;
+        public bool treatNaNAs0 = false;
         public int rasMaxIterations = 1000;
         public string hack = null;
         public double epsilon = 0.0001d;
