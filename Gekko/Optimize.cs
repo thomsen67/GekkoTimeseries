@@ -17,7 +17,7 @@ namespace Gekko
         public bool treatNaNAs0 = false;
         public int rasMaxIterations = 1000;
         public string hack = null;
-        public double epsilon = 0.0001d;
+        public double epsilon = 0.0001d;        
     }
 
     public enum EOptimizeType
@@ -94,6 +94,11 @@ namespace Gekko
                     if (options_map.storage.TryGetValue("%hack", out temp))
                     {
                         o.hack = O.ConvertToString(temp);
+                    }
+
+                    if (options_map.storage.TryGetValue("%tol", out temp))
+                    {
+                        o.totalTolerance = O.ConvertToVal(temp);
                     }
                 }
             }   
@@ -945,34 +950,153 @@ namespace Gekko
             return x;
         }
 
-        static double[,] GRAS(double[,] a, double[] r, double[] c, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
+        static double[,] GRAS(double[,] a, double[] r3, double[] c3, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
         {
             iterations = -1; //signals failure
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
 
-            double[] r2 = (double[])r.Clone();
-            double[] c2 = (double[])c.Clone();
-            double[,] x = (double[,])a.Clone();
+            double[] u = (double[])r3.Clone();
+            double[] v = (double[])c3.Clone();
+            double[,] X0 = (double[,])a.Clone();
 
             double[,] exo = Bounds2Exo(boundsLower, boundsUpper, ni, nj);
-            ExoRemove(true, x, r2, c2, exo, ni, nj);
+            
+            ExoRemove(true, X0, u, v, exo, ni, nj);
 
-            for (int iter = 0; iter < maxIter; iter++)
+            int m = X0.GetLength(0);
+            int nn = X0.GetLength(1);
+
+            // P = X0.*(X0 .>= 0) ; N = abs(X0 .* (X0 .< 0))
+            double[,] P = new double[m, nn]; //positive values
+            double[,] N = new double[m, nn]; //negative values
+            for (int i = 0; i < m; i++)
             {
-                RasScaleRows(x, r2, ni, nj);
-                RasScaleCols(x, c2, ni, nj);
-                double max = RasErrors(x, r2, c2, ni, nj);
-                if (max < tol)
+                for (int j = 0; j < nn; j++)
                 {
-                    iterations = iter + 1;
-                    break;
+                    if (X0[i, j] >= 0) P[i, j] = X0[i, j];
+                    else N[i, j] = Math.Abs(X0[i, j]);
                 }
             }
 
-            ExoRemove(false, x, null, null, exo, ni, nj);
+            double[] r = new double[m];
+            for (int i = 0; i < m; i++) r[i] = 1.0;
 
-            return x;
+            double[] s1 = new double[nn];
+            double[] s2 = new double[nn];
+
+            // --- Initial s1 Calculation ---
+            // pr = P' * r ; nr = N' * invd(r) * ones(m,1)
+            double[] pr = new double[nn];
+            double[] nr = new double[nn];
+            for (int j = 0; j < nn; j++)
+            {
+                for (int i = 0; i < m; i++)
+                {
+                    pr[j] += P[i, j] * r[i];
+                    nr[j] += N[i, j] * (r[i] == 0 ? 1.0 : 1.0 / r[i]);
+                }
+                // s1 logic including the (pr == 0) check
+                if (pr[j] != 0)
+                    s1[j] = (v[j] + Math.Sqrt(v[j] * v[j] + 4 * pr[j] * nr[j])) / (2 * pr[j]);
+                else
+                    s1[j] = -nr[j] / v[j];
+            }
+
+            // --- Initial r Calculation ---
+            // ps = P * s1 ; ns = N * invd(s1) * ones(nn,1)
+            double[] ps = new double[m];
+            double[] ns = new double[m];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < nn; j++)
+                {
+                    ps[i] += P[i, j] * s1[j];
+                    ns[i] += N[i, j] * (s1[j] == 0 ? 1.0 : 1.0 / s1[j]);
+                }
+                if (ps[i] != 0)
+                    r[i] = (u[i] + Math.Sqrt(u[i] * u[i] + 4 * ps[i] * ns[i])) / (2 * ps[i]);
+                else
+                    r[i] = -ns[i] / u[i];
+            }
+
+            // --- Initial s2 Calculation ---
+            for (int j = 0; j < nn; j++)
+            {
+                double pr_val = 0;
+                double nr_val = 0;
+                for (int i = 0; i < m; i++)
+                {
+                    pr_val += P[i, j] * r[i];
+                    nr_val += N[i, j] * (r[i] == 0 ? 1.0 : 1.0 / r[i]);
+                }
+                if (pr_val != 0)
+                    s2[j] = (v[j] + Math.Sqrt(v[j] * v[j] + 4 * pr_val * nr_val)) / (2 * pr_val);
+                else
+                    s2[j] = -nr_val / v[j];
+            }
+
+            int iter = 1;
+            double Maal = 0;
+            for (int j = 0; j < nn; j++) Maal = Math.Max(Maal, Math.Abs(s2[j] - s1[j]));
+
+            // --- Loop ---
+            while (Maal >  tol && iter < maxIter)
+            {
+                Array.Copy(s2, s1, nn);
+
+                // Update r (ps and ns)
+                for (int i = 0; i < m; i++)
+                {
+                    double ps_i = 0; double ns_i = 0;
+                    for (int j = 0; j < nn; j++)
+                    {
+                        ps_i += P[i, j] * s1[j];
+                        ns_i += N[i, j] * (s1[j] == 0 ? 1.0 : 1.0 / s1[j]);
+                    }
+                    if (ps_i != 0) r[i] = (u[i] + Math.Sqrt(u[i] * u[i] + 4 * ps_i * ns_i)) / (2 * ps_i);
+                    else r[i] = -ns_i / u[i];
+                }
+
+                // Update s2 (pr and nr)
+                for (int j = 0; j < nn; j++)
+                {
+                    double pr_j = 0; double nr_j = 0;
+                    for (int i = 0; i < m; i++)
+                    {
+                        pr_j += P[i, j] * r[i];
+                        nr_j += N[i, j] * (r[i] == 0 ? 1.0 : 1.0 / r[i]);
+                    }
+                    if (pr_j != 0) s2[j] = (v[j] + Math.Sqrt(v[j] * v[j] + 4 * pr_j * nr_j)) / (2 * pr_j);
+                    else s2[j] = -nr_j / v[j];
+                }
+
+                // Convergence check
+                Maal = 0;
+                for (int j = 0; j < nn; j++) Maal = Math.Max(Maal, Math.Abs(s2[j] - s1[j]));
+                iter++;
+            }
+
+            // --- Final Result Matrix Calculation ---
+            // X = diag(r)*P*diag(s) - inv(r)*N*inv(s)
+            double[,] X = new double[m, nn];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < nn; j++)
+                {
+                    // Positive component part
+                    double pos_part = r[i] * P[i, j] * s2[j];
+                    // Negative component part (inverse r and s)
+                    double neg_part = N[i, j] / ((r[i] == 0 ? 1.0 : r[i]) * (s2[j] == 0 ? 1.0 : s2[j]));
+                    X[i, j] = pos_part - neg_part;
+                }
+            }
+
+            ExoRemove(false, X, null, null, exo, ni, nj);
+
+            iterations = iter;
+
+            return X;
         }
 
         private static double RasErrors(double[,] x, double[] r2, double[] c2, int ni, int nj)
@@ -1050,10 +1174,10 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Removes and restores exogenized cells.
+        /// Removes inside x (setting to 0) and restores exogenized cells, while adjusting row and col sums
         /// </summary>
         private static void ExoRemove(bool remove, double[,] x, double[] adjR, double[] adjC, double[,] exo, int ni, int nj)
-        {
+        {            
             if (exo != null)
             {
                 if (remove)
