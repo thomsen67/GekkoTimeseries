@@ -23,6 +23,7 @@ namespace Gekko
     public enum EOptimizeType
     {
         Ras,
+        Gras,
         Entropy,
         Entropy2003,
         SqDif,
@@ -65,6 +66,7 @@ namespace Gekko
                     {
                         string s = O.ConvertToString(temp);
                         if (G.Equal(s, "ras")) o.type = EOptimizeType.Ras;
+                        else if (G.Equal(s, "gras")) o.type = EOptimizeType.Gras;
                         else if (G.Equal(s, "entropy")) o.type = EOptimizeType.Entropy;
                         else if (G.Equal(s, "entropy2003")) o.type = EOptimizeType.Entropy2003;
                         else if (G.Equal(s, "sqdif")) o.type = EOptimizeType.SqDif;
@@ -206,11 +208,11 @@ namespace Gekko
                 {
                     int i = k / nj;
                     int j = k % nj;
-                    if (i == 20 && j == 21)
-                    {
-                        //ignore
-                    }
-                    else
+                    //if (i == 20 && j == 21)
+                    //{
+                    //    //ignore
+                    //}
+                    //else
                     {                        
                         a[i, j] = Math.Max(o.epsilon, a[i, j]);
                     }
@@ -429,11 +431,11 @@ namespace Gekko
                     {                        
                         int i = k / nj;
                         int j = k % nj;
-                        if (i == 20 && j == 21)
-                        {
-                            //ignore, can be negative
-                        }
-                        else
+                        //if (i == 20 && j == 21)
+                        //{
+                        //    //ignore, can be negative
+                        //}
+                        //else
                         {
                             if (G.IsNumericalError(boundsLower[k]))
                             {
@@ -446,11 +448,24 @@ namespace Gekko
 
             if (o.type == EOptimizeType.Ras)
             {
-                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with the normal RAS procedure");                
+                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with RAS");
+                if (nWeights > 0) new Error("You cannot use cell weights with RAS");
                 DateTime t3 = DateTime.Now;
                 int iterations;
                 xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasMaxIterations, o.totalTolerance, out iterations);
-                string sExtra = null;                
+                string sExtra = null;
+                if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+            }
+            else if (o.type == EOptimizeType.Gras)
+            {
+                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with GRAS");
+                if (nWeights > 0) new Error("You cannot use cell weights with GRAS");
+                DateTime t3 = DateTime.Now;
+                int iterations;
+                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasMaxIterations, o.totalTolerance, out iterations);
+                string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
@@ -464,7 +479,7 @@ namespace Gekko
                     {
                         x1d[i * nj + j] = a[i, j];
                     }
-                }                                
+                }
 
                 alglib.minbleicstate state;
                 alglib.minbleicreport rep;
@@ -500,7 +515,7 @@ namespace Gekko
                     if (s != null) s2 = "Solver message: " + s;
                     new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ". " + s2 + ". Termination type " + rep.terminationtype + ".");
                 }
-                
+
                 xResult = new double[ni, nj];
                 for (int k = 0; k < x1d.Length; k++)
                 {
@@ -901,19 +916,185 @@ namespace Gekko
         }
 
         static double[,] RAS(double[,] a, double[] r, double[] c, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
-        {            
+        {
             iterations = -1; //signals failure
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
-                        
-            double[] adjR = (double[])r.Clone();
-            double[] adjC = (double[])c.Clone();
+
+            double[] r2 = (double[])r.Clone();
+            double[] c2 = (double[])c.Clone();
             double[,] x = (double[,])a.Clone();
 
-            double[,] exo = new double[ni, nj];
+            double[,] exo = Bounds2Exo(boundsLower, boundsUpper, ni, nj);
+            ExoRemove(true, x, r2, c2, exo, ni, nj);
+
+            for (int iter = 0; iter < maxIter; iter++)
+            {
+                RasScaleRows(x, r2, ni, nj);
+                RasScaleCols(x, c2, ni, nj);
+                double max = RasErrors(x, r2, c2, ni, nj);
+                if (max < tol)
+                {
+                    iterations = iter + 1;
+                    break;
+                }
+            }
+
+            ExoRemove(false, x, null, null, exo, ni, nj);
+
+            return x;
+        }
+
+        static double[,] GRAS(double[,] a, double[] r, double[] c, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
+        {
+            iterations = -1; //signals failure
+            int ni = a.GetLength(0);
+            int nj = a.GetLength(1);
+
+            double[] r2 = (double[])r.Clone();
+            double[] c2 = (double[])c.Clone();
+            double[,] x = (double[,])a.Clone();
+
+            double[,] exo = Bounds2Exo(boundsLower, boundsUpper, ni, nj);
+            ExoRemove(true, x, r2, c2, exo, ni, nj);
+
+            for (int iter = 0; iter < maxIter; iter++)
+            {
+                RasScaleRows(x, r2, ni, nj);
+                RasScaleCols(x, c2, ni, nj);
+                double max = RasErrors(x, r2, c2, ni, nj);
+                if (max < tol)
+                {
+                    iterations = iter + 1;
+                    break;
+                }
+            }
+
+            ExoRemove(false, x, null, null, exo, ni, nj);
+
+            return x;
+        }
+
+        private static double RasErrors(double[,] x, double[] r2, double[] c2, int ni, int nj)
+        {
+            // ---- Convergence test ----
+            double max = 0;
+
+            // Note: For checking error, we must mentally "add back" the fixed cells
+            // which is equivalent to checking active sum against adjR/adjC
+            for (int i = 0; i < ni; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < nj; j++) sum += x[i, j];
+                max = Math.Max(max, Math.Abs(sum - r2[i]));
+            }
+
+            for (int j = 0; j < nj; j++)
+            {
+                double sum = 0;
+                for (int i = 0; i < ni; i++) sum += x[i, j];
+                max = Math.Max(max, Math.Abs(sum - c2[j]));
+            }
+
+            return max;
+        }
+
+        private static void RasScaleCols(double[,] x, double[] c2, int ni, int nj)
+        {
+            // ---- Column scaling ----
+            for (int j = 0; j < nj; j++)
+            {
+                double sum = 0;
+                for (int i = 0; i < ni; i++) sum += x[i, j];
+
+                if (sum > 0)
+                {
+                    double factor = c2[j] / sum;
+                    for (int i = 0; i < ni; i++) x[i, j] *= factor;
+                }
+            }
+        }
+
+        private static void RasScaleRows(double[,] x, double[] r2, int ni, int nj)
+        {
+            // ---- Row scaling ----
+            for (int i = 0; i < ni; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < nj; j++) sum += x[i, j];
+
+                if (sum > 0) // Avoid division by zero if all cells in row are fixed/zero
+                {
+                    double factor = r2[i] / sum;
+                    for (int j = 0; j < nj; j++) x[i, j] *= factor;
+                }
+            }
+        }
+
+        private static void ExoRemove2(int ni, int nj, double[,] x, double[,] exo)
+        {
+            if (exo != null)
+            {
+                // Restore fixed cells
+                for (int i = 0; i < ni; i++)
+                {
+                    for (int j = 0; j < nj; j++)
+                    {
+                        if (!G.IsNumericalError(exo[i, j]))
+                        {
+                            x[i, j] = exo[i, j];
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes and restores exogenized cells.
+        /// </summary>
+        private static void ExoRemove(bool remove, double[,] x, double[] adjR, double[] adjC, double[,] exo, int ni, int nj)
+        {
+            if (exo != null)
+            {
+                if (remove)
+                {
+                    for (int i = 0; i < ni; i++)
+                    {
+                        for (int j = 0; j < nj; j++)
+                        {
+                            if (!G.IsNumericalError(exo[i, j]))
+                            {
+                                adjR[i] -= exo[i, j];
+                                adjC[j] -= exo[i, j];
+                                x[i, j] = 0; // Temporarily 0
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Restore fixed cells
+                    for (int i = 0; i < ni; i++)
+                    {
+                        for (int j = 0; j < nj; j++)
+                        {
+                            if (!G.IsNumericalError(exo[i, j]))
+                            {
+                                x[i, j] = exo[i, j];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static double[,] Bounds2Exo(double[] boundsLower, double[] boundsUpper, int ni, int nj)
+        {
+            double[,] exo = null;
 
             if (boundsLower != null && boundsUpper != null)
             {
+                exo = new double[ni, nj];
                 if (boundsLower.Length != boundsUpper.Length) new Error("Bounds upper/lower sizes do not match");
                 for (int k = 0; k < boundsLower.Length; k++)
                 {
@@ -932,96 +1113,9 @@ namespace Gekko
                 }
             }
 
-            if (exo != null)
-            {                
-                for (int i = 0; i < ni; i++)
-                {
-                    for (int j = 0; j < nj; j++)
-                    {
-                        if (!G.IsNumericalError(exo[i, j]))
-                        {
-                            //adjR[i] -= a[i, j];
-                            //adjC[j] -= a[i, j];
-                            adjR[i] -= exo[i, j];
-                            adjC[j] -= exo[i, j];
-                            x[i, j] = 0; // Temporarily 0 so scaling factors don't affect it
-                        }                        
-                    }
-                }
-            }
+            return exo;
+        }
 
-            for (int iter = 0; iter < maxIter; iter++)
-            {
-                // ---- Row scaling ----
-                for (int i = 0; i < ni; i++)
-                {
-                    double sum = 0;
-                    for (int j = 0; j < nj; j++) sum += x[i, j];
-
-                    if (sum > 0) // Avoid division by zero if all cells in row are fixed/zero
-                    {
-                        double factor = adjR[i] / sum;
-                        for (int j = 0; j < nj; j++) x[i, j] *= factor;
-                    }
-                }
-
-                // ---- Column scaling ----
-                for (int j = 0; j < nj; j++)
-                {
-                    double sum = 0;
-                    for (int i = 0; i < ni; i++) sum += x[i, j];
-
-                    if (sum > 0)
-                    {
-                        double factor = adjC[j] / sum;
-                        for (int i = 0; i < ni; i++) x[i, j] *= factor;
-                    }
-                }
-
-                // ---- Convergence test ----
-                double maxError = 0;
-
-                // Note: For checking error, we must mentally "add back" the fixed cells
-                // which is equivalent to checking active sum against adjR/adjC
-                for (int i = 0; i < ni; i++)
-                {
-                    double sum = 0;
-                    for (int j = 0; j < nj; j++) sum += x[i, j];
-                    maxError = Math.Max(maxError, Math.Abs(sum - adjR[i]));
-                }
-
-                for (int j = 0; j < nj; j++)
-                {
-                    double sum = 0;
-                    for (int i = 0; i < ni; i++) sum += x[i, j];
-                    maxError = Math.Max(maxError, Math.Abs(sum - adjC[j]));
-                }
-
-                if (maxError < tol)
-                {
-                    iterations = iter + 1;
-                    break;
-                }
-            }
-
-            if (exo != null)
-            {
-                // Restore fixed cells
-                for (int i = 0; i < ni; i++)
-                {
-                    for (int j = 0; j < nj; j++)
-                    {
-                        if (!G.IsNumericalError(exo[i, j]))
-                        {
-                            //x[i, j] = a[i, j];
-                            x[i, j] = exo[i, j];
-                        }
-                    }
-                }
-            }
-
-            return x;
-        }        
     }
 }
 
