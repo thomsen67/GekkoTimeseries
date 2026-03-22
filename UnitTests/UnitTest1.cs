@@ -35516,6 +35516,9 @@ print(df2)
                 if (ii == 0)
                 {
                     I("prt <n> io;");
+                    I("#constraints1 = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
+                    I("#constraints2 = (  (  ('a','a'), 10  ),  );");
+                    I("#exo = (  ('a','a'),  );");
 
                     I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
                     I("tell 'Original row/col RAS procedure';");
@@ -35525,11 +35528,14 @@ print(df2)
                     I("tell 'Entropy function (2013)';");
                     I("prt <n> io0a_entropy;");
 
-                    I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
-                    I("io0b_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
-                    I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
-                    I("prt <n> io0b_entropy;");
+                    I("io0a_entropy2003 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+                    I("tell 'Old 2003 entropy function';");
+                    I("prt <n> io0a_entropy2003;");                    
 
+                    I("io0a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");
+                    I("tell 'GRAS';");
+                    I("prt <n> io0a_entropy;");                    
+                    
                     I("io0a_sqdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
                     I("tell 'Squared absolute differences';");
                     I("prt <n> io0a_sqdif;");
@@ -35538,24 +35544,6 @@ print(df2)
                     I("tell 'Squared relative differences';");
                     I("prt <n> io0a_sqrel;");
 
-                    I("#exo = (  ('a','a'),  );");
-                    I("io0c_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
-                    I("tell 'Entropy with weights for x11==10';");
-                    I("prt <n> io0c_entropy;");
-
-                    I("#constraints = (  (  ('a','a'), 10  ),  );");
-                    I("io0d_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
-                    I("tell 'Entropy with constraints for x11==10';");
-                    I("prt <n> io0d_entropy;");
-
-                    I("io0c_ras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
-                    I("tell 'Original row/col RAS procedure';");
-                    I("prt <n> io0c_ras;");
-
-                    I("io0a_entropy2003 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
-                    I("tell 'Old 2003 entropy function';");
-                    I("prt <n> io0a_entropy2003;");
-
                     I("io0a_distdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
                     I("tell 'Distance/abs on differences';");
                     I("prt <n> io0a_distdif;");
@@ -35563,6 +35551,28 @@ print(df2)
                     I("io0a_distrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
                     I("tell 'Distance/abs on relative differences';");
                     I("prt <n> io0a_distrel;");
+
+                    // -----
+
+                    I("io0b_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints1, %type = 'entropy'));");
+                    I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
+                    I("prt <n> io0b_entropy;");
+
+                    // -----
+
+                    I("io0c_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
+                    I("tell 'Entropy with weights for x11 exo';");
+                    I("prt <n> io0c_entropy;");
+
+                    I("io0c_ras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
+                    I("tell 'Original row/col RAS procedure';");
+                    I("prt <n> io0c_ras;");
+
+                    // -----
+
+                    I("io0d_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints2, %type = 'entropy'));");
+                    I("tell 'Entropy with constraints for x11 exo';");
+                    I("prt <n> io0d_entropy;");                    
                 }
 
                 if (ii == 1)
@@ -35589,8 +35599,12 @@ print(df2)
                             {
                                 Assert.AreEqual((O.GetIVariableFromString("io0a_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
                                     (O.GetIVariableFromString("io0a_entropy[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                                Assert.AreEqual((O.GetIVariableFromString("io0a_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                    (O.GetIVariableFromString("io0a_gras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+
+
                                 Assert.AreEqual((O.GetIVariableFromString("io0d_entropy[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                    (O.GetIVariableFromString("io0c_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
+                                    (O.GetIVariableFromString("io0c_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 1d * deltaHere);
                             }
                         }
                         //Test the 2 restrictions

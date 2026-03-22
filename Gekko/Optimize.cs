@@ -13,11 +13,11 @@ namespace Gekko
     public class OptimizerOptions
     {
         public EOptimizeType type = EOptimizeType.Ras; //default
-        public double totalTolerance = 0.001;  //1 promille
+        public double toleranceAbsolute = 0.0001d;  //absolute
         public bool treatNaNAs0 = false;
-        public int rasMaxIterations = 1000;
+        public int rasGrasMaxIterations = 1000;
         public string hack = null;
-        public double epsilon = 0.0001d;        
+        public double epsilon = 0.0001d; //for hack 
     }
 
     public enum EOptimizeType
@@ -98,7 +98,7 @@ namespace Gekko
 
                     if (options_map.storage.TryGetValue("%tol", out temp))
                     {
-                        o.totalTolerance = O.ConvertToVal(temp);
+                        o.toleranceAbsolute = O.ConvertToVal(temp);
                     }
                 }
             }   
@@ -196,7 +196,7 @@ namespace Gekko
                     //if (G.IsNumericalError(weights[i, j])) weights[i, j] = 1d;
                 }
             }
-            if (Math.Abs(toti / totj - 1d) > o.totalTolerance) new Error("Rows sum to " + toti + ", whereas cols sum to " + totj + ". Tolerance " + o.totalTolerance + " exceeded");
+            if (Math.Abs(toti - totj) > o.toleranceAbsolute) new Error("Rows sum to " + toti + ", whereas cols sum to " + totj + ". Tolerance " + o.toleranceAbsolute + " exceeded");
 
             int niPlusNj = ni + nj;
             int niMultiplyNj = ni * nj;
@@ -457,10 +457,10 @@ namespace Gekko
                 if (nWeights > 0) new Error("You cannot use cell weights with RAS");
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasMaxIterations, o.totalTolerance, out iterations);
+                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
-                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
             else if (o.type == EOptimizeType.Gras)
@@ -469,10 +469,10 @@ namespace Gekko
                 if (nWeights > 0) new Error("You cannot use cell weights with GRAS");
                 DateTime t3 = DateTime.Now;
                 int iterations;
-                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasMaxIterations, o.totalTolerance, out iterations);
+                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
-                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
             }
             else
