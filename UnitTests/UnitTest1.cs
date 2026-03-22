@@ -35373,7 +35373,95 @@ print(df2)
         public void _Test_Ras()
         {
             //TODO: handle pure == 0d.         
-            //TODO: abs() on function? And how do negative cells do?            
+            //TODO: abs() on function? And how do negative cells do?
+            //
+            //Gauss program for ii == 1 and 2:
+            //The following Gauss program that has been tested a lot on Statistics Denmark.
+            //It seems that if all cell and totals values are flipped sign-wise, the Gauss program results also just flip.
+            //
+            //EITHER:
+            //x = {-1 2 3 1, 4 5 6 1, 7 8 9 1};
+            //u = {9, 15, 26};
+            //v = {10, 16, 20, 4};
+            //OR:
+            //x = { -1 2 0 5, -3 - 5 6 0, -2 3 - 5 4};
+            //u = { 3, -5, 0};     //true: {6, -2, 0}
+            //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
+
+            //maxiter = 1000;
+            //limit = 0.0000000000000001;
+            //print x;
+            //y = GRAS(x, u, v, maxiter, limit); 
+            //print y;
+            //
+            ////reciprocal col vector put into diagonal
+            //proc invd(y);                                              
+            //  local a;                                                 
+            //  a = diagrv(zeros(rows(y),rows(y)),(y + (y .== 0)).^-1) ;
+            //  retp(a);                                                 
+            //endp;      
+            //
+            //proc GRAS(X0, u, v, maxiter, limit);
+            //local m,nn,P,N,r,s,pr,nr,s1,ss,ps,ns,rr,s2,dif,iter,Maal,X,skriv1,skriv,forskel ;
+            //  forskel = abs(sumc(u)-sumc(v)) ;
+            //  if forskel > 0.000001 ;
+            //    //action...    
+            //  endif ;      
+            //  m = rows(X0) ;
+            //  nn = cols(X0) ;  
+            //  P = X0.*(X0 .>= 0) ;
+            //  N = abs(X0 .* (X0 .< 0)) ;  
+            //  r = ones(rows(X0),1) ;
+            //  s = ones(1,cols(X0)) ;  
+            //  pr = P'*r ;
+            //  nr = N'* invd(r) * ones(m,1) ;  
+            //  s1 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));
+            //  ss = -invd(v) * nr ;  
+            //  s1 = s1 + ss .* (pr .== 0) ;  
+            //  ps = P * s1 ;
+            //  ns = N * invd(s1) * ones(nn,1) ;  
+            //  r  =  invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+            //  rr = -invd(u) * ns ;  
+            //  r = r + rr .* (ps .== 0) ; 
+            //  pr = P' * r ;
+            //  nr = N' * invd(r) * ones(m,1) ;  
+            //  s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr))) ;
+            //  ss = -invd(v) * nr ;  
+            //  s2 = s2 + ss .* (pr .== 0) ;  
+            //  dif = s2 - s1 ;  
+            //  iter = 1 ;    
+            //  Maal = maxc(abs(dif)) ;  
+            //  do while Maal > limit and iter < maxiter ;    
+            //    s1 = s2 ;
+            //    ps = P * s1 ;
+            //    ns = N * invd(s1) * ones(nn,1) ;  
+            //    r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+            //    rr = -invd(u) * ns ;  
+            //    r = r + rr .* (ps .== 0) ;  
+            //    pr = p'*r ;
+            //    nr = N'* invd(r) * ones(m,1) ;  
+            //    s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));  /* s2*= s1 */
+            //    ss = -invd(v) * nr ;  
+            //    s2 = s2 + ss .* (pr .== 0) ;      
+            //    dif = s2 - s1 ;    
+            //    iter = iter + 1 ;  
+            //    Maal = maxc(abs(dif)) ;    
+            //  endo ;
+            //  
+            //  s = s2 ;
+            //  ps = P * s ;
+            //  ns = N * invd(s) * ones(nn,1) ;  
+            //  r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+            //  rr = -invd(u) * ns ;  
+            //  r = r + rr .* (ps .== 0) ;  
+            //  X = diagrv(zeros(m,m),r) * P * diagrv(zeros(nn,nn),s) - invd(r) * N * invd(s) ;  
+            //  if iter < maxiter-1 ;
+            //    print; print "ok, iterations = " iter;
+            //  else ;
+            //    print; print "fail, iterations = " iter;
+            //  endif ;  
+            //  retp(X) ;
+            //endp ;
 
             for (int ii = 0; ii < 3; ii++)
             {
@@ -35397,7 +35485,7 @@ print(df2)
                     I("colsum = series(1);");
                     I("colsum[a]= 160;"); I("colsum[b]= 170;"); I("colsum[c]= 140;"); I("colsum[d]= 51;");
                 }
-                else if(ii == 1)
+                else if (ii == 1)
                 {
                     //Just 1 negative
                     I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 3;"); I("io[a,d] = 1;");
@@ -35411,7 +35499,7 @@ print(df2)
                     // Gauss: x = {-1 2 3 1, 4 5 6 1, 7 8 9 1}; u = { 9, 15, 26}; v = { 10, 16, 20, 4};
                     //
                 }
-                else 
+                else
                 {
                     //Very sick                    
                     I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 0;"); I("io[a,d] = 5;");
@@ -35426,69 +35514,69 @@ print(df2)
                 }
 
                 if (ii == 0)
-                {                    
+                {
                     I("prt <n> io;");
 
-                    I("io1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
+                    I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
                     I("tell 'Original row/col RAS procedure';");
-                    I("prt <n> io1;");
+                    I("prt <n> io0a_ras;");
 
-                    I("io2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+                    I("io0a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
                     I("tell 'Entropy function (2013)';");
-                    I("prt <n> io2;");
+                    I("prt <n> io0a_entropy;");
 
                     I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
-                    I("io3 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
+                    I("io0b_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
                     I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
-                    I("prt <n> io3;");
+                    I("prt <n> io0b_entropy;");
 
-                    I("io4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
+                    I("io0a_sqdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
                     I("tell 'Squared absolute differences';");
-                    I("prt <n> io4;");
+                    I("prt <n> io0a_sqdif;");
 
-                    I("io5 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
+                    I("io0a_sqrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
                     I("tell 'Squared relative differences';");
-                    I("prt <n> io5;");
+                    I("prt <n> io0a_sqrel;");
 
                     I("#exo = (  ('a','a'),  );");
-                    I("io6 = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
+                    I("io0c_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
                     I("tell 'Entropy with weights for x11==10';");
-                    I("prt <n> io6;");
+                    I("prt <n> io0c_entropy;");
 
                     I("#constraints = (  (  ('a','a'), 10  ),  );");
-                    I("io7 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
+                    I("io0d_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
                     I("tell 'Entropy with constraints for x11==10';");
-                    I("prt <n> io7;");
+                    I("prt <n> io0d_entropy;");
 
-                    I("io7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
+                    I("io0c_ras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
                     I("tell 'Original row/col RAS procedure';");
-                    I("prt <n> io7a;");
+                    I("prt <n> io0c_ras;");
 
-                    I("io8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+                    I("io0a_entropy2003 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
                     I("tell 'Old 2003 entropy function';");
-                    I("prt <n> io8;");
+                    I("prt <n> io0a_entropy2003;");
 
-                    I("io9 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
+                    I("io0a_distdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
                     I("tell 'Distance/abs on differences';");
-                    I("prt <n> io9;");
+                    I("prt <n> io0a_distdif;");
 
-                    I("io10 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
+                    I("io0a_distrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
                     I("tell 'Distance/abs on relative differences';");
-                    I("prt <n> io10;");
+                    I("prt <n> io0a_distrel;");
                 }
 
                 if (ii == 1)
                 {
-                    I("io11 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("io1a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
                     I("tell 'GRAS';");
-                    I("prt <n> io11;");
+                    I("prt <n> io1a_gras;");
                 }
 
                 if (ii == 2)
                 {
-                    I("io12 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("io2a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
                     I("tell 'GRAS';");
-                    I("prt <n> io12;");
+                    I("prt <n> io2a_gras;");
                 }
 
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
@@ -35499,139 +35587,51 @@ print(df2)
                         {
                             foreach (string j in cols)
                             {
-                                Assert.AreEqual((O.GetIVariableFromString("io1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 
-                                    (O.GetIVariableFromString("io2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                                Assert.AreEqual((O.GetIVariableFromString("io7[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 
-                                    (O.GetIVariableFromString("io7a[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
+                                Assert.AreEqual((O.GetIVariableFromString("io0a_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                    (O.GetIVariableFromString("io0a_entropy[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                                Assert.AreEqual((O.GetIVariableFromString("io0d_entropy[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                    (O.GetIVariableFromString("io0c_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
                             }
                         }
                         //Test the 2 restrictions
-                        Assert.AreEqual((O.GetIVariableFromString("io3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                        (O.GetIVariableFromString("io3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual((O.GetIVariableFromString("io3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t) +
-                                        (O.GetIVariableFromString("io3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("io0b_entropy[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                        (O.GetIVariableFromString("io0b_entropy[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("io0b_entropy[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t) +
+                                        (O.GetIVariableFromString("io0b_entropy[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
 
                     }
                     else if (ii == 1)
                     {
                         double deltaHere2 = 0.0000001d;
-                        Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("io11[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.1093591, (O.GetIVariableFromString("io11[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(4.7803250, (O.GetIVariableFromString("io11[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.7699601, (O.GetIVariableFromString("io11[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.6140556, (O.GetIVariableFromString("io11[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(4.6329270, (O.GetIVariableFromString("io11[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(5.6981252, (O.GetIVariableFromString("io11[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.0548921, (O.GetIVariableFromString("io11[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(7.0455885, (O.GetIVariableFromString("io11[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(8.2577139, (O.GetIVariableFromString("io11[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(9.5215498, (O.GetIVariableFromString("io11[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.1751477, (O.GetIVariableFromString("io11[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-
-                        // Taken from the following Gauss program that has been tested a lot on Statistics Denmark.
-                        // For positive cells and totals, the Gauss programs and %type = 'ras' seems to correspond.
-                        // It seems that if all cell and totals values are flipped sign-wise, the Gauss program results also just flip.
-                        //
-                        //EITHER:
-                        //x = {-1 2 3 1, 4 5 6 1, 7 8 9 1};
-                        //u = {9, 15, 26};
-                        //v = {10, 16, 20, 4};
-                        //OR:
-                        //x = { -1 2 0 5, -3 - 5 6 0, -2 3 - 5 4};
-                        //u = { 3, -5, 0};     //true: {6, -2, 0}
-                        //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
-
-                        //maxiter = 1000;
-                        //limit = 0.0000000000000001;
-                        //print x;
-                        //y = GRAS(x, u, v, maxiter, limit); 
-                        //print y;
-                        //
-                        ////reciprocal col vector put into diagonal
-                        //proc invd(y);                                              
-                        //  local a;                                                 
-                        //  a = diagrv(zeros(rows(y),rows(y)),(y + (y .== 0)).^-1) ;
-                        //  retp(a);                                                 
-                        //endp;      
-                        //
-                        //proc GRAS(X0, u, v, maxiter, limit);
-                        //local m,nn,P,N,r,s,pr,nr,s1,ss,ps,ns,rr,s2,dif,iter,Maal,X,skriv1,skriv,forskel ;
-                        //  forskel = abs(sumc(u)-sumc(v)) ;
-                        //  if forskel > 0.000001 ;
-                        //    //action...    
-                        //  endif ;      
-                        //  m = rows(X0) ;
-                        //  nn = cols(X0) ;  
-                        //  P = X0.*(X0 .>= 0) ;
-                        //  N = abs(X0 .* (X0 .< 0)) ;  
-                        //  r = ones(rows(X0),1) ;
-                        //  s = ones(1,cols(X0)) ;  
-                        //  pr = P'*r ;
-                        //  nr = N'* invd(r) * ones(m,1) ;  
-                        //  s1 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));
-                        //  ss = -invd(v) * nr ;  
-                        //  s1 = s1 + ss .* (pr .== 0) ;  
-                        //  ps = P * s1 ;
-                        //  ns = N * invd(s1) * ones(nn,1) ;  
-                        //  r  =  invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
-                        //  rr = -invd(u) * ns ;  
-                        //  r = r + rr .* (ps .== 0) ; 
-                        //  pr = P' * r ;
-                        //  nr = N' * invd(r) * ones(m,1) ;  
-                        //  s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr))) ;
-                        //  ss = -invd(v) * nr ;  
-                        //  s2 = s2 + ss .* (pr .== 0) ;  
-                        //  dif = s2 - s1 ;  
-                        //  iter = 1 ;    
-                        //  Maal = maxc(abs(dif)) ;  
-                        //  do while Maal > limit and iter < maxiter ;    
-                        //    s1 = s2 ;
-                        //    ps = P * s1 ;
-                        //    ns = N * invd(s1) * ones(nn,1) ;  
-                        //    r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
-                        //    rr = -invd(u) * ns ;  
-                        //    r = r + rr .* (ps .== 0) ;  
-                        //    pr = p'*r ;
-                        //    nr = N'* invd(r) * ones(m,1) ;  
-                        //    s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));  /* s2*= s1 */
-                        //    ss = -invd(v) * nr ;  
-                        //    s2 = s2 + ss .* (pr .== 0) ;      
-                        //    dif = s2 - s1 ;    
-                        //    iter = iter + 1 ;  
-                        //    Maal = maxc(abs(dif)) ;    
-                        //  endo ;
-                        //  
-                        //  s = s2 ;
-                        //  ps = P * s ;
-                        //  ns = N * invd(s) * ones(nn,1) ;  
-                        //  r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
-                        //  rr = -invd(u) * ns ;  
-                        //  r = r + rr .* (ps .== 0) ;  
-                        //  X = diagrv(zeros(m,m),r) * P * diagrv(zeros(nn,nn),s) - invd(r) * N * invd(s) ;  
-                        //  if iter < maxiter-1 ;
-                        //    print; print "ok, iterations = " iter;
-                        //  else ;
-                        //    print; print "fail, iterations = " iter;
-                        //  endif ;  
-                        //  retp(X) ;
-                        //endp ;
+                        Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("io1a_gras[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.1093591, (O.GetIVariableFromString("io1a_gras[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.7803250, (O.GetIVariableFromString("io1a_gras[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.7699601, (O.GetIVariableFromString("io1a_gras[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.6140556, (O.GetIVariableFromString("io1a_gras[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.6329270, (O.GetIVariableFromString("io1a_gras[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(5.6981252, (O.GetIVariableFromString("io1a_gras[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.0548921, (O.GetIVariableFromString("io1a_gras[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(7.0455885, (O.GetIVariableFromString("io1a_gras[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(8.2577139, (O.GetIVariableFromString("io1a_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(9.5215498, (O.GetIVariableFromString("io1a_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.1751477, (O.GetIVariableFromString("io1a_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);                        
                     }
                     else
                     {
                         //See Gauss program above
                         double deltaHere2 = 0.0000001d;
-                        Assert.AreEqual(-1.2294873, (O.GetIVariableFromString("io12[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.6048915, (O.GetIVariableFromString("io12[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(0d, (O.GetIVariableFromString("io12[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(2.6245958, (O.GetIVariableFromString("io12[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-3.2409029, (O.GetIVariableFromString("io12[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-5.4748857, (O.GetIVariableFromString("io12[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.7157886, (O.GetIVariableFromString("io12[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(0d, (O.GetIVariableFromString("io12[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-1.5296098, (O.GetIVariableFromString("io12[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.8699942, (O.GetIVariableFromString("io12[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("io12[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.3754042, (O.GetIVariableFromString("io12[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.2294873, (O.GetIVariableFromString("io2a_gras[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.6048915, (O.GetIVariableFromString("io2a_gras[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2a_gras[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.6245958, (O.GetIVariableFromString("io2a_gras[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-3.2409029, (O.GetIVariableFromString("io2a_gras[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.4748857, (O.GetIVariableFromString("io2a_gras[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.7157886, (O.GetIVariableFromString("io2a_gras[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2a_gras[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.5296098, (O.GetIVariableFromString("io2a_gras[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.8699942, (O.GetIVariableFromString("io2a_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("io2a_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.3754042, (O.GetIVariableFromString("io2a_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                     }
                 }
             }
