@@ -956,147 +956,133 @@ namespace Gekko
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
 
-            double[] u = (double[])r3.Clone();
-            double[] v = (double[])c3.Clone();
-            double[,] X0 = (double[,])a.Clone();
+            double[] rowTarget = (double[])r3.Clone();
+            double[] colTarget = (double[])c3.Clone();
+            double[,] x0 = (double[,])a.Clone();
 
             double[,] exo = Bounds2Exo(boundsLower, boundsUpper, ni, nj);
-            
-            ExoRemove(true, X0, u, v, exo, ni, nj);
+            ExoRemove(true, x0, rowTarget, colTarget, exo, ni, nj);
 
-            int m = X0.GetLength(0);
-            int nn = X0.GetLength(1);
+            int nRows = x0.GetLength(0);
+            int nCols = x0.GetLength(1);
 
-            // P = X0.*(X0 .>= 0) ; N = abs(X0 .* (X0 .< 0))
-            double[,] P = new double[m, nn]; //positive values
-            double[,] N = new double[m, nn]; //negative values
-            for (int i = 0; i < m; i++)
+            // Split into positive and negative components
+            double[,] positive = new double[nRows, nCols]; //All positive values, are never changed after construction
+            double[,] negative = new double[nRows, nCols]; //All negative values, are never changed after construction
+            for (int i = 0; i < nRows; i++)
             {
-                for (int j = 0; j < nn; j++)
+                for (int j = 0; j < nCols; j++)
                 {
-                    if (X0[i, j] >= 0) P[i, j] = X0[i, j];
-                    else N[i, j] = Math.Abs(X0[i, j]);
+                    if (x0[i, j] >= 0) positive[i, j] = x0[i, j];
+                    else negative[i, j] = Math.Abs(x0[i, j]);
                 }
             }
 
-            double[] r = new double[m];
-            for (int i = 0; i < m; i++) r[i] = 1.0;
+            //Initial setup
+            double[] row1 = new double[nRows];
+            for (int i = 0; i < nRows; i++) row1[i] = 1.0;
+            double[] col1 = new double[nCols];
+            double[] col2 = new double[nCols];
+            col1 = ScaleRowOrColumn(positive, negative, row1, colTarget, false); //col update
+            row1 = ScaleRowOrColumn(positive, negative, col1, rowTarget, true); //row udate
+            col2 = ScaleRowOrColumn(positive, negative, row1, colTarget, false); //col update
 
-            double[] s1 = new double[nn];
-            double[] s2 = new double[nn];
+            int iter = 1;            
+            double error = GRASError(nCols, col1, col2);
 
-            // --- Initial s1 Calculation ---
-            // pr = P' * r ; nr = N' * invd(r) * ones(m,1)
-            double[] pr = new double[nn];
-            double[] nr = new double[nn];
-            for (int j = 0; j < nn; j++)
+            while (error > tol && iter < maxIter)
             {
-                for (int i = 0; i < m; i++)
-                {
-                    pr[j] += P[i, j] * r[i];
-                    nr[j] += N[i, j] * (r[i] == 0 ? 1.0 : 1.0 / r[i]);
-                }
-                // s1 logic including the (pr == 0) check
-                if (pr[j] != 0)
-                    s1[j] = (v[j] + Math.Sqrt(v[j] * v[j] + 4 * pr[j] * nr[j])) / (2 * pr[j]);
-                else
-                    s1[j] = -nr[j] / v[j];
-            }
-
-            // --- Initial r Calculation ---
-            // ps = P * s1 ; ns = N * invd(s1) * ones(nn,1)
-            double[] ps = new double[m];
-            double[] ns = new double[m];
-            for (int i = 0; i < m; i++)
-            {
-                for (int j = 0; j < nn; j++)
-                {
-                    ps[i] += P[i, j] * s1[j];
-                    ns[i] += N[i, j] * (s1[j] == 0 ? 1.0 : 1.0 / s1[j]);
-                }
-                if (ps[i] != 0)
-                    r[i] = (u[i] + Math.Sqrt(u[i] * u[i] + 4 * ps[i] * ns[i])) / (2 * ps[i]);
-                else
-                    r[i] = -ns[i] / u[i];
-            }
-
-            // --- Initial s2 Calculation ---
-            for (int j = 0; j < nn; j++)
-            {
-                double pr_val = 0;
-                double nr_val = 0;
-                for (int i = 0; i < m; i++)
-                {
-                    pr_val += P[i, j] * r[i];
-                    nr_val += N[i, j] * (r[i] == 0 ? 1.0 : 1.0 / r[i]);
-                }
-                if (pr_val != 0)
-                    s2[j] = (v[j] + Math.Sqrt(v[j] * v[j] + 4 * pr_val * nr_val)) / (2 * pr_val);
-                else
-                    s2[j] = -nr_val / v[j];
-            }
-
-            int iter = 1;
-            double Maal = 0;
-            for (int j = 0; j < nn; j++) Maal = Math.Max(Maal, Math.Abs(s2[j] - s1[j]));
-
-            // --- Loop ---
-            while (Maal >  tol && iter < maxIter)
-            {
-                Array.Copy(s2, s1, nn);
-
-                // Update r (ps and ns)
-                for (int i = 0; i < m; i++)
-                {
-                    double ps_i = 0; double ns_i = 0;
-                    for (int j = 0; j < nn; j++)
-                    {
-                        ps_i += P[i, j] * s1[j];
-                        ns_i += N[i, j] * (s1[j] == 0 ? 1.0 : 1.0 / s1[j]);
-                    }
-                    if (ps_i != 0) r[i] = (u[i] + Math.Sqrt(u[i] * u[i] + 4 * ps_i * ns_i)) / (2 * ps_i);
-                    else r[i] = -ns_i / u[i];
-                }
-
-                // Update s2 (pr and nr)
-                for (int j = 0; j < nn; j++)
-                {
-                    double pr_j = 0; double nr_j = 0;
-                    for (int i = 0; i < m; i++)
-                    {
-                        pr_j += P[i, j] * r[i];
-                        nr_j += N[i, j] * (r[i] == 0 ? 1.0 : 1.0 / r[i]);
-                    }
-                    if (pr_j != 0) s2[j] = (v[j] + Math.Sqrt(v[j] * v[j] + 4 * pr_j * nr_j)) / (2 * pr_j);
-                    else s2[j] = -nr_j / v[j];
-                }
-
-                // Convergence check
-                Maal = 0;
-                for (int j = 0; j < nn; j++) Maal = Math.Max(Maal, Math.Abs(s2[j] - s1[j]));
+                Array.Copy(col2, col1, nCols);
+                //Scale row
+                row1 = ScaleRowOrColumn(positive, negative, col1, rowTarget, true);
+                //Scale column
+                col2 = ScaleRowOrColumn(positive, negative, row1, colTarget, false);
+                error = GRASError(nCols, col1, col2);
                 iter++;
             }
 
-            // --- Final Result Matrix Calculation ---
-            // X = diag(r)*P*diag(s) - inv(r)*N*inv(s)
-            double[,] X = new double[m, nn];
-            for (int i = 0; i < m; i++)
+            // --- Final Matrix Construction ---
+            double[,] x = new double[nRows, nCols];
+            for (int i = 0; i < nRows; i++)
             {
-                for (int j = 0; j < nn; j++)
+                for (int j = 0; j < nCols; j++)
                 {
-                    // Positive component part
-                    double pos_part = r[i] * P[i, j] * s2[j];
-                    // Negative component part (inverse r and s)
-                    double neg_part = N[i, j] / ((r[i] == 0 ? 1.0 : r[i]) * (s2[j] == 0 ? 1.0 : s2[j]));
-                    X[i, j] = pos_part - neg_part;
+                    double pos_part = row1[i] * positive[i, j] * col2[j];
+                    double inv_r = row1[i] == 0 ? 1.0 : row1[i];
+                    double inv_s = col2[j] == 0 ? 1.0 : col2[j];
+                    double neg_part = negative[i, j] / (inv_r * inv_s);
+                    x[i, j] = pos_part - neg_part;
                 }
             }
 
-            ExoRemove(false, X, null, null, exo, ni, nj);
-
+            ExoRemove(false, x, null, null, exo, ni, nj);
             iterations = iter;
+            return x;
+        }
 
-            return X;
+        private static double GRASError(int nn, double[] s1, double[] s2)
+        {
+            double error = 0;
+            for (int j = 0; j < nn; j++) error = Math.Max(error, Math.Abs(s2[j] - s1[j]));
+            return error;
+        }
+
+        /// <summary>
+        /// Findes the factor (solving a second order equation if the signs diverge) that makes the
+        /// row or column match its target.
+        /// </summary>
+        private static double[] ScaleRowOrColumn(double[,] positive, double[,] negative, double[] rowOrColumn, double[] target, bool rowMode)
+        {            
+            int ni = rowMode ? positive.GetLength(0) : positive.GetLength(1);
+            int nj = rowMode ? positive.GetLength(1) : positive.GetLength(0);
+            double[] result = new double[ni];
+
+            for (int i = 0; i < ni; i++)
+            {
+                double positiveSum = 0;
+                double negativeSum = 0;
+
+                for (int j = 0; j < nj; j++)
+                {                    
+                    int row = rowMode ? i : j;
+                    int col = rowMode ? j : i;
+                    double v = rowOrColumn[j];
+                    double vInverted = (v == 0 ? 1.0 : 1.0 / v); //1 is arbitray here
+                    positiveSum += positive[row, col] * v;
+                    negativeSum += negative[row, col] * vInverted;
+                }
+
+                double targetI = target[i];                
+                if (positiveSum != 0)
+                {
+                    if (negativeSum != 0d)
+                    {
+                        //positiveSum != 0, negativeSum != 0 (both positives and negatives)
+                        result[i] = (targetI + Math.Sqrt(targetI * targetI + 4 * positiveSum * negativeSum)) / (2 * positiveSum);
+                    }
+                    else
+                    {
+                        //positiveSum != 0, negativeSum == 0 (no negatives)
+                        if (targetI <= 0d) result[i] = 0d; 
+                        else result[i] = targetI / positiveSum;
+                    }
+                }
+                else
+                {
+                    //positiveSum == 0, negativeSum != 0 (no positives, possibly all zeros)
+                    //positiveSum == 0, negativeSum == 0
+                    if (targetI == 0d)
+                    {
+                        if (positiveSum == 0 && negativeSum == 0) result[i] = 1d; // neutral scaling
+                        else result[i] = 0d; // or small epsilon
+                    }
+                    else
+                    {
+                        result[i] = -negativeSum / targetI;
+                    }
+                }
+            }
+            return result;
         }
 
         private static double RasErrors(double[,] x, double[] r2, double[] c2, int ni, int nj)
