@@ -1035,19 +1035,22 @@ namespace Gekko
         {            
             int ni = rowMode ? positive.GetLength(0) : positive.GetLength(1);
             int nj = rowMode ? positive.GetLength(1) : positive.GetLength(0);
-            double[] result = new double[ni];
+            double[] result = new double[ni]; //a little bit wasteful
+            
+            double[] invV = new double[nj]; //a little bit wasteful
+            for (int j = 0; j < nj; j++) invV[j] = 1.0 / rowOrColumn[j]; //faster to reuse the division later on in hot loop           
 
             for (int i = 0; i < ni; i++)
             {
                 double positiveSum = 0;
-                double negativeSum = 0;
+                double negativeSum = 0;                
 
                 for (int j = 0; j < nj; j++)
                 {                    
                     int row = rowMode ? i : j;
                     int col = rowMode ? j : i;
                     double v = rowOrColumn[j];
-                    double vInverted = (v == 0 ? 1.0 : 1.0 / v); //1 is arbitray here
+                    double vInverted = v == 0 ? 1.0 : invV[j]; //1 is arbitray here
                     positiveSum += positive[row, col] * v;
                     negativeSum += negative[row, col] * vInverted;
                 }
