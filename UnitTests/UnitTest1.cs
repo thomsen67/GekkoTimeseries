@@ -35387,6 +35387,12 @@ print(df2)
             //x = { -1 2 0 5, -3 - 5 6 0, -2 3 - 5 4};
             //u = { 3, -5, 0};     //true: {6, -2, 0}
             //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
+            //OR:
+            //x = { -1  2  0  5, -3 - 5  6  0, -2  3 - 5  4};
+            //u = { 3, -5, 0};     //true: {6, -2, 0}
+            //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
+            //x[3, 2] = x[3, 2] - 3; u[3] = u[3] - 3; v[2] = v[2] - 3;
+            //x[2, 1] = x[2, 1] + 3; u[2] = u[2] + 3; v[1] = v[1] + 3;
 
             //maxiter = 1000;
             //limit = 0.0000000000000001;
@@ -35499,7 +35505,7 @@ print(df2)
                     // Gauss: x = {-1 2 3 1, 4 5 6 1, 7 8 9 1}; u = { 9, 15, 26}; v = { 10, 16, 20, 4};
                     //
                 }
-                else
+                else if (ii == 2)
                 {
                     //Very sick                    
                     I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 0;"); I("io[a,d] = 5;");
@@ -35511,14 +35517,15 @@ print(df2)
                     I("colsum[a]= -6;"); I("colsum[b]= 0;"); I("colsum[c]= -2;"); I("colsum[d]= 6;");
                     //
                     // Gauss: x = {-1 2 0 5, -3 -5 6 0, -2 3 -5 4}; u = { 3, -5, 0}; v = { -6, 0, -2, 6};
-                }
+                }                
 
                 if (ii == 0)
                 {
                     I("prt <n> io;");
                     I("#constraints1 = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
                     I("#constraints2 = (  (  ('a','a'), 10  ),  );");
-                    I("#exo = (  ('a','a'),  );");
+                    I("#exo = (  ('a','a'),  );");                   
+
 
                     I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
                     I("prt <n> io0a_ras;");
@@ -35574,10 +35581,17 @@ print(df2)
 
                 if (ii == 2)
                 {
+                    I("#exo2 = (  ('c','b'), ('b','a')  );");
+
                     I("io2a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
-                    I("prt <n> io2a_gras;");
-                    I("io2a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy', %tol = 0.0000000000000001));");
-                    I("prt <n> io2a_entropy;");
+                    I("prt <n> io2a_gras;");                    
+                    
+                    I("io2a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy', %tol = 0.0001));");
+                    I("prt <n> io2a_entropy;"); //This one is BAD, does not converge with status 7...
+
+                    I("io2b_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', #exo = #exo2, %tol = 0.0000000000000001));");
+                    I("prt <n> io2b_gras;");
+
                 }
 
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
@@ -35627,6 +35641,23 @@ print(df2)
                         Assert.AreEqual(3.8699942, (O.GetIVariableFromString("io2a_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                         Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("io2a_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                         Assert.AreEqual(3.3754042, (O.GetIVariableFromString("io2a_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+
+                        //See Gauss program above, and add for io[c,b] and io[b,a]
+                        //In the Gauss program, the cells are removed by setting them = 0, and the values removed from totals.
+                        //In the Gekko program, this is easier.
+                        deltaHere2 = 0.0000001d;
+                        Assert.AreEqual(-1.4519130, (O.GetIVariableFromString("io2b_gras[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.0524897, (O.GetIVariableFromString("io2b_gras[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2b_gras[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.3994233, (O.GetIVariableFromString("io2b_gras[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-3d, (O.GetIVariableFromString("io2b_gras[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.0524897, (O.GetIVariableFromString("io2b_gras[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.0524897, (O.GetIVariableFromString("io2b_gras[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2b_gras[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.5480870, (O.GetIVariableFromString("io2b_gras[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3d, (O.GetIVariableFromString("io2b_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.0524897, (O.GetIVariableFromString("io2b_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.6005767, (O.GetIVariableFromString("io2b_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
 
                         //Helper_CompareCells("io2a_entropy", "io2a_gras", deltaHere, rows, cols, t);
                     }
