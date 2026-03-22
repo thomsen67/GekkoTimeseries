@@ -35375,9 +35375,8 @@ print(df2)
             //TODO: handle pure == 0d.         
             //TODO: abs() on function? And how do negative cells do?            
 
-            for (int ii = 0; ii < 2; ii++)
+            for (int ii = 0; ii < 3; ii++)
             {
-
                 double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
                 int year = 2020;
                 double sum = 60d;
@@ -35398,8 +35397,9 @@ print(df2)
                     I("colsum = series(1);");
                     I("colsum[a]= 160;"); I("colsum[b]= 170;"); I("colsum[c]= 140;"); I("colsum[d]= 51;");
                 }
-                else
+                else if(ii == 1)
                 {
+                    //Just 1 negative
                     I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 3;"); I("io[a,d] = 1;");
                     I("io[b,a] = 4;"); I("io[b,b] = 5;"); I("io[b,c] = 6;"); I("io[b,d] = 1;");
                     I("io[c,a] = 7;"); I("io[c,b] = 8;"); I("io[c,c] = 9;"); I("io[c,d] = 1;");
@@ -35410,6 +35410,19 @@ print(df2)
                     //
                     // Gauss: x = {-1 2 3 1, 4 5 6 1, 7 8 9 1}; u = { 9, 15, 26}; v = { 10, 16, 20, 4};
                     //
+                }
+                else 
+                {
+                    //Very sick                    
+                    I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 0;"); I("io[a,d] = 5;");
+                    I("io[b,a] = -3;"); I("io[b,b] = -5;"); I("io[b,c] = 6;"); I("io[b,d] = 0;");
+                    I("io[c,a] = -2;"); I("io[c,b] = 3;"); I("io[c,c] = -5;"); I("io[c,d] = 4;");
+                    I("rowsum = series(1);");
+                    I("rowsum[a]= 3;"); I("rowsum[b]= -5;"); I("rowsum[c]= 0;");
+                    I("colsum = series(1);");
+                    I("colsum[a]= -6;"); I("colsum[b]= 0;"); I("colsum[c]= -2;"); I("colsum[d]= 6;");
+                    //
+                    // Gauss: x = {-1 2 0 5, -3 -5 6 0, -2 3 -5 4}; u = { 3, -5, 0}; v = { -6, 0, -2, 6};
                 }
 
                 if (ii == 0)
@@ -35473,6 +35486,13 @@ print(df2)
                     I("prt <n> iony11;");
                 }
 
+                if (ii == 2)
+                {
+                    I("iony12 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("tell 'GRAS';");
+                    I("prt <n> iony12;");
+                }
+
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
                 {
                     if (ii == 0)
@@ -35492,7 +35512,7 @@ print(df2)
                                         (O.GetIVariableFromString("iony3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
 
                     }
-                    else
+                    else if (ii == 1)
                     {
                         double deltaHere2 = 0.0000001d;
                         Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("iony11[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
@@ -35512,9 +35532,15 @@ print(df2)
                         // For positive cells and totals, the Gauss programs and %type = 'ras' seems to correspond.
                         // It seems that if all cell and totals values are flipped sign-wise, the Gauss program results also just flip.
                         //
+                        //EITHER:
                         //x = {-1 2 3 1, 4 5 6 1, 7 8 9 1};
                         //u = {9, 15, 26};
                         //v = {10, 16, 20, 4};
+                        //OR:
+                        //x = { -1 2 0 5, -3 - 5 6 0, -2 3 - 5 4};
+                        //u = { 3, -5, 0};     //true: {6, -2, 0}
+                        //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
+
                         //maxiter = 1000;
                         //limit = 0.0000000000000001;
                         //print x;
@@ -35589,6 +35615,23 @@ print(df2)
                         //  endif ;  
                         //  retp(X) ;
                         //endp ;
+                    }
+                    else
+                    {
+                        //See Gauss program above
+                        double deltaHere2 = 0.0000001d;
+                        Assert.AreEqual(-1.2294873, (O.GetIVariableFromString("iony12[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.6048915, (O.GetIVariableFromString("iony12[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("iony12[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.6245958, (O.GetIVariableFromString("iony12[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-3.2409029, (O.GetIVariableFromString("iony12[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.4748857, (O.GetIVariableFromString("iony12[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.7157886, (O.GetIVariableFromString("iony12[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("iony12[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.5296098, (O.GetIVariableFromString("iony12[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.8699942, (O.GetIVariableFromString("iony12[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("iony12[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.3754042, (O.GetIVariableFromString("iony12[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                     }
                 }
             }
