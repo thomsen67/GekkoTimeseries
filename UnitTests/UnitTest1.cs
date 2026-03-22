@@ -35429,68 +35429,66 @@ print(df2)
                 {                    
                     I("prt <n> io;");
 
-                    I("iony1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
+                    I("io1 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
                     I("tell 'Original row/col RAS procedure';");
-                    I("prt <n> iony1;");
+                    I("prt <n> io1;");
 
-                    I("iony2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+                    I("io2 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
                     I("tell 'Entropy function (2013)';");
-                    I("prt <n> iony2;");
-                                        
+                    I("prt <n> io2;");
+
                     I("#constraints = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
-                    I("iony3 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
+                    I("io3 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
                     I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
-                    I("prt <n> iony3;");
+                    I("prt <n> io3;");
 
-                    I("iony4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
+                    I("io4 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
                     I("tell 'Squared absolute differences';");
-                    I("prt <n> iony4;");
+                    I("prt <n> io4;");
 
-                    I("iony5 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
+                    I("io5 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
                     I("tell 'Squared relative differences';");
-                    I("prt <n> iony5;");
+                    I("prt <n> io5;");
 
                     I("#exo = (  ('a','a'),  );");
-                    I("#w = (  ('a','a', 1000000),  );");
-                    //I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#weights = #w, %type = 'entropy'));"); //#exo does not work?            
-                    I("iony6 = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
+                    I("io6 = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
                     I("tell 'Entropy with weights for x11==10';");
-                    I("prt <n> iony6;");
+                    I("prt <n> io6;");
 
                     I("#constraints = (  (  ('a','a'), 10  ),  );");
-                    I("iony7 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
+                    I("io7 = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints, %type = 'entropy'));");
                     I("tell 'Entropy with constraints for x11==10';");
-                    I("prt <n> iony7;");
+                    I("prt <n> io7;");
 
-                    I("iony7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
+                    I("io7a = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
                     I("tell 'Original row/col RAS procedure';");
-                    I("prt <n> iony7a;");
+                    I("prt <n> io7a;");
 
-                    I("iony8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+                    I("io8 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
                     I("tell 'Old 2003 entropy function';");
-                    I("prt <n> iony8;");
+                    I("prt <n> io8;");
 
-                    I("iony9 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
+                    I("io9 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
                     I("tell 'Distance/abs on differences';");
-                    I("prt <n> iony9;");
+                    I("prt <n> io9;");
 
-                    I("iony10 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
+                    I("io10 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
                     I("tell 'Distance/abs on relative differences';");
-                    I("prt <n> iony10;");
+                    I("prt <n> io10;");
                 }
 
                 if (ii == 1)
                 {
-                    I("iony11 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("io11 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
                     I("tell 'GRAS';");
-                    I("prt <n> iony11;");
+                    I("prt <n> io11;");
                 }
 
                 if (ii == 2)
                 {
-                    I("iony12 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("io12 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
                     I("tell 'GRAS';");
-                    I("prt <n> iony12;");
+                    I("prt <n> io12;");
                 }
 
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
@@ -35501,32 +35499,34 @@ print(df2)
                         {
                             foreach (string j in cols)
                             {
-                                Assert.AreEqual((O.GetIVariableFromString("iony1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                                Assert.AreEqual((O.GetIVariableFromString("iony7[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("iony7a[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
+                                Assert.AreEqual((O.GetIVariableFromString("io1[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 
+                                    (O.GetIVariableFromString("io2[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                                Assert.AreEqual((O.GetIVariableFromString("io7[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 
+                                    (O.GetIVariableFromString("io7a[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 2d * deltaHere); //has to double delta
                             }
                         }
                         //Test the 2 restrictions
-                        Assert.AreEqual((O.GetIVariableFromString("iony3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                        (O.GetIVariableFromString("iony3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                        Assert.AreEqual((O.GetIVariableFromString("iony3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t) +
-                                        (O.GetIVariableFromString("iony3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("io3[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                        (O.GetIVariableFromString("io3[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("io3[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t) +
+                                        (O.GetIVariableFromString("io3[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
 
                     }
                     else if (ii == 1)
                     {
                         double deltaHere2 = 0.0000001d;
-                        Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("iony11[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.1093591, (O.GetIVariableFromString("iony11[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(4.7803250, (O.GetIVariableFromString("iony11[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.7699601, (O.GetIVariableFromString("iony11[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.6140556, (O.GetIVariableFromString("iony11[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(4.6329270, (O.GetIVariableFromString("iony11[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(5.6981252, (O.GetIVariableFromString("iony11[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.0548921, (O.GetIVariableFromString("iony11[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(7.0455885, (O.GetIVariableFromString("iony11[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(8.2577139, (O.GetIVariableFromString("iony11[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(9.5215498, (O.GetIVariableFromString("iony11[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.1751477, (O.GetIVariableFromString("iony11[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("io11[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.1093591, (O.GetIVariableFromString("io11[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.7803250, (O.GetIVariableFromString("io11[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.7699601, (O.GetIVariableFromString("io11[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.6140556, (O.GetIVariableFromString("io11[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.6329270, (O.GetIVariableFromString("io11[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(5.6981252, (O.GetIVariableFromString("io11[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.0548921, (O.GetIVariableFromString("io11[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(7.0455885, (O.GetIVariableFromString("io11[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(8.2577139, (O.GetIVariableFromString("io11[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(9.5215498, (O.GetIVariableFromString("io11[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.1751477, (O.GetIVariableFromString("io11[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
 
                         // Taken from the following Gauss program that has been tested a lot on Statistics Denmark.
                         // For positive cells and totals, the Gauss programs and %type = 'ras' seems to correspond.
@@ -35620,18 +35620,18 @@ print(df2)
                     {
                         //See Gauss program above
                         double deltaHere2 = 0.0000001d;
-                        Assert.AreEqual(-1.2294873, (O.GetIVariableFromString("iony12[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(1.6048915, (O.GetIVariableFromString("iony12[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(0d, (O.GetIVariableFromString("iony12[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(2.6245958, (O.GetIVariableFromString("iony12[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-3.2409029, (O.GetIVariableFromString("iony12[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-5.4748857, (O.GetIVariableFromString("iony12[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.7157886, (O.GetIVariableFromString("iony12[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(0d, (O.GetIVariableFromString("iony12[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-1.5296098, (O.GetIVariableFromString("iony12[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.8699942, (O.GetIVariableFromString("iony12[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("iony12[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
-                        Assert.AreEqual(3.3754042, (O.GetIVariableFromString("iony12[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.2294873, (O.GetIVariableFromString("io12[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.6048915, (O.GetIVariableFromString("io12[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io12[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.6245958, (O.GetIVariableFromString("io12[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-3.2409029, (O.GetIVariableFromString("io12[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.4748857, (O.GetIVariableFromString("io12[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.7157886, (O.GetIVariableFromString("io12[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io12[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.5296098, (O.GetIVariableFromString("io12[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.8699942, (O.GetIVariableFromString("io12[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("io12[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.3754042, (O.GetIVariableFromString("io12[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                     }
                 }
             }
