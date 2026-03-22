@@ -198,7 +198,9 @@ namespace Gekko
             }
             if (Math.Abs(toti - totj) > o.toleranceAbsolute) new Error("Rows sum to " + toti + ", whereas cols sum to " + totj + ". Tolerance " + o.toleranceAbsolute + " exceeded");
 
+            int ONE = 1;
             int niPlusNj = ni + nj;
+            int niPlusNjMinus1 = ni + nj - ONE; //dropping last constraing
             int niMultiplyNj = ni * nj;
 
             int nExtraConstraints = 0;
@@ -368,16 +370,16 @@ namespace Gekko
                 }
             }
 
-            double[,] constraints = new double[niPlusNj + nExtraConstraints + nExo_OLD, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
+            double[,] constraints = new double[niPlusNjMinus1 + nExtraConstraints + nExo_OLD, niMultiplyNj + 1]; // +1 because it is a column wherein to put constants (if x[a,a]+x[a,b]=100, we put the 100 there)
 
             //Normal constraints
             for (int i = 0; i < nExtraConstraints; i++)
             {
                 for (int j = 0; j < storage1[i].Length; j++) 
                 {
-                    constraints[niPlusNj + i, j] = storage1[i][j];
+                    constraints[niPlusNjMinus1 + i, j] = storage1[i][j];
                 }
-                constraints[niPlusNj + i, niMultiplyNj] = storage2[i];  //The constant column that is last
+                constraints[niPlusNjMinus1 + i, niMultiplyNj] = storage2[i];  //The constant column that is last
             }
 
             //Exo
@@ -393,37 +395,37 @@ namespace Gekko
             // row constraints
             for (int i = 0; i < ni; i++)
             {
-                for (int j = 0; j < nj; j++)
+                for (int j = 0; j < nj; j++) //dropping last col
                 {
                     constraints[i, i * nj + j] = 1;
                 }
                 constraints[i, niMultiplyNj] = rowSums[i];
-            }
+            }            
 
             // column constraints
-            for (int j = 0; j < nj; j++)
+            for (int j = 0; j < nj - ONE; j++)
             {
-                for (int i = 0; i < ni; i++)
+                for (int i = 0; i < ni; i++)  //dropping last one
                 {
                     constraints[ni + j, i * nj + j] = 1;
                 }
                 constraints[ni + j, niMultiplyNj] = colSums[j];
             }
 
-            int[] constraintsType = new int[niPlusNj + nExtraConstraints + nExo_OLD];
-            for (int i = 0; i < niPlusNj; i++)
+            int[] constraintsType = new int[niPlusNjMinus1 + nExtraConstraints + nExo_OLD];
+            for (int i = 0; i < niPlusNjMinus1; i++)
             {
                 constraintsType[i] = 0; //equality
             }
 
             for (int i = 0; i < nExtraConstraints; i++)
             {
-                constraintsType[niPlusNj + i] = 0; //equality
+                constraintsType[niPlusNjMinus1 + i] = 0; //equality
             }
 
             for (int i = 0; i < nExo_OLD; i++)
             {
-                constraintsType[niPlusNj + nExtraConstraints + i] = 0; //equality
+                constraintsType[niPlusNjMinus1 + nExtraConstraints + i] = 0; //equality
             }
 
             double[,] xResult = null;
