@@ -453,8 +453,8 @@ namespace Gekko
 
             if (o.type == EOptimizeType.Ras)
             {
-                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with RAS");
-                if (nWeights > 0) new Error("You cannot use cell weights with RAS");
+                if (nExtraConstraints > 0) new Error("You cannot use constraints with RAS (but exo is possible)");
+                if (nWeights > 0) new Error("You cannot use weights with RAS (but exo is possible)");
                 DateTime t3 = DateTime.Now;
                 int iterations;
                 xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations);
@@ -465,8 +465,8 @@ namespace Gekko
             }
             else if (o.type == EOptimizeType.Gras)
             {
-                if (nExtraConstraints > 0) new Error("You cannot use cell constraints with GRAS");
-                if (nWeights > 0) new Error("You cannot use cell weights with GRAS");
+                if (nExtraConstraints > 0) new Error("You cannot use constraints with GRAS (but exo is possible)");
+                if (nWeights > 0) new Error("You cannot use weights with GRAS (but exo is possible)");
                 DateTime t3 = DateTime.Now;
                 int iterations;
                 xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations);
@@ -503,13 +503,14 @@ namespace Gekko
 
                 string s = null;
                 if (rep.terminationtype == -7) s = "Gradient verification failed. See MinBLEICSetGradientCheck() for more information";
-                else if (rep.terminationtype == -3) s = "inconsistent constraints. Feasible point is either nonexistent or too hard to find. Try to restart optimizer with better initial approximation";
+                else if (rep.terminationtype == -3) s = "Inconsistent constraints. Feasible point is either nonexistent or too hard to find. Try to restart optimizer with better initial approximation";
                 else if (rep.terminationtype == 1) s = "Relative function improvement is no more than EpsF";
                 else if (rep.terminationtype == 2) s = "Relative step is no more than EpsX";
                 else if (rep.terminationtype == 4) s = "Gradient norm is no more than EpsG";
                 else if (rep.terminationtype == 5) s = "MaxIts steps was taken";
-                else if (rep.terminationtype == 7) s = "Stopping conditions are too stringent, further improvement is impossible, X contains best point found so far";
+                else if (rep.terminationtype == 7) s = "Stopping conditions are too stringent, further improvement is impossible";
 
+                //7 is probably bad...
                 if (rep.terminationtype == 1 || rep.terminationtype == 2 || rep.terminationtype == 4 || rep.terminationtype == 7)
                 {
                     G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + rep.iterationscount + " iteration" + G.S(rep.iterationscount) + " in " + G.Seconds(t2) + ", termination type " + rep.terminationtype + ".");

@@ -35520,93 +35520,74 @@ print(df2)
                     I("#constraints2 = (  (  ('a','a'), 10  ),  );");
                     I("#exo = (  ('a','a'),  );");
 
-                    I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
-                    I("tell 'Original row/col RAS procedure';");
+                    I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
                     I("prt <n> io0a_ras;");
 
-                    I("io0a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
-                    I("tell 'Entropy function (2013)';");
+                    I("io0a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");                    
                     I("prt <n> io0a_entropy;");
 
-                    I("io0a_entropy2003 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
-                    I("tell 'Old 2003 entropy function';");
+                    I("io0a_entropy2003 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");                    
                     I("prt <n> io0a_entropy2003;");                    
 
-                    I("io0a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");
-                    I("tell 'GRAS';");
-                    I("prt <n> io0a_entropy;");                    
+                    I("io0a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");                    
+                    I("prt <n> io0a_gras;");                    
                     
-                    I("io0a_sqdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
-                    I("tell 'Squared absolute differences';");
+                    I("io0a_sqdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");                    
                     I("prt <n> io0a_sqdif;");
 
-                    I("io0a_sqrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
-                    I("tell 'Squared relative differences';");
+                    I("io0a_sqrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");                    
                     I("prt <n> io0a_sqrel;");
 
-                    I("io0a_distdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
-                    I("tell 'Distance/abs on differences';");
+                    I("io0a_distdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");                    
                     I("prt <n> io0a_distdif;");
 
-                    I("io0a_distrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
-                    I("tell 'Distance/abs on relative differences';");
+                    I("io0a_distrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");                    
                     I("prt <n> io0a_distrel;");
 
                     // -----
 
-                    I("io0b_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints1, %type = 'entropy'));");
-                    I("tell 'Entropy function, #c set so that [a,a]==[a,b] and [b,d]+[c,d]=60';");
+                    I("io0b_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints1, %type = 'entropy'));");                    
                     I("prt <n> io0b_entropy;");
 
                     // -----
 
-                    I("io0c_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?            
-                    I("tell 'Entropy with weights for x11 exo';");
+                    I("io0c_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?                                
                     I("prt <n> io0c_entropy;");
 
-                    I("io0c_ras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
-                    I("tell 'Original row/col RAS procedure';");
+                    I("io0c_ras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");                    
+                    I("prt <n> io0c_ras;");
+
+                    I("io0c_gras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'gras'));");                    
                     I("prt <n> io0c_ras;");
 
                     // -----
 
-                    I("io0d_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints2, %type = 'entropy'));");
-                    I("tell 'Entropy with constraints for x11 exo';");
+                    I("io0d_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints2, %type = 'entropy'));");                    
                     I("prt <n> io0d_entropy;");                    
                 }
 
                 if (ii == 1)
                 {
                     I("io1a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
-                    I("tell 'GRAS';");
                     I("prt <n> io1a_gras;");
                 }
 
                 if (ii == 2)
                 {
                     I("io2a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
-                    I("tell 'GRAS';");
                     I("prt <n> io2a_gras;");
+                    I("io2a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy', %tol = 0.0000000000000001));");
+                    I("prt <n> io2a_entropy;");
                 }
 
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
                 {
                     if (ii == 0)
                     {
-                        foreach (string i in rows)
-                        {
-                            foreach (string j in cols)
-                            {
-                                Assert.AreEqual((O.GetIVariableFromString("io0a_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                    (O.GetIVariableFromString("io0a_entropy[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-                                Assert.AreEqual((O.GetIVariableFromString("io0a_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                    (O.GetIVariableFromString("io0a_gras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
-
-
-                                Assert.AreEqual((O.GetIVariableFromString("io0d_entropy[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
-                                    (O.GetIVariableFromString("io0c_ras[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), 1d * deltaHere);
-                            }
-                        }
+                        Helper_CompareCells("io0a_ras", "io0a_entropy", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0a_ras", "io0a_gras", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0d_entropy", "io0c_ras", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0d_entropy", "io0c_gras", 5d * deltaHere, rows, cols, t); //has to augment
                         //Test the 2 restrictions
                         Assert.AreEqual((O.GetIVariableFromString("io0b_entropy[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
                                         (O.GetIVariableFromString("io0b_entropy[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
@@ -35646,7 +35627,20 @@ print(df2)
                         Assert.AreEqual(3.8699942, (O.GetIVariableFromString("io2a_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                         Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("io2a_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
                         Assert.AreEqual(3.3754042, (O.GetIVariableFromString("io2a_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+
+                        //Helper_CompareCells("io2a_entropy", "io2a_gras", deltaHere, rows, cols, t);
                     }
+                }
+            }
+        }
+
+        private static void Helper_CompareCells(string goal, string trial, double deltaHere, List<string> rows, List<string> cols, GekkoTime t)
+        {
+            foreach (string i in rows)
+            {
+                foreach (string j in cols)
+                {
+                    Assert.AreEqual((O.GetIVariableFromString("" + goal + "[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("" + trial + "[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
                 }
             }
         }
