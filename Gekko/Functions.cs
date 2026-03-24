@@ -1883,11 +1883,20 @@ namespace Gekko
             return ts;
         }
 
+        public static void create(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            //create('xyz', 3) array-series with 3 dimensions (current frequency)
+            //create('xyz!a', 3) annual array-series with 3 dimensions
+            //create('b:xyz!a', 3) annual array-series with 3 dimensions, in databank b.
+            //Using indexes in name not allowed.
+            helper_seriesAndTimeless("create", x);            
+        }
+
         public static void identities(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             GamsModel.Identities();
         }
-        
+
 
         private static Series helper_seriesAndTimeless(string type, IVariable[] x)
         {
@@ -1917,7 +1926,6 @@ namespace Gekko
                     else
                     {
                         new Error("Expected argument 1 in series() to be value or string");
-                        //throw new GekkoException();
                     }
                 }
                 else if (x.Length == 2)
@@ -1932,18 +1940,16 @@ namespace Gekko
                     else
                     {
                         new Error("series() with 2 arguments must have string as first argument");
-                        //throw new GekkoException();
                     }
                 }
                 else
                 {
 
                     new Error("series() does not accept > 2 arguments");
-                    //throw new GekkoException();
                 }
 
             }
-            else
+            else if (type == "timeless")
             {
                 if (x.Length == 0)
                 {
@@ -1964,7 +1970,6 @@ namespace Gekko
                     else
                     {
                         new Error("Expected argument 1 in timeless() to be value or string");
-                        //throw new GekkoException();
                     }
                 }
                 else if (x.Length == 2)
@@ -1979,17 +1984,40 @@ namespace Gekko
                     else
                     {
                         new Error("timeless() with 2 arguments must have string as first argument");
-                        //throw new GekkoException();
                     }
                 }
                 else
                 {
-
-                    new Error("series() does not accept > 2 arguments");
-                    //throw new GekkoException();
+                    new Error("timeless() does not accept > 2 arguments");
                 }
             }
-
+            else if (type == "create")
+            {
+                if (x.Length != 2) new Error("create() only accepts 2 arguments");                
+                int i = O.ConvertToInt(x[1]); //dims
+                if (i < 1) new Error("create() must be stated with >= 1 dimensions");
+                List temp1 = new List(); temp1.Add(x[0]);
+                List<string> temp2 = O.Restrict(temp1, true, false, true, false);
+                foreach (string s in temp2)
+                {
+                    if ((Functions.exist(null, null, null, new ScalarString(s)) as ScalarVal).val == 1d)
+                    {
+                        //Do nothing. It may have wrong dimension, but we do not check that here.
+                    }
+                    else
+                    {
+                        IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.Can);
+                        Series ts2 = iv as Series;
+                        if (ts2 == null) new Error("Could not create '" + s + "' with " + i + " dimensions");
+                        ts2.dimensionsStorage = new Multidim();
+                        ts2.dimensions = i;
+                        ts2.type = ESeriesType.ArraySuper;
+                        ts2.meta = new SeriesMetaInformation();
+                        //We do not return ts2: it has been created, and create() is a void method.
+                    }
+                }
+            }
+            else new Error("Illegal series call");
             return ts;
         }
 
@@ -2232,7 +2260,6 @@ namespace Gekko
             if (items.Length < 2)
             {
                 new Error("Expected 2 or more arguments");
-                //throw new GekkoException();
             }
 
             bool hasDate = false;
