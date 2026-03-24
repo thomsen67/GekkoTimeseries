@@ -20890,6 +20890,7 @@ namespace UnitTests
             I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("#m = (('a', 'b', 'c'), ('d', 'e', 'f'));");
+            //I("#m = ((('a', 'b', 'c'), ('d', 'e', 'f')), (('a', 'b', 'c'), ('d', 'e', 'f')));"); Will not be exported
             I("write <gdx> temp;");
             I("reset;");
             I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
