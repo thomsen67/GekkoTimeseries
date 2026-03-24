@@ -5428,7 +5428,7 @@ namespace Gekko
                 else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Q;
                 else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.M;
 
-                double[] d = new double[1];  //used for sets
+                double[] d = new double[1];  //used for setss
 
                 int syCnt = 0, uelCnt = 0;
 
@@ -5606,26 +5606,92 @@ namespace Gekko
                         }
                         else if (iv.Type() == EVariableType.List)
                         {
-                            if (gdx.gdxDataWriteStrStart(nameWithoutFreq.Replace(Globals.symbolCollection.ToString(), ""), "", 1, gamsglobals.dt_set, 0) == 0)
+                            try
                             {
-                                new Error("Internal GAMS/gdx problem (variable '" + tup.Item1 + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
-                            }
+                                List l = iv as List;
 
-                            List l = iv as List;
-
-                            foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(l.list.ToArray()))
-                            {
-                                if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
+                                int nTuples = 1;
+                                foreach (IVariable x in l.list)
                                 {
-                                    new Error("Problem writing set (list) element for gdx, variable '" + tup.Item1 + "'");
+                                    if (x.Type() == EVariableType.List)
+                                    {
+                                        nTuples = (x as List).list.Count;
+                                        break;
+                                    }
                                 }
-                            }
 
-                            if (gdx.gdxDataWriteDone() == 0)
-                            {
-                                new Error("GAMS gdx did not terminate properly, variable '" + tup.Item1 + "'.");
+                                if (gdx.gdxDataWriteStrStart(nameWithoutFreq.Replace(Globals.symbolCollection.ToString(), ""), "", nTuples, gamsglobals.dt_set, 0) == 0)
+                                {
+                                    new Error("Internal GAMS/gdx problem (variable '" + tup.Item1 + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
+                                }
+
+                                if (nTuples > 1)
+                                {
+                                    bool ok = true;
+                                    int dim = -12345;
+                                    foreach (IVariable x in l.list)
+                                    {
+                                        if (x.Type() == EVariableType.List)
+                                        {
+                                            List<IVariable> m = (x as List).list;
+                                            List<string> temp = new List<string>();
+                                            if (dim == -12345)
+                                            {
+                                                dim = m.Count;
+                                            }
+                                            else if (dim != m.Count)
+                                            {
+                                                ok = false;
+                                            }
+                                            foreach (IVariable y in m)
+                                            {
+                                                if (y.Type() == EVariableType.String)
+                                                {
+                                                    temp.Add(O.ConvertToString(y));
+                                                }
+                                                else
+                                                {
+                                                    //TODO: Handle vals that are ints, maybe with leading zeroes
+                                                    ok = false;
+                                                }
+                                            }
+
+                                            if (gdx.gdxDataWriteStr(temp.ToArray(), d) == 0)
+                                            {
+                                                new Error("Problem writing set (list) element for gdx, variable '" + tup.Item1 + "'");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ok = false;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //Old code
+
+                                    string[] temp = Stringlist.GetListOfStringsFromListOfIvariables(l.list.ToArray());
+
+                                    foreach (string s in temp)
+                                    {
+                                        if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
+                                        {
+                                            new Error("Problem writing set (list) element for gdx, variable '" + tup.Item1 + "'");
+                                        }
+                                    }
+
+                                    if (gdx.gdxDataWriteDone() == 0)
+                                    {
+                                        new Error("GAMS gdx did not terminate properly, variable '" + tup.Item1 + "'.");
+                                    }
+                                }
+                                exportedSets++;
                             }
-                            exportedSets++;
+                            catch
+                            {
+                                skippedSets++;
+                            }                            
                         }
                         else continue;
                     }
@@ -5638,7 +5704,7 @@ namespace Gekko
                 }
 
                 G.Writeln2("Wrote " + counterVariables + " variables and " + exportedSets + " sets to " + pathAndFilename + " (" + G.Seconds(t) + ")");
-                if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
+                if (skippedSets > 0) new Note(skippedSets + " lists could not be exported as sets (may not conform to GAMS standard)");
                 if (timelessProblems.Count > 0)
                 {
                     Action<GAO> a = (gao) =>

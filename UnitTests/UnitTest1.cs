@@ -20881,6 +20881,41 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_GdxSetTuples()
+        {
+            //GAMS supports tuples for sets, but nothing more nested. So max 1 Gekko list nesting level.
+            //This is how GAMS is designed. And sub sub-lists must all have the same number
+            //of elements.
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("#m = (('a', 'b', 'c'), ('d', 'e', 'f'));");
+            I("write <gdx> temp;");
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("read <gdx> temp;");
+            List m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
+            List<string> m0 = Stringlist.GetListOfStringsFromIVariable(m.list[0] as List);
+            List<string> m1 = Stringlist.GetListOfStringsFromIVariable(m.list[1] as List);
+            Assert.AreEqual("a", m0[0]); Assert.AreEqual("b", m0[1]); Assert.AreEqual("c", m0[2]);
+            Assert.AreEqual("d", m1[0]); Assert.AreEqual("e", m1[1]); Assert.AreEqual("f", m1[2]);
+            // -------------------------
+            // Flat list
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("#m = ('a', 'b', 'c');");
+            I("write <gdx> temp;");
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("read <gdx> temp;");
+            m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
+            Assert.AreEqual("a", (m.list[0] as ScalarString).string2);
+            Assert.AreEqual("b", (m.list[1] as ScalarString).string2);
+            Assert.AreEqual("c", (m.list[2] as ScalarString).string2);
+        }
+
+        [TestMethod]
         public void _Test_ModelCacheResurrectsIniZipAndListsWIthAllEndoExoEtc()
         {
             File.Delete(Globals.ttPath2 + @"\regres\models\jul05__info.zip");
@@ -35524,8 +35559,7 @@ print(df2)
                     I("prt <n> io;");
                     I("#constraints1 = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
                     I("#constraints2 = (  (  ('a','a'), 10  ),  );");
-                    I("#exo = (  ('a','a'),  );");                   
-
+                    I("#exo = (  ('a','a'),  );");
 
                     I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
                     I("prt <n> io0a_ras;");
