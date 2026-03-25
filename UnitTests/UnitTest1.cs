@@ -36267,7 +36267,9 @@ print(df2)
             I("d = 8, 13, 10, 14, 7;");            
             I("q = laspchain(x, d, 2020).q;");
             I("p = laspchain(x, d, 2020).p;");
-            //The following numbers are created in a spreadsheet
+            //The following numbers are created and tested in a spreadsheet
+            _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2017, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
@@ -36279,12 +36281,15 @@ print(df2)
             _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
 
+            //Same, with missing value for D in first year
             I("reset;");
             I("time 2018 2022;");
             I("x = 10, 12, 11, 15, 4;");
             I("d = m(), 13, 10, 14, 7;");
             I("q = laspchain(x, d, 2020).q;");
             I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2017, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] ad d[2018] are not used at all for price index!
             _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
             _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
@@ -36296,6 +36301,31 @@ print(df2)
             _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
 
+            //Same, with 0 for D in first year. This ought to compute just as if the value was missing instead of 0.
+            //The 0 ends up in the denominator in the first part of the chain, and therefore the whole chain becomes
+            //missing value (or infinity).
+            //This is the fix Grane Høegh asked for in March 2026.
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = 10, 12, 11, 15, 4;");
+            I("d = 0, 13, 10, 14, 7;");
+            I("option bugfix series chain = yes;");
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] and d[2018] are not used at all for price index!
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
+            //Same, with missing value for value in first year (and a "hole" in D)
             I("reset;");
             I("time 2018 2022;");
             I("x = m(), 12, 11, 15, 4;");

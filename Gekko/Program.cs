@@ -22709,10 +22709,9 @@ namespace Gekko
                     // Laspeyres chain used to be computed via R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
                     // giving the quantity. But if one or more micro-quantities are missing in the first year, we
                     // cannot get the aggregated quantity and thus aggregated pris.
-                    // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.
-                    // So now we are first calculating prices.
-                    // These R's can be accumulated/chained. So the development in q's is weighted together at lagged prices.
-                    // From the chain (efter adjusting for base period), we get quantitites. Prices are then just costs / quantities.                    
+                    // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.                    
+                    // From the chained prices (efter adjusting for base period), we get quantitites.
+                    // Aggregated prices are then just costs/quantities.
                     //
                     double index = 1d;
                     xx[4, start] = 1d;  //quantity
@@ -22914,9 +22913,20 @@ namespace Gekko
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
             if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
             GekkoTime tStart_real = GekkoTime.tNull;
+            //TODO
+            //TODO
+            //TODO Integrate the two loops so it is only 1 loop to handle all the logic
+            //TODO
+            //TODO
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
-                if (!G.IsNumericalError(value.GetDataSimple(t)) && !G.IsNumericalError(valueAtLaggedPrices.GetDataSimple(t)))
+                double v1 = value.GetDataSimple(t);
+                double v2 = valueAtLaggedPrices.GetDataSimple(t);
+                if (G.IsNumericalError(v1) || G.IsNumericalError(v2))
+                {
+                    //Do nothing
+                }
+                else
                 {
                     //if both are non-missing
                     tStart_real = t;
@@ -22933,7 +22943,19 @@ namespace Gekko
                 //But tStart_real+1 contains prices from tStart_real, soimplicitly the period is used.
                 double v1 = value.GetDataSimple(t);
                 double v2 = valueAtLaggedPrices.GetDataSimple(t);
-                double r = G.HandleNumericalError(v1 / v2);
+
+                double r = double.NaN;
+                if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
+                {
+                    //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
+                    //For v2 == 0d, this fix is a good thing.
+                    //What happens for v2 == double.NaN ??
+                    r = 1d; 
+                }
+                else
+                {
+                    r = G.HandleNumericalError(v1 / v2);
+                }
 
                 if (opt.zeros1)
                 {

@@ -57,6 +57,7 @@ namespace Gekko
         public bool bugfix_decomp_lagsleads = false;
         public bool bugfix_dates_fast = true;  //not mentioned in help, set false to use old date parser (on "2020", "2020q01", "2020m1d1", "2020u09" etc. etc.
         public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.
+        public bool bugfix_series_chain = false; //not mentioned in help, fixes problem with a D-price value being == 0 in the first period.
 
         // ---
         //method options could look like the 2 following:
@@ -408,6 +409,7 @@ namespace Gekko
             Add("BUGFIX DECOMP LAGSLEADS", Globals.xbool);
             Add("BUGFIX DATES FAST", Globals.xbool);
             Add("BUGFIX SUBSERIES STAMP", Globals.xbool);
+            Add("BUGFIX SERIES CHAIN", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
