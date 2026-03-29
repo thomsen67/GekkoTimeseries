@@ -129,12 +129,17 @@ namespace Gekko
         [ProtoMember(14)]
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
 
+        [ProtoMember(15)]
+        public string units;
+
+        [ProtoMember(16)]
+        public Trace2_1_1 trace2 = null;
+
+        [ProtoMember(17)]
+        public TraceID2_1_1 traceID2 = null; //traceID2 because it is experimental
+
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank_1_1 parentDatabank = null;  //do not keep this in protobuf
-
-        public Trace2_1_1 trace2 = null;
-                
-        public TraceID2_1_1 traceID2 = null; //traceID2 because it is experimental
 
         private TimeSeries_1_1()
         {
@@ -973,7 +978,15 @@ namespace Gekko
             //return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + ", #" + this.counter;
             //return this.StampInLocalTime().ToString("d/M yyyy HH:mm:ss", new System.Globalization.CultureInfo("da-DK")) + "|" + this.counter;
             //return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
-        }        
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + this.stamp.GetHashCode();  //No need to use .ToLocalTime() here: we just hash the the global ("true" and common) UTC time.
+            hash = hash * 31 + this.counter.GetHashCode();
+            return hash;
+        }
     }
 
     public class TraceHelper_1_1
@@ -1933,8 +1946,13 @@ namespace Gekko
                                     if (trace.type != ETraceType.GluedToSeries) n++;
                                 }
                             }
+                            TraceFlow.Analyze(traces);
                             readInfo.nTraces = n;
                             G.WritelnGray("Protobuf trace deserialize took: " + G.Seconds(dt3));
+                            if (Globals.runningOnTTComputer)
+                            {
+
+                            }
                         }
                         catch (Exception e)
                         {
