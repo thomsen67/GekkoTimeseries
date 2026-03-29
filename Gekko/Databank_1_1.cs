@@ -1217,7 +1217,6 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date1 + "' as an int (start year)");
-                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1235,7 +1234,6 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date2 + "' as an int (end year)");
-                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1244,7 +1242,6 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                            //throw new GekkoException();
                         }
                         frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
 

@@ -22907,7 +22907,22 @@ namespace Gekko
         /// <returns></returns>
         private static Map LaspeyresChainSeries(string function, Series value, Series valueAtLaggedPrices, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd, LaspeyresOptions opt)
         {
-            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index.            
+            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index chain. Divide costs (p1*q1 + p2*q2) with R accumulated, and
+            //  we obtain a quantity. The lagged prices in the denominator in the first period do not matter, since R accumulated is adjusted anyway.
+            //We might instead us R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]) for the quantity chain. Divide costs (p1*q1 + p2*q2) with R accumulated, and
+            //  we obtain a price.
+            //
+            // p2020 =  (p1[2020]*q1[2020] + p2[2020]*q2[2020]) / (p1[2019]*q1[2020] + p2[2019]*q2[2020])
+            //
+            // p2021 =  (p1[2020]*q1[2020] + p2[2020]*q2[2020]) / (p1[2019]*q1[2020] + p2[2019]*q2[2020])
+            //        * (p1[2021]*q1[2021] + p2[2021]*q2[2021]) / (p1[2020]*q1[2021] + p2[2020]*q2[2021])
+            //
+            // p2022 =  (p1[2020]*q1[2020] + p2[2020]*q2[2020]) / (p1[2019]*q1[2020] + p2[2019]*q2[2020])
+            //        * (p1[2021]*q1[2021] + p2[2021]*q2[2021]) / (p1[2020]*q1[2021] + p2[2020]*q2[2021])
+            //        * (p1[2022]*q1[2022] + p2[2022]*q2[2022]) / (p1[2021]*q1[2022] + p2[2021]*q2[2022])
+            //
+            // Dette divideres så med basisåret, enten p2020, p2021 eller p2022. Ligegyldigt hvilken, vil p1[2019] og p2[2019] ikke indgå i den
+            // korrigerede pris.
             // -----                       
 
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");

@@ -8,14 +8,15 @@ namespace Gekko
 {
 
     using System;
-    //using alglib;
+    //using alglib;    
 
     public class OptimizerOptions
     {
         public EOptimizeType type = EOptimizeType.Ras; //default
         public double toleranceAbsolute = 0.0001d;  //absolute
         public bool treatNaNAs0 = false;
-        public int rasGrasMaxIterations = 1000;
+        public int rasGrasMaxIterations = int.MaxValue;
+        public int rasGrasMinIterations = 0;
         public string hack = null;
         public double epsilon = 0.0001d; //for hack 
     }
@@ -100,6 +101,16 @@ namespace Gekko
                     {
                         o.toleranceAbsolute = O.ConvertToVal(temp);
                     }
+
+                    if (options_map.storage.TryGetValue("%itermin", out temp))
+                    {
+                        o.rasGrasMinIterations = O.ConvertToInt(temp);
+                    }
+
+                    if (options_map.storage.TryGetValue("%itermax", out temp))
+                    {
+                        o.rasGrasMaxIterations = O.ConvertToInt(temp);
+                    }                    
                 }
             }   
 
@@ -458,24 +469,24 @@ namespace Gekko
                 if (nExtraConstraints > 0) new Error("You cannot use constraints with RAS (but exo is possible)");
                 if (nWeights > 0) new Error("You cannot use weights with RAS (but exo is possible)");
                 DateTime t3 = DateTime.Now;
-                int iterations;
-                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations);
+                int iterations; double error;
+                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMinIterations, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations, out error);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
-                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
-                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
+                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
             }
             else if (o.type == EOptimizeType.Gras)
             {
                 if (nExtraConstraints > 0) new Error("You cannot use constraints with GRAS (but exo is possible)");
                 if (nWeights > 0) new Error("You cannot use weights with GRAS (but exo is possible)");
                 DateTime t3 = DateTime.Now;
-                int iterations;
-                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations);
+                int iterations; double error;
+                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMinIterations, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations, out error);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
-                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
-                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
+                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
             }
             else
             {
@@ -858,8 +869,8 @@ namespace Gekko
 
             G.Writeln();
             DateTime t3 = DateTime.Now;
-            int iterations = -1;
-            double[,] y = RAS(A, rowTotals, colTotals, null, null, 1000, 1e-10, out iterations);
+            int iterations = -1; double error = double.NaN;
+            double[,] y = RAS(A, rowTotals, colTotals, null, null, 0, 1000, 1e-10, out iterations, out error);
             G.Writeln("RAS " + N + "x" + N + " done " + G.Seconds(t3) + " in " + iterations + " iterations");
             G.Writeln(y[0, 0] + "  " + y[0, 1] + " " + y[0, 2] + "  " + y[0, 3]);
             if (N <= 10)
@@ -923,7 +934,7 @@ namespace Gekko
             }
         }
 
-        static double[,] RAS(double[,] a, double[] r, double[] c, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
+        static double[,] RAS(double[,] a, double[] r, double[] c, double[] boundsLower, double[] boundsUpper, int iterMin, int iterMax, double tol, out int iterations, out double max)
         {
             iterations = -1; //signals failure
             int ni = a.GetLength(0);
@@ -936,12 +947,13 @@ namespace Gekko
             double[,] exo = Bounds2Exo(boundsLower, boundsUpper, ni, nj);
             ExoRemove(true, x, r2, c2, exo, ni, nj);
 
-            for (int iter = 0; iter < maxIter; iter++)
+            max = double.NaN;
+            for (int iter = 0; iter < iterMax; iter++)
             {
                 RasScaleRows(x, r2, ni, nj);
                 RasScaleCols(x, c2, ni, nj);
-                double max = RasErrors(x, r2, c2, ni, nj);
-                if (max < tol)
+                max = RasErrors(x, r2, c2, ni, nj);
+                if (max < tol && iter >= iterMin)
                 {
                     iterations = iter + 1;
                     break;
@@ -953,7 +965,7 @@ namespace Gekko
             return x;
         }
 
-        static double[,] GRAS(double[,] a, double[] r3, double[] c3, double[] boundsLower, double[] boundsUpper, int maxIter, double tol, out int iterations)
+        static double[,] GRAS(double[,] a, double[] r3, double[] c3, double[] boundsLower, double[] boundsUpper, int iterMin, int iterMax, double tol, out int iterations, out double error)
         {
             iterations = -1; //signals failure
             int ni = a.GetLength(0);
@@ -989,19 +1001,29 @@ namespace Gekko
             col1 = ScaleRowOrColumn(positive, negative, row1, colTarget, false); //col update
             row1 = ScaleRowOrColumn(positive, negative, col1, rowTarget, true); //row udate
             col2 = ScaleRowOrColumn(positive, negative, row1, colTarget, false); //col update
+                        
+            error = GRASError(nCols, col1, col2);
 
-            int iter = 1;            
-            double error = GRASError(nCols, col1, col2);
-
-            while (error > tol && iter < maxIter)
+            bool converged = false;
+            int iter;
+            for (iter = 1; iter < iterMax; iter++)
             {
+                if (iter >= iterMin && error <= tol)
+                {
+                    converged = true;
+                    break;
+                }
                 Array.Copy(col2, col1, nCols);
                 //Scale row
                 row1 = ScaleRowOrColumn(positive, negative, col1, rowTarget, true);
                 //Scale column
                 col2 = ScaleRowOrColumn(positive, negative, row1, colTarget, false);
-                error = GRASError(nCols, col1, col2);
-                iter++;
+                error = GRASError(nCols, col1, col2);                
+            }
+
+            if (!converged)
+            {
+                //Note: Max iterations reached without convergence
             }
 
             // --- Final Matrix Construction ---
