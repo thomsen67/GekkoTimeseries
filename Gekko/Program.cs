@@ -7531,7 +7531,6 @@ namespace Gekko
             if (databank_1_1.storage.Count == 0)
             {
                 new Error("Old databank in " + readInfo.databankVersion + " format has 0 variables");
-                //throw new GekkoException();
             }
             deserializedDatabank = new Databank(databank.name);
 
