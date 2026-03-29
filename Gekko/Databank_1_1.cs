@@ -911,6 +911,7 @@ namespace Gekko
         }
     }
 
+    [ProtoContract]
     public class TraceID2_1_1 //TraceID2 because it is experimental
     {
         /// <summary>
@@ -987,13 +988,15 @@ namespace Gekko
         public Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1> tracesDepth2 = new Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1>();
 
     }
+    
     public class PrecedentsAndDepth_1_1
     {
         public Precedents2_1_1 precedents = null;
         public int depth = 0;
     }
 
-
+    [Serializable]
+    [ProtoContract]    
     public class Trace2_1_1
     {
 
@@ -1266,6 +1269,7 @@ namespace Gekko
         }
     }
 
+    [ProtoContract]
     public class Precedents2_1_1
     {
         [ProtoMember(1)]
