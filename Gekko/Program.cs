@@ -3427,7 +3427,7 @@ write datatest;
                     }
 
                     string tracename = null;
-                    if (File.Exists(tempTsdxPath + "\\" + "trace.data")) tracename = tempTsdxPath + "\\" + "trace.data";  //legacy                    
+                    if (File.Exists(tempTsdxPath + "\\" + "trace.data")) tracename = tempTsdxPath + "\\" + "trace.data";
 
                     Databank temp = null;
                     using (FileStream fs = WaitForFileStream(name, GekkoFileReadOrWrite.Read))
