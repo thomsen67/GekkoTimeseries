@@ -2831,102 +2831,121 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {          
-
+        {
 
             if (Globals.runningOnTTComputer)
             {
                 //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
                 //new Writeln("0 --> " + M.Errorf(0d));
                 //new Writeln("1.96 --> " + M.Errorf(1.96d));
-                //                                
+                //
+                //             
 
-                if (Globals.runningOnTTComputer)
+                if (text == "stat")
                 {
-                    if (false)
+                    Globals.traceFrame = new TraceFrame();
+                    Globals.traceDict = new TraceDict();
+                    string rootPath = Program.options.folder_working;
+                    List<string> files = Directory.EnumerateFiles(rootPath, "*.gbk", SearchOption.AllDirectories).ToList();
+                    foreach (string file in files)
                     {
-                        Optimize.RAS();
-                    }
 
-                    if (true)
-                    {
-                        //Entity expr = "2 x^2 * y + z = 200";
-                        //Entity.Variable x = "x";
-                        //string s3 = expr.Solve(x).Simplify().ToString();
-                    }
+                        ReadOpenMulbkHelper oRead = null;
+                        List<ReadInfo> readInfos = new List<ReadInfo>();                        
+                        Program.OpenOrRead(null, true, oRead, false, readInfos, false, new P());
 
-                    if (false)
-                    {
-                        int n = 100;
-                        double[] x = new double[n];
-                        for (int i = 0; i < x.Length; i++)
+                        for (int i = 0; i < Globals.traceFrame.name.Count; i++)
                         {
-                            if (i % 10 == 0) x[i] = Globals.eps;
+                            Globals.traceDict.Add1(Globals.traceDict.dict_commandFileAndLine, Globals.traceFrame.commandFileAndLine[i]);
+                            Globals.traceDict.Add1(Globals.traceDict.dict_names, Globals.traceFrame.name[i]);
+                            Globals.traceDict.Add1(Globals.traceDict.dict_t1, Globals.traceFrame.t1[i]);
+                            Globals.traceDict.Add1(Globals.traceDict.dict_t2, Globals.traceFrame.t2[i]);
                         }
-                        int k = 10000000;
-                        DateTime dt = DateTime.Now;
-                        for (int j = 0; j < k; j++)
+
+                    }
+                    return;
+                }
+
+
+                if (false)
+                {
+                    Optimize.RAS();
+                }
+
+
+
+                if (false)
+                {
+                    int n = 100;
+                    double[] x = new double[n];
+                    for (int i = 0; i < x.Length; i++)
+                    {
+                        if (i % 10 == 0) x[i] = Globals.eps;
+                    }
+                    int k = 10000000;
+                    DateTime dt = DateTime.Now;
+                    for (int j = 0; j < k; j++)
+                    {
+                        //Array.Copy(x, x, n);
+                        //for (int i = 0; i < x.Length; i++)
+                        //{                        
+                        //    bool b = (Math.Abs(x[i]) <= 1e-300 && Math.Abs(x[i]) > 1e300);
+                        //    //x[i] = x[i];
+                        //}
+                        //bool hasOne = Array.Exists(x, z => z == 100d);
+                        foreach (double number in x.Skip(2))
                         {
-                            //Array.Copy(x, x, n);
-                            //for (int i = 0; i < x.Length; i++)
-                            //{                        
-                            //    bool b = (Math.Abs(x[i]) <= 1e-300 && Math.Abs(x[i]) > 1e300);
-                            //    //x[i] = x[i];
-                            //}
-                            //bool hasOne = Array.Exists(x, z => z == 100d);
-                            foreach (double number in x.Skip(2))
+                            if (number == 100d)
                             {
-                                if (number == 100d)
-                                {
-                                    break; // Exit the loop as soon as the target is found
-                                }
+                                break; // Exit the loop as soon as the target is found
                             }
                         }
-                        double milliseconds = (DateTime.Now - dt).TotalMilliseconds;
-                        G.Writeln2("Time = " + milliseconds + " ms");
                     }
-
-                    if (false)
-                    {
-                        double Round(double x, double factor)
-                        {
-                            return Math.Round(x / factor) * factor;
-                        }
-
-                        double eps = 1e-300;
-                        double rounding = 1e-250;
-
-                        double x0 = 0d;
-                        double x1 = 0d + eps;
-                        double x2 = 0d + eps + eps;
-
-                        new Writeln("x0 = 0: " + x0);
-                        new Writeln("x1 = 0 + eps: " + x1);
-                        new Writeln("x2 = 0 + eps + eps: " + x2);
-                        new Writeln("Round(x0) " + Round(x0, rounding));
-                        new Writeln("Round(x1) " + Round(x1, rounding));
-                        new Writeln("Round(x2) " + Round(x2, rounding));
-
-                        Masks m = new Masks();
-                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
-                        m.Set(new MultidimElement(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
-
-                        bool b1 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
-                        bool b2 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
-                        bool b3 = m.Get(new MultidimElement(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
-
-                        bool b4 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                        bool b5 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
-
-                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                        m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
-
-                        bool b6 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
-                        bool b7 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
-                    }
-
+                    double milliseconds = (DateTime.Now - dt).TotalMilliseconds;
+                    G.Writeln2("Time = " + milliseconds + " ms");
                 }
+
+                if (false)
+                {
+                    double Round(double x, double factor)
+                    {
+                        return Math.Round(x / factor) * factor;
+                    }
+
+                    double eps = 1e-300;
+                    double rounding = 1e-250;
+
+                    double x0 = 0d;
+                    double x1 = 0d + eps;
+                    double x2 = 0d + eps + eps;
+
+                    new Writeln("x0 = 0: " + x0);
+                    new Writeln("x1 = 0 + eps: " + x1);
+                    new Writeln("x2 = 0 + eps + eps: " + x2);
+                    new Writeln("Round(x0) " + Round(x0, rounding));
+                    new Writeln("Round(x1) " + Round(x1, rounding));
+                    new Writeln("Round(x2) " + Round(x2, rounding));
+
+                    Masks m = new Masks();
+                    m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                    m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1967, 1));
+                    m.Set(new MultidimElement(new string[] { "a", "d" }), new GekkoTime(EFreq.A, 1966, 1));
+
+                    bool b1 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1966, 1));
+                    bool b2 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 1970, 1));
+                    bool b3 = m.Get(new MultidimElement(new string[] { "a", "x" }), new GekkoTime(EFreq.A, 1970, 1));
+
+                    bool b4 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                    bool b5 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                    m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                    m.Set(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+
+                    bool b6 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 2966, 1));
+                    bool b7 = m.Get(new MultidimElement(new string[] { "a", "c" }), new GekkoTime(EFreq.A, 966, 1));
+                }
+
+
 
                 if (Globals.runningOnTTComputer && (text == "d777"))
                 {
@@ -2938,7 +2957,7 @@ namespace Gekko
                     return;
                 }
 
-                if (Globals.runningOnTTComputer && (text == "xd2"))
+                if ((text == "xd2"))
                 {
 
                     ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
@@ -7526,7 +7545,7 @@ namespace Gekko
             Databank deserializedDatabank;
             int nanCounter = 0;
             ReadInfo readInfo_oldbank = new ReadInfo();
-            Databank_1_1 databank_1_1 = null;
+            Databank_1_1 databank_1_1 = null;            
             Utilities_1_1.ReadGbkOld_1_1(databank.name, databankVersion, oRead, readInfo_oldbank, ref file, ref databank_1_1, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath, ref nanCounter);
             if (databank_1_1.storage.Count == 0)
             {

@@ -1946,7 +1946,17 @@ namespace Gekko
                                     if (trace.type != ETraceType.GluedToSeries) n++;
                                 }
                             }
-                            TraceFlow.Analyze(traces);
+                            try
+                            {
+                                if (Globals.traceStats)
+                                {
+                                    Globals.traceFrame = TraceFlow.Analyze(traces);
+                                }
+                            }
+                            catch
+                            {
+                            }
+                            
                             readInfo.nTraces = n;
                             G.WritelnGray("Protobuf trace deserialize took: " + G.Seconds(dt3));
                             if (Globals.runningOnTTComputer)

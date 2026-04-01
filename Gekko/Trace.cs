@@ -2219,15 +2219,52 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// Column based so we can later use Microsoft.data.analysis
+    /// </summary>
+    public class TraceFrame
+    {
+        public List<string> commandFileAndLine = new List<string>();
+        public List<string> name = new List<string>();
+        public List<int> t1 = new List<int>();
+        public List<int> t2 = new List<int>();
+    }
+
+    public class TraceDict 
+    {
+        public GekkoDictionary<string, int> dict_commandFileAndLine = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, int> dict_names = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<int, int> dict_t1 = new GekkoDictionary<int, int>();
+        public GekkoDictionary<int, int> dict_t2 = new GekkoDictionary<int, int>();
+
+        public void Add1(GekkoDictionary<string, int> dict, string s)
+        {
+            if (!dict.ContainsKey(s)) dict.Add(s, 1);
+            else dict[s]++;
+        }
+
+        public void Add1(GekkoDictionary<int, int> dict, int i)
+        {
+            if (!dict.ContainsKey(i)) dict.Add(i, 1);
+            else dict[i]++;
+        }
+    }
+
     public class TraceFlow
     {
-        public static void Analyze(List<Trace2_1_1> traces)
+        public static TraceFrame Analyze(List<Trace2_1_1> traces)
         {
+            TraceFrame df = new TraceFrame();            
             foreach (Trace2_1_1 trace in traces)
             {
-                 
+                if (trace.type == ETraceType.GluedToSeries) continue;
+                df.commandFileAndLine.Add(trace.traceContents.commandFileAndLine);
+                df.name.Add(trace.traceContents.name);
+                df.t1.Add(trace.traceContents.period.t1.super);
+                df.t2.Add(trace.traceContents.period.t2.super);
             }
-        }
+            return df;
+        }        
     }
 
     public class TraceFlowElement 
