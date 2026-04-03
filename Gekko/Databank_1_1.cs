@@ -938,7 +938,7 @@ namespace Gekko
         /// Should never happen.
         /// </summary>
         [ProtoMember(2)]
-        public readonly long counter = ++Globals.traceCounter;
+        private readonly long counter = ++Globals.traceCounter;
 
         public TraceID2_1_1()
         {
@@ -952,6 +952,16 @@ namespace Gekko
         public DateTime StampInLocalTime()
         {
             return this.stamp.ToLocalTime();
+        }
+
+        public DateTime GetStamp() 
+        {
+            return this.stamp;
+        }
+
+        public long GetCounter() 
+        {
+            return this.counter;
         }
 
         public override bool Equals(object o)
@@ -1302,7 +1312,7 @@ namespace Gekko
                 for (int i = 0; i < this.storageIDTemporary.Count; i++)
                 {
                     TraceID2_1_1 id = this.storageIDTemporary[i];
-                    if (id.counter < 0) { G.Writeln2("This trace is not stored in the databank, but has been pruned off: " + id.ToString()); throw new GekkoException(); }
+                    if (id.GetCounter() < 0) { G.Writeln2("This trace is not stored in the databank, but has been pruned off: " + id.ToString()); throw new GekkoException(); }
                     Trace2_1_1 trace = null; dict2.TryGetValue(id, out trace);
                     if (trace == null) { G.Writeln2("Could not find this trace in databank: " + id.ToString()); throw new GekkoException(); }
                     this.storage.Add(trace);
@@ -1948,9 +1958,10 @@ namespace Gekko
                             }
                             try
                             {
-                                if (Globals.traceStats)
+                                if (Globals.traceFrame != null)
                                 {
-                                    Globals.traceFrame = TraceFlow.Analyze(traces);
+                                    TraceHelper_1_1 th = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
+                                    readInfo.traceFrame = TraceFlow.Analyze(th.tracesDepth2, readInfo.fileName);
                                 }
                             }
                             catch

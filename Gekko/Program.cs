@@ -2841,28 +2841,51 @@ namespace Gekko
                 //
                 //             
 
-                if (text == "stat")
+                if (text == "t")
                 {
-                    Globals.traceFrame = new TraceFrame();
-                    Globals.traceDict = new TraceDict();
+                    string obkKeep = "obk_202603261643.gbk";  //can be null
+                    bool hasObkKeep = false;
+                    Globals.traceFrame = new TraceFrame();                    
                     string rootPath = Program.options.folder_working;
                     List<string> files = Directory.EnumerateFiles(rootPath, "*.gbk", SearchOption.AllDirectories).ToList();
+                    G.Writeln();
+                    int counter = -1;
+                    int counter2 = -1;                    
                     foreach (string file in files)
                     {
-
-                        ReadOpenMulbkHelper oRead = null;
-                        List<ReadInfo> readInfos = new List<ReadInfo>();                        
-                        Program.OpenOrRead(null, true, oRead, false, readInfos, false, new P());
-
-                        for (int i = 0; i < Globals.traceFrame.name.Count; i++)
+                        if (obkKeep != null)
                         {
-                            Globals.traceDict.Add1(Globals.traceDict.dict_commandFileAndLine, Globals.traceFrame.commandFileAndLine[i]);
-                            Globals.traceDict.Add1(Globals.traceDict.dict_names, Globals.traceFrame.name[i]);
-                            Globals.traceDict.Add1(Globals.traceDict.dict_t1, Globals.traceFrame.t1[i]);
-                            Globals.traceDict.Add1(Globals.traceDict.dict_t2, Globals.traceFrame.t2[i]);
+                            string fileName = Path.GetFileName(file);
+                            bool isObkKeep = G.Equal(fileName, obkKeep);
+                            if (G.StartsWith(fileName, "obk"))
+                            {
+                                if (!isObkKeep || hasObkKeep) continue;
+                                hasObkKeep = true;
+                            }
                         }
-
-                    }
+                        ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
+                        oRead.FileName = file;
+                        List<ReadInfo> readInfos = new List<ReadInfo>();
+                        CellOffset offset = new CellOffset();
+                        Program.OpenOrRead(offset, true, oRead, false, readInfos, false, new P());
+                        if (readInfos.Count != 1) new Error("Hov");
+                        ReadInfo readInfo = readInfos[0];
+                        if (readInfo.traceFrame != null)
+                        {                            
+                            counter++;
+                            G.Writeln("+++ " + file);
+                            Globals.traceFrame.AddRange(readInfo.traceFrame);
+                            Globals.traceFrame.databankFileCounter.AddRange(Enumerable.Repeat(counter, readInfo.traceFrame.name.Count));
+                        }
+                        else
+                        {
+                            counter2++;
+                            G.Writeln("    " + file);
+                        }
+                    }                    
+                    TraceFrameParquet.WriteParquetTraceFrame("traces.parquet", Globals.traceFrame);                    
+                    Globals.traceFrame = null;
+                    new Writeln("Wrote traces.data from " + (counter + 1) + " trace-banks (" + (counter2 + 1) + " banks without traces)");
                     return;
                 }
 
@@ -7553,6 +7576,7 @@ namespace Gekko
             }
             deserializedDatabank = new Databank(databank.name);
 
+            readInfo.traceFrame = readInfo_oldbank.traceFrame;
             readInfo.startPerInFile = readInfo_oldbank.startPerInFile;
             readInfo.endPerInFile = readInfo_oldbank.endPerInFile;
             readInfo.variables = readInfo_oldbank.variables;
@@ -35332,6 +35356,11 @@ namespace Gekko
             public string modelLastSimStamp;
             public string modelLargestLag;
             public string modelLargestLead;
+
+            //
+
+            //Used for analyzing traces from both Gekko 2 and 3
+            public TraceFrame traceFrame = null;
 
             public void Print()
             {
