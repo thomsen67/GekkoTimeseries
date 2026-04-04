@@ -2852,7 +2852,7 @@ namespace Gekko
                     int counter = -1;
                     int counter2 = -1;                    
                     foreach (string file in files)
-                    {
+                    {                        
                         if (obkKeep != null)
                         {
                             string fileName = Path.GetFileName(file);
@@ -2889,13 +2889,22 @@ namespace Gekko
                     return;
                 }
 
-
-                if (false)
+                if (text == "t2")
                 {
-                    Optimize.RAS();
+                    TraceFrame traceFrame1 = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces1.parquet"));
+                    TraceFrame traceFrame2 = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces2.parquet"));
+                    for (int i = 0; i < traceFrame2.databankFile.Count; i++)
+                    {                                             
+                        traceFrame2.databankFile[i] = traceFrame2.databankFile[i].Replace(@"c:\Thomas\Desktop\gekko\testing\obk_202603261643.gbk", @"p:\tth\NY\Sandkasse\gbk-2026-04-03a\DatopGek24\DatopGek24\obk.gbk");                     
+                    }
+                    traceFrame1.AddRange(traceFrame2);
+                    for (int i = 0; i < traceFrame1.databankFile.Count; i++)
+                    {                        
+                        traceFrame1.databankFile[i] = traceFrame1.databankFile[i].Replace(@"p:\tth\NY\Sandkasse\gbk-2026-04-03a\DatopGek24\DatopGek24\", @"g:\DatopGek24\");
+                    }
+                    TraceFrameParquet.WriteParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"), traceFrame1);
+                    return;
                 }
-
-
 
                 if (false)
                 {

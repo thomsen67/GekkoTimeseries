@@ -1934,7 +1934,7 @@ namespace Gekko
 
                 }  //end of using
 
-                if (Program.options.databank_trace && tracename != null)
+                if (Globals.traceFrame != null && tracename != null) //Only done when analyzing Gekko 2 traces
                 {
                     using (FileStream fs = Program.WaitForFileStream(tracename, null, Program.GekkoFileReadOrWrite.Read))
                     {
@@ -1942,38 +1942,28 @@ namespace Gekko
                         {
                             DateTime dt3 = DateTime.Now;
                             List<Trace2_1_1> traces = Serializer.Deserialize<List<Trace2_1_1>>(fs);
-                            if (Program.options.databank_trace)
-                            {
-                                databank.traces = traces;
-                                Trace2_1_1.HandleTraceRead1(databank);
-                                databank.traces = null;
-                            }
-                            int n = 0;
-                            if (traces != null)
-                            {
-                                foreach (Trace2_1_1 trace in traces)
-                                {
-                                    if (trace.type != ETraceType.GluedToSeries) n++;
-                                }
-                            }
+                            databank.traces = traces;
+                            Trace2_1_1.HandleTraceRead1(databank);
+                            databank.traces = null;
+                            //int n = 0;
+                            //if (traces != null)
+                            //{
+                            //    foreach (Trace2_1_1 trace in traces)
+                            //    {
+                            //        if (trace.type != ETraceType.GluedToSeries) n++;
+                            //    }
+                            //}
                             try
                             {
-                                if (Globals.traceFrame != null)
-                                {
-                                    TraceHelper_1_1 th = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
-                                    readInfo.traceFrame = TraceFlow.Analyze(th.tracesDepth2, readInfo.fileName);
-                                }
+                                TraceHelper_1_1 th = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
+                                readInfo.traceFrame = TraceFlow.Analyze(th.tracesDepth2, readInfo.fileName);
                             }
                             catch
                             {
+                                new Writeln("Failed traces on: " + originalFilePath);
                             }
-                            
-                            readInfo.nTraces = n;
-                            G.WritelnGray("Protobuf trace deserialize took: " + G.Seconds(dt3));
-                            if (Globals.runningOnTTComputer)
-                            {
-
-                            }
+                            //readInfo.nTraces = n;
+                            G.WritelnGray("Protobuf Gekko 2 traces deserialize took: " + G.Seconds(dt3));                            
                         }
                         catch (Exception e)
                         {

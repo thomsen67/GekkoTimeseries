@@ -2294,7 +2294,7 @@ namespace Gekko
             TraceFrame df = new TraceFrame();            
             foreach (KeyValuePair<Trace2_1_1, PrecedentsAndDepth_1_1> kvp in traces)
             {
-                ////Must correspond to #qwldak7dad
+                //Must correspond to #qwldak7dad
                 Trace2_1_1 trace = kvp.Key;
                 int depth = kvp.Value.depth;
                 if (trace.type == ETraceType.GluedToSeries) continue;

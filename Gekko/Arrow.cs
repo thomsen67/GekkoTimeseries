@@ -1263,7 +1263,7 @@ namespace Gekko
 
     public class TraceFrameParquet
     {
-        public static void GetSchemaHelper(List<DataField>m, ParquetTypeAndName nameAndType) 
+        public static void GetSchemaHelper(List<DataField> m, ParquetTypeAndName nameAndType)
         {
             if (nameAndType.type == typeof(string)) m.Add(new DataField<string>(nameAndType.name));
             else if (nameAndType.type == typeof(DateTime)) m.Add(new DataField<DateTime>(nameAndType.name));
@@ -1276,10 +1276,41 @@ namespace Gekko
         private static ParquetSchema GetSchema(List<ParquetTypeAndName> names)
         {
             List<DataField> m = new List<DataField>();
-            foreach (ParquetTypeAndName name in names) GetSchemaHelper(m, name);            
+            foreach (ParquetTypeAndName name in names) GetSchemaHelper(m, name);
             ParquetSchema schema = new ParquetSchema(m);
             return schema;
         }
+
+        public static TraceFrame ReadParquetTraceFrame(string filePath)
+        {
+            TraceFrame traceFrame = new TraceFrame();
+            using (Stream fileStream = File.OpenRead(filePath))
+            using (ParquetReader reader = ParquetReader.CreateAsync(fileStream).GetAwaiter().GetResult())
+            {
+                using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
+                {
+                    ////Must correspond to #qwldak7dad
+                    int i = -1;
+                    traceFrame.counter = ((long[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "counter")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.stamp = ((DateTime[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.period_start = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.period_end = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.date_start = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.date_end = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.name = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.text = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "text")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.precedentsNames = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "precedentsNames")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.commandFile = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "commandFile")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.commandLine = ((int[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "commandLine")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.dataFile = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dataFile")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.databankFile = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "databankFile")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.databankFileCounter = ((int[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "databankFileCounter")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.depth = ((int[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "depth")).GetAwaiter().GetResult()).Data).ToList();
+                }
+            }
+            return traceFrame;
+        }
+    
 
         public static void WriteParquetTraceFrame(string pathAndFilename, TraceFrame traceFrame)
         {
