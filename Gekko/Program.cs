@@ -2902,9 +2902,114 @@ namespace Gekko
                     {                        
                         traceFrame1.databankFile[i] = traceFrame1.databankFile[i].Replace(@"p:\tth\NY\Sandkasse\gbk-2026-04-03a\DatopGek24\DatopGek24\", @"g:\DatopGek24\");
                     }
+
+                    //TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
+                    var sortedIndices = Enumerable.Range(0, traceFrame1.stamp.Count).OrderBy(i => traceFrame1.stamp[i]).ThenBy(i => traceFrame1.counter[i]).ToList();
+                    traceFrame1.counter = sortedIndices.Select(i => traceFrame1.counter[i]).ToList();
+                    traceFrame1.stamp = sortedIndices.Select(i => traceFrame1.stamp[i]).ToList();
+                    traceFrame1.period_start = sortedIndices.Select(i => traceFrame1.period_start[i]).ToList();
+                    traceFrame1.period_end = sortedIndices.Select(i => traceFrame1.period_end[i]).ToList();
+                    traceFrame1.date_start = sortedIndices.Select(i => traceFrame1.date_start[i]).ToList();
+                    traceFrame1.date_end = sortedIndices.Select(i => traceFrame1.date_end[i]).ToList();
+                    traceFrame1.name = sortedIndices.Select(i => traceFrame1.name[i]).ToList();
+                    traceFrame1.text = sortedIndices.Select(i => traceFrame1.text[i]).ToList();
+                    traceFrame1.precedentsNames = sortedIndices.Select(i => traceFrame1.precedentsNames[i]).ToList();
+                    traceFrame1.commandFile = sortedIndices.Select(i => traceFrame1.commandFile[i]).ToList();
+                    traceFrame1.commandLine = sortedIndices.Select(i => traceFrame1.commandLine[i]).ToList();
+                    traceFrame1.dataFile = sortedIndices.Select(i => traceFrame1.dataFile[i]).ToList();
+                    traceFrame1.databankFile = sortedIndices.Select(i => traceFrame1.databankFile[i]).ToList();
+                    traceFrame1.databankFileCounter = sortedIndices.Select(i => traceFrame1.databankFileCounter[i]).ToList();
+                    traceFrame1.depth = sortedIndices.Select(i => traceFrame1.depth[i]).ToList();
+
                     TraceFrameParquet.WriteParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"), traceFrame1);
                     return;
                 }
+
+                if (text == "t3")
+                {
+                    bool onlyObk = false;
+                    TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
+                    GekkoDictionary<string, bool> all = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    List<GekkoDictionary<string, bool>> gcms1 = new List<GekkoDictionary<string, bool>>();
+                    List<List<string>> gcms2 = new List<List<string>>();
+                    gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                    gcms2.Add(new List<string>());
+                    int iBefore = -1;
+                    long counterCurrent = -1l;
+                    for (int i = 0; i < traceFrame.counter.Count; i++)
+                    {
+                        if (traceFrame.counter[i] == 500542109956958525l)
+                        {
+                        }
+                        if (onlyObk && !G.Equal(Path.GetFileName(traceFrame.databankFile[i]), "obk.gbk")) continue;
+                        if (iBefore != -1)
+                        {                            
+                            double seconds = (traceFrame.stamp[i] - traceFrame.stamp[iBefore]).TotalSeconds;
+                            if (seconds < 0d) new Error("Hov");
+                            long dif = traceFrame.counter[i] - traceFrame.counter[iBefore];
+                            //long dif = traceFrame.counter[i] - counterCurrent;
+                            if ( seconds > 60d || Math.Abs(dif) > 1000000000l)
+                            {
+                                gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                                gcms2.Add(new List<string>());
+                            }                            
+                        }                        
+                        if (!gcms1[gcms1.Count - 1].ContainsKey(traceFrame.commandFile[i]))
+                        {
+                            if (!traceFrame.commandFile[i].Contains("Unknown file and line"))
+                            {
+                                string dublet = "  ";
+                                if (all.ContainsKey(traceFrame.commandFile[i]))
+                                {
+                                    dublet = "! ";
+                                }
+                                else all.Add(traceFrame.commandFile[i], false);
+                                gcms1[gcms1.Count - 1].Add(traceFrame.commandFile[i], false);
+                                gcms2[gcms2.Count - 1].Add(dublet + traceFrame.commandFile[i] + "              " + traceFrame.counter[i] + "__" + traceFrame.stamp[i].ToString());
+                            }
+                        }
+                        iBefore = i;
+                    }
+
+                    //Second time                    
+                    for (int i1 = 0; i1 < gcms1.Count; i1++)
+                    {
+                        for (int i2 = i1 + 1; i2 < gcms1.Count; i2++)
+                        {
+                            bool allKeysPresent = gcms1[i1].Keys.All(gcms1[i2].ContainsKey);
+                            if (allKeysPresent)
+                            {
+                                gcms2[i1] = null;
+                                break;
+                            }
+                        }
+                    }
+
+
+                    using (FileStream fs = WaitForFileStream(Path.Combine(Program.options.folder_working, "traces_gcm.txt"), null, GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        int ii = -1;
+                        foreach (List<string> x in gcms2)
+                        {
+                            if (x == null) continue;
+                            ii++;
+                            sw.WriteLine();
+                            sw.WriteLine(" ------------- " + ii + "-----------------");
+                            foreach (string s in x)
+                            {
+                                sw.WriteLine(s);
+                            }
+                        }
+                        sw.Flush();
+                        sw.Close();
+                    }
+
+                    
+
+                    return;
+                }
+
 
                 if (false)
                 {
