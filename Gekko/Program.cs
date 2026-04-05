@@ -2928,47 +2928,53 @@ namespace Gekko
                 if (text == "t3")
                 {
                     bool onlyObk = false;
+                    long big = 1000000000;
                     TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
                     GekkoDictionary<string, bool> all = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                     List<GekkoDictionary<string, bool>> gcms1 = new List<GekkoDictionary<string, bool>>();
                     List<List<string>> gcms2 = new List<List<string>>();
-                    gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
-                    gcms2.Add(new List<string>());
-                    int iBefore = -1;
-                    long counterCurrent = -1l;
+                    //gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                    //gcms2.Add(new List<string>());                    
+                    long counterCurrent = -2 * big;
+                    DateTime stampCurrent = DateTime.MinValue;
                     for (int i = 0; i < traceFrame.counter.Count; i++)
                     {
-                        if (traceFrame.counter[i] == 500542109956958525l)
+                        string commandFilei = traceFrame.commandFile[i];
+                        string databankFilei = traceFrame.databankFile[i];
+                        long counteri = traceFrame.counter[i];
+                        DateTime stampi = traceFrame.stamp[i];
+
+                        if (onlyObk && !G.Equal(Path.GetFileName(databankFilei), "obk.gbk")) continue;                        
+
+                        double seconds = (stampi - stampCurrent).TotalSeconds;
+                        if (seconds < 0d) new Error("Hov");
+                        long dif = counteri - counterCurrent;
+                        if (seconds > 60d || Math.Abs(dif) > big)
                         {
+                            gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                            gcms2.Add(new List<string>());
                         }
-                        if (onlyObk && !G.Equal(Path.GetFileName(traceFrame.databankFile[i]), "obk.gbk")) continue;
-                        if (iBefore != -1)
-                        {                            
-                            double seconds = (traceFrame.stamp[i] - traceFrame.stamp[iBefore]).TotalSeconds;
-                            if (seconds < 0d) new Error("Hov");
-                            long dif = traceFrame.counter[i] - traceFrame.counter[iBefore];
-                            //long dif = traceFrame.counter[i] - counterCurrent;
-                            if ( seconds > 60d || Math.Abs(dif) > 1000000000l)
-                            {
-                                gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
-                                gcms2.Add(new List<string>());
-                            }                            
-                        }                        
-                        if (!gcms1[gcms1.Count - 1].ContainsKey(traceFrame.commandFile[i]))
+
+                        if (!gcms1[gcms1.Count - 1].ContainsKey(commandFilei))
                         {
-                            if (!traceFrame.commandFile[i].Contains("Unknown file and line"))
+                            if (!commandFilei.Contains("Unknown file and line"))
                             {
                                 string dublet = "  ";
-                                if (all.ContainsKey(traceFrame.commandFile[i]))
+                                if (all.ContainsKey(commandFilei))
                                 {
                                     dublet = "! ";
                                 }
-                                else all.Add(traceFrame.commandFile[i], false);
-                                gcms1[gcms1.Count - 1].Add(traceFrame.commandFile[i], false);
-                                gcms2[gcms2.Count - 1].Add(dublet + traceFrame.commandFile[i] + "              " + traceFrame.counter[i] + "__" + traceFrame.stamp[i].ToString());
-                            }
+                                else all.Add(commandFilei, false);
+                                gcms1[gcms1.Count - 1].Add(commandFilei, false);
+                                gcms2[gcms2.Count - 1].Add(dublet + commandFilei + "              " + counteri + "__" + stampi.ToString());
+                                                                
+                                if (commandFilei.Contains(@"pws.gcm"))
+                                {
+                                }
+                            }                            
                         }
-                        iBefore = i;
+                        counterCurrent = counteri;
+                        stampCurrent = stampi;
                     }
 
                     //Second time                    
