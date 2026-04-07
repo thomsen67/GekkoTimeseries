@@ -2904,7 +2904,7 @@ namespace Gekko
                     }
 
                     //TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
-                    var sortedIndices = Enumerable.Range(0, traceFrame1.stamp.Count).OrderBy(i => traceFrame1.stamp[i]).ThenBy(i => traceFrame1.counter[i]).ToList();
+                    var sortedIndices = Enumerable.Range(0, traceFrame1.stamp.Count).OrderBy(i => traceFrame1.counter[i]).ToList();
                     traceFrame1.counter = sortedIndices.Select(i => traceFrame1.counter[i]).ToList();
                     traceFrame1.stamp = sortedIndices.Select(i => traceFrame1.stamp[i]).ToList();
                     traceFrame1.period_start = sortedIndices.Select(i => traceFrame1.period_start[i]).ToList();
@@ -2929,74 +2929,57 @@ namespace Gekko
                 {
                     bool onlyObk = false;
                     long big = 1000000000;
+                    double gap = 60; //s
                     TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
                     GekkoDictionary<string, bool> all = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    List<GekkoDictionary<string, bool>> gcms1 = new List<GekkoDictionary<string, bool>>();
-                    List<List<string>> gcms2 = new List<List<string>>();
-                    //gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
-                    //gcms2.Add(new List<string>());                    
-                    long counterCurrent = -2 * big;
-                    DateTime stampCurrent = DateTime.MinValue;
-                    for (int i = 0; i < traceFrame.counter.Count; i++)
+
+                    //Chunk by counter "groups" (within 1.000.000.000)
+                    List<TraceFrame> traceFramesCounterGaps = TraceAnalyzeUsers(traceFrame, onlyObk, big);
+
+                    //Divide by > 60 seconds
+                    List<TraceFrame> traceFramesResult = TraceAnalyzeSessions(traceFramesCounterGaps, onlyObk, gap);
+
+
+
+
+
+
+
+                    int j = -1;
+                    foreach (TraceFrame traceFrame777 in traceFramesResult)
                     {
-                        string commandFilei = traceFrame.commandFile[i];
-                        string databankFilei = traceFrame.databankFile[i];
-                        long counteri = traceFrame.counter[i];
-                        DateTime stampi = traceFrame.stamp[i];
-
-                        if (onlyObk && !G.Equal(Path.GetFileName(databankFilei), "obk.gbk")) continue;                        
-
-                        double seconds = (stampi - stampCurrent).TotalSeconds;
-                        if (seconds < 0d) new Error("Hov");
-                        long dif = counteri - counterCurrent;
-                        if (seconds > 60d || Math.Abs(dif) > big)
+                        j++;
+                        for (int i = 0; i < traceFrame777.counter.Count; i++)
                         {
-                            gcms1.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
-                            gcms2.Add(new List<string>());
-                        }
+                            long counteri = traceFrame777.counter[i];
+                            DateTime stampi = traceFrame777.stamp[i];
 
-                        if (!gcms1[gcms1.Count - 1].ContainsKey(commandFilei))
-                        {
-                            if (!commandFilei.Contains("Unknown file and line"))
+                            if (counteri == 6803604891848990204)
                             {
-                                string dublet = "  ";
-                                if (all.ContainsKey(commandFilei))
-                                {
-                                    dublet = "! ";
-                                }
-                                else all.Add(commandFilei, false);
-                                gcms1[gcms1.Count - 1].Add(commandFilei, false);
-                                gcms2[gcms2.Count - 1].Add(dublet + commandFilei + "              " + counteri + "__" + stampi.ToString());
-                                                                
-                                if (commandFilei.Contains(@"pws.gcm"))
-                                {
-                                }
-                            }                            
-                        }
-                        counterCurrent = counteri;
-                        stampCurrent = stampi;
-                    }
-
-                    //Second time                    
-                    for (int i1 = 0; i1 < gcms1.Count; i1++)
-                    {
-                        for (int i2 = i1 + 1; i2 < gcms1.Count; i2++)
-                        {
-                            bool allKeysPresent = gcms1[i1].Keys.All(gcms1[i2].ContainsKey);
-                            if (allKeysPresent)
+                            }
+                            if (counteri == 6743463366115325046)
                             {
-                                gcms2[i1] = null;
-                                break;
                             }
                         }
                     }
 
 
+
+
+
+
+
+
+
+                    List<TraceFrame> sortedFrames = traceFramesResult.OrderBy(tf => tf.stamp.Count > 0 ? tf.stamp[0]: DateTime.MaxValue).ToList();
+
+                    List<List<string>> gcms = TraceAnalyzeShadow(sortedFrames, onlyObk, gap);    
+
                     using (FileStream fs = WaitForFileStream(Path.Combine(Program.options.folder_working, "traces_gcm.txt"), null, GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         int ii = -1;
-                        foreach (List<string> x in gcms2)
+                        foreach (List<string> x in gcms)
                         {
                             if (x == null) continue;
                             ii++;
@@ -3010,8 +2993,6 @@ namespace Gekko
                         sw.Flush();
                         sw.Close();
                     }
-
-                    
 
                     return;
                 }
@@ -3636,6 +3617,109 @@ namespace Gekko
             else G.Writeln(text);
         }
 
+        private static List<TraceFrame> TraceAnalyzeUsers(TraceFrame traceFrame, bool onlyObk, long big)
+        {
+            List<TraceFrame> traceFrames = new List<TraceFrame>();            
+            long counterCurrent = -1;
+            for (int i = 0; i < traceFrame.counter.Count; i++)
+            {                
+                long counteri = traceFrame.counter[i];                
+                long dif = counteri - counterCurrent;
+                if (Math.Abs(dif) > big)
+                {
+                    traceFrames.Add(new TraceFrame());
+                }                
+                traceFrames[traceFrames.Count - 1].Add(traceFrame, i);                
+                counterCurrent = counteri;
+            }
+            return traceFrames;
+        }
+
+        private static List<TraceFrame> TraceAnalyzeSessions(List<TraceFrame> traceFramesInput, bool onlyObk, double gap)
+        {
+            List<TraceFrame> traceFrames = new List<TraceFrame>();
+            long counterCurrent = -1;
+            DateTime stampCurrent = DateTime.MinValue;
+            foreach (TraceFrame traceFrame in traceFramesInput)
+            {
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {                    
+                    long counteri = traceFrame.counter[i];
+                    DateTime stampi = traceFrame.stamp[i];
+
+                    double dif = (stampi - stampCurrent).TotalSeconds;
+                    if (i > 0 && dif < 0d)
+                    {
+                        new Error("Hov");
+                    }
+                    if (Math.Abs(dif) > gap)
+                    {
+                        traceFrames.Add(new TraceFrame());
+                    }
+
+                    traceFrames[traceFrames.Count - 1].Add(traceFrame, i);
+
+                    counterCurrent = counteri;
+                    stampCurrent = stampi;
+                }
+            }
+            return traceFrames;
+        }
+
+        private static List<List<string>> TraceAnalyzeShadow(List<TraceFrame> traceFramesInput, bool onlyObk, double gap)
+        {
+            List<TraceFrame> traceFrames = new List<TraceFrame>();
+            long counterCurrent = -1;
+            DateTime stampCurrent = DateTime.MinValue;
+            List<GekkoDictionary<string, bool>> dict = new List<GekkoDictionary<string, bool>>();
+            foreach (TraceFrame traceFrame in traceFramesInput)
+            {
+                dict.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {
+                    string commandFilei = traceFrame.commandFile[i];
+                    if (!dict[dict.Count - 1].ContainsKey(commandFilei)) dict[dict.Count - 1].Add(commandFilei, false);
+                }
+            }
+            int counter = -1;
+
+            for (int i1 = 0; i1 < dict.Count; i1++)
+            {
+                bool ignore = false;
+                for (int i2 = i1 + 1; i2 < dict.Count; i2++)
+                {
+                    bool allKeysPresent = dict[i1].Keys.All(dict[i2].ContainsKey);
+                    if (allKeysPresent)
+                    {
+                        ignore = true;
+                        break;
+                    }
+                }
+                if (!ignore) traceFrames.Add(traceFramesInput[i1]);
+            }
+
+            List<List<string>> gcms = new List<List<string>>();
+            foreach (TraceFrame traceFrame in traceFrames)
+            {
+                GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                gcms.Add(new List<string>());
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {
+                    string commandFilei = traceFrame.commandFile[i];
+                    if (!dict2.ContainsKey(commandFilei))
+                    {
+                        if (!commandFilei.Contains("[Unknown file and line]"))
+                        {
+                            gcms[gcms.Count - 1].Add(commandFilei + G.Blanks(50 - commandFilei.Length) + traceFrame.counter[i] + " " + traceFrame.stamp[i]);
+                        }
+                        dict2.Add(commandFilei, false);
+                    }
+                }
+            }
+
+            return gcms;
+        }
+
         private static double Sum_numbers()
         {
             double sum = 0.0;
@@ -3648,9 +3732,6 @@ namespace Gekko
 
             return sum;
         }
-
-
-
 
         /// <summary>
         /// Dimensions with high value (for instance 1.0) are probably summed up with sum(i, x[i]) in the equations.

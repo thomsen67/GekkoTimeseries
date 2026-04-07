@@ -2251,19 +2251,38 @@ namespace Gekko
             //Must correspond to #qwldak7dad
             this.counter.AddRange(x.counter);
             this.stamp.AddRange(x.stamp);
-            this.commandFile.AddRange(x.commandFile);
-            this.commandLine.AddRange(x.commandLine);
-            this.name.AddRange(x.name);
             this.period_start.AddRange(x.period_start);
             this.period_end.AddRange(x.period_end);
             this.date_start.AddRange(x.date_start);
             this.date_end.AddRange(x.date_end);
+            this.name.AddRange(x.name);
             this.text.AddRange(x.text);
+            this.precedentsNames.AddRange(x.precedentsNames);
+            this.commandFile.AddRange(x.commandFile);
+            this.commandLine.AddRange(x.commandLine);            
             this.dataFile.AddRange(x.dataFile);
             this.databankFile.AddRange(x.databankFile);
-            this.databankFileCounter.AddRange(x.databankFileCounter);
-            this.precedentsNames.AddRange(x.precedentsNames);
+            this.databankFileCounter.AddRange(x.databankFileCounter);            
             this.depth.AddRange(x.depth);
+        }
+        public void Add(TraceFrame traceFrame, int i)
+        {
+            //Must correspond to #qwldak7dad
+            this.counter.Add(traceFrame.counter[i]);
+            this.stamp.Add(traceFrame.stamp[i]);
+            this.period_start.Add(traceFrame.period_start[i]);
+            this.period_end.Add(traceFrame.period_end[i]);
+            this.date_start.Add(traceFrame.date_start[i]);
+            this.date_end.Add(traceFrame.date_end[i]);
+            this.name.Add(traceFrame.name[i]);
+            this.text.Add(traceFrame.text[i]);
+            this.precedentsNames.Add(traceFrame.precedentsNames[i]);
+            this.commandFile.Add(traceFrame.commandFile[i]);
+            this.commandLine.Add(traceFrame.commandLine[i]);
+            this.dataFile.Add(traceFrame.dataFile[i]);
+            this.databankFile.Add(traceFrame.databankFile[i]);
+            this.databankFileCounter.Add(traceFrame.databankFileCounter[i]);
+            this.depth.Add(traceFrame.depth[i]);
         }
     }
 
