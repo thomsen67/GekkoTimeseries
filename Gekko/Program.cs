@@ -2835,16 +2835,19 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
-                //new Writeln("0 --> " + M.Errorf(0d));
-                //new Writeln("1.96 --> " + M.Errorf(1.96d));
-                //
-                //             
 
-                if (text == "t")
+                // -----------------------------------------------------------
+                // Kør tell't1', tell't2', tell't3'.
+                // Der var noget med, at obk_202603261643.gbk ikke dannede traces
+                //   på DST, så traces fra denne blev dannet på TTH pc. Her var
+                //   traces1.parquet så filen fra DST, mens traces2.parquet var
+                //   fra TTH pc.
+                // -----------------------------------------------------------
+
+                if (text == "t1")
                 {
-                    string obkKeep = "obk_202603261643.gbk";  //can be null
-                    bool hasObkKeep = false;
+                    string obkKeep = "obk_202603261643.gbk";  //can be null. Not sure what it does.
+                    bool hasObkKeep = false; //not a setting!
                     Globals.traceFrame = new TraceFrame();                    
                     string rootPath = Program.options.folder_working;
                     List<string> files = Directory.EnumerateFiles(rootPath, "*.gbk", SearchOption.AllDirectories).ToList();
@@ -2860,7 +2863,7 @@ namespace Gekko
                             if (G.StartsWith(fileName, "obk"))
                             {
                                 if (!isObkKeep || hasObkKeep) continue;
-                                hasObkKeep = true;
+                                hasObkKeep = true; //has been seen 1 time
                             }
                         }
                         ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
@@ -2885,7 +2888,7 @@ namespace Gekko
                     }                    
                     TraceFrameParquet.WriteParquetTraceFrame("traces.parquet", Globals.traceFrame);                    
                     Globals.traceFrame = null;
-                    new Writeln("Wrote traces.data from " + (counter + 1) + " trace-banks (" + (counter2 + 1) + " banks without traces)");
+                    new Writeln("Wrote traces.parquet from " + (counter + 1) + " trace-banks (" + (counter2 + 1) + " banks without traces)");
                     return;
                 }
 
@@ -2901,9 +2904,7 @@ namespace Gekko
                     for (int i = 0; i < traceFrame1.databankFile.Count; i++)
                     {                        
                         traceFrame1.databankFile[i] = traceFrame1.databankFile[i].Replace(@"p:\tth\NY\Sandkasse\gbk-2026-04-03a\DatopGek24\DatopGek24\", @"g:\DatopGek24\");
-                    }
-
-                    //TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
+                    }                    
                     var sortedIndices = Enumerable.Range(0, traceFrame1.stamp.Count).OrderBy(i => traceFrame1.counter[i]).ToList();
                     traceFrame1.counter = sortedIndices.Select(i => traceFrame1.counter[i]).ToList();
                     traceFrame1.stamp = sortedIndices.Select(i => traceFrame1.stamp[i]).ToList();
@@ -2920,61 +2921,23 @@ namespace Gekko
                     traceFrame1.databankFile = sortedIndices.Select(i => traceFrame1.databankFile[i]).ToList();
                     traceFrame1.databankFileCounter = sortedIndices.Select(i => traceFrame1.databankFileCounter[i]).ToList();
                     traceFrame1.depth = sortedIndices.Select(i => traceFrame1.depth[i]).ToList();
-
                     TraceFrameParquet.WriteParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"), traceFrame1);
                     return;
                 }
 
                 if (text == "t3")
                 {
-                    bool onlyObk = false;
+                    bool onlyObk = true;
                     long big = 1000000000;
                     double gap = 60; //s
                     TraceFrame traceFrame = TraceFrameParquet.ReadParquetTraceFrame(Path.Combine(Program.options.folder_working, "traces12.parquet"));
                     GekkoDictionary<string, bool> all = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
                     //Chunk by counter "groups" (within 1.000.000.000)
                     List<TraceFrame> traceFramesCounterGaps = TraceAnalyzeUsers(traceFrame, onlyObk, big);
-
                     //Divide by > 60 seconds
-                    List<TraceFrame> traceFramesResult = TraceAnalyzeSessions(traceFramesCounterGaps, onlyObk, gap);
-
-
-
-
-
-
-
-                    int j = -1;
-                    foreach (TraceFrame traceFrame777 in traceFramesResult)
-                    {
-                        j++;
-                        for (int i = 0; i < traceFrame777.counter.Count; i++)
-                        {
-                            long counteri = traceFrame777.counter[i];
-                            DateTime stampi = traceFrame777.stamp[i];
-
-                            if (counteri == 6803604891848990204)
-                            {
-                            }
-                            if (counteri == 6743463366115325046)
-                            {
-                            }
-                        }
-                    }
-
-
-
-
-
-
-
-
-
+                    List<TraceFrame> traceFramesResult = TraceAnalyzeSessions(traceFramesCounterGaps, gap);
                     List<TraceFrame> sortedFrames = traceFramesResult.OrderBy(tf => tf.stamp.Count > 0 ? tf.stamp[0]: DateTime.MaxValue).ToList();
-
-                    List<List<string>> gcms = TraceAnalyzeShadow(sortedFrames, onlyObk, gap);    
-
+                    List<List<string>> gcms = TraceAnalyzeShadow(sortedFrames, onlyObk, gap);
                     using (FileStream fs = WaitForFileStream(Path.Combine(Program.options.folder_working, "traces_gcm.txt"), null, GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -2984,7 +2947,7 @@ namespace Gekko
                             if (x == null) continue;
                             ii++;
                             sw.WriteLine();
-                            sw.WriteLine(" ------------- " + ii + "-----------------");
+                            sw.WriteLine(" ------------- " + ii + " -----------------");
                             foreach (string s in x)
                             {
                                 sw.WriteLine(s);
@@ -3622,7 +3585,14 @@ namespace Gekko
             List<TraceFrame> traceFrames = new List<TraceFrame>();            
             long counterCurrent = -1;
             for (int i = 0; i < traceFrame.counter.Count; i++)
-            {                
+            {
+                if (onlyObk)
+                {
+                    if (!G.Equal(Path.GetFileName(traceFrame.databankFile[i]), "obk.gbk"))
+                    {
+                        continue;
+                    }
+                }
                 long counteri = traceFrame.counter[i];                
                 long dif = counteri - counterCurrent;
                 if (Math.Abs(dif) > big)
@@ -3635,13 +3605,15 @@ namespace Gekko
             return traceFrames;
         }
 
-        private static List<TraceFrame> TraceAnalyzeSessions(List<TraceFrame> traceFramesInput, bool onlyObk, double gap)
+        private static List<TraceFrame> TraceAnalyzeSessions(List<TraceFrame> traceFramesInput, double gap)
         {
             List<TraceFrame> traceFrames = new List<TraceFrame>();
             long counterCurrent = -1;
             DateTime stampCurrent = DateTime.MinValue;
             foreach (TraceFrame traceFrame in traceFramesInput)
             {
+                traceFrames.Add(new TraceFrame());
+                stampCurrent = traceFrame.stamp[0];
                 for (int i = 0; i < traceFrame.counter.Count; i++)
                 {                    
                     long counteri = traceFrame.counter[i];
@@ -3710,7 +3682,7 @@ namespace Gekko
                     {
                         if (!commandFilei.Contains("[Unknown file and line]"))
                         {
-                            gcms[gcms.Count - 1].Add(commandFilei + G.Blanks(50 - commandFilei.Length) + traceFrame.counter[i] + " " + traceFrame.stamp[i]);
+                            gcms[gcms.Count - 1].Add(commandFilei + " " + G.Blanks(80 - commandFilei.Length) + traceFrame.stamp[i].ToString("dd'/'MM yyyy HH:mm") + " --- " + traceFrame.counter[i]);
                         }
                         dict2.Add(commandFilei, false);
                     }
@@ -16539,48 +16511,48 @@ namespace Gekko
                 SearchHelper1 helper = Program.SearchAllBanksAllFreqs(true, o.iv, null, EVariableType.Var);
                 if (helper.allBanks.count > 0)
                 {
-                    Action<GAO> a = (gao) =>
+                    m = new List<IVariable>();
+                    names = new List<string>();
+                    foreach (string s in helper.allBanks.list)
                     {
-                        m = new List<IVariable>();
-                        names = new List<string>();
-                        foreach (string s in helper.allBanks.list)
-                        {
-                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
-                            names.Add(ss);
-                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
-                        }
+                        string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                        names.Add(ss);
+                        m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                    }
+                    Action<GAO> a = (gao) =>
+                    {                        
                         DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + G.GetLinkAction(helper.allBanks.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
                 if (helper.allFreqs.count > 0)
                 {
-                    Action<GAO> a = (gao) =>
+                    m = new List<IVariable>();
+                    names = new List<string>();
+                    foreach (string s in helper.allFreqs.list)
                     {
-                        m = new List<IVariable>();
-                        names = new List<string>();
-                        foreach (string s in helper.allFreqs.list)
-                        {
-                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
-                            names.Add(ss);
-                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
-                        }
+                        string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                        names.Add(ss);
+                        m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                    }
+                    Action<GAO> a = (gao) =>
+                    {                        
                         DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
                 if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count)
                 {
-                    Action<GAO> a = (gao) =>
+                    m = new List<IVariable>();
+                    names = new List<string>();
+                    foreach (string s in helper.allBanksAndFreqs.list)
                     {
-                        m = new List<IVariable>();
-                        names = new List<string>();
-                        foreach (string s in helper.allBanksAndFreqs.list)
-                        {
-                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
-                            names.Add(ss);
-                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
-                        }
+                        string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                        names.Add(ss);
+                        m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                    }
+                    Action<GAO> a = (gao) =>
+                    {                        
                         DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allBanksAndFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
@@ -17307,7 +17279,6 @@ namespace Gekko
                                     Action<GAO> a = (gao) =>
                                     {
                                         DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, true, ts2, mm, bank, isGams);
-                                        //DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts2, mm, bank, isGams);
                                     };
                                     resulting += G.GetLinkAction(mm, new GekkoAction(EGekkoActionTypes.Unknown, null, a));
                                     if (jj == 0) i = success;
@@ -17529,7 +17500,6 @@ namespace Gekko
                     Action<GAO> a = (gao) =>
                     {
                         DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, true, ts2, varnameWithoutLag, bank, isGams);
-                        //DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts2, varnameWithoutLag, bank, isGams);
                     };
                     precedents2.Add(G.GetLinkAction(varnameWithoutLag, new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
@@ -17790,12 +17760,14 @@ namespace Gekko
                         else
                         {
                             //G.WriteLink("show", "disp3:" + ts.GetName());
+                            string xname = ts.GetParentDatabank().name;
+                            string yname = ts.GetName();
                             // ---------                
                             Action<GAO> a = (gao) =>
                             {
                                 Globals.guiHomeMainEnabled = true;
                                 List<string> temp = new List<string>();
-                                string varnameWithBankAndFreq = ts.GetParentDatabank().name + Globals.symbolBankColon + ts.GetName();
+                                string varnameWithBankAndFreq = xname + Globals.symbolBankColon + yname;
                                 temp.Add(varnameWithBankAndFreq);
                                 Program.Disp(ConvertFreqs(tStart, tEnd, ts.freq).t1, ConvertFreqs(tStart, tEnd, ts.freq).t2, temp, false, true, true, null);
                             };
@@ -35650,11 +35622,7 @@ namespace Gekko
                 TraceHelper th = Trace2.CollectAllTraces(this.databank, ETraceHelper.GetAllMetasAndTraces);
                 if (this.nTraces > 0)
                 {
-                    Action<GAO> a = (gao) =>
-                    {
-                        Functions.tracestats2(null, null, null, new ScalarString(this.databank.GetName()));
-                    };
-                    tab.CurRow.SetText(1, "Trace    : " + this.nTraces + " data-traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    tab.CurRow.SetText(1, "Trace    : " + this.nTraces + " data-traces");
                     tab.CurRow.Next();
                 }
 

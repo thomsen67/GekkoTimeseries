@@ -392,9 +392,7 @@ namespace Gekko
         public static int foldingButtonCounter = 0;
 
         public static int decompPerLag = -2;
-
-        public static bool deepTrace = true;
-
+        
         public static GekkoDictionary<string, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
         
