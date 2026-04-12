@@ -4443,18 +4443,15 @@ namespace Gekko
                     }
                 }
             Lbl:;
-
-                long nAll = 0; long nTrace = 0;
+                                
                 foreach (List<ParallelHelper> x1 in lists)
                 {
                     foreach (ParallelHelper x2 in x1)
-                    {
-                        nAll++;
+                    {                        
                         if (!x2.IsTrace())
                         {
                             Program.ProtobufWalker(x2.iv, true);
                         }
-                        else nTrace++;
                     }
                 }
                                 
@@ -4613,15 +4610,13 @@ namespace Gekko
 
                 DateTime t2 = DateTime.Now;
                 databank.traces = new List<Trace2>();                
-                long nAll = 0; long nTrace = 0;
+                
                 foreach (List<ParallelHelper> list in lists)
                 {
                     foreach (ParallelHelper ph in list)
-                    {
-                        nAll++;
+                    {                        
                         if (ph.IsTrace())
-                        {                            
-                            nTrace++;
+                        {                                                 
                             databank.traces.Add(ph.trace);
                         }
                         else
