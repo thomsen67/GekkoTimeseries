@@ -2870,7 +2870,7 @@ namespace Gekko
                         oRead.FileName = file;
                         List<ReadInfo> readInfos = new List<ReadInfo>();
                         CellOffset offset = new CellOffset();
-                        Program.OpenOrRead(offset, true, oRead, false, readInfos, false, new P());
+                        Program.OpenOrRead(offset, true, oRead, false, readInfos, false, false, new P());
                         if (readInfos.Count != 1) new Error("Hov");
                         ReadInfo readInfo = readInfos[0];
                         if (readInfo.traceFrame != null)
@@ -5882,9 +5882,11 @@ namespace Gekko
         /// <param name="open"></param>
         /// <param name="readInfos"></param>
         /// <param name="create"></param>
-        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create, P p)
+        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create, bool clear, P p)
         {
-            //open = true if called with OPEN statement              
+            //open = true if called with OPEN statement
+
+            if (clear && oRead.openType != EOpenType.Edit) new Error("You can only use the 'clear' option together with the 'edit' option, for instance 'open <edit clear>'");
 
             int n = 1;
             List<int> list = new List<int>();
@@ -5901,7 +5903,6 @@ namespace Gekko
                     else if (oRead.openType == EOpenType.Ref)
                     {
                         new Error("OPEN<ref> must be used with 1 databank");
-                        //throw new GekkoException();
                     }
                 }
                 if (Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition))
@@ -5948,7 +5949,6 @@ namespace Gekko
                 string originalFileName = file;
 
                 bool isGbk = true;
-                //bool isProtobuf = false;
                 string extension = "" + Globals.extensionDatabank + "";
 
                 if (oRead.Type == EDataFormat.Tsd)  //overrules any global settings
@@ -6044,6 +6044,8 @@ namespace Gekko
                 //  not already open |  read into position       |  fail unless OPEN<edit/create>  |
                 //                   |   maybe editable          |      createBrandNew             |
                 // ------------------+---------------------------+---------------------------------+
+                // Note: with 'clear', the bank is cleared at the end of the method.
+                //       with 'clear' and not already open and fileExists, the file is not read (would be a waste of time)
                 //
                 // Note: regarding databank name there is the complication that this may given as '*'
                 //       and also that ... AS ... may be used. In general, the resulting 'real' databank
@@ -6142,7 +6144,6 @@ namespace Gekko
                 readInfo.fileName = file; readInfo.fileNamePretty = ffh.prettyPathAndFileName;
 
                 Databank databank = null;
-
                 Databank databankTemp = null;  //temp bank where the external file is read into
 
                 // ---------------------------------------------------------------------------------
@@ -6150,33 +6151,37 @@ namespace Gekko
                 // ---------------------------------------------------------------------------------
 
                 string hash = null;
-
                 bool copyLocal2 = copyLocal && Globals.batchType != EBatchType.Gekcel;
 
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
-                    if (copyLocal2)
+                    if (!clear) //If 'clear', there is also 'edit', so always OPEN <edit clear>, and 'clear' can never happen with READ/IMPORT. With OPEN <edit clear>, it would be wasteful to read the file, and then delete the contents just below.
                     {
-                        //TODO
-                        //TODO
-                        //TODO copying is a waste of time if we have a zip path, no?
-                        //TODO
-                        //TODO
-
-                        DateTime t0 = DateTime.Now;
-                        localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
-                        WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
-                        G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
-                        file = localFileThatShouldBeDeletedPathAndFilename;
-                    }
-
-                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, oRead.bankName, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-                    if (open)
-                    {
-                        if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
+                        if (copyLocal2)
                         {
-                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null, null, null);
+                            //TODO
+                            //TODO
+                            //TODO copying is a waste of time if we have a zip path, no?
+                            //TODO
+                            //TODO
+                            DateTime t0 = DateTime.Now;
+                            localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
+                            WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
+                            G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                            file = localFileThatShouldBeDeletedPathAndFilename;
                         }
+
+                        databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, oRead.bankName, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                        if (open)
+                        {
+                            if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
+                            {
+                                hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null, null, null);
+                            }
+                        }
+                    }
+                    else
+                    {
                     }
                 }
                 else
@@ -6198,11 +6203,15 @@ namespace Gekko
                     databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI, create); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                                                                
                     databank.editable = false;
                     if (oRead.openType == EOpenType.Edit)
-                    {
+                    {                        
                         databank.editable = true;
                         databank.isDirty = true;  //13-1-2026: The dirty logic has caused too much pain, so now we set it on any open<edit> databank. If nothing is changed, it is re-written, but so be it. See also #8yewefjkda.
+                        if (clear)
+                        {
+                            databank.Clear(); //It may be a bank that is already open and is "moved" in the databank list -- and in that case we clear it.
+                        }
                     }
-                    databank.name = readInfo.dbName;
+                    databank.name = readInfo.dbName;                    
                 }
                 else
                 {
@@ -14084,89 +14093,7 @@ namespace Gekko
                         //not intended for "normal" Gekko users.
                         MakeBatFileForAremos();
                     }
-                    break;
-                case "--deploy":
-                    {
-                        //Deploy
-                        G.Writeln2("Use 'deploy' from Total Commander prompt");
-                        G.Writeln(@"Also see c:\Thomas\Gekko\GekkoCS\Deploy\!seher");
-                    }
-                    break;
-                case "--testsim":
-                    {
-                        int n = 1000;
-                        double[] abs = new double[3000];  //years
-                        double[] rel = new double[3000];  //years
-                        string[] absVar = new string[3000];  //years
-                        string[] relVar = new string[3000];  //years
-
-                        double[] absVs = new double[3000];  //years
-                        double[] relVs = new double[3000];  //years
-
-                        double[] absHs = new double[3000];  //years
-                        double[] relHs = new double[3000];  //years
-
-                        int min = int.MaxValue;
-                        int max = int.MinValue;
-                        List<string> list = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo"));
-                        int x = list.Count;
-                        G.Writeln("Testing " + x + " endogenous vars");
-                        for (int i = 0; i < x; i += n)
-                        {
-                            G.Writeln("Testing " + i + " up to " + (i + n - 1));
-                            List<string> res = TestSim(list, i, i + n - 1);
-                            foreach (string s in res)
-                            {
-                                string[] s3 = s.Split('¤');
-                                string type = s3[0];
-                                int year = int.Parse(s3[1]);
-                                string var = s3[2];
-                                bool bval = false;
-                                double val = G.ParseIntoDouble(s3[3], out bval);
-                                bool bvs = false;
-                                double vs = G.ParseIntoDouble(s3[4], out bvs);
-                                bool bhs = false;
-                                double hs = G.ParseIntoDouble(s3[5], out bhs);
-                                if (year < min) min = year;
-                                if (year > max) max = year;
-                                if (type == "abs")
-                                {
-                                    if (val > abs[year])
-                                    {
-                                        abs[year] = val;
-                                        absVar[year] = var;
-                                        absVs[year] = vs;
-                                        absHs[year] = hs;
-                                    }
-                                }
-                                else
-                                {
-                                    if (val > rel[year])
-                                    {
-                                        rel[year] = val;
-                                        relVar[year] = var;
-                                        relVs[year] = vs;
-                                        relHs[year] = hs;
-                                    }
-                                }
-                            }
-                        }
-
-                        G.Writeln();
-                        for (int y = min; y <= max; y++)
-                        {
-                            G.Writeln("rel% " + y + " " + relVar[y] + " " + rel[y] + "%     left " + relVs[y] + " right " + relHs[y]);
-                        }
-
-                        G.Writeln();
-                        for (int y = min; y <= max; y++)
-                        {
-                            G.Writeln("abs " + y + " " + absVar[y] + " " + abs[y] + "     left " + absVs[y] + " right " + absHs[y]);
-                        }
-
-
-                    }
-                    break;
+                    break;                 
                 case "--lex":
                     {
                         //show raw tokens
@@ -14197,21 +14124,7 @@ namespace Gekko
                     {
                         Program.TestRam(false);
                     }
-                    break;
-                case "--tracewalk":
-                    {
-                        if (Globals.traceWalkAllCombinations)
-                        {
-                            Globals.traceWalkAllCombinations = false;
-                            new Writeln("Does not walk all traces");
-                        }
-                        else
-                        {
-                            Globals.traceWalkAllCombinations = true;
-                            new Writeln("Walks all traces");
-                        }
-                    }
-                    break;
+                    break;                
                 case "--nopause":
                     {
                         if (Globals.pausePopup)
@@ -14268,8 +14181,11 @@ namespace Gekko
                     {
                         //
                         //rem without Xconversiontimeout it will only compile 10 % of the times. 120000 probably means 120 sec.
-                        //rem Takes about 1 minute 15 s, june 2019.The 1.5 GB setting makes compilation possible, and does not cost extra time.                        
-                        string antlrFile = "c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g";
+                        //rem Takes about 1 minute 15 s, june 2019.The 1.5 GB setting makes compilation possible, and does not cost extra time.                                                                        
+
+                        string path = "c:\\Thomas\\Gekko\\GekkoCS_MAIN";
+                        MessageBox.Show("Uses: " + path);
+                        string antlrFile = path + "\\ANTLR\\Cmd3.g";
                         string antlrFile4 = antlrFile.Replace("Cmd3.g", "Cmd4.g");
                         string javaPath = "c:\\Thomas\\Software\\Java\\jre6\\bin\\java.exe";
                         string classPath = "c:\\Thomas\\Software\\ANTLR\\antlr-3.1.3.jar";
@@ -14318,23 +14234,7 @@ namespace Gekko
                         else Globals.printGrayLinesForDebugging = true;
                         G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
                     }
-                    break;
-                case "--traceseed":
-                    {
-                        Globals.traceCounter = 0;
-                        G.Writeln("Trace counter set = 0");
-                    }
-                    break;
-                case "--prune":
-                    {
-                        string[] ss2 = sub.Split(' ');
-                        bool b = false;
-                        double prune = G.ParseIntoDouble(ss2[1].Trim(), out b);
-                        Globals.pruneDecomp = prune;
-                        G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
-                        G.Writeln();
-                    }
-                    break;
+                    break;                                
                 case "--killexcel":
                     {
                         DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);

@@ -7101,7 +7101,7 @@ namespace Gekko
                     offset.namecell = this.opt_namecell;
                     offset.datecell = this.opt_datecell;
 
-                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, oRead, open, readInfos, false, this.p);
+                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, oRead, open, readInfos, false, false, this.p);
                     Program.ReadInfo readInfo = readInfos[0];
                     readInfo.shouldMerge = oRead.Merge;
 
@@ -8272,6 +8272,7 @@ namespace Gekko
             public double opt_pos = double.NaN;
             public string opt_create = null;  //may use OPEN b1, where b1.gbk does not exist (like OPEN<edit>b1).
             public string opt_trace = "yes"; //default
+            public string opt_clear = null;
             public P p = null;
 
             public void Exe()
@@ -8294,10 +8295,10 @@ namespace Gekko
                 ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
 
                 bool create = false;
-                if (G.Equal(opt_create, "yes"))
-                {
-                    create = true;
-                }
+                if (G.Equal(opt_create, "yes")) create = true;
+
+                bool clear = false;
+                if (G.Equal(opt_clear, "yes")) clear = true;
 
                 oRead.openFileNames = new List<List<string>>();
 
@@ -8385,7 +8386,7 @@ namespace Gekko
                 CellOffset offset = new CellOffset();
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(offset, false, oRead, true, readInfos, create, this.p);
+                Program.OpenOrRead(offset, false, oRead, true, readInfos, create, clear, this.p);
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {

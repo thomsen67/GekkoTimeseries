@@ -68,6 +68,7 @@ tokens {
 	ASTOPT_STRING_NOCR;
     ASTOPT_STRING_TRACE;
     ASTOPT_STRING_YOY;
+    ASTOPT_STRING_CLEAR;
 	ASTL0;
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
@@ -3483,6 +3484,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
 						  | CREATE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CREATE yesNo?)
                           | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
+                          | CLEAR (EQUAL yesNo)? -> ^(ASTOPT_STRING_CLEAR yesNo?)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

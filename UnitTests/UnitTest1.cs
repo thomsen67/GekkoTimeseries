@@ -25536,6 +25536,7 @@ print(df2)
             // ----------------------------------------------------------
             //          - OPEN command, also OPEN<edit>, <first>, <last>, <ref>, etc., also non-existing files.
             //          - CLOSE command
+            //          - OPEN <edit clear>.
             //          uses a \temp folder that is deleted first
             // ----------------------------------------------------------
 
@@ -25964,24 +25965,28 @@ print(df2)
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
-                I("RESET;");
-                // if (i == 0)I("OPTION databank logic = aremos;");
+                I("RESET;");                
                 I("OPEN <edit> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 I("SERIES a = 100;");
                 I("CLOSE bankTemp;");
 
                 I("RESET;");
-                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
+                I("RESET;");
+                I("OPEN <edit clear> temp\\bankTemp;");
+                Assert.IsTrue(Program.databanks.GetDatabank("bankTemp").storage.Count() == 0);
+
+                I("RESET;");
+                FAIL("OPEN <clear> temp\\bankTemp;");
+
                 //changing REF stuff
                 I("RESET;");
-                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
