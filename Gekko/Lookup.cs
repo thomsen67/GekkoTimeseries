@@ -1938,8 +1938,7 @@ namespace Gekko
                 else databank = ib as Databank;  //null if series is inside a map
 
                 try
-                {
-                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the end of this try-catch
+                {                    
                     string traceString = null;
                     if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
 
@@ -1974,8 +1973,7 @@ namespace Gekko
                         }
                         //trace can probably never have a null period here
                         Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling, false);
-                    }
-                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                    }                    
                 }
                 catch (Exception e)
                 {

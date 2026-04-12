@@ -1121,11 +1121,11 @@ namespace Gekko
             if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
             {
                 try
-                {
+                {                    
                     TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
                     Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
                     foreach (Trace2 trace in databank.traces) dictInverted[trace.GetId()] = trace;
-                    HandleTraceRead2(th.metas, dictInverted);
+                    HandleTraceRead2(th.metas, dictInverted);                 
                 }
                 finally
                 {
@@ -1138,7 +1138,7 @@ namespace Gekko
         /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
         /// </summary>
         public static void HandleTraceRead2(List<SeriesMetaInformation> metas, Dictionary<TraceID2, Trace2> dict1Inverted)
-        {
+        {            
             foreach (SeriesMetaInformation meta in metas)
             {
                 meta.FromID(dict1Inverted);
@@ -1146,7 +1146,7 @@ namespace Gekko
             foreach (Trace2 trace in dict1Inverted.Values)
             {
                 trace.precedents.FromID(dict1Inverted);
-            }
+            }            
         }
 
         /// <summary>
@@ -1156,7 +1156,7 @@ namespace Gekko
         /// <param name="th"></param>
         /// <param name="dict1Inverted"></param>
         public static void HandleTraceWrite(Databank databank, out TraceHelper th, out Dictionary<TraceID2, Trace2> dict1Inverted)
-        {
+        {            
             //gather lists
             th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
             dict1Inverted = new Dictionary<TraceID2, Trace2>();
@@ -1169,7 +1169,7 @@ namespace Gekko
             {
                 meta.ToID();
             }
-            databank.traces = th.tracesDepth2.Keys.ToList();
+            databank.traces = th.tracesDepth2.Keys.ToList();            
         }
 
         public static void PrintTraceHelper(Trace2 trace, bool all)
