@@ -201,10 +201,11 @@ namespace Gekko
         public void Clear()
         {
             if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
-            yearStart = -12345;
-            yearEnd = -12345;
-            info1 = null;
-            date = null;
+            this.yearStart = -12345;
+            this.yearEnd = -12345;
+            this.info1 = null;
+            this.date = null;                                    
+            this.traces = null; //probably null already
             this.storage.Clear();
             this.isDirty = true;
         }
