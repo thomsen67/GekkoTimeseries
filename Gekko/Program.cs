@@ -2844,13 +2844,14 @@ namespace Gekko
                 }
                 //m.Add(new GekkoTime(EFreq.A, int.Parse(s1a), 1));
                 m.Add(gt);
-                return new DName(name, EFreq.None, m.ToArray(), -1);
+                return new DNameTime(name, EFreq.None, m.ToArray(), -1);
             }
             else
             {
                 string bank; string name; string freq; string[] indexes;
                 G.Chop_Chop(s, out bank, out name, out freq, out indexes);
                 List<StringOrTime> m = new List<StringOrTime>();
+                bool hasTime = false;
                 if (indexes != null)
                 {
                     foreach (string s2 in indexes)
@@ -2858,6 +2859,7 @@ namespace Gekko
                         if (G.LooksLikeYearOrQuarterOrMonth(s2))
                         {
                             m.Add(GekkoTime.FromStringToGekkoTime(s2, false, true, false));
+                            hasTime = true;
                         }
                         else
                         {
@@ -2865,7 +2867,8 @@ namespace Gekko
                         }
                     }
                 }
-                return new DName(name, G.ConvertFreq(freq), m.ToArray(), -1);
+                if (hasTime) return new DNameTime(name, G.ConvertFreq(freq), m.ToArray(), -1);
+                else return new DNameNoTimeOrLag(name, G.ConvertFreq(freq), m.ToArray());
             }
         }
 
@@ -2894,7 +2897,7 @@ namespace Gekko
             if (indexes1 == null && indexes2 == null)
             {
                 // x
-                return new DName(name, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
+                return new DNameLag(name, G.ConvertFreq(freq), new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
             }
             else if (indexes1 != null && indexes2 == null)
             {
@@ -2909,7 +2912,7 @@ namespace Gekko
                 List<StringOrTime> m = new List<StringOrTime>();
                 foreach (string s2 in indexes1) m.Add(s2);
                 m.Add(new GekkoTime(EFreq.Lag, 0));
-                return new DName(name, G.ConvertFreq(freq), m.ToArray(), -1);
+                return new DNameLag(name, G.ConvertFreq(freq), m.ToArray(), -1);
             }
             else if (indexes1 != null && indexes2 != null)
             {
@@ -2920,7 +2923,7 @@ namespace Gekko
                 List<StringOrTime> m = new List<StringOrTime>();
                 foreach (string s2 in indexes1) m.Add(s2);
                 m.Add(new GekkoTime(EFreq.Lag, i));
-                return new DName(name, G.ConvertFreq(freq), m.ToArray(), -1);
+                return new DNameLag(name, G.ConvertFreq(freq), m.ToArray(), -1);
             }
             else new Error("Hov");
             return null; //we never get here            
@@ -2932,9 +2935,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {          
-
-
+        {
             if (Globals.runningOnTTComputer)
             {
 
@@ -12107,7 +12108,7 @@ namespace Gekko
         /// <param name="varnameWithFreq"></param>
         public static void AddToPrecedents(Databank db, DName s)
         {
-            DName two = new DName(db.name + "." + s.GetName(), EFreq.None, s.GetIndexesExceptTime().Select(x => (StringOrTime)x).ToArray(), -1); //s has no time anyway
+            DNameNoTimeOrLag two = new DNameNoTimeOrLag(db.name + "." + s.GetName(), EFreq.None, s.GetIndexesExceptTime().Select(x => (StringOrTime)x).ToArray()); //s has no time anyway
             if (!Globals.precedentsContainer.ContainsKey(two))
             {
                 Globals.precedentsContainer.Add(two, 0);                
@@ -31171,7 +31172,7 @@ namespace Gekko
         {            
             string s = "";
             if (all > 1) s = (counter + 1).ToString();
-            return new DName(Globals.decompResidualName + s, EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
+            return new DNameLag(Globals.decompResidualName + s, EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
         }
 
         public static string GetDecompResidualNameSimple(int counter, int all)

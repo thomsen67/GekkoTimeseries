@@ -107,7 +107,7 @@ namespace Gekko
                 // TODO: Lag: What if it is a leaded equ input. Bad lag hack, #osaf89dsafa
                 //
                 //
-                DName eqName = temp[0].eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
+                DNameTime eqName = temp[0].eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
                 if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
@@ -209,7 +209,7 @@ namespace Gekko
                 if (temp.Count > 0 && temp[0].score >= walkInfo.minLhsScore)  //For instance only eqs that are found with checkbox "Name" in FIND window. We also do not show res_... nodes
                 {
                     //Bad lag hack, #osaf89dsafa
-                    DName eqNameChild = temp[0].eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
+                    DNameTime eqNameChild = temp[0].eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
                     WalkNodes(depth + 1, graph, varNameChild, eqNameChild, walkInfo);
                 }
                 else

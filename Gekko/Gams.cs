@@ -1239,7 +1239,7 @@ namespace Gekko
                         if (eh.eqName == null)
                         {
                         }                        
-                        if (names.Length > 0) lhsName = new DName(lhsName.GetName(), EFreq.None, names.Select(s => (StringOrTime)s).ToArray(), -1);
+                        if (names.Length > 0) lhsName = new DNameNoTimeOrLag(lhsName.GetName(), EFreq.None, names.Select(s => (StringOrTime)s).ToArray());
                         
                         if (Globals.greu)
                         {

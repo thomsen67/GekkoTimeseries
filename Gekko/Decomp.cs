@@ -875,7 +875,7 @@ namespace Gekko
                     if (handleAsGekko)
                     {
                         //Becomes: decomp y from e_y endo y
-                        decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].SetNamePrefix(Globals.decompGekkoEquationPrefix).AddTime(new GekkoTime(EFreq.Lag, 0)) };
+                        decompOptions2.new_from = new List<DName>() { decompOptions2.new_select[0].SetNamePrefix(Globals.decompGekkoEquationPrefix).AddLag(0) };
                         decompOptions2.new_endo = new List<DName>() { decompOptions2.new_select[0] };
                     }
                     else
@@ -969,7 +969,7 @@ namespace Gekko
                 List<StringOrTime> xxx = new List<StringOrTime>();
                 foreach (StringOrTime xx in s.GetIndexesExceptTime()) xxx.Add(xx);
                 xxx.Add(time);
-                DName s2 = new DName(s.GetName(), EFreq.None, xxx.ToArray(), -1);
+                DNameTime s2 = new DNameTime(s.GetName(), EFreq.None, xxx.ToArray(), -1);
 
                 int eqNumber;
                 //if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(DName.HACK1(s2), out eqNumber))
@@ -1102,7 +1102,7 @@ namespace Gekko
             if (decompOptions2.link[parentI].varnames == null)
             {
                 //does this ever happen?
-                decompOptions2.link[parentI].varnames = new DName(Globals.decompResidualName, EFreq.None, new StringOrTime[] { }, -1);
+                decompOptions2.link[parentI].varnames = new DNameSimplest(Globals.decompResidualName);
             }
 
             if (false)
@@ -1419,7 +1419,7 @@ namespace Gekko
             foreach (DName s in decompOptions2.link[0].endo)
             {
                 //string s2 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
-                DName s2 = s.AddTime(new GekkoTime(EFreq.Lag, 0));
+                DNameLag s2 = s.AddLag(0);
                 if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
             }
 
@@ -1660,7 +1660,7 @@ namespace Gekko
                     //    endo.Add(DName.HACK1(x), c);
                     //    endoReverse.Add(c, DName.HACK1(x));
                     //}
-                    DName x = s.AddTime(t);
+                    DNameTime x = s.AddTime(t);
                     if (!endo.ContainsKey(x))
                     {
                         int c = endo.Count();
@@ -1741,7 +1741,7 @@ namespace Gekko
                             tTemp = modelGamsScalar.Maybe2000GekkoTime(t);
                             add = t.Subtract(tTemp);
 
-                            DName eqName = eqPeriods.fullName.AddTime(tTemp);
+                            DNameTime eqName = eqPeriods.fullName.AddTime(tTemp);
                             if (k == 0)
                             {
                                 eqNames.Add(eqName);
@@ -1786,15 +1786,15 @@ namespace Gekko
                                     tt2 += eqPeriods.offset;
                                 }                                
 
-                                DName x1 = varName.AddTime(modelGamsScalar.tBasis.Add(tt1));
-                                DName x2 = varName.AddTime(new GekkoTime(EFreq.Lag, tt2));
+                                DNameTime x1 = varName.AddTime(modelGamsScalar.tBasis.Add(tt1));
+                                DNameTime x2 = varName.AddTime(new GekkoTime(EFreq.Lag, tt2));
 
                                 TwoDNames two = new TwoDNames(x1, x2);
                                 variables.Add(two);
                             }
                             //Has freq set to .None, because that is so in the decompDatas containers.
-                            DName xx2 = new DName(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count), EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
-                            DName xx1 = xx2.RemoveTime().AddTime(t.Add(0));
+                            DNameLag xx2 = new DNameLag(Program.GetDecompResidualNameSimple(ii, decompOptions2.link.Count), EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
+                            DNameTime xx1 = xx2.RemoveTime().AddTime(t.Add(0));
                             variables.Add(new TwoDNames(xx1, xx2));
 
                             //foreach precedent variable
@@ -2015,7 +2015,7 @@ namespace Gekko
                     DName xname = dn2.RemoveTime();
                     GekkoTime xtime = dn2.GetTime();
 
-                    DName enewName = ename.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
+                    DNameLag enewName = ename.RemoveTime().AddLag(0);
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
                                         
@@ -2026,7 +2026,7 @@ namespace Gekko
                         xlag = 0;  //always show as if unlagged, even if it really points back to .tBasis.
                     }
 
-                    DName xnewName = xname.AddTime(new GekkoTime(EFreq.Lag, xlag));
+                    DNameLag xnewName = xname.AddLag(xlag);
 
                     int ZERO = 0;
                     DecompDict dd = null;
@@ -3105,7 +3105,7 @@ namespace Gekko
                                                     //{
                                                     //    lag2 = lag.ToString();
                                                     //}
-                                                    DName name = nameOriginal.AddTime(new GekkoTime(EFreq.Lag, lag));
+                                                    DNameLag name = nameOriginal.AddLag(lag);
 
                                                     if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
                                                     {
@@ -3282,7 +3282,7 @@ namespace Gekko
                     }
                 }
 
-                DName s = eqPeriods.fullName.AddTime(modelGamsScalar.Maybe2000GekkoTime(t).Add(-offset));
+                DNameTime s = eqPeriods.fullName.AddTime(modelGamsScalar.Maybe2000GekkoTime(t).Add(-offset));
                 int eqNumber; if (!modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber))
                 {
                     new Error("Could not find equation '" + s.ToString() + "'");
@@ -3336,7 +3336,7 @@ namespace Gekko
                         {
                             lag2 += eqPeriods.offset;
                         }
-                        DName name = varName.AddTime(new GekkoTime(EFreq.Lag, lag2));
+                        DNameLag name = varName.AddLag(lag2);
                         d.cellsRef[name].SetData(t, x0);
                         d.cellsQuo[name].SetData(t, x1);
                         if (!vars.ContainsKey(name))  //for decomp pivot
@@ -3384,7 +3384,7 @@ namespace Gekko
                                     {
                                         lag2 += eqPeriods.offset;
                                     }
-                                    DName name = varName.AddTime(new GekkoTime(EFreq.Lag, lag2));
+                                    DNameLag name = varName.AddLag(lag2);
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
                                     d.cellsGradQuo[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
@@ -3437,7 +3437,7 @@ namespace Gekko
                                     {
                                         lag2 += eqPeriods.offset;
                                     }
-                                    DName name = varName.AddTime(new GekkoTime(EFreq.Lag, lag2));
+                                    DNameLag name = varName.AddLag(lag2);
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
                                     d.cellsGradRef[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
@@ -3490,7 +3490,7 @@ namespace Gekko
                                     {
                                         lag2 += eqPeriods.offset;
                                     }
-                                    DName name = varName.AddTime(new GekkoTime(EFreq.Lag, lag2));
+                                    DNameLag name = varName.AddLag(lag2);
                                     d.cellsRef[name].SetData(t, x0_before);
                                     d.cellsQuo[name].SetData(t, x1);
                                     d.cellsGradRef[name].SetData(t, grad);

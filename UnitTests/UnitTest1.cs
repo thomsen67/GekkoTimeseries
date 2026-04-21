@@ -20424,6 +20424,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Decomp_EquationLagging()
         {
+            Program.Flush();
             //
             // This is a quite good test regarding an equation (e6) that needs to be lagged (or alternatively leaded) to
             // decompose x1 for the current period. The test reproduces hand-calculated values.

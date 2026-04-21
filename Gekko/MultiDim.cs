@@ -476,36 +476,39 @@ namespace Gekko
     // ================================================================================================
 
     [ProtoContract]
+    public class DNameNoTimeOrLag : DName //Remember to put classname into ProtoInclude
+    {
+        public DNameNoTimeOrLag(string name, EFreq freq, StringOrTime[] indexes) : base(name, freq, indexes, -1) { }
+    }
+
+    [ProtoContract]
+    public class DNameLag : DName //Remember to put classname into ProtoInclude
+    {
+        public DNameLag(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
+    }
+
+    [ProtoContract] //Remember to put classname into ProtoInclude
     public class DNameTime : DName
     {        
         public DNameTime(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
     }
 
-    [ProtoContract]
+    [ProtoContract] //Remember to put classname into ProtoInclude
     public class DNameSimplest : DName
     {
         public DNameSimplest(string name) : base(name, EFreq.None, Array.Empty<StringOrTime>(), -1) { }
-
-        //public DNameSimplest(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
     }
 
     /// <summary>
     /// May or may not have frequency. May or may not have time.
     /// </summary>
     [ProtoContract]
+    [ProtoInclude(101, typeof(DNameNoTimeOrLag))]
+    [ProtoInclude(102, typeof(DNameLag))]
+    [ProtoInclude(103, typeof(DNameTime))]
+    [ProtoInclude(104, typeof(DNameSimplest))]
     public class DName : Multidim2Element
     {
-        // Bank var freq indexes                  iname  ibank  ifreq  iindex  --> others are -1
-        //      x        ?        DName           0                    1
-        // x    x        ?        DNameBank       0             1      2
-        //      x   x    ?        DNameFreq       0      1             2
-        // x    x   x    ?        DNameBankFreq   0      1      2      3   actually the current DName...
-        //
-        //In addition for indexes: ...Lag or ...Time. Lag has 1 lag, Time has 1 time. Position is given for these because index order matters.
-        //So we have _posTime that is also used by lag.
-        //Other GekkoTimes added in principle ok, for instance Age (call it Integer, perhaps use 2 shorts) or birth year.
-        //So do we have 12 combinations??
-
         private static readonly int _posName = 0; //hardcoded
         private static readonly int _posFreq = 1; //hardcoded
         private static readonly int _posIndex = 2; //hardcoded
@@ -660,14 +663,29 @@ namespace Gekko
             return new DName(this.GetName(), this.GetFreq(), temp, -1);
         }
 
-        public DName AddTime(GekkoTime t)
+        public DNameTime AddTime(GekkoTime t)
         {
             if (this.HasTime()) new Error("Cannot add time to variable that already has time");
             int add = 1;
             StringOrTime[] temp = new StringOrTime[this.storage.Length + add - DName._posIndex];
             Array.Copy(this.storage, DName._posIndex, temp, 0, this.storage.Length - DName._posIndex);
             temp[temp.Length - 1] = t;
-            return new DName(this.GetName(), this.GetFreq(), temp, -1);
+            return new DNameTime(this.GetName(), this.GetFreq(), temp, -1);
+        }
+
+        /// <summary>
+        /// -2 means x[-2].
+        /// </summary>
+        /// <param name="lag"></param>
+        /// <returns></returns>
+        public DNameLag AddLag(int lag)
+        {
+            if (this.HasTime()) new Error("Cannot add time to variable that already has time");
+            int add = 1;
+            StringOrTime[] temp = new StringOrTime[this.storage.Length + add - DName._posIndex];
+            Array.Copy(this.storage, DName._posIndex, temp, 0, this.storage.Length - DName._posIndex);
+            temp[temp.Length - 1] = new GekkoTime(EFreq.Lag, lag);
+            return new DNameLag(this.GetName(), this.GetFreq(), temp, -1);
         }
 
         public DName SetNamePrefix(string s)
