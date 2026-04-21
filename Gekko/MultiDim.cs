@@ -478,24 +478,28 @@ namespace Gekko
     [ProtoContract]
     public class DNameNoTimeOrLag : DName //Remember to put classname into ProtoInclude
     {
+        public DNameNoTimeOrLag() : base() { } // Protobuf only
         public DNameNoTimeOrLag(string name, EFreq freq, StringOrTime[] indexes) : base(name, freq, indexes, -1) { }
     }
 
     [ProtoContract]
     public class DNameLag : DName //Remember to put classname into ProtoInclude
     {
+        public DNameLag() : base() { } // Protobuf only
         public DNameLag(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
     }
 
     [ProtoContract] //Remember to put classname into ProtoInclude
     public class DNameTime : DName
-    {        
+    {
+        public DNameTime() : base() { } // Protobuf only
         public DNameTime(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag) : base(name, freq, indexes, posTimeOrLag) { }
     }
 
     [ProtoContract] //Remember to put classname into ProtoInclude
     public class DNameSimplest : DName
     {
+        public DNameSimplest() : base() { } // Protobuf only
         public DNameSimplest(string name) : base(name, EFreq.None, Array.Empty<StringOrTime>(), -1) { }
     }
 

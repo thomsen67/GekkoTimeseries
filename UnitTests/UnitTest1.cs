@@ -6420,6 +6420,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_CopyLogic()
         {
+            //Program.Flush();
             //This also implicitly tests a lot of RENAME functionality,
             //since COPY and RENAME share a lot of code.
 
@@ -24403,9 +24404,6 @@ print(df2)
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
             I("disp x['{%s}'+''];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
-
-
-
         }
 
         [TestMethod]
