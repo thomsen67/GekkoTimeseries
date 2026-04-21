@@ -1008,8 +1008,7 @@ namespace Gekko
         public int depthLimit = -12345;
         public List<Trace2_1_1> longest = new List<Trace2_1_1>();
         public Dictionary<Trace2_1_1, Precedents2_1_1> traces = new Dictionary<Trace2_1_1, Precedents2_1_1>();  //value is parent (may be null)
-        public Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1> tracesDepth2 = new Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1>();
-
+        public Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1> tracesDepth2 = new Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1>();        
     }
     
     public class PrecedentsAndDepth_1_1
@@ -1209,11 +1208,13 @@ namespace Gekko
 
         public static TraceHelper_1_1 CollectAllTraces(Databank_1_1 databank, ETraceHelper type, double scramble)
         {
-            TraceHelper_1_1 th1 = new TraceHelper_1_1();
+            TraceHelper_1_1 th1 = new TraceHelper_1_1();            
             th1.type = type;
-            th1.scramble = scramble;
+            th1.scramble = scramble;        
+
+            int n = 0;
             foreach (KeyValuePair<string, TimeSeries_1_1> kvp in databank.storage)
-            {
+            {                            
                 kvp.Value.DeepTrace(th1);
             }
             return th1;
@@ -1246,7 +1247,7 @@ namespace Gekko
                         }
                     }
                 }
-            }
+            }            
         }
 
         /// <summary>
@@ -1944,21 +1945,43 @@ namespace Gekko
                             List<Trace2_1_1> traces = Serializer.Deserialize<List<Trace2_1_1>>(fs);
                             databank.traces = traces;
                             Trace2_1_1.HandleTraceRead1(databank);
-                            databank.traces = null;
-                            //int n = 0;
-                            //if (traces != null)
-                            //{
-                            //    foreach (Trace2_1_1 trace in traces)
-                            //    {
-                            //        if (trace.type != ETraceType.GluedToSeries) n++;
-                            //    }
-                            //}
+                            databank.traces = null;                            
                             try
                             {
-                                TraceHelper_1_1 th = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
-                                readInfo.traceFrame = TraceFlow.Analyze(th.tracesDepth2, readInfo.fileName);
+                                //TODO: Given a set A for relevant ADAM-variables, for each A walk down precedents, excluding
+                                //      any other A's. Find which command files are relevant.
+                                //Then we can link clumps of command files to sets of relevant ADAM-variables.
+                                //
+                                //
+                                TraceHelper_1_1 th1 = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);                                
+                                readInfo.traceFrame = TraceFlow.Analyze(th1.tracesDepth2, readInfo.fileName);
+
+                                if (Globals.traceChunks != null)
+                                {                                    
+                                    foreach (KeyValuePair<Trace2_1_1, PrecedentsAndDepth_1_1> kvp in th1.tracesDepth2)
+                                    {
+                                        if (kvp.Key.type != ETraceType.GluedToSeries)
+                                        {
+                                            string name = G.Chop_GetNameAndFreq(kvp.Key.traceContents.name);
+                                            string commandFile = kvp.Key.traceContents.commandFileAndLine.Split('¤')[0];
+
+                                            if (!Globals.traceChunks.ContainsKey(commandFile))
+                                            {
+                                                GekkoDictionary<string, bool> temp2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                                                temp2.Add(name, false);
+                                                Globals.traceChunks.Add(commandFile, temp2);
+                                            }
+                                            else
+                                            {
+                                                GekkoDictionary<string, bool> temp2 = Globals.traceChunks[commandFile];
+                                                if (!temp2.ContainsKey(name)) temp2.Add(name, false);
+                                            }
+
+                                        }
+                                    }
+                                }                                
                             }
-                            catch
+                            catch (Exception e)
                             {
                                 new Writeln("Failed traces on: " + originalFilePath);
                             }

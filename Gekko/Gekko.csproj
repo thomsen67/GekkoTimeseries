@@ -512,6 +512,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Translate_2_4_to_3_0.cs" />
+    <Compile Include="Visualizer_temp.cs" />
     <Compile Include="WarningPool.cs" />
     <Compile Include="WindowFind.xaml.cs">
       <DependentUpon>WindowFind.xaml</DependentUpon>

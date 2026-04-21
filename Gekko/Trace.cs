@@ -57,7 +57,7 @@ namespace Gekko
         GetAllMetasAndTraces,
         OnlyGetMetas,
         TrimWithTimeShadowing,
-        Scramble  //not actually used for traces
+        Scramble,  //not actually used for traces
     }
 
     [ProtoContract]

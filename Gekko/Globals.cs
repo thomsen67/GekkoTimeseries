@@ -144,7 +144,9 @@ namespace Gekko
         public const bool traceUsesOrMayUseRealDataPeriod = true;  //for some traces, the real data period is used, so missings may truncate it. So if a command has actually run over some period, and it produces missings, its trace may completely disappear. In that case, the user just sees missing for some period, but cannot se the code line "producing" this missing. If this needs to be fixed, the varible acts as a pointer to these places.
         public const bool traceEndoRhsFix1 = true;   //fix hall or mirrors for x[%t] = x[%t] + ...
         public const bool traceEndoRhsFix2 = true;   //fix for  x = 1; x = x + 1; x = x + 1; ...        
-        public static TraceFrame traceFrame = null; //deactivated when null        
+        public static TraceFrame traceFrame = null; //deactivated when null
+        public static GekkoDictionary<string, GekkoDictionary<string, bool>> traceChunks = null;
+        public static GekkoDictionary<string, bool> traceChunksRelevant = null;
 
         public static bool gbkExtraMetadata = true;
 
@@ -198,7 +200,7 @@ namespace Gekko
         public const double lhsScore0 = 0.5d;  //start-score
         public const double lhsScore1 = 0.5d;  //if left of equals sign
         public const double lhsScore2 = 100d;  //if name corresponds to equation name
-        public const double lhsScore3 = 101d;  //if name corresponds to res_{name} variable
+        public const double lhsScore3 = 101d;  //if name corresponds to res_{name} variable        
 
         public const bool fixForGekko4_0 = false;
 
