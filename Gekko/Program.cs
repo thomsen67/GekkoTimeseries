@@ -16507,6 +16507,7 @@ namespace Gekko
 
             EquationTextHelper helper = new EquationTextHelper();
 
+            //Looking for an equation now:
             //Direct printing of an equation, like "DISP e_fy" rather than "DISP fy". No links are done.
             if (originalList != null)
             {
@@ -16514,7 +16515,8 @@ namespace Gekko
                 {
                     if (iv.Type() == EVariableType.String)
                     {
-                        string s = O.ConvertToString(iv);
+                        string s5 = O.ConvertToString(iv);
+                        string s = G.Chop_RemoveFreq(s5); //hacky, but eq names should not have frequency
                         GekkoTime tUsedHere = tStart;
                         if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
                         string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), null);

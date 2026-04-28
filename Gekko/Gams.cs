@@ -465,6 +465,7 @@ namespace Gekko
                 DateTime dt00 = DateTime.Now;
                 foreach (string line in values)
                 {                    
+                    if(G.NullOrBlanks(line)) continue;
                     if (line.StartsWith("*")) continue;
                     //Not efficient
                     //Not efficient
@@ -481,12 +482,13 @@ namespace Gekko
                     }
 
                     DName inputName = helper.dict_FromVarNumberToVarName[id];
-                    
+
                     //qwerty remove time (?)
-                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(inputName, out aNumber)) aNumber = -12345;
+                    DName inputNameWithoutTime = inputName.RemoveTime();
+                    int aNumber; if (!helper.dict_FromVarNameToANumber.TryGetValue(inputNameWithoutTime, out aNumber)) aNumber = -12345;
                     if (aNumber == -12345)
                     {
-                        new Error("When reading equation, could not find name '" + inputName + "' in dictionary");
+                        new Error("When reading equation, could not find name '" + inputNameWithoutTime + "' in dictionary");
                     }
                     int i1 = -12345;
                     if (inputName.GetTime().IsNull()) //reading timeless data (not activated)
@@ -2099,7 +2101,7 @@ namespace Gekko
             {
                 new Error("Malformed " + ex + "... line integer: " + line);
             }
-
+            
             nameWithIndex = G.ReplaceIgnoreCaseIgnoreQuoted(G.ReplaceIgnoreCaseIgnoreQuoted(G.Substring(line, idx7, line.Length - 1), "(", "["), ")", "]");            
             nameWithIndexNoTime = nameWithIndex;
             int i = nameWithIndex.IndexOf('[');
@@ -5519,7 +5521,14 @@ namespace Gekko
         public int known = 0;
         public int unique = 0;
 
-        public DName[] dict_FromANumberToVarName = null;        
+        /// <summary>
+        /// 0 --> "x1[a]", 1 --> "x1[b]"      
+        /// </summary>
+        public DName[] dict_FromANumberToVarName = null;
+
+        /// <summary>
+        /// --> "x1[a]", 1 --> "x1[b]"
+        /// </summary>
         public Dictionary<DName, int> dict_FromVarNameToANumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
         public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
@@ -5527,15 +5536,42 @@ namespace Gekko
         public List<List<int>> b = new List<List<int>>();
         public List<double> c = new List<double>();
         public List<List<int>> d = new List<List<int>>();
-        public List<int> eqPointers = new List<int>();        
+        public List<int> eqPointers = new List<int>();
 
-        public DName[] dict_FromEqNumberToEqName = null;        
+        /// <summary>
+        /// 0 --> e"[a,2001]"´, 1 --> "e[b,2001]"
+        /// </summary>
+        public DName[] dict_FromEqNumberToEqName = null;
+
+        /// <summary>
+        /// "e[a,2001]" --> 0, "e[b,2001]" --> 1
+        /// </summary>
         public Dictionary<DName, int> dict_FromEqNameToEqNumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
+
+        /// <summary>
+        /// 0 --> "x1[a,2001]", 1 --> "x1[b,2001]"
+        /// </summary>
         public DName[] dict_FromVarNumberToVarName = null;
+
+        /// <summary>
+        ///  //"x1[a,2001]" --> 0, "x1[b,2001]" --> 1
+        /// </summary>
         public Dictionary<DName, int> dict_FromVarNameToVarNumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
+
+        /// <summary>
+        /// //0 --> "e"
+        /// </summary>
         public DName[] dict_FromEqChunkNumberToEqName = null;
+
+        /// <summary>
+        /// //"e" --> 0
+        /// </summary>
         public Dictionary<DName, int> dict_FromEqNameToEqChunkNumber = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
-        public int[] dict_FromEqNumberToEqChunkNumber = null;
+
+        /// <summary>
+        /// //0 --> 0, 1 --> 0
+        /// </summary>
+        public int[] dict_FromEqNumberToEqChunkNumber = null; 
 
         public bool[] isTimeless = null;
 
