@@ -4078,13 +4078,13 @@ namespace Gekko
                 {
                     e2.MoveNext();
                     //string s1 = (string)(((DictionaryEntry)e1.Current).Key);
-                    string s1 = ((KeyValuePair<string, string>)e1.Current).Key;
-                    string s2 = ((KeyValuePair<string, string>)e2.Current).Key;
-                    endogeni.Add(s1);
-                    exogeni.Add(s2);
+                    DName s1 = ((KeyValuePair<DName, DName>)e1.Current).Key;
+                    DName s2 = ((KeyValuePair<DName, DName>)e2.Current).Key;
+                    endogeni.Add(s1.ToString()); //Quite hacky to transform into string and soon after into DName again.
+                    exogeni.Add(s2.ToString()); //Quite hacky to transform into string and soon after into DName again.
                 }
                 //This sorting is so that we get the same order no matter which order (and case) the means/goals were set
-                //This is probably more safe regarding cacheing of the results. Not sorting might give hard to track errors.
+                //This is probably more safe regarding caching of the results. Not sorting might give hard to track errors.
                 endogeni.Sort(StringComparer.OrdinalIgnoreCase);
                 exogeni.Sort(StringComparer.OrdinalIgnoreCase);
 
@@ -4092,49 +4092,40 @@ namespace Gekko
                 for (int i = 0; i < endogeni.Count; i++)
                 {
                     string s1 = endogeni[i];
-                    string s2 = exogeni[i];
-                    //BTypeData ss1 = (BTypeData)Program.model.modelGekko.varsBType[s1 + Globals.lagIndicator + "0"];
+                    string s2 = exogeni[i];                    
                     BTypeData ss1 = null; Program.model.modelGekko.varsBType.TryGetValue(new DNameSimplest(s1 + Globals.lagIndicator + "0"), out ss1);
                     if (ss1 == null)
                     {
                         //TODO: general error handling regarding endo/exo
                         //now we get runtime error
                         new Error("regarding endogenize: variable " + s1 + " does not exist in model");
-                        //throw new GekkoException();
                     }
                     int s1BNumber = ss1.bNumber;
-                    //int varNumber = ss1.bNumber;
                     if (Program.model.modelGekko.m2.endogenous.ContainsKey(s1))
                     {
                         new Error("regarding endogenize: variable " + s1 + " is already endogenous");
-                        //throw new GekkoException();
                     }
                     else
                     {
-                        Program.model.modelGekko.m2.endogenous.Add(s1, "");
-                        //Program.model.modelGekko.endogenousBNumbers.Add(s1BNumber, "");  DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
-                        //BTypeData ss2 = (BTypeData)Program.model.modelGekko.varsBType[s2 + Globals.lagIndicator + "0"];
+                        Program.model.modelGekko.m2.endogenous.Add(s1, "");                        
                         BTypeData ss2 = null; Program.model.modelGekko.varsBType.TryGetValue(new DNameSimplest(s2 + Globals.lagIndicator + "0"), out ss2);
                         if (ss2 == null)
                         {
                             //TODO: general error handling regarding endo/exo
                             //now we get runtime error
                             new Error("regarding exogenize: variable " + s2 + " does not exist in model");
-                            //throw new GekkoException();
                         }
                         int s2BNumber = ss2.bNumber;
 
                         if (Program.model.modelGekko.m2.endogenous.ContainsKey(s2))
                         {
                             Program.model.modelGekko.m2.endogenous.Remove(s2);
-                            //Program.model.modelGekko.endogenousBNumbers.Remove(s2BNumber);  //DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
                             Program.model.modelGekko.m2.endoSubstitution.Add(s2, s1);
                             Program.model.modelGekko.m2.endoSubstitutionBNumbers.Add(s2BNumber, s1BNumber);
                         }
                         else
                         {
                             new Error("regarding exogenize: variable " + s2 + " is not endogenous");
-                            //throw new GekkoException();
                         }
                     }
                 }
