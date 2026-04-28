@@ -22373,7 +22373,7 @@ namespace UnitTests
                 //library is lost, even if the gcm is called from a function.
                 //So a library gcm has no sense of where it is called from (from which library).
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
-                I("reset;");
+                I("reset; time 2015 2016;"); //Time because of a csv file being printed
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
                 I("library lib7;");
                 I("function string g(); return 'abcde'; end;");
