@@ -7670,7 +7670,6 @@ namespace UnitTests
             I("FOR string %i = a, b, c; END;");
             I("FOR val %v = 0 to 10 by 2; END;");
             I("FOR date %d = 2000 to 2010 by 2; END;");
-
         }
 
         [TestMethod]
@@ -37009,6 +37008,125 @@ print(df2)
             I("%s2 = #x.%s;");
             _AssertScalarString(First(), "%s1", "a");
             _AssertScalarString(First(), "%s2", "b");
+        }
+
+        [TestMethod]
+        public void _Test_Kaedepris2()
+        {            
+            string s1 = @"
+
+reset; mode data;
+function series kaedepris2(series _lbd, series _frg, date _p1, date _p2, date _p3);
+  delete _p_;
+  for date t = %_p1+1 to %_p2;
+    series <%t %t> vakst = 1;
+    if (_lbd[%t] <> 0 AND _frg[%t] <> 0 );
+      series <%t %t> vakst = _lbd/_frg;
+    end;
+    if (_lbd[%t] == 0 AND _frg[%t] <> 0 );
+      series <%t %t> vakst = 0.01;
+    end;
+    if (_lbd[%t] <> 0 AND _frg[%t] == 0 );
+      series <%t %t> vakst = 100;
+    end;
+  end;
+  series <%_p1 %_p1> p_ = 1;
+  series <%_p1+1 %_p2> p_ = p_[-1]*vakst;
+  series _p_ = p_/p_[%_p3] ;
+  return _p_;
+end;
+";
+            string s2 = @"
+time 2001 2005;
+series <2000 2006> c = 555, 102, 103, 104, 105, 106, 555;
+series <2000 2006> d = 666, 101.5, 102.1, 103.7, 104.3, 105.4, 666;
+series <2000 2006> p = 777 rep *;
+series <2000 2006> f = 888 rep *;
+<insert>
+create p = kaedepris2(c, d, 2001, 2005, 2004);
+series f = c/p;
+write kp;
+exit;
+";
+            for (int i1 = 0; i1 < 3; i1++)
+            {
+                for (int i2 = 0; i2 < 3; i2++)
+                {
+                    for (int i3 = 0; i3 < 3; i3++)
+                    {
+                        for (int i4 = 0; i4 < 3; i4++)
+                        {
+                            string ss = null;
+                            if (i1 == 0)
+                            {
+                                ss += "series c[2001] = m();" + G.NL;
+                            }
+                            else if (i1 == 1)
+                            {
+                                ss += "series c[2001] = 0;" + G.NL;
+                            }
+                            else if (i1 == 2)
+                            {
+                                ss += "series c[2001] = 50;" + G.NL;
+                            }
+                            else new Error("Hov");
+                            // ---------------------
+                            if (i2 == 0)
+                            {
+                                ss += "series c[2002] = m();" + G.NL;
+                            }
+                            else if (i2 == 1)
+                            {
+                                ss += "series c[2002] = 0;" + G.NL;
+                            }
+                            else if (i2 == 2)
+                            {
+                                ss += "series c[2002] = 51;" + G.NL;
+                            }
+                            else new Error("Hov");
+                            // -----------------------
+                            if (i3 == 0)
+                            {
+                                ss += "series d[2001] = m();" + G.NL;
+                            }
+                            else if (i3 == 1)
+                            {
+                                ss += "series d[2001] = 0;" + G.NL;
+                            }
+                            else if (i3 == 2)
+                            {
+                                ss += "series d[2001] = 40;" + G.NL;
+                            }
+                            else new Error("Hov");
+                            // ---------------------
+                            if (i4 == 0)
+                            {
+                                ss += "series d[2002] = m();" + G.NL;
+                            }
+                            else if (i4 == 1)
+                            {
+                                ss += "series d[2002] = 0;" + G.NL;
+                            }
+                            else if (i4 == 2)
+                            {
+                                ss += "series d[2002] = 41;" + G.NL;
+                            }
+                            else new Error("Hov");
+                            // -----------------------------                            
+                            string s = "reset;" + G.NL + s1 + G.NL + s2;
+                            s = s.Replace("<insert>", ss);
+                            File.WriteAllText(Globals.ttPath2 + @"\regres\Databanks\kp.gcm", s);
+                            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                            I("SYS 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit\\gekko.exe run kp.gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                            I("read kp.gbk;");
+                            I("prt <2000 2006> c, d, p, f;");
+                            goto Label1;
+                        }
+                    }
+                }
+            }
+        Label1:;
+            
         }
 
         [TestMethod]
