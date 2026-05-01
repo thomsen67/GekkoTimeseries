@@ -23144,61 +23144,121 @@ namespace Gekko
 
                 if (G.Equal(function, "laspchain"))
                 {
-                    //
-                    // Laspeyres chain used to be computed via R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
-                    // giving the quantity. But if one or more micro-quantities are missing in the first year, we
-                    // cannot get the aggregated quantity and thus aggregated pris.
-                    // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.                    
-                    // From the chained prices (efter adjusting for base period), we get quantitites.
-                    // Aggregated prices are then just costs/quantities.
-                    //
-                    double index = 1d;
-                    xx[4, start] = 1d;  //quantity
-                    xx[5, start] = 1d;  //price
-                    for (int i = start; i < obs; i++)
+                    if (Program.options.bugfix_laspchain_fix1)
                     {
-                        double sum = 0d;  //normal values/costs.
-                        double sum1 = 0d; //at lagged prices (d-values)
-                        for (int j = 0; j < n; j++)
+                        //NOTE NOTE NOTE
+                        //NOTE NOTE NOTE
+                        //NOTE NOTE NOTE --> early return from method here!
+                        //NOTE NOTE NOTE
+                        //NOTE NOTE NOTE                        
+                        Series c = new Series(EFreq.A, "c!a");
+                        Series d = new Series(EFreq.A, "d!a");
+                        foreach (GekkoTime t in new GekkoTimeIterator(EFreq.A, tStart, tEnd))
                         {
-                            sum += aX[j, i] * aP[j, i];
-                            if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
-                        }
-                        xx[0, i] = sum;   //total cost                            
-                        if (i > start)
-                        {
-                            xx[1, i] = sum1;  //total cost at previous period prices
-                            double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);
+                            int n5;
+                            if (list1 != null)
+                            {
+                                n5 = tempP.Count;
+                            }
+                            else
+                            {
+                                n5 = list1_data.Count;
+                            }
 
-                            if (opt.zeros1)
+                            c.SetData(t, 0d); //Current prices
+                            d.SetData(t, 0d); //D-prices
+                            for (int i = 0; i < n5; i++)
                             {
-                                if (xx[0, i] == 0d)
+                                double factor = 1d;
+                                SeriesAndBool sb1;
+                                SeriesAndBool sb2;
+                                if (list1 != null)
                                 {
-                                    r = 1d;
+                                    sb1 = tempP[i]; //prices
+                                    sb2 = tempX[i]; //quantities                                       
                                 }
+                                else
+                                {
+                                    sb1 = list1_data[i]; //prices
+                                    sb2 = list2_data[i]; //quantities                                 
+                                }
+                                if (sb2.b) factor = -1d;
+                                c.SetData(t, c.GetDataSimple(t) + factor * sb1.ts.GetDataSimple(t) * sb2.ts.GetDataSimple(t)); //Current prices
+                                d.SetData(t, d.GetDataSimple(t) + factor * sb1.ts.GetDataSimple(t.Add(-1)) * sb2.ts.GetDataSimple(t)); //D-prices
                             }
-                            else if (opt.zeros2)
+                        }
+
+                        Series p5 = ChainLoop(tStart, tEnd, c, d, opt, indexYear);
+                        Series q5 = new Series(EFreq.A, "q!a");
+                        foreach (GekkoTime t in new GekkoTimeIterator(EFreq.A, tStart, tEnd))
+                        {
+                            q5.SetData(t, c.GetDataSimple(t) / p5.GetDataSimple(t));
+                        }
+                        m = new Map();
+                        m.AddIVariable("p!a", p5);
+                        m.AddIVariable("q!a", q5);
+                        return m;
+
+                    }
+                    else
+                    {
+
+                        //
+                        // Laspeyres chain used to be computed via R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
+                        // giving the quantity. But if one or more micro-quantities are missing in the first year, we
+                        // cannot get the aggregated quantity and thus aggregated pris.
+                        // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.                    
+                        // From the chained prices (efter adjusting for base period), we get quantitites.
+                        // Aggregated prices are then just costs/quantities.
+                        //
+                        double index = 1d;
+                        xx[4, start] = 1d;  //quantity
+                        xx[5, start] = 1d;  //price
+                        for (int i = start; i < obs; i++)
+                        {
+                            double sum = 0d;  //normal values/costs.
+                            double sum1 = 0d; //at lagged prices (d-values)
+                            for (int j = 0; j < n; j++)
                             {
-                                if (xx[0, i] == 0d && xx[1, i] == 0d)
-                                {
-                                    r = 1d;
-                                }
+                                sum += aX[j, i] * aP[j, i];
+                                if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
                             }
-                            else if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+                            xx[0, i] = sum;   //total cost                            
+                            if (i > start)
                             {
-                                if (xx[0, i] == 0d && xx[1, i] != 0d)
+                                xx[1, i] = sum1;  //total cost at previous period prices
+                                double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);
+
+                                if (opt.zeros1)
                                 {
-                                    r = 1 / Globals.factorZero;
-                                    G.Warning("w29.2", null);
+                                    if (xx[0, i] == 0d)
+                                    {
+                                        r = 1d;
+                                    }
                                 }
-                                else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                else if (opt.zeros2)
                                 {
-                                    r = Globals.factorZero;
-                                    G.Warning("w29.2", null);
+                                    if (xx[0, i] == 0d && xx[1, i] == 0d)
+                                    {
+                                        r = 1d;
+                                    }
                                 }
+                                else if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+                                {
+                                    if (xx[0, i] == 0d && xx[1, i] != 0d)
+                                    {
+                                        r = 1 / Globals.factorZero;
+                                        G.Warning("w29.2", null);
+                                    }
+                                    else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                    {
+                                        r = Globals.factorZero;
+                                        G.Warning("w29.2", null);
+                                    }
+                                }
+                                index = index * r;
+                                xx[5, i] = index;
                             }
-                            index = index * r;
-                            xx[5, i] = index;
                         }
                     }
                 }
@@ -23367,12 +23427,12 @@ namespace Gekko
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
             if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");            
             Series p = ChainLoop(tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);
-            double indexValue = p.GetDataSimple(indexYear);
+            //double indexValue = p.GetDataSimple(indexYear);
             Series p2 = new Series(EFreq.A, "p2!a");
             Series q2 = new Series(EFreq.A, "q2!a");
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
-                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t) / indexValue));
+                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t)));
                 //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
                 q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
             }
@@ -23406,7 +23466,7 @@ namespace Gekko
                 }
             }
             if (tStart_real.IsNull()) tStart_real = t1;  //then we just get missing values later on
-            Series p = new Series(EFreq.A, "p!a");            
+            Series p = new Series(EFreq.A, "p!a");
             p.SetData(tStart_real.Add(-1), 1d);
             foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, t2))
             {
@@ -23448,6 +23508,11 @@ namespace Gekko
                     else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
                 }
                 p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
+            }
+            double x = p.GetDataSimple(ti);
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
             }
             return p;
         }
