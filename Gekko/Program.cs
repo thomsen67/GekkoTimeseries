@@ -23365,17 +23365,35 @@ namespace Gekko
             // -----                       
 
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
-            if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
+            if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");            
+            Series p = ChainLoop(tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);
+            double indexValue = p.GetDataSimple(indexYear);
+            Series p2 = new Series(EFreq.A, "p2!a");
+            Series q2 = new Series(EFreq.A, "q2!a");
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            {
+                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t) / indexValue));
+                //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
+                q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
+            }
+            Map m = new Map();
+            m.AddIVariable("p!a", p2);
+            m.AddIVariable("q!a", q2);
+            return m;
+        }
+
+        private static Series ChainLoop(GekkoTime t1, GekkoTime t2, Series c, Series d, LaspeyresOptions opt, GekkoTime ti)
+        {
             GekkoTime tStart_real = GekkoTime.tNull;
             //TODO
             //TODO
             //TODO Integrate the two loops so it is only 1 loop to handle all the logic
             //TODO
             //TODO
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                double v1 = value.GetDataSimple(t);
-                double v2 = valueAtLaggedPrices.GetDataSimple(t);
+                double v1 = c.GetDataSimple(t);
+                double v2 = d.GetDataSimple(t);
                 if (G.IsNumericalError(v1) || G.IsNumericalError(v2))
                 {
                     //Do nothing
@@ -23387,16 +23405,15 @@ namespace Gekko
                     break;
                 }
             }
-            if (tStart_real.IsNull()) tStart_real = tStart;  //then we just get missing values later on
-            Series p = new Series(EFreq.A, "p!a");
-            Series q = new Series(EFreq.A, "q!a");
+            if (tStart_real.IsNull()) tStart_real = t1;  //then we just get missing values later on
+            Series p = new Series(EFreq.A, "p!a");            
             p.SetData(tStart_real.Add(-1), 1d);
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, tEnd))
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, t2))
             {
                 //Note: ts1 or ts2 not used in period tStart_real.
                 //But tStart_real+1 contains prices from tStart_real, so implicitly the period is used.
-                double v1 = value.GetDataSimple(t);
-                double v2 = valueAtLaggedPrices.GetDataSimple(t);
+                double v1 = c.GetDataSimple(t);
+                double v2 = d.GetDataSimple(t);
 
                 double r = double.NaN;
                 if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
@@ -23404,7 +23421,7 @@ namespace Gekko
                     //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
                     //For v2 == 0d, this fix is a good thing.
                     //What happens for v2 == double.NaN ??
-                    r = 1d; 
+                    r = 1d;
                 }
                 else
                 {
@@ -23432,19 +23449,7 @@ namespace Gekko
                 }
                 p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
             }
-            double indexValue = p.GetDataSimple(indexYear);
-            Series p2 = new Series(EFreq.A, "p2!a");
-            Series q2 = new Series(EFreq.A, "q2!a");
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t) / indexValue));
-                //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
-                q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
-            }
-            Map m = new Map();
-            m.AddIVariable(p.GetName(), p2);
-            m.AddIVariable(q.GetName(), q2);
-            return m;
+            return p;
         }
 
         /// <summary>
