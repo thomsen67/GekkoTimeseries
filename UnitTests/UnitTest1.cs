@@ -35816,7 +35816,7 @@ print(df2)
         [TestMethod]
         public void _Test_PriceIndexFunctions()
         {
-            if (false)
+            if (true)
             {
                 //kaedepris2() emulator. At some point this unit test can be killed off (starts up Gekko 2 GUIs)
 
@@ -35950,10 +35950,11 @@ exit;
                                     double xd = d.GetDataSimple(t); double x_d = _d.GetDataSimple(t);
                                     double xp = p.GetDataSimple(t); double x_p = _p.GetDataSimple(t);
                                     double xf = f.GetDataSimple(t); double x_f = _f.GetDataSimple(t);
-                                    Assert.AreEqual(xc, x_c, sharedDelta);
-                                    Assert.AreEqual(xd, x_d, sharedDelta);
-                                    Assert.AreEqual(xp, x_p, sharedDelta);
-                                    Assert.AreEqual(xf, x_f, sharedDelta);
+                                    _AssertHelperTwoDoubles(xc, x_c, sharedDelta);
+                                    _AssertHelperTwoDoubles(xd, x_d, sharedDelta);
+                                    _AssertHelperTwoDoubles(xp, x_p, sharedDelta);
+                                    _AssertHelperTwoDoubles(xf, x_f, sharedDelta);
+
                                 }
                             }
                         }
@@ -36591,6 +36592,14 @@ exit;
                     double v2 = aq_b.GetDataSimple(new GekkoTime(EFreq.A, i, 1));
                     Assert.IsTrue(G.Equals(v1, v2));
                 }
+            }
+        }
+
+        private static void NaNComparer(double xc, double x_c)
+        {
+            if (G.IsNumericalError(xc) || G.IsNumericalError(x_c))
+            {
+
             }
         }
 

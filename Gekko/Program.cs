@@ -23444,75 +23444,124 @@ namespace Gekko
 
         private static Series ChainLoop(GekkoTime t1, GekkoTime t2, Series c, Series d, LaspeyresOptions opt, GekkoTime ti)
         {
-            GekkoTime tStart_real = GekkoTime.tNull;
-            //TODO
-            //TODO
-            //TODO Integrate the two loops so it is only 1 loop to handle all the logic
-            //TODO
-            //TODO
-            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-            {
-                double v1 = c.GetDataSimple(t);
-                double v2 = d.GetDataSimple(t);
-                if (G.IsNumericalError(v1) || G.IsNumericalError(v2))
-                {
-                    //Do nothing
-                }
-                else
-                {
-                    //if both are non-missing
-                    tStart_real = t;
-                    break;
-                }
-            }
-            if (tStart_real.IsNull()) tStart_real = t1;  //then we just get missing values later on
             Series p = new Series(EFreq.A, "p!a");
-            p.SetData(tStart_real.Add(-1), 1d);
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, t2))
+            if (G.Equal(Program.options.bugfix_laspchain_emulate, "kaedepris2"))
             {
-                //Note: ts1 or ts2 not used in period tStart_real.
-                //But tStart_real+1 contains prices from tStart_real, so implicitly the period is used.
-                double v1 = c.GetDataSimple(t);
-                double v2 = d.GetDataSimple(t);
+                //First obs or pchain will have value 1.
+                //For second obs and on, r is multiplied on pchain[-1]
+                //                              v2
+                //                       ==0          <>0
+                //                  +--------------------------+
+                //      v1     ==0  |     1           0.01     |
+                //             <>0  |   100           v1/v2    |
+                //                  +--------------------------+
+                //
+                //Missings will become missings in r.
+                //At the end pchain is adjusted with ti.
+                //
+                p.SetData(t1, 1d);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1.Add(1), t2))
+                {
+                    double v1 = c.GetDataSimple(t);
+                    double v2 = d.GetDataSimple(t);
+                    double r = double.NaN;
 
-                double r = double.NaN;
-                if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
-                {
-                    //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
-                    //For v2 == 0d, this fix is a good thing.
-                    //What happens for v2 == double.NaN ??
-                    r = 1d;
-                }
-                else
-                {
-                    r = G.HandleNumericalError(v1 / v2);
-                }
-
-                if (opt.zeros1)
-                {
-                    if (v1 == 0d)
+                    if (v1 == 0d && v2 != 0d)
+                    {
+                        r = 1d / Globals.factorZero;
+                    }
+                    else if (v1 != 0d && v2 == 0d)
+                    {
+                        r = Globals.factorZero;
+                    }
+                    else if (v1 == 0d && v2 == 0d)
                     {
                         r = 1d;
                     }
-                }
-                else if (opt.zeros2)
-                {
-                    if (v1 == 0d && v2 == 0d)
+                    else
                     {
-                        r = 1d;
+                        r = G.HandleNumericalError(v1 / v2);
                     }
+                    p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);
                 }
-                else if (Globals.handleZero)
+                double x = p.GetDataSimple(ti);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                 {
-                    if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
-                    else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
+                    p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
                 }
-                p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
             }
-            double x = p.GetDataSimple(ti);
-            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            else
             {
-                p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
+
+                GekkoTime tStart_real = GekkoTime.tNull;
+                //TODO
+                //TODO
+                //TODO Integrate the two loops so it is only 1 loop to handle all the logic
+                //TODO
+                //TODO
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    double v1 = c.GetDataSimple(t);
+                    double v2 = d.GetDataSimple(t);
+                    if (G.IsNumericalError(v1) || G.IsNumericalError(v2))
+                    {
+                        //Do nothing
+                    }
+                    else
+                    {
+                        //if both are non-missing
+                        tStart_real = t;
+                        break;
+                    }
+                }
+                if (tStart_real.IsNull()) tStart_real = t1;  //then we just get missing values later on                
+                p.SetData(tStart_real.Add(-1), 1d);
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, t2))
+                {
+                    //Note: ts1 or ts2 not used in period tStart_real.
+                    //But tStart_real+1 contains prices from tStart_real, so implicitly the period is used.
+                    double v1 = c.GetDataSimple(t);
+                    double v2 = d.GetDataSimple(t);
+
+                    double r = double.NaN;
+                    if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
+                    {
+                        //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
+                        //For v2 == 0d, this fix is a good thing.
+                        //What happens for v2 == double.NaN ??
+                        r = 1d;
+                    }
+                    else
+                    {
+                        r = G.HandleNumericalError(v1 / v2);
+                    }
+
+                    if (opt.zeros1)
+                    {
+                        if (v1 == 0d)
+                        {
+                            r = 1d;
+                        }
+                    }
+                    else if (opt.zeros2)
+                    {
+                        if (v1 == 0d && v2 == 0d)
+                        {
+                            r = 1d;
+                        }
+                    }
+                    else if (Globals.handleZero)
+                    {
+                        if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
+                        else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
+                    }
+                    p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
+                }
+                double x = p.GetDataSimple(ti);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
+                }
             }
             return p;
         }
