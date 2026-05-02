@@ -35816,7 +35816,7 @@ print(df2)
         [TestMethod]
         public void _Test_PriceIndexFunctions()
         {
-            if (true)
+            if (false)
             {
                 //kaedepris2() emulator. At some point this unit test can be killed off (starts up Gekko 2 GUIs)
 

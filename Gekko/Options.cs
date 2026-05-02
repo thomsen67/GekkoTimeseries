@@ -59,7 +59,8 @@ namespace Gekko
         public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.
         public bool bugfix_series_chain = false; //not mentioned in help, fixes problem with a D-price value being == 0 in the first period.
         public string bugfix_laspchain_emulate = "none"; //none|kaedepris2
-        public bool bugfix_laspchain_fix1 = true;        
+        public bool bugfix_laspchain_fix1 = true; //Using ChainLoop() for both variants of laspchain().
+        public bool bugfix_laspchain_fix2 = false; //Backwards and forwards loop
 
         // ---
         //method options could look like the 2 following:
@@ -413,6 +414,7 @@ namespace Gekko
             Add("BUGFIX SUBSERIES STAMP", Globals.xbool);
             Add("BUGFIX SERIES CHAIN", Globals.xbool);            
             Add("BUGFIX LASPCHAIN FIX1", Globals.xbool);
+            Add("BUGFIX LASPCHAIN FIX2", Globals.xbool);
             Add("BUGFIX LASPCHAIN EMULATE", Globals.xnameOrString, "none", "kaedepris2");
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
