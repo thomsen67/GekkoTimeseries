@@ -23188,12 +23188,11 @@ namespace Gekko
                             }
                         }
 
-                        Series p5 = ChainLoop(tStart, tEnd, c, d, opt, indexYear);
-                        Series q5 = new Series(EFreq.A, "q!a");
-                        foreach (GekkoTime t in new GekkoTimeIterator(EFreq.A, tStart, tEnd))
-                        {
-                            q5.SetData(t, c.GetDataSimple(t) / p5.GetDataSimple(t));
-                        }
+                        Series p5, q5; ChainLoop(out p5, out q5, tStart, tEnd, c, d, opt, indexYear);                        
+                        //foreach (GekkoTime t in new GekkoTimeIterator(EFreq.A, tStart, tEnd))
+                        //{
+                        //    q5.SetData(t, c.GetDataSimple(t) / p5.GetDataSimple(t));
+                        //}
                         m = new Map();
                         m.AddIVariable("p!a", p5);
                         m.AddIVariable("q!a", q5);
@@ -23425,26 +23424,27 @@ namespace Gekko
             // -----                       
 
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
-            if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");            
-            Series p = ChainLoop(tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);
+            if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
+            Series p2, q2; ChainLoop(out p2, out q2, tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);
             //double indexValue = p.GetDataSimple(indexYear);
-            Series p2 = new Series(EFreq.A, "p2!a");
-            Series q2 = new Series(EFreq.A, "q2!a");
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t)));
-                //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
-                q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
-            }
+            //Series p2 = new Series(EFreq.A, "p2!a");
+            //Series q2 = new Series(EFreq.A, "q2!a");
+            //foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            //{
+            //    p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t)));
+            //    //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
+            //    q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
+            //}
             Map m = new Map();
             m.AddIVariable("p!a", p2);
             m.AddIVariable("q!a", q2);
             return m;
         }
 
-        private static Series ChainLoop(GekkoTime t1, GekkoTime t2, Series c, Series d, LaspeyresOptions opt, GekkoTime ti)
+        private static void ChainLoop(out Series p, out Series q, GekkoTime t1, GekkoTime t2, Series c, Series d, LaspeyresOptions opt, GekkoTime ti)
         {
-            Series p = new Series(EFreq.A, "p!a");
+            p = new Series(EFreq.A, "p!a"); //Could be light series...
+            q = new Series(EFreq.A, "q!a"); //Could be light series...
             if (G.Equal(Program.options.bugfix_laspchain_emulate, "kaedepris2"))
             {
                 //At some point, perhaps in 2027, this option can be removed.
@@ -23496,16 +23496,32 @@ namespace Gekko
                 if (Program.options.bugfix_laspchain_fix2)
                 {
                     //New way, backwards and forwards
+                    //                    
+                    //rp = (p1 q1 + p2 q2)/ (p1.1 q1 + p2.1 q2)             = c/d
+                    //rq = (p1.1 q1 + p2.1 q2)/(p1.1 q1.1 + p2.1 q2.1)      = d/c.1   (may produce something even if current prices are missing. This scenario is probably rare, though)
+                    //rc = rp rq = (p1 q1 + p2 q2)/ (p1.1 q1.1 + p2.1 q2.1) = c/c.1                    
+                    //
+                    //p = p.1 * rp  -->  p.1 = p / rp
+                    //q = q.1 * rq  -->  q.1 = q / rq
+                    //
+                    // ------------------------
                     p.SetData(ti, 1d);
+                    q.SetData(ti, c.GetDataSimple(ti));
                     foreach (GekkoTime t in new GekkoTimeIteratorBackwards(ti.Add(-1), t1))
                     {                        
-                        double r = ChainLoopR(c.GetDataSimple(t), d.GetDataSimple(t), opt);
-                        p.SetData(t, p.GetDataSimple(t.Add(+1)) / r);
+                        //First backwards
+                        double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t), d.GetDataSimple(t), c.GetDataSimple(t.Add(-1)), opt);
+                        p.SetData(t, p.GetDataSimple(t.Add(+1)) / rp);
+                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(+1)) / rq); //May sometimes produce something
+                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
                     }
                     foreach (GekkoTime t in new GekkoTimeIterator(ti.Add(1), t2))                    
                     {
-                        double r = ChainLoopR(c.GetDataSimple(t), d.GetDataSimple(t), opt);
-                        p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);
+                        //Then forwards
+                        double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t), d.GetDataSimple(t), c.GetDataSimple(t.Add(-1)), opt);
+                        p.SetData(t, p.GetDataSimple(t.Add(-1)) * rp);
+                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(-1)) * rq); //May sometimes produce something
+                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
                     }
                 }
                 else
@@ -23581,35 +23597,32 @@ namespace Gekko
                     {
                         p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
                     }
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+                        q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
+                    }
                 }
             }
-            return p;
         }
 
-        private static double ChainLoopR(double v1, double v2, LaspeyresOptions opt)
-        {
-            double r = G.HandleNumericalError(v1 / v2);
+        private static void ChainLoopR(out double rp, out double rq, double c, double d, double cLag, LaspeyresOptions opt)
+        {            
+            rp = G.HandleNumericalError(c / d);
+            rq = G.HandleNumericalError(d / cLag);
             if (opt.zeros1)
             {
-                if (v1 == 0d)
+                if (c == 0d)
                 {
-                    r = 1d;
+                    rp = 1d; rq = double.NaN; //rq: signals to compute q from costs and price
                 }
             }
             else if (opt.zeros2)
             {
-                if (v1 == 0d && v2 == 0d)
+                if (c == 0d && d == 0d)
                 {
-                    r = 1d;
+                    rp = 1d;  rq = double.NaN; //rq: signals to compute q from costs and price
                 }
             }
-            else if (Globals.handleZero)
-            {
-                if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
-                else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
-            }
-
-            return r;
         }
 
         /// <summary>

@@ -36179,16 +36179,9 @@ exit;
             I("SERIES <1998 2002> pib = data(' 0.947841  0.979390  1.000000  1.041533  1.064828');");
             I("SERIES <1998 2002> fIb = data(' 122568.000000  119988.000000  128727.000000  125635.000000  121152.000000');");
             I("list #p= pibp, pibo, pibh;");
-            I("list #x=fIbp, fIbo, work:fIbh;");
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#p, #x, 2000);");
-            //TODO TODO TODO
-            //TODO TODO TODO
-            //TODO TODO TODO  think about how to indicate time in tuples
-            //TODO TODO TODO
-            //TODO TODO TODO
+            I("list #x=fIbp, fIbo, work:fIbh;");            
             I("OPEN<edit>temp;");
-            I("TIME 98 2002;");
-            //I("(SERIES xx_p, SERIES xx_x) = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
+            I("TIME 98 2002;");            
             I("MAP #m = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
             I("xx_p = #m.p;");
             I("xx_x = #m.q;");
@@ -36198,6 +36191,7 @@ exit;
             I("CREATE dif_p, dif_x;");
             I("SERIES dif_p = pib/xx_p;");
             I("SERIES dif_x = fib/xx_x;");
+            I("prt <97 2003> pib, xx_p, fib, xx_x;");
             for (int i = 1998; i <= 2002; i++)
             {
                 u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
