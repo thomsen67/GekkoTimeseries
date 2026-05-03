@@ -23421,16 +23421,7 @@ namespace Gekko
 
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
             if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
-            Series p2, q2; ChainLoop(out p2, out q2, tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);
-            //double indexValue = p.GetDataSimple(indexYear);
-            //Series p2 = new Series(EFreq.A, "p2!a");
-            //Series q2 = new Series(EFreq.A, "q2!a");
-            //foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            //{
-            //    p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t)));
-            //    //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
-            //    q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
-            //}
+            Series p2, q2; ChainLoop(out p2, out q2, tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);            
             Map m = new Map();
             m.AddIVariable("p!a", p2);
             m.AddIVariable("q!a", q2);

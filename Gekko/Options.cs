@@ -56,11 +56,10 @@ namespace Gekko
         public bool bugfix_score_even_with_res_vars = false;
         public bool bugfix_decomp_lagsleads = false;
         public bool bugfix_dates_fast = true;  //not mentioned in help, set false to use old date parser (on "2020", "2020q01", "2020m1d1", "2020u09" etc. etc.
-        public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.
-        //public bool bugfix_series_chain = false; //not mentioned in help, fixes problem with a D-price value being == 0 in the first period.
-        public string bugfix_laspchain_emulate = "none"; //none|kaedepris2
-        public bool bugfix_laspchain_fix1 = true; //Using ChainLoop() for both variants of laspchain().
-        public bool bugfix_laspchain_fix2 = true; //Backwards and forwards loop
+        public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.        
+        public string bugfix_laspchain_emulate = "none"; //none|kaedepris2. Works for both laspchain variants and will do a special version of ChainLoop(), where the kaedepris() function is emulated. 
+        public bool bugfix_laspchain_fix1 = true; //Should always be true, only if something unexpected hapens. Using ChainLoop() for both variants of laspchain().
+        public bool bugfix_laspchain_fix2 = true; //Should always be true, only if something unexpected hapens. Backwards and forwards loop
 
         // ---
         //method options could look like the 2 following:
