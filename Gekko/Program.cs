@@ -23188,11 +23188,7 @@ namespace Gekko
                             }
                         }
 
-                        Series p5, q5; ChainLoop(out p5, out q5, tStart, tEnd, c, d, opt, indexYear);                        
-                        //foreach (GekkoTime t in new GekkoTimeIterator(EFreq.A, tStart, tEnd))
-                        //{
-                        //    q5.SetData(t, c.GetDataSimple(t) / p5.GetDataSimple(t));
-                        //}
+                        Series p5, q5; ChainLoop(out p5, out q5, tStart, tEnd, c, d, opt, indexYear);                                                
                         m = new Map();
                         m.AddIVariable("p!a", p5);
                         m.AddIVariable("q!a", q5);
@@ -23512,16 +23508,16 @@ namespace Gekko
                         //First backwards
                         double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t.Add(1)), d.GetDataSimple(t.Add(1)), c.GetDataSimple(t), opt);
                         p.SetData(t, p.GetDataSimple(t.Add(+1)) / rp);
-                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(+1)) / rq); //May sometimes produce something
-                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
+                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(+1)) / rq); //May sometimes produce something for q
+                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t)); //Safest to do like this when possible
                     }
                     foreach (GekkoTime t in new GekkoTimeIterator(ti.Add(1), t2))                    
                     {
                         //Then forwards
                         double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t), d.GetDataSimple(t), c.GetDataSimple(t.Add(-1)), opt);
                         p.SetData(t, p.GetDataSimple(t.Add(-1)) * rp);
-                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(-1)) * rq); //May sometimes produce something
-                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
+                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(-1)) * rq); //May sometimes produce something for q
+                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t)); //Safest to do like this when possible
                     }
                 }
                 else
@@ -23559,17 +23555,17 @@ namespace Gekko
                         double v2 = d.GetDataSimple(t);
 
                         double r = double.NaN;
-                        if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
-                        {
-                            //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
-                            //For v2 == 0d, this fix is a good thing.
-                            //What happens for v2 == double.NaN ??
-                            r = 1d;
-                        }
-                        else
-                        {
+                        //if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
+                        //{
+                        //    //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
+                        //    //For v2 == 0d, this fix is a good thing.
+                        //    //What happens for v2 == double.NaN ??
+                        //    r = 1d;
+                        //}
+                        //else
+                        //{
                             r = G.HandleNumericalError(v1 / v2);
-                        }
+                        //}
 
                         if (opt.zeros1)
                         {

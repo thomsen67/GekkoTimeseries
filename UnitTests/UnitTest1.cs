@@ -36453,7 +36453,7 @@ exit;
             I("time 2018 2022;");
             I("x = 10, 12, 11, 15, 4;");
             I("d = 0, 13, 10, 14, 7;");
-            I("option bugfix series chain = yes;");
+            //I("option bugfix series chain = yes;");
             I("q = laspchain(x, d, 2020).q;");
             I("p = laspchain(x, d, 2020).p;");
             _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
@@ -36503,6 +36503,88 @@ exit;
             _AssertSeries(First(), "q!a", 2021, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
+
+            // ======= Here we are testing missing values in C and D (d-prices)
+            //         Is handled by the new ChainLoop() logic
+            //         These 5 variants have been checked manually, to see where missings appear.
+            //         Note: even if d[2001] is missing, 
+            for (int i = 0; i < 5; i++)
+            {
+                I("reset;");                
+                I("c <2001 2003> = 10, 20, 30;");
+                I("d <2001 2003> = 8, 17, 26;");
+                if (i == 1) I("c[2001] = m();");
+                else if (i == 2) I("d[2001] = m();");
+                else if (i == 3) I("c[2003] = m();");
+                else if (i == 4) I("d[2003] = m();");
+                I("p <2000 2004> = laspchain(c, d, 2002).p;");
+                I("q <2000 2004> = laspchain(c, d, 2002).q;");                
+                if (i == 0)
+                {
+                    _AssertSeries(First(), "p!a", 2000, 0.68000d, sharedTableDelta); //Because d contains prices from 2000!
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, 1.15385d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);                    
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta); //The year after index year has q = c !
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 1) //c[2001] = m()
+                {                 
+                    _AssertSeries(First(), "p!a", 2000, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, 1.15385d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 2) //d[2001] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, 1.15385d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 3) //c[2003] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, 0.68000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, double.NaN , sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta); //Can actually be calculated, because q in laspeyres quantity is d/c.1, so current c is not used at all for q.
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 4) //d[2003] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, 0.68000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+            }
 
             //
             // Symmetry regarding lists vs. series
