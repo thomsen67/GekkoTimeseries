@@ -36227,8 +36227,7 @@ exit;
             I("SERIES <1998 2002> fE =  data('478868.906250  534380.875000  602351.125000  621238.312500  646970.000000 ') ;");
             I("SERIES <1998 2002> py =  data('0.954835  0.970887  1.000000  1.024961  1.048567 ') ;");
             I("SERIES <1998 2002> fY =  data('1218658.000000  1249862.000000  1293965.000000  1303086.000000  1309156.000000 ') ;");
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#pris, #mgd, 2000);");
-
+            
             I("TIME 98 2002;");
 
             I("MAP #m = laspchain(#pris, #mgd, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.

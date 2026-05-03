@@ -60,7 +60,7 @@ namespace Gekko
         public bool bugfix_series_chain = false; //not mentioned in help, fixes problem with a D-price value being == 0 in the first period.
         public string bugfix_laspchain_emulate = "none"; //none|kaedepris2
         public bool bugfix_laspchain_fix1 = true; //Using ChainLoop() for both variants of laspchain().
-        public bool bugfix_laspchain_fix2 = false; //Backwards and forwards loop
+        public bool bugfix_laspchain_fix2 = true; //Backwards and forwards loop
 
         // ---
         //method options could look like the 2 following:

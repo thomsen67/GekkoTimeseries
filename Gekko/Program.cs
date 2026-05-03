@@ -23510,7 +23510,7 @@ namespace Gekko
                     foreach (GekkoTime t in new GekkoTimeIteratorBackwards(ti.Add(-1), t1))
                     {                        
                         //First backwards
-                        double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t), d.GetDataSimple(t), c.GetDataSimple(t.Add(-1)), opt);
+                        double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t.Add(1)), d.GetDataSimple(t.Add(1)), c.GetDataSimple(t), opt);
                         p.SetData(t, p.GetDataSimple(t.Add(+1)) / rp);
                         if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(+1)) / rq); //May sometimes produce something
                         else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
