@@ -23446,6 +23446,7 @@ namespace Gekko
                 //
                 //Missings will become missings in r.
                 //At the end pchain is adjusted with ti.
+                //Note: v1 corresponds to c, v2 to d.
                 //
                 p.SetData(t1, 1d);
                 foreach (GekkoTime t in new GekkoTimeIterator(t1.Add(1), t2))
@@ -23595,7 +23596,7 @@ namespace Gekko
         private static void ChainLoopR(out double rp, out double rq, double c, double d, double cLag, LaspeyresOptions opt)
         {            
             rp = G.HandleNumericalError(c / d);
-            rq = G.HandleNumericalError(d / cLag);
+            rq = G.HandleNumericalError(d / cLag); //only used if rp is missing value. If not, we later on get q from c and p.
             if (opt.zeros1)
             {
                 if (c == 0d)
@@ -23607,7 +23608,41 @@ namespace Gekko
             {
                 if (c == 0d && d == 0d)
                 {
-                    rp = 1d;  rq = double.NaN; //rq: signals to compute q from costs and price
+                    rp = 1d; rq = double.NaN; //rq: signals to compute q from costs and price
+                }
+            }
+            else if (!G.Equal(Program.options.series_laspchain_type, "none"))
+            {
+                //Here, we can have some pre-cooked types
+            }
+            else if (!G.IsNumericalError(Program.options.series_laspchain_zeros_a) || !G.IsNumericalError(Program.options.series_laspchain_zeros_b) || !G.IsNumericalError(Program.options.series_laspchain_zeros_c))
+            {
+                //For second obs and on, r is multiplied on pchain[-1]
+                //                              d
+                //                       ==0          <>0
+                //                  +--------------------------+
+                //      c      ==0  |   zerosa      zerosb     |  For instance: zerosa = 1, zerosb = 0.01, zerosc= 100
+                //             <>0  |   zerosc                 |  corresponding to old kaedepris2()
+                //                  +--------------------------+
+                //
+                if (G.IsNumericalError(c) || G.IsNumericalError(d))
+                {
+                    //Do nothing, this is only about zeroes
+                }
+                else
+                {
+                    if (!G.IsNumericalError(Program.options.series_laspchain_zeros_a) && c == 0d && d == 0d)
+                    {
+                        rp = Program.options.series_laspchain_zeros_a; rq = double.NaN; //rq: signals to compute q from costs and price
+                    }
+                    else if (!G.IsNumericalError(Program.options.series_laspchain_zeros_b) && c == 0d && d != 0d)
+                    {
+                        rp = Program.options.series_laspchain_zeros_b; rq = double.NaN; //rq: signals to compute q from costs and price
+                    }
+                    else if (!G.IsNumericalError(Program.options.series_laspchain_zeros_c) && c != 0d && d == 0d)
+                    {
+                        rp = Program.options.series_laspchain_zeros_c; rq = double.NaN; //rq: signals to compute q from costs and price
+                    }
                 }
             }
         }

@@ -238,6 +238,10 @@ namespace Gekko
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
+        public string series_laspchain_type = "none";
+        public double series_laspchain_zeros_a = double.NaN;
+        public double series_laspchain_zeros_b = double.NaN;
+        public double series_laspchain_zeros_c = double.NaN;
         //
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
         public ESeriesMissing series_array_table_missing = ESeriesMissing.Error;          //not used at the moment
@@ -584,7 +588,12 @@ namespace Gekko
             Add("SERIES DYN", Globals.xbool);
             Add("SERIES DYN CHECK", Globals.xbool);
             Add("SERIES FAILSAFE", Globals.xbool);
-            
+
+            Add("SERIES LASPCHAIN TYPE", Globals.xnameOrString, "none");
+            Add("SERIES LASPCHAIN ZEROS A", Globals.xval);
+            Add("SERIES LASPCHAIN ZEROS B", Globals.xval);
+            Add("SERIES LASPCHAIN ZEROS C", Globals.xval);
+
             Add("SERIES NORMAL TABLE MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
             Add("SERIES ARRAY PRINT MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
             Add("SERIES ARRAY CALC MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO");              //#ljfdssdfgsh
