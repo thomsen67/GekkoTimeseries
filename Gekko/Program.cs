@@ -12108,7 +12108,7 @@ namespace Gekko
         /// <param name="varnameWithFreq"></param>
         public static void AddToPrecedents(Databank db, DName s)
         {
-            DNameNoTimeOrLag two = new DNameNoTimeOrLag(db.name + "." + s.GetName(), EFreq.None, s.GetIndexesExceptTime().Select(x => (StringOrTime)x).ToArray()); //s has no time anyway
+            DNameNoTimeOrLag two = new DNameNoTimeOrLag(db.name + ":" + s.GetName(), s.GetFreq(), s.GetIndexesExceptTime().Select(x => (StringOrTime)x).ToArray()); //s has no time anyway
             if (!Globals.precedentsContainer.ContainsKey(two))
             {
                 Globals.precedentsContainer.Add(two, 0);                

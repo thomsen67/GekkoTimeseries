@@ -180,9 +180,12 @@ namespace Gekko
                 foreach (string s2 in this.mmi.storage) list.Add(s2);
                 string s = null;
                 if (this.mmi.parent != null) s = this.mmi.parent.name;
-                return new DNameNoTimeOrLag(s, EFreq.None, list.ToArray());
+                return new DNameNoTimeOrLag(G.Chop_GetName(s), this.mmi.parent.freq, list.ToArray());
             }
-            else return new DNameNoTimeOrLag(this.name, EFreq.None, Array.Empty<StringOrTime>());
+            else
+            {                
+                return new DNameNoTimeOrLag(G.Chop_GetName(this.name), this.freq, Array.Empty<StringOrTime>());
+            }
         }
 
         /// <summary>

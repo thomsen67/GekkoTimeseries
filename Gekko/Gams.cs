@@ -3467,6 +3467,10 @@ namespace Gekko
             {
                 new Error("No GAMS equations found");
             }
+            if (variable.HasTime() && variable.GetTime().freq == EFreq.Lag && variable.GetTime().super == 0)
+            {
+                variable = variable.RemoveTime(); // new  new DNameNoTimeOrLag(variable.GetName(), variable.GetTime().freq, variable.GetIndexesExceptTime());
+            }
             List<ModelGamsEquation> eqs = null; model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;
         }

@@ -1221,8 +1221,9 @@ namespace Gekko
             }
             else
             {
-                new Error("Old decomp not supported anymore");
+                //new Error("Old decomp not supported anymore");
                 //decompOutput = Decomp_OLD.DecompPivotToTable_OLD(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
+                decompOutput = Decomp.DecompPivotToTable(smpl, per1, per2, decompDataMAINClone, decompDatas, lhsString, decompOptions2.decompOperator, operatorOneOf3Types, decompOptions2, model);
             }
 
             if (false)
@@ -1417,9 +1418,8 @@ namespace Gekko
             //GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Dictionary<DName, int> endo = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
             foreach (DName s in decompOptions2.link[0].endo)
-            {
-                //string s2 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
-                DNameLag s2 = s.AddLag(0);
+            {                           
+                DName s2 = new DName(DecompFirst() + ":" + s.GetName(), per1.freq, s.GetIndexesExceptTime(), -1).AddLag(0); //a bit hacky that per1 freq is added here, to get it in...                
                 if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
             }
 
@@ -1605,10 +1605,12 @@ namespace Gekko
 
                     //string s3 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
 
-                    Series ts = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types)[s];
+                    DName s3 = new DName(DecompFirst() + ":" + s.GetName(), per1.freq, s.GetIndexesExceptTime(), -1).AddLag(0); //a bit hacky that per1 freq is added here, to get it in...                
+
+                    Series ts = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types)[s3];
                     ts.SetData(t, 1d);
 
-                    int i = endo[s];  //row
+                    int i = endo[s3];  //row
                     for (int j = 0; j < effect.GetLength(1); j++)
                     {
                         //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
@@ -3018,7 +3020,7 @@ namespace Gekko
                         iVar++;
 
                         Series xRef_series = null;
-                        IVariable dpx = O.GetIVariableFromString(dp.s.RemoveTime().ToString(), O.ECreatePossibilities.NoneReportError);
+                        IVariable dpx = O.GetIVariableFromString(dp.s.ToString(), O.ECreatePossibilities.NoneReportError);
 
                         if (dpx.Type() == EVariableType.Series)
                         {
