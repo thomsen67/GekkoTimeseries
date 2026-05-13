@@ -5721,84 +5721,42 @@ namespace Gekko
             //As a benefit we get to tell number of dublets.
 
             string hash = null;
-
-            if (false)
+            using (MD5 md5Instance = MD5.Create())
             {
-                //Old way, same result as new way if salt == null
-                using (MD5 md5Instance = MD5.Create())
+                using (FileStream stream = File.OpenRead(fileNameWithPath))
                 {
-                    using (FileStream stream = File.OpenRead(fileNameWithPath))
+
+                    string salt = extraSalt;
+                    if (salt == null) salt = "";
+                    byte[] saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
+                    byte[] buffer = new byte[4096]; // Read file in 4KB chunks
+                    int bytesRead;
+
+                    // 1. Feed the Salt into the hash
+                    md5Instance.TransformBlock(saltBytes, 0, saltBytes.Length, null, 0);
+
+                    // 2. Feed the File into the hash in chunks
+                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        byte[] hash2 = md5Instance.ComputeHash(stream);
-                        hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                        md5Instance.TransformBlock(buffer, 0, bytesRead, null, 0);
                     }
+
+                    // 3. Finalize the hash (must call TransformFinalBlock with an empty array or the last chunk)
+                    md5Instance.TransformFinalBlock(new byte[0], 0, 0);
+
+                    // 4. Get the resulting hash
+                    byte[] hash2 = md5Instance.Hash;
+
+                    // Your custom Base64 formatting
+                    hash = System.Convert.ToBase64String(hash2)
+                                 .Replace("=", "")
+                                 .Replace("+", "a")
+                                 .Replace("/", "b");
                 }
             }
-            else
-            {
-                using (MD5 md5Instance = MD5.Create())
-                {
-                    using (FileStream stream = File.OpenRead(fileNameWithPath))
-                    {
-
-                        string salt = extraSalt;
-                        if (salt == null) salt = "";
-                        byte[] saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
-                        byte[] buffer = new byte[4096]; // Read file in 4KB chunks
-                        int bytesRead;
-
-                        // 1. Feed the Salt into the hash
-                        md5Instance.TransformBlock(saltBytes, 0, saltBytes.Length, null, 0);
-
-                        // 2. Feed the File into the hash in chunks
-                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            md5Instance.TransformBlock(buffer, 0, bytesRead, null, 0);
-                        }
-
-                        // 3. Finalize the hash (must call TransformFinalBlock with an empty array or the last chunk)
-                        md5Instance.TransformFinalBlock(new byte[0], 0, 0);
-
-                        // 4. Get the resulting hash
-                        byte[] hash2 = md5Instance.Hash;
-
-                        // Your custom Base64 formatting
-                        hash = System.Convert.ToBase64String(hash2)
-                                     .Replace("=", "")
-                                     .Replace("+", "a")
-                                     .Replace("/", "b");
-                    }
-                }
-            }
-
             return hash;
         }
-
-        /// <summary>
-        /// Checks if a file is blocked by the filesystem/Windows. This method may exist somewhere else, something
-        /// like it was possibly being used in Gekko 2.x.
-        /// </summary>
-        /// <param name="FileName"></param>
-        /// <returns></returns>
-        public static bool IsBlocked(string FileName) 
-        {            
-            bool isBlocked = false;
-            if (System.IO.File.Exists(FileName))
-            {
-                try
-                {
-                    using (Stream stream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                    {
-                    }
-                }
-                catch (Exception ex)
-                {
-                    isBlocked = true;
-                }
-            }
-            return isBlocked;
-        }
-
+        
         /// <summary>
         /// /// Gets a MD5 hash from text. Seems to be the fastest reasonable hash available (faster than SHA). Not parallel though. See G.GetMd5FromFile().
         /// </summary>
@@ -5821,6 +5779,50 @@ namespace Gekko
             return hash;
         }
 
+        public static string GetSha256FromFile(string filePath)
+        {
+            using (var stream = File.OpenRead(filePath))
+            {
+                using (var sha256 = SHA256.Create())
+                {
+                    byte[] hashBytes = sha256.ComputeHash(stream);
+                    // Convert bytes to a hex string
+                    StringBuilder sb = new StringBuilder();
+                    foreach (byte b in hashBytes)
+                    {
+                        sb.Append(b.ToString("x2"));
+                    }
+                    return sb.ToString();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if a file is blocked by the filesystem/Windows. This method may exist somewhere else, something
+        /// like it was possibly being used in Gekko 2.x.
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <returns></returns>
+        public static bool IsBlocked(string FileName)
+        {
+            bool isBlocked = false;
+            if (System.IO.File.Exists(FileName))
+            {
+                try
+                {
+                    using (Stream stream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    {
+                    }
+                }
+                catch (Exception ex)
+                {
+                    isBlocked = true;
+                }
+            }
+            return isBlocked;
+        }
+
+
         /// <summary>
         /// Used in DECOMP. Not case sensitive.
         /// </summary>
@@ -5830,6 +5832,22 @@ namespace Gekko
         public static bool ContainsWord(string s, string word)
         {                       
             return Regex.Match(s, @"\b" + word + @"\b", RegexOptions.IgnoreCase).Success;
+        }
+
+        /// <summary>
+        /// Normalizes a folder name so it only uses backslashes and does not end with backslash.
+        /// Also optionally checks if the folder exists.
+        /// </summary>
+        /// <param name="f1"></param>
+        /// <returns></returns>
+        public static string CleanupFolderName(string f1, bool check)
+        {
+            if (f1 == null) return f1;
+            f1 = f1.Trim();
+            f1 = f1.Replace("/", "\\");
+            if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
+            if (check && !Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
+            return f1;
         }
 
         /// <summary>
