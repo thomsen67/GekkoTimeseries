@@ -684,7 +684,8 @@ namespace Gekko
             try
             {                
                 if (gui == null)
-                {                    
+                {
+                    Program.InitUfunctionsAndArithmeticsAndMore(); //Otherwise, it will not become initialized (unless reset/restart is the first command), since GUI does not start up.
                     Program.RunGekkoCommands(Globals.gekkoExeParameters, "", 0, new P());
                 }
                 else

@@ -77,7 +77,7 @@ namespace Gekko
         public bool databank_search = true;
 
         public bool databank_versioning = true;
-        public string databank_versioning_name = "dlink"; //none|dlink
+        public string databank_versioning_name = "dlink";
         public string databank_versioning_root1 = @"c:\Thomas\Desktop\gekko\testing";
         public string databank_versioning_root2 = @"c:\tools\blobs";
 
