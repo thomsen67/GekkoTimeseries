@@ -6398,7 +6398,7 @@ namespace Gekko
                     return;  //from READ * cancelling
                 }
 
-                Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
+                bool blob = true; Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
 
                 bool category2_fileExists = false;
                 if (file == null)
@@ -6860,6 +6860,8 @@ namespace Gekko
                         }
                     }
                 }
+
+                if (blob) { }
             }  //for each bank in list
 
             return;
@@ -7497,7 +7499,7 @@ namespace Gekko
             FindFileHelper ffh = Program.FindFile(fileName, null, true, true, true, true, o.p);
             fileName = ffh.realPathAndFileName;
 
-            Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
+            bool blob = true; Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
 
             TableLight inputTable = null;
             if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
@@ -7705,6 +7707,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
+            if (blob) { }
         }
 
         /// <summary>
@@ -22796,7 +22799,7 @@ namespace Gekko
 
             file = G.AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             if (File.Exists(pathAndFilename) && G.Equal(Path.GetExtension(pathAndFilename), "." + Globals.extensionCommand))
             {
@@ -23020,6 +23023,7 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
+            if (blob) { }
         }
 
         /// <summary>
@@ -24013,7 +24017,7 @@ namespace Gekko
                     CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "gdx");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     if (Program.options.gams_fast)
                     {
                         GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
@@ -24022,6 +24026,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
+                    if (blob) { }
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24035,7 +24040,7 @@ namespace Gekko
                     CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "arrow");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
                         Arrow.WriteArrowDatabank(list2Sorted, tStart, tEnd, pathAndFilename);
@@ -24049,6 +24054,7 @@ namespace Gekko
                         }
                         throw;
                     }
+                    if (blob) { }
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24062,7 +24068,7 @@ namespace Gekko
                     CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "parquet");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
                         Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1, o.opt_bankname);
@@ -24076,6 +24082,7 @@ namespace Gekko
                         }
                         throw;
                     }
+                    if (blob) { }
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24220,7 +24227,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -24251,6 +24258,7 @@ namespace Gekko
                 file.Flush();
             }
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
+            if (blob) { }
         }
 
         /// <summary>
@@ -24269,7 +24277,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -24299,7 +24307,8 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
+            if (blob) { }
+            G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
         /// <summary>
@@ -24466,7 +24475,7 @@ namespace Gekko
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFileNameResultingFile);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFileNameResultingFile);
 
             int count = 0;
 
@@ -24640,7 +24649,7 @@ namespace Gekko
                     }
                 }
             }
-
+            if (blob) { }
             return count;
         }
 
@@ -24701,7 +24710,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -24722,6 +24731,7 @@ namespace Gekko
                     }
                 }
             }
+            if (blob) { }
             return count;
         }
 
@@ -24741,7 +24751,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -24762,6 +24772,7 @@ namespace Gekko
                     }
                 }
             }
+            if (blob) { }
             return count;
         }
 
@@ -25565,7 +25576,7 @@ namespace Gekko
             }
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             if (true)
@@ -25822,7 +25833,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-
+            if (blob) { }
             return counter;
         }        
 
@@ -25920,7 +25931,7 @@ namespace Gekko
             filename = G.AddExtension(filename, ".dat");
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -25969,7 +25980,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-
+            if (blob) { }
             return list2.Count;
         }
 
@@ -26016,7 +26027,7 @@ namespace Gekko
             filename = filename;
             filename = G.AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -26061,6 +26072,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
+            if (blob) { }
             return counter;
         }
 
@@ -26667,12 +26679,10 @@ namespace Gekko
                         skipWrite = true;
                     }
                 }
-            }
-            int n = 0;
+            }            
             if (!skipWrite)
-            {
-                Globals.dependencyTracking.Add(2, "Write", false, removed.FileNameWithPath);
-                n = WriteGbk(p, null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
+            {                
+                WriteGbk(p, null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);                
             }
         }
 
@@ -32776,7 +32786,7 @@ namespace Gekko
                 }
                 fileNameWithPathOriginal = fileNameWithPath;
 
-                Globals.dependencyTracking.Add(2, "Write", false, fileNameWithPathOriginal);
+                bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, fileNameWithPathOriginal);
 
                 EAppend append = EAppend.No;
                 if (oPrt != null && oPrt.opt_append != null)
@@ -33167,6 +33177,7 @@ namespace Gekko
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
+                                if (blob) { }
                             }
                             catch (Exception e)
                             {
@@ -33412,7 +33423,7 @@ namespace Gekko
                 }
 
                 fileNameTempLocalFile = fileNameOriginalFile;  //3a is original file, 4 may become a local copy below
-                Globals.dependencyTracking.Add(2, "Write", false, fileNameOriginalFile);
+                bool blob = true; Globals.dependencyTracking.Add(2, "Write", false, fileNameOriginalFile);
 
                 if (copyLocal)
                 {
@@ -33792,7 +33803,8 @@ namespace Gekko
                         }
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
-                        if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
+                        G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
+                        if (blob) { }
                     }
                     return null;
                 }

@@ -1426,9 +1426,9 @@ namespace Gekko
                 {
                     nAll++;
                     string equationNameWithIndexes = eh.eqName;
-                    if (Globals.runningOnTTComputer && equationNameWithoutIndexes.Contains("__"))
+                    if (Globals.runningOnTTComputer && equationNameWithoutIndexes.Contains("___"))
                     {
-                        MessageBox.Show("Hovsa3"); //Not possible
+                        //MessageBox.Show("Hovsa3"); //Not possible
                     }
 
                     string equationNameWithoutIndexesTemp = equationNameWithoutIndexes;
@@ -3883,11 +3883,12 @@ namespace Gekko
         /// <returns></returns>
         public static string[] SplitEqName(string eqnameGams)
         {
-            if (eqnameGams.Contains("__"))
+            string[] delimiters = new string[] { "__", "_" };
+            if (eqnameGams.Contains("___"))
             {
-                G.Warning("w1.3", "Eqname '" + eqnameGams + "': did not expect '__' substring in name");
+                G.Warning("w1.3", "Eqname '" + eqnameGams + "': did not expect '___' substring in name");
             }
-            string[] ss = eqnameGams.Split('_');
+            string[] ss = eqnameGams.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
             if (ss.Length <= 1)
             {
                 G.Warning("w1.4", "Eqname '" + eqnameGams + "': did not find any '_' separators");
@@ -3896,7 +3897,6 @@ namespace Gekko
             {
                 G.Warning("w1.5", "Eqname '" + eqnameGams + "': expected it to start with 'e_'");
             }
-
             return ss;
         }
 
