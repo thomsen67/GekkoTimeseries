@@ -6863,7 +6863,7 @@ namespace Gekko
                     }
                 }
 
-                Blob(blob, new BlobInfo() { allVariables = databank.storage.Count() });
+                Blob(blob, new BlobInfo() { variables = databank.storage.Count() });
             }  //for each bank in list
 
             return;
@@ -23014,43 +23014,72 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
-            Blob(blob, new BlobInfo() { allVariables = list2.Count });
+            Blob(blob, new BlobInfo() { variables = list2.Count });
         }
 
         /// <summary>
         /// Handles blobs, for versioning
         /// </summary>
-        /// <param name="blob"></param>
-        private static void Blob(string blob, BlobInfo blobInfo)
+        /// <param name="fileNameAndPath"></param>
+        private static void Blob(string fileNameAndPath, BlobInfo blobInfo)
         {
             if (Program.options.databank_versioning)
-            {                
-                string f1 = G.CleanupFolderName(Program.options.databank_versioning_root1, false); //.gbk original
-                string f2 = G.CleanupFolderName(Program.options.databank_versioning_root2, false); //.dlink file                
-                string blobFileNameAndPath1 = null;
-                if (f1 == null || f2 == null)
-                {        
-                    //fail
+            {
+                //Note: just because a .dlink file is constructed, this it not the same
+                //      as that it has to go into blobs storage.
+                string f1 = G.CleanupFolderName(Program.options.databank_versioning_root1, false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
+                string f2 = G.CleanupFolderName(Program.options.databank_versioning_root2, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
+                string blobFileNameAndPath1 = G.RelativePath(fileNameAndPath, f1, f2, "Regarding versioning." + Program.options.databank_versioning_name + " file, option databank versioning root1 and root2 must both have values", "Regarding versioning." + Program.options.databank_versioning_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'");
+                blobInfo.sha256 = G.GetSha256FromFile(fileNameAndPath); //TODO: WithWait or WaitFor...
+                blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
+                string blobFileNameAndPath2 = Path.Combine(blobFileNameAndPath1 + "." + Program.options.databank_versioning_name);
+                if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2))) new Error("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_versioning_name + " file writing");
+                G.YamlWriter<BlobInfo>(blobInfo, blobFileNameAndPath2);
+            }
+        }
+
+        public static void BlobsFile(string fileName, string sha256, string blobsFolder, bool get) 
+        {            
+            if (!Directory.Exists(blobsFolder)) new Error("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
+            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini"))) new Error("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist for file blobs/storage");
+            string shapart1 = sha256.Substring(0, 2);
+            string shapart2 = sha256.Substring(2);
+            if (get)
+            {
+                //Getting
+                if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
+                {
+                    new Error("Could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
                 }
                 else
                 {
-                    if (blob.StartsWith(f1))
-                    {
-                        string temp = G.Substring(blob, f1.Length + 1, blob.Length - 1);
-                        blobFileNameAndPath1 = Path.Combine(f2, temp);                        
-                    }                    
+                    //Think about atomic copies (threads)
+                    File.Copy(Path.Combine(blobsFolder, shapart1, shapart2), fileName, true); //Allows overwrite, TODO UNZIPPING
                 }
-                if (blobFileNameAndPath1 == null) blobFileNameAndPath1 = Path.GetFullPath(blob); //Could issue error?? For instance accessing something on x drive                
-                string hex = G.GetSha256FromFile(blob); //TODO: WithWait or WaitFor...
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("SHA: " + hex);
-                if (blobInfo.allVariables != int.MinValue) sb.AppendLine("variables: " + blobInfo.allVariables);
-                sb.AppendLine("More: ");
-                string blobFileNameAndPath2 = Path.Combine(blobFileNameAndPath1 + "." + Program.options.databank_versioning_name);
-                if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2))) new Error("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_versioning_name + " file writing");
-                File.WriteAllText(blobFileNameAndPath2, sb.ToString()); //TODO: WithWait or WaitFor...
             }
-        }
+            else
+            {
+                //Putting
+                if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
+                {
+                    Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));
+                    //Think about atomic copies (threads)
+                    File.Copy(fileName, Path.Combine(blobsFolder, shapart1, shapart2)); //TODO ZIPPING
+                }
+                else
+                {
+                    if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
+                    {
+                        //Think about atomic copies (threads)
+                        File.Copy(fileName, Path.Combine(blobsFolder, shapart1, shapart2)); //TODO ZIPPING
+                    }
+                    else
+                    {
+                        //No need to copy it: same file is already there
+                    }
+                }
+            }
+        }        
 
         /// <summary>
         /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes. Call either with a list of strings (list1/list2) or
@@ -24052,7 +24081,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    Blob(blob, new BlobInfo() { allVariables = list1Sorted?.Count ?? 0 });
+                    Blob(blob, new BlobInfo() { variables = list1Sorted?.Count ?? 0 });
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24080,7 +24109,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    Blob(blob, new BlobInfo() { allVariables = list2Sorted?.Count ?? 0 });
+                    Blob(blob, new BlobInfo() { variables = list2Sorted?.Count ?? 0 });
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24108,7 +24137,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    Blob(blob, new BlobInfo() { allVariables = list2Sorted?.Count ?? 0 });
+                    Blob(blob, new BlobInfo() { variables = list2Sorted?.Count ?? 0 });
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24675,7 +24704,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new BlobInfo() { allVariables = count });
+            Blob(blob, new BlobInfo() { variables = count });
             return count;
         }
 
@@ -24757,7 +24786,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new BlobInfo() { allVariables = count });
+            Blob(blob, new BlobInfo() { variables = count });
             return count;
         }
 
@@ -24798,7 +24827,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new BlobInfo() { allVariables = count });
+            Blob(blob, new BlobInfo() { variables = count });
             return count;
         }
 
@@ -25859,7 +25888,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, new BlobInfo() { allVariables = counter });
+            Blob(blob, new BlobInfo() { variables = counter });
             return counter;
         }        
 
@@ -26006,7 +26035,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-            Blob(blob, new BlobInfo() { allVariables = list2.Count });
+            Blob(blob, new BlobInfo() { variables = list2.Count });
             return list2.Count;
         }
 
@@ -26098,7 +26127,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, new BlobInfo() { allVariables = counter });
+            Blob(blob, new BlobInfo() { variables = counter });
             return counter;
         }
 
@@ -38195,6 +38224,16 @@ namespace Gekko
 
     public class BlobInfo
     {
-        public int allVariables = int.MinValue;
+        public string version = "1.0";
+        public string sha256 = null;        
+        public long? size = null;
+        public int? variables = null;
+        public DateTime? stamp = null;
+        public string extra = null;        
+    }
+
+    public class Stamp
+    {        
+        public DateTime? stamp = null;
     }
 }

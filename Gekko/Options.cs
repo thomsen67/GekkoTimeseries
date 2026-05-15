@@ -78,8 +78,8 @@ namespace Gekko
 
         public bool databank_versioning = true;
         public string databank_versioning_name = "dlink";
-        public string databank_versioning_root1 = @"c:\Thomas\Desktop\gekko\testing";
-        public string databank_versioning_root2 = @"c:\tools\blobs";
+        public string databank_versioning_root1 = "";
+        public string databank_versioning_root2 = "";
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //

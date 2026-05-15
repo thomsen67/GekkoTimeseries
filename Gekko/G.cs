@@ -5851,6 +5851,75 @@ namespace Gekko
         }
 
         /// <summary>
+        /// In a path name input, the start f1 is replaced by f2. For instance, if
+        /// input = "c:\a1\a2\a3\a4", f1 = "c:\a1\a2" and f2 = "x:\b1", the output
+        /// will be "x:\b1\a3\a4". Note: for folder names, the input paths must not end with "\" --> then use
+        /// CleanupFolderName() to clean them up first.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="f1"></param>
+        /// <param name="f2"></param>
+        /// <param name="errorNull"></param>
+        /// <param name="errorIncongruent"></param>
+        /// <returns></returns>
+        public static string RelativePath(string input, string f1, string f2, string errorNull, string errorIncongruent)
+        {
+            string output = null;
+            if (G.NullOrBlanks(f1) || G.NullOrBlanks(f2))
+            {
+                //fail
+                new Error(errorNull);
+            }
+            else
+            {
+                if (input.StartsWith(f1))
+                {
+                    string temp = G.Substring(input, f1.Length + 1, input.Length - 1);
+                    output = Path.Combine(f2, temp);
+                }
+                else
+                {
+                    new Error(errorIncongruent);
+                }
+            }
+
+            return output;
+        }
+
+        public static T YamlReader<T>(string fileName)
+        {
+            T output = default(T);
+            try
+            {
+                string s = File.ReadAllText(fileName);
+                var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                    .IgnoreUnmatchedProperties()
+                    .Build();
+                output = deserializer.Deserialize<T>(s);
+            }
+            catch
+            {
+                new Error("Yaml reader problem");
+            }
+            return output;
+        }
+
+        public static void YamlWriter<T>(object? obj, string fileName)
+        {
+            try
+            {
+                T input = (T)obj;
+                var serializer = new YamlDotNet.Serialization.SerializerBuilder().ConfigureDefaultValuesHandling(YamlDotNet.Serialization.DefaultValuesHandling.OmitNull).Build();
+                string s = serializer.Serialize(input);
+                File.WriteAllText(fileName, s);
+            }
+            catch
+            {
+                new Error("Yaml writer problem");
+            }
+        }
+
+        /// <summary>
         /// Used to remove comments inside a JSON file (they officially do not allow comments, even though comments in JavaScript are as in C#)
         /// </summary>
         /// <param name="input"></param>
