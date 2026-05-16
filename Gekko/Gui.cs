@@ -248,6 +248,14 @@ namespace Gekko
         [STAThread]
         public static void Main(string[] args)
         {
+            MessageBox.Show(Stringlist.GetListWithCommas(args));
+                        
+            if (args.Length == 1 && args[0].StartsWith("-versioning:"))
+            {                
+                Program.Versioning(args);
+                return;
+            }
+
             //Code to handle unexpected crashes, for instance after hibernation
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
@@ -307,7 +315,7 @@ namespace Gekko
             {
                 ShowStackTraceWindow(e2);
             }
-        }
+        }        
 
         public static void ShowStackTraceWindow(Exception e2)
         {

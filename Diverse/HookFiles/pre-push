@@ -1,0 +1,3 @@
+#!/bin/sh
+# Only for extra safety, not strictly necessary
+bash "$(dirname "$0")/_common" "pre-push"

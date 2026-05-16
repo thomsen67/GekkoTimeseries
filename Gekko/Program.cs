@@ -2837,6 +2837,11 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
+                if (text == "v")
+                {
+                    Program.Versioning(new string[] { "versioning:'pre-commit','grundbk/_uddata/x2.gbk.dlink','grundbk/_uddata/x5.csv.dlink','grundbk/_uddata/x5.gbk.dlink'" });
+                    return;
+                }
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
@@ -23016,37 +23021,21 @@ namespace Gekko
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
             Blob(blob, new BlobInfo() { variables = list2.Count });
         }
-        public static void Versioning(IVariable[] input)
+
+        public static void Versioning(string[] args)
         {
             string programFolder = @"c:\Thomas\Gekko\BlobsTest\tth\staging";
             string dataFolder = @"c:\Tools\Data\tth\staging";
             string blobsFolder = @"c:\Tools\Blobs";
             string syncStampFile = Path.Combine(programFolder, ".git", "syncstamp");
-
-            if (input.Length < 1)
-            {
-                System.Windows.Forms.MessageBox.Show("Gekko: expected > 0 arguments for versioning() method call"); return;
-            }
-            string type = null;
-            List<string> dlinkFiles = new List<string>();
-            int n = -1;
-            foreach (IVariable iv in input)
-            {
-                n++;
-                if (iv.Type() != EVariableType.String)
-                {
-                    System.Windows.Forms.MessageBox.Show("Gekko: expected all string arguments for versioning() method call"); return;
-                }
-                string s = O.ConvertToString(iv);
-                if (n == 0) type = s;
-                else dlinkFiles.Add(s.Replace("/", Path.DirectorySeparatorChar.ToString()));
-            }
-
-            System.Windows.Forms.MessageBox.Show(type + " -- " + Stringlist.GetListWithCommas(dlinkFiles));
-
+            string s2 = args[0].Substring("versioning:".Length);            
+            System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(s2, @"'([^']*)'");
+            string[] results = new string[matches.Count - 1];
+            string type = matches[0].Groups[1].Value;
+            for (int i = 1; i < matches.Count; i++) results[i - 1] = matches[i].Groups[1].Value;
             List<string> filesNew = new List<string>();
             List<string> filesOverwritten = new List<string>();
-            foreach (string dlinkFile in dlinkFiles) //Could probably be parallelized
+            foreach (string dlinkFile in results) //Could probably be parallelized
             {
                 string dLinkFileWithPath = Path.Combine(programFolder, dlinkFile);
                 BlobInfo blobInfo = G.YamlReader<BlobInfo>(dLinkFileWithPath);
@@ -23076,7 +23065,7 @@ namespace Gekko
                     //Get it from blobs (A or B)
                     Program.BlobsFile(true, dataFile, blobInfo.sha256, blobsFolder, filesNew, filesOverwritten);
                 }
-            }     
+            }
             // GekkoIndex file
             // Versioning() gets called everytime Git is activated
             // It is set up so that Git delivers a list of all .dlink files
@@ -23092,12 +23081,12 @@ namespace Gekko
             // is in the index and if the datafile stamp + size match, do nothing.
             // Also, at the end, remove all dlink files from GekkoIndex that 
             // are no longer in use.
-            
+
             //
             G.YamlWriter<Stamp>(new Stamp() { stamp = DateTime.UtcNow }, syncStampFile);
-            if (filesNew.Count + filesOverwritten.Count > 0)
+            if (true || (filesNew.Count + filesOverwritten.Count > 0))
             {
-                string s = "Gekko/Git: ";                
+                string s = "Gekko/Git: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count > 0)
@@ -23108,7 +23097,7 @@ namespace Gekko
                 {
                     s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added.";
                 }
-                else 
+                else
                 {
                     s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
                 }
@@ -23135,7 +23124,7 @@ namespace Gekko
                 w.ShowDialog();
             }
         }
-
+        
 
         /// <summary>
         /// Returns true if file is ok, else it must be fetched from blobs

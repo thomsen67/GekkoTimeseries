@@ -1,0 +1,4 @@
+#!/bin/sh
+STAGED_FILES=$(git -C "c:/Thomas/Gekko/BlobsTest/tth/staging" ls-files --cached -- ':(icase)*.dlink')
+FORMATTED_FILES=$(echo "$STAGED_FILES" | sed "s/^/'/;s/$/'/" | paste -sd, -)
+cmd.exe //c "c:\Thomas\Gekko\GekkoCS_MAIN\Gekko\bin\Debug\Gekko.exe" "-versioning:'$1',$FORMATTED_FILES"

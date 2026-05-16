@@ -1,0 +1,2 @@
+#!/bin/sh
+bash "$(dirname "$0")/_common" "pre-commit"
