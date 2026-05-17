@@ -2839,7 +2839,9 @@ namespace Gekko
             {
                 if (text == "v")
                 {
-                    Program.Versioning(new string[] { "versioning:'pre-commit','grundbk/_uddata/x2.gbk.dlink','grundbk/_uddata/x5.csv.dlink','grundbk/_uddata/x5.gbk.dlink'" });
+                    string s = "-versioning:'pre-commit','grundbk/_uddata/x2.gbk.dlink','grundbk/_uddata/x5.csv.dlink','grundbk/_uddata/x5.gbk.dlink'";
+                    string[] args = new string[] { s };
+                    Program.Versioning(args);
                     return;
                 }
 
@@ -23024,22 +23026,50 @@ namespace Gekko
 
         public static void Versioning(string[] args)
         {
-            string programFolder = @"c:\Thomas\Gekko\BlobsTest\tth\staging";
-            string dataFolder = @"c:\Tools\Data\tth\staging";
-            string blobsFolder = @"c:\Tools\Blobs";
-            string syncStampFile = Path.Combine(programFolder, ".git", "syncstamp");
-            string s2 = args[0].Substring("versioning:".Length);            
-            System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(s2, @"'([^']*)'");
+            //Versionering af data
+            //- option databank versioning = 'dlink';
+            //- Når Gekko kører kildeprojekt tjekkes at hook scripts er aktiveret i \.git\config og ellers sættes den til.            
+            //- Mht.gbk - filer bruges "data-hash", SHA256.
+            //- .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens.  
+            //- Lægge filer i blobs som zippede (dog ikke .gbk og .xlsx og måske parquet og andre zippede --> TJEK).
+            //- Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
+            //- Reservér det sidste hex i hashkoden til at angive traces eller ej (0 eller 1).
+            //- Hvordan kører det med branch-switch, eller gå ind i anden branch-mappe, eller flytte .dlink-filer eller datafiler? Robust?            
+            //- Måske reservere den sidste hex til trace-eller-ej.
+
+            string programFolder = G.CleanupFolderName(@"c:\Thomas\Gekko\BlobsTest\tth\staging", false);
+            string dataFolder = G.CleanupFolderName(@"c:\Tools\Data\tth\staging", false);
+            string blobsFolder = G.CleanupFolderName(@"c:\Tools\Blobs", false);
+            string indexDlinkFile = Path.Combine(programFolder, ".git", "index_dlink");
+            string s2 = args[0].Substring("versioning:".Length);
+            MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
             string[] results = new string[matches.Count - 1];
             string type = matches[0].Groups[1].Value;
             for (int i = 1; i < matches.Count; i++) results[i - 1] = matches[i].Groups[1].Value;
             List<string> filesNew = new List<string>();
             List<string> filesOverwritten = new List<string>();
-            foreach (string dlinkFile in results) //Could probably be parallelized
+
+            Sha256Storage sha256Storage = new Sha256Storage();
+            if (File.Exists(indexDlinkFile))
             {
+                try
+                {
+                    sha256Storage = ProtobufRead<Sha256Storage>(indexDlinkFile);
+                }
+                catch
+                {
+                    if (programFolder.Contains("\\tth\\")) MessageBox.Show("Loading " + indexDlinkFile + " failed");                    
+                }
+            }
+
+            GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (string dlinkFile2 in results) //Could probably be parallelized
+            {
+                string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
                 string dLinkFileWithPath = Path.Combine(programFolder, dlinkFile);
                 BlobInfo blobInfo = G.YamlReader<BlobInfo>(dLinkFileWithPath);
                 string dataFile = Path.ChangeExtension(G.RelativePath(dLinkFileWithPath, programFolder, dataFolder, null, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + programFolder + "'"), null);
+                datafiles.Add(dataFile, false); //for cleanup purposes
                 if (G.NullOrBlanks(dataFile)) new Error("Datafile string is null");
                 // --------------------------------------------------------------------------------------------------
                 //                              datafile exists
@@ -23054,7 +23084,14 @@ namespace Gekko
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
                 // --------------------------------------------------------------------------------------------------
-                bool isDataFileOk = VersioningHelperFileOk(dataFile, blobInfo, syncStampFile);
+                Sha256StorageHelper helper = null;
+                sha256Storage.storage.TryGetValue(dataFile, out helper);
+                if (helper == null)
+                {
+                    helper = new Sha256StorageHelper();
+                    sha256Storage.storage.Add(dataFile, helper); //get it in
+                }
+                bool isDataFileOk = VersioningHelperFileOk(dataFile, blobInfo, helper);
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
@@ -23066,24 +23103,18 @@ namespace Gekko
                     Program.BlobsFile(true, dataFile, blobInfo.sha256, blobsFolder, filesNew, filesOverwritten);
                 }
             }
-            // GekkoIndex file
-            // Versioning() gets called everytime Git is activated
-            // It is set up so that Git delivers a list of all .dlink files
-            // that it knows. We then compare these files with the datafiles,
-            // one by one, where we take a sha256 of the datafile. If a datafile
-            // differs, it is taken from blobs.
-            // Taking sha256 of a datafile takes time, so Gekko keeps a GekkoIndex file
-            // that stores the sha256 corresponding to each .dlink file + stamp and size.
-            // Let us say that the .dlink files and the GekkoIndex correspond.
-            // A new Versioning() call: loop through dlink files. If the dlink file is
-            // not in the GekkoIndex, or if it is and stamp+size do not match,
-            // do sha256 and add/update info to the index. If the dlink file
-            // is in the index and if the datafile stamp + size match, do nothing.
-            // Also, at the end, remove all dlink files from GekkoIndex that 
-            // are no longer in use.
 
-            //
-            G.YamlWriter<Stamp>(new Stamp() { stamp = DateTime.UtcNow }, syncStampFile);
+            List<string> filesToRemove = sha256Storage.storage.Keys.Where(key => !datafiles.ContainsKey(key)).ToList();
+            foreach (var fileToRemove in filesToRemove) sha256Storage.storage.Remove(fileToRemove); //Else the storage will always grow
+            try
+            {
+                ProtobufWrite(sha256Storage, indexDlinkFile); //refresh the file
+            }
+            catch
+            {
+                if (programFolder.Contains("\\tth\\")) MessageBox.Show("Writing " + indexDlinkFile + " failed");
+            }
+
             if (true || (filesNew.Count + filesOverwritten.Count > 0))
             {
                 string s = "Gekko/Git: ";
@@ -23123,8 +23154,7 @@ namespace Gekko
                 w.textBox1.FontSize = 11;
                 w.ShowDialog();
             }
-        }
-        
+        }        
 
         /// <summary>
         /// Returns true if file is ok, else it must be fetched from blobs
@@ -23134,28 +23164,25 @@ namespace Gekko
         /// <param name="blobInfo"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool VersioningHelperFileOk(string dataFile, BlobInfo blobInfo, string syncStampFile)
-        {
-            DateTime? syncTimeUtc = null;
-            if (File.Exists(syncStampFile))
-            {
-                Stamp stamp1 = G.YamlReader<Stamp>(syncStampFile);
-                syncTimeUtc = stamp1.stamp;
-            }
+        public static bool VersioningHelperFileOk(string dataFile, BlobInfo blobInfo, Sha256StorageHelper helper)
+        {             
             FileInfo fi = new FileInfo(dataFile);
             if (!fi.Exists) return false;
             if (fi.Length != blobInfo.size) return false;
-            //Here we know that the data file exists and is of the right size
-            if (syncTimeUtc != null && fi.LastWriteTimeUtc.AddSeconds(-2d) < (DateTime)syncTimeUtc)
+            //Here we know that the data file exists and is of the right size. Now we check stamp.
+            double krit = 2d; //1s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
+            if (helper != null && helper.stampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)helper.stampUtc).TotalSeconds) < krit)
             {
                 //Will return true: if the file (that exists with the right size) has not changed since .dlink files were last investigated, we consider it ok (we give 2 s slack)            
             }
             else
             {
                 //We now need to check the sha256. In principle we could copy the file from blobs, where we know what the sha256 is,
-                //but sha256 is probably faster than file IO copying.
-                string sha = G.GetSha256FromFile(dataFile);
-                if (blobInfo.sha256 != sha) return false;
+                //but sha256 is probably faster than file IO copying.                
+                helper.sha256 = G.GetSha256FromFile(dataFile); //update it!
+                helper.stampUtc = fi.LastWriteTimeUtc;
+                helper.fileNameAndPath = dataFile;
+                if (blobInfo.sha256 != helper.sha256) return false;
             }
             return true;
         }
@@ -23199,24 +23226,28 @@ namespace Gekko
                     //Think about atomic copies (threads)
                     if (File.Exists(fileName)) filesOverwritten.Add(fileName);
                     else filesNew.Add(fileName);
-                    File.Copy(Path.Combine(blobsFolder, shapart1, shapart2), fileName, true); //Allows overwrite, TODO UNZIPPING
+                    File.Copy(Path.Combine(blobsFolder, shapart1, shapart2), fileName, true); //Allows overwrite, TODO UNZIPPING                    
+                    G.ReadOnlyRemove(fileName);
                 }
             }
             else
             {
                 //Putting
+                string blobsFile = Path.Combine(blobsFolder, shapart1, shapart2);
                 if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
                 {
                     Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));
                     //Think about atomic copies (threads)
-                    File.Copy(fileName, Path.Combine(blobsFolder, shapart1, shapart2)); //TODO ZIPPING
+                    File.Copy(fileName, blobsFile); //TODO ZIPPING
+                    G.ReadOnlySet(blobsFile);
                 }
                 else
                 {
                     if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
                     {
                         //Think about atomic copies (threads)
-                        File.Copy(fileName, Path.Combine(blobsFolder, shapart1, shapart2)); //TODO ZIPPING
+                        File.Copy(fileName, blobsFile); //TODO ZIPPING
+                        G.ReadOnlySet(blobsFile);
                     }
                     else
                     {
@@ -23225,6 +23256,7 @@ namespace Gekko
                 }
             }
         }
+        
 
         /// <summary>
         /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes. Call either with a list of strings (list1/list2) or
@@ -38375,10 +38407,25 @@ namespace Gekko
         public int? variables = null;
         public DateTime? stamp = null;
         public string extra = null;        
+    }    
+
+    [ProtoContract]
+    public class Sha256Storage
+    {
+        [ProtoMember(1)]
+        public string version = "1.0";
+        [ProtoMember(2)]
+        public GekkoDictionary<string, Sha256StorageHelper> storage = new GekkoDictionary<string, Sha256StorageHelper>(StringComparer.OrdinalIgnoreCase);
     }
 
-    public class Stamp
-    {        
-        public DateTime? stamp = null;
+    [ProtoContract]
+    public class Sha256StorageHelper
+    {
+        [ProtoMember(1)]
+        public string fileNameAndPath = null;
+        [ProtoMember(2)]
+        public string sha256 = null;
+        [ProtoMember(3)]
+        public DateTime? stampUtc = null;
     }
 }

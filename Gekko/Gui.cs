@@ -247,11 +247,10 @@ namespace Gekko
         ///
         [STAThread]
         public static void Main(string[] args)
-        {
-            MessageBox.Show(Stringlist.GetListWithCommas(args));
-                        
+        {                        
             if (args.Length == 1 && args[0].StartsWith("-versioning:"))
-            {                
+            {
+                MessageBox.Show(Stringlist.GetListWithCommas(args));
                 Program.Versioning(args);
                 return;
             }

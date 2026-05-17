@@ -5850,6 +5850,27 @@ namespace Gekko
             return f1;
         }
 
+        public static void ReadOnlyRemove(string fileName)
+        {
+            //Remove read-only
+            FileAttributes attributes = File.GetAttributes(fileName);
+            if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+            {
+                attributes = attributes & ~FileAttributes.ReadOnly;
+                File.SetAttributes(fileName, attributes);
+            }
+        }
+
+        public static void ReadOnlySet(string fileName)
+        {
+            FileAttributes attributes = File.GetAttributes(fileName);
+            if ((attributes & FileAttributes.ReadOnly) != FileAttributes.ReadOnly)
+            {
+                attributes |= FileAttributes.ReadOnly;
+                File.SetAttributes(fileName, attributes);
+            }
+        }
+
         /// <summary>
         /// In a path name input, the start f1 is replaced by f2. For instance, if
         /// input = "c:\a1\a2\a3\a4", f1 = "c:\a1\a2" and f2 = "x:\b1", the output
