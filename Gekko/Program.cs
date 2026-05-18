@@ -2839,9 +2839,9 @@ namespace Gekko
             {
                 if (text == "v")
                 {
-                    string s = "-dlink:'pre-commit','grundbk/_uddata/x2.gbk.dlink','grundbk/_uddata/x5.csv.dlink','grundbk/_uddata/x5.gbk.dlink'";
+                    string s = "-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x1.csv.dlink'";
                     string[] args = new string[] { s };
-                    Program.DLink(args);
+                    Program.DLinkCalledFromGitHook(args);
                     return;
                 }
 
@@ -6869,8 +6869,13 @@ namespace Gekko
                         }
                     }
                 }
-
-                Blob(blob, new BlobInfo() { variables = databank.storage.Count() });
+                else
+                {
+                    //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
+                    //      So CLOSE handles this.
+                    Blob(blob, new BlobInfo() { variables = databank.storage.Count() });
+                }
+                
             }  //for each bank in list
 
             return;
@@ -23029,9 +23034,49 @@ namespace Gekko
         /// could look at all .dlink files, but some of these may be irrelevant and not versioned.
         /// </summary>
         /// <param name="args"></param>
-        public static void DLink(string[] args)
+        public static void DLinkCalledFromGitHook(string[] args)
         {
             //Versionering af data
+
+            // -----------------------------------
+            // TESTING on TTH pc
+            // -----------------------------------
+            // + Create new repo on https://github.com/thomsen67, for instance Blobs2
+            // + On c:\Tools, create \Makrobk and \Makrobk_kilde
+            // + In c:\Tools\Makrobk\tth\test, clone Blobs2 so \.git ends at c:\Tools\Makrobk\tth\test\.git
+            // + In the \.git folder, manually add the line 
+            // + Create c:\Tools\Makrobk_kilde\2025_10_01\_blobs and 
+            //   c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata
+            // + In c:\Tools\Makrobk_kilde\2025_10_01\_blobs\_blobs, put a blobsroot.ini
+            // + Create folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs
+            // + Create folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_uddata_dlink
+            // + Create folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\_utilities
+            //     and put files from c:\Tools\Hooks inside.
+            // + Put this line in [core] is not already there: hooksPath = makrobk_grunddata/_utilities/githooks
+            // + In c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver, put a root.ini
+            // In Globals.cs, set these:
+            //     public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
+            //     public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\", false);
+            //     public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver", false);
+            //     public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver", false);
+            //     public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
+            // + Add the file c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs\run_modul.gcm, with this code:
+            //     reset; time 2001 2003;
+            //     x1 = 101;
+            //     write <csv> c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata\x1.csv;
+            // + Start Gekko 3 in folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs, and run run_modul.gcm.
+            //     - This produces c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_uddata_dlink\x1.csv.dlink
+            //     - Git-add run_modul.gcm and x1.csv.dlink
+            //     - Git-commit
+            // + Now there should be a file in: c:\Tools\Makrobk_kilde\2025_10_01\_blobs somewhere (with csv == 101 insisde)
+            // +   and also c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata\x1.csv == 101.
+            // + Now change in run_modul.gcm from 101 to 202, run the file, commit .gcm and .dlink.
+            // +   check the .csv, .csv.dlink and a new file in \_blobs.
+            // + Check out the previous commit, where x1 was set to 101.
+            // + The .csv.dlink file should revert, and the .csv file too!
+
+
+            // -----------------------------------
 
             // Make a new branch, and copy in all data files from some other branch
             // Open Gekko inside the branch in some module
@@ -23053,12 +23098,12 @@ namespace Gekko
             //  Burde vel være fint nok.
 
             //TODO: Get programFolder 
-            string programFolder = Globals.dlink_programFolder;
-            string dataFolder = Globals.dlink_dataFolder;
-            string blobsFolder = Globals.dlink_blobsFolder;
+
+
+
             // -----
-            string indexDlinkFile = Path.Combine(programFolder, ".git", "index_dlink");
-            string gitConfigFile = Path.Combine(programFolder, ".git", "config");
+            string indexDlinkFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "index_dlink");
+            string gitConfigFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "config");
             string s2 = args[0].Substring("dlink:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
             List<string> dlinkFiles = new List<string>();
@@ -23067,7 +23112,7 @@ namespace Gekko
             {
                 string s = matches[i].Groups[1].Value;
                 if (G.NullOrBlanks(s)) continue; //First time, it can have a '' as the first element
-                dlinkFiles[i - 1] = s;
+                dlinkFiles.Add(s);
             }
             List<string> filesNew = new List<string>();
             List<string> filesOverwritten = new List<string>();            
@@ -23081,7 +23126,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    if (programFolder.Contains("\\tth\\")) MessageBox.Show("Loading " + indexDlinkFile + " failed");
+                    if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Loading " + indexDlinkFile + " failed");
                 }
             }
 
@@ -23089,11 +23134,22 @@ namespace Gekko
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
             {
                 string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
-                string dLinkFileWithPath = Path.Combine(programFolder, dlinkFile);
-                BlobInfo blobInfo = G.YamlReader<BlobInfo>(dLinkFileWithPath);
-                string dataFile = Path.ChangeExtension(G.RelativePath(dLinkFileWithPath, programFolder, dataFolder, null, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + programFolder + "'"), null);
+                string dLinkFileWithPath = Path.Combine(Globals.dlink_programFolderGit, dlinkFile);
+                if (!File.Exists(dLinkFileWithPath))
+                {
+                    MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
+                    new Error();
+                }
+                BlobInfo blobInfo = G.YamlReader<BlobInfo>(dLinkFileWithPath);                
+                string xx = G.DLinkRelativePath(dLinkFileWithPath, Globals.dlink_programFolderRunning, Globals.dlink_dataFolder, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Globals.dlink_programFolderGit + "'", false);
+                string dataFile = Path.ChangeExtension(xx, null);
+                dataFile = dataFile.Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
                 datafiles.Add(dataFile, false); //for cleanup purposes
-                if (G.NullOrBlanks(dataFile)) new Error("Datafile string is null");
+                if (G.NullOrBlanks(dataFile))
+                {
+                    MessageBox.Show("Datafile string is null");
+                    new Error();
+                }
                 // --------------------------------------------------------------------------------------------------
                 //                              datafile exists
                 //                             yes            no
@@ -23118,12 +23174,12 @@ namespace Gekko
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
-                    Program.BlobsFile(false, dataFile, blobInfo.sha256, blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(false, dataFile, blobInfo.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    Program.BlobsFile(true, dataFile, blobInfo.sha256, blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(true, dataFile, blobInfo.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
                 }
             }
 
@@ -23135,25 +23191,25 @@ namespace Gekko
             }
             catch
             {
-                if (programFolder.Contains("\\tth\\")) MessageBox.Show("Writing " + indexDlinkFile + " failed");
+                if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Writing " + indexDlinkFile + " failed");
             }
 
             if (true || (filesNew.Count + filesOverwritten.Count > 0))
             {
                 string s = "Gekko/Git: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
-                string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
-                if (filesNew.Count > 0 && filesOverwritten.Count > 0)
-                {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
-                }
-                else if (filesNew.Count > 0)
+                string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";                
+                if (filesNew.Count > 0 && filesOverwritten.Count == 0)
                 {
                     s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added.";
                 }
-                else
+                else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
                 {
                     s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
+                }
+                else
+                {
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
                 }
                 s += " (" + type + ")";
                 s += G.NL + G.NL;
@@ -23281,21 +23337,25 @@ namespace Gekko
         public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, Sha256StorageHelper helper)
         {             
             FileInfo fi = new FileInfo(dataFile);
+            MessageBox.Show("File " + dataFile + " exists: " + fi.Exists + " len " + fi.Length + " stam1 " + helper.stampUtc + " stamp2 " + fi.LastWriteTimeUtc);
             if (!fi.Exists) return false;
             if (fi.Length != blobInfo.size) return false;
             //Here we know that the data file exists and is of the right size. Now we check stamp.
             double krit = 2d; //1s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
             if (helper != null && helper.stampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)helper.stampUtc).TotalSeconds) < krit)
             {
+                MessageBox.Show("File " + dataFile + " is ok regarding lenght and |stamp| < 2");
                 //Will return true: if the file (that exists with the right size) has not changed since .dlink files were last investigated, we consider it ok (we give 2 s slack)            
             }
             else
             {
+                MessageBox.Show("File " + dataFile + " has |stamp| > 2");
                 //We now need to check the sha256. In principle we could copy the file from blobs, where we know what the sha256 is,
                 //but sha256 is probably faster than file IO copying.                
                 helper.sha256 = Program.BlobsHash(dataFile, true); //update it!
                 helper.stampUtc = fi.LastWriteTimeUtc;
                 helper.fileNameAndPath = dataFile;
+                MessageBox.Show("sha1 " + blobInfo.sha256 + " sha2 " + helper.sha256);
                 if (blobInfo.sha256 != helper.sha256) return false;
             }
             return true;
@@ -23312,16 +23372,27 @@ namespace Gekko
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
                 string f1 = G.CleanupFolderName(Globals.dlink_dataFolder, false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
-                string f2 = G.CleanupFolderName(Globals.dlink_programFolder, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
-                string blobFileNameAndPath1 = G.RelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, option databank dlink root1 and root2 must both have values", "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'");
-                if (File.Exists(fileNameAndPath))
+                string f2 = G.CleanupFolderName(Globals.dlink_programFolderRunning, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
+                string blobFileNameAndPath1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
+                if (blobFileNameAndPath1 == null)
                 {
-                    blobInfo.sha256 = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                    //Do nothing: may be a databank on some other drive
                 }
-                blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
-                string blobFileNameAndPath2 = Path.Combine(blobFileNameAndPath1 + "." + Program.options.databank_dlink_name);
-                if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2))) new Error("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
-                G.YamlWriter<BlobInfo>(blobInfo, blobFileNameAndPath2);
+                else
+                {
+                    if (File.Exists(fileNameAndPath))
+                    {
+                        blobInfo.sha256 = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                    }
+                    blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
+                    string blobFileNameAndPath2 = blobFileNameAndPath1 + "." + Program.options.databank_dlink_name;
+                    if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2)))
+                    {
+                        MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
+                        new Error();
+                    }
+                    G.YamlWriter<BlobInfo>(blobInfo, blobFileNameAndPath2);
+                }
             }
         }
 
@@ -23374,7 +23445,7 @@ namespace Gekko
             return hash;
         }
 
-        public static void BlobsFile(bool get, string fileName, string sha256, string blobsFolder, List<string> filesNew, List<string> filesOverwritten)
+        public static void BlobsFile(bool isGet, string fileName, string sha256, string blobsFolder, List<string> filesNew, List<string> filesOverwritten)
         {
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -23385,18 +23456,27 @@ namespace Gekko
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            if (!Directory.Exists(blobsFolder)) new Error("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
-            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini"))) new Error("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist for file blobs/storage");
+            if (!Directory.Exists(blobsFolder))
+            {
+                MessageBox.Show("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
+                new Error();
+            }
+            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini")))
+            {
+                MessageBox.Show("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
+                new Error();
+            }
             string shapart1 = sha256.Substring(0, 2);
             string shapart2 = sha256.Substring(2);
-            if (get)
+            if (isGet)
             {
                 // ------------------------------------
                 // Getting
                 // ------------------------------------
                 if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
                 {
-                    new Error("Could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
+                    MessageBox.Show("For '" + fileName + "', could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
+                    new Error();
                 }
                 else
                 {                    
@@ -23459,6 +23539,10 @@ namespace Gekko
         {
             if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
             {
+                File.Copy(fileName, blobsFile);
+            }
+            else
+            {
                 using (FileStream zipToOpen = new FileStream(blobsFile, FileMode.Create, FileAccess.Write))
                 {
                     using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
@@ -23471,10 +23555,6 @@ namespace Gekko
                         }
                     }
                 }
-            }
-            else
-            {
-                File.Copy(fileName, blobsFile);
             }
             G.ReadOnlySet(blobsFile);
         }
@@ -26638,7 +26718,7 @@ namespace Gekko
 
 
         public static void MaybeWriteOpenDatabank(P p, Databank removed, bool noTrace)
-        {
+        {            
             if (Program.IsDatabankDirty(removed))
             {
                 //If it is a non-gbk, we are not going to alter the databank no matter what
@@ -26656,6 +26736,10 @@ namespace Gekko
                 {
                     Program.WriteRemovedDatabank(p, removed, noTrace);
                 }
+            }
+            if (File.Exists(removed.FileNameWithPath)) //probably always exists...
+            {
+                Blob(removed.FileNameWithPath, new BlobInfo() { variables = removed.storage.Count() });
             }
         }
 

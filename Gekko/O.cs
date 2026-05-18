@@ -8169,7 +8169,6 @@ namespace Gekko
                     else
                     {
                         new Error("Internal error #7983264234");
-                        //throw new GekkoException();
                     }
                 }
                 else

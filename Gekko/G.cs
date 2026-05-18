@@ -5883,30 +5883,22 @@ namespace Gekko
         /// <param name="input"></param>
         /// <param name="f1"></param>
         /// <param name="f2"></param>
-        /// <param name="errorNull"></param>
-        /// <param name="errorIncongruent"></param>
+        /// <param name="warningIncongruent"></param>
+        /// 
         /// <returns></returns>
-        public static string RelativePath(string input, string f1, string f2, string errorNull, string errorIncongruent)
+        public static string DLinkRelativePath(string input, string f1, string f2, string warningIncongruent, bool replace)
         {
             string output = null;
-            if (G.NullOrBlanks(f1) || G.NullOrBlanks(f2))
+            if (input.StartsWith(f1))
             {
-                //fail
-                new Error(errorNull);
+                string temp = G.Substring(input, f1.Length + 1, input.Length - 1);
+                output = Path.Combine(f2, temp);
+                if (replace) output = output.Replace("\\_inddata\\", "\\_inddata" + "_" + Program.options.databank_dlink_name + "\\").Replace("\\_uddata\\", "\\_uddata" + "_" + Program.options.databank_dlink_name + "\\");
             }
             else
             {
-                if (input.StartsWith(f1))
-                {
-                    string temp = G.Substring(input, f1.Length + 1, input.Length - 1);
-                    output = Path.Combine(f2, temp);
-                }
-                else
-                {
-                    new Error(errorIncongruent);
-                }
+                G.Warning("w45.1", warningIncongruent);
             }
-
             return output;
         }
 

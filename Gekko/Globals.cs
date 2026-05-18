@@ -43,13 +43,16 @@ namespace Gekko
 
         public static bool greuHack = false;  //Year must be YYYY, digits
 
-        public static string dlink_programFolder = G.CleanupFolderName(@"k:\makrobk\tth\test", false); //G.CleanupFolderName(@"c:\Thomas\Gekko\BlobsTest\tth\staging", false);
-        public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\tth\test", false); //G.CleanupFolderName(@"c:\Tools\Data\tth\staging", false);
-        public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01", false); //G.CleanupFolderName(@"c:\Tools\Blobs", false);
-        //public static string dlink_programFolder = G.CleanupFolderName(@"c:\Thomas\Gekko\BlobsTest\tth\staging", false);
-        //public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Data\tth\staging", false);
-        //public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Blobs", false);
-
+        //public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\tth\test", false);
+        //public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\tth\test\makrobk_grunddata", false);        
+        //public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\tth\test", false);
+        //public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_storage", false);
+        public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
+        public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\", false);
+        public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver", false);
+        public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver", false);
+        public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
+        
         public static bool gdxReaderDebug = false;        
         public const string libraryDriveCheatString = "library___name___";        
         public const string tempFileStart = "tempfile";

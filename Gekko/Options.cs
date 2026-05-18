@@ -77,9 +77,7 @@ namespace Gekko
         public bool databank_search = true;
 
         public bool databank_dlink = true;
-        public string databank_dlink_name = "dlink";
-        public string databank_dlink_root1 = "";
-        public string databank_dlink_root2 = "";
+        public string databank_dlink_name = "dlink";        
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
@@ -437,9 +435,7 @@ namespace Gekko
             Add("DATABANK SEARCH", Globals.xbool);            
 
             Add("DATABANK DLINK", Globals.xbool);
-            Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");
-            Add("DATABANK DLINK ROOT1", Globals.xnameOrStringOrFilename);
-            Add("DATABANK DLINK ROOT2", Globals.xnameOrStringOrFilename);
+            Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");            
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 
