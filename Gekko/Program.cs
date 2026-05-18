@@ -23111,7 +23111,7 @@ namespace Gekko
             List<string> filesNew = new List<string>();
             List<string> filesOverwritten = new List<string>();            
 
-            IndexDlink indexDlink = new IndexDlink();
+            IndexDlink indexDlink = new IndexDlink(); //empty
             if (File.Exists(indexDlinkFile))
             {
                 try
@@ -23157,23 +23157,34 @@ namespace Gekko
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
                 // --------------------------------------------------------------------------------------------------
+                string dataFileHash = null;
+                DateTime? dataFileStamp = null;
                 IndexDlinkElement indexDlinkElement = null;
                 indexDlink.storage.TryGetValue(dataFile, out indexDlinkElement);
-                if (indexDlinkElement == null)
+                if (indexDlinkElement != null)                
                 {
-                    indexDlinkElement = new IndexDlinkElement();
-                    indexDlink.storage.Add(dataFile, indexDlinkElement); //get it in
+                    dataFileHash = indexDlinkElement.sha256;
+                    dataFileStamp = indexDlinkElement.stampUtc;
                 }
-                bool isDataFileOk = DLlinkHelperFileOk(dataFile, blobInfo, indexDlinkElement);
+                bool isDataFileOk = DLlinkHelperFileOk(dataFile, blobInfo, dataFileStamp, dataFileHash); //regarding last two args: either both non-null or both null
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
                     Program.BlobsFile(false, dataFile, blobInfo.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    if (indexDlinkElement == null)
+                    {
+                        //Add it if not already there
+                        indexDlinkElement = new IndexDlinkElement(dataFile, blobInfo.sha256, new FileInfo(dataFile).LastWriteTimeUtc);
+                        indexDlink.storage.Add(dataFile, indexDlinkElement);
+                    }
                 }
                 else
                 {
                     //Get it from blobs (A or B)
                     Program.BlobsFile(true, dataFile, blobInfo.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    if (indexDlinkElement != null) indexDlink.storage.Remove(dataFile);
+                    indexDlinkElement = new IndexDlinkElement(dataFile, blobInfo.sha256, new FileInfo(dataFile).LastWriteTimeUtc);                    
+                    indexDlink.storage.Add(dataFile, indexDlinkElement);
                 }
             }
 
@@ -23328,27 +23339,24 @@ namespace Gekko
         /// <param name="blobInfo"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, IndexDlinkElement helper)
-        {             
+        public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, DateTime? dataFileStampUtc, string dataFileSha256Input)
+        {
+            string dataFileSha256 = dataFileSha256Input;
             FileInfo fi = new FileInfo(dataFile);
             if (!fi.Exists) return false;
             if (fi.Length != blobInfo.size) return false;
             //Here we know that the data file exists and is of the right size. Now we check stamp.
             double krit = 2d; //1s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
-            if (helper != null && helper.stampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)helper.stampUtc).TotalSeconds) < krit)
-            {
-                //Will return true: if the file (that exists with the right size) has not changed since .dlink files were last investigated, we consider it ok (we give 2 s slack)            
+            if (dataFileStampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)dataFileStampUtc).TotalSeconds) < krit)
+            {                
+                //dataFileSha256 is ok, but must still be checked
             }
             else
-            {                
-                //We now need to check the sha256. In principle we could copy the file from blobs, where we know what the sha256 is,
-                //but sha256 is probably faster than file IO copying.                
-                helper.sha256 = Program.BlobsHash(dataFile, true); //update it!
-                helper.stampUtc = fi.LastWriteTimeUtc;
-                helper.fileNameAndPath = dataFile;
-                //MessageBox.Show("sha1 " + blobInfo.sha256 + " sha2 " + helper.sha256);                
+            {
+                //We now need to calc the sha256 physically.                
+                dataFileSha256 = Program.BlobsHash(dataFile, true);
             }
-            if (blobInfo.sha256 != helper.sha256) return false;
+            if (blobInfo.sha256 != dataFileSha256) return false;
             return true;
         }
 
@@ -38724,5 +38732,17 @@ namespace Gekko
         public string sha256 = null;
         [ProtoMember(3)]
         public DateTime? stampUtc = null;
+
+        public IndexDlinkElement()
+        {
+            //For protobuf
+        }
+
+        public IndexDlinkElement(string fileNameAndPath, string sha256, DateTime? stampUtc)
+        {
+            this.fileNameAndPath = fileNameAndPath;
+            this.sha256 = sha256;
+            this.stampUtc = stampUtc;
+        }
     }
 }
