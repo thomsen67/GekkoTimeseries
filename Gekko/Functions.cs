@@ -6801,7 +6801,13 @@ namespace Gekko
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
             if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
-        }      
+        }
+
+        public static void githooks(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {            
+            string s = O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git")));
+            Program.VersioningHandleGitConfigFile(s);
+        }
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {

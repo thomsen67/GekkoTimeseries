@@ -5777,10 +5777,11 @@ namespace Gekko
             //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
             //This is a little better than hex (32 symbols).
             return hash;
-        }
+        }        
 
         public static string GetSha256FromFile(string filePath)
         {
+            string hash = null;
             using (var stream = File.OpenRead(filePath))
             {
                 using (var sha256 = SHA256.Create())
@@ -5792,9 +5793,11 @@ namespace Gekko
                     {
                         sb.Append(b.ToString("x2"));
                     }
-                    return sb.ToString();
+                    hash = sb.ToString();
                 }
             }
+
+            return hash;
         }
 
         /// <summary>

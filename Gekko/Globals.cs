@@ -538,6 +538,7 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
+        public static List<string> alreadyZipped = new List<string>() { "gbk", "xlsx", "parquet"};
 
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0

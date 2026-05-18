@@ -23027,27 +23027,25 @@ namespace Gekko
         public static void Versioning(string[] args)
         {
             //Versionering af data
-            //- option databank versioning = 'dlink';
-            //- Når Gekko kører kildeprojekt tjekkes at hook scripts er aktiveret i \.git\config og ellers sættes den til.            
+            //- brug githooks() og sæt option databank versioning = 'dlink';                 
             //- Mht.gbk - filer bruges "data-hash", SHA256.
-            //- .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens.  
-            //- Lægge filer i blobs som zippede (dog ikke .gbk og .xlsx og måske parquet og andre zippede --> TJEK).
+            //- .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens.              
             //- Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
             //- Reservér det sidste hex i hashkoden til at angive traces eller ej (0 eller 1).
             //- Hvordan kører det med branch-switch, eller gå ind i anden branch-mappe, eller flytte .dlink-filer eller datafiler? Robust?            
-            //- Måske reservere den sidste hex til trace-eller-ej.
-
+            
             string programFolder = G.CleanupFolderName(@"c:\Thomas\Gekko\BlobsTest\tth\staging", false);
             string dataFolder = G.CleanupFolderName(@"c:\Tools\Data\tth\staging", false);
             string blobsFolder = G.CleanupFolderName(@"c:\Tools\Blobs", false);
             string indexDlinkFile = Path.Combine(programFolder, ".git", "index_dlink");
+            string gitConfigFile = Path.Combine(programFolder, ".git", "config");
             string s2 = args[0].Substring("versioning:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
             string[] results = new string[matches.Count - 1];
             string type = matches[0].Groups[1].Value;
             for (int i = 1; i < matches.Count; i++) results[i - 1] = matches[i].Groups[1].Value;
             List<string> filesNew = new List<string>();
-            List<string> filesOverwritten = new List<string>();
+            List<string> filesOverwritten = new List<string>();            
 
             Sha256Storage sha256Storage = new Sha256Storage();
             if (File.Exists(indexDlinkFile))
@@ -23058,7 +23056,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    if (programFolder.Contains("\\tth\\")) MessageBox.Show("Loading " + indexDlinkFile + " failed");                    
+                    if (programFolder.Contains("\\tth\\")) MessageBox.Show("Loading " + indexDlinkFile + " failed");
                 }
             }
 
@@ -23154,7 +23152,98 @@ namespace Gekko
                 w.textBox1.FontSize = 11;
                 w.ShowDialog();
             }
-        }        
+        }
+
+        public static void VersioningHandleGitConfigFile(string parentPath)
+        {
+            string configFile = Path.Combine(parentPath, ".git", "config");
+            if (!File.Exists(configFile)) new Error(configFile + " does not exist");
+            var lines = File.ReadAllLines(configFile);
+
+            bool insideCoreSection = false;
+            bool hasHooksPathLine = false;
+            bool hooksPathIsCorrect = false;
+            int targetLineIndex = -1;
+            int endOfCoreIndex = -1;
+
+            // --- PASS 1: Analyze the file structure ---
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string trimmedLine = lines[i].Trim();
+                string cleanValue = trimmedLine.Replace(" ", "").Replace("\t", "");
+                if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
+                {
+                    if (insideCoreSection)
+                    {
+                        // We are leaving [core] and entering a new section. 
+                        // Mark where the [core] section naturally ended.
+                        endOfCoreIndex = i;
+                        insideCoreSection = false;
+                    }
+                    if (G.Equal(trimmedLine, "[core]"))
+                    {
+                        insideCoreSection = true;
+                    }
+                }
+                else if (insideCoreSection)
+                {
+                    // Track the last valid line index inside [core] in case we need to append
+                    if (!string.IsNullOrWhiteSpace(trimmedLine))
+                    {
+                        endOfCoreIndex = i + 1;
+                    }
+
+                    // Check if a hooksPath directive already exists here
+                    if (cleanValue.StartsWith("hooksPath=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasHooksPathLine = true;
+                        targetLineIndex = i; // Save exactly where it sits                        
+                        if (G.Equal(cleanValue, "hooksPath=hooks"))
+                        {
+                            hooksPathIsCorrect = true;
+                        }
+                    }
+                }
+            }
+
+            // Handle the edge case where [core] is at the very bottom of the file
+            if (insideCoreSection && endOfCoreIndex == -1)
+            {
+                endOfCoreIndex = lines.Length;
+            }
+
+            // --- PASS 2: Determine if changes are needed ---
+
+            // Scenario A: It already exists and it's exactly what you want. Do absolutely nothing!
+            if (hasHooksPathLine && hooksPathIsCorrect)
+            {
+                return;
+            }
+
+            var outputLines = new List<string>(lines);
+
+            // Scenario B: The line exists, but it points to the wrong directory.
+            // Overwrite it in place without moving it.
+            if (hasHooksPathLine && !hooksPathIsCorrect)
+            {
+                outputLines[targetLineIndex] = "\thooksPath = hooks";
+            }
+            // Scenario C: The line doesn't exist at all.
+            // Insert it safely at the very end of the [core] section.
+            else if (!hasHooksPathLine && endOfCoreIndex != -1)
+            {
+                outputLines.Insert(endOfCoreIndex, "\thooksPath = hooks");
+            }
+            // Scenario D: Extreme edge-case where [core] section doesn't exist in the file at all.
+            else
+            {
+                outputLines.Insert(0, "[core]");
+                outputLines.Insert(1, "\thooksPath = hooks");
+            }
+
+            // Commit changes to disk
+            File.WriteAllLines(configFile, outputLines);
+        }
 
         /// <summary>
         /// Returns true if file is ok, else it must be fetched from blobs
@@ -23179,7 +23268,7 @@ namespace Gekko
             {
                 //We now need to check the sha256. In principle we could copy the file from blobs, where we know what the sha256 is,
                 //but sha256 is probably faster than file IO copying.                
-                helper.sha256 = G.GetSha256FromFile(dataFile); //update it!
+                helper.sha256 = Program.BlobsHash(dataFile, true); //update it!
                 helper.stampUtc = fi.LastWriteTimeUtc;
                 helper.fileNameAndPath = dataFile;
                 if (blobInfo.sha256 != helper.sha256) return false;
@@ -23200,7 +23289,7 @@ namespace Gekko
                 string f1 = G.CleanupFolderName(Program.options.databank_versioning_root1, false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
                 string f2 = G.CleanupFolderName(Program.options.databank_versioning_root2, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
                 string blobFileNameAndPath1 = G.RelativePath(fileNameAndPath, f1, f2, "Regarding versioning." + Program.options.databank_versioning_name + " file, option databank versioning root1 and root2 must both have values", "Regarding versioning." + Program.options.databank_versioning_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'");
-                blobInfo.sha256 = G.GetSha256FromFile(fileNameAndPath); //TODO: WithWait or WaitFor...
+                blobInfo.sha256 = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
                 blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
                 string blobFileNameAndPath2 = Path.Combine(blobFileNameAndPath1 + "." + Program.options.databank_versioning_name);
                 if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2))) new Error("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_versioning_name + " file writing");
@@ -23208,55 +23297,160 @@ namespace Gekko
             }
         }
 
+        public static string BlobsHash(string filePath, bool specialFlagForTraces)
+        {
+            //
+            // TODO: here we could do datahash for .gbk files instead (and handle specialFlagForTraces too)
+            // If we can loop through all IVariables, while sorting dict keys before calling children, we
+            // can use an incremental sha256 engine. For series, we need to stamp/inject the first observation as
+            // a freq + super + sub + subsub. We need to rempace G.IsNumericalError() with double.NaN.
+            // Also, scalars and matrices and maps. Labels for matrices? Should we truncate precision?
+            //
+            string hash = G.GetSha256FromFile(filePath);
+
+            bool hasTraces = false;
+            bool isGbk = false;
+            if (specialFlagForTraces && G.Equal(Path.GetExtension(filePath), "gbk"))
+            {
+                try
+                {
+                    using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(filePath))
+                    {
+                        foreach (System.IO.Compression.ZipArchiveEntry entry in archive.Entries)
+                        {
+                            isGbk = true;
+                            if (G.Equal(entry.Name, Globals.protobufFileName3))
+                            {
+                                hasTraces = true;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                catch
+                {
+                }
+            }
+
+            //We are going to use "datahash" for .gbk. Below it is ensured that two files with same datahash, but where
+            //there are traces in one file and not in another will have different hashes.
+            if (isGbk && hasTraces)
+            {
+                hash = hash.Substring(0, hash.Length - 1) + "1"; //always ends with 1
+            }
+            else if (isGbk)
+            {
+                hash = hash.Substring(0, hash.Length - 1) + "0"; //always ends with 0
+            }
+            return hash;
+        }
+
         public static void BlobsFile(bool get, string fileName, string sha256, string blobsFolder, List<string> filesNew, List<string> filesOverwritten)
         {
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO            
+            // -----------------------------------------------------------
+            // ==== Think about atomic writes and simultaneous threads
+            // -----------------------------------------------------------
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             if (!Directory.Exists(blobsFolder)) new Error("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
             if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini"))) new Error("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist for file blobs/storage");
             string shapart1 = sha256.Substring(0, 2);
             string shapart2 = sha256.Substring(2);
             if (get)
             {
-                //Getting
+                // ------------------------------------
+                // Getting
+                // ------------------------------------
                 if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
                 {
                     new Error("Could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
                 }
                 else
-                {
-                    //Think about atomic copies (threads)
+                {                    
                     if (File.Exists(fileName)) filesOverwritten.Add(fileName);
                     else filesNew.Add(fileName);
-                    File.Copy(Path.Combine(blobsFolder, shapart1, shapart2), fileName, true); //Allows overwrite, TODO UNZIPPING                    
-                    G.ReadOnlyRemove(fileName);
+                    BlobsFileGet(fileName, Path.Combine(blobsFolder, shapart1, shapart2));
                 }
             }
             else
             {
-                //Putting
+                // ------------------------------------
+                // Putting
+                // ------------------------------------
                 string blobsFile = Path.Combine(blobsFolder, shapart1, shapart2);
                 if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
                 {
-                    Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));
-                    //Think about atomic copies (threads)
-                    File.Copy(fileName, blobsFile); //TODO ZIPPING
-                    G.ReadOnlySet(blobsFile);
+                    Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));                    
+                    BlobsFilePut(fileName, blobsFile);
                 }
                 else
                 {
-                    if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
+                    if (File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
                     {
-                        //Think about atomic copies (threads)
-                        File.Copy(fileName, blobsFile); //TODO ZIPPING
-                        G.ReadOnlySet(blobsFile);
+                        //No need to copy it: same file is already there
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO ---> if a gbk is newer but with same datahash, we could add the new one (may have better meta information)
+                        //TODO TODO TODO
+                        //TODO TODO TODO
                     }
                     else
                     {
-                        //No need to copy it: same file is already there
+                        BlobsFilePut(fileName, blobsFile);                        
                     }
                 }
             }
         }
-        
+
+        private static void BlobsFileGet(string fileName, string blobsFile)
+        {
+            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+            {
+                using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
+                {                    
+                    ZipArchiveEntry entry = archive.GetEntry("storage");
+                    if (entry != null)
+                    {                        
+                        entry.ExtractToFile(fileName, true);
+                    }
+                }
+            }
+            else
+            {
+                File.Copy(blobsFile, fileName, true); //Allows overwrite, TODO UNZIPPING                    
+            }
+            G.ReadOnlyRemove(fileName);
+        }
+
+        private static void BlobsFilePut(string fileName, string blobsFile)
+        {
+            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+            {
+                using (FileStream zipToOpen = new FileStream(blobsFile, FileMode.Create, FileAccess.Write))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
+                    {
+                        ZipArchiveEntry readmeEntry = archive.CreateEntry(Path.GetFileName("storage"));
+                        using (Stream writer = readmeEntry.Open())
+                        using (FileStream fs = File.OpenRead(fileName))
+                        {
+                            fs.CopyTo(writer);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                File.Copy(fileName, blobsFile);
+            }
+            G.ReadOnlySet(blobsFile);
+        }
+
 
         /// <summary>
         /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes. Call either with a list of strings (list1/list2) or
