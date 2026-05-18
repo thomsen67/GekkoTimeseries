@@ -76,10 +76,10 @@ namespace Gekko
         public bool databank_file_gbk_underscore = false; //if set to true, when reading a Gekko 2.x gbk databank, a variable like x___a___b is understood as an array-series x[a,b].
         public bool databank_search = true;
 
-        public bool databank_versioning = true;
-        public string databank_versioning_name = "dlink";
-        public string databank_versioning_root1 = "";
-        public string databank_versioning_root2 = "";
+        public bool databank_dlink = true;
+        public string databank_dlink_name = "dlink";
+        public string databank_dlink_root1 = "";
+        public string databank_dlink_root2 = "";
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
@@ -436,10 +436,10 @@ namespace Gekko
             Add("DATABANK FILE GBK UNDERSCORE", Globals.xbool);
             Add("DATABANK SEARCH", Globals.xbool);            
 
-            Add("DATABANK VERSIONING", Globals.xbool);
-            Add("DATABANK VERSIONING NAME", Globals.xnameOrString, "dlink");
-            Add("DATABANK VERSIONING ROOT1", Globals.xnameOrStringOrFilename);
-            Add("DATABANK VERSIONING ROOT2", Globals.xnameOrStringOrFilename);
+            Add("DATABANK DLINK", Globals.xbool);
+            Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK ROOT1", Globals.xnameOrStringOrFilename);
+            Add("DATABANK DLINK ROOT2", Globals.xnameOrStringOrFilename);
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 

@@ -6806,7 +6806,7 @@ namespace Gekko
         public static void githooks(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {            
             string s = O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git")));
-            Program.VersioningHandleGitConfigFile(s);
+            Program.GitHooks(s);
         }
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)

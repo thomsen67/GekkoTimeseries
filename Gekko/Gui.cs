@@ -248,10 +248,10 @@ namespace Gekko
         [STAThread]
         public static void Main(string[] args)
         {                        
-            if (args.Length == 1 && args[0].StartsWith("-versioning:"))
+            if (args.Length == 1 && args[0].StartsWith("-dlink:"))
             {
                 MessageBox.Show(Stringlist.GetListWithCommas(args));
-                Program.Versioning(args);
+                Program.DLink(args);
                 return;
             }
 

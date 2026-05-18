@@ -2839,9 +2839,9 @@ namespace Gekko
             {
                 if (text == "v")
                 {
-                    string s = "-versioning:'pre-commit','grundbk/_uddata/x2.gbk.dlink','grundbk/_uddata/x5.csv.dlink','grundbk/_uddata/x5.gbk.dlink'";
+                    string s = "-dlink:'pre-commit','grundbk/_uddata/x2.gbk.dlink','grundbk/_uddata/x5.csv.dlink','grundbk/_uddata/x5.gbk.dlink'";
                     string[] args = new string[] { s };
-                    Program.Versioning(args);
+                    Program.DLink(args);
                     return;
                 }
 
@@ -23024,26 +23024,51 @@ namespace Gekko
             Blob(blob, new BlobInfo() { variables = list2.Count });
         }
 
-        public static void Versioning(string[] args)
+        /// <summary>
+        /// DLink() must be fed with a list of .dlink files to update. The list comes from Git via a Git hook. In principle, Gekko
+        /// could look at all .dlink files, but some of these may be irrelevant and not versioned.
+        /// </summary>
+        /// <param name="args"></param>
+        public static void DLink(string[] args)
         {
             //Versionering af data
-            //- brug githooks() og sæt option databank versioning = 'dlink';                 
-            //- Mht.gbk - filer bruges "data-hash", SHA256.
-            //- .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens.              
-            //- Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
-            //- Reservér det sidste hex i hashkoden til at angive traces eller ej (0 eller 1).
-            //- Hvordan kører det med branch-switch, eller gå ind i anden branch-mappe, eller flytte .dlink-filer eller datafiler? Robust?            
-            
-            string programFolder = G.CleanupFolderName(@"c:\Thomas\Gekko\BlobsTest\tth\staging", false);
-            string dataFolder = G.CleanupFolderName(@"c:\Tools\Data\tth\staging", false);
-            string blobsFolder = G.CleanupFolderName(@"c:\Tools\Blobs", false);
+
+            // Make a new branch, and copy in all data files from some other branch
+            // Open Gekko inside the branch in some module
+            // Run githooks() --> activates .dlink sync when committing, switching etc.            
+            // Run a module --> should produce .dlink files
+            // Commit .dlink files
+            // Change something that changes a .gbk
+            // Commit new .dlink files.
+            // Checkout the previous commit
+
+            //+ Make sure githooks() has been run. But if not, this method can never be called anyway,
+            //  because only Git knows the list of .dlink files in its index file. When DLink() is called,
+            //  Git has just been asked to list all .dlink files form its index (this is a fast operation).
+            //+ Mht.gbk - filer bruges "data-hash", SHA256.
+            //+ .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens.              
+            //+ Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
+            //+ Reservér det sidste hex i hashkoden til at angive traces eller ej (0 eller 1).
+            //+ Hvordan kører det med branch-switch, eller gå ind i anden branch-mappe, eller flytte .dlink-filer eller datafiler? Robust?            
+            //  Burde vel være fint nok.
+
+            //TODO: Get programFolder 
+            string programFolder = Globals.dlink_programFolder;
+            string dataFolder = Globals.dlink_dataFolder;
+            string blobsFolder = Globals.dlink_blobsFolder;
+            // -----
             string indexDlinkFile = Path.Combine(programFolder, ".git", "index_dlink");
             string gitConfigFile = Path.Combine(programFolder, ".git", "config");
-            string s2 = args[0].Substring("versioning:".Length);
+            string s2 = args[0].Substring("dlink:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
-            string[] results = new string[matches.Count - 1];
+            List<string> dlinkFiles = new List<string>();
             string type = matches[0].Groups[1].Value;
-            for (int i = 1; i < matches.Count; i++) results[i - 1] = matches[i].Groups[1].Value;
+            for (int i = 1; i < matches.Count; i++)
+            {
+                string s = matches[i].Groups[1].Value;
+                if (G.NullOrBlanks(s)) continue; //First time, it can have a '' as the first element
+                dlinkFiles[i - 1] = s;
+            }
             List<string> filesNew = new List<string>();
             List<string> filesOverwritten = new List<string>();            
 
@@ -23061,7 +23086,7 @@ namespace Gekko
             }
 
             GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (string dlinkFile2 in results) //Could probably be parallelized
+            foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
             {
                 string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
                 string dLinkFileWithPath = Path.Combine(programFolder, dlinkFile);
@@ -23089,7 +23114,7 @@ namespace Gekko
                     helper = new Sha256StorageHelper();
                     sha256Storage.storage.Add(dataFile, helper); //get it in
                 }
-                bool isDataFileOk = VersioningHelperFileOk(dataFile, blobInfo, helper);
+                bool isDataFileOk = DLlinkHelperFileOk(dataFile, blobInfo, helper);
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
@@ -23154,7 +23179,7 @@ namespace Gekko
             }
         }
 
-        public static void VersioningHandleGitConfigFile(string parentPath)
+        public static void GitHooks(string parentPath)
         {
             string configFile = Path.Combine(parentPath, ".git", "config");
             if (!File.Exists(configFile)) new Error(configFile + " does not exist");
@@ -23253,7 +23278,7 @@ namespace Gekko
         /// <param name="blobInfo"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool VersioningHelperFileOk(string dataFile, BlobInfo blobInfo, Sha256StorageHelper helper)
+        public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, Sha256StorageHelper helper)
         {             
             FileInfo fi = new FileInfo(dataFile);
             if (!fi.Exists) return false;
@@ -23277,22 +23302,25 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Handles blobs, for versioning
+        /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="fileNameAndPath"></param>
         private static void Blob(string fileNameAndPath, BlobInfo blobInfo)
         {
-            if (Program.options.databank_versioning)
+            if (Program.options.databank_dlink)
             {
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
-                string f1 = G.CleanupFolderName(Program.options.databank_versioning_root1, false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
-                string f2 = G.CleanupFolderName(Program.options.databank_versioning_root2, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
-                string blobFileNameAndPath1 = G.RelativePath(fileNameAndPath, f1, f2, "Regarding versioning." + Program.options.databank_versioning_name + " file, option databank versioning root1 and root2 must both have values", "Regarding versioning." + Program.options.databank_versioning_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'");
-                blobInfo.sha256 = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                string f1 = G.CleanupFolderName(Globals.dlink_dataFolder, false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
+                string f2 = G.CleanupFolderName(Globals.dlink_programFolder, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
+                string blobFileNameAndPath1 = G.RelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, option databank dlink root1 and root2 must both have values", "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'");
+                if (File.Exists(fileNameAndPath))
+                {
+                    blobInfo.sha256 = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                }
                 blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
-                string blobFileNameAndPath2 = Path.Combine(blobFileNameAndPath1 + "." + Program.options.databank_versioning_name);
-                if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2))) new Error("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_versioning_name + " file writing");
+                string blobFileNameAndPath2 = Path.Combine(blobFileNameAndPath1 + "." + Program.options.databank_dlink_name);
+                if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2))) new Error("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
                 G.YamlWriter<BlobInfo>(blobInfo, blobFileNameAndPath2);
             }
         }
