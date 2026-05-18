@@ -23111,12 +23111,12 @@ namespace Gekko
             List<string> filesNew = new List<string>();
             List<string> filesOverwritten = new List<string>();            
 
-            Sha256Storage sha256Storage = new Sha256Storage();
+            IndexDlink indexDlink = new IndexDlink();
             if (File.Exists(indexDlinkFile))
             {
                 try
                 {
-                    sha256Storage = ProtobufRead<Sha256Storage>(indexDlinkFile);
+                    indexDlink = ProtobufRead<IndexDlink>(indexDlinkFile);
                 }
                 catch
                 {
@@ -23157,14 +23157,14 @@ namespace Gekko
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
                 // --------------------------------------------------------------------------------------------------
-                Sha256StorageHelper helper = null;
-                sha256Storage.storage.TryGetValue(dataFile, out helper);
-                if (helper == null)
+                IndexDlinkElement indexDlinkElement = null;
+                indexDlink.storage.TryGetValue(dataFile, out indexDlinkElement);
+                if (indexDlinkElement == null)
                 {
-                    helper = new Sha256StorageHelper();
-                    sha256Storage.storage.Add(dataFile, helper); //get it in
+                    indexDlinkElement = new IndexDlinkElement();
+                    indexDlink.storage.Add(dataFile, indexDlinkElement); //get it in
                 }
-                bool isDataFileOk = DLlinkHelperFileOk(dataFile, blobInfo, helper);
+                bool isDataFileOk = DLlinkHelperFileOk(dataFile, blobInfo, indexDlinkElement);
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
@@ -23177,11 +23177,11 @@ namespace Gekko
                 }
             }
 
-            List<string> filesToRemove = sha256Storage.storage.Keys.Where(key => !datafiles.ContainsKey(key)).ToList();
-            foreach (var fileToRemove in filesToRemove) sha256Storage.storage.Remove(fileToRemove); //Else the storage will always grow
+            List<string> filesToRemove = indexDlink.storage.Keys.Where(key => !datafiles.ContainsKey(key)).ToList();
+            foreach (var fileToRemove in filesToRemove) indexDlink.storage.Remove(fileToRemove); //Else the storage will always grow
             try
             {
-                ProtobufWrite(sha256Storage, indexDlinkFile); //refresh the file
+                ProtobufWrite(indexDlink, indexDlinkFile); //refresh the file
             }
             catch
             {
@@ -23328,22 +23328,19 @@ namespace Gekko
         /// <param name="blobInfo"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, Sha256StorageHelper helper)
+        public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, IndexDlinkElement helper)
         {             
             FileInfo fi = new FileInfo(dataFile);
-            //MessageBox.Show("File " + dataFile + " exists: " + fi.Exists + " len " + fi.Length + " stam1 " + helper.stampUtc + " stamp2 " + fi.LastWriteTimeUtc);
             if (!fi.Exists) return false;
             if (fi.Length != blobInfo.size) return false;
             //Here we know that the data file exists and is of the right size. Now we check stamp.
             double krit = 2d; //1s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
             if (helper != null && helper.stampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)helper.stampUtc).TotalSeconds) < krit)
             {
-                //MessageBox.Show("File " + dataFile + " is ok regarding lenght and |stamp| < 2");
                 //Will return true: if the file (that exists with the right size) has not changed since .dlink files were last investigated, we consider it ok (we give 2 s slack)            
             }
             else
-            {
-                //MessageBox.Show("File " + dataFile + " has |stamp| > 2");
+            {                
                 //We now need to check the sha256. In principle we could copy the file from blobs, where we know what the sha256 is,
                 //but sha256 is probably faster than file IO copying.                
                 helper.sha256 = Program.BlobsHash(dataFile, true); //update it!
@@ -38710,16 +38707,16 @@ namespace Gekko
     }    
 
     [ProtoContract]
-    public class Sha256Storage
+    public class IndexDlink
     {
         [ProtoMember(1)]
         public string version = "1.0";
         [ProtoMember(2)]
-        public GekkoDictionary<string, Sha256StorageHelper> storage = new GekkoDictionary<string, Sha256StorageHelper>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, IndexDlinkElement> storage = new GekkoDictionary<string, IndexDlinkElement>(StringComparer.OrdinalIgnoreCase);
     }
 
     [ProtoContract]
-    public class Sha256StorageHelper
+    public class IndexDlinkElement
     {
         [ProtoMember(1)]
         public string fileNameAndPath = null;
