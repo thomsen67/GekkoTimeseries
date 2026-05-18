@@ -23044,15 +23044,11 @@ namespace Gekko
             // + Create new repo on https://github.com/thomsen67, for instance Blobs2
             // + On c:\Tools, create \Makrobk and \Makrobk_kilde
             // + In c:\Tools\Makrobk\tth\test, clone Blobs2 so \.git ends at c:\Tools\Makrobk\tth\test\.git
-            // + In the \.git folder, manually add the line 
+            // + In \.git\config put this line in [core] if not already there: hooksPath = makrobk_grunddata/_utilities/githooks
             // + Create c:\Tools\Makrobk_kilde\2025_10_01\_blobs and 
             //   c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata
             // + In c:\Tools\Makrobk_kilde\2025_10_01\_blobs\_blobs, put a blobsroot.ini
-            // + Create folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs
-            // + Create folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_uddata_dlink
-            // + Create folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\_utilities
-            //     and put files from c:\Tools\Hooks inside.
-            // + Put this line in [core] is not already there: hooksPath = makrobk_grunddata/_utilities/githooks
+            // + From c:\Tools\Hooks copy the \makrobk_grunddata folder to c:\Tools\Makrobk\tth\test                        
             // + In c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver, put a root.ini
             // In Globals.cs, set these:
             //     public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
@@ -23098,8 +23094,6 @@ namespace Gekko
             //  Burde vel være fint nok.
 
             //TODO: Get programFolder 
-
-
 
             // -----
             string indexDlinkFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "index_dlink");
@@ -23337,27 +23331,27 @@ namespace Gekko
         public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, Sha256StorageHelper helper)
         {             
             FileInfo fi = new FileInfo(dataFile);
-            MessageBox.Show("File " + dataFile + " exists: " + fi.Exists + " len " + fi.Length + " stam1 " + helper.stampUtc + " stamp2 " + fi.LastWriteTimeUtc);
+            //MessageBox.Show("File " + dataFile + " exists: " + fi.Exists + " len " + fi.Length + " stam1 " + helper.stampUtc + " stamp2 " + fi.LastWriteTimeUtc);
             if (!fi.Exists) return false;
             if (fi.Length != blobInfo.size) return false;
             //Here we know that the data file exists and is of the right size. Now we check stamp.
             double krit = 2d; //1s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
             if (helper != null && helper.stampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)helper.stampUtc).TotalSeconds) < krit)
             {
-                MessageBox.Show("File " + dataFile + " is ok regarding lenght and |stamp| < 2");
+                //MessageBox.Show("File " + dataFile + " is ok regarding lenght and |stamp| < 2");
                 //Will return true: if the file (that exists with the right size) has not changed since .dlink files were last investigated, we consider it ok (we give 2 s slack)            
             }
             else
             {
-                MessageBox.Show("File " + dataFile + " has |stamp| > 2");
+                //MessageBox.Show("File " + dataFile + " has |stamp| > 2");
                 //We now need to check the sha256. In principle we could copy the file from blobs, where we know what the sha256 is,
                 //but sha256 is probably faster than file IO copying.                
                 helper.sha256 = Program.BlobsHash(dataFile, true); //update it!
                 helper.stampUtc = fi.LastWriteTimeUtc;
                 helper.fileNameAndPath = dataFile;
-                MessageBox.Show("sha1 " + blobInfo.sha256 + " sha2 " + helper.sha256);
-                if (blobInfo.sha256 != helper.sha256) return false;
+                //MessageBox.Show("sha1 " + blobInfo.sha256 + " sha2 " + helper.sha256);                
             }
+            if (blobInfo.sha256 != helper.sha256) return false;
             return true;
         }
 
@@ -23519,18 +23513,18 @@ namespace Gekko
         {
             if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
             {
-                using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
-                {                    
-                    ZipArchiveEntry entry = archive.GetEntry("storage");
-                    if (entry != null)
-                    {                        
-                        entry.ExtractToFile(fileName, true);
-                    }
-                }
+                File.Copy(blobsFile, fileName, true); //Allows overwrite, TODO UNZIPPING                    
             }
             else
             {
-                File.Copy(blobsFile, fileName, true); //Allows overwrite, TODO UNZIPPING                    
+                using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
+                {
+                    ZipArchiveEntry entry = archive.GetEntry("storage");
+                    if (entry != null)
+                    {
+                        entry.ExtractToFile(fileName, true);
+                    }
+                }
             }
             G.ReadOnlyRemove(fileName);
         }
