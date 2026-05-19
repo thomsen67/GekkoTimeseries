@@ -6873,7 +6873,7 @@ namespace Gekko
                 {
                     //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
                     //      So CLOSE handles this.
-                    Blob(blob, new DlinkFile() { variables = databank.storage.Count() });
+                    Blob(blob, databank.storage.Count());
                 }
                 
             }  //for each bank in list
@@ -7721,7 +7721,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
-            Blob(blob, new DlinkFile() { });
+            Blob(blob, null);
         }
 
         /// <summary>
@@ -23026,7 +23026,7 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
-            Blob(blob, new DlinkFile() { variables = list2.Count });
+            Blob(blob, list2.Count);
         }
 
         /// <summary>
@@ -23365,8 +23365,11 @@ namespace Gekko
         /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="fileNameAndPath"></param>
-        private static void Blob(string fileNameAndPath, DlinkFile blobInfo)
+        private static void Blob(string fileNameAndPath, long? nVariables)
         {
+            string hash = null;
+            long? size = null;
+            DateTime? stamp = null;            
             if (Program.options.databank_dlink)
             {
                 //Note: just because a .dlink file is constructed, this it not the same
@@ -23382,15 +23385,16 @@ namespace Gekko
                 {
                     if (File.Exists(fileNameAndPath))
                     {
-                        blobInfo.hash = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                        hash = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
                     }
-                    blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
+                    size = (new FileInfo(fileNameAndPath)).Length;
                     string blobFileNameAndPath2 = blobFileNameAndPath1 + "." + Program.options.databank_dlink_name;
                     if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2)))
                     {
                         MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
                         new Error();
                     }
+                    DlinkFile blobInfo = new DlinkFile(hash, size, stamp, nVariables, null);
                     G.YamlWriter<DlinkFile>(blobInfo, blobFileNameAndPath2);
                 }
             }
@@ -24560,7 +24564,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    Blob(blob, new DlinkFile() { variables = list1Sorted?.Count ?? 0 });
+                    Blob(blob, list1Sorted?.Count ?? 0);
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24588,7 +24592,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    Blob(blob, new DlinkFile() { variables = list2Sorted?.Count ?? 0 });
+                    Blob(blob, list2Sorted?.Count ?? 0 );
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24616,7 +24620,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    Blob(blob, new DlinkFile() { variables = list2Sorted?.Count ?? 0 });
+                    Blob(blob, list2Sorted?.Count ?? 0 );
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24792,7 +24796,7 @@ namespace Gekko
                 file.Flush();
             }
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
-            Blob(blob, new DlinkFile() { });
+            Blob(blob, null);
         }
 
         /// <summary>
@@ -24841,7 +24845,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            Blob(blob, new DlinkFile() { });
+            Blob(blob, null);
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
@@ -25183,7 +25187,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new DlinkFile() { variables = count });
+            Blob(blob, count);
             return count;
         }
 
@@ -25265,7 +25269,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new DlinkFile() { variables = count });
+            Blob(blob, count);
             return count;
         }
 
@@ -25306,7 +25310,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new DlinkFile() { variables = count });
+            Blob(blob, count);
             return count;
         }
 
@@ -26367,7 +26371,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, new DlinkFile() { variables = counter });
+            Blob(blob, counter);
             return counter;
         }        
 
@@ -26514,7 +26518,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-            Blob(blob, new DlinkFile() { variables = list2.Count });
+            Blob(blob, list2.Count);
             return list2.Count;
         }
 
@@ -26606,7 +26610,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, new DlinkFile() { variables = counter });
+            Blob(blob, counter);
             return counter;
         }
 
@@ -26739,7 +26743,7 @@ namespace Gekko
             }
             if (File.Exists(removed.FileNameWithPath)) //probably always exists...
             {
-                Blob(removed.FileNameWithPath, new DlinkFile() { variables = removed.storage.Count() });
+                Blob(removed.FileNameWithPath, removed.storage.Count());
             }
         }
 
@@ -33715,7 +33719,7 @@ namespace Gekko
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
-                                Blob(blob, new DlinkFile() { });
+                                Blob(blob, null);
                             }
                             catch (Exception e)
                             {
@@ -34342,7 +34346,7 @@ namespace Gekko
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                         G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
-                        Blob(blob, new DlinkFile() { });
+                        Blob(blob, null);
                     }
                     return null;
                 }
@@ -38742,11 +38746,20 @@ namespace Gekko
 
     public class DlinkFile
     {
-        public string version = "1.0";
-        public string hash = null;        
-        public long? size = null;
-        public DateTime? stamp = null;
-        public long? variables = null;
-        public string extra = null;        
+        public readonly string version = "1.0";
+        public readonly string hash = null;        
+        public readonly long? size = null;
+        public readonly DateTime? stamp = null;
+        public readonly long? variables = null;
+        public readonly string extra = null;
+
+        public DlinkFile(string hash, long? size, DateTime? stamp, long? nVariables, string extra)
+        {
+            this.hash = hash;
+            this.size = size;
+            this.stamp = stamp;
+            this.variables = nVariables;
+            this.extra = extra;
+        }
     }        
 }
