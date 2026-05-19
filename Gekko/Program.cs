@@ -23163,27 +23163,27 @@ namespace Gekko
                 indexDlink.storage.TryGetValue(dataFile, out indexDlinkElement);
                 if (indexDlinkElement != null)                
                 {
-                    indexDlink_dataFileHash = indexDlinkElement.sha256;
-                    indexDlink_dataFileStamp = indexDlinkElement.stampUtc;
+                    indexDlink_dataFileHash = indexDlinkElement.hash;
+                    indexDlink_dataFileStamp = indexDlinkElement.stamp;
                 }
                 bool isDataFileOk = DLlinkHelperFileOk(dataFile, dlinkFileData, indexDlink_dataFileStamp, indexDlink_dataFileHash); //regarding last two args: either both non-null or both null
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
-                    Program.BlobsFile(false, dataFile, dlinkFileData.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(false, dataFile, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
                     if (indexDlinkElement == null)
                     {
                         //Add it if not already there
-                        indexDlinkElement = new IndexDlinkElement(dataFile, dlinkFileData.sha256, new FileInfo(dataFile).LastWriteTimeUtc);
+                        indexDlinkElement = new IndexDlinkElement(dataFile, dlinkFileData.hash, new FileInfo(dataFile).Length, new FileInfo(dataFile).LastWriteTimeUtc);
                         indexDlink.storage.Add(dataFile, indexDlinkElement);
                     }
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    Program.BlobsFile(true, dataFile, dlinkFileData.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(true, dataFile, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
                     if (indexDlinkElement != null) indexDlink.storage.Remove(dataFile);
-                    indexDlinkElement = new IndexDlinkElement(dataFile, dlinkFileData.sha256, new FileInfo(dataFile).LastWriteTimeUtc);                    
+                    indexDlinkElement = new IndexDlinkElement(dataFile, dlinkFileData.hash, new FileInfo(dataFile).Length, new FileInfo(dataFile).LastWriteTimeUtc);
                     indexDlink.storage.Add(dataFile, indexDlinkElement);
                 }
             }
@@ -23357,7 +23357,7 @@ namespace Gekko
                 //We now need to calc the sha256 physically.                
                 realSha256 = Program.BlobsHash(dataFile, true);
             }
-            if (dlinkFileData.sha256 != realSha256) return false;
+            if (dlinkFileData.hash != realSha256) return false;
             return true;
         }
 
@@ -23382,7 +23382,7 @@ namespace Gekko
                 {
                     if (File.Exists(fileNameAndPath))
                     {
-                        blobInfo.sha256 = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                        blobInfo.hash = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
                     }
                     blobInfo.size = (new FileInfo(fileNameAndPath)).Length;
                     string blobFileNameAndPath2 = blobFileNameAndPath1 + "." + Program.options.databank_dlink_name;
@@ -38705,16 +38705,6 @@ namespace Gekko
         }
     }
 
-    public class DlinkFile
-    {
-        public string version = "1.0";
-        public string sha256 = null;        
-        public long? size = null;
-        public int? variables = null;
-        public DateTime? stamp = null;
-        public string extra = null;        
-    }    
-
     [ProtoContract]
     public class IndexDlink
     {
@@ -38728,22 +38718,35 @@ namespace Gekko
     public class IndexDlinkElement
     {
         [ProtoMember(1)]
-        public string fileNameAndPath = null;
+        public readonly string name = null;
         [ProtoMember(2)]
-        public string sha256 = null;
+        public readonly string hash = null;
         [ProtoMember(3)]
-        public DateTime? stampUtc = null;
+        public readonly long? size = null;        
+        [ProtoMember(4)]
+        public readonly DateTime? stamp = null;        
 
         public IndexDlinkElement()
         {
             //For protobuf
         }
 
-        public IndexDlinkElement(string fileNameAndPath, string sha256, DateTime? stampUtc)
+        public IndexDlinkElement(string name, string hash, long size, DateTime? stamp)
         {
-            this.fileNameAndPath = fileNameAndPath;
-            this.sha256 = sha256;
-            this.stampUtc = stampUtc;
+            this.name = name;
+            this.hash = hash;
+            this.size = size;            
+            this.stamp = stamp;            
         }
     }
+
+    public class DlinkFile
+    {
+        public string version = "1.0";
+        public string hash = null;        
+        public long? size = null;
+        public DateTime? stamp = null;
+        public long? variables = null;
+        public string extra = null;        
+    }        
 }
