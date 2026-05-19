@@ -23048,18 +23048,13 @@ namespace Gekko
             // + Create c:\Tools\Makrobk_kilde\2025_10_01\_blobs and 
             //   c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata
             // + In c:\Tools\Makrobk_kilde\2025_10_01\_blobs\_blobs, put a blobsroot.ini
-            // + From c:\Tools\Hooks copy the \makrobk_grunddata folder to c:\Tools\Makrobk\tth\test                        
-            // + In c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver, put a root.ini
+            // + From c:\Tools\Hooks copy the \makrobk_grunddata folder to c:\Tools\Makrobk\tth\test                                    
             // In Globals.cs, set these:
             //     public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
             //     public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\", false);
             //     public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver", false);
             //     public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver", false);
-            //     public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
-            // + Add the file c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs\run_modul.gcm, with this code:
-            //     reset; time 2001 2003;
-            //     x1 = 101;
-            //     write <csv> c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata\x1.csv;
+            //     public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);            
             // + Start Gekko 3 in folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs, and run run_modul.gcm.
             //     - This produces c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_uddata_dlink\x1.csv.dlink
             //     - Git-add run_modul.gcm and x1.csv.dlink
@@ -23136,13 +23131,16 @@ namespace Gekko
                 }
                 DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
                 string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Globals.dlink_programFolderRunning, Globals.dlink_dataFolder, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Globals.dlink_programFolderGit + "'", false);
-                string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
+                string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");                
                 datafiles.Add(dataFile, false); //for cleanup purposes
                 if (G.NullOrBlanks(dataFile))
                 {
-                    MessageBox.Show("Datafile string is null");
-                    new Error();
+                    MessageBox.Show("Datafile string is null"); new Error();
                 }
+
+                FileInfo fi1 = new FileInfo(dataFile); //File may not exist
+                RealFile realFile = new RealFile(fi1.FullName, null, fi1.Length, fi1.LastWriteTimeUtc, fi1.Exists);                                                                                                
+
                 // --------------------------------------------------------------------------------------------------
                 //                              datafile exists
                 //                             yes            no
@@ -23157,26 +23155,25 @@ namespace Gekko
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
                 // --------------------------------------------------------------------------------------------------                
                 CacheIndexDlinkElement cacheIndexDlinkElement = null;
-                cacheIndexDlink.storage.TryGetValue(dataFile, out cacheIndexDlinkElement);
-                bool isDataFileOk = DLlinkHelperFileOk(dataFile, dlinkFileData, cacheIndexDlinkElement); //regarding last two args: either both non-null or both null
+                cacheIndexDlink.storage.TryGetValue(realFile.name, out cacheIndexDlinkElement);
+                //After this method call, realFile may change regarding .hash and .exists fields (and only those)
+                bool isDataFileOk = IsDLlinkHelperFileOk(realFile.name, dlinkFileData, cacheIndexDlinkElement, ref realFile); //regarding last two args: either both non-null or both null
                 if (isDataFileOk)
                 {
-                    //Check that we have the file in blobs folder, else add it
-                    Program.BlobsFile(false, dataFile, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
-                    if (cacheIndexDlinkElement == null)
-                    {
-                        //Add it if not already there
-                        cacheIndexDlinkElement = new CacheIndexDlinkElement(dataFile, dlinkFileData.hash, new FileInfo(dataFile).Length, new FileInfo(dataFile).LastWriteTimeUtc);
-                        cacheIndexDlink.storage.Add(dataFile, cacheIndexDlinkElement);
-                    }
+                    //Check that we have the file in blobs folder, else add it there
+                    Program.BlobsFile(false, realFile.name, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);                    
+                    //Force-update the cache entry
+                    cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, realFile.hash, realFile.size, realFile.stamp);
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    Program.BlobsFile(true, dataFile, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
-                    if (cacheIndexDlinkElement != null) cacheIndexDlink.storage.Remove(dataFile);
-                    cacheIndexDlinkElement = new CacheIndexDlinkElement(dataFile, dlinkFileData.hash, new FileInfo(dataFile).Length, new FileInfo(dataFile).LastWriteTimeUtc);
-                    cacheIndexDlink.storage.Add(dataFile, cacheIndexDlinkElement);
+                    Program.BlobsFile(true, realFile.name, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    FileInfo fi2 = new FileInfo(realFile.name);
+                    //We update the realFile, because its contents have changed
+                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
+                    //Force-update the cache entry              
+                    cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, dlinkFileData.hash, realFile.size, realFile.stamp);
                 }
             }
 
@@ -23184,7 +23181,7 @@ namespace Gekko
             foreach (var fileToRemove in filesToRemove) cacheIndexDlink.storage.Remove(fileToRemove); //Else the storage will always grow
             try
             {
-                ProtobufWrite(cacheIndexDlink, cacheIndexDlinkFile); //refresh the file
+                ProtobufWrite(cacheIndexDlink, cacheIndexDlinkFile); //always refresh the file
             }
             catch
             {
@@ -23194,7 +23191,6 @@ namespace Gekko
             DLinkCalledFromGitHookReporting(type, filesNew, filesOverwritten);
         }
 
-
         /// <summary>
         /// Returns true if file is ok, else it must be fetched from blobs
         /// </summary>
@@ -23203,24 +23199,26 @@ namespace Gekko
         /// <param name="dlinkFileData"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool DLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement)
-        {
-            FileInfo fi = new FileInfo(dataFile);
-            if (!fi.Exists) return false;
-            if (fi.Length != dlinkFileData.size) return false;
+        public static bool IsDLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement, ref RealFile realFile)
+        {            
+            if (!realFile.exists) return false; //In that case, realFile.stamp etc. are null too
+            if (realFile.size != dlinkFileData.size) return false;
             //Here we know that the data file exists and is of the right size. Now we check stamp.
             double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
             string realHash;
-            if (cacheIndexDlinkElement.stamp != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
+            if (cacheIndexDlinkElement != null && cacheIndexDlinkElement.size == realFile.size && cacheIndexDlinkElement.stamp != null && Math.Abs(((DateTime)realFile.stamp - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
             {
+                //EASY way
                 //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
-                realHash = cacheIndexDlinkElement.hash; //first hypothesis
+                realHash = cacheIndexDlinkElement.hash;
             }
             else
             {
+                //HARD way
                 //We now need to calc the sha256 physically.                
                 realHash = Program.BlobsHash(dataFile, true);
             }
+            realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
             if (dlinkFileData.hash != realHash) return false;
             return true;
         }
@@ -38746,11 +38744,15 @@ namespace Gekko
     public class DlinkFile
     {
         public readonly string version = "1.0";
-        public readonly string hash = null;        
-        public readonly long? size = null;
-        public readonly DateTime? stamp = null;
-        public readonly long? variables = null;
-        public readonly string extra = null;
+        public string hash { get; private set; }
+        public long? size { get; private set; }
+        public DateTime? stamp { get; private set; }
+        public long? variables { get; private set; }
+        public string extra { get; private set; }
+
+        public DlinkFile()
+        {
+        }
 
         public DlinkFile(string hash, long? size, DateTime? stamp, long? nVariables, string extra)
         {
@@ -38760,5 +38762,23 @@ namespace Gekko
             this.variables = nVariables;
             this.extra = extra;
         }
-    }        
+    }
+
+    public class RealFile
+    {
+        public readonly string name = null;
+        public readonly string hash = null;
+        public readonly long? size = null;
+        public readonly DateTime? stamp = null;
+        public readonly bool exists = false;
+
+        public RealFile(string name, string hash, long? size, DateTime? stamp, bool exists)
+        {
+            this.name = name;
+            this.hash = hash;
+            this.size = size;
+            this.stamp = stamp;
+            this.exists = exists;
+        }
+    }
 }
