@@ -23096,7 +23096,7 @@ namespace Gekko
             //TODO: Get programFolder 
 
             // -----
-            string indexDlinkFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "index_dlink");
+            string cacheIndexDlinkFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "index_dlink");
             string gitConfigFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "config");
             string s2 = args[0].Substring("dlink:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
@@ -23109,18 +23109,18 @@ namespace Gekko
                 dlinkFiles.Add(s);
             }
             List<string> filesNew = new List<string>();
-            List<string> filesOverwritten = new List<string>();            
+            List<string> filesOverwritten = new List<string>();
 
             CacheIndexDlink cacheIndexDlink = new CacheIndexDlink(); //empty
-            if (File.Exists(indexDlinkFile))
+            if (File.Exists(cacheIndexDlinkFile))
             {
                 try
                 {
-                    cacheIndexDlink = ProtobufRead<CacheIndexDlink>(indexDlinkFile);
+                    cacheIndexDlink = ProtobufRead<CacheIndexDlink>(cacheIndexDlinkFile);
                 }
                 catch
                 {
-                    if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Loading " + indexDlinkFile + " failed");
+                    if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
                 }
             }
 
@@ -23134,9 +23134,9 @@ namespace Gekko
                     MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
                     new Error();
                 }
-                DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);                
-                string xx = G.DLinkRelativePath(dLinkFileWithPath, Globals.dlink_programFolderRunning, Globals.dlink_dataFolder, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Globals.dlink_programFolderGit + "'", false);
-                string dataFile = Path.ChangeExtension(xx, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");                
+                DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
+                string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Globals.dlink_programFolderRunning, Globals.dlink_dataFolder, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Globals.dlink_programFolderGit + "'", false);
+                string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
                 datafiles.Add(dataFile, false); //for cleanup purposes
                 if (G.NullOrBlanks(dataFile))
                 {
@@ -23155,11 +23155,9 @@ namespace Gekko
                 //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
-                // --------------------------------------------------------------------------------------------------
-                string indexDlink_dataFileHash = null;
-                DateTime? indexDlink_dataFileStamp = null;
+                // --------------------------------------------------------------------------------------------------                
                 CacheIndexDlinkElement cacheIndexDlinkElement = null;
-                cacheIndexDlink.storage.TryGetValue(dataFile, out cacheIndexDlinkElement);                
+                cacheIndexDlink.storage.TryGetValue(dataFile, out cacheIndexDlinkElement);
                 bool isDataFileOk = DLlinkHelperFileOk(dataFile, dlinkFileData, cacheIndexDlinkElement); //regarding last two args: either both non-null or both null
                 if (isDataFileOk)
                 {
@@ -23186,53 +23184,47 @@ namespace Gekko
             foreach (var fileToRemove in filesToRemove) cacheIndexDlink.storage.Remove(fileToRemove); //Else the storage will always grow
             try
             {
-                ProtobufWrite(cacheIndexDlink, indexDlinkFile); //refresh the file
+                ProtobufWrite(cacheIndexDlink, cacheIndexDlinkFile); //refresh the file
             }
             catch
             {
-                if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Writing " + indexDlinkFile + " failed");
+                if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
             }
 
-            if (true || (filesNew.Count + filesOverwritten.Count > 0))
-            {
-                string s = "Gekko/Git: ";
-                string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
-                string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";                
-                if (filesNew.Count > 0 && filesOverwritten.Count == 0)
-                {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added.";
-                }
-                else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
-                {
-                    s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
-                }
-                else
-                {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
-                }
-                s += " (" + type + ")";
-                s += G.NL + G.NL;
-                foreach (string f in filesNew)
-                {
-                    s += f + " (added)";
-                }
-                foreach (string f in filesOverwritten)
-                {
-                    s += f + " (overwritten)";
-                }
-
-                WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
-                w.Height = 300;
-                w.Width = 500;
-                w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
-                w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
-                w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;
-                w.textBox1.Text = s;
-                w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
-                w.textBox1.FontSize = 11;
-                w.ShowDialog();
-            }
+            DLinkCalledFromGitHookReporting(type, filesNew, filesOverwritten);
         }
+
+
+        /// <summary>
+        /// Returns true if file is ok, else it must be fetched from blobs
+        /// </summary>
+        /// <param name="dataFile"></param>
+        /// <param name="syncTimeUtc"></param>
+        /// <param name="dlinkFileData"></param>
+        /// <param name="fi"></param>
+        /// <returns></returns>
+        public static bool DLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement)
+        {
+            FileInfo fi = new FileInfo(dataFile);
+            if (!fi.Exists) return false;
+            if (fi.Length != dlinkFileData.size) return false;
+            //Here we know that the data file exists and is of the right size. Now we check stamp.
+            double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
+            string realHash;
+            if (cacheIndexDlinkElement.stamp != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
+            {
+                //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
+                realHash = cacheIndexDlinkElement.hash; //first hypothesis
+            }
+            else
+            {
+                //We now need to calc the sha256 physically.                
+                realHash = Program.BlobsHash(dataFile, true);
+            }
+            if (dlinkFileData.hash != realHash) return false;
+            return true;
+        }
+
 
         public static void GitHooks(string parentPath)
         {
@@ -23325,34 +23317,47 @@ namespace Gekko
             File.WriteAllLines(configFile, outputLines);
         }
 
-        /// <summary>
-        /// Returns true if file is ok, else it must be fetched from blobs
-        /// </summary>
-        /// <param name="dataFile"></param>
-        /// <param name="syncTimeUtc"></param>
-        /// <param name="dlinkFileData"></param>
-        /// <param name="fi"></param>
-        /// <returns></returns>
-        public static bool DLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement)
-        {            
-            FileInfo fi = new FileInfo(dataFile);
-            if (!fi.Exists) return false;
-            if (fi.Length != dlinkFileData.size) return false;
-            //Here we know that the data file exists and is of the right size. Now we check stamp.
-            double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
-            string realHash;
-            if (cacheIndexDlinkElement.stamp != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
+        private static void DLinkCalledFromGitHookReporting(string type, List<string> filesNew, List<string> filesOverwritten)
+        {
+            if (true || (filesNew.Count + filesOverwritten.Count > 0))
             {
-                //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
-                realHash = cacheIndexDlinkElement.hash; //first hypothesis
+                string s = "Gekko/Git: ";
+                string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
+                string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
+                if (filesNew.Count > 0 && filesOverwritten.Count == 0)
+                {
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added.";
+                }
+                else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
+                {
+                    s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
+                }
+                else
+                {
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
+                }
+                s += " (" + type + ")";
+                s += G.NL + G.NL;
+                foreach (string f in filesNew)
+                {
+                    s += f + " (added)";
+                }
+                foreach (string f in filesOverwritten)
+                {
+                    s += f + " (overwritten)";
+                }
+
+                WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
+                w.Height = 300;
+                w.Width = 500;
+                w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+                w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+                w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;
+                w.textBox1.Text = s;
+                w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+                w.textBox1.FontSize = 11;
+                w.ShowDialog();
             }
-            else
-            {
-                //We now need to calc the sha256 physically.                
-                realHash = Program.BlobsHash(dataFile, true);
-            }
-            if (dlinkFileData.hash != realHash) return false;
-            return true;
         }
 
         /// <summary>
