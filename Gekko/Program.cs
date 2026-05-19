@@ -6873,7 +6873,7 @@ namespace Gekko
                 {
                     //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
                     //      So CLOSE handles this.
-                    Blob(blob, new BlobInfo() { variables = databank.storage.Count() });
+                    Blob(blob, new DlinkFile() { variables = databank.storage.Count() });
                 }
                 
             }  //for each bank in list
@@ -7721,7 +7721,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
-            Blob(blob, new BlobInfo() { });
+            Blob(blob, new DlinkFile() { });
         }
 
         /// <summary>
@@ -23026,7 +23026,7 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
-            Blob(blob, new BlobInfo() { variables = list2.Count });
+            Blob(blob, new DlinkFile() { variables = list2.Count });
         }
 
         /// <summary>
@@ -23134,7 +23134,7 @@ namespace Gekko
                     MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
                     new Error();
                 }
-                BlobInfo blobInfo = G.YamlReader<BlobInfo>(dLinkFileWithPath);                
+                DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);                
                 string xx = G.DLinkRelativePath(dLinkFileWithPath, Globals.dlink_programFolderRunning, Globals.dlink_dataFolder, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Globals.dlink_programFolderGit + "'", false);
                 string dataFile = Path.ChangeExtension(xx, null);
                 dataFile = dataFile.Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
@@ -23157,33 +23157,33 @@ namespace Gekko
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
                 // --------------------------------------------------------------------------------------------------
-                string dataFileHash = null;
-                DateTime? dataFileStamp = null;
+                string indexDlink_dataFileHash = null;
+                DateTime? indexDlink_dataFileStamp = null;
                 IndexDlinkElement indexDlinkElement = null;
                 indexDlink.storage.TryGetValue(dataFile, out indexDlinkElement);
                 if (indexDlinkElement != null)                
                 {
-                    dataFileHash = indexDlinkElement.sha256;
-                    dataFileStamp = indexDlinkElement.stampUtc;
+                    indexDlink_dataFileHash = indexDlinkElement.sha256;
+                    indexDlink_dataFileStamp = indexDlinkElement.stampUtc;
                 }
-                bool isDataFileOk = DLlinkHelperFileOk(dataFile, blobInfo, dataFileStamp, dataFileHash); //regarding last two args: either both non-null or both null
+                bool isDataFileOk = DLlinkHelperFileOk(dataFile, dlinkFileData, indexDlink_dataFileStamp, indexDlink_dataFileHash); //regarding last two args: either both non-null or both null
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it
-                    Program.BlobsFile(false, dataFile, blobInfo.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(false, dataFile, dlinkFileData.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
                     if (indexDlinkElement == null)
                     {
                         //Add it if not already there
-                        indexDlinkElement = new IndexDlinkElement(dataFile, blobInfo.sha256, new FileInfo(dataFile).LastWriteTimeUtc);
+                        indexDlinkElement = new IndexDlinkElement(dataFile, dlinkFileData.sha256, new FileInfo(dataFile).LastWriteTimeUtc);
                         indexDlink.storage.Add(dataFile, indexDlinkElement);
                     }
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    Program.BlobsFile(true, dataFile, blobInfo.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(true, dataFile, dlinkFileData.sha256, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
                     if (indexDlinkElement != null) indexDlink.storage.Remove(dataFile);
-                    indexDlinkElement = new IndexDlinkElement(dataFile, blobInfo.sha256, new FileInfo(dataFile).LastWriteTimeUtc);                    
+                    indexDlinkElement = new IndexDlinkElement(dataFile, dlinkFileData.sha256, new FileInfo(dataFile).LastWriteTimeUtc);                    
                     indexDlink.storage.Add(dataFile, indexDlinkElement);
                 }
             }
@@ -23336,27 +23336,28 @@ namespace Gekko
         /// </summary>
         /// <param name="dataFile"></param>
         /// <param name="syncTimeUtc"></param>
-        /// <param name="blobInfo"></param>
+        /// <param name="dlinkFileData"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool DLlinkHelperFileOk(string dataFile, BlobInfo blobInfo, DateTime? dataFileStampUtc, string dataFileSha256Input)
-        {
-            string dataFileSha256 = dataFileSha256Input;
+        public static bool DLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, DateTime? indexDlink_dataFileStampUtc, string indexDlink_dataFileSha256Input)
+        {            
             FileInfo fi = new FileInfo(dataFile);
             if (!fi.Exists) return false;
-            if (fi.Length != blobInfo.size) return false;
+            if (fi.Length != dlinkFileData.size) return false;
             //Here we know that the data file exists and is of the right size. Now we check stamp.
-            double krit = 2d; //1s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
-            if (dataFileStampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)dataFileStampUtc).TotalSeconds) < krit)
-            {                
-                //dataFileSha256 is ok, but must still be checked
+            double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
+            string realSha256 = null;
+            if (indexDlink_dataFileStampUtc != null && Math.Abs((fi.LastWriteTimeUtc - (DateTime)indexDlink_dataFileStampUtc).TotalSeconds) < krit)
+            {
+                //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
+                realSha256 = indexDlink_dataFileSha256Input; //first hypothesis
             }
             else
             {
                 //We now need to calc the sha256 physically.                
-                dataFileSha256 = Program.BlobsHash(dataFile, true);
+                realSha256 = Program.BlobsHash(dataFile, true);
             }
-            if (blobInfo.sha256 != dataFileSha256) return false;
+            if (dlinkFileData.sha256 != realSha256) return false;
             return true;
         }
 
@@ -23364,7 +23365,7 @@ namespace Gekko
         /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="fileNameAndPath"></param>
-        private static void Blob(string fileNameAndPath, BlobInfo blobInfo)
+        private static void Blob(string fileNameAndPath, DlinkFile blobInfo)
         {
             if (Program.options.databank_dlink)
             {
@@ -23390,7 +23391,7 @@ namespace Gekko
                         MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
                         new Error();
                     }
-                    G.YamlWriter<BlobInfo>(blobInfo, blobFileNameAndPath2);
+                    G.YamlWriter<DlinkFile>(blobInfo, blobFileNameAndPath2);
                 }
             }
         }
@@ -24559,7 +24560,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    Blob(blob, new BlobInfo() { variables = list1Sorted?.Count ?? 0 });
+                    Blob(blob, new DlinkFile() { variables = list1Sorted?.Count ?? 0 });
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24587,7 +24588,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    Blob(blob, new BlobInfo() { variables = list2Sorted?.Count ?? 0 });
+                    Blob(blob, new DlinkFile() { variables = list2Sorted?.Count ?? 0 });
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24615,7 +24616,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    Blob(blob, new BlobInfo() { variables = list2Sorted?.Count ?? 0 });
+                    Blob(blob, new DlinkFile() { variables = list2Sorted?.Count ?? 0 });
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24791,7 +24792,7 @@ namespace Gekko
                 file.Flush();
             }
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
-            Blob(blob, new BlobInfo() { });
+            Blob(blob, new DlinkFile() { });
         }
 
         /// <summary>
@@ -24840,7 +24841,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            Blob(blob, new BlobInfo() { });
+            Blob(blob, new DlinkFile() { });
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
@@ -25182,7 +25183,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new BlobInfo() { variables = count });
+            Blob(blob, new DlinkFile() { variables = count });
             return count;
         }
 
@@ -25264,7 +25265,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new BlobInfo() { variables = count });
+            Blob(blob, new DlinkFile() { variables = count });
             return count;
         }
 
@@ -25305,7 +25306,7 @@ namespace Gekko
                     }
                 }
             }
-            Blob(blob, new BlobInfo() { variables = count });
+            Blob(blob, new DlinkFile() { variables = count });
             return count;
         }
 
@@ -26366,7 +26367,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, new BlobInfo() { variables = counter });
+            Blob(blob, new DlinkFile() { variables = counter });
             return counter;
         }        
 
@@ -26513,7 +26514,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-            Blob(blob, new BlobInfo() { variables = list2.Count });
+            Blob(blob, new DlinkFile() { variables = list2.Count });
             return list2.Count;
         }
 
@@ -26605,7 +26606,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, new BlobInfo() { variables = counter });
+            Blob(blob, new DlinkFile() { variables = counter });
             return counter;
         }
 
@@ -26738,7 +26739,7 @@ namespace Gekko
             }
             if (File.Exists(removed.FileNameWithPath)) //probably always exists...
             {
-                Blob(removed.FileNameWithPath, new BlobInfo() { variables = removed.storage.Count() });
+                Blob(removed.FileNameWithPath, new DlinkFile() { variables = removed.storage.Count() });
             }
         }
 
@@ -33714,7 +33715,7 @@ namespace Gekko
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
-                                Blob(blob, new BlobInfo() { });
+                                Blob(blob, new DlinkFile() { });
                             }
                             catch (Exception e)
                             {
@@ -34341,7 +34342,7 @@ namespace Gekko
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                         G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
-                        Blob(blob, new BlobInfo() { });
+                        Blob(blob, new DlinkFile() { });
                     }
                     return null;
                 }
@@ -38704,7 +38705,7 @@ namespace Gekko
         }
     }
 
-    public class BlobInfo
+    public class DlinkFile
     {
         public string version = "1.0";
         public string sha256 = null;        
