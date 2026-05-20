@@ -1216,7 +1216,7 @@ img {border-style: none;
             bool onlyPlot = false; //default: false
             bool skip = false;  //only for debug            
 
-            bool small = false; //default: false, only few eqs.
+            bool small = true; //default: false, only few eqs.
             bool flush = false;  //Not necessary to set true anymore
             bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO, but what does this really do?           
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
@@ -1378,7 +1378,7 @@ img {border-style: none;
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPathPretty);
 
             BrowserHelper bh = null;
-            if (true)
+            if (false)
             {
                 //GREU
                 bh = new BrowserHelper();
@@ -1404,7 +1404,8 @@ img {border-style: none;
                 bh.freq = freq;
                 bh.firstColWidth = 200;
                 bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
-                bh.type = EBrowserType.MakroIdentitiesText;
+                //bh.type = EBrowserType.MakroIdentitiesText;
+                bh.type = EBrowserType.Makro;
                 bh.text = new StringBuilder();
             }
 
@@ -1505,8 +1506,10 @@ img {border-style: none;
                 {
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
-                    Program.RunGekkoCommands(f + "reset; read <gdx> previous_deep_calibration.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
-                }
+                    //Program.RunGekkoCommands(f + "reset; read <gdx> previous_deep_calibration.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; read <gdx> baseline_2026May.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration_2026May.zip; " + @"open makrobk_2026May.gbk as traces;", "", 0, new P());
+                    MessageBox.Show("Få ny makrobk.gbk ind! Sæt måske længere historisk periode");
+                }                
                 else if (bh.type == EBrowserType.Greu)
                 {
                     //TODO TODO

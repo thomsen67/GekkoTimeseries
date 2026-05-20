@@ -910,6 +910,7 @@ namespace Gekko
                 foreach (string line in values)
                 {                    
                     if (line.Trim() == "" || line.StartsWith("*")) continue;
+                    if (!(G.Contains(line, ".l=") || G.Contains(line, ".l =") || G.Contains(line, ".fx=") || G.Contains(line, ".fx ="))) continue; //We assume this pattern. There may be .m and others.
                     string[] ss = line.Split(split, StringSplitOptions.None);
                     int id = -12345;
                     try

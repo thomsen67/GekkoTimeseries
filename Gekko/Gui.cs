@@ -250,7 +250,7 @@ namespace Gekko
         {                        
             if (args.Length == 1 && args[0].StartsWith("-dlink:"))
             {
-                MessageBox.Show(Stringlist.GetListWithCommas(args));
+                //MessageBox.Show(Stringlist.GetListWithCommas(args));
                 Program.DLinkCalledFromGitHook(args);
                 return;
             }

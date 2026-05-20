@@ -47,12 +47,28 @@ namespace Gekko
         //public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\tth\test\makrobk_grunddata", false);        
         //public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\tth\test", false);
         //public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_storage", false);
-        public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
-        public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\", false);
-        public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver", false);
-        public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver", false);
-        public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
-        
+
+        //+ i config, aktivér dlink
+        //+ Læg \githooks ind under \utilities, og sæt sti til Gekko i _common
+        //+ Og i \.git skal denne i [core]: hooksPath = makrobk_grunddata/_utilities/githooks
+        //+ I datamappe skal der være en \_blobs og blobsroot.ini
+        //public static string ident = "tth";
+        //public static string sub = "test";
+        //public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\" + ident + "\\" + sub, false);
+        //public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
+        //public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata\biver", false);
+        //public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\" + ident + "\\" + sub + @"\biver", false);
+        //public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
+
+        public static string ident = "dsi";
+        public static string sub = "base";
+        public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub, false);
+        public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
+        public static string dlink_programFolderRunning = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata\biver", false);
+        public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\" + ident + "\\" + sub + @"\biver", false);
+        public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_blobs", false);
+
+
         public static bool gdxReaderDebug = false;        
         public const string libraryDriveCheatString = "library___name___";        
         public const string tempFileStart = "tempfile";

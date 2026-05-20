@@ -909,8 +909,8 @@ namespace Gekko
         public double[][] a = null;
         public byte[][] fix = null;
 
-        public Dictionary<int, int> nonExisting = null;  //value not used
-        public Dictionary<int, int> nonExisting_ref = null; //value not used
+        public Dictionary<int, int> nonExisting = new Dictionary<int, int>();
+        public Dictionary<int, int> nonExisting_ref = new Dictionary<int, int>();
 
         // ------------------------------------
 

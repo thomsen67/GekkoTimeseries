@@ -23065,30 +23065,13 @@ namespace Gekko
             // +   check the .csv, .csv.dlink and a new file in \_blobs.
             // + Check out the previous commit, where x1 was set to 101.
             // + The .csv.dlink file should revert, and the .csv file too!
-
-
-            // -----------------------------------
-
-            // Make a new branch, and copy in all data files from some other branch
-            // Open Gekko inside the branch in some module
-            // Run githooks() --> activates .dlink sync when committing, switching etc.            
-            // Run a module --> should produce .dlink files
-            // Commit .dlink files
-            // Change something that changes a .gbk
-            // Commit new .dlink files.
-            // Checkout the previous commit
-
-            //+ Make sure githooks() has been run. But if not, this method can never be called anyway,
-            //  because only Git knows the list of .dlink files in its index file. When DLink() is called,
-            //  Git has just been asked to list all .dlink files form its index (this is a fast operation).
-            //+ Mht.gbk - filer bruges "data-hash", SHA256.
-            //+ .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens.              
-            //+ Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
-            //+ Reservér det sidste hex i hashkoden til at angive traces eller ej (0 eller 1).
-            //+ Hvordan kører det med branch-switch, eller gå ind i anden branch-mappe, eller flytte .dlink-filer eller datafiler? Robust?            
-            //  Burde vel være fint nok.
-
-            //TODO: Get programFolder 
+            //
+            // TODO: Make githooks() method being called, adding hooks
+            // TODO: gbk data-hash, måske med viden om traces eller ej (sidste hex)
+            // TODO: .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens, "tabel". Tabel for array og subseries.
+            // TODO: Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
+            // TODO: Stier hvordan ?
+            // TODO: Man skal kunne aborte mht. indlæggelse af ændrede datafiler
 
             // -----
             string cacheIndexDlinkFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "index_dlink");
@@ -23316,23 +23299,23 @@ namespace Gekko
         }
 
         private static void DLinkCalledFromGitHookReporting(string type, List<string> filesNew, List<string> filesOverwritten)
-        {
-            if (true || (filesNew.Count + filesOverwritten.Count > 0))
+        {            
+            if (filesNew.Count + filesOverwritten.Count > 0)
             {
                 string s = "Gekko/Git: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
                 {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added.";
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added ";
                 }
                 else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
                 {
-                    s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
+                    s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
                 }
                 else
                 {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten.";
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
                 }
                 s += " (" + type + ")";
                 s += G.NL + G.NL;
@@ -23347,7 +23330,7 @@ namespace Gekko
 
                 WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
                 w.Height = 300;
-                w.Width = 500;
+                w.Width = 600;
                 w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
                 w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
                 w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;

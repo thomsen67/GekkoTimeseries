@@ -76,7 +76,7 @@ namespace Gekko
         public bool databank_file_gbk_underscore = false; //if set to true, when reading a Gekko 2.x gbk databank, a variable like x___a___b is understood as an array-series x[a,b].
         public bool databank_search = true;
 
-        public bool databank_dlink = true;
+        public bool databank_dlink = false;
         public string databank_dlink_name = "dlink";        
 
         public bool databank_trace = true;
