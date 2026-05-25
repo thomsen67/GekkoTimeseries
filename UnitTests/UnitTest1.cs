@@ -13308,7 +13308,7 @@ namespace UnitTests
             I("model <gms> makro2gekko.zip;");
             I("read <gdx> dec24;");
             I("eXudl[xVar] = 6;");
-            I("qXy[xVar] += -100, -200, -300, -150, -200, -100, -150;");
+            I("qXy[xVar] += -100, -200, -300, -150, -200, -100, -150;"); 
             //ShowDecompTable();
             I("decomp <m> qXy[xVar] from E_qXy[xVar] endo qXy[xVar] rows vars, lags cols time;");
             //
