@@ -1965,7 +1965,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null, false); //#overview
+                                        List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null, false);
                                         string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
                                         RichSetText(equation, Decomp.GetColoredEquations(txt));
                                     }
@@ -2445,6 +2445,7 @@ namespace Gekko
             {
                 this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText3;
             }
+            if (decompOptions.invertError != null) this.windowDecompStatusBar.Text = decompOptions.invertError;
         }        
 
         private void radioButton1_Checked(object sender, RoutedEventArgs e)
@@ -3178,6 +3179,7 @@ namespace Gekko
         public List<string> new_endo = new List<string>();
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
+        public string invertError = null;
         //--------------------------------------------------------------- 
 
         public bool groupAge = false;

@@ -299,6 +299,7 @@ namespace Gekko
         public List<double> red = null; //lamps
         public List<List<string>> black = null;  //expand/collapse arrows
         public Tuple<bool, bool> rowsOrColsSumUp = null;
+        public string invertError = null;
 
         public DecompOutput(Table table, string ignore, List<double> red, List<List<string>> black)
         {
@@ -1059,6 +1060,8 @@ namespace Gekko
         {
             //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
 
+            decompOptions2.invertError = null;
+
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
 
@@ -1265,6 +1268,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter, System.Drawing.Color.Gray);  //using writeln2 to avoid popup
 
+            decompOutput.invertError = decompOptions2.invertError; //transferring this
             return decompOutput;
         }
 
@@ -1650,7 +1654,7 @@ namespace Gekko
                 try
                 {
                     double[,] temp = (double[,])mEndo.Clone();
-                    inverse = Program.InvertMatrix(temp);
+                    bool fail;  inverse = Program.InvertMatrix(temp, false, false, out fail);
                 }
                 catch (Exception e)
                 {
@@ -1992,12 +1996,15 @@ namespace Gekko
             {
                 if (Program.options.bugfix_decomp_jacobi)
                 {
+                    bool fail = false;
                     try
                     {
                         double[,] temp = (double[,])mEndo2.Clone();  //gradients
-                        inverse = Program.InvertMatrix(temp);
+                        inverse = Program.InvertMatrix(temp, false, false, out fail);
                     }
-                    catch (Exception e)
+                    catch { fail = true; }
+                    
+                    if (fail)
                     {
                         bool nan = false;
                         foreach (double d in mEndo2)
@@ -2011,21 +2018,20 @@ namespace Gekko
                         if (!nan)
                         {
                             string extra = null;
-                            if (CheckIfEverythingIsZero(mEndo2)) extra = " Note that the " + mEndo2.GetLength(0) + " x " + mEndo2.GetLength(1) + " Jacobian matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not affect the equation(s), and hence the effects cannot be calculated.";
-                            new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
-                            throw;
+                            if (CheckIfEverythingIsZero(mEndo2)) extra = " The " + mEndo2.GetLength(0) + " x " + mEndo2.GetLength(1) + " matrix contains only zeroes.";
+                            if (decompOptions2.invertError == null) decompOptions2.invertError = "Matrix inversion failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra;  //we prefer to show the first error
                         }
-                        else
-                        {
-                            //We allow this, may just be some missing data
-                            inverse = G.CreateArrayDouble(mEndo2.GetLength(0), mEndo2.GetLength(1), double.NaN);
-                        }
+                        //We allow this, may be some missing data (if nan == true)
+                        inverse = G.CreateArrayDouble(mEndo2.GetLength(0), mEndo2.GetLength(1), double.NaN);
                     }
                     effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
 
                 }
                 else
                 {
+                    //NOT USED
+                    //NOT USED
+                    //NOT USED
                     if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
                     {
                         //nothing happens, so we can say that the effect is also zeroes...
@@ -2036,7 +2042,8 @@ namespace Gekko
                         try
                         {
                             double[,] temp = (double[,])mEndo.Clone();
-                            inverse = Program.InvertMatrix(temp);
+                            bool fail;
+                            inverse = Program.InvertMatrix(temp, false, false, out fail);
                         }
                         catch (Exception e)
                         {
@@ -2682,6 +2689,9 @@ namespace Gekko
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
         {            
             //OVERVIEW, #overview
+            // +++ Fixed that it looks for variable explanations (labels)
+            // +++ Make sure ok regarding domains
+            // 
             //
             //DecompGetFuncExpressionsAndRecalc()
             //  thread: CreateDecompWindow()

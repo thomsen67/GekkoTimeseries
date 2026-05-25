@@ -32143,7 +32143,7 @@ namespace Gekko
         /// <returns></returns>
         public static double[,] InvertMatrix(double[,] matrix)
         {
-            return InvertMatrix(matrix, true);
+            bool fail; return InvertMatrix(matrix, true, true, out fail);
         }
 
         /// <summary>
@@ -32152,20 +32152,37 @@ namespace Gekko
         /// <param name="matrix"></param>
         /// <param name="printError"></param>
         /// <returns></returns>
-        public static double[,] InvertMatrix(double[,] matrix, bool printError)
+        public static double[,] InvertMatrix(double[,] matrix, bool printError, bool mayGiveExceptionError, out bool fail)
         {
+            fail = false;
             int success = 0;
             alglib.matinvreport report = new alglib.matinvreport();
             alglib.rmatrixinverse(ref matrix, out success, out report);
             if (success == 3)
             {
-                if (printError) new Error("Inv(): It seems the matrix is singular");
-                else throw new GekkoException();
+                if (mayGiveExceptionError)
+                {
+                    if (printError) new Error("Inv(): It seems the matrix is singular");
+                    else throw new GekkoException();
+                }
+                else
+                {
+                    if (printError) new Writeln("Inv(): It seems the matrix is singular");
+                }
+                fail = true;
             }
             else if (success != 1)
             {
-                if (printError) new Error("Inv(): Could not invert matrix");
-                else throw new GekkoException();
+                if (mayGiveExceptionError)
+                {
+                    if (printError) new Error("Inv(): Could not invert matrix");
+                    else throw new GekkoException();
+                }
+                else
+                {
+                    if (printError) new Writeln("Inv(): Could not invert matrix");
+                }
+                fail = true;
             }
             return matrix;
         }
