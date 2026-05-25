@@ -723,6 +723,12 @@ namespace Gekko
                 tab.CurRow.Next();
                 tab.CurRow.SetText(1, "Var data        = " + this.hasReadSomeData + " observations");
             }
+            if (hasResVariables)
+            {
+                tab.CurRow.SetBottomBorder(1, 1);
+                tab.CurRow.Next();
+                tab.CurRow.SetText(1, "Decomp          = '" + Globals.decompResidualPrefix + "'-variables active");
+            }
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.SetLeftBorder(1);
             tab.CurRow.SetRightBorder(1);
@@ -1429,7 +1435,11 @@ namespace Gekko
 
         /// <summary>
         /// Obtains an a[][] data array from a Databank. This array is from model.a.
-        /// if model is a ModelGamsScalar.
+        /// if model is a ModelGamsScalar. The second dimension of a is
+        /// .dict_FromANumberToVarName, so it is the variables actually present
+        /// in the model. If a variable does not exist (for instance, if qM[tot] is
+        /// present in the model and either qM or qM[tot] does not exist, the qM[tot]
+        /// "slot" will have missing values.
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>

@@ -23299,10 +23299,11 @@ namespace Gekko
         }
 
         private static void DLinkCalledFromGitHookReporting(string type, List<string> filesNew, List<string> filesOverwritten)
-        {            
+        {
+            string s = null;
             if (filesNew.Count + filesOverwritten.Count > 0)
             {
-                string s = "Gekko/Git: ";
+                s = "Gekko/Git data versioning: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
@@ -23327,18 +23328,24 @@ namespace Gekko
                 {
                     s += f + " (overwritten)";
                 }
-
-                WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
-                w.Height = 300;
-                w.Width = 600;
-                w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
-                w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
-                w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;
-                w.textBox1.Text = s;
-                w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
-                w.textBox1.FontSize = 11;
-                w.ShowDialog();
             }
+            else
+            {
+                s = "Gekko/Git data versioning was called: no data files changed";
+                s += G.NL + G.NL;
+                s += "(For now, this message is kept --> may be omitted when data versioning has matured).";
+            }
+            
+            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
+            w.Height = 300;
+            w.Width = 600;
+            w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;
+            w.textBox1.Text = s;
+            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+            w.textBox1.FontSize = 11;
+            w.ShowDialog();
         }
 
         /// <summary>
@@ -23501,6 +23508,11 @@ namespace Gekko
 
         private static void BlobsFileGet(string fileName, string blobsFile)
         {
+            //TODO
+            //TODO
+            //TODO Maybe check that the sha hash is correct after fetching the file.
+            //TODO
+            //TODO
             if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
             {
                 File.Copy(blobsFile, fileName, true); //Allows overwrite, TODO UNZIPPING                    

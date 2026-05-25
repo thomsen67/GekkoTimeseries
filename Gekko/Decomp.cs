@@ -1057,6 +1057,8 @@ namespace Gekko
         /// </summary>
         public static DecompOutput DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, ref DecompDatas decompDatas, Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
 
@@ -1733,6 +1735,8 @@ namespace Gekko
         /// <param name="parentI"></param>
         public static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             GekkoDictionaryBlanks<int> endo = new GekkoDictionaryBlanks<int>();
             GekkoDictionaryBlanks<int> exo = new GekkoDictionaryBlanks<int>();
             GekkoDictionaryBlanks<int> all = new GekkoDictionaryBlanks<int>();  //all variables that are present in 1 or more equations
@@ -2676,7 +2680,57 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
-        {            
+        {
+            //OVERVIEW, #overview
+            //
+            //DecompGetFuncExpressionsAndRecalc()
+            //  thread: CreateDecompWindow()
+            //    RecalcCellsWithNewType()
+            //      RecalcCellsWithNewTypeHelper()
+            //        DecompMain()
+            //          DecompMainInit()
+            //          PrepareEquations()
+            //          foreach (Link link in decompOptions2.link) //for each equation if they are linked
+            //            foreach (DecompStartHelper dsh in link.GAMS_dsh) //for each uncontrolled #i in x[#i] --> is that used??
+            //              DecompLowLevelScalar()
+            //                foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+            //                  foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars) //for each precedent variable
+            //                    //decomposition gradients
+            //                foreach (GekkoTime t2 in new GekkoTimeIterator(gt1, gt2))
+            //                  foreach (string s in vars.Keys)
+            //                    //contributinons, and residuals
+            //              DecompMainMergeOrAdd()
+            //          foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2)) //no time loop with <dyn>
+            //            DecompMainHelperInvertScalar()
+            //              //figure out endo and exo etc.
+            //              //IN LOOPS, MATRIX VALUES ARE GATHERED, POSSIBLY "STACKED" OVER TIME
+            //              //INVERT MATRIX
+            //              //CALCULATE EFFECTS AFTER INVERTING
+            //          DecompPivotToTable()
+            //
+            // Regarding data, in MaybeLoadDataIntoModel(), the databanks are represented by double[][] arrays. So each
+            // model variable (from the GAMS dict) has a number. If a variable from the model does not exist in the model array,
+            // (for instance, if qM[tot] is present in the model and either qM or qM[tot] does not exist), the variable
+            // "slot" in the model will have missing values.
+            //
+            // For <xm>, DecompMainStoreRawVariable() gets series from db, called from DecompMainHelperInvertScalar(), but only for .isRaw.
+            // Then afterwards, series from db are gotten from DecompPivotGetDomains() line 5038, both .isRaw and not
+            // Then afterwards, series from db are gotten from DecompPivotCreateDataframe() line 4575, but only for .isRaw
+            //
+            // Regarding missing values, in the GUI this can be clicked:
+            // this.decompFind.decompOptions2.missingAsZero = true;
+            //
+            //Pivot is probably ok, so where it can go wrong is
+            // (1) missing series or sub-series
+            // (2) matrix inversion
+            //In (1) show as "N" for raw, NaN for decomp
+            //In (2) set matrix values NaN
+            //Make missing=zero work good
+            //Error about missing equation --> truncate time window until ok (perhaps with "N" for such columns in raw, <dyn> is spcielal here)
+            //
+
+
+
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompFind.model.DecompType() == EModelType.Unknown)
             {
@@ -2797,7 +2851,9 @@ namespace Gekko
         /// </summary>
         /// <param name="o2"></param>
         private static void CreateDecompWindow(object o2)
-        {            
+        {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             DecompFind decompFind = o2 as DecompFind;
 
             if (decompFind.decompOptions2.guiIsFlowStatement && decompFind.depth == 0)
@@ -3306,6 +3362,8 @@ namespace Gekko
         /// <returns></returns>
         public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, DecompStartHelper eqPeriods, DecompOperator op, string residualName, ref int funcCounter, bool missingAsZero, Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
             int tZero = 0;
@@ -3697,6 +3755,8 @@ namespace Gekko
 
         public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, string lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
 
@@ -4512,7 +4572,7 @@ namespace Gekko
 
                         if (op.isRaw)
                         {
-                            Series tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                            Series tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series; //#overview
                             if (tsFirst != null)
                             {
                                 dLevel = tsFirst.GetDataSimple(t2.Add(chop.iLag));
@@ -4544,7 +4604,7 @@ namespace Gekko
                             if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                             {
                                 Series tsFirst = null;
-                                tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                tsFirst = O.GetIVariableFromString(chop.fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series; //#overview
                                 bool isMissingResVariable = false;
                                 if (tsFirst == null)
                                 {
@@ -4975,7 +5035,7 @@ namespace Gekko
             {
                 //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
                 //So in this case, #a and #sector would be added as columns
-                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways);
+                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways); //#overview
                 if (iv != null)
                 {
                     Series ts = iv as Series;

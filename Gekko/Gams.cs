@@ -3832,7 +3832,7 @@ namespace Gekko
             }
             else
             {
-                new Error("option model gams dep method = lhs|eqname.");
+                new Error("option model gams dep method = lhs|eqname|both.");
             }
 
             string d = null; if (dependents != null) dependents.TryGetValue(eqnameGams, out d);

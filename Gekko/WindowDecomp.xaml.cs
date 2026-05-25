@@ -2046,6 +2046,8 @@ namespace Gekko
         /// <param name="refresh"></param>
         public void RecalcCellsWithNewType(Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             if (false)
             {
                 //See #f8kd8sfdgksldgjf
@@ -2100,6 +2102,8 @@ namespace Gekko
 
         public void RecalcCellsWithNewTypeHelper(Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             this.decompFind.decompOptions2.code = this.decompFind.decompOptions2.ToCode();
             SetRadioButtonsDefaults();
 

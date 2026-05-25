@@ -1216,7 +1216,7 @@ img {border-style: none;
             bool onlyPlot = false; //default: false
             bool skip = false;  //only for debug            
 
-            bool small = true; //default: false, only few eqs.
+            bool small = false; //default: false, only few eqs.
             bool flush = false;  //Not necessary to set true anymore
             bool ignoreMissing = true;  //quite a lot of missings observations in MAKRO, but what does this really do?           
             EFreq freq = EFreq.A;  //there is some method for this, looking at model or bank??
