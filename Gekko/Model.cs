@@ -727,7 +727,7 @@ namespace Gekko
             {
                 tab.CurRow.SetBottomBorder(1, 1);
                 tab.CurRow.Next();
-                tab.CurRow.SetText(1, "Decomp          = '" + Globals.decompResidualPrefix + "'-variables active");
+                tab.CurRow.SetText(1, "Decomp          : " + Globals.decompResidualPrefix + "...-variables active");
             }
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.SetLeftBorder(1);

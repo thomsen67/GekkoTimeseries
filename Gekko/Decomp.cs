@@ -2680,7 +2680,7 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
-        {
+        {            
             //OVERVIEW, #overview
             //
             //DecompGetFuncExpressionsAndRecalc()
@@ -2712,10 +2712,10 @@ namespace Gekko
             // model variable (from the GAMS dict) has a number. If a variable from the model does not exist in the model array,
             // (for instance, if qM[tot] is present in the model and either qM or qM[tot] does not exist), the variable
             // "slot" in the model will have missing values.
-            //
-            // For <xm>, DecompMainStoreRawVariable() gets series from db, called from DecompMainHelperInvertScalar(), but only for .isRaw.
-            // Then afterwards, series from db are gotten from DecompPivotGetDomains() line 5038, both .isRaw and not
-            // Then afterwards, series from db are gotten from DecompPivotCreateDataframe() line 4575, but only for .isRaw
+            // BUT:     
+            // + For <xn>, DecompMainStoreRawVariable() gets series from db, called from DecompMainHelperInvertScalar(), but only for .isRaw.
+            // + Then afterwards, series from db are gotten from DecompPivotGetDomains() line 5038, both .isRaw and not
+            // + Then afterwards, series from db are gotten from DecompPivotCreateDataframe() line 4575, but only for .isRaw
             //
             // Regarding missing values, in the GUI this can be clicked:
             // this.decompFind.decompOptions2.missingAsZero = true;

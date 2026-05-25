@@ -1965,7 +1965,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+                                        List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null, false); //#overview
                                         string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
                                         RichSetText(equation, Decomp.GetColoredEquations(txt));
                                     }

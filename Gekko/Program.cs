@@ -13085,7 +13085,7 @@ namespace Gekko
         {
             if (varnameMaybeWithFreq == null) return null;
             string label = null;
-            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, true);
             if (expls != null && expls.Count > 0) label = expls[0];
             return label;
         }
@@ -13099,7 +13099,7 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings, bool mayGiveExceptionError)
         {
             //For Gekko 4.0, clean up the two first parameters (should be just 1).
             //For Gekko 4.0, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
@@ -13109,7 +13109,13 @@ namespace Gekko
             if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
 
             List<string> rv = new List<string>();
-            IVariable iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
+            IVariable iv = null;
+            if (mayGiveExceptionError) iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
+            else
+            {
+                iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNullAlways, false);
+                if (iv == null) return rv;
+            }
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
@@ -13221,7 +13227,7 @@ namespace Gekko
         {
             string ss = "";
             string var2 = G.Chop_RemoveLagOrLead_OLD(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
-            List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
+            List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings, true);
             return ss2;
         }        
 
@@ -15046,7 +15052,7 @@ namespace Gekko
                     {
                         foreach (string s7 in names)
                         {
-                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null, false)).ToString();
                             rv2.Add(new TwoStrings(s7, ss));
                         }
                     }
@@ -15163,7 +15169,7 @@ namespace Gekko
 
                     foreach (string s7 in names)
                     {
-                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null, false)).ToString();
                         rv2.Add(new TwoStrings(s7, ss));
                     }
                 }
@@ -17097,7 +17103,7 @@ namespace Gekko
                     }
                 }
 
-                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, true);
                 foreach (string expl in expls) G.Writeln(expl);
 
                 if (ts.meta.trace2 != null)
