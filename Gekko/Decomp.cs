@@ -1926,7 +1926,8 @@ namespace Gekko
                                         }
 
                                         Series ts = dd.storage[x2];
-                                        double d1 = ts.GetDataSimple(t);
+                                        double d1 = double.NaN;
+                                        if (ts != null) d1 = ts.GetDataSimple(t);
                                         mEndo[row, col] = d1;
 
                                         double d2 = InvertGetGradient(decompDatas.storage[ii][jj], x2, t, operatorOneOf3Types);
@@ -1952,7 +1953,8 @@ namespace Gekko
                                             //exudl, forsøger her at finde en [-2], der er noget rotten
                                             //omkring 2030. Måske lave en liste over de tidsløse
                                         }
-                                        double d = ts.GetDataSimple(t);
+                                        double d = double.NaN;
+                                        if (ts != null) d = ts.GetDataSimple(t);
                                         mExo[row, col] = d;
                                     }
                                     else
