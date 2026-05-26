@@ -4389,8 +4389,8 @@ namespace Gekko
             File.WriteAllText("c:\\tools\\Model2.cs", sb.ToString(), G.GetEncoding());
 
             new Writeln("See c:\\tools\\Model1.cs/Model2.cs for code");
-
         }
+        
 
         public static List<object> ProtobufModelGamsScalar5a(int k, Model model)
         {
@@ -25027,9 +25027,7 @@ namespace Gekko
             else
             {
                 //in the very rare case, any files here will be overwritten
-            }
-
-            CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
+            }            
 
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
 
@@ -25107,6 +25105,20 @@ namespace Gekko
                     tracesToWrite = databank.traces;
                     databank.traces = null;
                 }
+
+                //Data hash
+                string dataHash = null;
+                if (true)
+                {
+                    SHA256 hash = SHA256.Create();
+                    foreach (KeyValuePair<string, IVariable> kvp in databank.storage) kvp.Value.DeepHash(hash);
+                    string hasTraces = "false"; if (tracesToWrite != null && tracesToWrite.Count > 0) hasTraces = "true";
+                    Hashing.HashString("hasTraces: " + hasTraces, hash);
+                    hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+                    dataHash = BitConverter.ToString(hash.Hash!).Replace("-", "").ToLower();
+                }
+
+                CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand, dataHash);
 
                 List<int> workToDo = new List<int>() { 0, 1 };
                 if (noTrace) workToDo = new List<int>() { 0 };  //do not do traces
@@ -25399,9 +25411,8 @@ namespace Gekko
             }
         }
 
-        private static void CreateDatabankXmlInfo(P p, Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand)
+        private static void CreateDatabankXmlInfo(P p, Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand, string dataHash)
         {
-
             // Create the xml document containe
             XmlDocument doc = new XmlDocument();// Create the XML Declaration, and append it to XML document
             XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", null, null);
@@ -25418,7 +25429,7 @@ namespace Gekko
                 {                     
                     XmlElement user = doc.CreateElement("User");                    
                     user.InnerText = (Functions.user(null, null, null, new IVariable[] { }) as ScalarString).string2;
-                    root.AppendChild(user);
+                    if (!G.NullOrBlanks(user.InnerText)) root.AppendChild(user);
                 } 
                 catch { }
                 
@@ -25426,7 +25437,7 @@ namespace Gekko
                 {                     
                     XmlElement branch = doc.CreateElement("Branch");
                     branch.InnerText = (Functions.branch(null, null, null, new IVariable[] { }) as ScalarString).string2;
-                    root.AppendChild(branch);
+                    if (!G.NullOrBlanks(branch.InnerText)) root.AppendChild(branch);
                 } 
                 catch { }
                 
@@ -25434,7 +25445,7 @@ namespace Gekko
                 {                    
                     XmlElement commit = doc.CreateElement("Commit");
                     commit.InnerText = (Functions.commit(null, null, null, new IVariable[] { }) as ScalarString).string2;
-                    root.AppendChild(commit);
+                    if (!G.NullOrBlanks(commit.InnerText)) root.AppendChild(commit);
                 } 
                 catch { }
                 
@@ -25442,7 +25453,7 @@ namespace Gekko
                 {                    
                     XmlElement gcm = doc.CreateElement("Gcm");
                     gcm.InnerText = p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence); //Like for runfolder() and runfile(), we are interested in the executing .gcm file, so do not return a proc/func. This is done for data-traces, though, so there is a minor inconsistency here, but for traces, you often want to see the exact series statement.
-                    root.AppendChild(gcm);
+                    if (!G.NullOrBlanks(gcm.InnerText)) root.AppendChild(gcm);
                 } 
                 catch { }
             }
@@ -25450,12 +25461,16 @@ namespace Gekko
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
             comment.InnerText = databank.info1;
-            root.AppendChild(comment);
+            if (!G.NullOrBlanks(comment.InnerText)) root.AppendChild(comment);
 
             XmlElement date = doc.CreateElement("Date");
             string now = GetDateTimePretty(DateTime.Now);
             date.InnerText = now;
-            root.AppendChild(date);
+            if (!G.NullOrBlanks(date.InnerText)) root.AppendChild(date);
+            
+            XmlElement dataHash2 = doc.CreateElement("DataHash");
+            dataHash2.InnerText = dataHash;
+            if (!G.NullOrBlanks(dataHash2.InnerText)) root.AppendChild(dataHash2);            
 
             if (G.GetModelSourceType() == EModelType.Gekko && !isCloseCommand)
             {
@@ -25477,40 +25492,40 @@ namespace Gekko
 
                     XmlElement modelName = doc.CreateElement("ModelName");
                     modelName.InnerText = Path.GetFileName(Program.model.modelGekko.modelInfo.fileName);
-                    root.AppendChild(modelName);
+                    if (!G.NullOrBlanks(modelName.InnerText)) root.AppendChild(modelName);
 
                     XmlElement modelInfo = doc.CreateElement("ModelInfo");
                     modelInfo.InnerText = Program.model.modelGekko.modelInfo.info;
-                    root.AppendChild(modelInfo);
+                    if (!G.NullOrBlanks(modelInfo.InnerText)) root.AppendChild(modelInfo);
 
                     XmlElement modelDate = doc.CreateElement("ModelDate");
                     modelDate.InnerText = Program.model.modelGekko.modelInfo.date;
-                    root.AppendChild(modelDate);
+                    if (!G.NullOrBlanks(modelDate.InnerText)) root.AppendChild(modelDate);
 
                     XmlElement modelSignature = doc.CreateElement("ModelSignature");
                     modelSignature.InnerText = Program.model.modelGekko.signatureFoundInFileHeader;
-                    root.AppendChild(modelSignature);
+                    if (!G.NullOrBlanks(modelSignature.InnerText)) root.AppendChild(modelSignature);
 
                     XmlElement modelHash = doc.CreateElement("ModelHash");
                     modelHash.InnerText = Program.model.modelGekko.modelHashTrue;
-                    root.AppendChild(modelHash);
+                    if (!G.NullOrBlanks(modelHash.InnerText)) root.AppendChild(modelHash);
 
                     XmlElement modelLastSimPeriod = doc.CreateElement("ModelLastSimPeriod");
                     if (Program.model.modelGekko.lastSimPer1.IsNull() || Program.model.modelGekko.lastSimPer2.IsNull()) modelLastSimPeriod.InnerText = "";
                     else modelLastSimPeriod.InnerText = G.FromDateToString(Program.model.modelGekko.lastSimPer1) + "-" + G.FromDateToString(Program.model.modelGekko.lastSimPer2);
-                    root.AppendChild(modelLastSimPeriod);
+                    if (!G.NullOrBlanks(modelLastSimPeriod.InnerText)) root.AppendChild(modelLastSimPeriod);
 
                     XmlElement modelLastSimStamp = doc.CreateElement("ModelLastSimStamp");
                     modelLastSimStamp.InnerText = Program.model.modelGekko.lastSimStamp;
-                    root.AppendChild(modelLastSimStamp);
+                    if (!G.NullOrBlanks(modelLastSimStamp.InnerText)) root.AppendChild(modelLastSimStamp);
 
                     XmlElement modelLargestLag = doc.CreateElement("ModelLargestLag");
                     modelLargestLag.InnerText = "" + Program.model.modelGekko.largestLag;
-                    root.AppendChild(modelLargestLag);
+                    if (!G.NullOrBlanks(modelLargestLag.InnerText)) root.AppendChild(modelLargestLag);
 
                     XmlElement modelLargestLead = doc.CreateElement("ModelLargestLead");
                     modelLargestLead.InnerText = "" + Program.model.modelGekko.largestLead;
-                    root.AppendChild(modelLargestLead);
+                    if (!G.NullOrBlanks(modelLargestLead.InnerText)) root.AppendChild(modelLargestLead);
                 }
             }
 

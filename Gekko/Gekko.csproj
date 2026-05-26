@@ -440,6 +440,7 @@
     <Compile Include="GuiDialogMakeBatfile.Designer.cs">
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </Compile>
+    <Compile Include="Hashing.cs" />
     <Compile Include="IBank.cs" />
     <Compile Include="GuiInputBox.cs" />
     <Compile Include="IVariable.cs" />

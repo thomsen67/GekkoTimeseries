@@ -3290,7 +3290,26 @@ namespace Gekko
                 Program.GetYearMinMax(this, yearMinMax);
             }
         }
-        
+
+        public void DeepHash(System.Security.Cryptography.SHA256 hash)
+        {
+            if (this.type == ESeriesType.ArraySuper)
+            {                
+                //List<MultidimElement> keys1 = this.dimensionsStorage.storage.Keys.ToList();
+                //keys1.Sort(Multidim.CompareMultidimElements);
+                List<KeyValuePair<MultidimElement, IVariable>> sortedList = this.dimensionsStorage.storage.OrderBy(kvp => kvp.Key, Comparer<MultidimElement>.Create(Multidim.CompareMultidimElements)).ToList();
+                foreach (KeyValuePair<MultidimElement, IVariable> kvp in sortedList)
+                {
+                    Series subSeries = kvp.Value as Series;
+                    if (subSeries != null) Hashing.HashDoubleArray(subSeries.data.GetDataArray_ONLY_INTERNAL_USE(), hash);                    
+                }
+            }
+            else
+            {
+                Hashing.HashDoubleArray(this.data.GetDataArray_ONLY_INTERNAL_USE(), hash);
+            }
+        }        
+
         private static void ConnectArraysSeriesWithSubSeries(Series arraySeries, Series subSeries, MultidimElement mmi)
         {
             mmi.parent = arraySeries;  //The mmi item points to the array-series
