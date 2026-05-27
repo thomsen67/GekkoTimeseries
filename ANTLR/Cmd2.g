@@ -60,6 +60,7 @@ ASTOPT_STRING_DATECELL;
 ASTOPT_STRING_METHOD;
 ASTOPT_STRING_METHOD;
 ASTOPT_STRING_ALL;
+ASTOPT_STRING_TRACE;
 	ASTCOMPARE2;
 	ASTSERIESOPERATOR;
 	ASTSERIESDOLLARCONDITION;
@@ -2455,6 +2456,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | METHOD '=' name -> ^(ASTOPT_STRING_METHOD name)
 						  | COLLAPSE '=' name -> ^(ASTOPT_STRING_COLLAPSE name)
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						  ;
 
 identOrStar               : ident -> ident
@@ -2655,6 +2657,7 @@ writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)	
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						  ;
 
 //writeOpt2                 : leftAngle R (EQUAL yesNo)? RIGHTANGLE -> ^(ASTOPT_STRING_R yesNo?);
@@ -2752,6 +2755,7 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)	
 						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						  ;
 
 olsOpt1                   : ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;

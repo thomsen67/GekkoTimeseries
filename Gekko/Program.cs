@@ -21699,7 +21699,7 @@ write datatest;
                     ts.SetDirtyGhost(true, false);
                 }
 
-                if (Program.options.databank_trace)
+                if (Program.options.databank_trace && Program.options.databank_trace_add)
                 {
                     try
                     {
@@ -21747,6 +21747,10 @@ write datatest;
                 G.Writeln();
                 throw new GekkoException();
             }
+
+            bool trace = true; //default if not set
+            if (G.equal(o.opt_trace, "no")) trace = false;
+            else if (G.equal(o.opt_trace, "yes")) trace = true;
 
             bool isDefault = false;
             if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null && o.opt_gdx == null && o.opt_r == null)
@@ -25558,7 +25562,7 @@ write datatest;
                 }
             }
 
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 try
                 {
@@ -25714,7 +25718,7 @@ write datatest;
                 }
             }
 
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 try
                 {

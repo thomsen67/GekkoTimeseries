@@ -250,7 +250,7 @@ namespace Gekko
             this.storage.Add(variable, ts);
             ts.parentDatabank = this;
             this.isDirty = true;
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 //Globals.traceContainer.Add(ts);
             }
@@ -271,7 +271,7 @@ namespace Gekko
             this.storage.Add(variable, ts);
             ts.parentDatabank = this;
             this.isDirty = true;
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 //Globals.traceContainer.Add(ts);
             }
@@ -286,7 +286,7 @@ namespace Gekko
         {            
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             TimeSeries x = null; this.storage.TryGetValue(variable, out x);
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 if (Globals.hack_lhsOrRhs == 1)
                 {
@@ -300,7 +300,7 @@ namespace Gekko
         {
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             TimeSeries x = null; this.storage.TryGetValue(variable, out x);
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 if (Globals.hack_lhsOrRhs == 1)
                 {

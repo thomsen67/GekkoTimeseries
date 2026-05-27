@@ -461,7 +461,7 @@ namespace Gekko
                 }
                 this.SetDirtyGhost(true, false);
             }
-            if (Program.options.databank_trace)
+            if (Program.options.databank_trace && Program.options.databank_trace_add)
             {
                 try
                 {

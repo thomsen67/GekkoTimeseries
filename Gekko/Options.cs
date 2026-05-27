@@ -49,7 +49,7 @@ Additionally, there are model, solve, equation options.
         public bool bugfix_download = true;
         public bool bugfix_trace = false;        
         public bool bugfix_trace_skip = false;
-        public int bugfix_trace_set = -1;         //not mentioned in help, -1 = inactive: sets max depth for trace viewer
+        public int bugfix_trace_set = -1;         //NOT ACTIVE ANYWAY! not mentioned in help, -1 = inactive: sets max depth for trace viewer
 
         public bool databank_create_auto = false;
         public bool databank_create_message = true;  //this option could be removed now
@@ -61,7 +61,8 @@ Additionally, there are model, solve, equation options.
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
         public string databank_logic = "default";  //default | aremos
         public bool databank_search = false;
-        public bool databank_trace = true;
+        public bool databank_trace = true; //(a) reads traces and (b) writes traces, and (c) creates new traces from series commands. Note: (c) is not active, if "option databank trace add = no".
+        public bool databank_trace_add = true; //creates new traces from series commands --> will omit (c) above.
         public bool folder = true;
         public string folder_bank = "";
         public string folder_bank1 = "";

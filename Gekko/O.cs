@@ -1944,6 +1944,7 @@ namespace Gekko
             public string opt_namecell = null;
             public string opt_datecell = null;
             public string opt_all = null;
+            public string opt_trace = null;
 
             public string gekkocode = null;
             public P p = null;
@@ -2143,6 +2144,10 @@ namespace Gekko
                 }
 
                 hlp.array = this.opt_array;
+
+                bool trace = true; //default if not set
+                if (G.equal(this.opt_trace, "no")) trace = false;
+                else if (G.equal(this.opt_trace, "yes")) trace = true;
 
                 Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos);
                 Program.ReadInfo readInfo = readInfos[0];
@@ -2833,7 +2838,7 @@ namespace Gekko
                 }
                 lhs.Stamp();
 
-                if (Program.options.databank_trace)
+                if (Program.options.databank_trace && Program.options.databank_trace_add)
                 {
                     try
                     {
@@ -2987,7 +2992,7 @@ namespace Gekko
                 }
                 ts3.Stamp();
 
-                if (Program.options.databank_trace)
+                if (Program.options.databank_trace && Program.options.databank_trace_add)
                 {
                     try
                     {
@@ -3169,6 +3174,7 @@ namespace Gekko
             public string opt_edit = null;
             public string opt_save = null;
             public double opt_pos = double.NaN;
+            public string opt_trace = null;
             public void Exe()
             {
                 if (G.equal(opt_prot, "yes"))
@@ -3250,8 +3256,12 @@ namespace Gekko
                         G.Writeln2("*** ERROR: OPEN<pos=...> should be integer value");
                         throw new GekkoException();
                     }
-                }                                
-                
+                }
+
+                bool trace = true; //default if not set
+                if (G.equal(this.opt_trace, "no")) trace = false;
+                else if (G.equal(this.opt_trace, "yes")) trace = true;
+
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
                 Program.OpenOrRead(false, hlp, true, readInfos);                
 
@@ -3686,7 +3696,7 @@ namespace Gekko
                                 ts2.SetDataSequence(t1, t2, values, index1);
                                 ts2.Stamp();  //will get a new date stamp, since it is not cloning here
 
-                                if (Program.options.databank_trace)
+                                if (Program.options.databank_trace && Program.options.databank_trace_add)
                                 {
                                     try
                                     {
@@ -3711,7 +3721,7 @@ namespace Gekko
                                 ts2.Truncate(this.t1, this.t2);
                                 toBank.AddVariable(ts2);
 
-                                if (Program.options.databank_trace)
+                                if (Program.options.databank_trace && Program.options.databank_trace_add)
                                 {
                                     try
                                     {
@@ -3750,7 +3760,7 @@ namespace Gekko
                             }
                             toBank.AddVariable(ts2);
 
-                            if (Program.options.databank_trace)
+                            if (Program.options.databank_trace && Program.options.databank_trace_add)
                             {
                                 try
                                 {
@@ -3844,7 +3854,7 @@ namespace Gekko
                         counter++;
                         ts.Stamp();
 
-                        if (Program.options.databank_trace)
+                        if (Program.options.databank_trace && Program.options.databank_trace_add)
                         {
                             try
                             {
@@ -3921,7 +3931,7 @@ namespace Gekko
                         ts.parentDatabank.AddVariable(ts);
                         counter++;
 
-                        if (Program.options.databank_trace)
+                        if (Program.options.databank_trace && Program.options.databank_trace_add)
                         {
                             try
                             {
@@ -4262,7 +4272,7 @@ namespace Gekko
                     G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
 
-                if (Program.options.databank_trace)
+                if (Program.options.databank_trace && Program.options.databank_trace_add)
                 {
                     try
                     {
@@ -4489,7 +4499,7 @@ namespace Gekko
                         }
                         count++;
 
-                        if (Program.options.databank_trace)
+                        if (Program.options.databank_trace && Program.options.databank_trace_add)
                         {
                             try
                             {
@@ -5617,6 +5627,8 @@ namespace Gekko
             public string opt_cols = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public string opt_all = null;
+            public string opt_trace = null;
+
             public void Exe()
             {
 
