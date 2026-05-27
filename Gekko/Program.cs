@@ -2317,7 +2317,7 @@ namespace Gekko
             return found;
         }
 
-        public static void OpenOrRead(bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos)
+        public static void OpenOrRead(bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, bool trace, List<ReadInfo> readInfos)
         {
             //open = true if called with OPEN command                      
 
@@ -2540,7 +2540,7 @@ namespace Gekko
                     }
                     else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
                     {
-                        ReadTsdOrTsdx(dates, oRead, readInfo, ref file, isTsdx, ref isProtobuf, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                        ReadTsdOrTsdx(dates, oRead, readInfo, trace, ref file, isTsdx, ref isProtobuf, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     }
                     else if (oRead.Type == EDataFormat.Tsp)
                     {
@@ -3009,7 +3009,7 @@ namespace Gekko
             return v;
         }
 
-        private static void ReadTsdOrTsdx(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        private static void ReadTsdOrTsdx(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, bool trace, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             bool mergeOrTimeLimit = oRead.Merge || dates != null;
 
@@ -3452,11 +3452,11 @@ write datatest;
                         }
                     }
 
-                    if (Program.options.databank_trace && tracename != null)
+                    //NOTE: if <trace=...> is not used, trace will simply be == Program.options.databank_trace.
+                    if (trace && tracename != null)
                     {
                         using (FileStream fs = WaitForFileStream(tracename, GekkoFileReadOrWrite.Read))
                         {
-
                             try
                             {
                                 DateTime dt3 = DateTime.Now;
@@ -3470,9 +3470,9 @@ write datatest;
                                 int n = 0;
                                 if (traces != null)
                                 {
-                                    foreach (Trace2 trace in traces)
+                                    foreach (Trace2 trace2 in traces)
                                     {
-                                        if (trace.type != ETraceType.GluedToSeries) n++;
+                                        if (trace2.type != ETraceType.GluedToSeries) n++;
                                     }
                                 }
                                 readInfo.nTraces = n;
@@ -21738,6 +21738,9 @@ write datatest;
 
         public static int Write(O.Write o)
         {
+            bool trace = Program.options.databank_trace; //default if not set
+            if (G.equal(o.opt_trace, "no")) trace = false;
+            else if (G.equal(o.opt_trace, "yes")) trace = true;
 
             if (G.equal(o.opt_tsdx, "yes"))
             {
@@ -21746,11 +21749,7 @@ write datatest;
                 G.Writeln("           and rename that file to .tsdx afterwards.", Color.Red);
                 G.Writeln();
                 throw new GekkoException();
-            }
-
-            bool trace = true; //default if not set
-            if (G.equal(o.opt_trace, "no")) trace = false;
-            else if (G.equal(o.opt_trace, "yes")) trace = true;
+            }            
 
             bool isDefault = false;
             if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null && o.opt_gdx == null && o.opt_r == null)
@@ -21897,7 +21896,7 @@ write datatest;
                 //tsd or gbk or unspecified format                
                 CheckSomethingToWrite(list);
                 //first argument (the databank) is only used if list = null
-                return Write(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                return Write(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false, trace);
             }
             else
             {
@@ -22114,7 +22113,7 @@ write datatest;
             return newList;
         }
 
-        public static int Write(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int Write(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand, bool trace)
         {
             //ErrorIfDatabanksSwapped();
             int n = 0;
@@ -22277,9 +22276,7 @@ write datatest;
                         }
                         databank.storage = databankWithFewerPeriods;
                         databank.Trim();  //to make it smaller, slack removed from each TimeSeries
-                    }
-
-                    bool useTraces = Program.options.databank_trace;
+                    }                    
 
                     bool traceFail = false;
                     TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
@@ -22310,9 +22307,9 @@ write datatest;
                     {
                         if (tracesToWrite != null)
                         {
-                            foreach (Trace2 trace in tracesToWrite)
+                            foreach (Trace2 trace2 in tracesToWrite)
                             {
-                                if (trace.type != ETraceType.GluedToSeries) n++;
+                                if (trace2.type != ETraceType.GluedToSeries) n++;
                             }
                         }
                     }
@@ -22336,7 +22333,8 @@ write datatest;
                         }
                     }
 
-                    if (useTraces && tracesToWrite != null && !Program.options.bugfix_trace_skip)
+                    //NOTE: if <trace=...> is not used, trace will simply be == Program.options.databank_trace.
+                    if (trace && tracesToWrite != null && !Program.options.bugfix_trace_skip)
                     {
                         using (FileStream fs = WaitForFileStream(pathAndFilename3, GekkoFileReadOrWrite.Write))
                         {

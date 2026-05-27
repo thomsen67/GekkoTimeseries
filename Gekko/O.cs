@@ -2145,11 +2145,11 @@ namespace Gekko
 
                 hlp.array = this.opt_array;
 
-                bool trace = true; //default if not set
+                bool trace = Program.options.databank_trace; //default if not set
                 if (G.equal(this.opt_trace, "no")) trace = false;
                 else if (G.equal(this.opt_trace, "yes")) trace = true;
 
-                Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos);
+                Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, trace, readInfos);
                 Program.ReadInfo readInfo = readInfos[0];
                 readInfo.shouldMerge = hlp.Merge;                
 
@@ -3258,12 +3258,12 @@ namespace Gekko
                     }
                 }
 
-                bool trace = true; //default if not set
+                bool trace = Program.options.databank_trace; //default if not set
                 if (G.equal(this.opt_trace, "no")) trace = false;
                 else if (G.equal(this.opt_trace, "yes")) trace = true;
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(false, hlp, true, readInfos);                
+                Program.OpenOrRead(false, hlp, true, trace, readInfos);                
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {                    
