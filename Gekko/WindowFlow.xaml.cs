@@ -100,8 +100,11 @@ namespace Gekko
                 string varName = this.decompFind.decompOptions2.guiFlowName;
                 int depth = 0;
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                WalkNodes(depth, graph, varName, eqName, walkInfo);
+                if (temp.Count > 0) //if .Count == 0, the window will be empty but not crash...
+                {
+                    string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                    WalkNodes(depth, graph, varName, eqName, walkInfo);
+                }
                 if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;
@@ -131,8 +134,16 @@ namespace Gekko
             if (!walkInfo.visitedDepths.ContainsKey(varName))
             {                
                 hasBeenSeenAlready = false;
-                arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);                
-                walkInfo.visitedDepths.Add(varName, arrowsFromTo);
+                try
+                {
+                    arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo.decompFind, walkInfo);
+                    walkInfo.visitedDepths.Add(varName, arrowsFromTo);
+                }
+                catch 
+                {
+                    //No need to die on decomp error here
+                    return;
+                }                
             }
             else if (depth < walkInfo.visitedDepths.Get(varName).depth)
             {
@@ -260,7 +271,7 @@ namespace Gekko
                 statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
                 statusTextBox.Opacity = 1.0;
                 var drawingNode = (Node)node.DrawingObject;
-                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text);
+                string label = Program.GetVariableExplanation1Line(drawingNode.Label.Text, false);
                 statusTextBox.Text = label;
             }
             else

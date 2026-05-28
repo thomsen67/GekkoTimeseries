@@ -13081,11 +13081,11 @@ namespace Gekko
         /// </summary>
         /// <param name="varnameMaybeWithFreq"></param>
         /// <returns></returns>
-        public static string GetVariableExplanation1Line(string varnameMaybeWithFreq)
+        public static string GetVariableExplanation1Line(string varnameMaybeWithFreq, bool mayGiveExceptionError)
         {
             if (varnameMaybeWithFreq == null) return null;
             string label = null;
-            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, true);
+            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, mayGiveExceptionError);
             if (expls != null && expls.Count > 0) label = expls[0];
             return label;
         }
@@ -13223,11 +13223,11 @@ namespace Gekko
         /// </summary>
         /// <param name="variableNameWithOrWithoutLag"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag, HtmlBrowserSettings htmlBrowserSettings, bool mayGiveExceptionError)
         {
             string ss = "";
             string var2 = G.Chop_RemoveLagOrLead_OLD(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
-            List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings, true);
+            List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings, mayGiveExceptionError);
             return ss2;
         }        
 
@@ -17103,7 +17103,7 @@ namespace Gekko
                     }
                 }
 
-                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, true);
+                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, false);
                 foreach (string expl in expls) G.Writeln(expl);
 
                 if (ts.meta.trace2 != null)

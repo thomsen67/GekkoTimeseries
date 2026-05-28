@@ -6700,7 +6700,7 @@ namespace Gekko
                 //#6irhwakery7
                 string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, b, b, "");
 
-                string label = Program.GetVariableExplanation1Line(name);
+                string label = Program.GetVariableExplanation1Line(name, false);
 
                 string lbl = null;
                 if (!G.NullOrEmpty(label)) lbl = " (" + label + ")";

@@ -599,7 +599,7 @@ img {border-style: none;
                 HtmlBrowserSettings htmlBrowserSettings = new HtmlBrowserSettings();
                 htmlBrowserSettings.isDanish = isDanish;
                 htmlBrowserSettings.show_source = settings_show_source;
-                List<string> varExpl = Program.GetVariableExplanationAugmented(varnameWithFreq, htmlBrowserSettings);
+                List<string> varExpl = Program.GetVariableExplanationAugmented(varnameWithFreq, htmlBrowserSettings, false);
                 foreach (string line in varExpl)
                 {
                     if (line != "")
@@ -1670,7 +1670,7 @@ img {border-style: none;
                 foreach (string var2 in vars)
                 {
                     if (G.StartsWith(var2, res)) continue;  //skip res_... variables.
-                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2));
+                    string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2, false));
                     x2.Append("<tr>");
                     x2.Append("<td width = `20%`>");
                     x2.Append(HtmlLink(var2, settings_vars_foldername + "/" + SimplerName(var2) + ".html"));
@@ -1927,7 +1927,7 @@ img {border-style: none;
 
                     html1.AppendLine("<tr>");
                     html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName, SimplerName(variableName) + ".html") + "</td>");
-                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)) + "</td>");
+                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName, false)) + "</td>");
                     html1.AppendLine("</tr>");
 
                     EquationTextHelper helper2 = new EquationTextHelper();
@@ -1942,7 +1942,7 @@ img {border-style: none;
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
                         html1.Append("<td>" + EquationBrowser.HtmlLink(varnameWithoutLag, SimplerName(varnameWithoutLag) + ".html") + "</td>");
-                        html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag)) + "</td>");
+                        html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(varnameWithoutLag, false)) + "</td>");
                         html1.AppendLine("</tr>");
                         dict.Add(varnameWithoutLag, false);
                     }
@@ -1962,7 +1962,7 @@ img {border-style: none;
                     bool first2 = true;
                     foreach (string s in dependentVarsList)
                     {
-                        string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s));
+                        string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(s, false));
                         string link = EquationBrowser.HtmlLink(s, SimplerName(s) + ".html", tooltip);
                         if (!first2) s8 += ", ";
                         s8 += link;
@@ -2300,7 +2300,7 @@ img {border-style: none;
             EquationBrowser.SpanHtmlColor(html2, variableName);
             html2.Append("</p>");
             //EquationBrowser.WriteHtmlColor(html2, variableName);
-            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));            
+            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName, false)));            
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName + ":");            
             string table = "<table cellpadding=`5`>";
@@ -2435,7 +2435,7 @@ img {border-style: none;
                             }
                             string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
                             string title = null;
-                            if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE
+                            if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName, false)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE
                             if (!G.NullOrBlanks(sVarsInside)) title += sVarsInside;
                             string titleHtml = null;
                             if (!G.NullOrBlanks(title)) titleHtml = " title=`" + title.Trim() + "`";
