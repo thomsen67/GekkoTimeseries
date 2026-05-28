@@ -3071,9 +3071,13 @@ namespace Gekko
             public string name = null;  //only if '*' is indicated, not used otherwise
             public List<string> listItems = null;
             public string opt_save = null;
+            public string opt_trace = null;
             public void Exe()
             {
-                
+                bool trace = Program.options.databank_trace; //default if not set
+                if (G.equal(this.opt_trace, "no")) trace = false;
+                else if (G.equal(this.opt_trace, "yes")) trace = true;
+
                 List<string> databanks = new List<string>();
                 if (this.listItems == null)
                 {
@@ -3120,7 +3124,7 @@ namespace Gekko
                     }
                     else
                     {
-                        Program.MaybeWriteOpenDatabank(removed);
+                        Program.MaybeWriteOpenDatabank(removed, trace);
                     }
                 }
                 if (databanks.Count > 0)
@@ -3143,9 +3147,7 @@ namespace Gekko
                 {
                     G.Writeln2("There were no open databanks to close (Work and " + Globals.Ref + " cannot be closed)");
                 }
-            }
-
-            
+            }            
         }
 
         public class Open

@@ -22397,7 +22397,7 @@ write datatest;
             {
                 G.Writeln();
                 string s = null;
-                if (n > 0) s = " and " + n + " data-traces";
+                if (trace && n > 0) s = " and " + n + " data-traces";
                 G.Writeln("Wrote " + count + " variables" + s + " to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
                 if (isUsingOptionFolderBank)
                 {
@@ -23390,7 +23390,7 @@ write datatest;
         }
 
 
-        public static void MaybeWriteOpenDatabank(Databank removed)
+        public static void MaybeWriteOpenDatabank(Databank removed, bool trace)
         {
             if (Program.IsDatabankDirty(removed))
             {
@@ -23405,7 +23405,7 @@ write datatest;
                 }                
                 else
                 {
-                    Program.WriteRemovedDatabank(removed);
+                    Program.WriteRemovedDatabank(removed, trace);
                 }
             }
         }
@@ -23567,12 +23567,12 @@ write datatest;
                 else if (G.equal(Program.databanks.storage[i].aliasName, Globals.Ref)) b = i;
                 else
                 {
-                    MaybeWriteOpenDatabank(Program.databanks.storage[i]);
+                    MaybeWriteOpenDatabank(Program.databanks.storage[i], Program.options.databank_trace);
                 }
             }
         }
 
-        public static void WriteRemovedDatabank(Databank removed)
+        public static void WriteRemovedDatabank(Databank removed, bool trace)
         {            
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
             if (removed.FileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
@@ -23614,7 +23614,7 @@ write datatest;
                 }
             }
             int n = 0;
-            if (!skipWrite) n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+            if (!skipWrite) n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true, trace);
         }
         
         public static string ErrorHandling(string s, P p, bool noWindowShown)

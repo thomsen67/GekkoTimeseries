@@ -1968,6 +1968,7 @@ close					  : CLOSE closeOpt1? listItems -> ^({token("ASTCLOSE", ASTCLOSE, $CLOS
 						  ;
 closeOpt1                 : ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						  ;						
 
 cls						  : CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
@@ -3302,6 +3303,7 @@ optionType :
 			 | DATABANK CREATE MESSAGE '='? yesNoSimple -> DATABANK CREATE MESSAGE ^(ASTBOOL yesNoSimple )			
 			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )			
              | DATABANK TRACE '='? yesNoSimple -> DATABANK TRACE ^(ASTBOOL yesNoSimple )			
+             | DATABANK TRACE ADD '='? yesNoSimple -> DATABANK TRACE ADD ^(ASTBOOL yesNoSimple )			
 			 | DATABANK LOGIC '='? optionDatabankLogic -> DATABANK LOGIC ^(ASTSTRINGSIMPLE optionDatabankLogic )		
 
 			 | FOLDER question -> FOLDER question
