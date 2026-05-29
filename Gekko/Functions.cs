@@ -1823,12 +1823,12 @@ namespace Gekko
             double d = alglib.rmatrixdet(m.data);
             return new ScalarVal(d);
         }
-        public static IVariable ras(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames)
+        public static IVariable balance(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames)
         {
-            return ras(smpl, _t1, _t2, a, rowSums, colSums, rowNames, colNames, null);
+            return balance(smpl, _t1, _t2, a, rowSums, colSums, rowNames, colNames, null);
         }
 
-        public static IVariable ras(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
+        public static IVariable balance(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             return Optimize.Optimize1(t1, t2, a, rowSums, colSums, rowNames, colNames, other);

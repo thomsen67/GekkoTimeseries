@@ -17185,19 +17185,7 @@ namespace Gekko
         /// <param name="varnameWithoutFreq"></param>
         private static void DispHelperShowNormalEquation(bool showDetailed, string varnameWithoutFreq)
         {
-            List<string> d4 = new List<string>();
-            if (Program.model?.modelGekko?.dependents != null && Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
-            {
-                Dictionary<string, string> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
-                if (d2 != null)
-                {
-                    foreach (string d3 in d2.Keys)
-                    {
-                        d4.Add(d3);
-                    }
-                }
-                d4.Sort(StringComparer.InvariantCulture);
-            }
+            List<string> d4 = ModelInfluences(varnameWithoutFreq);
 
             EquationHelper found = Program.FindEquationByMeansOfVariableName(varnameWithoutFreq);
 
@@ -17264,6 +17252,25 @@ namespace Gekko
                     G.Writeln();
                 }
             }
+        }
+
+        private static List<string> ModelInfluences(string varnameWithoutFreq)
+        {
+            List<string> d4 = new List<string>();
+            if (Program.model?.modelGekko?.dependents != null && Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
+            {
+                Dictionary<string, string> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
+                if (d2 != null)
+                {
+                    foreach (string d3 in d2.Keys)
+                    {
+                        d4.Add(d3);
+                    }
+                }
+                d4.Sort(StringComparer.InvariantCulture);
+            }
+
+            return d4;
         }
 
         /// <summary>

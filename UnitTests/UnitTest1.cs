@@ -35418,7 +35418,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void _Test_Ras()
+        public void _Test_balance()
         {
             //TODO: handle pure == 0d.         
             //TODO: abs() on function? And how do negative cells do?
@@ -35574,55 +35574,55 @@ print(df2)
                     I("#constraints2 = (  (  ('a','a'), 10  ),  );");
                     I("#exo = (  ('a','a'),  );");
 
-                    I("io0a_ras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
+                    I("io0a_ras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
                     I("prt <n> io0a_ras;");
 
-                    I("io0a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");                    
+                    I("io0a_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");                    
                     I("prt <n> io0a_entropy;");
 
-                    I("io0a_entropy2003 = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");                    
+                    I("io0a_entropy2003 = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");                    
                     I("prt <n> io0a_entropy2003;");                    
 
-                    I("io0a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");                    
+                    I("io0a_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");                    
                     I("prt <n> io0a_gras;");                    
                     
-                    I("io0a_sqdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");                    
+                    I("io0a_sqdif = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");                    
                     I("prt <n> io0a_sqdif;");
 
-                    I("io0a_sqrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");                    
+                    I("io0a_sqrel = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");                    
                     I("prt <n> io0a_sqrel;");
 
-                    I("io0a_distdif = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");                    
+                    I("io0a_distdif = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");                    
                     I("prt <n> io0a_distdif;");
 
-                    I("io0a_distrel = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");                    
+                    I("io0a_distrel = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");                    
                     I("prt <n> io0a_distrel;");
 
                     // -----
 
-                    I("io0b_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints1, %type = 'entropy'));");                    
+                    I("io0b_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints1, %type = 'entropy'));");                    
                     I("prt <n> io0b_entropy;");
 
                     // -----
 
-                    I("io0c_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?                                
+                    I("io0c_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?                                
                     I("prt <n> io0c_entropy;");
 
-                    I("io0c_ras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");                    
+                    I("io0c_ras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");                    
                     I("prt <n> io0c_ras;");
 
-                    I("io0c_gras = ras(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'gras'));");                    
+                    I("io0c_gras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'gras'));");                    
                     I("prt <n> io0c_ras;");
 
                     // -----
 
-                    I("io0d_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints2, %type = 'entropy'));");                    
+                    I("io0d_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints2, %type = 'entropy'));");                    
                     I("prt <n> io0d_entropy;");                    
                 }
 
                 if (ii == 1)
                 {
-                    I("io1a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("io1a_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
                     I("prt <n> io1a_gras;");
                 }
 
@@ -35630,13 +35630,13 @@ print(df2)
                 {
                     I("#exo2 = (  ('c','b'), ('b','a')  );");
 
-                    I("io2a_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("io2a_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
                     I("prt <n> io2a_gras;");                    
                     
-                    I("io2a_entropy = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy', %tol = 0.0001));");
+                    I("io2a_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy', %tol = 0.0001));");
                     I("prt <n> io2a_entropy;"); //This one is BAD, does not converge with status 7...
 
-                    I("io2b_gras = ras(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', #exo = #exo2, %tol = 0.0000000000000001));");
+                    I("io2b_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', #exo = #exo2, %tol = 0.0000000000000001));");
                     I("prt <n> io2b_gras;");
 
                 }

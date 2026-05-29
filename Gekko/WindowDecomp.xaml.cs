@@ -1183,6 +1183,26 @@ namespace Gekko
 
             border.Child = textBlock;
             dockPanel.Children.Add(border);
+            if (type == GekkoTableTypes.UpperLeft)
+            {
+                TextBlock infl = new TextBlock();
+                infl.HorizontalAlignment = HorizontalAlignment.Center;
+                infl.VerticalAlignment = VerticalAlignment.Center;
+                infl.FontFamily = Globals.decompFontFamily;
+                infl.FontSize = Globals.decompFontSize - 0;
+                int padding = 0;
+                double opa = 0.4;
+                infl.Padding = new Thickness(padding, 2, 4, 3);
+                infl.MouseDown += Mouse_Down;
+                Brush originalColor = Brushes.Black;
+                infl.Foreground = originalColor;
+                infl.MouseEnter += (s, e) => { infl.Foreground = Brushes.Blue; infl.Opacity = 1.0; };
+                infl.MouseLeave += (s, e) => { infl.Foreground = originalColor; infl.Opacity = opa; };
+                    infl.ToolTip = "Click to see which variables are influenced by the decomposed variable";
+                infl.Text = "[Influences]";
+                infl.Opacity = opa;
+                dockPanel.Children.Add(infl);
+            }
             dockPanel.SetValue(Grid.ColumnProperty, j);
             dockPanel.SetValue(Grid.RowProperty, i);
             g.Children.Add(dockPanel);
@@ -1201,10 +1221,9 @@ namespace Gekko
             bool bb1 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top);           
             if (bb1)
             {
-                //                
                 this.SetExpandCollapse(g, i, j, type, isRowOrCol, black, rowsOrColsSumUp, decompFind.decompOptions2);
             }
-        }
+        }        
 
         private bool IsEndogenous(int i, int j, DecompOptions2 decompOptions2)
         {            
@@ -1738,6 +1757,9 @@ namespace Gekko
             int col = (int)dp.GetValue(Grid.ColumnProperty);
             int row = (int)dp.GetValue(Grid.RowProperty);
 
+            bool isInfluences = false;
+            if (row == 0 && col == 0) isInfluences = true;
+
             Cell c, c2;
             GetTwoCells(row, col, out c, out c2);
 
@@ -1748,13 +1770,21 @@ namespace Gekko
                 // ---------------------------------------
 
                 string var = Decomp.HiddenVariableHelper(c2, false);
+
+                if (isInfluences)
+                {
+                    if (var == null) return;
+                    MessageBox.Show(var + " influences ...");
+                    return;
+                }
+
                 if (var == null)
                 {                    
                     new Error(Decomp.Text1(1));
                 }
 
                 _activeVariable = var;
-
+                                
                 if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                 {
                     decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
