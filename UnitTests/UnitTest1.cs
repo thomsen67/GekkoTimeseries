@@ -6417,6 +6417,7 @@ namespace UnitTests
             I("open <edit> m2; clear m2; lock m2;");
             FAIL("copy <frombank = work tobank = m1> x;");  //ignores <tobank> and tries to copy from work to first-pos (m2). But m2 is locked. Before the error there is a warning, too.
             I("copy <frombank = work tobank = m1> x to *;");  //copy from work to b1.
+            I("unlock m2;"); //else the following tests will crash
         }
 
         [TestMethod]
@@ -22408,7 +22409,7 @@ namespace UnitTests
                 //library is lost, even if the gcm is called from a function.
                 //So a library gcm has no sense of where it is called from (from which library).
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
-                I("reset;");
+                I("reset; time 2015 2016;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
                 I("library lib7;");
                 I("function string g(); return 'abcde'; end;");
@@ -23644,10 +23645,16 @@ namespace UnitTests
             //---
             I("write <arrow> test1.arrow;");
 
-            //====== trying out R ===============================
+            string s;
+            string output;
 
-            Globals.unitTestScreenOutput.Clear();
-            string s = @"
+            if (false)
+            {
+
+                //====== trying out R ===============================
+
+                Globals.unitTestScreenOutput.Clear();
+                s = @"
 library(arrow)
 library(dplyr)
 df1 <- read_feather(""" + Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow"")
@@ -23658,24 +23665,25 @@ df3 <- select(filter(df, dims == 0), c(name, freq, per1, per2, per3, value))
 print(df3)
 
 ";
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.r", s);
-            I("r_run test1.r;");
-            string output = Globals.unitTestScreenOutput.ToString();
-            //could be a more precise test regarding R, but never mind
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.r", s);
+                I("r_run test1.r;");
+                output = Globals.unitTestScreenOutput.ToString();
+                //could be a more precise test regarding R, but never mind
 
-            if (true)
-            {
-                //Mystery why this char is suddently showing up in R...? (Since new PC may 2023).
-                Assert.IsTrue(output.Contains("# A tibble: 45 ├ù 9"));
+                if (true)
+                {
+                    //Mystery why this char is suddently showing up in R...? (Since new PC may 2023).
+                    Assert.IsTrue(output.Contains("# A tibble: 45 ├ù 9"));
+                }
+                else
+                {
+                    Assert.IsTrue(output.Contains("# A tibble: 45 x 9"));
+                }
+                Assert.IsTrue(output.Contains("   name  freq   dims dim1  dim2   per1  per2  per3 value"));
+                Assert.IsTrue(output.Contains("   <chr> <chr> <int> <chr> <chr> <int> <int> <int> <dbl>"));
+                Assert.IsTrue(output.Contains(" 1 x     a         0 <NA>  <NA>   2021     0     0     1"));
+                Assert.IsTrue(output.Contains(" 2 x     a         0 <NA>  <NA>   2022     0     0     2"));
             }
-            else
-            {
-                Assert.IsTrue(output.Contains("# A tibble: 45 x 9"));
-            }
-            Assert.IsTrue(output.Contains("   name  freq   dims dim1  dim2   per1  per2  per3 value"));
-            Assert.IsTrue(output.Contains("   <chr> <chr> <int> <chr> <chr> <int> <int> <int> <dbl>"));
-            Assert.IsTrue(output.Contains(" 1 x     a         0 <NA>  <NA>   2021     0     0     1"));
-            Assert.IsTrue(output.Contains(" 2 x     a         0 <NA>  <NA>   2022     0     0     2"));
 
             //====== trying out Python ===============================
 

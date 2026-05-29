@@ -12776,11 +12776,14 @@ namespace Gekko
                 }
                 else if (G.IsUnitTestingOrNotShowingGUI())
                 {
-                    //startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
-                    //
-                    // ---
-                    //This should work too, and be more robust
-                    startup = G.GekkoExeFolder();
+                    if (G.IsUnitTesting())
+                    {
+                        startup = Globals.ttPath2 + "\\" + "GekkoCS" + "\\Gekko\\bin\\Debug";                        
+                    }
+                    else
+                    {
+                        startup = G.GekkoExeFolder();
+                    }
                 }
                 else
                 {
