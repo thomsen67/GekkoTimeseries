@@ -5098,17 +5098,7 @@ namespace Gekko
                     Cell c5 = table1.Get(i, 2);
                     //string name2 = c5?.vars_hack?[0];
                     string name2 = GetVarsHack(c5);
-                    double max = 0d;
-                    for (int j = 2; j <= table1.GetColMaxNumber(); j++)
-                    {
-                        Cell c1 = table1.Get(i, j);
-                        Cell c2 = table1.Get(2, j);
-                        double d = 0d;
-                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
-                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
-                        if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
-                    }
+                    double max = IgnoreHelper1(table1, decompOptions2, i, name2);
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
             }
@@ -5120,17 +5110,7 @@ namespace Gekko
                     //string name2 = c5?.vars_hack?[0];
                     string name2 = GetVarsHack(c5);
                     if (IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
-                    double max = 0d;
-                    for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
-                    {
-                        Cell c1 = table1.Get(i, j);
-                        Cell c2 = table1.Get(i, 2);
-                        double d = 0d;
-                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
-                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
-                        if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
-                    }
+                    double max = IgnoreHelper2(table1, decompOptions2, j, name2);
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }
             }
@@ -5556,6 +5536,48 @@ namespace Gekko
 
             DecompOutput decompOutput = new DecompOutput(table2, ignoredText, red, black);
             return decompOutput;
+        }
+
+        private static double IgnoreHelper2(Table table1, DecompOptions2 decompOptions2, int j, string name2)
+        {
+            double max = 0d;
+            for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
+            {
+                Cell c1 = table1.Get(i, j);
+                Cell c2 = table1.Get(i, 2);
+                double d = 0d;
+                if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
+                else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                if (!G.IsNumericalError(d)) max = Math.Max(max, d);
+                if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+            }
+
+            return max;
+        }
+
+        private static double IgnoreHelper1(Table table1, DecompOptions2 decompOptions2, int i, string name2)
+        {
+            double max = 0d;
+            double sum = 0d;
+            for (int j = 2; j <= table1.GetColMaxNumber(); j++)
+            {
+                Cell c1 = table1.Get(i, j);
+                Cell c2 = table1.Get(2, j);
+                double d = 0d;
+                if (decompOptions2.decompOperator.isRaw)
+                {
+                    d = Math.Abs(c1.value_hack);
+                    if (!G.IsNumericalError(c1.value_hack)) sum += c1.value_hack;
+                }
+                else
+                {
+                    d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                    if (!G.IsNumericalError(c1.value_hack / c2.value_hack * 100d)) sum += c1.value_hack / c2.value_hack * 100d;
+                }
+                if (!G.IsNumericalError(d)) max = Math.Max(max, d);
+                if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+            }            
+            return max;
         }
 
         /// <summary>
@@ -6802,28 +6824,14 @@ namespace Gekko
 
             for (int i2 = 2; i2 <= decompTable.GetRowMaxNumber(); i2++)
             {
-                Cell cellVariableName = decompTable.Get(i2, 1);
-                List<string> vars = new List<string>();
-                Cell cellFirstData = decompTable.Get(i2, 2);
-                string uniqueName = null;
-                if (cellFirstData != null)
-                {
-                    vars = cellFirstData.vars_hack;
-                    uniqueName = Decomp.HiddenVariableHelper(cellFirstData, true);
-                }
-                //string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
-                //string label = null;
-                //if (uniqueName != null) label = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName));
+                Cell cellVariableName = decompTable.Get(i2, 1);                                              
                 string name = cellVariableName.CellText.TextData[0];
                 name = name.Trim();
-
                 string name2 = name;
                 if (walkInfo.ignoreLags) name2 = G.Chop_RemoveLagOrLead(name);
                 if (name2 != name) walkInfo.lagsOrLeadsWereEncountered = true;
-
-                Cell cellData = decompTable.Get(i2, 2);
+                Cell cellData = decompTable.Get(i2, 2); //even though there are often more cols, we only use from the first col. But ignore's are calculated from all cols.
                 double value = cellData.number;
-
                 if (poolingFrom.ContainsKey(name2))
                 {
                     poolingFrom[name2] += value;

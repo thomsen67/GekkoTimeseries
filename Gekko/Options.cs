@@ -54,7 +54,7 @@ namespace Gekko
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
         public bool bugfix_score_even_with_res_vars = false;
-        public bool bugfix_flow_use_full_period = false;
+        public bool bugfix_flow_use_full_period = true;
         public bool bugfix_decomp_lagsleads = false;
         public bool bugfix_dates_fast = true;  //not mentioned in help, set false to use old date parser (on "2020", "2020q01", "2020m1d1", "2020u09" etc. etc.
         public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.        

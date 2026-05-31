@@ -90,7 +90,7 @@ namespace Gekko
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
                 if (Program.options.bugfix_flow_use_full_period) 
                 {
-                    //TODO
+                    walkInfo.t2 = this.decompFind.decompOptions2.t2;
                 }
                 //walkInfo.t1 = new GekkoTime(EFreq.A, 2032, 1);
                 //walkInfo.t2 = new GekkoTime(EFreq.A, 2032, 1);
