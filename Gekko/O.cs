@@ -8874,6 +8874,7 @@ namespace Gekko
                     Gekko.Model model = Program.model;
                     DecompOptions2 decompOptions2 = new DecompOptions2();
                     Decomp.SetSomeDecompOptions(decompOptions2, this.oDecomp);
+                    if (this.oDecomp.isFlowStatement) decompOptions2.guiIsFlowStatement = true;
                     this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, decompOptions2, null, model);                    
 
                     this.decompFind.decompOptions2.t1 = this.t1;

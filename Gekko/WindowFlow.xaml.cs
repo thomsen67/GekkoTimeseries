@@ -88,6 +88,13 @@ namespace Gekko
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = this.decompFind.decompOptions2.t1;
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
+                if (Program.options.bugfix_flow_use_full_period) 
+                {
+                    //TODO
+                }
+                //walkInfo.t1 = new GekkoTime(EFreq.A, 2032, 1);
+                //walkInfo.t2 = new GekkoTime(EFreq.A, 2032, 1);
+
                 walkInfo.visitedDepths = new GekkoDictionaryBlanks<FlowInfo>();
                 walkInfo.nodeNames = new GekkoDictionaryBlanks<string>();
                 walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
@@ -99,12 +106,35 @@ namespace Gekko
                 walkInfo.ignoreLags = true;
                 string varName = this.decompFind.decompOptions2.guiFlowName;
                 int depth = 0;
-                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                if (temp.Count > 0) //if .Count == 0, the window will be empty but not crash...
+
+                string eqName = null;
+                if (this.decompFind.decompOptions2.guiIsFlowUseEquationName)
                 {
-                    string eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                    WalkNodes(depth, graph, varName, eqName, walkInfo);
+                    try
+                    {
+                        eqName = G.Chop_DimensionRemoveLast_FASTER(this.decompFind.decompOptions2.new_from[0]);
+                    }
+                    catch { }
                 }
+                
+                if (eqName == null)
+                {                    
+                    try
+                    {
+                        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
+                        if (temp.Count > 0) //if .Count == 0, the window will be empty but not crash...
+                        {
+                            eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!G.NullOrBlanks(eqName))
+                {
+                    WalkNodes(depth, graph, varName, eqName, walkInfo); //if problems, the window will be empty but not crash...
+                }
+
                 if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;
@@ -361,6 +391,7 @@ namespace Gekko
                             DecompFind decompFindHere = this.decompFind;
                             DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
                             decompFindHereChild.decompOptions2.guiFlowName = G.HandleBlanksRemove(name);
+                            decompFindHereChild.decompOptions2.guiIsFlowUseEquationName = false; //hack
                             CallFlowGraph(decompFindHereChild);                            
                         }
                     }

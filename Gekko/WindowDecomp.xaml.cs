@@ -1183,13 +1183,13 @@ namespace Gekko
 
             border.Child = textBlock;
             dockPanel.Children.Add(border);
-            if (type == GekkoTableTypes.UpperLeft)
+            if (false && type == GekkoTableTypes.UpperLeft)
             {
                 TextBlock infl = new TextBlock();
                 infl.HorizontalAlignment = HorizontalAlignment.Center;
                 infl.VerticalAlignment = VerticalAlignment.Center;
                 infl.FontFamily = Globals.decompFontFamily;
-                infl.FontSize = Globals.decompFontSize - 0;
+                infl.FontSize = Globals.decompFontSize - 1;
                 int padding = 0;
                 double opa = 0.4;
                 infl.Padding = new Thickness(padding, 2, 4, 3);
@@ -1198,7 +1198,7 @@ namespace Gekko
                 infl.Foreground = originalColor;
                 infl.MouseEnter += (s, e) => { infl.Foreground = Brushes.Blue; infl.Opacity = 1.0; };
                 infl.MouseLeave += (s, e) => { infl.Foreground = originalColor; infl.Opacity = opa; };
-                    infl.ToolTip = "Click to see which variables are influenced by the decomposed variable";
+                infl.ToolTip = "Click to see which variables are influenced by the selected variable";
                 infl.Text = "[Influences]";
                 infl.Opacity = opa;
                 dockPanel.Children.Add(infl);
@@ -1310,7 +1310,6 @@ namespace Gekko
 
             return isEndogenous;
         }
-
 
         //public static double delete = 0.15;
 
@@ -3140,6 +3139,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];
+                decompFind.decompOptions2.guiIsFlowUseEquationName = true; //hack
                 WindowFlow.CallFlowGraph(this.decompFind);
             }
         }        
@@ -3256,6 +3256,7 @@ namespace Gekko
         public string modelHash = null;
         // ---
         public bool guiIsFlowStatement = false; //True for "FLOW qBNP ...;", and will activate flowgraph but only for depth==0!
+        public bool guiIsFlowUseEquationName = true; //Complete hack to handle calling from FLOW command or clicking [Flow] in the decomp window (but not for clicking on a node in the flow window).
         public string guiFlowName = null;
         public bool guiFlowRotate = false;        
         public bool guiFlowLagsOrLeadsWereEncountered = false;
@@ -3376,6 +3377,7 @@ namespace Gekko
 
             d.flowgraphDepth = this.flowgraphDepth;
             d.guiIsFlowStatement = this.guiIsFlowStatement;
+            d.guiIsFlowUseEquationName = this.guiIsFlowUseEquationName; //hack
             d.guiFlowName = this.guiFlowName;            
 
             foreach (string s in this.subst)

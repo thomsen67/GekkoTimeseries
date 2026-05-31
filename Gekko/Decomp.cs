@@ -2872,6 +2872,7 @@ namespace Gekko
             {
                 //Flowgraph, and only if called from statement "FLOW ...;", which will have depth == 0.
                 decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];
+                decompFind.decompOptions2.guiIsFlowUseEquationName = true; //hack
                 WindowFlow.CallFlowGraph(decompFind);
             }
             else

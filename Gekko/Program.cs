@@ -29592,6 +29592,10 @@ namespace Gekko
                     {
                         d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_yoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
+                    //gnuplot does not like values too small apparently                    
+                    if (d > 0) d = Math.Max(d, 1e-200);
+                    if (d < 0) d = Math.Min(d, -1e-200);
+
                     i++;                    
 
                     //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
