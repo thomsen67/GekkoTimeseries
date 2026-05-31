@@ -10,7 +10,7 @@ using System.Drawing;
 namespace Gekko
 {
     /// <summary>
-    /// Used to store info on how label, unit, etc. is shown in EquationBrower (html). In this classe so not to pollute anything...
+    /// Used to store info on how label, unit, etc. is shown in EquationBrower (html). In this class so not to pollute anything...
     /// </summary>
     public class HtmlBrowserSettings
     {
@@ -350,7 +350,7 @@ namespace Gekko
             }
             else if (Globals.runningOnTTComputer)
             {
-                DialogResult result = MessageBox.Show("Only a few vars?", "Vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                DialogResult result = MessageBox.Show("Only a few vars?", "vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result == DialogResult.Yes)
                 {
                     vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };
@@ -1226,7 +1226,7 @@ img {border-style: none;
             string settings_find_filename = "find.html";
             string settings_css_filename = "styles.css";            
             string settings_icon_filename = null;
-            string settings_vars_foldername = "Vars";            
+            string settings_vars_foldername = "vars";            
             string settings_commands = null;
             string settings_plot_start = Globals.globalPeriodStart.super.ToString();
             string settings_plot_end = Globals.globalPeriodEnd.super.ToString();
@@ -1507,9 +1507,9 @@ img {border-style: none;
                     string f = null; if (flush) f = "flush(); ";
                     Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
                     //Program.RunGekkoCommands(f + "reset; read <gdx> previous_deep_calibration.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
-                    Program.RunGekkoCommands(f + "reset; read <gdx> baseline_2026May.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration_2026May.zip; " + @"open makrobk_2026May.gbk as traces;", "", 0, new P());
-                    MessageBox.Show("Få ny makrobk.gbk ind! Sæt måske længere historisk periode");
-                }                
+                    //Program.RunGekkoCommands(f + "reset; read <gdx> baseline_2026May.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration_2026May.zip; " + @"open makrobk_2026May.gbk as traces;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; read<gdx> previous_deep_calibration_2025December.gdx; time 2029 2034; model<gms> deep_dynamic_calibration_2025December.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\makrobk-2025-12-15.gbk' as traces;", "", 0, new P()); //hash: b4d0d93, makrobk fra 15/12 2025.                                     
+                }
                 else if (bh.type == EBrowserType.Greu)
                 {
                     //TODO TODO
@@ -2261,7 +2261,8 @@ img {border-style: none;
                         ope0.labelGiven = new List<string>() { kvp.Key + extra2 };
                         ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
-                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReportError) as Series;
+                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                        if (ope0.variable[0] == null) continue;
                         o0.prtElements.Add(ope0);
                         try
                         {
@@ -2483,11 +2484,11 @@ img {border-style: none;
                             {
                                 if (n > 1)
                                 {
-                                    imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.3; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
+                                    imgBlack = "<img class=`img-size` src=`" + "../normal.png" + "` style=`opacity:0.3; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
                                 }
                                 else
                                 {
-                                    imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.0; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
+                                    imgBlack = "<img class=`img-size` src=`" + "../normal.png" + "` style=`opacity:0.0; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
                                 }
                             }
 
@@ -2556,7 +2557,7 @@ img {border-style: none;
                 TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);                
                 html.AppendLine(@"<div class=`list-item-content`>");
                 string visibility = null;
-                string image = "normal.png";
+                string image = "../normal.png";
                 string imageExtra = null;
                 if (childrenCount == 0)
                 {
@@ -2567,7 +2568,7 @@ img {border-style: none;
                     if (WalkTracesForHtmlIsPruned(th, depth))
                     {
                         //Has children but is pruned
-                        image = "normal_red.png";
+                        image = "../normal_red.png";
                         imageExtra = " onclick = `alert('Sub-traces at this depth exist, but have been pruned off for space reasons in this html trace viewer.')` ";
                     }
                 }
@@ -2601,7 +2602,7 @@ img {border-style: none;
                         if (depth == 0 && counter == 0)
                         {
                             html.AppendLine(@"<div class=`list-item-content`>");
-                            html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
+                            html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`../normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
                             html.AppendLine(@"<div style = `font-weight: bold;`>Code</div>");
                             html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
                             html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
@@ -3613,10 +3614,10 @@ img {border-style: none;
             
             // Change folder icon
             if (folder.classList.contains('open')) {
-                this.innerHTML = '<img class=`img-size` src=`checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
+                this.innerHTML = '<img class=`img-size` src=`../checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
             } else
                                 {
-                                    this.innerHTML = '<img class=`img-size` src =`normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
+                                    this.innerHTML = '<img class=`img-size` src =`../normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
                                 }
 
                                 // Recalculate the column width
