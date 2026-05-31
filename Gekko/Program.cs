@@ -17254,7 +17254,7 @@ namespace Gekko
             }
         }
 
-        private static List<string> ModelInfluences(string varnameWithoutFreq)
+        public static List<string> ModelInfluences(string varnameWithoutFreq)
         {
             List<string> d4 = new List<string>();
             if (Program.model?.modelGekko?.dependents != null && Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))

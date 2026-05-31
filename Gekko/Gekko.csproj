@@ -524,6 +524,9 @@
     <Compile Include="WindowFlow.xaml.cs">
       <DependentUpon>WindowFlow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowInfluences.xaml.cs">
+      <DependentUpon>WindowInfluences.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowPlot.xaml.cs">
       <DependentUpon>WindowPlot.xaml</DependentUpon>
     </Compile>
@@ -722,6 +725,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WindowFlow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowInfluences.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

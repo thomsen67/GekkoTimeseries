@@ -1183,7 +1183,7 @@ namespace Gekko
 
             border.Child = textBlock;
             dockPanel.Children.Add(border);
-            if (false && type == GekkoTableTypes.UpperLeft)
+            if (true && type == GekkoTableTypes.UpperLeft)
             {
                 TextBlock infl = new TextBlock();
                 infl.HorizontalAlignment = HorizontalAlignment.Center;
@@ -1773,7 +1773,16 @@ namespace Gekko
                 if (isInfluences)
                 {
                     if (var == null) return;
-                    MessageBox.Show(var + " influences ...");
+                    List<string> m = Program.ModelInfluences(var);
+                    //MessageBox.Show(var + " influences: " + Stringlist.GetListWithCommas(m));
+
+                    List<string> myNames = new List<string> { "John Doe", "Jane Smith", "Alex Carter" };
+                    List<string> myTooltips = new List<string> { "View John's Profile", "View Jane's Profile", "View Alex's Profile" };
+
+                    WindowInfluences popup = new WindowInfluences(myNames, myTooltips);
+                    popup.Owner = this; // Keeps it on top of your main window
+                    popup.ShowDialog(); // Opens as a modal popup
+
                     return;
                 }
 
@@ -3502,6 +3511,12 @@ namespace Gekko
 
             return d;
         }
+    }
+
+    public class HyperlinkItem
+    {
+        public string Name { get; set; }
+        public string ToolTip { get; set; }
     }
 
 }
