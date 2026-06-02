@@ -35599,7 +35599,19 @@ print(df2)
 
                     I("io0a_ras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
                     I("prt <n> io0a_ras;");
-                    
+
+                    if (true)
+                    {
+                        //Only testing special cases
+                        I("#exow0 = (  ('a','a', 0.00),  );"); //0% fixed, same as no #exo
+                        I("io0a_rasw0 = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exow0, %type = 'ras'));");
+                        I("prt <n> io0a_rasw0;");
+                        // ---
+                        I("#exow1 = (  ('a','a', 1.00),  );"); //100% fixed, same as #exo
+                        I("io0a_rasw1 = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exow1, %type = 'ras'));");
+                        I("prt <n> io0a_rasw1;");
+                    }
+
                     I("io0a_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");                    
                     I("prt <n> io0a_entropy;");
 
@@ -35632,15 +35644,7 @@ print(df2)
                     I("prt <n> io0c_entropy;");
 
                     I("io0c_ras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");                    
-                    I("prt <n> io0c_ras;");
-
-                    if (false)
-                    {
-                        I("#exow = (  ('a','a', 0.3),  );"); //only 30% fixed, not 100%
-                        I("io0c_rasw = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exow, %type = 'ras'));");
-                        I("prt <n> io0c_rasw;");
-                        return;
-                    }                    
+                    I("prt <n> io0c_ras;");                     
 
                     I("io0c_gras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'gras'));");                    
                     I("prt <n> io0c_ras;");
@@ -35676,7 +35680,9 @@ print(df2)
                 {
                     if (ii == 0)
                     {
-                        Helper_CompareCells("io0a_ras", "io0a_entropy", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0a_ras", "io0a_entropy", deltaHere, rows, cols, t);                        
+                        Helper_CompareCells("io0a_ras", "io0a_rasw0", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0c_ras", "io0a_rasw1", deltaHere, rows, cols, t);
                         Helper_CompareCells("io0a_ras", "io0a_gras", deltaHere, rows, cols, t);
                         Helper_CompareCells("io0d_entropy", "io0c_ras", deltaHere, rows, cols, t);
                         Helper_CompareCells("io0d_entropy", "io0c_gras", 5d * deltaHere, rows, cols, t); //has to augment
