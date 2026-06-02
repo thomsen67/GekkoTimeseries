@@ -35599,7 +35599,7 @@ print(df2)
 
                     I("io0a_ras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");                    
                     I("prt <n> io0a_ras;");
-
+                    
                     I("io0a_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");                    
                     I("prt <n> io0a_entropy;");
 
@@ -35633,6 +35633,14 @@ print(df2)
 
                     I("io0c_ras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");                    
                     I("prt <n> io0c_ras;");
+
+                    if (false)
+                    {
+                        I("#exow = (  ('a','a', 0.3),  );"); //only 30% fixed, not 100%
+                        I("io0c_rasw = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exow, %type = 'ras'));");
+                        I("prt <n> io0c_rasw;");
+                        return;
+                    }                    
 
                     I("io0c_gras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'gras'));");                    
                     I("prt <n> io0c_ras;");

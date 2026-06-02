@@ -58,13 +58,11 @@ namespace Gekko
             if (keyData == (Keys.Control | Keys.C))
             {
                 string s = this.SelectedText;
-                MessageBox.Show("Copying: " + s);
                 s = System.Text.RegularExpressions.Regex.Replace(s, @"#action:\d+", "");
                 s = System.Text.RegularExpressions.Regex.Replace(s, @"#disp:[A-Za-z_][A-Za-z0-9_]*", "");
                 s = System.Text.RegularExpressions.Regex.Replace(s, @"#disp2:[A-Za-z_][A-Za-z0-9_]*", "");
                 s = System.Text.RegularExpressions.Regex.Replace(s, @"#disp3:[A-Za-z_][A-Za-z0-9_]*", "");
                 s = System.Text.RegularExpressions.Regex.Replace(s, @"#outputtab:\d+", "");
-                MessageBox.Show("Copying: " + s);                
                 Clipboard.SetText(s);
                 return true;
             }
