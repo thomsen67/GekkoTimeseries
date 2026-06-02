@@ -35418,7 +35418,30 @@ print(df2)
         }
 
         [TestMethod]
-        public void _Test_balance()
+        public void _Test_balance2()
+        {
+            //The databank ras_datopgek24_2026-04-08.gbk is real data from g:\DatopGek24\ras on DST, using Gekko 2 and manual loops.
+            //So very good to test up against. With i == 0, we test up against a translation of the manual loops into Gekko 3.
+            //With i == 1, we test up against the inbuilt balance()-function with 'ras' option. This yields the same with a lot of
+            //precision, so it verifies that balance('ras') is ok on real data.
+            //With i == 2, we try to exogenize using #exo, rather than by hand.
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Ras';");
+            for (int i = 0; i <= 1; i++)
+            {
+                I("writefile('options.txt', '" + i + "');"); //Just for safety
+                I("sys'del ras.gbk';"); //Just for safety                
+                I("run kqr;");
+                I("read ras;");
+                I("read <ref> 'ras_datopgek24_2026-04-08.gbk';");
+                Globals.unitTestScreenOutput.Clear();
+                I("compare <2023 2025 pch = 0.00000001>;");
+                string s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("892 common series, 0 differences"));
+            }
+        }
+
+        [TestMethod]
+        public void _Test_balance1()
         {
             //TODO: handle pure == 0d.         
             //TODO: abs() on function? And how do negative cells do?

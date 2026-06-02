@@ -470,7 +470,7 @@ namespace Gekko
                 if (nWeights > 0) new Error("You cannot use weights with RAS (but exo is possible)");
                 DateTime t3 = DateTime.Now;
                 int iterations; double error;
-                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMinIterations, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations, out error);
+                xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMinIterations - 1, o.rasGrasMaxIterations - 1, o.toleranceAbsolute, out iterations, out error);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
@@ -482,7 +482,7 @@ namespace Gekko
                 if (nWeights > 0) new Error("You cannot use weights with GRAS (but exo is possible)");
                 DateTime t3 = DateTime.Now;
                 int iterations; double error;
-                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMinIterations, o.rasGrasMaxIterations, o.toleranceAbsolute, out iterations, out error);
+                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, o.rasGrasMinIterations - 1, o.rasGrasMaxIterations - 1, o.toleranceAbsolute, out iterations, out error);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));

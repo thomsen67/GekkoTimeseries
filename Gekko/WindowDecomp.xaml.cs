@@ -1181,15 +1181,14 @@ namespace Gekko
                 SetBorderThickness(g, i, j, border);
             }
 
-            border.Child = textBlock;
-            dockPanel.Children.Add(border);
+            border.Child = textBlock;            
             if (true && type == GekkoTableTypes.UpperLeft)
             {
                 TextBlock infl = new TextBlock();
-                infl.HorizontalAlignment = HorizontalAlignment.Center;
+                infl.HorizontalAlignment = HorizontalAlignment.Left;
                 infl.VerticalAlignment = VerticalAlignment.Center;
                 infl.FontFamily = Globals.decompFontFamily;
-                infl.FontSize = Globals.decompFontSize - 1;
+                infl.FontSize = Globals.decompFontSize - 0;
                 int padding = 0;
                 double opa = 0.4;
                 infl.Padding = new Thickness(padding, 2, 4, 3);
@@ -1198,11 +1197,12 @@ namespace Gekko
                 infl.Foreground = originalColor;
                 infl.MouseEnter += (s, e) => { infl.Foreground = Brushes.Blue; infl.Opacity = 1.0; };
                 infl.MouseLeave += (s, e) => { infl.Foreground = originalColor; infl.Opacity = opa; };
-                infl.ToolTip = "Click to see which variables are influenced by the selected variable";
-                infl.Text = "[Influences]";
+                infl.ToolTip = "Click to see which variables are influenced by the dependent variable";
+                infl.Text = "[Infl.]";
                 infl.Opacity = opa;
                 dockPanel.Children.Add(infl);
             }
+            dockPanel.Children.Add(border);
             dockPanel.SetValue(Grid.ColumnProperty, j);
             dockPanel.SetValue(Grid.RowProperty, i);
             g.Children.Add(dockPanel);
@@ -1747,9 +1747,7 @@ namespace Gekko
         {
             //#98732498724
             //Click in FIND: #8fdskfesdfw
-
-            bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-
+                        
             TextBlock tb = (TextBlock)sender;
             DockPanel dp = G.FindParent<DockPanel>(tb);
 
@@ -1772,43 +1770,61 @@ namespace Gekko
 
                 if (isInfluences)
                 {
-                    if (var == null) return;
-                    List<string> m = Program.ModelInfluences(var);
-                    //MessageBox.Show(var + " influences: " + Stringlist.GetListWithCommas(m));
-
-                    List<string> myNames = new List<string> { "John Doe", "Jane Smith", "Alex Carter" };
-                    List<string> myTooltips = new List<string> { "View John's Profile", "View Jane's Profile", "View Alex's Profile" };
-
-                    WindowInfluences popup = new WindowInfluences(myNames, myTooltips);
-                    popup.Owner = this; // Keeps it on top of your main window
-                    popup.ShowDialog(); // Opens as a modal popup
-
+                    List<string> myNames = new List<string>();
+                    try
+                    {
+                        if (var == null) return;                        
+                        if (Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                        {
+                            myNames = Program.ModelInfluences(var);
+                        }
+                        else
+                        {
+                            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(var, Program.model.modelGamsScalar.GetDecompT(), Program.model, false, false, false);
+                            myNames = Program.FindDependentVars(var, Program.model, Program.model.modelGams, Program.model.modelGamsScalar, eqsContainingVariable);
+                        }
+                        List<string> myTooltips = new List<string>();
+                        foreach (string s in myNames)
+                        {
+                            myTooltips.Add(s + G.NL + Program.GetVariableExplanation1Line(s, false));
+                        }
+                        WindowInfluences popup = new WindowInfluences(myNames, myTooltips, this.decompFind);
+                        popup.Owner = this;
+                        popup.Title = "Influences (" + var + ")";
+                        popup.ShowDialog();
+                    }
+                    catch { }
                     return;
                 }
 
                 if (var == null)
-                {                    
+                {
                     new Error(Decomp.Text1(1));
                 }
 
                 _activeVariable = var;
-                                
-                if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
-                {
-                    decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
-                    WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
-                }
-                else
-                {
-                    O.Find o = new O.Find(this.decompFind);
-                    List m = new List(new List<string>() { var });
-                    o.iv = m;
-                    o.Exe();
-                }
+                DecompLinkClicked(var, this.decompFind);
             }
             else
             {
                 new Error("Unexpected link error");
+            }
+        }
+
+        public static void DecompLinkClicked(string var, DecompFind decompFind)
+        {            
+            bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+            if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+            {
+                decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
+                WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
+            }
+            else
+            {
+                O.Find o = new O.Find(decompFind);
+                List m = new List(new List<string>() { var });
+                o.iv = m;
+                o.Exe();
             }
         }
 
