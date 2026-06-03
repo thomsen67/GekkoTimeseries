@@ -183,7 +183,6 @@ namespace Gekko
             int nExo_OLD = 0;
             int nExo = 0;
             double[,] weights = null;
-            //bool[,] exo = null;
             int ni = a.GetLength(0);
             int nj = a.GetLength(1);
             int nr = rowSums.Length; //rowTotals run over i

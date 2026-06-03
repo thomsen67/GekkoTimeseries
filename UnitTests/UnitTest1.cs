@@ -35426,15 +35426,15 @@ print(df2)
             //precision, so it verifies that balance('ras') is ok on real data.
             //With i == 2, we try to exogenize using #exo, rather than by hand.
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Ras';");
-            for (int i = 0; i <= 1; i++)
+            for (int i = 2; i <= 2; i++)
             {
                 I("writefile('options.txt', '" + i + "');"); //Just for safety
                 I("sys'del ras.gbk';"); //Just for safety                
-                I("run kqr;");
+                I("run kqr;"); //See c:\Thomas\Gekko\regres\Ras\kqr_2026_06_03.gcm to reproduce this exact commit.
                 I("read ras;");
                 I("read <ref> 'ras_datopgek24_2026-04-08.gbk';");
                 Globals.unitTestScreenOutput.Clear();
-                I("compare <2023 2025 pch = 0.00000001>;");
+                I("compare <2023 2025 pch = 0.00000001>;");                
                 string s = Globals.unitTestScreenOutput.ToString();
                 Assert.IsTrue(s.Contains("892 common series, 0 differences"));
             }
