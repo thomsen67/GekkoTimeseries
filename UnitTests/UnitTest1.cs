@@ -35431,7 +35431,7 @@ print(df2)
                 //if (i == 1) continue; //For some reason this does not work, probably just some code in kqr.gcm. Never mind, i == 2 tests balance() really well.
                 I("writefile('options.txt', '" + i + "');"); //Just for safety
                 I("sys'del ras.gbk';"); //Just for safety                
-                I("run kqr;"); //for this commit, see kqr_2026_06_03a.gcm, reproducing i=1,2,3.
+                I("run kqr;");
                 I("read ras;");
                 I("read <ref> 'ras_datopgek24_2026-04-08.gbk';");
                 Globals.unitTestScreenOutput.Clear();
