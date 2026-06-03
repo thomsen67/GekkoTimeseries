@@ -35430,7 +35430,7 @@ print(df2)
             {
                 I("writefile('options.txt', '" + i + "');"); //Just for safety
                 I("sys'del ras.gbk';"); //Just for safety                
-                I("run kqr;"); //See c:\Thomas\Gekko\regres\Ras\kqr_2026_06_03.gcm to reproduce this exact commit.
+                I("run kqr;");
                 I("read ras;");
                 I("read <ref> 'ras_datopgek24_2026-04-08.gbk';");
                 Globals.unitTestScreenOutput.Clear();
