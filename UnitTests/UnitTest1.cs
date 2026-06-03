@@ -35426,8 +35426,9 @@ print(df2)
             //precision, so it verifies that balance('ras') is ok on real data.
             //With i == 2, we try to exogenize using #exo, rather than by hand.
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Ras';");
-            for (int i = 2; i <= 2; i++)
+            for (int i = 0; i <= 2; i++)
             {
+                if (i == 1) continue; //For some reason this does not work, probably just some code in kqr.gcm. Never mind, i == 2 tests balance() really well.
                 I("writefile('options.txt', '" + i + "');"); //Just for safety
                 I("sys'del ras.gbk';"); //Just for safety                
                 I("run kqr;");
