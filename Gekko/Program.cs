@@ -66,7 +66,7 @@ namespace Gekko
 
     public class xp_example1
     {
-        static gdxcs gdx;
+        static gdxcs gdx; 
         public static void ReportGDXError()
         {
             string S = string.Empty;
