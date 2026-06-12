@@ -11729,6 +11729,7 @@ namespace Gekko
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
+            if (P.IsFunctionOrProcedure(fileName)) return; //the line will not make sense for that case
             G.Writeln(text, Color.Red, true);  //will also be red for a STOP statement, but without counting as an error
             G.Writeln("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueSymbols(problemLine), Color.Blue, true);
         }
