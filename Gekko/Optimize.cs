@@ -60,58 +60,57 @@ namespace Gekko
                 //Options                
                 if (other.Type() == EVariableType.Map)
                 {
-                    IVariable temp = null;
+                    
                     Map options_map = other as Map;
                     //Type can be 'fast', 
-                    if (options_map.storage.TryGetValue("%type", out temp))
-                    {
-                        string s = O.ConvertToString(temp);
-                        if (G.Equal(s, "ras")) o.type = EOptimizeType.Ras;
-                        else if (G.Equal(s, "gras")) o.type = EOptimizeType.Gras;
-                        else if (G.Equal(s, "entropy")) o.type = EOptimizeType.Entropy;
-                        else if (G.Equal(s, "entropy2003")) o.type = EOptimizeType.Entropy2003;
-                        else if (G.Equal(s, "sqdif")) o.type = EOptimizeType.SqDif;
-                        else if (G.Equal(s, "sqrel")) o.type = EOptimizeType.SqRel;
-                        else if (G.Equal(s, "distdif")) o.type = EOptimizeType.DistDif;
-                        else if (G.Equal(s, "distrel")) o.type = EOptimizeType.DistRel;
-                        else new Error("Expected type 'default', 'entropy', 'sqdif', 'sqrel', 'distdif' or 'distrel'");
-                    }
 
-                    if (options_map.storage.TryGetValue("#constraints", out temp))
+                    foreach (KeyValuePair<string, IVariable> kvp in options_map.storage)
                     {
-                        constraints = temp as List;
-                    }
-
-                    if (options_map.storage.TryGetValue("#weights", out temp))
-                    {
-                        weights = temp as List;
-                    }
-
-                    if (options_map.storage.TryGetValue("#exo", out temp))
-                    {
-                        exo = temp as List;
-                    }
-
-                    if (options_map.storage.TryGetValue("%hack", out temp))
-                    {
-                        o.hack = O.ConvertToString(temp);
-                    }
-
-                    if (options_map.storage.TryGetValue("%tol", out temp))
-                    {
-                        o.toleranceAbsolute = O.ConvertToVal(temp);
-                    }
-
-                    if (options_map.storage.TryGetValue("%itermin", out temp))
-                    {
-                        o.rasGrasMinIterations = O.ConvertToInt(temp);
-                    }
-
-                    if (options_map.storage.TryGetValue("%itermax", out temp))
-                    {
-                        o.rasGrasMaxIterations = O.ConvertToInt(temp);
+                        if (G.Equal(kvp.Key, "%type"))
+                        {
+                            string s = O.ConvertToString(kvp.Value);
+                            if (G.Equal(s, "ras")) o.type = EOptimizeType.Ras;
+                            else if (G.Equal(s, "gras")) o.type = EOptimizeType.Gras;
+                            else if (G.Equal(s, "entropy")) o.type = EOptimizeType.Entropy;
+                            else if (G.Equal(s, "entropy2003")) o.type = EOptimizeType.Entropy2003;
+                            else if (G.Equal(s, "sqdif")) o.type = EOptimizeType.SqDif;
+                            else if (G.Equal(s, "sqrel")) o.type = EOptimizeType.SqRel;
+                            else if (G.Equal(s, "distdif")) o.type = EOptimizeType.DistDif;
+                            else if (G.Equal(s, "distrel")) o.type = EOptimizeType.DistRel;
+                            else new Error("Expected type 'default', 'entropy', 'sqdif', 'sqrel', 'distdif' or 'distrel'");
+                        }
+                        else if (G.Equal(kvp.Key, "#constraints"))
+                        {
+                            constraints = kvp.Value as List;
+                        }
+                        else if (G.Equal(kvp.Key, "#weights"))
+                        {
+                            weights = kvp.Value as List;
+                        }
+                        else if (G.Equal(kvp.Key, "#exo"))
+                        {
+                            exo = kvp.Value as List;
+                        }
+                        else if (G.Equal(kvp.Key, "%hack"))
+                        {
+                            o.hack = O.ConvertToString(kvp.Value);
+                        }
+                        else if (G.Equal(kvp.Key, "%tol"))
+                        {
+                            o.toleranceAbsolute = O.ConvertToVal(kvp.Value);
+                        }
+                        else if (G.Equal(kvp.Key, "%itermin"))
+                        {
+                            o.rasGrasMinIterations = O.ConvertToInt(kvp.Value);
+                        }
+                        else if (G.Equal(kvp.Key, "%itermax"))
+                        {
+                            o.rasGrasMaxIterations = O.ConvertToInt(kvp.Value);
+                        }                        
+                        else new Error("balance() function: did not recognize option '" + kvp.Key + "'");
                     }                    
                 }
+                else new Error("Expected map type for options");
             }   
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))

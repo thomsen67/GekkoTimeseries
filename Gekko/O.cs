@@ -953,7 +953,7 @@ namespace Gekko
                 }
                 else if (Program.options.missing == ESeriesMissing.Error)
                 {
-                    //This sets their default values, like when Gekko starts up, of after RESET/RESTART.
+                    //This sets their default values, like when Gekko starts up, or after RESET/RESTART.
                     Program.options.decomp_array_calc_missing = ESeriesMissing.M;  //We do not use .Error here, too confusing with popup error windows in the GUI. Af something is missing, people will try to print it anyway.
                     Program.options.decomp_data_missing = ESeriesMissing.M;
                     Program.options.series_array_calc_missing = ESeriesMissing.Error;
