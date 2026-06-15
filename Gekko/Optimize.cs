@@ -470,13 +470,13 @@ namespace Gekko
                 if (nExtraConstraints > 0) new Error("You cannot use constraints with GRAS (but #exo is possible)");
                 if (nWeights > 0) new Error("You cannot use weights with GRAS (but #exo is possible)");
                 DateTime t3 = DateTime.Now;
-                int iterations; double error;
-                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, boundsFactor, o.rasGrasMinIterations - 1, o.rasGrasMaxIterations - 1, o.toleranceAbsolute, out iterations, out error);
+                int iterations; double error; double error2;
+                xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, boundsFactor, o.rasGrasMinIterations - 1, o.rasGrasMaxIterations - 1, o.toleranceAbsolute, out iterations, out error, out error2);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
                 if (exos.Count > 0) sExtra = " with " + exos.Count + " exogenization" + G.S(exos.Count);
-                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
-                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
+                if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " and error2 " + error2.ToString("G8") + " in " + G.Seconds(t3));
+                G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " and error2 " + error2.ToString("G8") + " in " + G.Seconds(t3));
             }
             else
             {
@@ -954,7 +954,7 @@ namespace Gekko
             return x;
         }
 
-        static double[,] GRAS(double[,] a, double[] r3, double[] c3, double[] boundsLower, double[] boundsUpper, double[] boundsFactor, int iterMin, int iterMax, double tol, out int iterations, out double error)
+        static double[,] GRAS(double[,] a, double[] r3, double[] c3, double[] boundsLower, double[] boundsUpper, double[] boundsFactor, int iterMin, int iterMax, double tol, out int iterations, out double error, out double error2)
         {
             iterations = -1; //signals failure
             int ni = a.GetLength(0);
@@ -1031,8 +1031,36 @@ namespace Gekko
 
             ExoRemove(false, x, null, null, exo, ni, nj);
             iterations = iter;
+
+            error2 = GRASError2(nRows, nCols, x, r3, c3);
+
             return x;
-        }        
+        }
+
+        private static double GRASError2(int nRows, int nCols, double[,] x, double[] r3, double[] c3)
+        {
+            double error2 = 0d;
+            for (int i = 0; i < nRows; i++)
+            {
+                double sum = 0d;
+                for (int j = 0; j < nCols; j++)
+                {
+                    sum += x[i, j];
+                }
+                error2 = Math.Max(error2, Math.Abs(sum - r3[i]));
+            }
+            for (int j = 0; j < nCols; j++)
+            {
+                double sum = 0d;
+                for (int i = 0; i < nRows; i++)
+                {
+                    sum += x[i, j];
+                }                
+                error2 = Math.Max(error2, Math.Abs(sum - c3[j]));
+            }
+
+            return error2;
+        }
 
         private static double GRASError(int nn, double[] s1, double[] s2)
         {
