@@ -344,7 +344,7 @@ namespace Gekko.Parser.Gek
             }
             Program.WriteCallStack(false, p);  //will only be performed once
             throw e;
-            }
+        }
 
         private static void SingletonSuggestion(string problemLine2, string temp1)
         {                      

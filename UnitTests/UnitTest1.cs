@@ -22521,7 +22521,8 @@ namespace UnitTests
         public void _Test_Datahash()
         {            
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            for (int i = 0; i < 7 + 1; i++)
+            //BEWARE: i set from 0 to 99!!
+            for (int i = 0; i < 100 + 1; i++)
             {
                 I("reset;");
                 I("time 2001 2003;");
@@ -22529,16 +22530,42 @@ namespace UnitTests
                 else if (i == 1) I("x = -2, 3, 4;");
                 else if (i == 2) I("x = 2, -3, 4;");
                 else if (i == 3) I("x = 2, 3, -4;");
-                else if (i == 4) I("x = 2, 3, 4; x[2300] = 100; x[2300] = m();");
+                else if (i == 4) I("x = 2, 3, 4; x[2004] = m(); x[2300] = 100; x[2300] = m();");
                 else if (i == 5) I("x <2002 2004> = 2, 3, 4;");
-                else if (i == 6) I("x!q <2002q1 2002q3> = 2, 3, 4;");
-                else if (i == 7) I("y = 2, 3, 4;");
+                else if (i == 6) I("x <2000 2002> = 2, 3, 4;");
+                else if (i == 7) I("x!q <2002q1 2002q3> = 2, 3, 4;");
+                else if (i == 8) I("y = 2, 3, 4;"); //note: y
+                else if (i == 9) I("x <2001 2004> = 2, 3, 4, 5;");
+                else if (i == 10) I("x <2000 2003> = 1, 2, 3, 4;");
+                // ---
+                else if (i == 20) I("#m = map(); #m.x = 2, 3, 4;");
+                else if (i == 21) I("#m = map(); #m.x = -2, 3, 4;");
+                // ---
+                else if (i == 30) I("#m = list(); x = 2, 3, 4; #m.append(x);");
+                else if (i == 31) I("#m = list();  x = -2, 3, 4; #m.append(x);");
+                // ---
+                else if (i == 40) I("%v = 2;");
+                else if (i == 41) I("%v = -2;");
+                // ---
+                else if (i == 50) I("%s = '2';");
+                else if (i == 51) I("%s = '-2';");
+                // ---
+                else if (i == 60) I("%d = 2001q1;");
+                else if (i == 61) I("%d = 2001q2;");
+                else continue;
                 I("write datahash;");
                 Globals.unitTestScreenOutput.Clear();
                 I("read datahash;");
                 string s = Globals.unitTestScreenOutput.ToString();
-                bool b = s.Contains(" (data-hash: " + "f74190d4");
-                if (i == 0) Assert.IsTrue(b);
+                string truth = null;
+                if (i >= 0 && i <= 19) truth = "f74190d4";
+                else if (i >= 20 && i <= 29) truth = "68d44d6f";
+                else if (i >= 30 && i <= 39) truth = "f7d570a2";
+                else if (i >= 40 && i <= 49) truth = "c2cce21a";
+                else if (i >= 50 && i <= 59) truth = "e02e04b1";
+                else if (i >= 60 && i <= 69) truth = "a92e58d1";
+                bool b = s.Contains(" (data-hash: " + truth);
+                if (i == 0 || i == 20 || i == 30 || i == 40 || i == 50 || i == 60) Assert.IsTrue(b);
                 else Assert.IsFalse(b);
             }
         }
