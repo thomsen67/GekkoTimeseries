@@ -25120,7 +25120,7 @@ namespace Gekko
                 bool traceFail = false;
                 TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
                 List<Trace2> tracesToWrite = null;
-                if (!noTrace)
+                if (true) // Bugfix 2/3 2026: was: "if (!noTrace)". Changed this, because even when not writing traces, we need to get them out of the DAG, so they are not part of the timeseries objects!
                 {
                     try
                     {
@@ -25180,7 +25180,7 @@ namespace Gekko
                     //      The databank is dead, as it is in the process of being closed anyway.
                 }
 
-                if (!noTrace)
+                if (true) //was: "if (!noTrace)", see comment above
                 {
                     try
                     {
