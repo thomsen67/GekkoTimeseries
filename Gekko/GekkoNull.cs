@@ -142,9 +142,10 @@ namespace Gekko
             return;
         }
 
-        public void DeepHash(System.Security.Cryptography.SHA256 hash)
+        public void DeepHash(string name, DeepHashHelper helper)
         {
-            //do nothing
+            Hashing.HashEnum1(Hashing.EHashType.Null, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);            
         }
 
     }

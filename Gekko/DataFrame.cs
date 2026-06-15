@@ -150,7 +150,7 @@ namespace Gekko
             //do nothing
         }
 
-        public void DeepHash(System.Security.Cryptography.SHA256 hash)
+        public void DeepHash(string name, DeepHashHelper helper)
         {
             //do nothing
         }

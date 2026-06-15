@@ -593,9 +593,18 @@ namespace Gekko
             }
         }
 
-        public void DeepHash(System.Security.Cryptography.SHA256 hash)
+        public void DeepHash(string name, DeepHashHelper helper)
         {
-            //do nothing for now
+            Hashing.HashEnum1(Hashing.EHashType.List, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+            Hashing.HashInteger(this.list.Count, helper.hash);
+            foreach (IVariable iv in this.list)
+            {
+                if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
+                {
+                    iv.DeepHash(null, helper); //list element has no name, only position
+                }
+            }
         }
     }
 }

@@ -4108,7 +4108,15 @@ namespace Gekko
         {
             StringBuilder sb = new StringBuilder();
             string workingFolder = GetWorkingFolder();
-            sb.AppendLine("==================================================================================");
+            string branch = Program.GetBranch();
+            string sBranch = null;
+            if (!G.NullOrBlanks(branch))
+            {
+                if (branch.Contains(":")) sBranch = " (" + branch + ")";
+                else sBranch = " (branch: " + branch + ")";
+            }
+            string wf = workingFolder + sBranch;
+            sb.AppendLine(new string('=', wf.Length + 4));
             if (type == "large")
             {
                 sb.AppendLine(" Gekko Timeseries Software -- timeseries handling and modeling");
@@ -4155,18 +4163,10 @@ namespace Gekko
 
                 sb.AppendLine(" Program folder: ");
                 sb.AppendLine("   " + pd + exe);                
-            }
-
-            string branch = Program.GetBranch();
-            string sBranch = null;
-            if (!G.NullOrBlanks(branch))
-            {
-                if (branch.Contains(":")) sBranch = " (" + branch + ")";
-                else sBranch = " (branch: " + branch + ")";
-            }
+            }            
                         
             sb.AppendLine(" Working folder: ");
-            sb.AppendLine("   " + workingFolder + sBranch);
+            sb.AppendLine("   " + wf);
 
             if (type == "large")
             {
@@ -4224,7 +4224,7 @@ namespace Gekko
 
 
             }
-            sb.AppendLine("==================================================================================");
+            sb.AppendLine(new string('=', wf.Length + 4));
             sb.AppendLine();
             if (!silent)
             {

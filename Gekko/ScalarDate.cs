@@ -192,9 +192,11 @@ namespace Gekko
             //do nothing
         }
 
-        public void DeepHash(System.Security.Cryptography.SHA256 hash)
+        public void DeepHash(string name, DeepHashHelper helper)
         {
-            //do nothing for now
+            Hashing.HashEnum1(Hashing.EHashType.ScalarDate, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+            Hashing.HashDate(this.date, helper.hash);
         }
     }
 }

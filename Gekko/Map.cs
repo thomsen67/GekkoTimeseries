@@ -301,9 +301,18 @@ namespace Gekko
             }
         }
 
-        public void DeepHash(System.Security.Cryptography.SHA256 hash)
-        {
-            //do nothing for now
+        public void DeepHash(string name, DeepHashHelper helper)
+        {            
+            Hashing.HashEnum1(Hashing.EHashType.Dictionary, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+            Hashing.HashInteger(this.storage.Count, helper.hash);
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase))            
+            {
+                if (!Object.ReferenceEquals(this, kvp.Value)) //if it contains itself
+                {
+                    kvp.Value.DeepHash(kvp.Key, helper); //kvp.Key will get lower-cased later on when Hashing.HashString() is called
+                }
+            }
         }
 
         public EBankType BankType()

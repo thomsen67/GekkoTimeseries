@@ -69,12 +69,15 @@ namespace Gekko
         // ---        
         public bool copy_respect = false;  //yes|no
         // ---        
-        public bool databank_create_auto = true;
+        public bool databank_create_auto = true;        
         public string databank_file_cache = "all"; //[all | nonbgk | none] --> will cache databank files for faster (re)read.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;        
         public string databank_file_gbk_internal = "databank.data";
         public bool databank_file_gbk_underscore = false; //if set to true, when reading a Gekko 2.x gbk databank, a variable like x___a___b is understood as an array-series x[a,b].
+        public bool databank_file_gbk_datahash = true; //calculate data hash code for .gbk files
+        public bool databank_file_gbk_datahash_trace = true; //includes a "flag" to distingusih if there are 0 traces or > 0 traces.
+        public bool databank_file_gbk_datahash_meta = false; //includes metadata for series, except stamps
         public bool databank_search = true;
 
         public bool databank_dlink = false;
@@ -434,6 +437,10 @@ namespace Gekko
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
             Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);                        
             Add("DATABANK FILE GBK UNDERSCORE", Globals.xbool);
+            Add("DATABANK FILE GBK DATAHASH", Globals.xbool);
+            Add("DATABANK FILE GBK DATAHASH META", Globals.xbool);
+            Add("DATABANK FILE GBK DATAHASH TRACE", Globals.xbool);
+
             Add("DATABANK SEARCH", Globals.xbool);            
 
             Add("DATABANK DLINK", Globals.xbool);

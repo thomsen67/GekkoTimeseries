@@ -994,7 +994,6 @@ namespace UnitTests
         {
             G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-
             I("RESET; TIME 2010 2012;");
             I("OPEN <edit> b1;");
             I("xx = 5;");
@@ -22515,8 +22514,33 @@ namespace UnitTests
             Assert.IsTrue(c1.Contains(@"Call stack: Statement line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib4.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm (run-time error in line 72)"));
+        }
 
 
+        [TestMethod]
+        public void _Test_Datahash()
+        {            
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            for (int i = 0; i < 7 + 1; i++)
+            {
+                I("reset;");
+                I("time 2001 2003;");
+                if (i == 0) I("x = 2, 3, 4;");
+                else if (i == 1) I("x = -2, 3, 4;");
+                else if (i == 2) I("x = 2, -3, 4;");
+                else if (i == 3) I("x = 2, 3, -4;");
+                else if (i == 4) I("x = 2, 3, 4; x[2300] = 100; x[2300] = m();");
+                else if (i == 5) I("x <2002 2004> = 2, 3, 4;");
+                else if (i == 6) I("x!q <2002q1 2002q3> = 2, 3, 4;");
+                else if (i == 7) I("y = 2, 3, 4;");
+                I("write datahash;");
+                Globals.unitTestScreenOutput.Clear();
+                I("read datahash;");
+                string s = Globals.unitTestScreenOutput.ToString();
+                bool b = s.Contains(" (data-hash: " + "f74190d4");
+                if (i == 0) Assert.IsTrue(b);
+                else Assert.IsFalse(b);
+            }
         }
 
         [TestMethod]

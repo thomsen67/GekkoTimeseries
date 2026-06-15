@@ -653,9 +653,13 @@ namespace Gekko
             //do nothing
         }
 
-        public void DeepHash(System.Security.Cryptography.SHA256 hash)
+        public void DeepHash(string name, DeepHashHelper helper)
         {
-            //do nothing for now
+            Hashing.HashEnum1(Hashing.EHashType.MatrixDouble, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+            Hashing.HashDoubleArray(this.data, helper.hash);
+            Hashing.HashStringArray(this.rownames.ToArray(), helper.hash);
+            Hashing.HashStringArray(this.colnames.ToArray(), helper.hash);
         }
     }
 }

@@ -207,6 +207,12 @@ namespace Gekko
         Unknown
     }
 
+    public class DeepHashHelper 
+    {
+        public SHA256 hash = SHA256.Create();
+        public bool includeMetadata = false;
+    }
+
     public class CheckboxImageConverter : System.Windows.Data.IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -7101,6 +7107,7 @@ namespace Gekko
                         readInfo.databankVersion = databankTemp2.cacheParameters.databankVersion;
                         readInfo.info1 = databankTemp2.cacheParameters.info1;
                         readInfo.date = databankTemp2.cacheParameters.date;
+                        readInfo.dataHash = databankTemp2.cacheParameters.dataHash;
                         readInfo.nTraces = databankTemp2.cacheParameters.nTraces;
                         readInfo.modelName = databankTemp2.cacheParameters.modelName;
                         readInfo.modelInfo = databankTemp2.cacheParameters.modelInfo;
@@ -7886,6 +7893,13 @@ namespace Gekko
                     readInfo.date = date.InnerText.Trim();
                 }
 
+                XmlNodeList dataHashes = doc.GetElementsByTagName("DataHash");
+                foreach (XmlNode dataHash in dataHashes) //should be only 1 in this loop
+                {
+                    readInfo.dataHash = dataHash.InnerText.Trim();
+                    if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
+                }
+
                 XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
                 foreach (XmlNode modelName in modelNames) //should be only 1 in this loop
                 {
@@ -8054,7 +8068,8 @@ namespace Gekko
                 cacheParameters.databankVersion = readInfo.databankVersion;
                 cacheParameters.info1 = readInfo.info1;
                 cacheParameters.date = readInfo.date;
-                cacheParameters.nTraces = readInfo.nTraces;
+                cacheParameters.dataHash = readInfo.dataHash;
+                cacheParameters.nTraces = readInfo.nTraces;                
 
                 if (Globals.gbkExtraMetadata)
                 {
@@ -23083,10 +23098,9 @@ namespace Gekko
             // + Check out the previous commit, where x1 was set to 101.
             // + The .csv.dlink file should revert, and the .csv file too!
             //
-            // TODO: Make githooks() method being called, adding hooks
-            // TODO: gbk data-hash, måske med viden om traces eller ej (sidste hex)
+            // TODO: Make githooks() method being called, adding hooks            
             // TODO: .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens, "tabel". Tabel for array og subseries.
-            // TODO: Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata).
+            // TODO: Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata). Eller hvad?
             // TODO: Stier hvordan ?
             // TODO: Man skal kunne aborte mht. indlæggelse af ændrede datafiler
 
@@ -25119,14 +25133,24 @@ namespace Gekko
 
                 //Data hash
                 string dataHash = null;
-                if (true)
+                if (Program.options.databank_file_gbk_datahash)
                 {
-                    SHA256 hash = SHA256.Create();
-                    foreach (KeyValuePair<string, IVariable> kvp in databank.storage) kvp.Value.DeepHash(hash);
-                    string hasTraces = "false"; if (tracesToWrite != null && tracesToWrite.Count > 0) hasTraces = "true";
-                    Hashing.HashString("hasTraces: " + hasTraces, hash);
-                    hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-                    dataHash = BitConverter.ToString(hash.Hash!).Replace("-", "").ToLower();
+                    //At this point, the databank has been trimmed regarding series internal arrays                    
+                    DateTime t0 = DateTime.Now;
+                    DeepHashHelper helper = new DeepHashHelper();
+                    helper.includeMetadata = Program.options.databank_file_gbk_datahash_meta;
+                    foreach (var kvp in databank.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)) kvp.Value.DeepHash(kvp.Key, helper);
+                    if (Program.options.databank_file_gbk_datahash_trace)
+                    {
+                        //With this option, we distinguish between a gbk with 0 data-traces and a gbk with > 0 data-traces
+                        //When releasing a databank, traces are sometimes removed. The contents of the data-traces is not hashed.
+                        Hashing.HashEnum1(Hashing.EHashType.SeriesTraces, helper.hash);
+                        int hasTraces = 0; if (tracesToWrite != null && tracesToWrite.Count > 0) hasTraces = 1;
+                        Hashing.HashInteger(hasTraces, helper.hash);
+                    }
+                    helper.hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+                    dataHash = BitConverter.ToString(helper.hash.Hash!).Replace("-", "").ToLower();
+                    G.WritelnGray("Datahash = " + dataHash + ", " + G.Seconds(t0));
                 }
 
                 CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand, dataHash);
@@ -36535,6 +36559,7 @@ namespace Gekko
             public string databankVersion = "";
             public string info1 = null;
             public string date;
+            public string dataHash;
             public string user;
             public string branch;
             public string commit;
@@ -36596,12 +36621,33 @@ namespace Gekko
                     tab.CurRow.Next();
                 }
 
+                string dateAndHash = null;
                 if (!G.NullOrBlanks(this.date))
                 {
-                    tab.CurRow.SetText(1, "Date     : " + this.date);
-                    tab.CurRow.Next();
-                }                
-                
+                    if (!G.NullOrBlanks(this.dataHash))
+                    {
+                        tab.CurRow.SetText(1, "Stamp    : " + this.date + " (data-hash: " + this.dataHash + ")");
+                        tab.CurRow.Next();
+                    }
+                    else
+                    {
+                        tab.CurRow.SetText(1, "Stamp    : " + this.date);
+                        tab.CurRow.Next();
+                    }
+                }
+                else
+                {
+                    if (!G.NullOrBlanks(this.dataHash))
+                    {
+                        tab.CurRow.SetText(1, "Data-hash: " + this.dataHash);
+                        tab.CurRow.Next();
+                    }
+                    else
+                    {
+                        //No printing
+                    }
+                }
+
                 if (open)
                 {
                     tab.CurRow.SetText(1, "Open     : Opened " + fileNameNamePretty + " as '" + this.dbName + "'");
