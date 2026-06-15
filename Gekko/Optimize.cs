@@ -147,7 +147,7 @@ namespace Gekko
                     nj++;
                     double d = (colSums_series.dimensionsStorage.storage[new MultidimElement(new string[] { sj })] as Series).GetDataSimple(t);
                     colSums_array[nj] = d;
-                }                
+                }
 
                 double[,] xResult = Optimize2(a_array, rowSums_array, colSums_array, rowNames_list, colNames_list, constraints, weights, exo, t.ToString(), o);
 
@@ -270,13 +270,14 @@ namespace Gekko
                     }
                 }
             }
-
+            
+            Dictionary<int, bool> exos = new Dictionary<int, bool>();
             if (exo3 != null)
             {
                 //These may in principle be inconsistent regarding the more "normal" constraints.
                 //Using #exo = (('a', 'b'),) amounts to #weights = (('a', 'b', 1), io[a, b][2020]),)
                 //if we are exogenizing that cell. So exo notation is much easier for this.
-                //exo = new bool[ni, nj];
+                //exo = new bool[ni, nj];                
                 List<IVariable> exo2 = O.ConvertToList(exo3);
                 foreach (IVariable temp1 in exo2)
                 {
@@ -302,6 +303,8 @@ namespace Gekko
                         double d = O.ConvertToVal(temp2[2]);
                         boundsFactor[k] = d;
                     }
+                    //Here, we do not care if boundsFactor[k] == 0, even though it means no exogenization of any part of the cell
+                    if (!exos.ContainsKey(k)) exos.Add(k, true);
                 }
             }
 
@@ -458,6 +461,7 @@ namespace Gekko
                 xResult = RAS(a, rowSums, colSums, boundsLower, boundsUpper, boundsFactor, o.rasGrasMinIterations - 1, o.rasGrasMaxIterations - 1, o.toleranceAbsolute, out iterations, out error);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
+                if (exos.Count > 0) sExtra = " with " + exos.Count + " exogenization" + G.S(exos.Count);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
             }
@@ -470,6 +474,7 @@ namespace Gekko
                 xResult = GRAS(a, rowSums, colSums, boundsLower, boundsUpper, boundsFactor, o.rasGrasMinIterations - 1, o.rasGrasMaxIterations - 1, o.toleranceAbsolute, out iterations, out error);
                 string sExtra = null;
                 if (nExo_OLD > 0) sExtra = " with " + nWeights + " constraints" + G.S(nExo_OLD);
+                if (exos.Count > 0) sExtra = " with " + exos.Count + " exogenization" + G.S(exos.Count);
                 if (iterations == -1) new Error("Optimization " + period + " (" + o.type + ") failed on " + ni + "x" + nj + " cells" + sExtra + " using " + o.rasGrasMaxIterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
                 G.Writeln2("Optimized " + period + " (" + o.type + ") " + ni + "x" + nj + " cells" + sExtra + " using " + iterations + " iteration" + G.S(iterations) + " with error " + error.ToString("G8") + " in " + G.Seconds(t3));
             }
@@ -928,7 +933,7 @@ namespace Gekko
             double[] c2 = (double[])c.Clone();
             double[,] x = (double[,])a.Clone();
 
-            double[,] exo = Bounds2Exo(boundsLower, boundsUpper, boundsFactor, ni, nj);
+            double[,] exo = Bounds2Exo(boundsLower, boundsUpper, boundsFactor, ni, nj);            
             ExoRemove(true, x, r2, c2, exo, ni, nj);
 
             max = double.NaN;
@@ -985,7 +990,7 @@ namespace Gekko
             col1 = ScaleRowOrColumn(positive, negative, row1, colTarget, false); //col update
             row1 = ScaleRowOrColumn(positive, negative, col1, rowTarget, true); //row udate
             col2 = ScaleRowOrColumn(positive, negative, row1, colTarget, false); //col update
-                        
+
             error = GRASError(nCols, col1, col2);
 
             bool converged = false;
@@ -1002,7 +1007,7 @@ namespace Gekko
                 row1 = ScaleRowOrColumn(positive, negative, col1, rowTarget, true);
                 //Scale column
                 col2 = ScaleRowOrColumn(positive, negative, row1, colTarget, false);
-                error = GRASError(nCols, col1, col2);                
+                error = GRASError(nCols, col1, col2);
             }
 
             if (!converged)
@@ -1027,7 +1032,7 @@ namespace Gekko
             ExoRemove(false, x, null, null, exo, ni, nj);
             iterations = iter;
             return x;
-        }
+        }        
 
         private static double GRASError(int nn, double[] s1, double[] s2)
         {
