@@ -96,8 +96,8 @@ namespace Gekko.Parser.Gek
 
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams.CompilerOptions = Program.GetCompilerOptions();  //has no effect it seems
-            compilerParams.GenerateInMemory = false;  //cannot be set true, since the .gcm dll needs to refer to the user defined functions dll. But this should not be a problem.
-            compilerParams.IncludeDebugInformation = false; //CHanged, maybe change back
+            compilerParams.GenerateInMemory = false;  //It seems it can be set to true. In that case a file is made for a split second, and erased afterward. No persistence of the file. Generating 100% only in memory seems to demand Roslyn compiler.
+            compilerParams.IncludeDebugInformation = false; //Changed, maybe change back
             compilerParams.ReferencedAssemblies.Add("system.dll");
             compilerParams.ReferencedAssemblies.Add("system.windows.forms.dll");
             compilerParams.ReferencedAssemblies.Add("system.drawing.dll");
