@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
+using System.IO;
 
 namespace Gekko
 {
@@ -402,11 +399,11 @@ namespace Gekko
             }
             else if (type == EPrintTypes.Print)
             {
-                if (n > Program.options.print_elements_max)
+                if (n > Program.options.print_elements_max && o.opt_filename == null)
                 {
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
-                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max + ". You can use PRT<nomax> or set OPTION print elements max = ... ;");                        
+                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max + " (unless 'prt ... file=...' is used). You can use PRT<nomax> or set OPTION print elements max = ... ;");                        
                     }
                 }
             }
@@ -506,21 +503,6 @@ namespace Gekko
             string dateType = o.opt_datetype;
             string dateFormat = o.opt_dateformat;
 
-            //if (type == EPrintTypes.Sheet)
-            //{
-            //    if (pretty == true)
-            //    {
-            //        using (Error txt = new Error())
-            //        {
-            //            txt.MainAdd("When writing to Excel while using 'option sheet freq = pretty;', <dateformat=...> cannot be <> 'gekko' and <datetype=...> cannot be <> 'text'.");
-                        
-            //            //dateformat must be null or 'gekko' 
-            //            //datetype must be null or 'text'
-            //        }
-            //        //Program.options.sheet_freq
-            //    }
-            //}
-
             if (type == EPrintTypes.Plot)
             {
                 if (G.Equal(System.IO.Path.GetExtension(o.opt_filename), ".parquet"))
@@ -602,9 +584,26 @@ namespace Gekko
                     Program.options.print_width = int.MaxValue;
                     try
                     {
-                        G.Writeln("");
                         List<string> ss = printTable.Print();
-                        foreach (string s in ss) G.Writeln(s);
+                        if (o.opt_filename == null)
+                        {
+                            G.Writeln("");
+                            foreach (string s in ss) G.Writeln(s);
+                        }
+                        else
+                        {
+                            //prt ... file = ...;                            
+                            string f2 = Program.CreateFullPathAndFileName(G.StripQuotes(o.opt_filename));
+                            using (FileStream fs = Program.WaitForFileStream(f2, null, Program.GekkoFileReadOrWrite.Write))
+                            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                            {
+                                foreach (string s in ss) sw.WriteLine(s);
+                                sw.Flush();
+                                sw.Close();
+                                new Writeln("");
+                                new Writeln("Data written to text file '" + f2 + "'");
+                            }
+                        }
                     }
                     finally
                     {
