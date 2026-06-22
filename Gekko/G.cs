@@ -4116,7 +4116,7 @@ namespace Gekko
                 else sBranch = " (branch: " + branch + ")";
             }
             string wf = workingFolder + sBranch;
-            sb.AppendLine(new string('=', wf.Length + 4));
+            sb.AppendLine(new string('=', Math.Min(60, wf.Length + 4))); //See #77afakjhf
             if (type == "large")
             {
                 sb.AppendLine(" Gekko Timeseries Software -- timeseries handling and modeling");
@@ -4223,8 +4223,8 @@ namespace Gekko
                 catch { };  //fail silently               
 
 
-            }
-            sb.AppendLine(new string('=', wf.Length + 4));
+            }            
+            sb.AppendLine(new string('=', Math.Min(60, wf.Length + 4))); //See #77afakjhf
             sb.AppendLine();
             if (!silent)
             {
